@@ -1,17 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Card from './card'
-import { CARD_RESIZED, CARD_DRAG_STOPPED } from './action-types'
+import { CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED } from './action-types'
 
-const presentation = ({ cards, onResize, onDragStop }) => {
+const presentation = ({ cards, onDragStop, onResize, onResizeStop }) => {
   return (
   <div id='board'>
     {cards.valueSeq().map(card =>
       <Card
         key={card.get('id')}
         card={card}
-        onResize={onResize}
         onDragStop={onDragStop}
+        onResize={onResize}
+        onResizeStop={onResizeStop}
       />
     )}
   </div>
@@ -27,8 +28,11 @@ const mapDispatchToProps = (dispatch) => {
     onDragStop: (id, d) => {
       dispatch({type: CARD_DRAG_STOPPED, id: id, x: d.x, y: d.y})
     },
-    onResize: (id, ref, position) => {
-      dispatch({type: CARD_RESIZED, id: id, width: ref.offsetWidth, height: ref.offsetHeight, x: position.x, y: position.y})
+    onResize: (id, ref) => {
+      dispatch({type: CARD_RESIZED, id: id, width: ref.offsetWidth, height: ref.offsetHeight})
+    },
+    onResizeStop: (id, ref) => {
+      dispatch({type: CARD_RESIZE_STOPPED, id: id, width: ref.offsetWidth, height: ref.offsetHeight})
     }
   }
 }
