@@ -1,7 +1,7 @@
 import { Map, List } from 'immutable'
 import { EditorState } from 'draft-js'
 import uuid from 'uuid/v4'
-import { INITIALIZE_IF_EMPTY, CARD_CREATED, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_EDITOR_CHANGED, CARD_SELECTED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS} from './action-types'
 
 const GRID_SIZE = 5
 const CARD_DEFAULT_WIDTH = 200
@@ -75,12 +75,16 @@ function cardEditorChanged(state, id, editorState) {
 }
 
 function cardSelected(state, id) {
+  return state.setIn(['cards', id, 'selected'], true)
+}
+
+function clearSelections(state) {
   state.get('cards').forEach((card, idx) => {
     if (card.get('selected')) {
       state = state.setIn(['cards', idx, 'selected'], false)
     }
   })
-  return state.setIn(['cards', id, 'selected'], true)
+  return state
 }
 
 function Reducer(state, action) {
@@ -104,6 +108,9 @@ function Reducer(state, action) {
 
     case CARD_SELECTED:
       return cardSelected(state, action.id)
+
+    case CLEAR_SELECTIONS:
+      return clearSelections(state)
 
     case '@@redux/INIT':
       return state;

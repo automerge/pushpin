@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Card from './card'
-import { CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_CREATED } from './action-types'
+import { CARD_CREATED, CLEAR_SELECTIONS } from './action-types'
 
 const style = {
   width: 2410,
@@ -9,18 +9,17 @@ const style = {
   background: '#e8e8ee'
 }
 
-const presentation = ({ cards, onDrag, onDragStop, onResize, onResizeStop, onDoubleClick }) => {
+const presentation = ({ cards, onDrag, onDragStop, onResize, onResizeStop, onClick, onDoubleClick }) => {
   return (
   <div
     id='board'
+    onClick={onClick}
     onDoubleClick={onDoubleClick}
     style={style}>
     {cards.valueSeq().map(card =>
       <Card
         key={card.get('id')}
         card={card}
-        onDragStop={onDragStop}
-        onResizeStop={onResizeStop}
       />
     )}
   </div>
@@ -33,13 +32,11 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onDragStop: (id, d) => {
-      dispatch({type: CARD_DRAG_STOPPED, id: id, x: d.x, y: d.y})
-    },
-    onResizeStop: (id, ref) => {
-      dispatch({type: CARD_RESIZE_STOPPED, id: id, width: ref.offsetWidth, height: ref.offsetHeight})
+    onClick: (e) => {
+      dispatch({type: CLEAR_SELECTIONS})
     },
     onDoubleClick: (e) => {
+      dispatch({type: CLEAR_SELECTIONS})
       dispatch({type: CARD_CREATED, x: e.pageX, y: e.pageY, selected: true})
     }
   }

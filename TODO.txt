@@ -1,13 +1,11 @@
 ## In progress
 
 ## Technical
-Try refactoring card callbacks to move next to card data
 
 ## Functional
-Drop selection when clicking outside any card
+Select even when clicking around edge of card?
 Do something with text when leaving focus
 Include image
-Outline card when selected
 Seperate color bar, white cards
 Screen maxes at size of board (including scroll)
 Cards created with random color

@@ -22,7 +22,10 @@ class InlineEditorPresentation extends React.Component {
       this.setState({editorState: editorState})
       props.onChange(props.cardId, editorState)
     }
-    this.focus = () => {
+    this.focus = (e) => {
+      if (e) {
+        e.stopPropagation()
+      }
       this.refs.editor.focus()
       props.onSelected(props.cardId)
     }
