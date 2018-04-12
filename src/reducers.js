@@ -1,6 +1,6 @@
 import { Map, List } from 'immutable'
 import uuid from 'uuid/v4'
-import { INITIALIZE_IF_EMPTY, CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED, CARD_CREATED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_DRAGGED, CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED, CARD_CREATED } from './action-types'
 
 const GRID_SIZE = 5
 const CARD_DEFAULT_WIDTH = 200
@@ -40,18 +40,14 @@ function cardDragStopped(state, id, x, y) {
   })
 }
 
-function cardResized(state, id, width, height) {
-  return state.updateIn(['cards', id], (card) => {
-    return card
-      .set('width', width)
-      .set('height', height)
-  })
-}
-
 function cardResizeStopped(state, id, width, height) {
   const snapWidth = snapToGrid(width)
   const snapHeight = snapToGrid(height)
-  return cardResized(state, id, snapWidth, snapHeight)
+  return state.updateIn(['cards', id], (card) => {
+    return card
+      .set('width', snapWidth)
+      .set('height', snapHeight)
+  })
 }
 
 function cardCreated(state, x, y) {
@@ -73,12 +69,9 @@ function Reducer(state, action) {
   switch (action.type) {
     case INITIALIZE_IF_EMPTY:
       return initializeIfEmpty(state);
-    
+
     case CARD_DRAG_STOPPED:
       return cardDragStopped(state, action.id, action.x, action.y)
-
-    case CARD_RESIZED:
-      return cardResized(state, action.id, action.width, action.height)
 
     case CARD_RESIZE_STOPPED:
       return cardResizeStopped(state, action.id, action.width, action.height)

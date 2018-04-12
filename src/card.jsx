@@ -16,7 +16,7 @@ const resizeAvailable = {
   topRight: false, bottomLeft: false, topLeft: false
 }
 
-const presentation = ({ card, onDragStop, onResize, onResizeStop }) => {
+const presentation = ({ card, onDragStop, onResizeStop }) => {
   return (
   <Rnd
     style={style}
@@ -24,7 +24,6 @@ const presentation = ({ card, onDragStop, onResize, onResizeStop }) => {
     enableResizing={resizeAvailable}
     position={{ x: card.get('x'), y: card.get('y') }}
     onDragStop={(e, d) => { onDragStop(card.get('id'), d) }}
-    onResize={(e, direction, ref, delta, position) => { onResize(card.get('id'), ref) }}
     onResizeStop={(e, direction, ref, delta, position) => { onResizeStop(card.get('id'), ref) }}
   >
     <InlineEditor />

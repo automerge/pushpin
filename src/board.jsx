@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Card from './card'
-import { CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED, CARD_CREATED } from './action-types'
+import { CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_CREATED } from './action-types'
 
 const style = {
   width: 2410,
@@ -9,7 +9,7 @@ const style = {
   background: '#e8e8ee'
 }
 
-const presentation = ({ cards, onDragStop, onResize, onResizeStop, onDoubleClick }) => {
+const presentation = ({ cards, onDrag, onDragStop, onResize, onResizeStop, onDoubleClick }) => {
   return (
   <div
     id='board'
@@ -20,7 +20,6 @@ const presentation = ({ cards, onDragStop, onResize, onResizeStop, onDoubleClick
         key={card.get('id')}
         card={card}
         onDragStop={onDragStop}
-        onResize={onResize}
         onResizeStop={onResizeStop}
       />
     )}
@@ -36,9 +35,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onDragStop: (id, d) => {
       dispatch({type: CARD_DRAG_STOPPED, id: id, x: d.x, y: d.y})
-    },
-    onResize: (id, ref) => {
-      dispatch({type: CARD_RESIZED, id: id, width: ref.offsetWidth, height: ref.offsetHeight})
     },
     onResizeStop: (id, ref) => {
       dispatch({type: CARD_RESIZE_STOPPED, id: id, width: ref.offsetWidth, height: ref.offsetHeight})
