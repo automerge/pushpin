@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { RootState, Reducer } from './reducers'
 import Board from './board'
+import InlineEditor from './inline-editor'
 import { INITIALIZE_IF_EMPTY } from './action-types'
 
 const init = () => {
@@ -16,7 +17,7 @@ const render = (store) => {
   ReactDOM.render(
     <Provider store={store}>
       <div>
-        <Board />
+        <InlineEditor />
       </div>
     </Provider>,
     document.getElementById('container')
