@@ -28,6 +28,11 @@ class InlineEditorPresentation extends React.Component {
     }
   }
 
+  componentDidMount() {
+    if (this.props.createFocus) {
+      this.focus()
+    }
+  }
   render() {
     return (
       <div style={styles} onClick={this.focus}>

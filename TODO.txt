@@ -1,5 +1,4 @@
 ## In progress
-Double-click create puts you directly in edit
 
 ## Technical
 Try refactoring card callbacks to move next to card data

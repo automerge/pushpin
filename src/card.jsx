@@ -30,6 +30,7 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
     <InlineEditor
       cardId={card.get('id')}
       editorState={card.get('editorState')}
+      createFocus={card.get('selected')}
     />
   </Rnd>
   )
