@@ -4,8 +4,8 @@ import Card from './card'
 import { CARD_CREATED, CLEAR_SELECTIONS } from './action-types'
 
 const style = {
-  width: 2410,
-  height: 1000,
+  width: 3600,
+  height: 1200,
   background: '#e8e8ee'
 }
 
