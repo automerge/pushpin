@@ -40,7 +40,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({type: CARD_RESIZE_STOPPED, id: id, width: ref.offsetWidth, height: ref.offsetHeight})
     },
     onDoubleClick: (e) => {
-      dispatch({type: CARD_CREATED, x: e.pageX, y: e.pageY, focused: true})
+      dispatch({type: CARD_CREATED, x: e.pageX, y: e.pageY, selected: true})
     }
   }
 }

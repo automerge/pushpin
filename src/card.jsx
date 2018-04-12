@@ -20,6 +20,7 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
   return (
   <Rnd
     style={style}
+    className={ card.get('selected') ? 'selected' : 'unselected' }
     size={{ width: card.get('width'), height: card.get('height') }}
     enableResizing={resizeAvailable}
     position={{ x: card.get('x'), y: card.get('y') }}
@@ -29,7 +30,6 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
     <InlineEditor
       cardId={card.get('id')}
       editorState={card.get('editorState')}
-      focused={card.get('focused')}
     />
   </Rnd>
   )

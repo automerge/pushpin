@@ -5,6 +5,7 @@ Double-click create puts you directly in edit
 Try refactoring card callbacks to move next to card data
 
 ## Functional
+Drop selection when clicking outside any card
 Do something with text when leaving focus
 Include image
 Outline card when selected

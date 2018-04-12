@@ -1,7 +1,7 @@
 import { Map, List } from 'immutable'
 import { EditorState } from 'draft-js'
 import uuid from 'uuid/v4'
-import { INITIALIZE_IF_EMPTY, CARD_CREATED, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_EDITOR_CHANGED} from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_EDITOR_CHANGED, CARD_SELECTED } from './action-types'
 
 const GRID_SIZE = 5
 const CARD_DEFAULT_WIDTH = 200
@@ -31,19 +31,23 @@ function initializeIfEmpty(state) {
   return state
 }
 
-function cardCreated(state, x, y, focused) {
+function cardCreated(state, x, y, selected) {
   const id = uuid()
   const snapX = snapToGrid(x)
   const snapY = snapToGrid(y)
-  return state.setIn(['cards', id], new Map({
+  state = state.setIn(['cards', id], new Map({
     id: id,
-    x: x,
-    y: y,
+    x: snapX,
+    y: snapY,
     width: CARD_DEFAULT_WIDTH,
     height: CARD_DEFAULT_HEIGHT,
-    focused: focused,
+    selected: false,
     editorState: EditorState.createEmpty()
   }))
+  if (selected) {
+    state = cardSelected(state, id)
+  }
+  return state
 }
 
 function cardDragStopped(state, id, x, y) {
@@ -70,6 +74,15 @@ function cardEditorChanged(state, id, editorState) {
   return state.setIn(['cards', id, 'editorState'], editorState)
 }
 
+function cardSelected(state, id) {
+  state.get('cards').forEach((card, idx) => {
+    if (card.get('selected')) {
+      state = state.setIn(['cards', idx, 'selected'], false)
+    }
+  })
+  return state.setIn(['cards', id, 'selected'], true)
+}
+
 function Reducer(state, action) {
   console.log(action)
 
@@ -78,7 +91,7 @@ function Reducer(state, action) {
       return initializeIfEmpty(state);
 
     case CARD_CREATED:
-      return cardCreated(state, action.x, action.y, action.focused)
+      return cardCreated(state, action.x, action.y, action.selected)
 
     case CARD_DRAG_STOPPED:
       return cardDragStopped(state, action.id, action.x, action.y)
@@ -88,6 +101,9 @@ function Reducer(state, action) {
 
     case CARD_EDITOR_CHANGED:
       return cardEditorChanged(state, action.id, action.editorState)
+
+    case CARD_SELECTED:
+      return cardSelected(state, action.id)
 
     case '@@redux/INIT':
       return state;
