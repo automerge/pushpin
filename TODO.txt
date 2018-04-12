@@ -1,5 +1,4 @@
 ## In progress
-Editor state in Redux
 Double-click create puts you directly in edit
 
 ## Technical
@@ -15,6 +14,7 @@ Cards created with random color
 Hold space to pan
 Can do basic text formatting with b/i/u
 More advanced text formatting
+Don't create new card when double-clicking within existing card
 
 ## Styling
 More appealing background with dots

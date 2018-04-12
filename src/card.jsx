@@ -26,7 +26,11 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
     onDragStop={(e, d) => { onDragStop(card.get('id'), d) }}
     onResizeStop={(e, direction, ref, delta, position) => { onResizeStop(card.get('id'), ref) }}
   >
-    <InlineEditor />
+    <InlineEditor
+      cardId={card.get('id')}
+      editorState={card.get('editorState')}
+      focused={card.get('focused')}
+    />
   </Rnd>
   )
 }

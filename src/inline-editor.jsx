@@ -1,5 +1,7 @@
 import React from 'react'
-import {Editor, EditorState} from 'draft-js'
+import { connect } from 'react-redux'
+import {Editor} from 'draft-js'
+import { CARD_EDITOR_CHANGED } from './action-types'
 
 const styles = {
   fontFamily: '\'Helvetica\', sans-serif',
@@ -12,12 +14,17 @@ const styles = {
   height: '100%',
 }
 
-class InlineEditor extends React.Component {
+class InlineEditorPresentation extends React.Component {
   constructor(props) {
-    super(props);
-    this.state = {editorState: EditorState.createEmpty()};
-    this.focus = () => this.editor.focus();
-    this.onChange = (editorState) => this.setState({editorState});
+    super(props)
+    this.state = {editorState: props.editorState}
+    this.onChange = (editorState) => {
+      this.setState({editorState: editorState})
+      props.onChange(props.cardId, editorState)
+    }
+    this.focus = () => {
+      this.refs.editor.focus()
+    }
   }
 
   render() {
@@ -25,12 +32,22 @@ class InlineEditor extends React.Component {
       <div style={styles} onClick={this.focus}>
         <Editor
           editorState={this.state.editorState}
-          onChange={(editorState) => { this.onChange(editorState) }}
-          ref={(ref) => this.editor = ref}
+          onChange={this.onChange}
+          ref='editor'
         />
       </div>
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onChange: (id, editorState) => {
+      dispatch({type: CARD_EDITOR_CHANGED, id: id, editorState: editorState })
+    }
+  }
+}
+
+const InlineEditor = connect(null, mapDispatchToProps)(InlineEditorPresentation)
 
 export default InlineEditor

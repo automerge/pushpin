@@ -1,6 +1,7 @@
 import { Map, List } from 'immutable'
+import { EditorState } from 'draft-js'
 import uuid from 'uuid/v4'
-import { INITIALIZE_IF_EMPTY, CARD_DRAGGED, CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED, CARD_CREATED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_EDITOR_CHANGED} from './action-types'
 
 const GRID_SIZE = 5
 const CARD_DEFAULT_WIDTH = 200
@@ -24,10 +25,25 @@ function snapToGrid(num) {
 }
 
 function initializeIfEmpty(state) {
-  state = cardCreated(state, 50, 50)
-  state = cardCreated(state, 200, 400)
-  state = cardCreated(state, 400, 200)
+  state = cardCreated(state, 50, 50, false)
+  state = cardCreated(state, 200, 400, false)
+  state = cardCreated(state, 400, 200, false)
   return state
+}
+
+function cardCreated(state, x, y, focused) {
+  const id = uuid()
+  const snapX = snapToGrid(x)
+  const snapY = snapToGrid(y)
+  return state.setIn(['cards', id], new Map({
+    id: id,
+    x: x,
+    y: y,
+    width: CARD_DEFAULT_WIDTH,
+    height: CARD_DEFAULT_HEIGHT,
+    focused: focused,
+    editorState: EditorState.createEmpty()
+  }))
 }
 
 function cardDragStopped(state, id, x, y) {
@@ -50,17 +66,8 @@ function cardResizeStopped(state, id, width, height) {
   })
 }
 
-function cardCreated(state, x, y) {
-  const id = uuid()
-  const snapX = snapToGrid(x)
-  const snapY = snapToGrid(y)
-  return state.setIn(['cards', id], new Map({
-    id: id,
-    x: x,
-    y: y,
-    width: CARD_DEFAULT_WIDTH,
-    height: CARD_DEFAULT_HEIGHT
-  }))
+function cardEditorChanged(state, id, editorState) {
+  return state.setIn(['cards', id, 'editorState'], editorState)
 }
 
 function Reducer(state, action) {
@@ -70,14 +77,17 @@ function Reducer(state, action) {
     case INITIALIZE_IF_EMPTY:
       return initializeIfEmpty(state);
 
+    case CARD_CREATED:
+      return cardCreated(state, action.x, action.y, action.focused)
+
     case CARD_DRAG_STOPPED:
       return cardDragStopped(state, action.id, action.x, action.y)
 
     case CARD_RESIZE_STOPPED:
       return cardResizeStopped(state, action.id, action.width, action.height)
 
-    case CARD_CREATED:
-      return cardCreated(state, action.x, action.y)
+    case CARD_EDITOR_CHANGED:
+      return cardEditorChanged(state, action.id, action.editorState)
 
     case '@@redux/INIT':
       return state;
