@@ -4,8 +4,8 @@ import Card from './card'
 import { CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED } from './action-types'
 
 const style = {
-  width: 2900,
-  height: 1200,
+  width: 2410,
+  height: 1000,
   background: '#e8e8ee'
 }
 
