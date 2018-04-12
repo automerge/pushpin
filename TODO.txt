@@ -1,0 +1,20 @@
+## In progress
+Double-click create puts you directly in edit
+
+## Technical
+Try refactoring card callbacks to move next to card data
+
+## Functional
+Editor state in Redux
+Do something with text when leaving focus
+Include image
+Outline card when selected
+Seperate color bar, white cards
+Screen maxes at size of board (including scroll)
+Cards created with random color
+Hold space to pan
+Can do basic text formatting with b/i/u
+More advanced text formatting
+
+## Styling
+More appealing background with dots
