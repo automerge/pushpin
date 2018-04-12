@@ -20,9 +20,9 @@ function snapTo(num, gridSize) {
 function initializeIfEmpty(state) {
   return state.update('cards', (cards) => {
     return cards
-      .set('1', new Map({id: '1', text: 'first card',  width: 150, height: 100, x: 50,  y: 50}))
-      .set('2', new Map({id: '2', text: 'second card', width: 150, height: 100, x: 200, y: 400}))
-      .set('3', new Map({id: '3', text: 'third card',  width: 150, height: 100, x: 400, y: 200}))
+      .set('1', new Map({id: '1', text: 'first card',  width: 200, height: 150, x: 50,  y: 50}))
+      .set('2', new Map({id: '2', text: 'second card', width: 200, height: 150, x: 200, y: 400}))
+      .set('3', new Map({id: '3', text: 'third card',  width: 200, height: 150, x: 400, y: 200}))
   })
 }
 

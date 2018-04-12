@@ -1,12 +1,13 @@
 import React from 'react'
 import Rnd from 'react-rnd'
+import InlineEditor from './inline-editor'
 
 const style = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  border: 'solid 1px #ddd',
-  background: '#f0f0f0',
+  padding: 15,
+  background: '#ff7eb9',
 }
 
 const resizeAvailable = {
@@ -26,7 +27,7 @@ const presentation = ({ card, onDragStop, onResize, onResizeStop }) => {
     onResize={(e, direction, ref, delta, position) => { onResize(card.get('id'), ref) }}
     onResizeStop={(e, direction, ref, delta, position) => { onResizeStop(card.get('id'), ref) }}
   >
-    { card.get('text') }
+    <InlineEditor />
   </Rnd>
   )
 }

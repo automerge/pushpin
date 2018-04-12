@@ -2,7 +2,7 @@ import React from 'react'
 import {Editor, EditorState} from 'draft-js'
 
 class InlineEditor extends React.Component {
-  constructor(ed) {
+  constructor(props) {
     super(props);
     this.state = {editorState: EditorState.createEmpty()};
     this.focus = () => this.editor.focus();
@@ -11,34 +11,26 @@ class InlineEditor extends React.Component {
 
   render() {
     return (
-      <div id='editorWrapper' style={styles.editorWrapper}>
-        <div id='editor' style={styles.editor} onClick={this.focus}>
-          <Editor
-            editorState={this.state.editorState}
-            onChange={(editorState) => { console.log(editorState.getCurrentContent().getPlainText('\n')); this.onChange(editorState) }}
-            ref={(ref) => this.editor = ref}
-          />
-        </div>
+      <div style={styles} onClick={this.focus}>
+        <Editor
+          editorState={this.state.editorState}
+          onChange={(editorState) => { console.log(editorState.getCurrentContent().getPlainText('\n')); this.onChange(editorState) }}
+          ref={(ref) => this.editor = ref}
+        />
       </div>
     );
   }
 }
 
 const styles = {
-  editorWrapper: {
-    fontFamily: '\'Helvetica\', sans-serif',
-    fontSize: 12,
-    padding: 10,
-    width: 200,
-    border: '1px solid #ccc'
-  },
-  editor: {
-    cursor: 'text',
-    minHeight: 80,
-    padding: 5,
-    border: '1px solid #ccc'
-  }
- 
+  fontFamily: '\'Helvetica\', sans-serif',
+  fontSize: 14,
+  color: '#090909',
+  padding: 0,
+  margin: 0,
+  cursor: 'text',
+  width: '100%',
+  height: '100%',
 }
 
 export default InlineEditor

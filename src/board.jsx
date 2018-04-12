@@ -5,7 +5,7 @@ import { CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED } from './action-t
 
 const presentation = ({ cards, onDragStop, onResize, onResizeStop }) => {
   return (
-  <div id='board'>
+  <div id='board' style={{width: 2900, height: 1200, background: '#e8e8ee'}}>
     {cards.valueSeq().map(card =>
       <Card
         key={card.get('id')}
