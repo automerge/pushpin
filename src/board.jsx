@@ -3,9 +3,15 @@ import { connect } from 'react-redux'
 import Card from './card'
 import { CARD_DRAG_STOPPED, CARD_RESIZED, CARD_RESIZE_STOPPED } from './action-types'
 
+const style = {
+  width: 2900,
+  height: 1200,
+  background: '#e8e8ee'
+}
+
 const presentation = ({ cards, onDragStop, onResize, onResizeStop }) => {
   return (
-  <div id='board' style={{width: 2900, height: 1200, background: '#e8e8ee'}}>
+  <div id='board' style={style}>
     {cards.valueSeq().map(card =>
       <Card
         key={card.get('id')}

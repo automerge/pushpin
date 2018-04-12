@@ -1,6 +1,17 @@
 import React from 'react'
 import {Editor, EditorState} from 'draft-js'
 
+const styles = {
+  fontFamily: '\'Helvetica\', sans-serif',
+  fontSize: 14,
+  color: '#090909',
+  padding: 0,
+  margin: 0,
+  cursor: 'text',
+  width: '100%',
+  height: '100%',
+}
+
 class InlineEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -14,23 +25,12 @@ class InlineEditor extends React.Component {
       <div style={styles} onClick={this.focus}>
         <Editor
           editorState={this.state.editorState}
-          onChange={(editorState) => { console.log(editorState.getCurrentContent().getPlainText('\n')); this.onChange(editorState) }}
+          onChange={(editorState) => { this.onChange(editorState) }}
           ref={(ref) => this.editor = ref}
         />
       </div>
     );
   }
-}
-
-const styles = {
-  fontFamily: '\'Helvetica\', sans-serif',
-  fontSize: 14,
-  color: '#090909',
-  padding: 0,
-  margin: 0,
-  cursor: 'text',
-  width: '100%',
-  height: '100%',
 }
 
 export default InlineEditor
