@@ -3,17 +3,16 @@
 ## Technical
 
 ## Functional
+Screen maxes at size of board (including scroll)
+Hold space to pan
+Delete with empty note deletes card
 Select even when clicking around edge of card?
 Do something with text when hitting enter on URL
 Include image
 Seperate color bar, white cards
-Screen maxes at size of board (including scroll)
 Cards created with random color
-Hold space to pan
 Can do basic text formatting with b/i/u
 More advanced text formatting
-Don't create new card when double-clicking within existing card
-Delete with empty note deletes card
 
 ## Styling
 More appealing background with dots
