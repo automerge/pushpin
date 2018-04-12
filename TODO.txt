@@ -1,11 +1,11 @@
 ## In progress
+Editor state in Redux
 Double-click create puts you directly in edit
 
 ## Technical
 Try refactoring card callbacks to move next to card data
 
 ## Functional
-Editor state in Redux
 Do something with text when leaving focus
 Include image
 Outline card when selected
