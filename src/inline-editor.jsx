@@ -7,11 +7,12 @@ const styles = {
   fontFamily: '\'Helvetica\', sans-serif',
   fontSize: 14,
   color: '#090909',
-  padding: 0,
+  padding: 15,
   margin: 0,
   cursor: 'text',
-  width: '100%',
+  'box-sizing': 'border-box',
   height: '100%',
+  width: '100%',
 }
 
 class InlineEditorPresentation extends React.Component {

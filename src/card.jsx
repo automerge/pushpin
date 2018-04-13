@@ -5,10 +5,9 @@ import InlineEditor from './inline-editor'
 import { CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED } from './action-types'
 
 const style = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: 15,
+  //alignItems: 'center',
+  //justifyContent: 'center',
+  padding: 0,
   background: '#ff7eb9',
 }
 

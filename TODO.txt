@@ -1,18 +1,20 @@
 ## In progress
 
 ## Technical
+Extract all CSS
 
 ## Functional
-Hold space to pan [stuck]
+Image cards
+Typing more expands a card
 Delete with empty note deletes card
 More robust way to handle max window size etc.
-Focus editor even when clicking around edge of card
 Do something with text when hitting enter on URL
-Include image
 Seperate color bar, white cards
 Cards created with random color
 Can do basic text formatting with b/i/u
 More advanced text formatting
+Drag box to select and drag multiple cards
+Hold space to pan [tried, got stuck]
 
 ## Styling
 More appealing background with dots
