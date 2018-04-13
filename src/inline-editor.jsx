@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {Editor} from 'draft-js'
+import Measure from 'react-measure'
 import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS } from './action-types'
 
 const styles = {
@@ -39,13 +40,21 @@ class InlineEditorPresentation extends React.Component {
   }
   render() {
     return (
-      <div style={styles} onClick={this.focus}>
-        <Editor
-          editorState={this.state.editorState}
-          onChange={this.onChange}
-          ref='editor'
-        />
-      </div>
+      <Measure
+        bounds
+        onResize={(contentRect) => {
+          console.log('onResize', contentRect)
+        }}>
+        {({ measureRef }) =>
+          <div ref={measureRef} style={styles} onClick={this.focus}>
+            <Editor
+              editorState={this.state.editorState}
+              onChange={this.onChange}
+              ref='editor'
+            />
+          </div>
+        }
+      </Measure>
     );
   }
 }
