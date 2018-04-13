@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {Editor} from 'draft-js'
-import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS } from './action-types'
+import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_TEXT_RESIZED } from './action-types'
 
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
@@ -18,6 +18,9 @@ class InlineEditorPresentation extends React.Component {
       this.refs.editor.focus()
       props.onSelected(props.cardId)
     }
+    this.onTextResized = (height) => {
+      props.onTextResized(props.cardId, height)
+    }
   }
 
   componentDidMount() {
@@ -27,7 +30,7 @@ class InlineEditorPresentation extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log('update.refs', this.refs.editorWrapper.clientWidth, this.refs.editorWrapper.clientHeight)
+    this.onTextResized(this.refs.editorWrapper.clientHeight)
   }
 
   render() {
@@ -55,6 +58,9 @@ const mapDispatchToProps = (dispatch) => {
     onSelected: (id) => {
       dispatch({type: CLEAR_SELECTIONS})
       dispatch({type: CARD_SELECTED, id: id})
+    },
+    onTextResized: (id, height) => {
+      dispatch({type: CARD_TEXT_RESIZED, id: id, height: height})
     }
   }
 }
