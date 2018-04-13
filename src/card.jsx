@@ -31,6 +31,7 @@ const imageStyles = {
   'box-sizing': 'border-box',
   height: '100%',
   width: '100%',
+  'pointer-events': 'none'
 }
 
 const imageInnerPresentation = (card) => {
