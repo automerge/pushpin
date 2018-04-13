@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {Editor} from 'draft-js'
-import { CARD_EDITOR_CHANGED, CARD_SELECTED } from './action-types'
+import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS } from './action-types'
 
 const styles = {
   fontFamily: '\'Helvetica\', sans-serif',
@@ -55,6 +55,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({type: CARD_EDITOR_CHANGED, id: id, editorState: editorState })
     },
     onSelected: (id) => {
+      dispatch({type: CLEAR_SELECTIONS})
       dispatch({type: CARD_SELECTED, id: id})
     }
   }
