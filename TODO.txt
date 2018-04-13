@@ -1,4 +1,5 @@
 ## In progress
+Typing more expands a card
 Upload and save image
 
 ## Technical
@@ -7,7 +8,6 @@ Figure out how to async actions around images like checking if file exists and g
 Consider copying image data into specific storage location, grab filename
 
 ## Functional
-Typing more expands a card
 Can't correctly select text within card - moves instead?
 Delete with empty note deletes card
 More robust way to handle max window size etc.

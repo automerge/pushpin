@@ -6,7 +6,7 @@ import { CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED } from './action-types'
 
 const style = {
   padding: 0,
-  background: '#ff7eb9',
+  background: '#ffffff',
 }
 
 const resizeAvailable = {
