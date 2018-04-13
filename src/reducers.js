@@ -82,7 +82,21 @@ function cardResizeStopped(state, id, width, height) {
   })
 }
 
+const filePat = /^(\/\S+\.(jpg|png))\n$/
+
 function cardEditorChanged(state, id, editorState) {
+  const plainText = editorState.getCurrentContent().getPlainText('\n')
+  const filePatMatch = filePat.exec(plainText)
+  if (filePatMatch) {
+     return state.updateIn(['cards', id], (card) => {
+       return card
+         .set('type', 'image')
+         .set('path', filePatMatch[1])
+         .set('width', 900/3)
+         .set('height', 750/3)
+         .delete('editorState')
+     })
+  }
   return state.setIn(['cards', id, 'editorState'], editorState)
 }
 

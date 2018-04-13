@@ -1,14 +1,15 @@
 ## In progress
-Image cards
+Upload and save image
 
 ## Technical
 Extract all CSS
 
 ## Functional
 Typing more expands a card
+Image cards get weird gragging behaviour
+Can't correctly select text within card - moves instead?
 Delete with empty note deletes card
 More robust way to handle max window size etc.
-Do something with text when hitting enter on URL
 Seperate color bar, white cards
 Cards created with random color
 Can do basic text formatting with b/i/u
