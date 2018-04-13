@@ -6,7 +6,7 @@
 Hold space to pan [stuck]
 Delete with empty note deletes card
 More robust way to handle max window size etc.
-Select even when clicking around edge of card?
+Focus editor even when clicking around edge of card
 Do something with text when hitting enter on URL
 Include image
 Seperate color bar, white cards
