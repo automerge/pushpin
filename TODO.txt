@@ -3,7 +3,6 @@ Typing more expands a card
 Upload and save image
 
 ## Technical
-Extract all CSS
 Figure out how to async actions around images like checking if file exists and getting sizes
 Consider copying image data into specific storage location, grab filename
 

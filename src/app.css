@@ -2,10 +2,42 @@ body {
   margin: 0;
 }
 
-div.unselected {
+div.board {
+  width: 3600px;
+  height: 1200px;
+  background: #e8e8ee;
+}
+
+div.card {
+  padding: 0;
+  background: #ffffff;
+}
+
+div.card.unselected {
   border: 1px solid grey;
 }
 
-div.selected {
+div.card.selected {
   border: 1px solid black;
+}
+
+div.card img.image {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+}
+
+div.card div.editorWrapper {
+  font-family: 'Helvetica', sans-serif;
+  font-size: 14px;
+  color: #090909;
+  padding: 15px;
+  margin: 0;
+  cursor: text;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
 }

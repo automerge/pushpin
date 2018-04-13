@@ -1,19 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Rnd from 'react-rnd'
+import classNames from 'classnames'
 import InlineEditor from './inline-editor'
 import { CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED } from './action-types'
-
-const style = {
-  padding: 0,
-  background: '#ffffff',
-}
-
-const resizeAvailable = {
-  bottomRight: true,
-  top: false, right: false, bottom: false, left: false,
-  topRight: false, bottomLeft: false, topLeft: false
-}
 
 const textInnerPresentation = (card) => {
   return (
@@ -25,29 +15,30 @@ const textInnerPresentation = (card) => {
   )
 }
 
-const imageStyles = {
-  padding: 0,
-  margin: 0,
-  'box-sizing': 'border-box',
-  height: '100%',
-  width: '100%',
-  'pointer-events': 'none'
-}
-
 const imageInnerPresentation = (card) => {
   return (
   <img
+    className='image'
     src={card.get('path')}
-    style={imageStyles}
   />
   )
+}
+
+const resizeAvailable = {
+  bottomRight: true,
+  top: false,
+  right: false,
+  bottom: false,
+  left: false,
+  topRight: false,
+  bottomLeft: false,
+  topLeft: false
 }
 
 const presentation = ({ card, onDragStop, onResizeStop }) => {
   return (
   <Rnd
-    style={style}
-    className={ card.get('selected') ? 'selected' : 'unselected' }
+    className={ classNames('card', card.get('selected') ? 'selected' : 'unselected') }
     size={{ width: card.get('width'), height: card.get('height') }}
     minWidth={100}
     minHeight={100}

@@ -3,19 +3,12 @@ import { connect } from 'react-redux'
 import Card from './card'
 import { CARD_CREATED, CLEAR_SELECTIONS } from './action-types'
 
-const style = {
-  width: 3600,
-  height: 1200,
-  background: '#e8e8ee'
-}
-
-const presentation = ({ cards, onDrag, onDragStop, onResize, onResizeStop, onClick, onDoubleClick }) => {
+const presentation = ({ cards, onClick, onDoubleClick }) => {
   return (
   <div
-    id='board'
+    className='board'
     onClick={onClick}
-    onDoubleClick={onDoubleClick}
-    style={style}>
+    onDoubleClick={onDoubleClick}>
     {cards.valueSeq().map(card =>
       <Card
         key={card.get('id')}

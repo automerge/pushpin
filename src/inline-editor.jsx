@@ -3,18 +3,6 @@ import { connect } from 'react-redux'
 import {Editor} from 'draft-js'
 import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS } from './action-types'
 
-const styles = {
-  fontFamily: '\'Helvetica\', sans-serif',
-  fontSize: 14,
-  color: '#090909',
-  padding: 15,
-  margin: 0,
-  cursor: 'text',
-  'box-sizing': 'border-box',
-  height: '100%',
-  width: '100%',
-}
-
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
     super(props)
@@ -39,16 +27,17 @@ class InlineEditorPresentation extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log('update.refs', this.refs.wrapper.clientWidth, this.refs.wrapper.clientHeight, this.refs.wrapper.getBoundingClientRect().width)
+    console.log('update.refs', this.refs.editorWrapper.clientWidth, this.refs.editorWrapper.clientHeight)
   }
 
   render() {
     return (
       <div
-        style={styles}
+        className='editorWrapper'
         onClick={this.focus}
-        ref='wrapper'>
+        ref='editorWrapper'>
         <Editor
+          className='editor'
           editorState={this.state.editorState}
           onChange={this.onChange}
           ref='editor'
