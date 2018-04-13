@@ -1,10 +1,10 @@
 ## In progress
+Image cards
 
 ## Technical
 Extract all CSS
 
 ## Functional
-Image cards
 Typing more expands a card
 Delete with empty note deletes card
 More robust way to handle max window size etc.

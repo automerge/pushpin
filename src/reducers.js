@@ -28,6 +28,17 @@ function initializeIfEmpty(state) {
   state = cardCreated(state, 50, 50, false)
   state = cardCreated(state, 200, 400, false)
   state = cardCreated(state, 400, 200, false)
+  const id = uuid()
+  state = state.setIn(['cards', id], new Map({
+    id: id,
+    type: 'image',
+    x: 750,
+    y: 100,
+    width: (900/3),
+    height: (750/3),
+    selected: false,
+    path: '../img/kay.jpg'
+  }))
   return state
 }
 
@@ -37,6 +48,7 @@ function cardCreated(state, x, y, selected) {
   const snapY = snapToGrid(y)
   state = state.setIn(['cards', id], new Map({
     id: id,
+    type: 'text',
     x: snapX,
     y: snapY,
     width: CARD_DEFAULT_WIDTH,
