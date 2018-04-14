@@ -1,7 +1,7 @@
 import { Map, List } from 'immutable'
 import { EditorState } from 'draft-js'
 import uuid from 'uuid/v4'
-import { INITIALIZE_IF_EMPTY, CARD_CREATED, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_TEXT_RESIZED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_TEXT_RESIZED, CARD_FILE_INLINED } from './action-types'
 
 const GRID_SIZE = 5
 const CARD_DEFAULT_WIDTH = 250
@@ -82,21 +82,8 @@ function cardResizeStopped(state, id, width, height) {
   })
 }
 
-const filePat = /^(\/\S+\.(jpg|png))\n$/
 
 function cardEditorChanged(state, id, editorState) {
-  const plainText = editorState.getCurrentContent().getPlainText('\n')
-  const filePatMatch = filePat.exec(plainText)
-  if (filePatMatch) {
-     return state.updateIn(['cards', id], (card) => {
-       return card
-         .set('type', 'image')
-         .set('path', filePatMatch[1])
-         .set('width', 900/3)
-         .set('height', 750/3)
-         .delete('editorState')
-     })
-  }
   return state.setIn(['cards', id, 'editorState'], editorState)
 }
 
@@ -120,6 +107,17 @@ function cardTextResized(state, id, height) {
     return state.setIn(['cards', id, 'height'], height)
   }
   return state
+}
+
+function cardFileInlined(state, id, path, width, height) {
+  return state.updateIn(['cards', id], (card) => {
+    return card
+      .set('type', 'image')
+      .set('path', path)
+      .set('width', width)
+      .set('height', height)
+      .delete('editorState')
+  })
 }
 
 function Reducer(state, action) {
@@ -149,6 +147,9 @@ function Reducer(state, action) {
 
     case CARD_TEXT_RESIZED:
       return cardTextResized(state, action.id, action.height)
+
+    case CARD_FILE_INLINED:
+      return cardFileInlined(state, action.id, action.path, action.width, action.height)
 
     case '@@redux/INIT':
       return state;

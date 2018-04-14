@@ -1,7 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {Editor} from 'draft-js'
-import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_TEXT_RESIZED } from './action-types'
+import { Editor} from 'draft-js'
+import Fs from 'fs'
+import Jimp from 'jimp'
+import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_TEXT_RESIZED, CARD_FILE_INLINED } from './action-types'
 
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
@@ -50,10 +52,33 @@ class InlineEditorPresentation extends React.Component {
   }
 }
 
+const filePat = /^(\/\S+\.(jpg|jpeg|png|gif))\n$/
+
 const mapDispatchToProps = (dispatch) => {
   return {
     onChange: (id, editorState) => {
       dispatch({type: CARD_EDITOR_CHANGED, id: id, editorState: editorState })
+      const plainText = editorState.getCurrentContent().getPlainText('\n')
+      const filePatMatch = filePat.exec(plainText)
+      if (!filePatMatch) {
+        return
+      }
+      const path = filePatMatch[1]
+      Fs.stat(path, (err, stat) => {
+        if (err || !stat.isFile()) {
+          console.log('No file found?', err)
+          return
+        }
+        Jimp.read(path, function (err, img) {
+          if (err) {
+            console.log('Error loading image?', err)
+            return
+          }
+          const width = img.bitmap.width
+          const height = img.bitmap.height
+          dispatch({type: CARD_FILE_INLINED, id: id, path: path, width: width, height: height})
+        })
+      })
     },
     onSelected: (id) => {
       dispatch({type: CLEAR_SELECTIONS})

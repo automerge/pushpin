@@ -53,6 +53,7 @@
     "electron-devtools-installer": "^2.2.3",
     "electron-squirrel-startup": "^1.0.0",
     "immutable": "^3.8.2",
+    "jimp": "^0.2.28",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "react-hot-loader": "^3.1.3",
