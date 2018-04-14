@@ -1,5 +1,5 @@
 ## In progress
-Allow gifs
+Grab and save image filename
 
 ## Technical
 Figure out less verbose approach for redux
@@ -7,7 +7,6 @@ Figure out less verbose approach for redux
 ## Functional
 Scale image down by default if it's large
 Copy image data into specific storage location
-Grab and save image filename
 Receive image by native file finder
 Receive image by drag and drop
 Design and fix pointer types

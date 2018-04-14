@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Editor} from 'draft-js'
 import Fs from 'fs'
+import Path from 'path'
 import Jimp from 'jimp'
 import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_TEXT_RESIZED, CARD_FILE_INLINED } from './action-types'
 
@@ -64,6 +65,7 @@ const mapDispatchToProps = (dispatch) => {
         return
       }
       const path = filePatMatch[1]
+      const basename = Path.basename(path)
       Fs.stat(path, (err, stat) => {
         if (err || !stat.isFile()) {
           console.log('No file found?', err)
