@@ -1,19 +1,21 @@
 ## In progress
-Grab and save image filename
 
 ## Functional
+Index into and select text
+Grab and save image filename
 Design and implement default image & pdf scaling
 Copy image data into specific storage location
 Design and fix pointer types
 Figure out real semantics for size of cards changing with text
 Can't correctly select text within card - moves instead?
-Delete with empty note deletes card
+Delete within empty text card deletes that card
+Delete when selecting image or pdf card deletes that card
+Undo accross the app
 More robust way to handle max window size etc.
 Seperate color bar, white cards
 Can do basic text formatting with b/i/u
 More advanced text formatting
 Selection of images / pdfs when creating?
-Figure out how to initialize plain text
 Cut, copy, and paste cards
 Context menu for individual cards including cut, copy, download original, delete
 

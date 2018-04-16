@@ -1,5 +1,5 @@
 import { Map, List } from 'immutable'
-import { EditorState } from 'draft-js'
+import { EditorState, ContentState } from 'draft-js'
 import uuid from 'uuid/v4'
 import Fs from 'fs'
 import Path from 'path'
@@ -15,6 +15,23 @@ const CARD_DEFAULT_WIDTH = 250
 const CARD_DEFAULT_HEIGHT = 100
 const CARD_MIN_WIDTH = 100
 const CARD_MIN_HEIGHT = 100
+
+const WELCOME_TEXT =
+`Welcome to the board demo! You can:
+
+* Double-click to create a new text card.
+
+* Right-click to create a new text, image, or PDF card.
+
+* Click on a card to edit its text.
+
+* Click and drag anywhere on a card to move it around.
+
+* Click and drag on the bottom right corner of a card to resize it.
+
+* Paste an absolute file name to an image or pdf as the only text in a card + hit enter, to load that file.
+
+We've made some initial cards for you to play with. Have fun!`
 
 
 //// Helper functions - may be called within action functions or from UI code.
@@ -121,15 +138,15 @@ const RootState = new Map({
 //// Action functions. Functions match 1:1 with reducer switch further below.
 
 function initializeIfEmpty(state) {
-  state = cardCreatedText(state,  { x: 50,  y: 50,  selected: false })
-  state = cardCreatedText(state,  { x: 200, y: 400, selected: false })
-  state = cardCreatedText(state,  { x: 400, y: 200, selected: false })
-  state = cardCreatedImage(state, { x: 750, y: 100, selected: false, path: '../img/kay.jpg', width: (900/3), height: (750/3) })
+  const welcomeEditorState = EditorState.createWithContent(ContentState.createFromText(WELCOME_TEXT))
+  state = cardCreatedText(state,  { x: 50,  y: 50,  selected: true, editorState: welcomeEditorState})
+  state = cardCreatedText(state,  { x: 350, y: 150, selected: false })
+  state = cardCreatedImage(state, { x: 550, y: 200, selected: false, path: '../img/kay.jpg', width: (900/3), height: (750/3) })
   const id = uuid()
   return state
 }
 
-function cardCreatedText(state, { x, y, selected }) {
+function cardCreatedText(state, { x, y, selected, editorState }) {
   const id = uuid()
   const snapX = snapToGrid(x)
   const snapY = snapToGrid(y)
@@ -141,7 +158,7 @@ function cardCreatedText(state, { x, y, selected }) {
     width: CARD_DEFAULT_WIDTH,
     height: CARD_DEFAULT_HEIGHT,
     selected: selected,
-    editorState: EditorState.createEmpty()
+    editorState: editorState || EditorState.createEmpty()
   }))
   return state
 }
