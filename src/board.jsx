@@ -70,7 +70,9 @@ const rightClickMenu = (dispatch, e) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onClick: (e) => {
+      console.log('board.onClick.start')
       dispatch({type: CLEAR_SELECTIONS})
+      console.log('board.onClick.finish')
     },
     onDoubleClick: (e) => {
       dispatch({type: CLEAR_SELECTIONS})

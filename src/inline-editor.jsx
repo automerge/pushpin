@@ -23,6 +23,7 @@ class InlineEditorPresentation extends React.Component {
     this.onTextResized = (height) => {
       props.onTextResized(props.cardId, height)
     }
+    this.lastHeight = 0
   }
 
   componentDidMount() {
@@ -32,14 +33,18 @@ class InlineEditorPresentation extends React.Component {
   }
 
   componentDidUpdate() {
-    this.onTextResized(this.refs.editorWrapper.clientHeight)
+    const newHeight = this.refs.editorWrapper.clientHeight
+    if (this.lastHeight != newHeight) {
+      this.onTextResized(newHeight)
+      this.lastHeight = newHeight
+    }
   }
 
   render() {
     return (
       <div
         className='editorWrapper'
-        onClick={this.focus}
+        onClick={() => { console.log('inlineEditor.onClick.start'); this.focus(); console.log('inlineEditor.onClick.finish') }}
         ref='editorWrapper'>
         <Editor
           className='editor'
@@ -55,15 +60,21 @@ class InlineEditorPresentation extends React.Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     onChange: (id, editorState) => {
+      console.log('inlineEditor.onClick.start')
       dispatch({type: CARD_EDITOR_CHANGED, id: id, editorState: editorState })
       maybeInlineFile(dispatch, id, editorState)
+      console.log('inlineEditor.onClick.finish')
     },
     onSelected: (id) => {
+      console.log('inlineEditor.onSelected.start')
       dispatch({type: CLEAR_SELECTIONS})
       dispatch({type: CARD_SELECTED, id: id})
+      console.log('inlineEditor.onSelected.finish')
     },
     onTextResized: (id, height) => {
+      console.log('inlineEditor.onTextResized.start')
       dispatch({type: CARD_TEXT_RESIZED, id: id, height: height})
+      console.log('inlineEditor.onTextResized.finish')
     }
   }
 }
