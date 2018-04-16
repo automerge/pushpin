@@ -77,7 +77,7 @@ function processImage(dispatch, path, id, x, y) {
 
 
 // Recognizes absolute local file paths to supported file types.
-const filePat = /^(\/\S+\.(jpg|jpeg|png|gif|pdf))\n$/
+const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif|pdf))\n\s*$/
 
 // Given the current editorState for a card indexed by id, sees if the text
 // contains only a local file path for a file type by supported by the app. In

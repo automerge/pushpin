@@ -2,7 +2,6 @@
 Grab and save image filename
 
 ## Functional
-More generic support for whitespace on either side of files paths.
 Design and implement default image & pdf scaling
 Download or otherwise use files?
 Copy image data into specific storage location
