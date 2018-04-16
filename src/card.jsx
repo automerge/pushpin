@@ -2,8 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Rnd from 'react-rnd'
 import classNames from 'classnames'
+
 import InlineEditor from './inline-editor'
 import { CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED } from './action-types'
+import { CARD_MIN_WIDTH, CARD_MIN_HEIGHT } from './model'
 
 const textInnerPresentation = (card) => {
   return (
@@ -40,8 +42,8 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
   <Rnd
     className={ classNames('card', card.get('selected') ? 'selected' : 'unselected') }
     size={{ width: card.get('width'), height: card.get('height') }}
-    minWidth={100}
-    minHeight={100}
+    minWidth={CARD_MIN_WIDTH}
+    minHeight={CARD_MIN_HEIGHT}
     enableResizing={resizeAvailable}
     lockAspectRatio={card.get('type') === 'text' ? false : true }
     position={{ x: card.get('x'), y: card.get('y') }}

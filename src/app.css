@@ -5,7 +5,7 @@ body {
 div.board {
   width: 3600px;
   height: 1200px;
-  background: #e8e8ee;
+  background: #fafafa;
 }
 
 div.card {
