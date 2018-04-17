@@ -11,15 +11,15 @@ class InlineEditorPresentation extends React.Component {
     this.state = {editorState: props.editorState}
     this.onChange = (editorState) => {
       this.setState({editorState: editorState})
-      props.onChange(props.cardId, editorState)
+      //props.onChange(props.cardId, editorState)
     }
-    this.focus = (e) => {
-      if (e) {
-        e.stopPropagation()
-      }
-      this.refs.editor.focus()
-      props.onSelected(props.cardId)
-    }
+    //this.focus = (e) => {
+    //  if (e) {
+    //    e.stopPropagation()
+    //  }
+    //  this.refs.editor.focus()
+    //  props.onSelected(props.cardId)
+    //}
     this.onTextResized = (height) => {
       props.onTextResized(props.cardId, height)
     }
@@ -28,7 +28,7 @@ class InlineEditorPresentation extends React.Component {
 
   componentDidMount() {
     if (this.props.createFocus) {
-      this.focus()
+      this.refs.editor.focus()
     }
   }
 
@@ -44,7 +44,7 @@ class InlineEditorPresentation extends React.Component {
     return (
       <div
         className='editorWrapper'
-        onClick={() => { console.log('inlineEditor.onClick.start'); this.focus(); console.log('inlineEditor.onClick.finish') }}
+        onClick={() => { console.log('inlineEditor.onClick.start', this); this.refs.editor.focus(); console.log('inlineEditor.onClick.finish') }}
         ref='editorWrapper'>
         <Editor
           className='editor'

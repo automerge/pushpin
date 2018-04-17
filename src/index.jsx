@@ -5,6 +5,7 @@ import { createStore } from 'redux'
 
 import { RootState, Reducer } from './model'
 import { INITIALIZE_IF_EMPTY } from './action-types'
+import SimpleEditor from './simple-editor'
 import Board from './board'
 
 const init = () => {
@@ -24,4 +25,12 @@ const render = (store) => {
   )
 }
 
-init()
+const initTest = () => {
+  const store = createStore(Reducer, RootState)
+  store.dispatch({type: INITIALIZE_IF_EMPTY})
+  ReactDOM.render(
+    <SimpleEditor />,
+    document.getElementById('container')
+  )
+}
+initTest()
