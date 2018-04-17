@@ -35,7 +35,6 @@ const rightClickMenu = (dispatch, e) => {
   const y = e.pageY
   const menu = new Menu()
   menu.append(new MenuItem({label: 'Add Note',  click() {
-    dispatch({type: CLEAR_SELECTIONS})
     dispatch({type: CARD_CREATED_TEXT, x: x, y: y, selected: true})
   }}))
   menu.append(new MenuItem({label: 'Add Image', click() {
@@ -94,7 +93,6 @@ const mapDispatchToProps = (dispatch, getState) => {
     },
     onDoubleClick: (e) => {
       console.log('board.onDoubleClick.start')
-      dispatch({type: CLEAR_SELECTIONS})
       dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, selected: true})
       console.log('board.onDoubleClick.finish')
     },

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Editor, getDefaultKeyBinding } from 'draft-js'
 
 import { maybeInlineFile } from './model'
-import { CARD_EDITOR_CHANGED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_TEXT_RESIZED, CARD_IMAGE_INLINED, CARD_PDF_INLINED, CARD_DELETED } from './action-types'
+import { CARD_EDITOR_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_IMAGE_INLINED, CARD_PDF_INLINED, CARD_DELETED } from './action-types'
 
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
@@ -24,12 +24,17 @@ class InlineEditorPresentation extends React.Component {
   }
 
   componentDidMount() {
+    this.checkEditorHeight()
     if (this.props.createFocus) {
       this.focus()
     }
   }
 
   componentDidUpdate() {
+    this.checkEditorHeight()
+  }
+
+  checkEditorHeight() {
     const newHeight = this.refs.editorWrapper.clientHeight
     if (this.lastHeight != newHeight) {
       this.onTextResized(newHeight)
@@ -90,8 +95,7 @@ const mapDispatchToProps = (dispatch) => {
     },
     onSelected: (id) => {
       console.log('inlineEditor.onSelected.start')
-      dispatch({type: CLEAR_SELECTIONS})
-      dispatch({type: CARD_SELECTED, id: id})
+      dispatch({type: CARD_UNIQUELY_SELECTED, id: id})
       console.log('inlineEditor.onSelected.finish')
     },
     onTextResized: (id, height) => {

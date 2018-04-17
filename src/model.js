@@ -6,7 +6,7 @@ import Path from 'path'
 import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_DELETED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED } from './action-types'
 
 //// Contants
 
@@ -147,6 +147,7 @@ function initializeIfEmpty(state) {
 }
 
 function cardCreatedText(state, { x, y, selected, editorState }) {
+  state = clearSelections(state)
   const id = uuid()
   const snapX = snapToGrid(x)
   const snapY = snapToGrid(y)
@@ -168,6 +169,7 @@ function cardCreatedText(state, { x, y, selected, editorState }) {
 }
 
 function cardCreatedImage(state, { x, y, selected, path, width, height }) {
+  state = clearSelections(state)
   const id = uuid()
   const snapX = snapToGrid(x)
   const snapY = snapToGrid(y)
@@ -189,6 +191,7 @@ function cardCreatedImage(state, { x, y, selected, path, width, height }) {
 }
 
 function cardCreatedPDF(state, { x, y, selected, path, width, height}) {
+  state = clearSelections(state)
   const id = uuid()
   const snapX = snapToGrid(x)
   const snapY = snapToGrid(y)
@@ -254,6 +257,7 @@ function cardDragStarted(state, { id, x, y }) {
     return card
       .set('resizing', resizing)
       .set('moving', moving)
+      .set('totalDrag', 0)
   })
 }
 
@@ -266,6 +270,8 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
   if (card.get('resizing') && card.get('moving')) {
     throw new Error(`Did not expect drag with both resize and move`)
   }
+
+  const newTotalDrag = card.get('totalDrag') + Math.abs(deltaX) + Math.abs(deltaY)
 
   if (card.get('resizing')) {
     let preMinWidth = card.get('width') + deltaX
@@ -297,6 +303,7 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
         .set('height', newHeight)
         .set('slackWidth', newSlackWidth)
         .set('slackHeight', newSlackHeight)
+        .set('totalDrag', newTotalDrag)
     })
   }
 
@@ -308,6 +315,7 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
       return card
         .set('x', newX)
         .set('y', newY)
+        .set('totalDrag', newTotalDrag)
     })
   }
 }
@@ -318,6 +326,11 @@ function cardDragStopped(state, { id }) {
   const snapY = snapToGrid(card.get('y'))
   const snapWidth = snapToGrid(card.get('width'))
   const snapHeight = snapToGrid(card.get('height'))
+  const selectedBefore = card.get('selected')
+  const minDragSelection = card.get('totalDrag') < GRID_SIZE/2
+  if (minDragSelection) {
+    state = clearSelections(state)
+  }
   return state.updateIn(['cards', id], (card) => {
     return card
       .set('x', snapX)
@@ -328,11 +341,19 @@ function cardDragStopped(state, { id }) {
       .set('slackHeight', 0)
       .set('resizing', false)
       .set('moving', false)
+      .set('selected', selectedBefore || minDragSelection)
+      .delete('totalDrag')
   })
 }
 
 function cardSelected(state, { id }) {
   return state.setIn(['cards', id, 'selected'], true)
+}
+
+function cardUniquelySelected(state, params) {
+  state = clearSelections(state)
+  state = cardSelected(state, params)
+  return state
 }
 
 function clearSelections(state) {
@@ -392,6 +413,9 @@ function Reducer(state, action) {
 
     case CARD_SELECTED:
       return cardSelected(state, action)
+
+    case CARD_UNIQUELY_SELECTED:
+      return cardUniquelySelected(state, action)
 
     case CLEAR_SELECTIONS:
       return clearSelections(state)
