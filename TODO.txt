@@ -1,7 +1,9 @@
 ## In progress
+Remove simple files
 
 ## Functional
-Index into and select text
+Design and implement text note size effects
+Highlighting of images on resize?
 Clicking anywhere on text card should select
 Grab and save image filename
 Design and implement default image & pdf scaling
