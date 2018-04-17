@@ -6,7 +6,7 @@ import Path from 'path'
 import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED, CARD_SELECTED, CLEAR_SELECTIONS } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CLEAR_SELECTIONS } from './action-types'
 
 //// Contants
 
@@ -15,6 +15,7 @@ const CARD_DEFAULT_WIDTH = 250
 const CARD_DEFAULT_HEIGHT = 100
 const CARD_MIN_WIDTH = 100
 const CARD_MIN_HEIGHT = 100
+const RESIZE_HANDLE_SIZE = 21
 
 const WELCOME_TEXT =
 `Welcome to the board demo! You can:
@@ -134,7 +135,6 @@ const RootState = new Map({
   cards: new Map()
 })
 
-
 //// Action functions. Functions match 1:1 with reducer switch further below.
 
 function initializeIfEmpty(state) {
@@ -157,6 +157,10 @@ function cardCreatedText(state, { x, y, selected, editorState }) {
     y: snapY,
     width: CARD_DEFAULT_WIDTH,
     height: CARD_DEFAULT_HEIGHT,
+    slackWidth: 0,
+    slackHeight: 0,
+    resizing: false,
+    moving: false,
     selected: selected,
     editorState: editorState || EditorState.createEmpty()
   }))
@@ -174,6 +178,10 @@ function cardCreatedImage(state, { x, y, selected, path, width, height }) {
     y: snapY,
     width: width,
     height: height,
+    slackWidth: 0,
+    slackHeight: 0,
+    resizing: false,
+    moving: false,
     selected: selected,
     path: path
   }))
@@ -191,6 +199,10 @@ function cardCreatedPDF(state, { x, y, selected, path, width, height}) {
     y: snapY,
     width: width,
     height: height,
+    slackWidth: 0,
+    slackHeight: 0,
+    resizing: false,
+    moving: false,
     selected: selected,
     path: path
   }))
@@ -231,23 +243,91 @@ function cardInlinedPDF(state, { id, path, width, height }) {
   })
 }
 
-function cardDragStopped(state, { id, x, y }) {
-  const snapX = snapToGrid(x)
-  const snapY = snapToGrid(y)
+function cardDragStarted(state, { id, x, y }) {
+  const card = state.getIn(['cards', id])
+  const resizing = ((x >= (card.get('x') + card.get('width') - RESIZE_HANDLE_SIZE)) &&
+                    (x <= (card.get('x') + card.get('width'))) &&
+                    (y >= (card.get('y') + card.get('height') - RESIZE_HANDLE_SIZE)) &&
+                    (y <= (card.get('y') + card.get('height'))))
+  const moving = !resizing
+  return state.updateIn(['cards', id], (card) => {
+    return card
+      .set('resizing', resizing)
+      .set('moving', moving)
+  })
+}
+
+function cardDragMoved(state, { id, deltaX, deltaY }) {
+  const card = state.getIn(['cards', id])
+
+  if (!card.get('resizing') && !card.get('moving')) {
+    throw new Error(`Did not expect drag without resize or move`)
+  }
+  if (card.get('resizing') && card.get('moving')) {
+    throw new Error(`Did not expect drag with both resize and move`)
+  }
+
+  if (card.get('resizing')) {
+    let preMinWidth = card.get('width') + deltaX
+    let preMinHeight = card.get('height') + deltaY
+
+    if (card.get('type') !== 'text') {
+      const ratio = card.get('width') / card.get('height')
+      preMinHeight = preMinWidth / ratio
+      preMinWidth = preMinHeight * ratio
+    }
+
+    // Add slack to the values used to calculate bound position. This will
+    // ensure that if we start removing slack, the element won't react to
+    // it right away until it's been completely removed.
+    let newWidth = preMinWidth + card.get('slackWidth')
+    let newHeight = preMinHeight + card.get('slackHeight')
+
+    newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
+    newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
+
+    // If the numbers changed, we must have introduced some slack.
+    // Record it for the next iteration.
+    const newSlackWidth = card.get('slackWidth') + preMinWidth - newWidth
+    const newSlackHeight = card.get('slackHeight') + preMinHeight - newHeight
+
+    return state.updateIn(['cards', id], (card) => {
+      return card
+        .set('width', newWidth)
+        .set('height', newHeight)
+        .set('slackWidth', newSlackWidth)
+        .set('slackHeight', newSlackHeight)
+    })
+  }
+
+  if (card.get('moving')) {
+    const newX = card.get('x') + deltaX
+    const newY = card.get('y') + deltaY
+
+    return state.updateIn(['cards', id], (card) => {
+      return card
+        .set('x', newX)
+        .set('y', newY)
+    })
+  }
+}
+
+function cardDragStopped(state, { id }) {
+  const card = state.getIn(['cards', id])
+  const snapX = snapToGrid(card.get('x'))
+  const snapY = snapToGrid(card.get('y'))
+  const snapWidth = snapToGrid(card.get('width'))
+  const snapHeight = snapToGrid(card.get('height'))
   return state.updateIn(['cards', id], (card) => {
     return card
       .set('x', snapX)
       .set('y', snapY)
-  })
-}
-
-function cardResizeStopped(state, { id, width, height }) {
-  const snapWidth = snapToGrid(width)
-  const snapHeight = snapToGrid(height)
-  return state.updateIn(['cards', id], (card) => {
-    return card
       .set('width', snapWidth)
       .set('height', snapHeight)
+      .set('slackWidth', 0)
+      .set('slackHeight', 0)
+      .set('resizing', false)
+      .set('moving', false)
   })
 }
 
@@ -295,11 +375,14 @@ function Reducer(state, action) {
     case CARD_INLINED_PDF:
       return cardInlinedPDF(state, action)
 
+    case CARD_DRAG_STARTED:
+      return cardDragStarted(state, action)
+
+    case CARD_DRAG_MOVED:
+      return cardDragMoved(state, action)
+
     case CARD_DRAG_STOPPED:
       return cardDragStopped(state, action)
-
-    case CARD_RESIZE_STOPPED:
-      return cardResizeStopped(state, action)
 
     case CARD_SELECTED:
       return cardSelected(state, action)

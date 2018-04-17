@@ -1,11 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Rnd from 'react-rnd'
+import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
 
 import InlineEditor from './inline-editor'
-import { CARD_DRAG_STOPPED, CARD_RESIZE_STOPPED } from './action-types'
-import { CARD_MIN_WIDTH, CARD_MIN_HEIGHT } from './model'
+import { CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED } from './action-types'
 
 const textInnerPresentation = (card) => {
   return (
@@ -26,52 +25,58 @@ const imageInnerPresentation = (card) => {
   )
 }
 
-const resizeAvailable = {
-  bottomRight: true,
-  top: false,
-  right: false,
-  bottom: false,
-  left: false,
-  topRight: false,
-  bottomLeft: false,
-  topLeft: false
-}
-
-const presentation = ({ card, onDragStop, onResizeStop }) => {
+const presentation = ({ card, onMouseDown, onStart, onDrag, onStop }) => {
   return (
-  <Rnd
-    className={ classNames('card', card.get('selected') ? 'selected' : 'unselected') }
-    size={{ width: card.get('width'), height: card.get('height') }}
-    minWidth={CARD_MIN_WIDTH}
-    minHeight={CARD_MIN_HEIGHT}
-    enableResizing={resizeAvailable}
-    lockAspectRatio={card.get('type') === 'text' ? false : true }
-    position={{ x: card.get('x'), y: card.get('y') }}
-    onDragStop={(e, d) => {
-      onDragStop(card.get('id'), d.x, d.y)
-    }}
-    onResizeStop={(e, direction, ref, delta, position) => {
-      if (delta.width != 0 || delta.height != 0) {
-        onResizeStop(card.get('id'), ref.offsetWidth, ref.offsetHeight)
-      }
-    }}
+  <DraggableCore
+    allowAnyClick={false}
+    disabled={false}
+    enableUserSelectHack={false}
+    onStart={(e, d) => onStart(card, e, d)}
+    onDrag={(e, d) => onDrag(card, e, d)}
+    onStop={(e, d) => onStop(card, e, d)}
+    onMouseDown={(e) => onMouseDown(card, e)}
   >
-    { card.get('type') === 'text' ? textInnerPresentation(card) : imageInnerPresentation(card) }
-  </Rnd>
+    <div
+      className={classNames('card', card.get('selected') ? 'selected' : 'unselected')}
+      style={{
+        width: card.get('width'),
+        height: card.get('height'),
+        position: 'absolute',
+        left: card.get('x'),
+        top: card.get('y')
+      }}>
+      { card.get('type') === 'text' ? textInnerPresentation(card) : imageInnerPresentation(card) }
+      <span className='cardResizeHandle' />
+    </div>
+  </DraggableCore>
   )
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onDragStop: (id, x, y) => {
-      console.log('card.onDragStop.start')
-      dispatch({type: CARD_DRAG_STOPPED, id: id, x: x, y: y})
-      console.log('card.onDragStop.finish')
+    onMouseDown: (card, e) => {
+      console.log('card.onMouseDown')
     },
-    onResizeStop: (id, width, height) => {
-      console.log('card.onResizeStop.start')
-      dispatch({type: CARD_RESIZE_STOPPED, id: id, width: width, height: height})
-      console.log('card.onDragStop.finish')
+    onStart: (card, e, d) => {
+      console.log('card.onStart.start')
+      if (d.deltaX != 0 || d.deltaY != 0) {
+        throw new Error(`Did not expect delta in onStart`)
+      }
+      dispatch({ type: CARD_DRAG_STARTED, id: card.get('id'), x: d.lastX, y: d.lastY })
+      console.log('card.onStart.finish')
+    },
+    onDrag: (card, e, d) => {
+      if (d.deltaX != 0 || d.deltaY != 0) {
+        dispatch({ type: CARD_DRAG_MOVED, id: card.get('id'), deltaX: d.deltaX, deltaY: d.deltaY })
+      }
+    },
+    onStop: (card, e, d) => {
+      console.log('card.onStop.start')
+      if (d.deltaX != 0 || d.deltaY != 0) {
+        throw new Error(`Did not expect delta in onStart`)
+      }
+      dispatch({ type: CARD_DRAG_STOPPED, id: card.get('id') })
+      console.log('card.onStop.finish')
     }
   }
 }
