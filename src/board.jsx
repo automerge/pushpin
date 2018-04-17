@@ -77,7 +77,6 @@ const withinCard = (card, x, y) => {
 const mapDispatchToProps = (dispatch, getState) => {
   return {
     onClick: (e, cards) => {
-      console.log('board.onClick.start')
       let clickingInCard = false
       cards.valueSeq().forEach((card) => {
         const res = withinCard(card, e.pageX, e.pageY)
@@ -86,9 +85,11 @@ const mapDispatchToProps = (dispatch, getState) => {
           return
         }
       })
-      if (!clickingInCard) {
-        dispatch({type: CLEAR_SELECTIONS})
+      if (clickingInCard) {
+        return
       }
+      console.log('board.onClick.start')
+      dispatch({type: CLEAR_SELECTIONS})
       console.log('board.onClick.finish')
     },
     onDoubleClick: (e) => {

@@ -1,5 +1,6 @@
 ## In progress
-Remove simple files
+Pass through editorState again
+Get selections working again
 
 ## Functional
 Design and implement text note size effects

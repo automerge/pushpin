@@ -58,10 +58,10 @@ const mapDispatchToProps = (dispatch) => {
       console.log('card.onMouseDown')
     },
     onStart: (card, e, d) => {
-      console.log('card.onStart.start')
       if (d.deltaX != 0 || d.deltaY != 0) {
         throw new Error(`Did not expect delta in onStart`)
       }
+      console.log('card.onStart.start')
       dispatch({ type: CARD_DRAG_STARTED, id: card.get('id'), x: d.lastX, y: d.lastY })
       console.log('card.onStart.finish')
     },
@@ -71,10 +71,10 @@ const mapDispatchToProps = (dispatch) => {
       }
     },
     onStop: (card, e, d) => {
-      console.log('card.onStop.start')
       if (d.deltaX != 0 || d.deltaY != 0) {
         throw new Error(`Did not expect delta in onStart`)
       }
+      console.log('card.onStop.start')
       dispatch({ type: CARD_DRAG_STOPPED, id: card.get('id') })
       console.log('card.onStop.finish')
     }
