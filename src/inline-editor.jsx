@@ -13,38 +13,35 @@ class InlineEditorPresentation extends React.Component {
       this.setState({editorState: editorState})
       //props.onChange(props.cardId, editorState)
     }
-    //this.focus = (e) => {
-    //  if (e) {
-    //    e.stopPropagation()
-    //  }
-    //  this.refs.editor.focus()
-    //  props.onSelected(props.cardId)
-    //}
-    this.onTextResized = (height) => {
-      props.onTextResized(props.cardId, height)
-    }
-    this.lastHeight = 0
-  }
-
-  componentDidMount() {
-    if (this.props.createFocus) {
+    this.focus = (e) => {
       this.refs.editor.focus()
+      // props.onSelected(props.cardId)
     }
+    // this.onTextResized = (height) => {
+    //   props.onTextResized(props.cardId, height)
+    // }
+    // this.lastHeight = 0
   }
 
-  componentDidUpdate() {
-    const newHeight = this.refs.editorWrapper.clientHeight
-    if (this.lastHeight != newHeight) {
-      this.onTextResized(newHeight)
-      this.lastHeight = newHeight
-    }
-  }
+  // componentDidMount() {
+  //   if (this.props.createFocus) {
+  //     this.focus()
+  //   }
+  // }
+
+  // componentDidUpdate() {
+  //   const newHeight = this.refs.editorWrapper.clientHeight
+  //   if (this.lastHeight != newHeight) {
+  //     this.onTextResized(newHeight)
+  //     this.lastHeight = newHeight
+  //   }
+  // }
 
   render() {
     return (
       <div
         className='editorWrapper'
-        onClick={() => { console.log('inlineEditor.onClick.start', this); this.refs.editor.focus(); console.log('inlineEditor.onClick.finish') }}
+        onClick={this.focus}
         ref='editorWrapper'>
         <Editor
           className='editor'

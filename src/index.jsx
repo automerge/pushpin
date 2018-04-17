@@ -11,15 +11,9 @@ import Board from './board'
 const init = () => {
   const store = createStore(Reducer, RootState)
   store.dispatch({type: INITIALIZE_IF_EMPTY})
-  render(store)
-}
-
-const render = (store) => {
   ReactDOM.render(
     <Provider store={store}>
-      <div>
-        <Board />
-      </div>
+      <Board />
     </Provider>,
     document.getElementById('container')
   )
@@ -29,8 +23,11 @@ const initTest = () => {
   const store = createStore(Reducer, RootState)
   store.dispatch({type: INITIALIZE_IF_EMPTY})
   ReactDOM.render(
-    <SimpleEditor />,
+    <Provider store={store}>
+      <SimpleEditor />
+    </Provider>,
     document.getElementById('container')
   )
 }
+
 initTest()
