@@ -48,12 +48,10 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
     lockAspectRatio={card.get('type') === 'text' ? false : true }
     position={{ x: card.get('x'), y: card.get('y') }}
     onDragStop={(e, d) => {
-      if (d.deltaX > 0 && d.deltaY > 0) {
-        onDragStop(card.get('id'), d.x, d.y)
-      }
+      onDragStop(card.get('id'), d.x, d.y)
     }}
     onResizeStop={(e, direction, ref, delta, position) => {
-      if (delta.width > 0 && delta.height > 0) {
+      if (delta.width != 0 || delta.height != 0) {
         onResizeStop(card.get('id'), ref.offsetWidth, ref.offsetHeight)
       }
     }}
