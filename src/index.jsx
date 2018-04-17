@@ -20,12 +20,8 @@ const init = () => {
 }
 
 const initTest = () => {
-  const store = createStore(Reducer, RootState)
-  store.dispatch({type: INITIALIZE_IF_EMPTY})
   ReactDOM.render(
-    <Provider store={store}>
-      <SimpleEditor />
-    </Provider>,
+    <SimpleEditor />,
     document.getElementById('container')
   )
 }
