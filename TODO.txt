@@ -1,15 +1,14 @@
 ## In progress
-Pass through editorState again
-Get selections working again
 
 ## Functional
 Design and implement text note size effects
+Design and implement selection mechanics
+Design and implement pointer types
 Highlighting of images on resize?
 Clicking anywhere on text card should select
 Grab and save image filename
 Design and implement default image & pdf scaling
 Copy image data into specific storage location
-Design and fix pointer types
 Figure out real semantics for size of cards changing with text
 Delete within empty text card deletes that card
 Delete when selecting image or pdf card deletes that card
@@ -18,7 +17,6 @@ More robust way to handle max window size etc.
 Seperate color bar, white cards
 Can do basic text formatting with b/i/u
 More advanced text formatting
-Selection of images / pdfs when creating?
 Cut, copy, and paste cards
 Context menu for individual cards including cut, copy, download original, delete
 
@@ -27,4 +25,5 @@ Hold space to pan around board with mouse [tried, got stuck]
 
 ## Styling
 Style background with dots aligning to grid
+Style resize handle, maybe to appear dynamically
 Style typography

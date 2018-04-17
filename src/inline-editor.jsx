@@ -11,31 +11,31 @@ class InlineEditorPresentation extends React.Component {
     this.state = {editorState: props.editorState}
     this.onChange = (editorState) => {
       this.setState({editorState: editorState})
-      //props.onChange(props.cardId, editorState)
+      props.onChange(props.cardId, editorState)
     }
     this.focus = (e) => {
       this.refs.editor.focus()
-      // props.onSelected(props.cardId)
+      props.onSelected(props.cardId)
     }
-    // this.onTextResized = (height) => {
-    //   props.onTextResized(props.cardId, height)
-    // }
-    // this.lastHeight = 0
+    this.onTextResized = (height) => {
+      props.onTextResized(props.cardId, height)
+    }
+    this.lastHeight = 0
   }
 
-  // componentDidMount() {
-  //   if (this.props.createFocus) {
-  //     this.focus()
-  //   }
-  // }
+  componentDidMount() {
+    if (this.props.createFocus) {
+      this.focus()
+    }
+  }
 
-  // componentDidUpdate() {
-  //   const newHeight = this.refs.editorWrapper.clientHeight
-  //   if (this.lastHeight != newHeight) {
-  //     this.onTextResized(newHeight)
-  //     this.lastHeight = newHeight
-  //   }
-  // }
+  componentDidUpdate() {
+    const newHeight = this.refs.editorWrapper.clientHeight
+    if (this.lastHeight != newHeight) {
+      this.onTextResized(newHeight)
+      this.lastHeight = newHeight
+    }
+  }
 
   render() {
     return (
