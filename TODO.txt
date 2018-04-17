@@ -1,11 +1,7 @@
 ## In progress
 
 ## Functional
-Design and implement text note size effects
-Design and implement selection mechanics
-Design and implement pointer types
 Highlighting of images on resize?
-Clicking anywhere on text card should select
 Grab and save image filename
 Design and implement default image & pdf scaling
 Copy image data into specific storage location
@@ -19,6 +15,10 @@ Can do basic text formatting with b/i/u
 More advanced text formatting
 Cut, copy, and paste cards
 Context menu for individual cards including cut, copy, download original, delete
+
+Design and implement text note size effects
+Design and implement focus and selection mechanics
+Design and implement pointer types
 
 Drag box to select and drag multiple cards[tried, got stuck]
 Hold space to pan around board with mouse [tried, got stuck]
