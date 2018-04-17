@@ -11,18 +11,18 @@ const { Menu, MenuItem, dialog } = remote
 
 const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
   return (
-  <div
-    className='board'
-    onClick={(e) => { onClick(e, cards) }}
-    onDoubleClick={onDoubleClick}
-    onContextMenu={onContextMenu}>
-    {cards.valueSeq().map(card =>
-      <Card
-        key={card.get('id')}
-        card={card}
-      />
-    )}
-  </div>
+    <div
+      className='board'
+      onClick={(e) => { onClick(e, cards) }}
+      onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}>
+      {cards.valueSeq().map(card =>
+        <Card
+          key={card.get('id')}
+          card={card}
+        />
+      )}
+    </div>
   )
 }
 

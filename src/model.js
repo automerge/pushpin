@@ -6,7 +6,7 @@ import Path from 'path'
 import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CLEAR_SELECTIONS } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CLEAR_SELECTIONS, CARD_DELETED } from './action-types'
 
 //// Contants
 
@@ -344,6 +344,9 @@ function clearSelections(state) {
   return state
 }
 
+function cardDeleted(state, { id }) {
+  return state.deleteIn(['cards', id])
+}
 
 //// Reducer switch. Cases match 1:1 with action functions above.
 
@@ -351,6 +354,9 @@ function Reducer(state, action) {
   console.log(action)
 
   switch (action.type) {
+    case '@@redux/INIT':
+      return state;
+
     case INITIALIZE_IF_EMPTY:
       return initializeIfEmpty(state);
 
@@ -390,8 +396,8 @@ function Reducer(state, action) {
     case CLEAR_SELECTIONS:
       return clearSelections(state)
 
-    case '@@redux/INIT':
-      return state;
+    case CARD_DELETED:
+      return cardDeleted(state, action)
 
     default:
       throw new Error(`Unkonwn action: ${action.type}`);

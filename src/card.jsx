@@ -8,47 +8,47 @@ import { CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED } from './action-
 
 const textInnerPresentation = (card) => {
   return (
-  <InlineEditor
-    cardId={card.get('id')}
-    editorState={card.get('editorState')}
-    createFocus={card.get('selected')}
-  />
+    <InlineEditor
+      cardId={card.get('id')}
+      editorState={card.get('editorState')}
+      createFocus={card.get('selected')}
+    />
   )
 }
 
 const imageInnerPresentation = (card) => {
   return (
-  <img
-    className='image'
-    src={card.get('path')}
-  />
+    <img
+      className='image'
+      src={card.get('path')}
+    />
   )
 }
 
 const presentation = ({ card, onMouseDown, onStart, onDrag, onStop }) => {
   return (
-  <DraggableCore
-    allowAnyClick={false}
-    disabled={false}
-    enableUserSelectHack={false}
-    onStart={(e, d) => onStart(card, e, d)}
-    onDrag={(e, d) => onDrag(card, e, d)}
-    onStop={(e, d) => onStop(card, e, d)}
-    onMouseDown={(e) => onMouseDown(card, e)}
-  >
-    <div
-      className={classNames('card', card.get('selected') ? 'selected' : 'unselected')}
-      style={{
-        width: card.get('width'),
-        height: card.get('height'),
-        position: 'absolute',
-        left: card.get('x'),
-        top: card.get('y')
-      }}>
-      { card.get('type') === 'text' ? textInnerPresentation(card) : imageInnerPresentation(card) }
-      <span className='cardResizeHandle' />
-    </div>
-  </DraggableCore>
+    <DraggableCore
+      allowAnyClick={false}
+      disabled={false}
+      enableUserSelectHack={false}
+      onStart={(e, d) => onStart(card, e, d)}
+      onDrag={(e, d) => onDrag(card, e, d)}
+      onStop={(e, d) => onStop(card, e, d)}
+      onMouseDown={(e) => onMouseDown(card, e)}
+    >
+      <div
+        className={classNames('card', card.get('selected') ? 'selected' : 'unselected')}
+        style={{
+          width: card.get('width'),
+          height: card.get('height'),
+          position: 'absolute',
+          left: card.get('x'),
+          top: card.get('y')
+        }}>
+        { card.get('type') === 'text' ? textInnerPresentation(card) : imageInnerPresentation(card) }
+        <span className='cardResizeHandle' />
+      </div>
+    </DraggableCore>
   )
 }
 
