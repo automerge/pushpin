@@ -13,7 +13,7 @@ const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
   return (
   <div
     className='board'
-    onClick={onClick}
+    onClick={(e) => { onClick(e, cards) }}
     onDoubleClick={onDoubleClick}
     onContextMenu={onContextMenu}>
     {cards.valueSeq().map(card =>
@@ -67,21 +67,42 @@ const rightClickMenu = (dispatch, e) => {
   return menu
 }
 
-const mapDispatchToProps = (dispatch) => {
+const withinCard = (card, x, y) => {
+  return (x >= card.get('x')) &&
+         (x <= card.get('x')+card.get('width')) &&
+         (y >= card.get('y')) &&
+         (y <= card.get('y')+card.get('height'))
+}
+
+const mapDispatchToProps = (dispatch, getState) => {
   return {
-    onClick: (e) => {
+    onClick: (e, cards) => {
       console.log('board.onClick.start')
-      dispatch({type: CLEAR_SELECTIONS})
+      let clickingInCard = false
+      cards.valueSeq().forEach((card) => {
+        const res = withinCard(card, e.pageX, e.pageY)
+        if (res) {
+          clickingInCard = true
+          return
+        }
+      })
+      if (!clickingInCard) {
+        dispatch({type: CLEAR_SELECTIONS})
+      }
       console.log('board.onClick.finish')
     },
     onDoubleClick: (e) => {
+      console.log('board.onDoubleClick.start')
       dispatch({type: CLEAR_SELECTIONS})
       dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, selected: true})
+      console.log('board.onDoubleClick.finish')
     },
     onContextMenu: (e, ...rest) => {
+      console.log('board.onContextMenu.start')
       e.preventDefault()
       const menu = rightClickMenu(dispatch, e)
       menu.popup({window: remote.getCurrentWindow()})
+      console.log('board.onContextMenu.finish')
     }
   }
 }
