@@ -47,8 +47,16 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
     enableResizing={resizeAvailable}
     lockAspectRatio={card.get('type') === 'text' ? false : true }
     position={{ x: card.get('x'), y: card.get('y') }}
-    onDragStop={(e, d) => { onDragStop(card.get('id'), d.x, d.y) }}
-    onResizeStop={(e, direction, ref, delta, position) => { onResizeStop(card.get('id'), ref.offsetWidth, ref.offsetHeight) }}
+    onDragStop={(e, d) => {
+      if (d.deltaX > 0 && d.deltaY > 0) {
+        onDragStop(card.get('id'), d.x, d.y)
+      }
+    }}
+    onResizeStop={(e, direction, ref, delta, position) => {
+      if (delta.width > 0 && delta.height > 0) {
+        onResizeStop(card.get('id'), ref.offsetWidth, ref.offsetHeight)
+      }
+    }}
   >
     { card.get('type') === 'text' ? textInnerPresentation(card) : imageInnerPresentation(card) }
   </Rnd>
@@ -58,10 +66,14 @@ const presentation = ({ card, onDragStop, onResizeStop }) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onDragStop: (id, x, y) => {
+      console.log('card.onDragStop.start')
       dispatch({type: CARD_DRAG_STOPPED, id: id, x: x, y: y})
+      console.log('card.onDragStop.finish')
     },
     onResizeStop: (id, width, height) => {
+      console.log('card.onResizeStop.start')
       dispatch({type: CARD_RESIZE_STOPPED, id: id, width: width, height: height})
+      console.log('card.onDragStop.finish')
     }
   }
 }
