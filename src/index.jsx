@@ -7,16 +7,37 @@ import { RootState, Reducer } from './model'
 import { INITIALIZE_IF_EMPTY, CARD_DELETED } from './action-types'
 import Board from './board'
 
+var spaceDown = false
+
 const onKeyDown = (e, store) => {
-  if (e.key !== 'Backspace') {
+  if (e.key === 'Backspace') {
+    const state = store.getState()
+    state.get('cards').forEach((card, idx) => {
+      if (card.get('selected') && (card.get('type') !== 'text')) {
+        store.dispatch({ type: CARD_DELETED, id: card.get('id') })
+      }
+    })
     return
   }
-  const state = store.getState()
-  state.get('cards').forEach((card, idx) => {
-    if (card.get('selected') && (card.get('type') !== 'text')) {
-      store.dispatch({ type: CARD_DELETED, id: card.get('id') })
-    }
-  })
+
+  if (e.key === ' ' && e.target === document.body) {
+    spaceDown = true
+    e.preventDefault()
+    return
+  }
+}
+
+const onKeyUp = (e) => {
+  if (e.key === ' ' && e.target === document.body) {
+    spaceDown = false
+    return
+  }
+}
+
+const onMouseMove = (e) => {
+  if (spaceDown) {
+    window.scrollBy(e.movementX*2, e.movementY*2)
+  }
 }
 
 const init = () => {
@@ -29,6 +50,8 @@ const init = () => {
     document.getElementById('container')
   )
   document.addEventListener('keydown', (e) => { onKeyDown(e, store) })
+  document.addEventListener('keyup', (e) => { onKeyUp(e) })
+  document.addEventListener('mousemove', e => { onMouseMove(e) })
 
   const board = document.getElementById('board')
   window.scrollTo(

@@ -15,7 +15,6 @@ Clicking anywhere on note brings you to editing
 
 Design and implement text note size effects [should be doable]
 Drag box to select and drag multiple cards[tried, got stuck]
-Hold space to pan around board with mouse [tried, got stuck, no programatic scroll]
 
 ## Styling
 Style background with dots aligning to grid
