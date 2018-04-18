@@ -1,7 +1,6 @@
 ## In progress
 
 ## Functional
-Highlighting of images on resize?
 Grab and save image filename
 Design and implement default image & pdf scaling
 Copy image data into specific storage location
