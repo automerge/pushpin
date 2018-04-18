@@ -5,7 +5,6 @@ Highlighting of images on resize?
 Grab and save image filename
 Design and implement default image & pdf scaling
 Copy image data into specific storage location
-Delete when selecting image or pdf card deletes that card
 Undo accross the app
 More robust way to handle max window size etc.
 Seperate color bar, white cards
@@ -25,4 +24,3 @@ Hold space to pan around board with mouse [tried, got stuck]
 Style background with dots aligning to grid
 Style resize handle, maybe to appear dynamically
 Style typography
-
