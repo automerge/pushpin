@@ -32,6 +32,10 @@ const WELCOME_TEXT =
 
 * Paste an absolute file name to an image or pdf as the only text in a card + hit enter, to load that file.
 
+* Use arrow keys to scroll around the board.
+
+* Press space + move the mouse to scroll around the board.
+
 We've made some initial cards for you to play with. Have fun!`
 
 
