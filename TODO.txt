@@ -14,13 +14,12 @@ Cut, copy, and paste cards
 Context menu for individual cards including cut, copy, download original, delete
 Clicking anywhere on note brings you to editing
 
-Design and implement text note size effects
-Design and implement pointer types
-
+Design and implement text note size effects [should be doable]
 Drag box to select and drag multiple cards[tried, got stuck]
-Hold space to pan around board with mouse [tried, got stuck]
+Hold space to pan around board with mouse [tried, got stuck, no programatic scroll]
 
 ## Styling
 Style background with dots aligning to grid
 Style resize handle, maybe to appear dynamically
 Style typography
+Style pointer types
