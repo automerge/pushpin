@@ -1,9 +1,10 @@
 ## In progress
 
 ## Functional
-Grab and save image filename
 Design and implement default image & pdf scaling
+Grab and save image filename
 Copy image data into specific storage location
+Figure out default image deta for demo
 More robust way to handle max window size etc.
 Seperate color bar, white cards
 Can do basic text formatting with b/i/u

@@ -139,9 +139,9 @@ const RootState = new Map({
 
 function initializeIfEmpty(state) {
   const welcomeEditorState = EditorState.createWithContent(ContentState.createFromText(WELCOME_TEXT))
-  state = cardCreatedText(state,  { x: 50,  y: 50,  selected: true, editorState: welcomeEditorState})
-  state = cardCreatedText(state,  { x: 350, y: 150, selected: false })
-  state = cardCreatedImage(state, { x: 550, y: 200, selected: false, path: '../img/kay.jpg', width: (900/3), height: (750/3) })
+  state = cardCreatedText(state,  { x: 1300, y: 250,  selected: true, editorState: welcomeEditorState})
+  state = cardCreatedText(state,  { x: 1650, y: 350, selected: false })
+  state = cardCreatedImage(state, { x: 1950, y: 500, selected: false, path: '../img/kay.jpg', width: (900/3), height: (750/3) })
   const id = uuid()
   return state
 }

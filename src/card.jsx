@@ -37,6 +37,7 @@ const presentation = ({ card, onMouseDown, onStart, onDrag, onStop }) => {
       onMouseDown={(e) => onMouseDown(card, e)}
     >
       <div
+        id={`card-${card.get('id')}`}
         className={classNames('card', card.get('selected') ? 'selected' : 'unselected')}
         style={{
           width: card.get('width'),

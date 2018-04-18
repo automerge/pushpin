@@ -12,6 +12,7 @@ const { Menu, MenuItem, dialog } = remote
 const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
   return (
     <div
+      id='board'
       className='board'
       onClick={(e) => { onClick(e, cards) }}
       onDoubleClick={onDoubleClick}

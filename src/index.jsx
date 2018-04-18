@@ -29,6 +29,12 @@ const init = () => {
     document.getElementById('container')
   )
   document.addEventListener('keydown', (e) => { onKeyDown(e, store) })
+
+  const board = document.getElementById('board')
+  window.scrollTo(
+    (board.clientWidth/2)-(window.innerWidth/2),
+    (board.clientHeight/2.5)-(window.innerHeight/2)
+  )
 }
 
 init()
