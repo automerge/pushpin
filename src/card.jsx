@@ -2,55 +2,20 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
-import ReactMarkdown from 'react-markdown'
 
 import InlineEditor from './inline-editor'
 import { CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED } from './action-types'
 
 class CardPresentation extends React.Component {
-  constructor(props) {
-    super(props)
-    this.lastHeight = 0
-  }
-
-  componentDidMount() {
-    this.checkTextHeight()
-  }
-
-  componentDidUpdate() {
-    this.checkTextHeight()
-  }
-
-  checkTextHeight() {
-    if (this.props.card.get('type') === 'text') {
-      // console.log(this.props, this.props.children)
-      // const newHeight = this.props.children[0].clientHeight
-      // if (this.lastHeight != newHeight) {
-      //   this.props.onTextResized(props.card, newHeight)
-      //   this.lastHeight = newHeight
-      // }
-    }
-  }
 
   renderTextInner() {
-    const card = this.props.card
-    if (card.get('selected')) {
-      return (
-        <InlineEditor
-          cardId={card.get('id')}
-          editorState={card.get('editorState')}
-          createFocus={card.get('selected')}
-        />
-      )
-    } else {
-      const mdText = card.get('editorState').getCurrentContent().getPlainText('\n')
-      return (
-        <ReactMarkdown
-          source={mdText}
-          className={'renderedMarkdown'}
-        />
-      )
-    }
+    return (
+      <InlineEditor
+        cardId={this.props.card.get('id')}
+        editorState={this.props.card.get('editorState')}
+        selected={this.props.card.get('selected')}
+      />
+    )
   }
 
   renderImageInner() {
@@ -117,12 +82,7 @@ const mapDispatchToProps = (dispatch) => {
       console.log('card.onStop.start')
       dispatch({ type: CARD_DRAG_STOPPED, id: card.get('id') })
       console.log('card.onStop.finish')
-    },
-    onTextResized: (card, height) => {
-      console.log('card.onTextResized.start')
-      dispatch({type: CARD_TEXT_RESIZED, id: card.get('id'), height: height})
-      console.log('card.onTextResized.finish')
-    },
+    }
   }
 }
 

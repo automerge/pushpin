@@ -46,7 +46,7 @@ div.card img.image {
   user-select: none;
 }
 
-div.card div.renderedMarkdown {
+div.card div.renderer {
   font-family: 'Helvetica', sans-serif;
   font-size: 14px;
   color: #090909;
@@ -57,7 +57,7 @@ div.card div.renderedMarkdown {
   width: 100%;
 }
 
-div.card div.inlineEditor {
+div.card div.editor {
   font-family: 'Helvetica', sans-serif;
   font-size: 14px;
   color: #090909;

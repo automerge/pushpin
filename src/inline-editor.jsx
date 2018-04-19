@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Editor, getDefaultKeyBinding } from 'draft-js'
+import ReactMarkdown from 'react-markdown'
 
 import { maybeInlineFile } from './model'
 import { CARD_EDITOR_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_IMAGE_INLINED, CARD_PDF_INLINED, CARD_DELETED } from './action-types'
@@ -9,6 +10,28 @@ class InlineEditorPresentation extends React.Component {
   constructor(props) {
     super(props)
     this.state = {editorState: props.editorState}
+    this.lastHeight = 0
+  }
+
+  componentDidMount() {
+    console.log('inlineEditor.componentDidMount')
+    if (this.props.selected) {
+      this.focus()
+    }
+    this.checkTextHeight()
+  }
+
+  componentDidUpdate() {
+    console.log('inlineEditor.componentDidUpdate')
+    this.checkTextHeight()
+  }
+
+  checkTextHeight() {
+    const newHeight = (this.refs.editor || this.refs.renderer).clientHeight
+    if (this.lastHeight != newHeight) {
+      this.props.onTextResized(this.props.cardId, newHeight)
+      this.lastHeight = newHeight
+    }
   }
 
   onChange(editorState) {
@@ -17,13 +40,8 @@ class InlineEditorPresentation extends React.Component {
   }
 
   focus() {
+    console.log('focus!')
     this.refs.editor.focus()
-  }
-
-  componentDidMount() {
-    if (this.props.createFocus) {
-      this.focus()
-    }
   }
 
   checkForBackspaceDelete(e) {
@@ -51,19 +69,33 @@ class InlineEditorPresentation extends React.Component {
   }
 
   render() {
-    return (
-      <div
-        className='inlineEditor'
-      >
-        <Editor
-          editorState={this.state.editorState}
-          onChange={this.onChange.bind(this)}
-          keyBindingFn={this.checkForBackspaceDelete.bind(this)}
-          handleKeyCommand={this.maybeDoBackspaceDelete.bind(this)}
-          ref='editor'
-        />
-      </div>
-    )
+    if (this.props.selected) {
+      return (
+        <div
+          className={'editor'}
+        >
+          <Editor
+            editorState={this.state.editorState}
+            onChange={this.onChange.bind(this)}
+            keyBindingFn={this.checkForBackspaceDelete.bind(this)}
+            handleKeyCommand={this.maybeDoBackspaceDelete.bind(this)}
+            ref={'editor'}
+          />
+        </div>
+      )
+    } else {
+      const mdText = this.state.editorState.getCurrentContent().getPlainText('\n')
+      return (
+        <div
+          className={'renderer'}
+          ref={'renderer'}
+        >
+          <ReactMarkdown
+            source={mdText}
+          />
+        </div>
+      )
+    }
   }
 }
 
@@ -84,7 +116,12 @@ const mapDispatchToProps = (dispatch) => {
       console.log('inlineEditor.onDeleted.start')
       dispatch({type: CARD_DELETED, id: id})
       console.log('inlineEditor.onDeleted.finish')
-    }
+    },
+    onTextResized: (id, height) => {
+      console.log('card.onTextResized.start')
+      dispatch({type: CARD_TEXT_RESIZED, id: id, height: height})
+      console.log('card.onTextResized.finish')
+    },
   }
 }
 
