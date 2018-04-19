@@ -14,19 +14,17 @@ class InlineEditorPresentation extends React.Component {
   }
 
   componentDidMount() {
-    console.log('inlineEditor.componentDidMount')
-    if (this.props.selected) {
-      this.focus()
-    }
-    this.checkTextHeight()
+    this.checkFocusAndHeight()
   }
 
   componentDidUpdate() {
-    console.log('inlineEditor.componentDidUpdate')
-    this.checkTextHeight()
+    this.checkFocusAndHeight()
   }
 
-  checkTextHeight() {
+  checkFocusAndHeight() {
+    if (this.props.selected) {
+      this.focus()
+    }
     const newHeight = (this.refs.editor || this.refs.renderer).clientHeight
     if (this.lastHeight != newHeight) {
       this.props.onTextResized(this.props.cardId, newHeight)
@@ -40,7 +38,6 @@ class InlineEditorPresentation extends React.Component {
   }
 
   focus() {
-    console.log('focus!')
     this.refs.editor.focus()
   }
 
