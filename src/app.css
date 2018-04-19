@@ -57,7 +57,7 @@ div.card div.renderedMarkdown {
   width: 100%;
 }
 
-div.card div.editorWrapper {
+div.card div.inlineEditor {
   font-family: 'Helvetica', sans-serif;
   font-size: 14px;
   color: #090909;

@@ -9,35 +9,20 @@ class InlineEditorPresentation extends React.Component {
   constructor(props) {
     super(props)
     this.state = {editorState: props.editorState}
-    this.onChange = (editorState) => {
-      this.setState({editorState: editorState})
-      props.onChange(props.cardId, editorState)
-    }
-    this.focus = (e) => {
-      this.refs.editor.focus()
-    }
-    this.onTextResized = (height) => {
-      props.onTextResized(props.cardId, height)
-    }
-    this.lastHeight = 0
+  }
+
+  onChange(editorState) {
+    this.setState({editorState: editorState})
+    this.props.onChange(this.props.cardId, editorState)
+  }
+
+  focus() {
+    this.refs.editor.focus()
   }
 
   componentDidMount() {
-    this.checkEditorHeight()
     if (this.props.createFocus) {
       this.focus()
-    }
-  }
-
-  componentDidUpdate() {
-    this.checkEditorHeight()
-  }
-
-  checkEditorHeight() {
-    const newHeight = this.refs.editorWrapper.clientHeight
-    if (this.lastHeight != newHeight) {
-      this.onTextResized(newHeight)
-      this.lastHeight = newHeight
     }
   }
 
@@ -57,26 +42,24 @@ class InlineEditorPresentation extends React.Component {
     return 'backspace-delete-card'
   }
 
-  doBackspaceDelete(command) {
-    if (command !== 'backspace-delete-card') {
-      return 'not-handled'
+  maybeDoBackspaceDelete(command) {
+    if (command === 'backspace-delete-card') {
+      this.props.onDeleted(this.props.cardId)
+      return 'handled'
     }
-    this.props.onDeleted(this.props.cardId)
-    return 'handled'
+    return 'not-handled'
   }
 
   render() {
     return (
       <div
-        className='editorWrapper'
-        onClick={this.focus}
-        ref='editorWrapper'>
+        className='inlineEditor'
+      >
         <Editor
-          className='editor'
           editorState={this.state.editorState}
-          onChange={this.onChange}
+          onChange={this.onChange.bind(this)}
           keyBindingFn={this.checkForBackspaceDelete.bind(this)}
-          handleKeyCommand={this.doBackspaceDelete.bind(this)}
+          handleKeyCommand={this.maybeDoBackspaceDelete.bind(this)}
           ref='editor'
         />
       </div>
@@ -96,11 +79,6 @@ const mapDispatchToProps = (dispatch) => {
       console.log('inlineEditor.onSelected.start')
       dispatch({type: CARD_UNIQUELY_SELECTED, id: id})
       console.log('inlineEditor.onSelected.finish')
-    },
-    onTextResized: (id, height) => {
-      console.log('inlineEditor.onTextResized.start')
-      dispatch({type: CARD_TEXT_RESIZED, id: id, height: height})
-      console.log('inlineEditor.onTextResized.finish')
     },
     onDeleted: (id) => {
       console.log('inlineEditor.onDeleted.start')

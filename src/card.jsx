@@ -7,61 +7,89 @@ import ReactMarkdown from 'react-markdown'
 import InlineEditor from './inline-editor'
 import { CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED } from './action-types'
 
-const textInnerPresentation = (card) => {
-  if (card.get('selected')) {
+class CardPresentation extends React.Component {
+  constructor(props) {
+    super(props)
+    this.lastHeight = 0
+  }
+
+  componentDidMount() {
+    this.checkTextHeight()
+  }
+
+  componentDidUpdate() {
+    this.checkTextHeight()
+  }
+
+  checkTextHeight() {
+    if (this.props.card.get('type') === 'text') {
+      // console.log(this.props, this.props.children)
+      // const newHeight = this.props.children[0].clientHeight
+      // if (this.lastHeight != newHeight) {
+      //   this.props.onTextResized(props.card, newHeight)
+      //   this.lastHeight = newHeight
+      // }
+    }
+  }
+
+  renderTextInner() {
+    const card = this.props.card
+    if (card.get('selected')) {
+      return (
+        <InlineEditor
+          cardId={card.get('id')}
+          editorState={card.get('editorState')}
+          createFocus={card.get('selected')}
+        />
+      )
+    } else {
+      const mdText = card.get('editorState').getCurrentContent().getPlainText('\n')
+      return (
+        <ReactMarkdown
+          source={mdText}
+          className={'renderedMarkdown'}
+        />
+      )
+    }
+  }
+
+  renderImageInner() {
     return (
-      <InlineEditor
-        cardId={card.get('id')}
-        editorState={card.get('editorState')}
-        createFocus={card.get('selected')}
-      />
-    )
-  } else {
-    const mdText = card.get('editorState').getCurrentContent().getPlainText('\n')
-    return (
-      <ReactMarkdown
-        source={mdText}
-        className={'renderedMarkdown'}
+      <img
+        className='image'
+        src={this.props.card.get('path')}
       />
     )
   }
-}
 
-const imageInnerPresentation = (card) => {
-  return (
-    <img
-      className='image'
-      src={card.get('path')}
-    />
-  )
-}
-
-const presentation = ({ card, onMouseDown, onStart, onDrag, onStop }) => {
-  return (
-    <DraggableCore
-      allowAnyClick={false}
-      disabled={false}
-      enableUserSelectHack={false}
-      onStart={(e, d) => onStart(card, e, d)}
-      onDrag={(e, d) => onDrag(card, e, d)}
-      onStop={(e, d) => onStop(card, e, d)}
-      onMouseDown={(e) => onMouseDown(card, e)}
-    >
-      <div
-        id={`card-${card.get('id')}`}
-        className={classNames('card', card.get('selected') ? 'selected' : 'unselected')}
-        style={{
-          width: card.get('width'),
-          height: card.get('height'),
-          position: 'absolute',
-          left: card.get('x'),
-          top: card.get('y')
-        }}>
-        { card.get('type') === 'text' ? textInnerPresentation(card) : imageInnerPresentation(card) }
-        <span className='cardResizeHandle' />
-      </div>
-    </DraggableCore>
-  )
+  render() {
+    const card = this.props.card
+    return (
+      <DraggableCore
+        allowAnyClick={false}
+        disabled={false}
+        enableUserSelectHack={false}
+        onStart={(e, d) => this.props.onStart(card, e, d)}
+        onDrag={(e, d) => this.props.onDrag(card, e, d)}
+        onStop={(e, d) => this.props.onStop(card, e, d)}
+        onMouseDown={(e) => this.props.onMouseDown(card, e)}
+      >
+        <div
+          id={`card-${card.get('id')}`}
+          className={classNames('card', card.get('selected') ? 'selected' : 'unselected')}
+          style={{
+            width: card.get('width'),
+            height: card.get('height'),
+            position: 'absolute',
+            left: card.get('x'),
+            top: card.get('y')
+          }}>
+          { card.get('type') === 'text' ? this.renderTextInner(card) : this.renderImageInner(card) }
+          <span className='cardResizeHandle' />
+        </div>
+      </DraggableCore>
+    )
+  }
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -89,10 +117,15 @@ const mapDispatchToProps = (dispatch) => {
       console.log('card.onStop.start')
       dispatch({ type: CARD_DRAG_STOPPED, id: card.get('id') })
       console.log('card.onStop.finish')
-    }
+    },
+    onTextResized: (card, height) => {
+      console.log('card.onTextResized.start')
+      dispatch({type: CARD_TEXT_RESIZED, id: card.get('id'), height: height})
+      console.log('card.onTextResized.finish')
+    },
   }
 }
 
-const Card = connect(null, mapDispatchToProps)(presentation)
+const Card = connect(null, mapDispatchToProps)(CardPresentation)
 
 export default Card
