@@ -1,14 +1,14 @@
 ## In progress
 
 ## Functional
+Make board solid
+Markdown editing
 Design and implement default image & pdf scaling
 Grab and save image filename
 Copy image data into specific storage location
 Figure out default image deta for demo
 More robust way to handle max window size etc.
 Seperate color bar, white cards
-Can do basic text formatting with b/i/u
-More advanced text formatting
 Cut, copy, paste, and undo accross the app including at card level
 Context menu for individual cards including cut, copy, download original, delete
 Clicking anywhere on note brings you to editing
