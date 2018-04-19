@@ -1,8 +1,8 @@
 ## In progress
+Markdown editing
 
 ## Functional
 Make board solid
-Markdown editing
 Design and implement default image & pdf scaling
 Grab and save image filename
 Copy image data into specific storage location

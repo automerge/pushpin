@@ -11,20 +11,24 @@ import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATE
 //// Contants
 
 const GRID_SIZE = 5
-const CARD_DEFAULT_WIDTH = 250
+const CARD_DEFAULT_WIDTH = 300
 const CARD_DEFAULT_HEIGHT = 100
 const CARD_MIN_WIDTH = 100
 const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
 
 const WELCOME_TEXT =
-`Welcome to the board demo! You can:
+`## Welcome
+
+This is our board demo! You can:
 
 * Double-click to create a new text card.
 
 * Right-click to create a new text, image, or PDF card.
 
 * Click on a card to edit its text.
+
+* Write Markdown in cards for formatting.
 
 * Click and drag anywhere on a card to move it around.
 

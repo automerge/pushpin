@@ -46,6 +46,17 @@ div.card img.image {
   user-select: none;
 }
 
+div.card div.renderedMarkdown {
+  font-family: 'Helvetica', sans-serif;
+  font-size: 14px;
+  color: #090909;
+  padding: 21px;
+  margin: 0;
+  cursor: text;
+  box-sizing: border-box;
+  width: 100%;
+}
+
 div.card div.editorWrapper {
   font-family: 'Helvetica', sans-serif;
   font-size: 14px;

@@ -15,7 +15,6 @@ class InlineEditorPresentation extends React.Component {
     }
     this.focus = (e) => {
       this.refs.editor.focus()
-      props.onSelected(props.cardId)
     }
     this.onTextResized = (height) => {
       props.onTextResized(props.cardId, height)

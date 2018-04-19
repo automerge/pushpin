@@ -2,18 +2,29 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
+import ReactMarkdown from 'react-markdown'
 
 import InlineEditor from './inline-editor'
 import { CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED } from './action-types'
 
 const textInnerPresentation = (card) => {
-  return (
-    <InlineEditor
-      cardId={card.get('id')}
-      editorState={card.get('editorState')}
-      createFocus={card.get('selected')}
-    />
-  )
+  if (card.get('selected')) {
+    return (
+      <InlineEditor
+        cardId={card.get('id')}
+        editorState={card.get('editorState')}
+        createFocus={card.get('selected')}
+      />
+    )
+  } else {
+    const mdText = card.get('editorState').getCurrentContent().getPlainText('\n')
+    return (
+      <ReactMarkdown
+        source={mdText}
+        className={'renderedMarkdown'}
+      />
+    )
+  }
 }
 
 const imageInnerPresentation = (card) => {
