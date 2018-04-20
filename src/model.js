@@ -18,7 +18,7 @@ const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
 
 const WELCOME_TEXT =
-`# Welcome
+`## Welcome
 
 This is our board demo!
 

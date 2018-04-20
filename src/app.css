@@ -92,6 +92,10 @@ div.card img.image {
 
 div.card.text {
   cursor: text;
+  color: #444;
+  font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+  font-size: 14px;
+  line-height: 1.5em;
 }
 
 div.card.text div.editorWrapper {
@@ -108,13 +112,6 @@ div.card.text div.renderer {
 
 
 /* Markdown Styles: https://simon.lc/sites/markdown/ */
-
-div.renderer {
-  color: #444;
-  font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
-  font-size: 14px;
-  line-height: 1.5em;
-}
 
 div.renderer a {
   color: #0645ad;
@@ -245,6 +242,7 @@ div.renderer sub {
 }
 
 div.renderer ul, ol {
+  list-style-type: disc;
   margin: 1em 0;
   padding: 0 0 0 2em;
 }
@@ -264,4 +262,12 @@ div.renderer table {
 
 div.renderer td {
   vertical-align: top;
+}
+
+div.renderer :first-child {
+  margin-top: 0;
+}
+
+div.renderer :last-child {
+  margin-bottom: 0;
 }

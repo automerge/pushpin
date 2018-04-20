@@ -1,6 +1,7 @@
 ## In progress
-Markdown editing and styling
 Maybe you can't resize text boxes
+Take another pass at designing intro data
+Try out all the markdown features
 
 ## Functional
 Make board solid
