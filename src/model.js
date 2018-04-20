@@ -22,9 +22,10 @@ const RESIZE_HANDLE_SIZE = 21
 const WELCOME_TEXT =
 `## Welcome
 
-This is our board demo!
+This is our board demo!`
 
-### Usage
+const USAGE_TEXT =
+`### Usage
 
 * Double-click to create a new text card.
 * Right-click to create a new text, image, or PDF card.
@@ -34,9 +35,10 @@ This is our board demo!
 * Click and drag on the bottom right corner of a card to resize it.
 * Paste an absolute file name to an image or pdf as the only text in a card + hit enter, to load that file.
 * Use arrow keys to scroll around the board.
-* Press space + move the mouse to scroll around the board.
+* Press space + move the mouse to scroll around the board.`
 
-### Example data
+const EXAMPLE_TEXT =
+`### Example data
 
 We've made some initial cards for you to play with. Have fun!`
 
@@ -145,10 +147,18 @@ const RootState = new Map({
 
 function initializeIfEmpty(state) {
   const welcomeEditorState = EditorState.createWithContent(ContentState.createFromText(WELCOME_TEXT))
-  state = cardCreatedText(state,  { x: 1300, y: 150,  selected: true, editorState: welcomeEditorState})
-  state = cardCreatedText(state,  { x: 1650, y: 250, selected: false })
-  state = cardCreatedImage(state, { x: 1950, y: 450, selected: false, path: '../img/kay.jpg', width: (900/3), height: (750/3) })
-  const id = uuid()
+  state = cardCreatedText(state,  { x: 1300, y: 300,  selected: false, editorState: welcomeEditorState})
+
+  const usageEditorState = EditorState.createWithContent(ContentState.createFromText(USAGE_TEXT))
+  state = cardCreatedText(state,  { x: 1300, y: 450, selected: false, editorState: usageEditorState })
+
+  const exampleEditorState = EditorState.createWithContent(ContentState.createFromText(EXAMPLE_TEXT))
+  state = cardCreatedText(state,  { x: 1300, y: 950, selected: false, editorState: exampleEditorState })
+
+  state = cardCreatedImage(state, { x: 1750, y: 350, selected: false, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
+
+  state = cardCreatedImage(state, { x: 1700, y: 700, selected: false, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
+
   return state
 }
 
