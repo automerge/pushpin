@@ -1,5 +1,4 @@
 ## In progress
-Make board solid
 
 ## Functional
 Maybe you can't resize text boxes

@@ -280,9 +280,11 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
   const newTotalDrag = card.get('totalDrag') + Math.abs(deltaX) + Math.abs(deltaY)
 
   if (card.get('resizing')) {
+    // First guess at change in dimensions given mouse movements.
     let preClampWidth = card.get('width') + deltaX
     let preClampHeight = card.get('height') + deltaY
 
+    // Maintain aspect ratio on image cards.
     if (card.get('type') !== 'text') {
       const ratio = card.get('width') / card.get('height')
       preClampHeight = preClampWidth / ratio
@@ -295,6 +297,7 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
     let newWidth = preClampWidth + card.get('slackWidth')
     let newHeight = preClampHeight + card.get('slackHeight')
 
+    // Clamp to ensure card doesn't resize beyond the board or min dimensions.
     newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
     newWidth = Math.min(BOARD_WIDTH - card.get('x'), newWidth)
     newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
@@ -316,13 +319,33 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
   }
 
   if (card.get('moving')) {
-    const newX = card.get('x') + deltaX
-    const newY = card.get('y') + deltaY
+    // First guess at change in location given mouse movements.
+    let preClampX = card.get('x') + deltaX
+    let preClampY = card.get('y') + deltaY
+
+    // Add slack to the values used to calculate bound position. This will
+    // ensure that if we start removing slack, the element won't react to
+    // it right away until it's been completely removed.
+    let newX = preClampX + card.get('slackWidth')
+    let newY = preClampY + card.get('slackHeight')
+
+    // Clamp to ensure card doesn't move beyond the board.
+    newX = Math.max(newX, 0)
+    newX = Math.min(newX, BOARD_WIDTH - card.get('width'))
+    newY = Math.max(newY, 0)
+    newY = Math.min(newY, BOARD_HEIGHT - card.get('height'))
+
+    // If the numbers changed, we must have introduced some slack.
+    // Record it for the next iteration.
+    const newSlackWidth = card.get('slackWidth') + preClampX - newX
+    const newSlackHeight = card.get('slackHeight') + preClampY - newY
 
     return state.updateIn(['cards', id], (card) => {
       return card
         .set('x', newX)
         .set('y', newY)
+        .set('slackWidth', newSlackWidth)
+        .set('slackHeight', newSlackHeight)
         .set('totalDrag', newTotalDrag)
     })
   }
