@@ -1,7 +1,8 @@
 ## In progress
 
 ## Functional
-Scroll wheel zooms in and out?
+Make scrolling / zooming smooth
+Fix random highlighting of text when moving / resizing
 Maybe you can't resize text boxes
 Figure out how to get Markdown italics, maybe bold and markdown only require one symbol
 Ability to select while editing text? (+ highlight styling)

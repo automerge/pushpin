@@ -42,17 +42,20 @@ const onMouseMove = (e) => {
 }
 
 const onWheel = (e) => {
-  // Zoom out.
-  if (e.deltaY < 0) {
-    webFrame.setZoomFactor(webFrame.getZoomFactor() - 0.05)
+  console.log('wheel', e)
+
+  if (e.deltaY === 0) {
+    throw new Error('Unexpected non-zoom wheel')
   }
 
-  // Zoom in.
-  if (e.deltaY > 0) {
-    webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.05)
-  }
-
-  throw new Error('Unexpected zoom event')
+  const oldZoom = webFrame.getZoomFactor()
+  const scaleFactor = (e.deltaY < 0) ? 0.95 : 1.05
+  const newZoom = oldZoom * scaleFactor
+  const offsetX = e.clientX * (1-(1/scaleFactor))
+  const offsetY = e.clientY * (1-(1/scaleFactor))
+  webFrame.setZoomFactor(newZoom)
+  window.scrollBy(offsetX, offsetY)
+  e.preventDefault()
 }
 
 const init = () => {
