@@ -3,7 +3,7 @@
 ## Functional
 Maybe you can't resize text boxes
 Take another pass at designing intro data
-Try out all the markdown features
+Figure out how to get Markdown italics, maybe bold and markdown only require one symbol
 Ability to select while editing text? (+ highlight styling)
 Design and implement default image & pdf scaling
 Grab and save image filename
