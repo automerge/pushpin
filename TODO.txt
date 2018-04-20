@@ -2,6 +2,7 @@
 
 ## Functional
 Make scrolling / zooming smooth
+Add reasonable caps on zooming
 Fix random highlighting of text when moving / resizing
 Maybe you can't resize text boxes
 Figure out how to get Markdown italics, maybe bold and markdown only require one symbol
@@ -15,9 +16,7 @@ Seperate color bar, white cards
 Cut, copy, paste, and undo accross the app including at card level
 Context menu for individual cards including cut, copy, download original, delete
 Clicking anywhere on note brings you to editing
-
-Design and implement text note size effects [should be doable]
-Drag box to select and drag multiple cards[tried, got stuck]
+Drag box to select and drag multiple cards
 
 ## Styling
 Style background with dots aligning to grid
