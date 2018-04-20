@@ -10,6 +10,8 @@ import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATE
 
 //// Contants
 
+const BOARD_WIDTH = 3600
+const BOARD_HEIGHT = 1800
 const GRID_SIZE = 5
 const CARD_DEFAULT_WIDTH = 300
 const CARD_DEFAULT_HEIGHT = 100
@@ -278,28 +280,30 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
   const newTotalDrag = card.get('totalDrag') + Math.abs(deltaX) + Math.abs(deltaY)
 
   if (card.get('resizing')) {
-    let preMinWidth = card.get('width') + deltaX
-    let preMinHeight = card.get('height') + deltaY
+    let preClampWidth = card.get('width') + deltaX
+    let preClampHeight = card.get('height') + deltaY
 
     if (card.get('type') !== 'text') {
       const ratio = card.get('width') / card.get('height')
-      preMinHeight = preMinWidth / ratio
-      preMinWidth = preMinHeight * ratio
+      preClampHeight = preClampWidth / ratio
+      preClampWidth = preClampHeight * ratio
     }
 
     // Add slack to the values used to calculate bound position. This will
     // ensure that if we start removing slack, the element won't react to
     // it right away until it's been completely removed.
-    let newWidth = preMinWidth + card.get('slackWidth')
-    let newHeight = preMinHeight + card.get('slackHeight')
+    let newWidth = preClampWidth + card.get('slackWidth')
+    let newHeight = preClampHeight + card.get('slackHeight')
 
     newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
+    newWidth = Math.min(BOARD_WIDTH - card.get('x'), newWidth)
     newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
+    newHeight = Math.min(BOARD_HEIGHT - card.get('y'), newHeight)
 
     // If the numbers changed, we must have introduced some slack.
     // Record it for the next iteration.
-    const newSlackWidth = card.get('slackWidth') + preMinWidth - newWidth
-    const newSlackHeight = card.get('slackHeight') + preMinHeight - newHeight
+    const newSlackWidth = card.get('slackWidth') + preClampWidth - newWidth
+    const newSlackHeight = card.get('slackHeight') + preClampHeight - newHeight
 
     return state.updateIn(['cards', id], (card) => {
       return card
@@ -432,4 +436,4 @@ function Reducer(state, action) {
   }
 }
 
-export { RootState, Reducer, maybeInlineFile, processImage, processPDF };
+export { RootState, Reducer, maybeInlineFile, processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT };

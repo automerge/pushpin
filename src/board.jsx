@@ -5,7 +5,7 @@ import Card from './card'
 import { remote } from 'electron'
 
 import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from './action-types'
-import { processImage, processPDF } from './model'
+import { processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT } from './model'
 
 const { Menu, MenuItem, dialog } = remote
 
@@ -14,6 +14,7 @@ const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
     <div
       id='board'
       className='board'
+      style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT}}
       onClick={(e) => { onClick(e, cards) }}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}>
