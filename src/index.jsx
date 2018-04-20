@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import { webFrame } from 'electron'
 
 import { RootState, Reducer } from './model'
 import { INITIALIZE_IF_EMPTY, CARD_DELETED } from './action-types'
@@ -40,6 +41,20 @@ const onMouseMove = (e) => {
   }
 }
 
+const onWheel = (e) => {
+  // Zoom out.
+  if (e.deltaY < 0) {
+    webFrame.setZoomFactor(webFrame.getZoomFactor() - 0.05)
+  }
+
+  // Zoom in.
+  if (e.deltaY > 0) {
+    webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.05)
+  }
+
+  throw new Error('Unexpected zoom event')
+}
+
 const init = () => {
   const store = createStore(Reducer, RootState)
   store.dispatch({type: INITIALIZE_IF_EMPTY})
@@ -51,7 +66,8 @@ const init = () => {
   )
   document.addEventListener('keydown', (e) => { onKeyDown(e, store) })
   document.addEventListener('keyup', (e) => { onKeyUp(e) })
-  document.addEventListener('mousemove', e => { onMouseMove(e) })
+  document.addEventListener('mousemove', (e) => { onMouseMove(e) })
+  document.addEventListener('wheel', (e) => { onWheel(e) })
 
   const board = document.getElementById('board')
   window.scrollTo(
