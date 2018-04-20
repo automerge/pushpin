@@ -25,7 +25,7 @@ class InlineEditorPresentation extends React.Component {
     if (this.props.selected) {
       this.focus()
     }
-    const newHeight = (this.refs.editor || this.refs.renderer).clientHeight
+    const newHeight = (this.refs.editorWrapper || this.refs.renderer).clientHeight
     if (this.lastHeight != newHeight) {
       this.props.onTextResized(this.props.cardId, newHeight)
       this.lastHeight = newHeight
@@ -69,7 +69,8 @@ class InlineEditorPresentation extends React.Component {
     if (this.props.selected) {
       return (
         <div
-          className={'editor'}
+          className={'editorWrapper'}
+          ref={'editorWrapper'}
         >
           <Editor
             editorState={this.state.editorState}

@@ -1,5 +1,6 @@
 ## In progress
 Markdown editing
+Maybe you can't resize text boxes
 
 ## Functional
 Make board solid

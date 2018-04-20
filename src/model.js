@@ -18,27 +18,23 @@ const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
 
 const WELCOME_TEXT =
-`## Welcome
+`# Welcome
 
-This is our board demo! You can:
+This is our board demo!
+
+### Usage
 
 * Double-click to create a new text card.
-
 * Right-click to create a new text, image, or PDF card.
-
 * Click on a card to edit its text.
-
 * Write Markdown in cards for formatting.
-
 * Click and drag anywhere on a card to move it around.
-
 * Click and drag on the bottom right corner of a card to resize it.
-
 * Paste an absolute file name to an image or pdf as the only text in a card + hit enter, to load that file.
-
 * Use arrow keys to scroll around the board.
-
 * Press space + move the mouse to scroll around the board.
+
+### Example data
 
 We've made some initial cards for you to play with. Have fun!`
 
@@ -380,7 +376,7 @@ function cardDeleted(state, { id }) {
 //// Reducer switch. Cases match 1:1 with action functions above.
 
 function Reducer(state, action) {
-  console.log(action)
+  // console.log(action)
 
   switch (action.type) {
     case '@@redux/INIT':

@@ -41,7 +41,7 @@ class CardPresentation extends React.Component {
       >
         <div
           id={`card-${card.get('id')}`}
-          className={classNames('card', card.get('selected') ? 'selected' : 'unselected')}
+          className={classNames('card', card.get('type'), card.get('selected') ? 'selected' : 'unselected')}
           style={{
             width: card.get('width'),
             height: card.get('height'),
