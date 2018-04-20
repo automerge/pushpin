@@ -20,7 +20,6 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
@@ -50,7 +49,7 @@ table {
 div.board {
   width: 3600px;
   height: 1200px;
-  background: #efefef;
+  background: #fafafa;
 }
 
 div.card {
@@ -82,10 +81,6 @@ div.card span.cardResizeHandle {
 
 div.card {
   box-sizing: border-box;
-  font-family: 'Helvetica', sans-serif;
-  font-size: 14px;
-  line-height: 1.2;
-  color: #090909;
 }
 
 div.card img.image {
@@ -111,22 +106,162 @@ div.card.text div.renderer {
   padding: 21px;
 }
 
+
+/* Markdown Styles: https://simon.lc/sites/markdown/ */
+
+div.renderer {
+  color: #444;
+  font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+  font-size: 14px;
+  line-height: 1.5em;
+}
+
+div.renderer a {
+  color: #0645ad;
+  text-decoration: none;
+}
+
+div.renderer a:visited {
+  color: #0b0080;
+}
+
+div.renderer a:hover {
+  color: #06e;
+}
+
+div.renderer a:active {
+  color: #faa700;
+}
+
+div.renderer a:focus {
+  outline: thin dotted;
+}
+
+div.renderer a:hover, a:active {
+  outline: 0;
+}
+
 div.renderer h1, h2, h3, h4, h5, h6 {
-  /* margin-bottom: 14px; */
+  font-weight: normal;
+  color: #111;
+  line-height: 1em;
+}
+
+div.renderer h4, h5, h6 {
+  font-weight: bold;
+}
+
+div.renderer h1 {
+  font-size: 2.5em;
+}
+
+div.renderer h2 {
+  font-size: 2em;
+}
+
+div.renderer h3 {
+  font-size: 1.5em;
+}
+
+div.renderer h4 {
+  font-size: 1.2em;
+}
+
+div.renderer h5 {
+  font-size: 1em;
+}
+
+div.renderer h6 {
+  font-size: 0.9em;
 }
 
 div.renderer p {
-  /* margin-bottom: 14px; */
+  margin: 1em 0;
 }
 
-div.renderer ul {
-  /* margin-bottom: 14px; */
+div.renderer blockquote {
+  color: #666666;
+  margin: 0;
+  padding-left: 3em;
+  border-left: 0.5em #eee solid;
 }
 
-div.renderer li {
-  /* margin-bottom: 7px; */
+div.renderer hr {
+  display: block;
+  border: 0;
+  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #eee;
+  margin: 1em 0;
+  padding: 0;
 }
 
-div.renderer li p {
-  /* display: inline; */
+div.renderer pre, code, kbd, samp {
+  color: #000;
+  font-family: monospace, monospace;
+  _font-family: 'courier new', monospace;
+  font-size: 0.98em;
+}
+
+div.renderer pre {
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+div.renderer b, strong {
+  font-weight: bold;
+}
+
+div.renderer dfn {
+  font-style: italic;
+}
+
+div.renderer ins {
+  background: #ff9;
+  color: #000;
+  text-decoration: none;
+}
+
+div.renderer mark {
+  background: #ff0;
+  color: #000;
+  font-style: italic;
+  font-weight: bold;
+}
+
+div.renderer sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+div.renderer sup {
+  top: -0.5em;
+}
+
+div.renderer sub {
+  bottom: -0.25em;
+}
+
+div.renderer ul, ol {
+  margin: 1em 0;
+  padding: 0 0 0 2em;
+}
+
+div.renderer li p:last-child {
+  margin: 0;
+}
+
+div.renderer dd {
+  margin: 0 0 0 2em;
+}
+
+div.renderer table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+div.renderer td {
+  vertical-align: top;
 }

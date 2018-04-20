@@ -1,5 +1,5 @@
 ## In progress
-Markdown editing
+Markdown editing and styling
 Maybe you can't resize text boxes
 
 ## Functional
