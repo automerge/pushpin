@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { webFrame } from 'electron'
+import Hypermerge from 'hypermerge'
+import RAM from 'random-access-memory'
 
 import { RootState, Reducer } from './model'
-import { INITIALIZE_IF_EMPTY, CARD_DELETED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
 import Board from './board'
 
 var spaceDown = false
@@ -13,9 +15,9 @@ var spaceDown = false
 const onKeyDown = (e, store) => {
   if (e.key === 'Backspace') {
     const state = store.getState()
-    state.get('cards').forEach((card, idx) => {
-      if (card.get('selected') && (card.get('type') !== 'text')) {
-        store.dispatch({ type: CARD_DELETED, id: card.get('id') })
+    state.board.cards.forEach((card, idx) => {
+      if (card.selected && (card.type !== 'text')) {
+        store.dispatch({ type: CARD_DELETED, id: card.id })
       }
     })
     return
@@ -42,8 +44,6 @@ const onMouseMove = (e) => {
 }
 
 const onWheel = (e) => {
-  console.log('wheel', e)
-
   if (e.deltaY === 0) {
     throw new Error('Unexpected non-zoom wheel')
   }
@@ -58,25 +58,47 @@ const onWheel = (e) => {
   e.preventDefault()
 }
 
+const centerOnStart = () => {
+  const board = document.getElementById('board')
+  window.scrollTo(
+    (board.clientWidth/2)-(window.innerWidth/2),
+    (board.clientHeight/2.5)-(window.innerHeight/2)
+  )
+}
+
 const init = () => {
-  const store = createStore(Reducer, RootState)
-  store.dispatch({type: INITIALIZE_IF_EMPTY})
+  const hm = new Hypermerge({path: RAM, port: 0})
+  hm.once('ready', function() {
+    hm.joinSwarm()
+
+    const store = createStore(Reducer, RootState)
+
+    hm.on('document:ready', (docId, doc) => {
+      store.dispatch({type: DOCUMENT_READY, docId: docId, doc: doc})
+    })
+    hm.on('document:updated', (docId, doc) => {
+      store.dispatch({type: DOCUMENT_UPDATED, docId: docId, doc: doc})
+    })
+
+    store.dispatch({type: INITIALIZE_IF_EMPTY})
+    render(store)
+  })
+}
+
+const render = (store) => {
   ReactDOM.render(
     <Provider store={store}>
       <Board />
     </Provider>,
     document.getElementById('container')
   )
+
   document.addEventListener('keydown', (e) => { onKeyDown(e, store) })
   document.addEventListener('keyup', (e) => { onKeyUp(e) })
   document.addEventListener('mousemove', (e) => { onMouseMove(e) })
   document.addEventListener('wheel', (e) => { onWheel(e) })
 
-  const board = document.getElementById('board')
-  window.scrollTo(
-    (board.clientWidth/2)-(window.innerWidth/2),
-    (board.clientHeight/2.5)-(window.innerHeight/2)
-  )
+  centerOnStart()
 }
 
 init()

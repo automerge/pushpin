@@ -11,9 +11,9 @@ class CardPresentation extends React.Component {
   renderTextInner() {
     return (
       <InlineEditor
-        cardId={this.props.card.get('id')}
-        editorState={this.props.card.get('editorState')}
-        selected={this.props.card.get('selected')}
+        cardId={this.props.card.id}
+        editorState={this.props.card.editorState}
+        selected={this.props.card.selected}
       />
     )
   }
@@ -22,7 +22,7 @@ class CardPresentation extends React.Component {
     return (
       <img
         className='image'
-        src={this.props.card.get('path')}
+        src={this.props.card.path}
       />
     )
   }
@@ -40,16 +40,16 @@ class CardPresentation extends React.Component {
         onMouseDown={(e) => this.props.onMouseDown(card, e)}
       >
         <div
-          id={`card-${card.get('id')}`}
-          className={classNames('card', card.get('type'), card.get('selected') ? 'selected' : 'unselected')}
+          id={`card-${card.id}`}
+          className={classNames('card', card.type, card.selected ? 'selected' : 'unselected')}
           style={{
-            width: card.get('width'),
-            height: card.get('height'),
+            width: card.width,
+            height: card.height,
             position: 'absolute',
-            left: card.get('x'),
-            top: card.get('y')
+            left: card.x,
+            top: card.y
           }}>
-          { card.get('type') === 'text' ? this.renderTextInner(card) : this.renderImageInner(card) }
+          { card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(card) }
           <span className='cardResizeHandle' />
         </div>
       </DraggableCore>
@@ -67,12 +67,12 @@ const mapDispatchToProps = (dispatch) => {
         throw new Error(`Did not expect delta in onStart`)
       }
       console.log('card.onStart.start')
-      dispatch({ type: CARD_DRAG_STARTED, id: card.get('id'), x: d.lastX, y: d.lastY })
+      dispatch({ type: CARD_DRAG_STARTED, id: card.id, x: d.lastX, y: d.lastY })
       console.log('card.onStart.finish')
     },
     onDrag: (card, e, d) => {
       if (d.deltaX != 0 || d.deltaY != 0) {
-        dispatch({ type: CARD_DRAG_MOVED, id: card.get('id'), deltaX: d.deltaX, deltaY: d.deltaY })
+        dispatch({ type: CARD_DRAG_MOVED, id: card.id, deltaX: d.deltaX, deltaY: d.deltaY })
       }
     },
     onStop: (card, e, d) => {
@@ -80,7 +80,7 @@ const mapDispatchToProps = (dispatch) => {
         throw new Error(`Did not expect delta in onStart`)
       }
       console.log('card.onStop.start')
-      dispatch({ type: CARD_DRAG_STOPPED, id: card.get('id') })
+      dispatch({ type: CARD_DRAG_STOPPED, id: card.id })
       console.log('card.onStop.finish')
     }
   }

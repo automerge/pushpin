@@ -20,11 +20,11 @@ const createWindow = async () => {
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
   // Open the DevTools if in dev mode.
-  // const isDevMode = process.execPath.match(/[\\/]electron/);
-  // if (isDevMode) {
-  //   await installExtension(REACT_DEVELOPER_TOOLS);
-  //   mainWindow.webContents.openDevTools();
-  // }
+  const isDevMode = process.execPath.match(/[\\/]electron/);
+  if (isDevMode) {
+    await installExtension(REACT_DEVELOPER_TOOLS);
+    mainWindow.webContents.openDevTools();
+  }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

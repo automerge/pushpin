@@ -10,6 +10,10 @@ import { processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT } from './model'
 const { Menu, MenuItem, dialog } = remote
 
 const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
+  let cardChildren = []
+  cards.forEach((card, id) => {
+    cardChildren.push(<Card key={card.id} card={card} />)
+  })
   return (
     <div
       id='board'
@@ -18,18 +22,13 @@ const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
       onClick={(e) => { onClick(e, cards) }}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}>
-      {cards.valueSeq().map(card =>
-        <Card
-          key={card.get('id')}
-          card={card}
-        />
-      )}
+      {cardChildren}
     </div>
   )
 }
 
 const mapStateToProps = (state) => {
-  return {cards: state.get('cards')}
+  return {cards: state.board.cards}
 }
 
 const rightClickMenu = (dispatch, e) => {
@@ -69,17 +68,17 @@ const rightClickMenu = (dispatch, e) => {
 }
 
 const withinCard = (card, x, y) => {
-  return (x >= card.get('x')) &&
-         (x <= card.get('x')+card.get('width')) &&
-         (y >= card.get('y')) &&
-         (y <= card.get('y')+card.get('height'))
+  return (x >= card.x) &&
+         (x <= card.x + card.width) &&
+         (y >= card.y) &&
+         (y <= card.y + card.height)
 }
 
 const mapDispatchToProps = (dispatch, getState) => {
   return {
     onClick: (e, cards) => {
       let clickingInCard = false
-      cards.valueSeq().forEach((card) => {
+      cards.forEach((card, id) => {
         const res = withinCard(card, e.pageX, e.pageY)
         if (res) {
           clickingInCard = true

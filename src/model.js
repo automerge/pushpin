@@ -1,4 +1,3 @@
-import { Map, List } from 'immutable'
 import { EditorState, ContentState } from 'draft-js'
 import uuid from 'uuid/v4'
 import Fs from 'fs'
@@ -6,7 +5,7 @@ import Path from 'path'
 import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
 
 //// Contants
 
@@ -136,12 +135,18 @@ function snapToGrid(num) {
   }
 }
 
+// Returns a new state with card set in. Can be a new or updated card.
+function setCard(state, id, newCard) {
+  const newCards = new Map(state.board.cards)
+  newCards.set(id, newCard)
+  const newBoard = Object.assign({}, state.board, {cards: newCards})
+  const newState = Object.assign({}, state, {board: newBoard})
+  return newState
+}
 
 //// Initial state. Evolved by actions below.
 
-const RootState = new Map({
-  cards: new Map()
-})
+const RootState = { board: { cards: new Map() } }
 
 //// Action functions. Functions match 1:1 with reducer switch further below.
 
@@ -162,141 +167,114 @@ function initializeIfEmpty(state) {
   return state
 }
 
-function cardCreatedText(state, { x, y, selected, editorState }) {
+function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
   state = clearSelections(state)
   const id = uuid()
   const snapX = snapToGrid(x)
   const snapY = snapToGrid(y)
-  state = state.setIn(['cards', id], new Map({
+  const newCard = Object.assign({
     id: id,
-    type: 'text',
+    type: type,
     x: snapX,
     y: snapY,
-    width: CARD_DEFAULT_WIDTH,
-    height: CARD_DEFAULT_HEIGHT,
+    width: width || CARD_DEFAULT_WIDTH,
+    height: height || CARD_DEFAULT_HEIGHT,
     slackWidth: 0,
     slackHeight: 0,
     resizing: false,
     moving: false,
-    selected: selected,
-    editorState: editorState || EditorState.createEmpty()
-  }))
-  return state
+    selected: selected
+  }, typeAttrs)
+  return setCard(state, id, newCard)
+}
+
+function cardCreatedText(state, { x, y, selected, editorState }) {
+  const useEditorState = editorState || EditorState.createEmpty()
+  return cardCreated(state, { x, y, selected, type: 'text', typeAttrs: { editorState: useEditorState } })
 }
 
 function cardCreatedImage(state, { x, y, selected, path, width, height }) {
-  state = clearSelections(state)
-  const id = uuid()
-  const snapX = snapToGrid(x)
-  const snapY = snapToGrid(y)
-  state = state.setIn(['cards', id], new Map({
-    id: id,
-    type: 'image',
-    x: snapX,
-    y: snapY,
-    width: width,
-    height: height,
-    slackWidth: 0,
-    slackHeight: 0,
-    resizing: false,
-    moving: false,
-    selected: selected,
-    path: path
-  }))
-  return state
+  return cardCreated(state, { x, y, selected, width, height, type: 'image', typeAttrs: { path: path }})
 }
 
 function cardCreatedPDF(state, { x, y, selected, path, width, height}) {
-  state = clearSelections(state)
-  const id = uuid()
-  const snapX = snapToGrid(x)
-  const snapY = snapToGrid(y)
-  state = state.setIn(['cards', id], new Map({
-    id: id,
-    type: 'pdf',
-    x: snapX,
-    y: snapY,
-    width: width,
-    height: height,
-    slackWidth: 0,
-    slackHeight: 0,
-    resizing: false,
-    moving: false,
-    selected: selected,
-    path: path
-  }))
-  return state
+  return cardCreated(state, { x, y, selected, width, height, type: 'pdf', typeAttrs: { path: path }})
 }
 
 function cardEditorChanged(state, { id, editorState }) {
-  return state.setIn(['cards', id, 'editorState'], editorState)
+  const card = state.board.cards.get(id)
+  const newCard = Object.assign({}, card, { editorState: editorState })
+  return setCard(state, id, newCard)
 }
 
 function cardTextResized(state, { id, height }) {
-  const currentHeight = state.getIn(['cards', id, 'height'])
-  if (currentHeight < height) {
-    return state.setIn(['cards', id, 'height'], height)
+  const card = state.board.cards.get(id)
+  if (card.height < height) {
+    const newCard = Object.assign({}, card, { height: height })
+    return setCard(state, id, newCard)
   }
   return state
 }
 
 function cardInlinedImage(state, { id, path, width, height }) {
-  return state.updateIn(['cards', id], (card) => {
-    return card
-      .set('type', 'image')
-      .set('path', path)
-      .set('width', width)
-      .set('height', height)
-      .delete('editorState')
+  const card = state.board.cards.get(id)
+  const newCard = Object.assign({}, card, {
+    type: 'image',
+    path: path,
+    width: width,
+    height: height
   })
+  delete newCard.editorState
+  return setCard(state, id, newCard)
 }
 
 function cardInlinedPDF(state, { id, path, width, height }) {
-  return state.updateIn(['cards', id], (card) => {
-    return card
-      .set('type', 'pdf')
-      .set('path', path)
-      .set('width', width)
-      .set('height', height)
-      .delete('editorState')
+  const card = state.board.cards.get(id)
+  const newCard = Object.assign({}, card, {
+    type: 'pdf',
+    path: path,
+    width: width,
+    height: height
   })
+  delete newCard.editorState
+  return setCard(state, id, newCard)
 }
 
 function cardDragStarted(state, { id, x, y }) {
-  const card = state.getIn(['cards', id])
-  const resizing = ((x >= (card.get('x') + card.get('width') - RESIZE_HANDLE_SIZE)) &&
-                    (x <= (card.get('x') + card.get('width'))) &&
-                    (y >= (card.get('y') + card.get('height') - RESIZE_HANDLE_SIZE)) &&
-                    (y <= (card.get('y') + card.get('height'))))
+  const card = state.board.cards.get(id)
+  const resizing = ((x >= (card.x + card.width - RESIZE_HANDLE_SIZE)) &&
+                    (x <= (card.x + card.width)) &&
+                    (y >= (card.y + card.height - RESIZE_HANDLE_SIZE)) &&
+                    (y <= (card.y + card.height)))
   const moving = !resizing
-  return state.updateIn(['cards', id], (card) => {
-    return card
-      .set('resizing', resizing)
-      .set('moving', moving)
-      .set('totalDrag', 0)
+  const newCard = Object.assign({}, card, {
+    resizing: resizing,
+    moving: moving,
+    totalDrag: 0
   })
+  return setCard(state, id, newCard)
 }
 
 function cardDragMoved(state, { id, deltaX, deltaY }) {
-  const card = state.getIn(['cards', id])
+  const card = state.board.cards.get(id)
 
-  if (!card.get('resizing') && !card.get('moving')) {
+  if (!card.resizing && !card.moving) {
     throw new Error(`Did not expect drag without resize or move`)
   }
-  if (card.get('resizing') && card.get('moving')) {
+  if (card.resizing && card.moving) {
     throw new Error(`Did not expect drag with both resize and move`)
   }
 
-  const newTotalDrag = card.get('totalDrag') + Math.abs(deltaX) + Math.abs(deltaY)
+  const newTotalDrag = card.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
 
-  if (card.get('resizing')) {
+  if (card.resizing) {
     // First guess at change in dimensions given mouse movements.
-    let preClampWidth = card.get('width') + deltaX
-    let preClampHeight = card.get('height') + deltaY
+    let preClampWidth = card.width + deltaX
+    let preClampHeight = card.height + deltaY
 
     // Maintain aspect ratio on image cards.
-    if (card.get('type') !== 'text') {
-      const ratio = card.get('width') / card.get('height')
+    if (card.type !== 'text') {
+      const ratio = card.width / card.height
       preClampHeight = preClampWidth / ratio
       preClampWidth = preClampHeight * ratio
     }
@@ -304,91 +282,93 @@ function cardDragMoved(state, { id, deltaX, deltaY }) {
     // Add slack to the values used to calculate bound position. This will
     // ensure that if we start removing slack, the element won't react to
     // it right away until it's been completely removed.
-    let newWidth = preClampWidth + card.get('slackWidth')
-    let newHeight = preClampHeight + card.get('slackHeight')
+    let newWidth = preClampWidth + card.slackWidth
+    let newHeight = preClampHeight + card.slackHeight
 
     // Clamp to ensure card doesn't resize beyond the board or min dimensions.
     newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
-    newWidth = Math.min(BOARD_WIDTH - card.get('x'), newWidth)
+    newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
     newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
-    newHeight = Math.min(BOARD_HEIGHT - card.get('y'), newHeight)
+    newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
 
     // If the numbers changed, we must have introduced some slack.
     // Record it for the next iteration.
-    const newSlackWidth = card.get('slackWidth') + preClampWidth - newWidth
-    const newSlackHeight = card.get('slackHeight') + preClampHeight - newHeight
+    const newSlackWidth = card.slackWidth + preClampWidth - newWidth
+    const newSlackHeight = card.slackHeight + preClampHeight - newHeight
 
-    return state.updateIn(['cards', id], (card) => {
-      return card
-        .set('width', newWidth)
-        .set('height', newHeight)
-        .set('slackWidth', newSlackWidth)
-        .set('slackHeight', newSlackHeight)
-        .set('totalDrag', newTotalDrag)
+    const newCard = Object.assign({}, card, {
+      width: newWidth,
+      height: newHeight,
+      slackWidth: newSlackWidth,
+      slackHeight: newSlackHeight,
+      totalDrag: newTotalDrag
     })
+    return setCard(state, id, newCard)
   }
 
-  if (card.get('moving')) {
+  if (card.moving) {
     // First guess at change in location given mouse movements.
-    let preClampX = card.get('x') + deltaX
-    let preClampY = card.get('y') + deltaY
+    let preClampX = card.x + deltaX
+    let preClampY = card.y + deltaY
 
     // Add slack to the values used to calculate bound position. This will
     // ensure that if we start removing slack, the element won't react to
     // it right away until it's been completely removed.
-    let newX = preClampX + card.get('slackWidth')
-    let newY = preClampY + card.get('slackHeight')
+    let newX = preClampX + card.slackWidth
+    let newY = preClampY + card.slackHeight
 
     // Clamp to ensure card doesn't move beyond the board.
     newX = Math.max(newX, 0)
-    newX = Math.min(newX, BOARD_WIDTH - card.get('width'))
+    newX = Math.min(newX, BOARD_WIDTH - card.width)
     newY = Math.max(newY, 0)
-    newY = Math.min(newY, BOARD_HEIGHT - card.get('height'))
+    newY = Math.min(newY, BOARD_HEIGHT - card.height)
 
     // If the numbers changed, we must have introduced some slack.
     // Record it for the next iteration.
-    const newSlackWidth = card.get('slackWidth') + preClampX - newX
-    const newSlackHeight = card.get('slackHeight') + preClampY - newY
+    const newSlackWidth = card.slackWidth + preClampX - newX
+    const newSlackHeight = card.slackHeight + preClampY - newY
 
-    return state.updateIn(['cards', id], (card) => {
-      return card
-        .set('x', newX)
-        .set('y', newY)
-        .set('slackWidth', newSlackWidth)
-        .set('slackHeight', newSlackHeight)
-        .set('totalDrag', newTotalDrag)
+    const newCard = Object.assign({}, card, {
+      x: newX,
+      y: newY,
+      slackWidth: newSlackWidth,
+      slackHeight: newSlackHeight,
+      totalDrag: newTotalDrag
     })
+    return setCard(state, id, newCard)
   }
 }
 
 function cardDragStopped(state, { id }) {
-  const card = state.getIn(['cards', id])
-  const snapX = snapToGrid(card.get('x'))
-  const snapY = snapToGrid(card.get('y'))
-  const snapWidth = snapToGrid(card.get('width'))
-  const snapHeight = snapToGrid(card.get('height'))
-  const selectedBefore = card.get('selected')
-  const minDragSelection = card.get('totalDrag') < GRID_SIZE/2
+  const card = state.board.cards.get(id)
+  const snapX = snapToGrid(card.x)
+  const snapY = snapToGrid(card.y)
+  const snapWidth = snapToGrid(card.width)
+  const snapHeight = snapToGrid(card.height)
+  const selectedBefore = card.selected
+  const minDragSelection = card.totalDrag < GRID_SIZE/2
   if (minDragSelection) {
     state = clearSelections(state)
   }
-  return state.updateIn(['cards', id], (card) => {
-    return card
-      .set('x', snapX)
-      .set('y', snapY)
-      .set('width', snapWidth)
-      .set('height', snapHeight)
-      .set('slackWidth', 0)
-      .set('slackHeight', 0)
-      .set('resizing', false)
-      .set('moving', false)
-      .set('selected', selectedBefore || minDragSelection)
-      .delete('totalDrag')
+  const newCard = Object.assign({}, card, {
+    x: snapX,
+    y: snapY,
+    width: snapWidth,
+    height: snapHeight,
+    slackWidth: 0,
+    slackHeight: 0,
+    resizing: false,
+    moving: false,
+    selected: selectedBefore || minDragSelection
   })
+  delete newCard.totalDrag
+  return setCard(state, id, newCard)
 }
 
 function cardSelected(state, { id }) {
-  return state.setIn(['cards', id, 'selected'], true)
+  const card = state.board.cards.get(id)
+  const newCard = Object.assign({}, card, {selected: true})
+  return setCard(state, id, newCard)
 }
 
 function cardUniquelySelected(state, params) {
@@ -398,26 +378,37 @@ function cardUniquelySelected(state, params) {
 }
 
 function clearSelections(state) {
-  state.get('cards').forEach((card, idx) => {
-    if (card.get('selected')) {
-      state = state.setIn(['cards', idx, 'selected'], false)
+  state.board.cards.forEach((card, id) => {
+    if (card.selected) {
+      const newCard = Object.assign({}, card, {selected: false})
+      state = setCard(state, id, newCard)
     }
   })
   return state
 }
 
 function cardDeleted(state, { id }) {
-  return state.deleteIn(['cards', id])
+  const newCards = new Map(state.board.cards)
+  newCards.delete(id)
+  const newBoard = Object.assign({}, state.board, {cards: newCards})
+  const newState = Object.assign({}, state, {board: newBoard})
+  return newState
 }
 
 //// Reducer switch. Cases match 1:1 with action functions above.
 
 function Reducer(state, action) {
-  // console.log(action)
+  console.log(action)
 
   switch (action.type) {
     case '@@redux/INIT':
       return state;
+
+    case DOCUMENT_READY:
+      return state
+
+    case DOCUMENT_UPDATED:
+      return state
 
     case INITIALIZE_IF_EMPTY:
       return initializeIfEmpty(state);
