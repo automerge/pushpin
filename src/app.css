@@ -269,3 +269,8 @@ div.renderer :first-child {
 div.renderer :last-child {
   margin-bottom: 0;
 }
+
+
+div.exampleEditor {
+  width: 600;
+}

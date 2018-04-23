@@ -11,9 +11,10 @@ const { Menu, MenuItem, dialog } = remote
 
 const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
   let cardChildren = []
-  cards.forEach((card, id) => {
-    cardChildren.push(<Card key={card.id} card={card} />)
-  })
+  for (let id in cards) {
+    const card = cards[id]
+    cardChildren.push(<Card key={id} card={card} />)
+  }
   return (
     <div
       id='board'
@@ -36,7 +37,7 @@ const rightClickMenu = (dispatch, e) => {
   const y = e.pageY
   const menu = new Menu()
   menu.append(new MenuItem({label: 'Add Note',  click() {
-    dispatch({type: CARD_CREATED_TEXT, x: x, y: y, selected: true})
+    dispatch({type: CARD_CREATED_TEXT, x: x, y: y, selected: true, text: ''})
   }}))
   menu.append(new MenuItem({label: 'Add Image', click() {
     dialog.showOpenDialog({
@@ -78,13 +79,14 @@ const mapDispatchToProps = (dispatch, getState) => {
   return {
     onClick: (e, cards) => {
       let clickingInCard = false
-      cards.forEach((card, id) => {
+      for (let id in cards) {
+        const card = cards[id]
         const res = withinCard(card, e.pageX, e.pageY)
         if (res) {
           clickingInCard = true
           return
         }
-      })
+      }
       if (clickingInCard) {
         return
       }
@@ -94,7 +96,7 @@ const mapDispatchToProps = (dispatch, getState) => {
     },
     onDoubleClick: (e) => {
       console.log('board.onDoubleClick.start')
-      dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, selected: true})
+      dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, selected: true, text: ''})
       console.log('board.onDoubleClick.finish')
     },
     onContextMenu: (e, ...rest) => {

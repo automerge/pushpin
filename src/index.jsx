@@ -6,6 +6,7 @@ import { webFrame } from 'electron'
 import Hypermerge from 'hypermerge'
 import RAM from 'random-access-memory'
 
+import ExampleEditor from './example-editor'
 import { RootState, Reducer } from './model'
 import { INITIALIZE, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
 import Board from './board'
@@ -15,11 +16,12 @@ var spaceDown = false
 const onKeyDown = (e, store) => {
   if (e.key === 'Backspace') {
     const state = store.getState()
-    state.board.cards.forEach((card, idx) => {
+    for (let id in state.board.cards) {
+      const card = state.board.cards[id]
       if (card.selected && (card.type !== 'text')) {
         store.dispatch({ type: CARD_DELETED, id: card.id })
       }
-    })
+    }
     return
   }
 
@@ -99,6 +101,16 @@ const render = (store) => {
   document.addEventListener('wheel', (e) => { onWheel(e) })
 
   centerOnStart()
+}
+
+const initEditor = () => {
+  ReactDOM.render(
+    <ExampleEditor
+      selected={true}
+      initialText={'# Welcome\n\nLet us try some initial text.'}
+    />,
+    document.getElementById('container')
+  )
 }
 
 init()

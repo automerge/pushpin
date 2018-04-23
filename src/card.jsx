@@ -12,7 +12,7 @@ class CardPresentation extends React.Component {
     return (
       <InlineEditor
         cardId={this.props.card.id}
-        editorState={this.props.card.editorState}
+        text={this.props.card.text}
         selected={this.props.card.selected}
       />
     )

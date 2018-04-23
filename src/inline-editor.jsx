@@ -1,30 +1,31 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Editor, getDefaultKeyBinding } from 'draft-js'
 import ReactMarkdown from 'react-markdown'
+import { Editor } from 'slate-react'
+import Plain from 'slate-plain-serializer'
 
 import { maybeInlineFile } from './model'
-import { CARD_EDITOR_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_IMAGE_INLINED, CARD_PDF_INLINED, CARD_DELETED } from './action-types'
+import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_IMAGE_INLINED, CARD_PDF_INLINED, CARD_DELETED } from './action-types'
 
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
+    console.log('editor.constructor', props)
     super(props)
-    this.state = {editorState: props.editorState}
+    this.state = {value: Plain.deserialize(props.text)}
     this.lastHeight = 0
   }
 
   componentDidMount() {
+    console.log('editor.componentDidMount')
     this.checkFocusAndHeight()
   }
 
   componentDidUpdate() {
+    console.log('editor.componentDidUpdate')
     this.checkFocusAndHeight()
   }
 
   checkFocusAndHeight() {
-    if (this.props.selected) {
-      this.focus()
-    }
     const newHeight = (this.refs.editorWrapper || this.refs.renderer).clientHeight
     if (this.lastHeight != newHeight) {
       this.props.onTextResized(this.props.cardId, newHeight)
@@ -32,40 +33,18 @@ class InlineEditorPresentation extends React.Component {
     }
   }
 
-  onChange(editorState) {
-    this.setState({editorState: editorState})
-    this.props.onChange(this.props.cardId, editorState)
+  willReceiveProps(props) {
+    console.log('editor.willReceiveProps')
   }
 
-  focus() {
-    this.refs.editor.focus()
-  }
-
-  checkForBackspaceDelete(e) {
-    if (e.key !== 'Backspace') {
-      return getDefaultKeyBinding(e)
-    }
-    const selectionState = this.state.editorState.getSelection()
-    const firstLine = (this.state.editorState.getCurrentContent().getBlockMap().first().getKey() == selectionState.getFocusKey())
-    if (!firstLine) {
-      return getDefaultKeyBinding(e)
-    }
-    const startOfLine = (selectionState.getAnchorOffset() == 0)
-    if (!startOfLine) {
-      return getDefaultKeyBinding(e)
-    }
-    return 'backspace-delete-card'
-  }
-
-  maybeDoBackspaceDelete(command) {
-    if (command === 'backspace-delete-card') {
-      this.props.onDeleted(this.props.cardId)
-      return 'handled'
-    }
-    return 'not-handled'
+  onChange({ value }) {
+    console.log('editor.onChange')
+    this.setState({value: value})
+    this.props.onChange(this.props.cardId, Plain.serialize(value))
   }
 
   render() {
+    console.log('editor.render')
     if (this.props.selected) {
       return (
         <div
@@ -73,23 +52,20 @@ class InlineEditorPresentation extends React.Component {
           ref={'editorWrapper'}
         >
           <Editor
-            editorState={this.state.editorState}
+            value={this.state.value}
             onChange={this.onChange.bind(this)}
-            keyBindingFn={this.checkForBackspaceDelete.bind(this)}
-            handleKeyCommand={this.maybeDoBackspaceDelete.bind(this)}
             ref={'editor'}
           />
         </div>
       )
     } else {
-      const mdText = this.state.editorState.getCurrentContent().getPlainText('\n')
       return (
         <div
           className={'renderer'}
           ref={'renderer'}
         >
           <ReactMarkdown
-            source={mdText}
+            source={this.props.text}
           />
         </div>
       )
@@ -99,10 +75,10 @@ class InlineEditorPresentation extends React.Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onChange: (id, editorState) => {
+    onChange: (id, text) => {
       console.log('inlineEditor.onChange.start')
-      dispatch({type: CARD_EDITOR_CHANGED, id: id, editorState: editorState })
-      maybeInlineFile(dispatch, id, editorState)
+      dispatch({type: CARD_TEXT_CHANGED, id: id, text: text })
+      maybeInlineFile(dispatch, id, text)
       console.log('inlineEditor.onChange.finish')
     },
     onSelected: (id) => {

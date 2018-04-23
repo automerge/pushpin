@@ -1,11 +1,10 @@
-import { EditorState, ContentState } from 'draft-js'
 import uuid from 'uuid/v4'
 import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_EDITOR_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
+import { INITIALIZE, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
 
 //// Contants
 
@@ -104,13 +103,11 @@ function processImage(dispatch, path, id, x, y) {
 // Recognizes absolute local file paths to supported file types.
 const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif|pdf))\n\s*$/
 
-// Given the current editorState for a card indexed by id, sees if the text
-// contains only a local file path for a file type by supported by the app. In
-// this case, converts the card from a text card to image or pdf card as
-// appropriate.
-function maybeInlineFile(dispatch, id, editorState) {
-  const plainText = editorState.getCurrentContent().getPlainText('\n')
-  const filePatMatch = filePat.exec(plainText)
+// Given the current text for a card indexed by id, sees if it contains only a
+// local file path for a file type by supported by the app. In this case,
+// converts the card from a text card to image or pdf card as appropriate.
+function maybeInlineFile(dispatch, id, text) {
+  const filePatMatch = filePat.exec(text)
   if (!filePatMatch) {
     return
   }
@@ -136,12 +133,11 @@ function snapToGrid(num) {
 }
 
 function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
-  console.log('state.board', state.board.cards)
   const newBoard = hm.change(state.board, (b) => {
-    console.log('b', b.cards)
-    for (card in b.cards) {
-      if (card.selected) {
-        card.selected = false
+    for (let id in b.cards) {
+      const c = b.cards[id]
+      if (c.selected) {
+        c.selected = false
       }
     }
 
@@ -181,18 +177,13 @@ function initialize(hm, state) {
     b.cards = {}
   })
 
-  console.log('board', board.cards)
-
   state = Object.assign({}, state, { board: board })
 
-  const welcomeEditorState = EditorState.createWithContent(ContentState.createFromText(WELCOME_TEXT))
-  state = cardCreatedText(hm, state,  { x: 1300, y: 300,  selected: false, editorState: welcomeEditorState})
+  state = cardCreatedText(hm, state,  { x: 1300, y: 300, selected: false, text: WELCOME_TEXT})
 
-  const usageEditorState = EditorState.createWithContent(ContentState.createFromText(USAGE_TEXT))
-  state = cardCreatedText(hm, state,  { x: 1300, y: 450, selected: false, editorState: usageEditorState })
+  state = cardCreatedText(hm, state,  { x: 1300, y: 450, selected: false, text: USAGE_TEXT })
 
-  const exampleEditorState = EditorState.createWithContent(ContentState.createFromText(EXAMPLE_TEXT))
-  state = cardCreatedText(hm, state,  { x: 1300, y: 950, selected: false, editorState: exampleEditorState })
+  state = cardCreatedText(hm, state,  { x: 1300, y: 950, selected: false, text: EXAMPLE_TEXT })
 
   state = cardCreatedImage(hm, state, { x: 1750, y: 350, selected: false, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
 
@@ -201,9 +192,8 @@ function initialize(hm, state) {
   return state
 }
 
-function cardCreatedText(hm, state, { x, y, selected, editorState }) {
-  const useEditorState = editorState || EditorState.createEmpty()
-  return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { editorState: useEditorState } })
+function cardCreatedText(hm, state, { x, y, selected, text }) {
+  return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
 }
 
 function cardCreatedImage(hm, state, { x, y, selected, path, width, height }) {
@@ -214,9 +204,9 @@ function cardCreatedPDF(hm, state, { x, y, selected, path, width, height}) {
   return cardCreated(hm, state, { x, y, selected, width, height, type: 'pdf', typeAttrs: { path: path }})
 }
 
-function cardEditorChanged(hm, state, { id, editorState }) {
+function cardTextChanged(hm, state, { id, text }) {
   const newBoard = hm.change(state.board, (b) => {
-    b.cards[id].editorState = editorState
+    b.cards[id].text = text
   })
   return Object.assign({}, state, {board: newBoard})
 }
@@ -239,7 +229,7 @@ function cardInlinedImage(hm, state, { id, path, width, height }) {
     card.path = path
     card.width = width
     card.height = height
-    delete card.editorState
+    delete card.text
   })
   return Object.assign({}, state, {board: newBoard})
 }
@@ -251,7 +241,7 @@ function cardInlinedPDF(hm, state, { id, path, width, height }) {
     card.path = path
     card.width = width
     card.height = height
-    delete card.editorState
+    delete card.text
   })
   return Object.assign({}, state, {board: newBoard})
 }
@@ -364,9 +354,10 @@ function cardDragStopped(hm, state, { id }) {
     const minDragSelection = card.totalDrag < GRID_SIZE/2
     // Clear selections if we're effectively just clicking on this card.
     if (minDragSelection) {
-      for (card in b.cards) {
-        if (card.selected) {
-          card.selected = false
+      for (let id in b.cards) {
+        const c = b.cards[id]
+        if (c.selected) {
+          c.selected = false
         }
       }
     }
@@ -394,9 +385,10 @@ function cardSelected(hm, state, { id }) {
 
 function cardUniquelySelected(hm, state, { id }) {
   const newBoard = hm.change(state.board, (b) => {
-    for (card in b.cards) {
-      if (card.selected) {
-        card.selected = false
+    for (let id in b.cards) {
+      const c = b.cards[id]
+      if (c.selected) {
+        c.selected = false
       }
     }
     b.cards[id].selected = true
@@ -406,9 +398,10 @@ function cardUniquelySelected(hm, state, { id }) {
 
 function clearSelections(hm, state) {
   const newBoard = hm.change(state.board, (b) => {
-    for (card in b.cards) {
-      if (card.selected) {
-        card.selected = false
+    for (let id in b.cards) {
+      const c = b.cards[id]
+      if (c.selected) {
+        c.selected = false
       }
     }
   })
@@ -450,8 +443,8 @@ function Reducer(hm) {
       case CARD_CREATED_PDF:
         return cardCreatedPDF(hm, state, action)
 
-      case CARD_EDITOR_CHANGED:
-        return cardEditorChanged(hm, state, action)
+      case CARD_TEXT_CHANGED:
+        return cardTextChanged(hm, state, action)
 
       case CARD_TEXT_RESIZED:
         return cardTextResized(hm, state, action)

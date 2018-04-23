@@ -63,7 +63,9 @@
     "react-measure": "^2.0.2",
     "react-redux": "^5.0.7",
     "react-rnd": "^7.4.0",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "slate": "^0.33.4",
+    "slate-react": "^0.12.4"
   },
   "devDependencies": {
     "babel-plugin-transform-async-to-generator": "^6.24.1",
