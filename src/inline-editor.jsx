@@ -43,6 +43,18 @@ class InlineEditorPresentation extends React.Component {
     }
   }
 
+  onKeyDown(e, change) {
+    if (e.key !== 'Backspace') {
+      return
+    }
+    const text = Plain.serialize(this.state.value)
+    if (text != '') {
+      return
+    }
+    e.preventDefault()
+    this.props.onDeleted(this.props.cardId)
+  }
+
   willReceiveProps(props) {
     console.log('editor.willReceiveProps')
   }
@@ -64,6 +76,7 @@ class InlineEditorPresentation extends React.Component {
           <Editor
             value={this.state.value}
             onChange={this.onChange.bind(this)}
+            onKeyDown={this.onKeyDown.bind(this)}
             ref={'editor'}
           />
         </div>
