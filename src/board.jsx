@@ -29,6 +29,9 @@ const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
 }
 
 const mapStateToProps = (state) => {
+  if (!state.board || !state.board.cards) {
+    return {cards: []}
+  }
   return {cards: state.board.cards}
 }
 

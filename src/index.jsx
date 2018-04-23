@@ -8,7 +8,8 @@ import RAM from 'random-access-memory'
 
 import ExampleEditor from './example-editor'
 import { RootState, Reducer } from './model'
-import { INITIALIZE, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
+import HashForm from './hash-form'
 import Board from './board'
 
 var spaceDown = false
@@ -64,7 +65,7 @@ const centerOnStart = () => {
   const board = document.getElementById('board')
   window.scrollTo(
     (board.clientWidth/2)-(window.innerWidth/2),
-    (board.clientHeight/2.5)-(window.innerHeight/2)
+    0 //(board.clientHeight/2.5)-(window.innerHeight/2)
   )
 }
 
@@ -77,12 +78,14 @@ const init = () => {
 
     hm.on('document:ready', (docId, doc) => {
       store.dispatch({type: DOCUMENT_READY, docId: docId, doc: doc})
+      store.dispatch({type: INITIALIZE_IF_EMPTY})
     })
     hm.on('document:updated', (docId, doc) => {
       store.dispatch({type: DOCUMENT_UPDATED, docId: docId, doc: doc})
     })
 
-    store.dispatch({type: INITIALIZE})
+    hm.create()
+
     render(store)
   })
 }
@@ -90,7 +93,10 @@ const init = () => {
 const render = (store) => {
   ReactDOM.render(
     <Provider store={store}>
-      <Board />
+      <div>
+        <HashForm />
+        <Board />
+      </div>
     </Provider>,
     document.getElementById('container')
   )
@@ -101,16 +107,6 @@ const render = (store) => {
   document.addEventListener('wheel', (e) => { onWheel(e) })
 
   centerOnStart()
-}
-
-const initEditor = () => {
-  ReactDOM.render(
-    <ExampleEditor
-      selected={true}
-      initialText={'# Welcome\n\nLet us try some initial text.'}
-    />,
-    document.getElementById('container')
-  )
 }
 
 init()

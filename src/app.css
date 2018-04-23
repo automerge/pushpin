@@ -46,6 +46,19 @@ table {
 
 /* App Styles */
 
+div#hashForm {
+  background: blue;
+  text-align: center;
+  width: 3600px;
+  height: 50px;
+}
+
+div#hashForm input {
+  background: white;
+  width: 500px;
+  height: 40px;
+}
+
 div.board {
   background: #fafafa;
 }
@@ -268,9 +281,4 @@ div.renderer :first-child {
 
 div.renderer :last-child {
   margin-bottom: 0;
-}
-
-
-div.exampleEditor {
-  width: 600;
 }

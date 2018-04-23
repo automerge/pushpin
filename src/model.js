@@ -4,7 +4,7 @@ import Path from 'path'
 import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
 
 //// Contants
 
@@ -166,29 +166,28 @@ function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs
 
 //// Initial state. Evolved by actions below.
 
-const RootState = { }
+const RootState = {
+  formDocId: '',
+  activeDocId: '',
+  requestedDocId: ''
+}
 
 //// Action functions. Functions match 1:1 with reducer switch further below.
 
-function initialize(hm, state) {
-  let board = hm.create()
+function initializeIfEmpty(hm, state) {
+  if (state.board.cards) {
+    return state
+  }
 
-  board = hm.change(board, (b) => {
+  const newBoard = hm.change(state.board, (b) => {
     b.cards = {}
   })
-
-  state = Object.assign({}, state, { board: board })
-
+  state = Object.assign({}, state, { board: newBoard })
   state = cardCreatedText(hm, state,  { x: 1300, y: 300, selected: false, text: WELCOME_TEXT})
-
   state = cardCreatedText(hm, state,  { x: 1300, y: 450, selected: false, text: USAGE_TEXT })
-
   state = cardCreatedText(hm, state,  { x: 1300, y: 950, selected: false, text: EXAMPLE_TEXT })
-
   state = cardCreatedImage(hm, state, { x: 1750, y: 350, selected: false, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
-
   state = cardCreatedImage(hm, state, { x: 1700, y: 700, selected: false, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
-
   return state
 }
 
@@ -415,24 +414,54 @@ function cardDeleted(hm, state, { id }) {
   return Object.assign({}, state, {board: newBoard})
 }
 
+function documentReady(hm, state, { docId, doc }) {
+  // Case where app is loaded default empty doc.
+  if (state.requestedDocId === '') {
+    return Object.assign({}, state, {
+      activeDocId: docId,
+      formDocId: docId,
+      requestedDocId: docId,
+      board: doc
+    })
+  // Case where an existing doc was opened and is still requested.
+  } else if (state.requestedDocId === docId) {
+    return Object.assign({}, state, {
+      activeDocId: docId,
+      board: doc
+    })
+  }
+  // Case where an existing doc was opened but is no longer requested.
+  return state
+}
+
+function documentUpdated(hm, state, { docId, doc }) {
+  if (state.activeDocId !== docId) {
+    return state
+  }
+  return Object.assign({}, state, {board: doc})
+}
+
+function formChanged(hm, state, { docId }) {
+  return Object.assign({}, state, {formDocId: docId})
+}
+
+function formSubmitted(hm, state) {
+  hm.open(state.formDocId)
+  return Object.assign({}, state, {requestedDocId: state.formDocId})
+}
+
 //// Reducer switch. Cases match 1:1 with action functions above.
 
 function Reducer(hm) {
   return (state, action) => {
-     console.log(action)
+     // console.log(action)
 
     switch (action.type) {
       case '@@redux/INIT':
         return state;
 
-      case DOCUMENT_READY:
-        return state
-
-      case DOCUMENT_UPDATED:
-        return state
-
-      case INITIALIZE:
-        return initialize(hm, state);
+      case INITIALIZE_IF_EMPTY:
+        return initializeIfEmpty(hm, state, action);
 
       case CARD_CREATED_TEXT:
         return cardCreatedText(hm, state, action)
@@ -471,10 +500,22 @@ function Reducer(hm) {
         return cardUniquelySelected(hm, state, action)
 
       case CLEAR_SELECTIONS:
-        return clearSelections(hm, state)
+        return clearSelections(hm, state, action)
 
       case CARD_DELETED:
         return cardDeleted(hm, state, action)
+
+      case DOCUMENT_READY:
+        return documentReady(hm, state, action)
+
+      case DOCUMENT_UPDATED:
+        return documentUpdated(hm, state, action)
+
+      case FORM_CHANGED:
+        return formChanged(hm, state, action)
+
+      case FORM_SUBMITTED:
+        return formSubmitted(hm, state, action)
 
       default:
         throw new Error(`Unkonwn action: ${action.type}`);
