@@ -7,7 +7,7 @@ import Hypermerge from 'hypermerge'
 import RAM from 'random-access-memory'
 
 import { RootState, Reducer } from './model'
-import { INITIALIZE_IF_EMPTY, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
+import { INITIALIZE, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
 import Board from './board'
 
 var spaceDown = false
@@ -71,7 +71,7 @@ const init = () => {
   hm.once('ready', function() {
     hm.joinSwarm()
 
-    const store = createStore(Reducer, RootState)
+    const store = createStore(Reducer(hm), RootState)
 
     hm.on('document:ready', (docId, doc) => {
       store.dispatch({type: DOCUMENT_READY, docId: docId, doc: doc})
@@ -80,7 +80,7 @@ const init = () => {
       store.dispatch({type: DOCUMENT_UPDATED, docId: docId, doc: doc})
     })
 
-    store.dispatch({type: INITIALIZE_IF_EMPTY})
+    store.dispatch({type: INITIALIZE})
     render(store)
   })
 }

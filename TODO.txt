@@ -23,3 +23,6 @@ Style background with dots aligning to grid
 Style resize handle, maybe to appear dynamically
 Style typography
 Style pointer types
+
+## Technical
+Look into re-deduplicating clearSelections
