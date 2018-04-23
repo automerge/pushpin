@@ -17,6 +17,7 @@ Cut, copy, paste, and undo accross the app including at card level
 Context menu for individual cards including cut, copy, download original, delete
 Clicking anywhere on note brings you to editing
 Drag box to select and drag multiple cards
+Ability to move cards to front or back
 
 ## Styling
 Style background with dots aligning to grid
