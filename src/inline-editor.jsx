@@ -25,7 +25,17 @@ class InlineEditorPresentation extends React.Component {
     this.checkFocusAndHeight()
   }
 
+  focus() {
+    if (!this.state.value.isFocused) {
+      const newValue = this.state.value.change().focus().value
+      this.setState({value: newValue})
+    }
+  }
+
   checkFocusAndHeight() {
+    if (this.props.selected) {
+      this.focus()
+    }
     const newHeight = (this.refs.editorWrapper || this.refs.renderer).clientHeight
     if (this.lastHeight != newHeight) {
       this.props.onTextResized(this.props.cardId, newHeight)
