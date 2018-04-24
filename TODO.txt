@@ -2,7 +2,6 @@
 
 ## Functional
 Snap image width and height, in addition to x and y, to grid
-Avoid resizing in when going from Markdown to text.
 Scaled markdown markup like presentation markup.
 Now focus doesn't go away when clicking outside of card?
 Make scrolling / zooming smooth
