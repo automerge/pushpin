@@ -1,6 +1,7 @@
 ## In progress
 
 ## Functional
+Maybe click and drag around board instead of space and drag
 Snap image width and height, in addition to x and y, to grid
 Scaled markdown markup like presentation markup.
 Now focus doesn't go away when clicking outside of card?
