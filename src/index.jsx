@@ -18,7 +18,7 @@ const onKeyDown = (e, store) => {
     const state = store.getState()
     for (let id in state.board.cards) {
       const card = state.board.cards[id]
-      if (card.selected && (card.type !== 'text')) {
+      if ((id === state.selected) && (card.type !== 'text')) {
         store.dispatch({ type: CARD_DELETED, id: card.id })
       }
     }

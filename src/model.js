@@ -132,10 +132,8 @@ function snapToGrid(num) {
   }
 }
 
-function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
+function cardCreated(hm, state, { x, y, width, height, type, typeAttrs }) {
   const newBoard = hm.change(state.board, (b) => {
-    _clearSelections(b)
-
     const id = uuid()
     const snapX = snapToGrid(x)
     const snapY = snapToGrid(y)
@@ -150,7 +148,6 @@ function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs
       slackHeight: 0,
       resizing: false,
       moving: false,
-      selected: selected
     }, typeAttrs)
 
     b.cards[id] = newCard
@@ -159,22 +156,13 @@ function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs
   return Object.assign({}, state, {board: newBoard})
 }
 
-// Must call within hm.change block.
-function _clearSelections(board) {
-  for (let id in board.cards) {
-    const card = board.cards[id]
-    if (card.selected) {
-      card.selected = false
-    }
-  }
-}
-
 //// Initial state. Evolved by actions below.
 
 const RootState = {
   formDocId: '',
   activeDocId: '',
-  requestedDocId: ''
+  requestedDocId: '',
+  selected: null
 }
 
 //// Action functions. Functions match 1:1 with reducer switch further below.
@@ -188,24 +176,24 @@ function initializeIfEmpty(hm, state) {
     b.cards = {}
   })
   state = Object.assign({}, state, { board: newBoard })
-  state = cardCreatedText(hm, state,  { x: 1300, y: 300, selected: false, text: WELCOME_TEXT})
-  state = cardCreatedText(hm, state,  { x: 1300, y: 450, selected: false, text: USAGE_TEXT })
-  state = cardCreatedText(hm, state,  { x: 1300, y: 950, selected: false, text: EXAMPLE_TEXT })
-  state = cardCreatedImage(hm, state, { x: 1750, y: 350, selected: false, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
-  state = cardCreatedImage(hm, state, { x: 1700, y: 700, selected: false, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
+  state = cardCreatedText(hm, state,  { x: 1300, y: 300, text: WELCOME_TEXT})
+  state = cardCreatedText(hm, state,  { x: 1300, y: 450, text: USAGE_TEXT })
+  state = cardCreatedText(hm, state,  { x: 1300, y: 950, text: EXAMPLE_TEXT })
+  state = cardCreatedImage(hm, state, { x: 1750, y: 350, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
+  state = cardCreatedImage(hm, state, { x: 1700, y: 700, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
   return state
 }
 
-function cardCreatedText(hm, state, { x, y, selected, text }) {
-  return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
+function cardCreatedText(hm, state, { x, y, text }) {
+  return cardCreated(hm, state, { x, y, type: 'text', typeAttrs: { text: text } })
 }
 
-function cardCreatedImage(hm, state, { x, y, selected, path, width, height }) {
-  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { path: path }})
+function cardCreatedImage(hm, state, { x, y, path, width, height }) {
+  return cardCreated(hm, state, { x, y, width, height, type: 'image', typeAttrs: { path: path }})
 }
 
-function cardCreatedPDF(hm, state, { x, y, selected, path, width, height}) {
-  return cardCreated(hm, state, { x, y, selected, width, height, type: 'pdf', typeAttrs: { path: path }})
+function cardCreatedPDF(hm, state, { x, y, path, width, height}) {
+  return cardCreated(hm, state, { x, y, width, height, type: 'pdf', typeAttrs: { path: path }})
 }
 
 function cardTextChanged(hm, state, { id, text }) {
@@ -348,18 +336,16 @@ function cardDragMoved(hm, state, { id, deltaX, deltaY }) {
 }
 
 function cardDragStopped(hm, state, { id }) {
+  let selected
   const newBoard = hm.change(state.board, (b) => {
     const card = b.cards[id]
     const snapX = snapToGrid(card.x)
     const snapY = snapToGrid(card.y)
     const snapWidth = snapToGrid(card.width)
     const snapHeight = snapToGrid(card.height)
-    const selectedBefore = card.selected
+    const selectedBefore = (card.id === state.selected)
     const minDragSelection = card.totalDrag < GRID_SIZE/2
-    // Clear selections if we're effectively just clicking on this card.
-    if (minDragSelection) {
-      _clearSelections(b)
-    }
+    selected = minDragSelection ? card.id : state.selected
     card.x = snapX
     card.y = snapY
     card.width = snapWidth
@@ -368,33 +354,22 @@ function cardDragStopped(hm, state, { id }) {
     card.slackHeight = 0
     card.resizing = false
     card.moving = false
-    card.selected = selectedBefore || minDragSelection
     delete card.totalDrag
   })
 
-  return Object.assign({}, state, {board: newBoard})
+  return Object.assign({}, state, {board: newBoard, selected: selected})
 }
 
 function cardSelected(hm, state, { id }) {
-  const newBoard = hm.change(state.board, (b) => {
-    b.cards[id].selected = true
-  })
-  return Object.assign({}, state, {board: newBoard})
+  return Object.assign({}, state, {selected: id})
 }
 
 function cardUniquelySelected(hm, state, { id }) {
-  const newBoard = hm.change(state.board, (b) => {
-    _clearSelections(b)
-    b.cards[id].selected = true
-  })
- return Object.assign({}, state, {board: newBoard})
+  return cardSelected(hm, state, { id })
 }
 
 function clearSelections(hm, state) {
-  const newBoard = hm.change(state.board, (b) => {
-    _clearSelections(b)
-  })
-  return Object.assign({}, state, {board: newBoard})
+  return Object.assign({}, state, {selected: null})
 }
 
 function cardDeleted(hm, state, { id }) {

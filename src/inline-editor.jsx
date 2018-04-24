@@ -55,8 +55,11 @@ class InlineEditorPresentation extends React.Component {
     this.props.onDeleted(this.props.cardId)
   }
 
-  willReceiveProps(props) {
-    console.log('editor.willReceiveProps')
+  componentWillReceiveProps(props) {
+    console.log('editor.willReceiveProps', props.selected)
+    if (!props.selected) {
+      this.setState({value: Plain.deserialize(props.text)})
+    }
   }
 
   onChange({ value }) {
@@ -66,7 +69,7 @@ class InlineEditorPresentation extends React.Component {
   }
 
   render() {
-    console.log('editor.render')
+    console.log('editor.render', this.props, this.state)
     if (this.props.selected) {
       return (
         <div

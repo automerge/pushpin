@@ -9,11 +9,11 @@ import { processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT } from './model'
 
 const { Menu, MenuItem, dialog } = remote
 
-const presentation = ({ cards, onClick, onDoubleClick, onContextMenu }) => {
+const presentation = ({ cards, selected, onClick, onDoubleClick, onContextMenu }) => {
   let cardChildren = []
   for (let id in cards) {
     const card = cards[id]
-    cardChildren.push(<Card key={id} card={card} />)
+    cardChildren.push(<Card key={id} card={card} selected={selected === id}/>)
   }
   return (
     <div
@@ -32,7 +32,7 @@ const mapStateToProps = (state) => {
   if (!state.board || !state.board.cards) {
     return {cards: []}
   }
-  return {cards: state.board.cards}
+  return {cards: state.board.cards, selected: state.selected}
 }
 
 const rightClickMenu = (dispatch, e) => {
@@ -40,7 +40,7 @@ const rightClickMenu = (dispatch, e) => {
   const y = e.pageY
   const menu = new Menu()
   menu.append(new MenuItem({label: 'Add Note',  click() {
-    dispatch({type: CARD_CREATED_TEXT, x: x, y: y, selected: true, text: ''})
+    dispatch({type: CARD_CREATED_TEXT, x: x, y: y, text: ''})
   }}))
   menu.append(new MenuItem({label: 'Add Image', click() {
     dialog.showOpenDialog({
@@ -99,7 +99,7 @@ const mapDispatchToProps = (dispatch, getState) => {
     },
     onDoubleClick: (e) => {
       console.log('board.onDoubleClick.start')
-      dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, selected: true, text: ''})
+      dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, text: ''})
       console.log('board.onDoubleClick.finish')
     },
     onContextMenu: (e, ...rest) => {

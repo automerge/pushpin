@@ -13,7 +13,7 @@ class CardPresentation extends React.Component {
       <InlineEditor
         cardId={this.props.card.id}
         text={this.props.card.text}
-        selected={this.props.card.selected}
+        selected={this.props.selected}
       />
     )
   }
@@ -41,7 +41,7 @@ class CardPresentation extends React.Component {
       >
         <div
           id={`card-${card.id}`}
-          className={classNames('card', card.type, card.selected ? 'selected' : 'unselected')}
+          className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
           style={{
             width: card.width,
             height: card.height,
