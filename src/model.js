@@ -74,7 +74,7 @@ function processPDF(dispatch, path, id, x, y) {
         if (id) {
           dispatch({type: CARD_INLINED_PDF, id: id, path: pngPath, width: scaledWidth, height: scaledHeight})
         } else {
-          dispatch({type: CARD_CREATED_PDF, path: pngPath, width: scaledWidth, height: scaledHeight, x: x, y: y})
+          dispatch({type: CARD_CREATED_PDF, path: pngPath, width: scaledWidth, height: scaledHeight, x: x, y: y, selected: true})
         }
       })
     })
@@ -94,7 +94,7 @@ function processImage(dispatch, path, id, x, y) {
     if (id) {
       dispatch({type: CARD_INLINED_IMAGE, id: id, path: path, width: scaledWidth, height: scaledHeight})
     } else {
-      dispatch({type: CARD_CREATED_IMAGE, path: path, width: scaledWidth, height: scaledHeight, x: x, y: y})
+      dispatch({type: CARD_CREATED_IMAGE, path: path, width: scaledWidth, height: scaledHeight, x: x, y: y, selected: true})
     }
   })
 }
@@ -132,9 +132,10 @@ function snapToGrid(num) {
   }
 }
 
-function cardCreated(hm, state, { x, y, width, height, type, typeAttrs }) {
+function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
+  const id = uuid()
+
   const newBoard = hm.change(state.board, (b) => {
-    const id = uuid()
     const snapX = snapToGrid(x)
     const snapY = snapToGrid(y)
     const newCard = Object.assign({
@@ -153,7 +154,9 @@ function cardCreated(hm, state, { x, y, width, height, type, typeAttrs }) {
     b.cards[id] = newCard
   })
 
-  return Object.assign({}, state, {board: newBoard})
+  const newSelected = selected ? id : state.selected
+
+  return Object.assign({}, state, {board: newBoard, selected: newSelected})
 }
 
 //// Initial state. Evolved by actions below.
@@ -184,16 +187,16 @@ function initializeIfEmpty(hm, state) {
   return state
 }
 
-function cardCreatedText(hm, state, { x, y, text }) {
-  return cardCreated(hm, state, { x, y, type: 'text', typeAttrs: { text: text } })
+function cardCreatedText(hm, state, { x, y, selected, text }) {
+  return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
 }
 
-function cardCreatedImage(hm, state, { x, y, path, width, height }) {
-  return cardCreated(hm, state, { x, y, width, height, type: 'image', typeAttrs: { path: path }})
+function cardCreatedImage(hm, state, { x, y, selected, path, width, height }) {
+  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { path: path }})
 }
 
-function cardCreatedPDF(hm, state, { x, y, path, width, height}) {
-  return cardCreated(hm, state, { x, y, width, height, type: 'pdf', typeAttrs: { path: path }})
+function cardCreatedPDF(hm, state, { x, y, selected, path, width, height}) {
+  return cardCreated(hm, state, { x, y, selected, width, height, type: 'pdf', typeAttrs: { path: path }})
 }
 
 function cardTextChanged(hm, state, { id, text }) {
