@@ -60,16 +60,16 @@ class InlineEditorPresentation extends React.Component {
   componentWillReceiveProps(props) {
     console.log('editor.willReceiveProps')
 
-    if (!props.selected) {
+    if (this.props.selected && !props.selected) {
+      this.props.onTextChanged(this.props.cardId, Plain.serialize(this.state.value))
+    } else if (!props.selected) {
       this.setState({value: Plain.deserialize(props.text)})
     }
   }
 
   onChange({ value }) {
     console.log('editor.onChange')
-
     this.setState({value: value})
-    this.props.onChange(this.props.cardId, Plain.serialize(value))
   }
 
   render() {
@@ -106,7 +106,8 @@ class InlineEditorPresentation extends React.Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onChange: (id, text) => {
+    onTextChanged: (id, text) => {
+      console.log('editor.onTextChanged')
       dispatch({type: CARD_TEXT_CHANGED, id: id, text: text })
       maybeInlineFile(dispatch, id, text)
     },

@@ -1,6 +1,8 @@
 ## In progress
 
 ## Functional
+Toggleable logging
+Avoid resizing in when going from Markdown to text.
 Now focus doesn't go away when clicking outside of card?
 Make scrolling / zooming smooth
 Add reasonable caps on zooming
