@@ -1,6 +1,7 @@
 ## In progress
 
 ## Functional
+Now focus doesn't go away when clicking outside of card?
 Make scrolling / zooming smooth
 Add reasonable caps on zooming
 Fix random highlighting of text when moving / resizing

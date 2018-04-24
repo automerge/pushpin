@@ -99,10 +99,8 @@ class InlineEditorPresentation extends React.Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     onChange: (id, text) => {
-      console.log('inlineEditor.onChange.start')
       dispatch({type: CARD_TEXT_CHANGED, id: id, text: text })
       maybeInlineFile(dispatch, id, text)
-      console.log('inlineEditor.onChange.finish')
     },
     onSelected: (id) => {
       console.log('inlineEditor.onSelected.start')
