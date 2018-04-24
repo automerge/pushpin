@@ -5,6 +5,7 @@ import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
 import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
+import log from './log'
 
 //// Contants
 
@@ -59,13 +60,13 @@ function processPDF(dispatch, path, id, x, y) {
   const pdfImage = new PDFImage(path, pdfConvertOptions)
   pdfImage.convertPage(0)
     .catch(err => {
-      console.log('Error converting PDF to PNG?', err)
+      console.warn('Error converting PDF to PNG?', err)
       return
     })
     .then(pngPath => {
       Jimp.read(pngPath, (err, img) => {
         if (err) {
-          console.log('Error loading converted image?', err)
+          console.warn('Error loading converted image?', err)
           return
         }
         const width = img.bitmap.width
@@ -85,7 +86,7 @@ function processPDF(dispatch, path, id, x, y) {
 function processImage(dispatch, path, id, x, y) {
   Jimp.read(path, (err, img) => {
     if (err) {
-      console.log('Error loading image?', err)
+      console.warn('Error loading image?', err)
       return
     }
     const width = img.bitmap.width
@@ -318,7 +319,7 @@ function formSubmitted(hm, state) {
 
 function Reducer(hm) {
   return (state, action) => {
-     console.log(action)
+     log('model.reduce', action)
 
     switch (action.type) {
       case '@@redux/INIT':

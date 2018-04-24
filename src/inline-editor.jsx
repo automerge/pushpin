@@ -6,30 +6,31 @@ import Plain from 'slate-plain-serializer'
 
 import { maybeInlineFile } from './model'
 import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_IMAGE_INLINED, CARD_PDF_INLINED, CARD_DELETED } from './action-types'
+import log from './log'
 
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
-    console.log('editor.constructor')
+    log('editor.constructor')
     super(props)
     this.state = {value: Plain.deserialize(props.text)}
     this.lastLocalHeight = null
   }
 
   componentDidMount() {
-    console.log('editor.didMount')
+    log('editor.didMount')
     this.ensureFocus()
     this.checkHeight()
   }
 
   componentDidUpdate() {
-    console.log('editor.didUpdate')
+    log('editor.didUpdate')
     this.ensureFocus()
     this.checkHeight()
   }
 
   ensureFocus() {
     if (this.props.selected && !this.state.value.isFocused) {
-      console.log('editor.forceFocus')
+      log('editor.forceFocus')
       const newValue = this.state.value.change().focus().value
       this.setState({value: newValue})
     }
@@ -51,7 +52,7 @@ class InlineEditorPresentation extends React.Component {
   }
 
   onKeyDown(e, change) {
-    console.log('editor.onKeyDown')
+    log('editor.onKeyDown')
 
     if (e.key !== 'Backspace') {
       return
@@ -65,7 +66,7 @@ class InlineEditorPresentation extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log('editor.willReceiveProps')
+    log('editor.willReceiveProps')
 
     if (this.props.selected && !props.selected) {
       this.props.onTextChanged(this.props.cardId, Plain.serialize(this.state.value))
@@ -75,12 +76,12 @@ class InlineEditorPresentation extends React.Component {
   }
 
   onChange({ value }) {
-    console.log('editor.onChange')
+    log('editor.onChange')
     this.setState({value: value})
   }
 
   render() {
-    console.log('editor.render')
+    log('editor.render')
 
     if (this.props.selected) {
       return (
@@ -114,20 +115,20 @@ class InlineEditorPresentation extends React.Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     onTextChanged: (id, text) => {
-      console.log('editor.onTextChanged')
+      log('editor.onTextChanged')
       dispatch({type: CARD_TEXT_CHANGED, id: id, text: text })
       maybeInlineFile(dispatch, id, text)
     },
     onSelected: (id) => {
-      console.log('editor.onSelected')
+      log('editor.onSelected')
       dispatch({type: CARD_UNIQUELY_SELECTED, id: id})
     },
     onDeleted: (id) => {
-      console.log('editor.onDeleted')
+      log('editor.onDeleted')
       dispatch({type: CARD_DELETED, id: id})
     },
     onTextResized: (id, height) => {
-      console.log('editor.onTextResized')
+      log('editor.onTextResized')
       dispatch({type: CARD_TEXT_RESIZED, id: id, height: height})
     },
   }

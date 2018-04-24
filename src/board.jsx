@@ -6,11 +6,12 @@ import { remote } from 'electron'
 
 import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from './action-types'
 import { processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT } from './model'
+import log from './log'
 
 const { Menu, MenuItem, dialog } = remote
 
 const presentation = ({ cards, selected, onClick, onDoubleClick, onContextMenu }) => {
-  console.log('board.render')
+  log('board.render')
 
   let cardChildren = []
   for (let id in cards) {
@@ -95,15 +96,15 @@ const mapDispatchToProps = (dispatch, getState) => {
       if (clickingInCard) {
         return
       }
-      console.log('board.onClick')
+      log('board.onClick')
       dispatch({type: CLEAR_SELECTIONS})
     },
     onDoubleClick: (e) => {
-      console.log('board.onDoubleClick')
+      log('board.onDoubleClick')
       dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, text: '', selected: true})
     },
     onContextMenu: (e, ...rest) => {
-      console.log('board.onContextMenu')
+      log('board.onContextMenu')
       e.preventDefault()
       const menu = rightClickMenu(dispatch, e)
       menu.popup({window: remote.getCurrentWindow()})

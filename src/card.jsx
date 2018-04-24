@@ -6,12 +6,13 @@ import classNames from 'classnames'
 import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from './model'
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from './action-types'
+import log from './log'
 
 class CardPresentation extends React.Component {
 
   constructor(props) {
     super(props)
-    console.log('card.constructor')
+    log('card.constructor')
     this.state = {
       moving: false,
       resizing: false,
@@ -28,15 +29,15 @@ class CardPresentation extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log('card.receiveProps')
+    log('card.receiveProps')
   }
 
   onMouseDown(e) {
-    console.log('card.onMouseDown')
+    log('card.onMouseDown')
   }
 
   onStart(e, d) {
-    console.log('card.onStart')
+    log('card.onStart')
 
     if (d.deltaX != 0 || d.deltaY != 0) {
       throw new Error(`Did not expect delta in onStart`)
@@ -73,7 +74,7 @@ class CardPresentation extends React.Component {
   }
 
   onDrag(e, d) {
-    console.log('card.onDrag')
+    log('card.onDrag')
 
     if (!this.state.resizing && !this.state.moving) {
       throw new Error(`Did not expect drag without resize or move`)
@@ -160,7 +161,7 @@ class CardPresentation extends React.Component {
   }
 
   onStop(e, d) {
-    console.log('card.onStop')
+    log('card.onStop')
 
     if (d.deltaX != 0 || d.deltaY != 0) {
       throw new Error(`Did not expect delta in onStart`)
@@ -203,7 +204,7 @@ class CardPresentation extends React.Component {
   }
 
   render() {
-    console.log('card.render')
+    log('card.render')
 
     const card = this.props.card
     return (
@@ -234,7 +235,7 @@ class CardPresentation extends React.Component {
   }
 
   onLocalHeight(resizeHeight) {
-    console.log('card.onLocalheight', resizeHeight)
+    log('card.onLocalheight', resizeHeight)
     this.setState({resizeHeight: resizeHeight})
   }
 
