@@ -12,34 +12,41 @@ class InlineEditorPresentation extends React.Component {
     console.log('editor.constructor')
     super(props)
     this.state = {value: Plain.deserialize(props.text)}
-    this.lastHeight = 0
+    this.lastLocalHeight = null
   }
 
   componentDidMount() {
     console.log('editor.didMount')
-    this.checkFocusAndHeight()
+    this.ensureFocus()
+    this.checkHeight()
   }
 
   componentDidUpdate() {
     console.log('editor.didUpdate')
-    this.checkFocusAndHeight()
+    this.ensureFocus()
+    this.checkHeight()
   }
 
-  focus() {
-    if (!this.state.value.isFocused) {
+  ensureFocus() {
+    if (this.props.selected && !this.state.value.isFocused) {
+      console.log('editor.forceFocus')
       const newValue = this.state.value.change().focus().value
       this.setState({value: newValue})
     }
   }
 
-  checkFocusAndHeight() {
-    if (this.props.selected) {
-      this.focus()
+  checkHeight() {
+    const localHeight = this.props.selected ? this.refs.editorWrapper.clientHeight : null
+    if (this.lastLocalHeight != localHeight) {
+      this.props.onLocalHeight(localHeight)
+      this.lastLocalHeight = localHeight
     }
-    const newHeight = (this.refs.editorWrapper || this.refs.renderer).clientHeight
-    if (this.lastHeight != newHeight) {
-      this.props.onTextResized(this.props.cardId, newHeight)
-      this.lastHeight = newHeight
+
+    if (!this.props.selected) {
+      const height = this.refs.renderer.clientHeight
+      if (this.props.cardHeight != height) {
+        this.props.onTextResized(this.props.cardId, height)
+      }
     }
   }
 

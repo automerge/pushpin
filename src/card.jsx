@@ -233,12 +233,19 @@ class CardPresentation extends React.Component {
     )
   }
 
+  onLocalHeight(resizeHeight) {
+    console.log('card.onLocalheight', resizeHeight)
+    this.setState({resizeHeight: resizeHeight})
+  }
+
   renderTextInner() {
     return (
       <InlineEditor
         cardId={this.props.card.id}
         text={this.props.card.text}
         selected={this.props.selected}
+        onLocalHeight={this.onLocalHeight.bind(this)}
+        cardHeight={this.props.card.height}
       />
     )
   }
