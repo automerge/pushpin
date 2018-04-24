@@ -10,6 +10,8 @@ import { processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT } from './model'
 const { Menu, MenuItem, dialog } = remote
 
 const presentation = ({ cards, selected, onClick, onDoubleClick, onContextMenu }) => {
+  console.log('board.render')
+
   let cardChildren = []
   for (let id in cards) {
     const card = cards[id]
@@ -93,21 +95,18 @@ const mapDispatchToProps = (dispatch, getState) => {
       if (clickingInCard) {
         return
       }
-      console.log('board.onClick.start')
+      console.log('board.onClick')
       dispatch({type: CLEAR_SELECTIONS})
-      console.log('board.onClick.finish')
     },
     onDoubleClick: (e) => {
-      console.log('board.onDoubleClick.start')
+      console.log('board.onDoubleClick')
       dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, text: ''})
-      console.log('board.onDoubleClick.finish')
     },
     onContextMenu: (e, ...rest) => {
-      console.log('board.onContextMenu.start')
+      console.log('board.onContextMenu')
       e.preventDefault()
       const menu = rightClickMenu(dispatch, e)
       menu.popup({window: remote.getCurrentWindow()})
-      console.log('board.onContextMenu.finish')
     }
   }
 }

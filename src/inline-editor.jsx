@@ -9,19 +9,19 @@ import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_IMAG
 
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
-    console.log('editor.constructor', props)
+    console.log('editor.constructor')
     super(props)
     this.state = {value: Plain.deserialize(props.text)}
     this.lastHeight = 0
   }
 
   componentDidMount() {
-    console.log('editor.componentDidMount')
+    console.log('editor.didMount')
     this.checkFocusAndHeight()
   }
 
   componentDidUpdate() {
-    console.log('editor.componentDidUpdate')
+    console.log('editor.didUpdate')
     this.checkFocusAndHeight()
   }
 
@@ -44,6 +44,8 @@ class InlineEditorPresentation extends React.Component {
   }
 
   onKeyDown(e, change) {
+    console.log('editor.onKeyDown')
+
     if (e.key !== 'Backspace') {
       return
     }
@@ -56,7 +58,8 @@ class InlineEditorPresentation extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log('editor.willReceiveProps', props.selected)
+    console.log('editor.willReceiveProps')
+
     if (!props.selected) {
       this.setState({value: Plain.deserialize(props.text)})
     }
@@ -64,12 +67,14 @@ class InlineEditorPresentation extends React.Component {
 
   onChange({ value }) {
     console.log('editor.onChange')
+
     this.setState({value: value})
     this.props.onChange(this.props.cardId, Plain.serialize(value))
   }
 
   render() {
-    console.log('editor.render', this.props, this.state)
+    console.log('editor.render')
+
     if (this.props.selected) {
       return (
         <div

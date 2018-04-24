@@ -4,7 +4,7 @@ import Path from 'path'
 import Jimp from 'jimp'
 import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_DRAG_STARTED, CARD_DRAG_MOVED, CARD_DRAG_STOPPED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
 
 //// Contants
 
@@ -238,126 +238,22 @@ function cardInlinedPDF(hm, state, { id, path, width, height }) {
   return Object.assign({}, state, {board: newBoard})
 }
 
-function cardDragStarted(hm, state, { id, x, y }) {
+function cardMoved(hm, state, { id, x, y }) {
   const newBoard = hm.change(state.board, (b) => {
     const card = b.cards[id]
-    const resizing = ((x >= (card.x + card.width - RESIZE_HANDLE_SIZE)) &&
-                      (x <= (card.x + card.width)) &&
-                      (y >= (card.y + card.height - RESIZE_HANDLE_SIZE)) &&
-                      (y <= (card.y + card.height)))
-    const moving = !resizing
-    card.resizing = resizing
-    card.moving = moving
-    card.totalDrag = 0
+    card.x = x
+    card.y = y
   })
   return Object.assign({}, state, {board: newBoard})
 }
 
-function cardDragMoved(hm, state, { id, deltaX, deltaY }) {
+function cardResized(hm, state, {id, width, height }) {
   const newBoard = hm.change(state.board, (b) => {
     const card = b.cards[id]
-
-    if (!card.resizing && !card.moving) {
-      throw new Error(`Did not expect drag without resize or move`)
-    }
-    if (card.resizing && card.moving) {
-      throw new Error(`Did not expect drag with both resize and move`)
-    }
-
-    const newTotalDrag = card.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
-
-    if (card.resizing) {
-      // First guess at change in dimensions given mouse movements.
-      let preClampWidth = card.width + deltaX
-      let preClampHeight = card.height + deltaY
-
-      // Maintain aspect ratio on image cards.
-      if (card.type !== 'text') {
-        const ratio = card.width / card.height
-        preClampHeight = preClampWidth / ratio
-        preClampWidth = preClampHeight * ratio
-      }
-
-      // Add slack to the values used to calculate bound position. This will
-      // ensure that if we start removing slack, the element won't react to
-      // it right away until it's been completely removed.
-      let newWidth = preClampWidth + card.slackWidth
-      let newHeight = preClampHeight + card.slackHeight
-
-      // Clamp to ensure card doesn't resize beyond the board or min dimensions.
-      newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
-      newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
-      newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
-      newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
-
-      // If the numbers changed, we must have introduced some slack.
-      // Record it for the next iteration.
-      const newSlackWidth = card.slackWidth + preClampWidth - newWidth
-      const newSlackHeight = card.slackHeight + preClampHeight - newHeight
-
-      card.width = newWidth
-      card.height = newHeight
-      card.slackWidth = newSlackWidth
-      card.slackHeight = newSlackHeight
-      card.totalDrag = newTotalDrag
-    }
-
-    if (card.moving) {
-      // First guess at change in location given mouse movements.
-      let preClampX = card.x + deltaX
-      let preClampY = card.y + deltaY
-
-      // Add slack to the values used to calculate bound position. This will
-      // ensure that if we start removing slack, the element won't react to
-      // it right away until it's been completely removed.
-      let newX = preClampX + card.slackWidth
-      let newY = preClampY + card.slackHeight
-
-      // Clamp to ensure card doesn't move beyond the board.
-      newX = Math.max(newX, 0)
-      newX = Math.min(newX, BOARD_WIDTH - card.width)
-      newY = Math.max(newY, 0)
-      newY = Math.min(newY, BOARD_HEIGHT - card.height)
-
-      // If the numbers changed, we must have introduced some slack.
-      // Record it for the next iteration.
-      const newSlackWidth = card.slackWidth + preClampX - newX
-      const newSlackHeight = card.slackHeight + preClampY - newY
-
-      card.x = newX
-      card.y = newY
-      card.slackWidth = newSlackWidth
-      card.slackHeight = newSlackHeight
-      card.totalDrag = newTotalDrag
-    }
+    card.width = width
+    card.height = height
   })
-
   return Object.assign({}, state, {board: newBoard})
-}
-
-function cardDragStopped(hm, state, { id }) {
-  let selected
-  const newBoard = hm.change(state.board, (b) => {
-    const card = b.cards[id]
-    const snapX = snapToGrid(card.x)
-    const snapY = snapToGrid(card.y)
-    const snapWidth = snapToGrid(card.width)
-    const snapHeight = snapToGrid(card.height)
-    const selectedBefore = (card.id === state.selected)
-    const minDragSelection = card.totalDrag < GRID_SIZE/2
-    selected = minDragSelection ? card.id : state.selected
-    card.x = snapX
-    card.y = snapY
-    card.width = snapWidth
-    card.height = snapHeight
-    card.slackWidth = 0
-    card.slackHeight = 0
-    card.resizing = false
-    card.moving = false
-    delete card.totalDrag
-  })
-
-  return Object.assign({}, state, {board: newBoard, selected: selected})
 }
 
 function cardSelected(hm, state, { id }) {
@@ -419,7 +315,7 @@ function formSubmitted(hm, state) {
 
 function Reducer(hm) {
   return (state, action) => {
-     // console.log(action)
+     console.log(action)
 
     switch (action.type) {
       case '@@redux/INIT':
@@ -449,14 +345,11 @@ function Reducer(hm) {
       case CARD_INLINED_PDF:
         return cardInlinedPDF(hm, state, action)
 
-      case CARD_DRAG_STARTED:
-        return cardDragStarted(hm, state, action)
+      case CARD_MOVED:
+        return cardMoved(hm, state, action)
 
-      case CARD_DRAG_MOVED:
-        return cardDragMoved(hm, state, action)
-
-      case CARD_DRAG_STOPPED:
-        return cardDragStopped(hm, state, action)
+      case CARD_RESIZED:
+        return cardResized(hm, state, action)
 
       case CARD_SELECTED:
         return cardSelected(hm, state, action)
@@ -488,4 +381,4 @@ function Reducer(hm) {
   }
 }
 
-export { RootState, Reducer, maybeInlineFile, processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT };
+export { RootState, Reducer, maybeInlineFile, processImage, processPDF, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }
