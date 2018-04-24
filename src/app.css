@@ -50,14 +50,22 @@ div#hashForm {
   background: blue;
   text-align: center;
   width: 3600px;
-  height: 50px;
 }
 
 div#hashForm input {
-  background: white;
-  width: 500px;
-  height: 40px;
+  background: #ffffff;
+  width: 100%;
+  height: 28px;
+  text-align: center;
+  color: #444;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
 }
+
+div#hashForm input.loading {
+  background-color: #fff2cc;
+}
+
 
 div.board {
   background: #fafafa;
@@ -104,7 +112,7 @@ div.card img.image {
 div.card.text {
   cursor: text;
   color: #444;
-  font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+  font-family: 'Georgia', serif;
   font-size: 14px;
   line-height: 1.5em;
 }
@@ -203,10 +211,10 @@ div.renderer hr {
   padding: 0;
 }
 
+
 div.renderer pre, code, kbd, samp {
   color: #000;
-  font-family: monospace, monospace;
-  _font-family: 'courier new', monospace;
+  font-family: 'Courier New', monospace;
   font-size: 0.98em;
 }
 

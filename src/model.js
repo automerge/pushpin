@@ -180,11 +180,11 @@ function initializeIfEmpty(hm, state) {
     b.cards = {}
   })
   state = Object.assign({}, state, { board: newBoard })
-  state = cardCreatedText(hm, state,  { x: 1300, y: 300, text: WELCOME_TEXT})
-  state = cardCreatedText(hm, state,  { x: 1300, y: 450, text: USAGE_TEXT })
-  state = cardCreatedText(hm, state,  { x: 1300, y: 950, text: EXAMPLE_TEXT })
-  state = cardCreatedImage(hm, state, { x: 1750, y: 350, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
-  state = cardCreatedImage(hm, state, { x: 1700, y: 700, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
+  state = cardCreatedText(hm, state,  { x: 1350, y: 100, text: WELCOME_TEXT})
+  state = cardCreatedText(hm, state,  { x: 1350, y: 250, text: USAGE_TEXT })
+  state = cardCreatedText(hm, state,  { x: 1350, y: 750, text: EXAMPLE_TEXT })
+  state = cardCreatedImage(hm, state, { x: 1800, y: 150, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
+  state = cardCreatedImage(hm, state, { x: 1750, y: 500, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
   return state
 }
 
