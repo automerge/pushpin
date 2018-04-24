@@ -111,19 +111,16 @@ const mapDispatchToProps = (dispatch) => {
       maybeInlineFile(dispatch, id, text)
     },
     onSelected: (id) => {
-      console.log('inlineEditor.onSelected.start')
+      console.log('editor.onSelected')
       dispatch({type: CARD_UNIQUELY_SELECTED, id: id})
-      console.log('inlineEditor.onSelected.finish')
     },
     onDeleted: (id) => {
-      console.log('inlineEditor.onDeleted.start')
+      console.log('editor.onDeleted')
       dispatch({type: CARD_DELETED, id: id})
-      console.log('inlineEditor.onDeleted.finish')
     },
     onTextResized: (id, height) => {
-      console.log('card.onTextResized.start')
+      console.log('editor.onTextResized')
       dispatch({type: CARD_TEXT_RESIZED, id: id, height: height})
-      console.log('card.onTextResized.finish')
     },
   }
 }
