@@ -208,12 +208,9 @@ function cardTextChanged(hm, state, { id, text }) {
 }
 
 function cardTextResized(hm, state, { id, height }) {
-  const card = state.board.cards[id]
-  if (card.height >= height) {
-    return state
-  }
   const newBoard = hm.change(state.board, (b) => {
-    b.cards[id].height = height
+    const card = b.cards[id]
+    card.height = height
   })
   return Object.assign({}, state, {board: newBoard})
 }

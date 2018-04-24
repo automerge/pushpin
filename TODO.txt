@@ -21,6 +21,7 @@ Context menu for individual cards including cut, copy, download original, delete
 Clicking anywhere on note brings you to editing
 Drag box to select and drag multiple cards
 Ability to move cards to front or back
+Command-K doesn't clear line in text editor.
 
 ## Styling
 Style background with dots aligning to grid
