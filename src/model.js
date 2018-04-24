@@ -134,12 +134,7 @@ function snapToGrid(num) {
 
 function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
   const newBoard = hm.change(state.board, (b) => {
-    for (let id in b.cards) {
-      const c = b.cards[id]
-      if (c.selected) {
-        c.selected = false
-      }
-    }
+    _clearSelections(b)
 
     const id = uuid()
     const snapX = snapToGrid(x)
@@ -162,6 +157,16 @@ function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs
   })
 
   return Object.assign({}, state, {board: newBoard})
+}
+
+// Must call within hm.change block.
+function _clearSelections(board) {
+  for (let id in board.cards) {
+    const card = board.cards[id]
+    if (card.selected) {
+      card.selected = false
+    }
+  }
 }
 
 //// Initial state. Evolved by actions below.
@@ -353,12 +358,7 @@ function cardDragStopped(hm, state, { id }) {
     const minDragSelection = card.totalDrag < GRID_SIZE/2
     // Clear selections if we're effectively just clicking on this card.
     if (minDragSelection) {
-      for (let id in b.cards) {
-        const c = b.cards[id]
-        if (c.selected) {
-          c.selected = false
-        }
-      }
+      _clearSelections(b)
     }
     card.x = snapX
     card.y = snapY
@@ -384,12 +384,7 @@ function cardSelected(hm, state, { id }) {
 
 function cardUniquelySelected(hm, state, { id }) {
   const newBoard = hm.change(state.board, (b) => {
-    for (let id in b.cards) {
-      const c = b.cards[id]
-      if (c.selected) {
-        c.selected = false
-      }
-    }
+    _clearSelections(b)
     b.cards[id].selected = true
   })
  return Object.assign({}, state, {board: newBoard})
@@ -397,12 +392,7 @@ function cardUniquelySelected(hm, state, { id }) {
 
 function clearSelections(hm, state) {
   const newBoard = hm.change(state.board, (b) => {
-    for (let id in b.cards) {
-      const c = b.cards[id]
-      if (c.selected) {
-        c.selected = false
-      }
-    }
+    _clearSelections(b)
   })
   return Object.assign({}, state, {board: newBoard})
 }

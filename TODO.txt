@@ -27,4 +27,3 @@ Style typography
 Style pointer types
 
 ## Technical
-Look into re-deduplicating clearSelections
