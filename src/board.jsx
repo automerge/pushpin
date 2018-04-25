@@ -5,7 +5,7 @@ import Card from './card'
 import { remote } from 'electron'
 
 import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from './action-types'
-import { processImage, processPDF, BOARD_WIDTH, BOARD_HEIGHT } from './model'
+import { processImage, BOARD_WIDTH, BOARD_HEIGHT } from './model'
 import log from './log'
 
 const { Menu, MenuItem, dialog } = remote
@@ -50,24 +50,15 @@ const rightClickMenu = (dispatch, e) => {
       properties: ['openFile'],
       filters: [{name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif']}]
     }, (paths) => {
-      if (paths.length !== 1) {
+      // User aborted.
+      if (!paths) {
         return
+      }
+      if (paths.length !== 1) {
+        throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
       processImage(dispatch, path, null, x, y)
-      }
-    )
-  }}))
-  menu.append(new MenuItem({label: 'Add PDF', click() {
-    dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{name: 'PDFs', extensions: ['pdf']}]
-    }, (paths) => {
-      if (paths.length !== 1) {
-        return
-      }
-      const path = paths[0]
-      processPDF(dispatch, path, null, x, y)
       }
     )
   }}))

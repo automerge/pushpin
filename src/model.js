@@ -2,9 +2,8 @@ import uuid from 'uuid/v4'
 import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
-import { PDFImage } from 'pdf-image'
 
-import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_CREATED_PDF, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_INLINED_PDF, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
+import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
 import log from './log'
 
 //// Contants
@@ -27,12 +26,12 @@ const USAGE_TEXT =
 `### Usage
 
 * Double-click to create a new text card.
-* Right-click to create a new text, image, or PDF card.
+* Right-click to create a new text or image card.
 * Click on a card to edit its text.
 * Write Markdown in cards for formatting.
 * Click and drag anywhere on a card to move it around.
 * Click and drag on the bottom right corner of a card to resize it.
-* Paste an absolute file name to an image or pdf as the only text in a card + hit enter, to load that file.
+* Paste an absolute file name to an image as the only text in a card + hit enter, to load that file.
 * Use arrow keys to scroll around the board.
 * Press space + move the mouse to scroll around the board.`
 
@@ -49,36 +48,6 @@ function scaleImage(width, height) {
   const scaledWidth = CARD_DEFAULT_WIDTH
   const scaledHeight = height * (scaledWidth / width)
   return [scaledWidth, scaledHeight]
-}
-
-// Need to convert using these options to get good quality PDF previews.
-const pdfConvertOptions = { convertOptions: { '-quality': '100', '-density': '218'} }
-
-// Process the PDF at the given path, upgrading the card at id to a PDF
-// card if id is given, otherwise creating a new PDF card at (x,y).
-function processPDF(dispatch, path, id, x, y) {
-  const pdfImage = new PDFImage(path, pdfConvertOptions)
-  pdfImage.convertPage(0)
-    .catch(err => {
-      console.warn('Error converting PDF to PNG?', err)
-      return
-    })
-    .then(pngPath => {
-      Jimp.read(pngPath, (err, img) => {
-        if (err) {
-          console.warn('Error loading converted image?', err)
-          return
-        }
-        const width = img.bitmap.width
-        const height = img.bitmap.height
-        const [scaledWidth, scaledHeight] = scaleImage(width, height)
-        if (id) {
-          dispatch({type: CARD_INLINED_PDF, id: id, path: pngPath, width: scaledWidth, height: scaledHeight})
-        } else {
-          dispatch({type: CARD_CREATED_PDF, path: pngPath, width: scaledWidth, height: scaledHeight, x: x, y: y, selected: true})
-        }
-      })
-    })
 }
 
 // Process the image at the given path, upgrading the card at id to an image
@@ -102,11 +71,11 @@ function processImage(dispatch, path, id, x, y) {
 
 
 // Recognizes absolute local file paths to supported file types.
-const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif|pdf))\n\s*$/
+const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif))\n\s*$/
 
 // Given the current text for a card indexed by id, sees if it contains only a
 // local file path for a file type by supported by the app. In this case,
-// converts the card from a text card to image or pdf card as appropriate.
+// converts the card from a text card to image card.
 function maybeInlineFile(dispatch, id, text) {
   const filePatMatch = filePat.exec(text)
   if (!filePatMatch) {
@@ -118,8 +87,7 @@ function maybeInlineFile(dispatch, id, text) {
     if (err || !stat.isFile()) {
       return
     }
-    const processFn = (extension === 'pdf') ? processPDF : processImage
-    processFn(dispatch, path, id)
+    processImage(dispatch, path, id)
   })
 }
 
@@ -196,10 +164,6 @@ function cardCreatedImage(hm, state, { x, y, selected, path, width, height }) {
   return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { path: path }})
 }
 
-function cardCreatedPDF(hm, state, { x, y, selected, path, width, height}) {
-  return cardCreated(hm, state, { x, y, selected, width, height, type: 'pdf', typeAttrs: { path: path }})
-}
-
 function cardTextChanged(hm, state, { id, text }) {
   const newBoard = hm.change(state.board, (b) => {
     b.cards[id].text = text
@@ -219,18 +183,6 @@ function cardInlinedImage(hm, state, { id, path, width, height }) {
   const newBoard = hm.change(state.board, (b) => {
     const card = b.cards[id]
     card.type = 'image'
-    card.path = path
-    card.width = width
-    card.height = height
-    delete card.text
-  })
-  return Object.assign({}, state, {board: newBoard})
-}
-
-function cardInlinedPDF(hm, state, { id, path, width, height }) {
-  const newBoard = hm.change(state.board, (b) => {
-    const card = b.cards[id]
-    card.type = 'pdf'
     card.path = path
     card.width = width
     card.height = height
@@ -331,9 +283,6 @@ function Reducer(hm) {
       case CARD_CREATED_IMAGE:
         return cardCreatedImage(hm, state, action)
 
-      case CARD_CREATED_PDF:
-        return cardCreatedPDF(hm, state, action)
-
       case CARD_TEXT_CHANGED:
         return cardTextChanged(hm, state, action)
 
@@ -342,9 +291,6 @@ function Reducer(hm) {
 
       case CARD_INLINED_IMAGE:
         return cardInlinedImage(hm, state, action)
-
-      case CARD_INLINED_PDF:
-        return cardInlinedPDF(hm, state, action)
 
       case CARD_MOVED:
         return cardMoved(hm, state, action)
@@ -382,4 +328,4 @@ function Reducer(hm) {
   }
 }
 
-export { RootState, Reducer, maybeInlineFile, processImage, processPDF, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }
+export { RootState, Reducer, maybeInlineFile, processImage, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }

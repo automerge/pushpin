@@ -11,7 +11,7 @@ Fix random highlighting of text when moving / resizing
 Maybe you can't resize text boxes
 Figure out how to get Markdown italics, maybe bold and markdown only require one symbol
 Ability to select while editing text? (+ highlight styling)
-Design and implement default image & pdf scaling
+Design and implement default image
 Grab and save image filename
 Copy image data into specific storage location
 Figure out default image deta for demo
@@ -22,7 +22,9 @@ Context menu for individual cards including cut, copy, download original, delete
 Clicking anywhere on note brings you to editing
 Drag box to select and drag multiple cards
 Ability to move cards to front or back
-Command-K doesn't clear line in text editor.
+Command-K doesn't clear line in text editor
+Ability to download original images
+Maybe add back PDFs
 
 ## Styling
 Style background with dots aligning to grid

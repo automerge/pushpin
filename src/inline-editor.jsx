@@ -6,7 +6,7 @@ import Plain from 'slate-plain-serializer'
 import Prism from 'prismjs'
 
 import { maybeInlineFile } from './model'
-import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_IMAGE_INLINED, CARD_PDF_INLINED, CARD_DELETED } from './action-types'
+import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_DELETED } from './action-types'
 import log from './log'
 
 // Add Markdown syntax to Prism.
