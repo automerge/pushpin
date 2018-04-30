@@ -1,6 +1,8 @@
-# Board Demo
+# PushPin
 
-Electron app demonstrating basic pinboard functionality.
+A collaborative corkboard app.
+
+Built with Electron and the Dat p2p stack.
 
 ## Running
 
