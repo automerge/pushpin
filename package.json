@@ -1,8 +1,8 @@
 {
-  "name": "board-demo",
-  "productName": "board-demo",
+  "name": "pushpin",
+  "productName": "pushpin",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "A collaborative corkboard app",
   "main": "src/electron.js",
   "scripts": {
     "start": "electron-forge start",
