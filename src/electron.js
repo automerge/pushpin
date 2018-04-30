@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
-import { BOARD_WIDTH, BOARD_HEIGHT } from './model'
+import * as Model from './model'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -12,8 +12,8 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 1000,
-    maxWidth: BOARD_WIDTH,
-    maxHeight: BOARD_HEIGHT+37
+    maxWidth: Model.BOARD_WIDTH,
+    maxHeight: Model.BOARD_HEIGHT+37
   });
 
   // and load the index.html of the app.

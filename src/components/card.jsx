@@ -1,18 +1,20 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
+import Debug from 'debug'
 
-import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from './model'
+import Loop from '../loop'
 import InlineEditor from './inline-editor'
-import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from './action-types'
-import log from './log'
+import * as Model from '../model'
 
-class CardPresentation extends React.Component {
+const log = Debug('card')
+
+class Card extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    log('card.constructor')
+    log('constructor')
+
     this.state = {
       moving: false,
       resizing: false,
@@ -26,18 +28,47 @@ class CardPresentation extends React.Component {
       slackHeight: null,
       totalDrag: null
     }
+
+    this.onStart = this.onStart.bind(this)
+    this.onDrag = this.onDrag.bind(this)
+    this.onStop = this.onStop.bind(this)
+    this.onLocalHeight = this.onLocalHeight.bind(this)
   }
 
-  componentWillReceiveProps(props) {
-    log('card.receiveProps')
+  componentWillMount() {
+    log('componentWillMount')
   }
 
-  onMouseDown(e) {
-    log('card.onMouseDown')
+  componentDidMount() {
+    log('componentDidMount')
+  }
+
+  componentWillReceiveProps(nextProps) {
+    log('componentWillReceiveProps')
+  }
+
+  componentWillUpdate(nextProps) {
+    log('componentWillUpdate')
+  }
+
+  componentDidUpdate() {
+    log('componentDidUpdate')
+  }
+
+  onSelected(id) {
+    Loop.dispatch(Model.cardUniquelySelected, { id })
+  }
+
+  onMoved(id, x, y) {
+    Loop.dispatch(Model.cardMoved, { id, x, y })
+  }
+
+  onResized(id, width, height) {
+    Loop.dispatch(Model.cardResized, { id, width, height })
   }
 
   onStart(e, d) {
-    log('card.onStart')
+    log('onStart')
 
     if (d.deltaX != 0 || d.deltaY != 0) {
       throw new Error(`Did not expect delta in onStart`)
@@ -46,9 +77,9 @@ class CardPresentation extends React.Component {
     const clickX = d.lastX
     const clickY = d.lastY
     const card = this.props.card
-    const resizing = ((clickX >= (card.x + card.width - RESIZE_HANDLE_SIZE)) &&
+    const resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
                       (clickX <= (card.x + card.width)) &&
-                      (clickY >= (card.y + card.height - RESIZE_HANDLE_SIZE)) &&
+                      (clickY >= (card.y + card.height - Model.RESIZE_HANDLE_SIZE)) &&
                       (clickY <= (card.y + card.height)))
 
     const updates = {}
@@ -74,7 +105,7 @@ class CardPresentation extends React.Component {
   }
 
   onDrag(e, d) {
-    log('card.onDrag')
+    log('onDrag')
 
     if (!this.state.resizing && !this.state.moving) {
       throw new Error(`Did not expect drag without resize or move`)
@@ -105,9 +136,9 @@ class CardPresentation extends React.Component {
 
       // Clamp to ensure card doesn't move beyond the board.
       newX = Math.max(newX, 0)
-      newX = Math.min(newX, BOARD_WIDTH - card.width)
+      newX = Math.min(newX, Model.BOARD_WIDTH - card.width)
       newY = Math.max(newY, 0)
-      newY = Math.min(newY, BOARD_HEIGHT - card.height)
+      newY = Math.min(newY, Model.BOARD_HEIGHT - card.height)
 
       // If the numbers changed, we must have introduced some slack.
       // Record it for the next iteration.
@@ -139,10 +170,10 @@ class CardPresentation extends React.Component {
       let newHeight = preClampHeight + this.state.slackHeight
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
-      newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
-      newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
-      newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
-      newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
+      newWidth = Math.max(Model.CARD_MIN_WIDTH, newWidth)
+      newWidth = Math.min(Model.BOARD_WIDTH - card.x, newWidth)
+      newHeight = Math.max(Model.CARD_MIN_HEIGHT, newHeight)
+      newHeight = Math.min(Model.BOARD_HEIGHT - card.y, newHeight)
 
       // If the numbers changed, we must have introduced some slack.
       // Record it for the next iteration.
@@ -161,25 +192,25 @@ class CardPresentation extends React.Component {
   }
 
   onStop(e, d) {
-    log('card.onStop')
+    log('onStop')
 
     if (d.deltaX != 0 || d.deltaY != 0) {
       throw new Error(`Did not expect delta in onStart`)
     }
 
     const card = this.props.card
-    const minDragSelection = this.state.totalDrag < GRID_SIZE/2
+    const minDragSelection = this.state.totalDrag < Model.GRID_SIZE/2
 
     if (!this.props.selected && minDragSelection) {
-      this.props.onSelected(card.id)
+      this.onSelected(card.id)
     }
 
     const updates = {}
 
     if (this.state.moving) {
-      const snapX = snapToGrid(this.state.moveX)
-      const snapY = snapToGrid(this.state.moveY)
-      this.props.onMoved(card.id, snapX, snapY)
+      const snapX = Model.snapToGrid(this.state.moveX)
+      const snapY = Model.snapToGrid(this.state.moveY)
+      this.onMoved(card.id, snapX, snapY)
       updates.moveX = null
       updates.moveY = null
       updates.slackX = null
@@ -187,9 +218,9 @@ class CardPresentation extends React.Component {
     }
 
     else if (this.state.resizing) {
-      const snapWidth = snapToGrid(this.state.resizeWidth)
-      const snapHeight = snapToGrid(this.state.resizeHeight)
-      this.props.onResized(card.id, snapWidth, snapHeight)
+      const snapWidth = Model.snapToGrid(this.state.resizeWidth)
+      const snapHeight = Model.snapToGrid(this.state.resizeHeight)
+      this.onResized(card.id, snapWidth, snapHeight)
       updates.resizeWidth = null
       updates.resizeHeight = null
       updates.slackWidth = null
@@ -203,8 +234,13 @@ class CardPresentation extends React.Component {
     this.setState(updates)
   }
 
+  onLocalHeight(resizeHeight) {
+    log('onLocalheight', resizeHeight)
+    this.setState({resizeHeight: resizeHeight})
+  }
+
   render() {
-    log('card.render')
+    log('render')
 
     const card = this.props.card
     return (
@@ -212,10 +248,9 @@ class CardPresentation extends React.Component {
         allowAnyClick={false}
         disabled={false}
         enableUserSelectHack={false}
-        onMouseDown={this.onMouseDown.bind(this)}
-        onStart={this.onStart.bind(this)}
-        onDrag={this.onDrag.bind(this)}
-        onStop={this.onStop.bind(this)}
+        onStart={this.onStart}
+        onDrag={this.onDrag}
+        onStop={this.onStop}
       >
         <div
           id={`card-${card.id}`}
@@ -234,18 +269,13 @@ class CardPresentation extends React.Component {
     )
   }
 
-  onLocalHeight(resizeHeight) {
-    log('card.onLocalheight', resizeHeight)
-    this.setState({resizeHeight: resizeHeight})
-  }
-
   renderTextInner() {
     return (
       <InlineEditor
         cardId={this.props.card.id}
         text={this.props.card.text}
         selected={this.props.selected}
-        onLocalHeight={this.onLocalHeight.bind(this)}
+        onLocalHeight={this.onLocalHeight}
         cardHeight={this.props.card.height}
       />
     )
@@ -260,21 +290,5 @@ class CardPresentation extends React.Component {
     )
   }
 }
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onSelected: (id) => {
-      dispatch({type: CARD_UNIQUELY_SELECTED, id: id})
-    },
-    onMoved: (id, x, y) => {
-      dispatch({type: CARD_MOVED, id: id, x: x, y: y})
-    },
-    onResized: (id, width, height) => {
-      dispatch({type: CARD_RESIZED, id: id, width: width, height: height})
-    }
-  }
-}
-
-const Card = connect(null, mapDispatchToProps)(CardPresentation)
 
 export default Card

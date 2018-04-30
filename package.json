@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
+    "debug": "^3.1.0",
     "electron-compile": "^6.4.2",
     "electron-devtools-installer": "^2.2.3",
     "electron-squirrel-startup": "^1.0.0",
