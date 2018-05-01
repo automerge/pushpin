@@ -74,17 +74,18 @@ export default class HyperFile {
     })
   }
 
-  // callback = (err)
+  // callback = (err, blobPath)
   static fetch(dataPath, imgId, coreKey, callback) {
+    coreKey = Buffer.from(coreKey, "base64")
     const core = Hypercore(corePath(dataPath, imgId), coreKey, hypercoreOptions)
     core.on('error', callback)
     core.on('ready', () => {
-      swarm = Hyperdiscovery(core)
-      core.download()
-    })
-    core.on('sync', () => {
-      core.close()
-      callback(null)
+      Hyperdiscovery(core)
+      core.get(0, null, (err, data) => {
+        core.close()
+        const blobPath = Path.join(dataPath, imgId, "data")
+        callback(null, blobPath)
+      })
     })
   }
 }

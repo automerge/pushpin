@@ -18,7 +18,8 @@ const CARD_MIN_WIDTH = 100
 const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
 
-const HYPERFILE_DATA_PATH = "./data"
+const USER = process.env.NAME || "userA"
+const HYPERFILE_DATA_PATH = Path.join(".", USER, "hyperfile")
 
 const WELCOME_TEXT =
 `## Welcome
@@ -86,7 +87,8 @@ function processImage(dispatch, path, id, x, y) {
             selected: true,
             hypercore: {
               key: key.toString("base64"),
-              imageId: imageId
+              imageId: imageId,
+              imageExt: Path.extname(path)
             }
           })
         })
