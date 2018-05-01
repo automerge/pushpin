@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
-import { FORM_CHANGED, FORM_SUBMITTED } from './action-types';
+import { FORM_CHANGED, FORM_SUBMITTED } from '../action-types';
 
 const hashFormPresentation = ({ formDocId, activeDocId, requestedDocId, onChange, onSubmit }) => {
   return (

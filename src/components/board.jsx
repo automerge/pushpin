@@ -4,9 +4,9 @@ import Jimp from 'jimp'
 import Card from './card'
 import { remote } from 'electron'
 
-import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from './action-types'
-import { processImage, BOARD_WIDTH, BOARD_HEIGHT } from './model'
-import log from './log'
+import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from '../action-types'
+import { processImage, BOARD_WIDTH, BOARD_HEIGHT } from '../model'
+import log from '../log'
 
 const { Menu, MenuItem, dialog } = remote
 
