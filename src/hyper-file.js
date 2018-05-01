@@ -26,19 +26,19 @@ function dataPath(dataPath, imgId) {
 //         console.error(err)
 //         process.exit(1)
 //       }
-//     
+//
 //       HyperFile.serve(client1Data, kayId, coreKey, (err) => {
 //         if (err) {
 //           console.error(err)
 //           process.exit(1)
 //         }
-//     
+//
 //         HyperFile.fetch(client2Data, kayId, coreKey, (err) => {
 //           if (err) {
 //             console.error(err)
 //             process.exit(1)
 //           }
-//     
+//
 //           console.log(dataPath(client2Data, kayId))
 //           process.exit(0)
 //         })
@@ -51,8 +51,9 @@ export default class HyperFile {
     const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions)
     core.on('error', callback)
     core.on('ready', () => {
-      readStream = Fs.createReadStream(imgPath)
-      writeStream = core.createWriteStream()
+      const readStream = Fs.createReadStream(imgPath)
+      const writeStream = core.createWriteStream()
+
       readStream.on('error', callback)
       writeStream.on('error', callback)
       writeStream.on('finish', () => {
@@ -68,7 +69,7 @@ export default class HyperFile {
     const core = Hypercore(corePath(dataPath, imgId), coreKey, hypercoreOptions)
     core.on('error', callback)
     core.on('ready', () => {
-      swarm = Hyperdiscovery(core)
+      Hyperdiscovery(core)
       callback(null)
     })
   }

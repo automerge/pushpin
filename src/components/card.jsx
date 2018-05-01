@@ -7,6 +7,7 @@ import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from '../action-types'
 import log from '../log'
+import HyperFile from "../hyper-file"
 
 class CardPresentation extends React.Component {
 
@@ -24,8 +25,18 @@ class CardPresentation extends React.Component {
       resizeHeight: null,
       slackWidth: null,
       slackHeight: null,
-      totalDrag: null
+      totalDrag: null,
+      loading: false
     }
+
+    if(props.card.hypercore.imageId) {
+      this.state.loading = true
+      this.loadHypercoreData()
+    }
+  }
+
+  loadHypercoreData() {
+
   }
 
   componentWillReceiveProps(props) {
@@ -207,6 +218,21 @@ class CardPresentation extends React.Component {
     log('card.render')
 
     const card = this.props.card
+
+    if(this.state.loading)
+      return <div 
+        className={ classNames('card', card.type, this.props.selected ? 'selected' : 'unselected') }
+        style={{
+          width: this.state.resizeWidth || card.width,
+          height: this.state.resizeHeight || card.height,
+          position: 'absolute',
+          left: this.state.moveX || card.x,
+          top: this.state.moveY || card.y
+        }}
+      >
+        <h3>Loading</h3>
+      </div>
+
     return (
       <DraggableCore
         allowAnyClick={false}
