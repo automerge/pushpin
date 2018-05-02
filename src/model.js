@@ -2,10 +2,10 @@ import uuid from 'uuid/v4'
 import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
-import HyperFile from "./hyper-file"
+import Debug from 'debug'
 
 import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
-import log from './log'
+import HyperFile from "./hyper-file"
 
 //// Contants
 
@@ -44,6 +44,7 @@ const EXAMPLE_TEXT =
 
 We've made some initial cards for you to play with. Have fun!`
 
+const log = Debug('pushpin:model')
 
 //// Helper functions - may be called within action functions or from UI code.
 
@@ -297,7 +298,7 @@ function formSubmitted(hm, state) {
 
 function Reducer(hm) {
   return (state, action) => {
-     log('model.reduce', action)
+     log('reduce', action)
 
     switch (action.type) {
       case '@@redux/INIT':

@@ -3,15 +3,17 @@ import { connect } from 'react-redux'
 import Jimp from 'jimp'
 import Card from './card'
 import { remote } from 'electron'
+import Debug from 'debug'
 
 import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from '../action-types'
 import { processImage, BOARD_WIDTH, BOARD_HEIGHT } from '../model'
-import log from '../log'
 
 const { Menu, MenuItem, dialog } = remote
 
+const log = Debug('pushpin:board')
+
 const presentation = ({ cards, selected, onClick, onDoubleClick, onContextMenu }) => {
-  log('board.render')
+  log('render')
 
   let cardChildren = []
   for (let id in cards) {
@@ -88,15 +90,15 @@ const mapDispatchToProps = (dispatch, getState) => {
       if (clickingInCard) {
         return
       }
-      log('board.onClick')
+      log('onClick')
       dispatch({type: CLEAR_SELECTIONS})
     },
     onDoubleClick: (e) => {
-      log('board.onDoubleClick')
+      log('onDoubleClick')
       dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, text: '', selected: true})
     },
     onContextMenu: (e, ...rest) => {
-      log('board.onContextMenu')
+      log('onContextMenu')
       e.preventDefault()
       const menu = rightClickMenu(dispatch, e)
       menu.popup({window: remote.getCurrentWindow()})

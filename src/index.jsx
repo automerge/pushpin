@@ -1,3 +1,9 @@
+import Debug from 'debug'
+// The debug module wants to cache the env['DEBUG'] config, but they get it
+// wrong, at least for the render process. Delete the attempted cache so it
+// doesn't confuse future instances.
+localStorage.removeItem('debug')
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'

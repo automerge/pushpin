@@ -2,8 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
-import Path from "path"
-import Fs from "fs"
+import Path from 'path'
+import Fs from 'fs'
+import Debug from 'debug'
 
 const USER = process.env.NAME || "userA"
 const USER_PATH = Path.join(".", USER)
@@ -19,7 +20,6 @@ if(!Fs.existsSync(CACHE_PATH))
 import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from '../action-types'
-import log from '../log'
 import HyperFile from "../hyper-file"
 
 function copyFile(source, destination, callback) {
@@ -30,11 +30,13 @@ function copyFile(source, destination, callback) {
   })
 }
 
+const log = Debug('pushpin:card')
+
 class CardPresentation extends React.Component {
 
   constructor(props) {
     super(props)
-    log('card.constructor')
+    log('constructor')
     this.state = {
       moving: false,
       resizing: false,
@@ -72,15 +74,15 @@ class CardPresentation extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    log('card.receiveProps')
+    log('componentWillReceiveProps')
   }
 
   onMouseDown(e) {
-    log('card.onMouseDown')
+    log('onMouseDown')
   }
 
   onStart(e, d) {
-    log('card.onStart')
+    log('onStart')
 
     if (d.deltaX != 0 || d.deltaY != 0) {
       throw new Error(`Did not expect delta in onStart`)
@@ -117,7 +119,7 @@ class CardPresentation extends React.Component {
   }
 
   onDrag(e, d) {
-    log('card.onDrag')
+    log('onDrag')
 
     if (!this.state.resizing && !this.state.moving) {
       throw new Error(`Did not expect drag without resize or move`)
@@ -204,7 +206,7 @@ class CardPresentation extends React.Component {
   }
 
   onStop(e, d) {
-    log('card.onStop')
+    log('onStop')
 
     if (d.deltaX != 0 || d.deltaY != 0) {
       throw new Error(`Did not expect delta in onStart`)
@@ -247,7 +249,7 @@ class CardPresentation extends React.Component {
   }
 
   render() {
-    log('card.render')
+    log('render')
 
     const card = this.props.card
 
@@ -293,7 +295,7 @@ class CardPresentation extends React.Component {
   }
 
   onLocalHeight(resizeHeight) {
-    log('card.onLocalheight', resizeHeight)
+    log('onLocalheight', resizeHeight)
     this.setState({resizeHeight: resizeHeight})
   }
 
