@@ -2,11 +2,33 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
+import Path from "path"
+import Fs from "fs"
+
+const USER = process.env.NAME || "userA"
+const USER_PATH = Path.join(".", USER)
+const HYPERFILE_DATA_PATH = Path.join(USER_PATH, "hyperfile")
+const CACHE_PATH = Path.join(USER_PATH, "hyperfile-cache")
+
+if(!Fs.existsSync(USER_PATH))
+  Fs.mkdirSync(USER_PATH)
+
+if(!Fs.existsSync(CACHE_PATH))
+  Fs.mkdirSync(CACHE_PATH)
 
 import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from '../action-types'
 import log from '../log'
+import HyperFile from "../hyper-file"
+
+function copyFile(source, destination, callback) {
+  Fs.readFile(source, (err, data) => {
+    Fs.writeFile(destination, data, (err) => {
+      callback()
+    })
+  })
+}
 
 class CardPresentation extends React.Component {
 
@@ -24,8 +46,29 @@ class CardPresentation extends React.Component {
       resizeHeight: null,
       slackWidth: null,
       slackHeight: null,
-      totalDrag: null
+      totalDrag: null,
+      loading: false,
+      imagePath: null
     }
+
+    if(props.card.hypercore.imageId) {
+      this.state.loading = true
+      this.loadHypercoreData()
+    }
+  }
+
+  loadHypercoreData() {
+    let card = this.props.card
+
+    HyperFile.fetch(HYPERFILE_DATA_PATH, card.hypercore.imageId, card.hypercore.key, (error, blobPath) => {
+      if(error)
+        log(error)
+
+      const imagePath = Path.join(CACHE_PATH, card.hypercore.imageId + card.hypercore.imageExt)
+      copyFile(blobPath, imagePath, () => {
+        this.setState({ loading: false, imagePath: "../" + imagePath })
+      })
+    })
   }
 
   componentWillReceiveProps(props) {
@@ -207,6 +250,21 @@ class CardPresentation extends React.Component {
     log('card.render')
 
     const card = this.props.card
+
+    if(this.state.loading)
+      return <div 
+        className={ classNames('card', card.type, this.props.selected ? 'selected' : 'unselected') }
+        style={{
+          width: this.state.resizeWidth || card.width,
+          height: this.state.resizeHeight || card.height,
+          position: 'absolute',
+          left: this.state.moveX || card.x,
+          top: this.state.moveY || card.y
+        }}
+      >
+        <h3>Loading</h3>
+      </div>
+
     return (
       <DraggableCore
         allowAnyClick={false}
@@ -255,7 +313,7 @@ class CardPresentation extends React.Component {
     return (
       <img
         className='image'
-        src={this.props.card.path}
+        src={this.state.imagePath}
       />
     )
   }

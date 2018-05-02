@@ -2,6 +2,7 @@ import uuid from 'uuid/v4'
 import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
+import HyperFile from "./hyper-file"
 
 import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
 import log from './log'
@@ -16,6 +17,9 @@ const CARD_DEFAULT_HEIGHT = 100
 const CARD_MIN_WIDTH = 100
 const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
+
+const USER = process.env.NAME || "userA"
+const HYPERFILE_DATA_PATH = Path.join(".", USER, "hyperfile")
 
 const WELCOME_TEXT =
 `## Welcome
@@ -61,10 +65,34 @@ function processImage(dispatch, path, id, x, y) {
     const width = img.bitmap.width
     const height = img.bitmap.height
     const [scaledWidth, scaledHeight] = scaleImage(width, height)
-    if (id) {
-      dispatch({type: CARD_INLINED_IMAGE, id: id, path: path, width: scaledWidth, height: scaledHeight})
-    } else {
-      dispatch({type: CARD_CREATED_IMAGE, path: path, width: scaledWidth, height: scaledHeight, x: x, y: y, selected: true})
+
+    if (id)
+      dispatch({ type: CARD_INLINED_IMAGE, id: id, path: path, width: scaledWidth, height: scaledHeight })
+    else {
+      let imageId = uuid()
+      HyperFile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
+        if(error)
+          log(error)
+
+        HyperFile.serve(HYPERFILE_DATA_PATH, imageId, key, (error) => {
+          if(error)
+            log(error)
+
+          dispatch({
+            type: CARD_CREATED_IMAGE,
+            width: scaledWidth,
+            height: scaledHeight,
+            x: x,
+            y: y,
+            selected: true,
+            hypercore: {
+              key: key.toString("base64"),
+              imageId: imageId,
+              imageExt: Path.extname(path)
+            }
+          })
+        })
+      })
     }
   })
 }
@@ -101,7 +129,7 @@ function snapToGrid(num) {
   }
 }
 
-function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
+function cardCreated(hm, state, { x, y, width, height, selected, type, hypercore, typeAttrs }) {
   const id = uuid()
 
   const newBoard = hm.change(state.board, (b) => {
@@ -118,6 +146,7 @@ function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs
       slackHeight: 0,
       resizing: false,
       moving: false,
+      hypercore: hypercore || {}
     }, typeAttrs)
 
     b.cards[id] = newCard
@@ -160,8 +189,8 @@ function cardCreatedText(hm, state, { x, y, selected, text }) {
   return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
 }
 
-function cardCreatedImage(hm, state, { x, y, selected, path, width, height }) {
-  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { path: path }})
+function cardCreatedImage(hm, state, { x, y, selected, path, width, height, hypercore }) {
+  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', hypercore })
 }
 
 function cardTextChanged(hm, state, { id, text }) {

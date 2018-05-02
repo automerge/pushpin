@@ -18,6 +18,7 @@ const presentation = ({ cards, selected, onClick, onDoubleClick, onContextMenu }
     const card = cards[id]
     cardChildren.push(<Card key={id} card={card} selected={selected === id}/>)
   }
+
   return (
     <div
       id='board'
