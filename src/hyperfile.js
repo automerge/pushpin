@@ -76,7 +76,12 @@ export function fetch(dataPath, imgId, coreKey, callback) {
   core.on('error', callback)
   core.on('ready', () => {
     serve(core)
-    core.get(0, null, (err, data) => {
+    core.get(0, null, (error, data) => {
+      if(error) {
+        callback(error)
+        return
+      }
+
       const blobPath = Path.join(dataPath, imgId, "data")
       callback(null, blobPath)
     })

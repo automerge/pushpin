@@ -65,8 +65,18 @@ function scaleImage(width, height) {
 }
 
 function copyFile(source, destination, callback) {
-  Fs.readFile(source, (err, data) => {
-    Fs.writeFile(destination, data, (err) => {
+  Fs.readFile(source, (error, data) => {
+    if(error) {
+      callback(error)
+      return
+    }
+
+    Fs.writeFile(destination, data, (error) => {
+      if(error) {
+        callback(error)
+        return
+      }
+
       callback()
     })
   })
@@ -80,12 +90,9 @@ function fetchImage({ imageId, imageExt, key }, callback) {
     }
 
     const imagePath = Path.join(HYPERFILE_CACHE_PATH, imageId + imageExt)
-    copyFile(blobPath, imagePath, () => {
-      callback(null, imagePath)
-    })
+    copyFile(blobPath, imagePath, error => callback(error, imagePath))
   })
 }
-
 
 // Process the image at the given path, upgrading the card at id to an image
 // card if id is given, otherwise creating a new image card at (x,y).
