@@ -17,7 +17,6 @@ import { INITIALIZE_IF_EMPTY, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } f
 import HashForm from './components/hash-form'
 import Board from './components/board'
 
-var spaceDown = false
 
 const onKeyDown = (e, store) => {
   if (e.key === 'Backspace') {
@@ -28,50 +27,12 @@ const onKeyDown = (e, store) => {
         store.dispatch({ type: CARD_DELETED, id: card.id })
       }
     }
-    return
   }
-
-  if (e.key === ' ' && e.target === document.body) {
-    spaceDown = true
-    e.preventDefault()
-    return
-  }
-}
-
-const onKeyUp = (e) => {
-  if (e.key === ' ' && e.target === document.body) {
-    spaceDown = false
-    return
-  }
-}
-
-const onMouseMove = (e) => {
-  if (spaceDown) {
-    window.scrollBy(e.movementX*2, e.movementY*2)
-  }
-}
-
-const onWheel = (e) => {
-  if (e.deltaY === 0) {
-    throw new Error('Unexpected non-zoom wheel')
-  }
-
-  const oldZoom = webFrame.getZoomFactor()
-  const scaleFactor = (e.deltaY < 0) ? 0.95 : 1.05
-  const newZoom = oldZoom * scaleFactor
-  const offsetX = e.clientX * (1-(1/scaleFactor))
-  const offsetY = e.clientY * (1-(1/scaleFactor))
-  webFrame.setZoomFactor(newZoom)
-  window.scrollBy(offsetX, offsetY)
-  e.preventDefault()
 }
 
 const centerOnStart = () => {
   const board = document.getElementById('board')
-  window.scrollTo(
-    (board.clientWidth/2)-(window.innerWidth/2),
-    0 //(board.clientHeight/2.5)-(window.innerHeight/2)
-  )
+  window.scrollTo((board.clientWidth/2)-(window.innerWidth/2), 0)
 }
 
 const init = () => {
@@ -107,9 +68,6 @@ const render = (store) => {
   )
 
   document.addEventListener('keydown', (e) => { onKeyDown(e, store) })
-  document.addEventListener('keyup', (e) => { onKeyUp(e) })
-  document.addEventListener('mousemove', (e) => { onMouseMove(e) })
-  document.addEventListener('wheel', (e) => { onWheel(e) })
 
   centerOnStart()
 }
