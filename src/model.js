@@ -96,7 +96,7 @@ function fetchImage({ imageId, imageExt, key }, callback) {
 
 // Process the image at the given path, upgrading the card at id to an image
 // card if id is given, otherwise creating a new image card at (x,y).
-function processImage(dispatch, path, id, x, y) {
+function processImage(dispatch, path, x, y) {
   Jimp.read(path, (err, img) => {
     if (err) {
       console.warn('Error loading image?', err)
@@ -105,30 +105,26 @@ function processImage(dispatch, path, id, x, y) {
     const width = img.bitmap.width
     const height = img.bitmap.height
     const [scaledWidth, scaledHeight] = scaleImage(width, height)
+    const imageId = uuid()
 
-    if (id)
-      dispatch({ type: CARD_INLINED_IMAGE, id: id, path: path, width: scaledWidth, height: scaledHeight })
-    else {
-      let imageId = uuid()
-      Hyperfile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
-        if(error)
-          log(error)
+    Hyperfile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
+      if(error)
+        log(error)
 
-        dispatch({
-          type: CARD_CREATED_IMAGE,
-          width: scaledWidth,
-          height: scaledHeight,
-          x: x,
-          y: y,
-          selected: true,
-          hyperfile: {
-            key: key.toString("base64"),
-            imageId: imageId,
-            imageExt: Path.extname(path)
-          }
-        })
+      dispatch({
+        type: CARD_CREATED_IMAGE,
+        width: scaledWidth,
+        height: scaledHeight,
+        x: x,
+        y: y,
+        selected: true,
+        hyperfile: {
+          key: key.toString("base64"),
+          imageId: imageId,
+          imageExt: Path.extname(path)
+        }
       })
-    }
+    })
   })
 }
 
@@ -220,7 +216,7 @@ function cardCreatedText(hm, state, { x, y, selected, text }) {
   return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
 }
 
-function cardCreatedImage(hm, state, { x, y, selected, path, width, height, hyperfile }) {
+function cardCreatedImage(hm, state, { x, y, selected, width, height, hyperfile }) {
   return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
 }
 
