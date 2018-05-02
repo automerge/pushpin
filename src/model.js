@@ -3,6 +3,7 @@ import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
 import Debug from 'debug'
+import * as Hyperfile from "./hyperfile"
 
 import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
 import HyperFile from "./hyper-file"
@@ -71,11 +72,11 @@ function processImage(dispatch, path, id, x, y) {
       dispatch({ type: CARD_INLINED_IMAGE, id: id, path: path, width: scaledWidth, height: scaledHeight })
     else {
       let imageId = uuid()
-      HyperFile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
+      Hyperfile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
         if(error)
           log(error)
 
-        HyperFile.serve(HYPERFILE_DATA_PATH, imageId, key, (error) => {
+        Hyperfile.serve(HYPERFILE_DATA_PATH, imageId, key, (error) => {
           if(error)
             log(error)
 

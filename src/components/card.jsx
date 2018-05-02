@@ -20,7 +20,8 @@ if(!Fs.existsSync(CACHE_PATH))
 import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from '../action-types'
-import HyperFile from "../hyper-file"
+import log from '../log'
+import * as Hyperfile from "../hyperfile"
 
 function copyFile(source, destination, callback) {
   Fs.readFile(source, (err, data) => {
@@ -62,7 +63,7 @@ class CardPresentation extends React.Component {
   loadHypercoreData() {
     let card = this.props.card
 
-    HyperFile.fetch(HYPERFILE_DATA_PATH, card.hypercore.imageId, card.hypercore.key, (error, blobPath) => {
+    Hyperfile.fetch(HYPERFILE_DATA_PATH, card.hypercore.imageId, card.hypercore.key, (error, blobPath) => {
       if(error)
         log(error)
 
