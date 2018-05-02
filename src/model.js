@@ -76,23 +76,18 @@ function processImage(dispatch, path, id, x, y) {
         if(error)
           log(error)
 
-        Hyperfile.serve(HYPERFILE_DATA_PATH, imageId, key, (error) => {
-          if(error)
-            log(error)
-
-          dispatch({
-            type: CARD_CREATED_IMAGE,
-            width: scaledWidth,
-            height: scaledHeight,
-            x: x,
-            y: y,
-            selected: true,
-            hypercore: {
-              key: key.toString("base64"),
-              imageId: imageId,
-              imageExt: Path.extname(path)
-            }
-          })
+        dispatch({
+          type: CARD_CREATED_IMAGE,
+          width: scaledWidth,
+          height: scaledHeight,
+          x: x,
+          y: y,
+          selected: true,
+          hypercore: {
+            key: key.toString("base64"),
+            imageId: imageId,
+            imageExt: Path.extname(path)
+          }
         })
       })
     }

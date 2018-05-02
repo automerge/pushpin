@@ -14,6 +14,10 @@ function dataPath(dataPath, imgId) {
   return Path.join(dataPath, imgId, 'data')
 }
 
+function serve(hypercore) {
+  Hyperdiscovery(hypercore)
+}
+
 // Example:
 //
 //     const client1Data = '/Users/mmcgrana/Desktop/client-1'
@@ -57,20 +61,11 @@ export function write(dataPath, imgId, imgPath, callback) {
     readStream.on('error', callback)
     writeStream.on('error', callback)
     writeStream.on('finish', () => {
-      core.close()
+      serve(core)
       callback(null, core.key)
     })
-    readStream.pipe(writeStream)
-  })
-}
 
-// callback = (err)
-export function serve(dataPath, imgId, coreKey, callback) {
-  const core = Hypercore(corePath(dataPath, imgId), coreKey, hypercoreOptions)
-  core.on('error', callback)
-  core.on('ready', () => {
-    Hyperdiscovery(core)
-    callback(null)
+    readStream.pipe(writeStream)
   })
 }
 
@@ -80,9 +75,8 @@ export function fetch(dataPath, imgId, coreKey, callback) {
   const core = Hypercore(corePath(dataPath, imgId), coreKey, hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
-    Hyperdiscovery(core)
+    serve(core)
     core.get(0, null, (err, data) => {
-      core.close()
       const blobPath = Path.join(dataPath, imgId, "data")
       callback(null, blobPath)
     })
