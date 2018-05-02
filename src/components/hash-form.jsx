@@ -1,22 +1,48 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import Debug from 'debug'
 
 import { FORM_CHANGED, FORM_SUBMITTED } from '../action-types';
 
-const hashFormPresentation = ({ formDocId, activeDocId, requestedDocId, onChange, onSubmit }) => {
-  return (
-    <div id='hashForm'>
-      <form onSubmit={onSubmit}>
-        <input
-           type='text'
-           value={formDocId}
-           onChange={onChange}
-           className={classNames(activeDocId === requestedDocId ? 'loaded' : 'loading')}
-        />
-      </form>
-    </div>
-  )
+const log = Debug('pushpin:hash-form')
+
+class HashFromPresentation extends React.PureComponent {
+  constructor(props) {
+    super(props)
+    log('constructor')
+
+    this.onChange = this.onChange.bind(this)
+    this.onSubmit = this.onSubmit.bind(this)
+  }
+
+  onChange(e) {
+    log('onChange')
+    this.props.dispatch({type: FORM_CHANGED, docId: e.target.value})
+  }
+
+  onSubmit(e) {
+    log('onSubmit')
+    e.preventDefault()
+    this.props.dispatch({type: FORM_SUBMITTED})
+  }
+
+  render() {
+    log('render')
+
+    return (
+      <div id='hashForm'>
+        <form onSubmit={this.onSubmit}>
+          <input
+             type='text'
+             value={this.props.formDocId}
+             onChange={this.onChange}
+             className={classNames(this.props.activeDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
+          />
+        </form>
+      </div>
+    )
+  }
 }
 
 const mapStateToProps = (state) => {
@@ -28,17 +54,9 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-    onChange: (event) => {
-      dispatch({type: FORM_CHANGED, docId: event.target.value})
-    },
-    onSubmit: (event) => {
-      event.preventDefault()
-      dispatch({type: FORM_SUBMITTED})
-    }
-  }
+  return { dispatch }
 }
 
-const HashForm = connect(mapStateToProps, mapDispatchToProps)(hashFormPresentation)
+const HashForm = connect(mapStateToProps, mapDispatchToProps)(HashFromPresentation)
 
 export default HashForm
