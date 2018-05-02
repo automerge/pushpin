@@ -20,7 +20,15 @@ const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
 
 const USER = process.env.NAME || "userA"
-const HYPERFILE_DATA_PATH = Path.join(".", USER, "hyperfile")
+const USER_PATH = Path.join(".", USER)
+const HYPERFILE_DATA_PATH = Path.join(USER_PATH, "hyperfile")
+const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, "hyperfile-cache")
+
+if(!Fs.existsSync(USER_PATH))
+  Fs.mkdirSync(USER_PATH)
+
+if(!Fs.existsSync(HYPERFILE_CACHE_PATH))
+  Fs.mkdirSync(HYPERFILE_CACHE_PATH)
 
 const WELCOME_TEXT =
 `## Welcome
@@ -55,6 +63,29 @@ function scaleImage(width, height) {
   const scaledHeight = height * (scaledWidth / width)
   return [scaledWidth, scaledHeight]
 }
+
+function copyFile(source, destination, callback) {
+  Fs.readFile(source, (err, data) => {
+    Fs.writeFile(destination, data, (err) => {
+      callback()
+    })
+  })
+}
+
+function fetchImage({ imageId, imageExt, key }, callback) {
+  Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blobPath) => {
+    if(error) {
+      callback(error)
+      return
+    }
+
+    const imagePath = Path.join(HYPERFILE_CACHE_PATH, imageId + imageExt)
+    copyFile(blobPath, imagePath, () => {
+      callback(null, imagePath)
+    })
+  })
+}
+
 
 // Process the image at the given path, upgrading the card at id to an image
 // card if id is given, otherwise creating a new image card at (x,y).
@@ -354,4 +385,4 @@ function Reducer(hm) {
   }
 }
 
-export { RootState, Reducer, maybeInlineFile, processImage, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }
+export { RootState, Reducer, maybeInlineFile, processImage, fetchImage, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }

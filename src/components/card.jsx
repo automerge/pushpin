@@ -6,31 +6,11 @@ import Path from 'path'
 import Fs from 'fs'
 import Debug from 'debug'
 
-const USER = process.env.NAME || "userA"
-const USER_PATH = Path.join(".", USER)
-const HYPERFILE_DATA_PATH = Path.join(USER_PATH, "hyperfile")
-const CACHE_PATH = Path.join(USER_PATH, "hyperfile-cache")
-
-if(!Fs.existsSync(USER_PATH))
-  Fs.mkdirSync(USER_PATH)
-
-if(!Fs.existsSync(CACHE_PATH))
-  Fs.mkdirSync(CACHE_PATH)
-
-import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
+import { snapToGrid, fetchImage, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from '../action-types'
 import log from '../log'
 import * as Hyperfile from "../hyperfile"
-
-function copyFile(source, destination, callback) {
-  Fs.readFile(source, (err, data) => {
-    Fs.writeFile(destination, data, (err) => {
-      callback()
-    })
-  })
-}
-
 const log = Debug('pushpin:card')
 
 class CardPresentation extends React.Component {
@@ -53,25 +33,19 @@ class CardPresentation extends React.Component {
       loading: false,
       imagePath: null
     }
-
-    if(props.card.hypercore.imageId) {
-      this.state.loading = true
-      this.loadHypercoreData()
-    }
   }
 
-  loadHypercoreData() {
-    let card = this.props.card
+  componentDidMount() {
+    if(this.props.card.hypercore.imageId) {
+      this.setState({ loading: true }, () => {
+        fetchImage(this.props.card.hypercore, (error, imagePath) => {
+          if(error)
+            log(error)
 
-    Hyperfile.fetch(HYPERFILE_DATA_PATH, card.hypercore.imageId, card.hypercore.key, (error, blobPath) => {
-      if(error)
-        log(error)
-
-      const imagePath = Path.join(CACHE_PATH, card.hypercore.imageId + card.hypercore.imageExt)
-      copyFile(blobPath, imagePath, () => {
-        this.setState({ loading: false, imagePath: "../" + imagePath })
+          this.setState({ loading: false, imagePath: "../" + imagePath })
+        })
       })
-    })
+    }
   }
 
   componentWillReceiveProps(props) {
