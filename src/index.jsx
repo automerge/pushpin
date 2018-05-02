@@ -8,8 +8,8 @@ import RAM from 'random-access-memory'
 
 import { RootState, Reducer } from './model'
 import { INITIALIZE_IF_EMPTY, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
-import HashForm from './hash-form'
-import Board from './board'
+import HashForm from './components/hash-form'
+import Board from './components/board'
 
 var spaceDown = false
 

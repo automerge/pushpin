@@ -4,9 +4,9 @@ import ReactMarkdown from 'react-markdown'
 import { Editor } from 'slate-react'
 import Plain from 'slate-plain-serializer'
 
-import { maybeInlineFile } from './model'
-import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_DELETED } from './action-types'
-import log from './log'
+import { maybeInlineFile } from '../model'
+import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_DELETED } from '../action-types'
+import log from '../log'
 
 class InlineEditorPresentation extends React.Component {
   constructor(props) {
