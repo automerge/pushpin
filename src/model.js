@@ -121,7 +121,7 @@ function processImage(dispatch, path, id, x, y) {
           x: x,
           y: y,
           selected: true,
-          hypercore: {
+          hyperfile: {
             key: key.toString("base64"),
             imageId: imageId,
             imageExt: Path.extname(path)
@@ -164,7 +164,7 @@ function snapToGrid(num) {
   }
 }
 
-function cardCreated(hm, state, { x, y, width, height, selected, type, hypercore, typeAttrs }) {
+function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
 
   const newBoard = hm.change(state.board, (b) => {
@@ -180,8 +180,7 @@ function cardCreated(hm, state, { x, y, width, height, selected, type, hypercore
       slackWidth: 0,
       slackHeight: 0,
       resizing: false,
-      moving: false,
-      hypercore: hypercore || {}
+      moving: false
     }, typeAttrs)
 
     b.cards[id] = newCard
@@ -204,19 +203,16 @@ const RootState = {
 //// Action functions. Functions match 1:1 with reducer switch further below.
 
 function initializeIfEmpty(hm, state) {
-  if (state.board.cards) {
+  if (state.board.cards)
     return state
-  }
 
-  const newBoard = hm.change(state.board, (b) => {
-    b.cards = {}
-  })
+  const newBoard = hm.change(state.board, b => b.cards = {})
+
   state = Object.assign({}, state, { board: newBoard })
   state = cardCreatedText(hm, state,  { x: 1350, y: 100, text: WELCOME_TEXT})
   state = cardCreatedText(hm, state,  { x: 1350, y: 250, text: USAGE_TEXT })
   state = cardCreatedText(hm, state,  { x: 1350, y: 750, text: EXAMPLE_TEXT })
-  state = cardCreatedImage(hm, state, { x: 1800, y: 150, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
-  state = cardCreatedImage(hm, state, { x: 1750, y: 500, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
+
   return state
 }
 
@@ -224,8 +220,8 @@ function cardCreatedText(hm, state, { x, y, selected, text }) {
   return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
 }
 
-function cardCreatedImage(hm, state, { x, y, selected, path, width, height, hypercore }) {
-  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', hypercore })
+function cardCreatedImage(hm, state, { x, y, selected, path, width, height, hyperfile }) {
+  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
 }
 
 function cardTextChanged(hm, state, { id, text }) {

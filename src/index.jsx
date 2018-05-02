@@ -12,7 +12,7 @@ import { webFrame } from 'electron'
 import Hypermerge from 'hypermerge'
 import RAM from 'random-access-memory'
 
-import { RootState, Reducer } from './model'
+import { RootState, Reducer, processImage } from './model'
 import { INITIALIZE_IF_EMPTY, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types'
 import HashForm from './components/hash-form'
 import Board from './components/board'
@@ -45,7 +45,10 @@ const init = () => {
     hm.on('document:ready', (docId, doc) => {
       store.dispatch({type: DOCUMENT_READY, docId: docId, doc: doc})
       store.dispatch({type: INITIALIZE_IF_EMPTY})
+      processImage(store.dispatch, "./img/kay.jpg", null, 1750, 500)
+      processImage(store.dispatch, "./img/carpenters-workshop.jpg", null, 1800, 150)
     })
+
     hm.on('document:updated', (docId, doc) => {
       store.dispatch({type: DOCUMENT_UPDATED, docId: docId, doc: doc})
     })

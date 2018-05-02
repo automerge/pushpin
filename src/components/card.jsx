@@ -36,9 +36,9 @@ class CardPresentation extends React.Component {
   }
 
   componentDidMount() {
-    if(this.props.card.hypercore.imageId) {
+    if(this.props.card.type === "image") {
       this.setState({ loading: true }, () => {
-        fetchImage(this.props.card.hypercore, (error, imagePath) => {
+        fetchImage(this.props.card.hyperfile, (error, imagePath) => {
           if(error)
             log(error)
 
