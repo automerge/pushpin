@@ -227,20 +227,13 @@ class CardPresentation extends React.Component {
     log('render')
 
     const card = this.props.card
-
-    if(this.state.loading)
-      return <div 
-        className={ classNames('card', card.type, this.props.selected ? 'selected' : 'unselected') }
-        style={{
-          width: this.state.resizeWidth || card.width,
-          height: this.state.resizeHeight || card.height,
-          position: 'absolute',
-          left: this.state.moveX || card.x,
-          top: this.state.moveY || card.y
-        }}
-      >
-        <h3>Loading</h3>
-      </div>
+    const style = {
+      width: this.state.resizeWidth || card.width,
+      height: this.state.resizeHeight || card.height,
+      position: 'absolute',
+      left: this.state.moveX || card.x,
+      top: this.state.moveY || card.y
+    }
 
     return (
       <DraggableCore
@@ -255,14 +248,9 @@ class CardPresentation extends React.Component {
         <div
           id={`card-${card.id}`}
           className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
-          style={{
-            width: this.state.resizeWidth || card.width,
-            height: this.state.resizeHeight || card.height,
-            position: 'absolute',
-            left: this.state.moveX || card.x,
-            top: this.state.moveY || card.y
-          }}>
-          { card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(card) }
+          style={style}
+        >
+          { card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(this.state) }
           <span className='cardResizeHandle' />
         </div>
       </DraggableCore>
@@ -286,13 +274,11 @@ class CardPresentation extends React.Component {
     )
   }
 
-  renderImageInner() {
-    return (
-      <img
-        className='image'
-        src={this.state.imagePath}
-      />
-    )
+  renderImageInner(state) {
+    if(state.loading)
+      return <h3>Loading</h3>
+    else
+      return <img className='image' src={ state.imagePath } />
   }
 }
 
