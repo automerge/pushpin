@@ -3,9 +3,10 @@ import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
 import Debug from 'debug'
+import mkdirp from 'mkdirp'
 
 import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
-import HyperFile from "./hyper-file"
+import * as Hyperfile from './hyperfile'
 
 //// Contants
 
@@ -19,7 +20,12 @@ const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
 
 const USER = process.env.NAME || "userA"
-const HYPERFILE_DATA_PATH = Path.join(".", USER, "hyperfile")
+const USER_PATH = Path.join(".", "data", USER)
+const HYPERFILE_DATA_PATH = Path.join(USER_PATH, "hyperfile")
+const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, "hyperfile-cache")
+
+mkdirp.sync(HYPERFILE_DATA_PATH)
+mkdirp.sync(HYPERFILE_CACHE_PATH)
 
 const WELCOME_TEXT =
 `## Welcome
@@ -55,9 +61,39 @@ function scaleImage(width, height) {
   return [scaledWidth, scaledHeight]
 }
 
+function copyFile(source, destination, callback) {
+  Fs.readFile(source, (error, data) => {
+    if(error) {
+      callback(error)
+      return
+    }
+
+    Fs.writeFile(destination, data, (error) => {
+      if(error) {
+        callback(error)
+        return
+      }
+
+      callback()
+    })
+  })
+}
+
+function fetchImage({ imageId, imageExt, key }, callback) {
+  Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blobPath) => {
+    if(error) {
+      callback(error)
+      return
+    }
+
+    const imagePath = Path.join(HYPERFILE_CACHE_PATH, imageId + imageExt)
+    copyFile(blobPath, imagePath, error => callback(error, imagePath))
+  })
+}
+
 // Process the image at the given path, upgrading the card at id to an image
 // card if id is given, otherwise creating a new image card at (x,y).
-function processImage(dispatch, path, id, x, y) {
+function processImage(dispatch, path, x, y) {
   Jimp.read(path, (err, img) => {
     if (err) {
       console.warn('Error loading image?', err)
@@ -66,35 +102,26 @@ function processImage(dispatch, path, id, x, y) {
     const width = img.bitmap.width
     const height = img.bitmap.height
     const [scaledWidth, scaledHeight] = scaleImage(width, height)
+    const imageId = uuid()
 
-    if (id)
-      dispatch({ type: CARD_INLINED_IMAGE, id: id, path: path, width: scaledWidth, height: scaledHeight })
-    else {
-      let imageId = uuid()
-      HyperFile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
-        if(error)
-          log(error)
+    Hyperfile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
+      if(error)
+        log(error)
 
-        HyperFile.serve(HYPERFILE_DATA_PATH, imageId, key, (error) => {
-          if(error)
-            log(error)
-
-          dispatch({
-            type: CARD_CREATED_IMAGE,
-            width: scaledWidth,
-            height: scaledHeight,
-            x: x,
-            y: y,
-            selected: true,
-            hypercore: {
-              key: key.toString("base64"),
-              imageId: imageId,
-              imageExt: Path.extname(path)
-            }
-          })
-        })
+      dispatch({
+        type: CARD_CREATED_IMAGE,
+        width: scaledWidth,
+        height: scaledHeight,
+        x: x,
+        y: y,
+        selected: true,
+        hyperfile: {
+          key: key.toString("base64"),
+          imageId: imageId,
+          imageExt: Path.extname(path)
+        }
       })
-    }
+    })
   })
 }
 
@@ -130,7 +157,7 @@ function snapToGrid(num) {
   }
 }
 
-function cardCreated(hm, state, { x, y, width, height, selected, type, hypercore, typeAttrs }) {
+function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
 
   const newBoard = hm.change(state.board, (b) => {
@@ -146,8 +173,7 @@ function cardCreated(hm, state, { x, y, width, height, selected, type, hypercore
       slackWidth: 0,
       slackHeight: 0,
       resizing: false,
-      moving: false,
-      hypercore: hypercore || {}
+      moving: false
     }, typeAttrs)
 
     b.cards[id] = newCard
@@ -170,19 +196,16 @@ const RootState = {
 //// Action functions. Functions match 1:1 with reducer switch further below.
 
 function initializeIfEmpty(hm, state) {
-  if (state.board.cards) {
+  if (state.board.cards)
     return state
-  }
 
-  const newBoard = hm.change(state.board, (b) => {
-    b.cards = {}
-  })
+  const newBoard = hm.change(state.board, b => b.cards = {})
+
   state = Object.assign({}, state, { board: newBoard })
   state = cardCreatedText(hm, state,  { x: 1350, y: 100, text: WELCOME_TEXT})
   state = cardCreatedText(hm, state,  { x: 1350, y: 250, text: USAGE_TEXT })
   state = cardCreatedText(hm, state,  { x: 1350, y: 750, text: EXAMPLE_TEXT })
-  state = cardCreatedImage(hm, state, { x: 1800, y: 150, path: '../img/carpenters-workshop.jpg', width: 500, height: 300 })
-  state = cardCreatedImage(hm, state, { x: 1750, y: 500, path: '../img/kay.jpg', width: (445/1.5), height: (385/1.5) })
+
   return state
 }
 
@@ -190,8 +213,8 @@ function cardCreatedText(hm, state, { x, y, selected, text }) {
   return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
 }
 
-function cardCreatedImage(hm, state, { x, y, selected, path, width, height, hypercore }) {
-  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', hypercore })
+function cardCreatedImage(hm, state, { x, y, selected, width, height, hyperfile }) {
+  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
 }
 
 function cardTextChanged(hm, state, { id, text }) {
@@ -358,4 +381,4 @@ function Reducer(hm) {
   }
 }
 
-export { RootState, Reducer, maybeInlineFile, processImage, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }
+export { RootState, Reducer, maybeInlineFile, processImage, fetchImage, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }

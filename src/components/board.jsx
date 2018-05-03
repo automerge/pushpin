@@ -61,7 +61,7 @@ const rightClickMenu = (dispatch, e) => {
         throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
-      processImage(dispatch, path, null, x, y)
+      processImage(dispatch, path, x, y)
       }
     )
   }}))

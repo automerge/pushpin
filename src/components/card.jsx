@@ -6,29 +6,10 @@ import Path from 'path'
 import Fs from 'fs'
 import Debug from 'debug'
 
-const USER = process.env.NAME || "userA"
-const USER_PATH = Path.join(".", USER)
-const HYPERFILE_DATA_PATH = Path.join(USER_PATH, "hyperfile")
-const CACHE_PATH = Path.join(USER_PATH, "hyperfile-cache")
-
-if(!Fs.existsSync(USER_PATH))
-  Fs.mkdirSync(USER_PATH)
-
-if(!Fs.existsSync(CACHE_PATH))
-  Fs.mkdirSync(CACHE_PATH)
-
-import { snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
+import { snapToGrid, fetchImage, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from '../action-types'
-import HyperFile from "../hyper-file"
-
-function copyFile(source, destination, callback) {
-  Fs.readFile(source, (err, data) => {
-    Fs.writeFile(destination, data, (err) => {
-      callback()
-    })
-  })
-}
+import * as Hyperfile from "../hyperfile"
 
 const log = Debug('pushpin:card')
 
@@ -52,25 +33,19 @@ class CardPresentation extends React.Component {
       loading: false,
       imagePath: null
     }
-
-    if(props.card.hypercore.imageId) {
-      this.state.loading = true
-      this.loadHypercoreData()
-    }
   }
 
-  loadHypercoreData() {
-    let card = this.props.card
+  componentDidMount() {
+    if(this.props.card.type === "image") {
+      this.setState({ loading: true }, () => {
+        fetchImage(this.props.card.hyperfile, (error, imagePath) => {
+          if(error)
+            log(error)
 
-    HyperFile.fetch(HYPERFILE_DATA_PATH, card.hypercore.imageId, card.hypercore.key, (error, blobPath) => {
-      if(error)
-        log(error)
-
-      const imagePath = Path.join(CACHE_PATH, card.hypercore.imageId + card.hypercore.imageExt)
-      copyFile(blobPath, imagePath, () => {
-        this.setState({ loading: false, imagePath: "../" + imagePath })
+          this.setState({ loading: false, imagePath: "../" + imagePath })
+        })
       })
-    })
+    }
   }
 
   componentWillReceiveProps(props) {
@@ -252,20 +227,13 @@ class CardPresentation extends React.Component {
     log('render')
 
     const card = this.props.card
-
-    if(this.state.loading)
-      return <div 
-        className={ classNames('card', card.type, this.props.selected ? 'selected' : 'unselected') }
-        style={{
-          width: this.state.resizeWidth || card.width,
-          height: this.state.resizeHeight || card.height,
-          position: 'absolute',
-          left: this.state.moveX || card.x,
-          top: this.state.moveY || card.y
-        }}
-      >
-        <h3>Loading</h3>
-      </div>
+    const style = {
+      width: this.state.resizeWidth || card.width,
+      height: this.state.resizeHeight || card.height,
+      position: 'absolute',
+      left: this.state.moveX || card.x,
+      top: this.state.moveY || card.y
+    }
 
     return (
       <DraggableCore
@@ -280,14 +248,9 @@ class CardPresentation extends React.Component {
         <div
           id={`card-${card.id}`}
           className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
-          style={{
-            width: this.state.resizeWidth || card.width,
-            height: this.state.resizeHeight || card.height,
-            position: 'absolute',
-            left: this.state.moveX || card.x,
-            top: this.state.moveY || card.y
-          }}>
-          { card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(card) }
+          style={style}
+        >
+          { card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(this.state) }
           <span className='cardResizeHandle' />
         </div>
       </DraggableCore>
@@ -311,13 +274,11 @@ class CardPresentation extends React.Component {
     )
   }
 
-  renderImageInner() {
-    return (
-      <img
-        className='image'
-        src={this.state.imagePath}
-      />
-    )
+  renderImageInner(state) {
+    if(state.loading)
+      return <h3>Loading</h3>
+    else
+      return <img className='image' src={ state.imagePath } />
   }
 }
 

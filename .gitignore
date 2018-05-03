@@ -3,3 +3,4 @@ out
 .eslintcache
 *.swp
 *.swo
+data/
