@@ -6,7 +6,7 @@ import { Editor } from 'slate-react'
 import Plain from 'slate-plain-serializer'
 import Debug from 'debug'
 
-import { maybeInlineFile } from '../model'
+import { snapToGrid, maybeInlineFile, GRID_SIZE } from '../model'
 import { CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_DELETED } from '../action-types'
 
 const log = Debug('pushpin:inline-editor')
@@ -64,7 +64,7 @@ class InlineEditorPresentation extends React.PureComponent {
     if (!this.props.selected) {
       const height = this.refs.renderer.clientHeight
       if (this.props.cardHeight !== height) {
-        this.props.dispatch({ type: CARD_TEXT_RESIZED, id: this.props.cardId, height })
+        this.props.dispatch({ type: CARD_TEXT_RESIZED, id: this.props.cardId, height: snapToGrid(height + (GRID_SIZE / 2)) })
       }
     }
   }

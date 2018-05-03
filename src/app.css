@@ -69,7 +69,6 @@ div#hashForm input.loading {
 
 div.board {
   position: absolute;
-  background-color: #f9f9f9;
   background-image: url(grid.svg);
 }
 

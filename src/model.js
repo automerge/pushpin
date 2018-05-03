@@ -12,11 +12,11 @@ import * as Hyperfile from './hyperfile'
 
 const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
-const GRID_SIZE = 5
+const GRID_SIZE = 24
 const CARD_DEFAULT_WIDTH = 300
 const CARD_DEFAULT_HEIGHT = 100
 const CARD_MIN_WIDTH = 100
-const CARD_MIN_HEIGHT = 60
+const CARD_MIN_HEIGHT = 50
 const RESIZE_HANDLE_SIZE = 21
 
 const USER = process.env.NAME || 'userA'
@@ -30,7 +30,7 @@ mkdirp.sync(HYPERFILE_CACHE_PATH)
 const WELCOME_TEXT =
 `## Welcome
 
-This is our board demo!`
+This is our demo board!`
 
 const USAGE_TEXT =
 `### Usage

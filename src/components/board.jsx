@@ -113,7 +113,7 @@ class BoardPresentation extends React.PureComponent {
 
 const mapStateToProps = (state) => {
   if (!state.board || !state.board.cards) {
-    return { cards: [] }
+    return { cards: [], selected: false }
   }
   return { cards: state.board.cards, selected: state.selected }
 }
