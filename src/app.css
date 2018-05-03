@@ -69,7 +69,14 @@ div#hashForm input.loading {
 
 div.board {
   position: absolute;
+  background: #020f44;
   background-image: url(grid.svg);
+  transform: perspective(300px) rotateX(7deg) translateY(-250px);
+}
+
+body {
+  background: linear-gradient(#020f44, black 100%);
+  background-attachment: fixed;
 }
 
 div.board::after {
@@ -84,12 +91,12 @@ div.card {
 }
 
 div.card.unselected {
-  border-top: 8px solid black;
+  border-top: 16px solid #e714cd;
 }
 
 div.card.selected {
-  border: 1px solid black;
-  border-top: 8px solid black;
+  border: 1px solid #e714cd;
+  border-top: 16px solid #e714cd;
 }
 
 div.card span.cardResizeHandle {
