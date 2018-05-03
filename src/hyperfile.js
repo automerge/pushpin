@@ -50,21 +50,26 @@ export function write(dataPath, imgId, imgPath, callback) {
   const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
-    const readStream = Fs.createReadStream(imgPath)
-    const writeStream = core.createWriteStream()
+    Fs.readFile(imgPath, (error, image) => {
+      if(error) {
+        callback(error)
+        return
+      }
 
-    readStream.on('error', callback)
-    writeStream.on('error', callback)
-    writeStream.on('finish', () => {
-      serve(core)
-      callback(null, core.key)
+      core.append(image, (error) => {
+        if(error) {
+          callback(error)
+          return
+        }
+
+        serve(core)
+        callback(null, core.key)
+      })
     })
-
-    readStream.pipe(writeStream)
   })
 }
 
-// callback = (err, blobPath)
+// callback = (err, blob)
 export function fetch(dataPath, imgId, coreKey, callback) {
   coreKey = Buffer.from(coreKey, 'base64')
   const core = Hypercore(corePath(dataPath, imgId), coreKey, hypercoreOptions)
@@ -77,8 +82,7 @@ export function fetch(dataPath, imgId, coreKey, callback) {
         return
       }
 
-      const blobPath = Path.join(dataPath, imgId, 'data')
-      callback(null, blobPath)
+      callback(null, data)
     })
   })
 }
