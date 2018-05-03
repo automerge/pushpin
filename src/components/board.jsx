@@ -5,8 +5,8 @@ import Card from './card'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from '../action-types'
-import { processImage, BOARD_WIDTH, BOARD_HEIGHT } from '../model'
+import Loop from '../loop'
+import * as Model from '../model'
 
 const { Menu, MenuItem, dialog } = remote
 
@@ -30,11 +30,11 @@ const withinAnyCard = (cards, x, y) => {
 }
 
 const boardStyle = {
-  width: BOARD_WIDTH,
-  height: BOARD_HEIGHT
+  width: Model.BOARD_WIDTH,
+  height: Model.BOARD_HEIGHT
 }
 
-class BoardPresentation extends React.PureComponent {
+class Board extends React.PureComponent {
   constructor(props) {
     super(props)
     log('constructor')
@@ -44,17 +44,29 @@ class BoardPresentation extends React.PureComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
   }
 
+  componentDidMount() {
+    log('componentDidMount')
+    document.addEventListener('keydown', this.onKeyDown)
+    window.scrollTo((this.refs.board.clientWidth/2)-(window.innerWidth/2), 0)
+  }
+
+  onKeyDown(e) {
+    if (e.key === 'Backspace') {
+      Loop.dispatch(Model.boardBackspaced)
+    }
+  }
+
   onClick(e) {
     if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
       log('onClick')
-      this.props.dispatch({type: CLEAR_SELECTIONS})
+      Loop.dispatch(Model.clearSelections)
     }
   }
 
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      this.props.dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, text: '', selected: true})
+      Loop.dispatch(Model.cardCreatedText, { x: e.pageX, y: e.pageY, text: '', selected: true })
     }
   }
 
@@ -64,9 +76,8 @@ class BoardPresentation extends React.PureComponent {
     const x = e.pageX
     const y = e.pageY
     const menu = new Menu()
-    const dispatch = this.props.dispatch
     menu.append(new MenuItem({label: 'Add Note',  click() {
-      dispatch({type: CARD_CREATED_TEXT, x: x, y: y, text: '', selected: true})
+      Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
     }}))
     menu.append(new MenuItem({label: 'Add Image', click() {
       dialog.showOpenDialog({
@@ -81,7 +92,7 @@ class BoardPresentation extends React.PureComponent {
           throw new Error('Expected exactly one path?')
         }
         const path = paths[0]
-        processImage(dispatch, path, x, y)
+        Model.processImage(path, x, y)
       })
     }}))
     menu.popup({window: remote.getCurrentWindow()})
@@ -100,6 +111,7 @@ class BoardPresentation extends React.PureComponent {
       <div
         id='board'
         className='board'
+        ref='board'
         style={boardStyle}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
@@ -116,11 +128,5 @@ const mapStateToProps = (state) => {
   }
   return {cards: state.board.cards, selected: state.selected}
 }
-
-const mapDispatchToProps = (dispatch) => {
-  return { dispatch }
-}
-
-const Board = connect(mapStateToProps, mapDispatchToProps)(BoardPresentation)
 
 export default Board

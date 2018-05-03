@@ -5,12 +5,12 @@ import { Editor } from 'slate-react'
 import Plain from 'slate-plain-serializer'
 import Debug from 'debug'
 
-import { maybeInlineFile } from '../model'
-import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_DELETED } from '../action-types'
+import Loop from '../loop'
+import * as Model from '../model'
 
 const log = Debug('pushpin:inline-editor')
 
-class InlineEditorPresentation extends React.PureComponent {
+class InlineEditor extends React.PureComponent {
   constructor(props) {
     log('constructor')
     super(props)
@@ -36,8 +36,8 @@ class InlineEditorPresentation extends React.PureComponent {
   componentWillReceiveProps(props) {
     log('componentWillReceiveProps')
     if (this.props.selected && !props.selected) {
-      this.props.dispatch({type: CARD_TEXT_CHANGED, id: this.props.cardId, text: Plain.serialize(this.state.value) })
-      maybeInlineFile(this.props.dispatch, this.props.cardId, this.props.text)
+      Loop.dispatch(Model.cardTextChanged, { id: this.props.cardId, text: Plain.serialize(this.state.value) })
+      Model.maybeInlineFile(this.props.cardId, this.props.text)
     } else if (!props.selected) {
       this.setState({value: Plain.deserialize(props.text)})
     }
@@ -61,7 +61,7 @@ class InlineEditorPresentation extends React.PureComponent {
     if (!this.props.selected) {
       const height = this.refs.renderer.clientHeight
       if (this.props.cardHeight != height) {
-        this.props.dispatch({type: CARD_TEXT_RESIZED, id: this.props.cardId, height: height})
+        Loop.dispatch(Model.cardTextResized, { id: this.props.cardId, height: height })
       }
     }
   }
@@ -77,7 +77,7 @@ class InlineEditorPresentation extends React.PureComponent {
       return
     }
     e.preventDefault()
-    this.props.dispatch({type: CARD_DELETED, id: this.props.cardId})
+    Loop.dispatch(Model.cardDeleted, { id: this.props.cardId })
   }
 
   onChange({ value }) {
@@ -116,11 +116,5 @@ class InlineEditorPresentation extends React.PureComponent {
     }
   }
 }
-
-const mapDispatchToProps = (dispatch) => {
-  return { dispatch }
-}
-
-const InlineEditor = connect(null, mapDispatchToProps)(InlineEditorPresentation)
 
 export default InlineEditor

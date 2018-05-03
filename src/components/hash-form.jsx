@@ -3,11 +3,12 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import Debug from 'debug'
 
-import { FORM_CHANGED, FORM_SUBMITTED } from '../action-types';
+import Loop from '../loop'
+import * as Model from '../model'
 
 const log = Debug('pushpin:hash-form')
 
-class HashFromPresentation extends React.PureComponent {
+class HashForm extends React.PureComponent {
   constructor(props) {
     super(props)
     log('constructor')
@@ -18,13 +19,13 @@ class HashFromPresentation extends React.PureComponent {
 
   onChange(e) {
     log('onChange')
-    this.props.dispatch({type: FORM_CHANGED, docId: e.target.value})
+    Loop.dispatch(Model.formChanged, { docId: e.target.value })
   }
 
   onSubmit(e) {
     log('onSubmit')
     e.preventDefault()
-    this.props.dispatch({type: FORM_SUBMITTED})
+    Loop.dispatch(Model.formSubmitted)
   }
 
   render() {
@@ -44,19 +45,5 @@ class HashFromPresentation extends React.PureComponent {
     )
   }
 }
-
-const mapStateToProps = (state) => {
-  return {
-    activeDocId: state.activeDocId,
-    formDocId: state.formDocId,
-    requestedDocId: state.requestedDocId
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return { dispatch }
-}
-
-const HashForm = connect(mapStateToProps, mapDispatchToProps)(HashFromPresentation)
 
 export default HashForm

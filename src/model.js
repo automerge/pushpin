@@ -2,30 +2,30 @@ import uuid from 'uuid/v4'
 import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
+import Hypermerge from 'hypermerge'
+import RAM from 'random-access-memory'
 import Debug from 'debug'
 import mkdirp from 'mkdirp'
 
-import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
+import Loop from './loop'
 import * as Hyperfile from './hyperfile'
+
 
 //// Contants
 
-const BOARD_WIDTH = 3600
-const BOARD_HEIGHT = 1800
-const GRID_SIZE = 5
-const CARD_DEFAULT_WIDTH = 300
-const CARD_DEFAULT_HEIGHT = 100
-const CARD_MIN_WIDTH = 100
-const CARD_MIN_HEIGHT = 60
-const RESIZE_HANDLE_SIZE = 21
+export const BOARD_WIDTH = 3600
+export const BOARD_HEIGHT = 1800
+export const GRID_SIZE = 5
+export const CARD_DEFAULT_WIDTH = 300
+export const CARD_DEFAULT_HEIGHT = 100
+export const CARD_MIN_WIDTH = 100
+export const CARD_MIN_HEIGHT = 60
+export const RESIZE_HANDLE_SIZE = 21
 
 const USER = process.env.NAME || "userA"
 const USER_PATH = Path.join(".", "data", USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, "hyperfile")
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, "hyperfile-cache")
-
-mkdirp.sync(HYPERFILE_DATA_PATH)
-mkdirp.sync(HYPERFILE_CACHE_PATH)
 
 const WELCOME_TEXT =
 `## Welcome
@@ -52,13 +52,60 @@ We've made some initial cards for you to play with. Have fun!`
 
 const log = Debug('pushpin:model')
 
-//// Helper functions - may be called within action functions or from UI code.
+
+//// Imperative top-levels.
+
+mkdirp.sync(HYPERFILE_DATA_PATH)
+mkdirp.sync(HYPERFILE_CACHE_PATH)
+
+
+//// Pure helper functions.
 
 // Pick a resonable initial display scale for an image of given dimensions.
 function scaleImage(width, height) {
   const scaledWidth = CARD_DEFAULT_WIDTH
   const scaledHeight = height * (scaledWidth / width)
   return [scaledWidth, scaledHeight]
+}
+
+// Snap given num to nearest multiple of our grid size.
+export function snapToGrid(num) {
+  var resto = num % GRID_SIZE
+  if (resto <= (GRID_SIZE / 2)) {
+    return num - resto
+  } else {
+    return num + GRID_SIZE - resto
+  }
+}
+
+
+//// Initial state. Evolved by actions below.
+
+export const empty = {
+  formDocId: '',
+  activeDocId: '',
+  requestedDocId: '',
+  selected: null,
+  hm: null
+}
+
+
+//// Action functions. Evolve loop state and may also re-dispatch subsequent actions.
+
+// Starts IO subsystems and populates associated state.
+export function init(state) {
+  const hm = new Hypermerge({path: RAM, port: 0})
+  hm.once('ready', () => {
+    hm.joinSwarm()
+    hm.on('document:ready', (docId, doc) => {
+      Loop.dispatch(documentReady, { docId, doc })
+    })
+    hm.on('document:updated', (docId, doc) => {
+      Loop.dispatch(documentUpdated, { docId, doc })
+    })
+    hm.create()
+  })
+  return Object.assign({}, state, { hm })
 }
 
 function copyFile(source, destination, callback) {
@@ -79,7 +126,7 @@ function copyFile(source, destination, callback) {
   })
 }
 
-function fetchImage({ imageId, imageExt, key }, callback) {
+export function fetchImage({ imageId, imageExt, key }, callback) {
   Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blobPath) => {
     if(error) {
       callback(error)
@@ -93,7 +140,7 @@ function fetchImage({ imageId, imageExt, key }, callback) {
 
 // Process the image at the given path, upgrading the card at id to an image
 // card if id is given, otherwise creating a new image card at (x,y).
-function processImage(dispatch, path, x, y) {
+export function processImage(path, x, y) {
   Jimp.read(path, (err, img) => {
     if (err) {
       console.warn('Error loading image?', err)
@@ -108,12 +155,10 @@ function processImage(dispatch, path, x, y) {
       if(error)
         log(error)
 
-      dispatch({
-        type: CARD_CREATED_IMAGE,
+      Loop.dispatch(cardCreatedImage, {
+        x, y,
         width: scaledWidth,
         height: scaledHeight,
-        x: x,
-        y: y,
         selected: true,
         hyperfile: {
           key: key.toString("base64"),
@@ -132,7 +177,7 @@ const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif))\n\s*$/
 // Given the current text for a card indexed by id, sees if it contains only a
 // local file path for a file type by supported by the app. In this case,
 // converts the card from a text card to image card.
-function maybeInlineFile(dispatch, id, text) {
+export function maybeInlineFile(id, text) {
   const filePatMatch = filePat.exec(text)
   if (!filePatMatch) {
     return
@@ -143,24 +188,14 @@ function maybeInlineFile(dispatch, id, text) {
     if (err || !stat.isFile()) {
       return
     }
-    processImage(dispatch, path, id)
+    processImage(path, id)
   })
 }
 
-// Snap given num to nearest multiple of our grid size.
-function snapToGrid(num) {
-  var resto = num % GRID_SIZE
-  if (resto <= (GRID_SIZE / 2)) {
-    return num - resto
-  } else {
-    return num + GRID_SIZE - resto
-  }
-}
-
-function cardCreated(hm, state, { x, y, width, height, selected, type, typeAttrs }) {
+export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
 
-  const newBoard = hm.change(state.board, (b) => {
+  const newBoard = state.hm.change(state.board, (b) => {
     const snapX = snapToGrid(x)
     const snapY = snapToGrid(y)
     const newCard = Object.assign({
@@ -195,45 +230,46 @@ const RootState = {
 
 //// Action functions. Functions match 1:1 with reducer switch further below.
 
-function initializeIfEmpty(hm, state) {
-  if (state.board.cards)
-    return state
+function populateDemoBoard(state) {
+  if (state.board.cards) {
+    throw new Error('Should only be called on an empty board')
+  }
 
-  const newBoard = hm.change(state.board, b => b.cards = {})
-
+  const newBoard = state.hm.change(state.board, (b) => {
+    b.cards = {}
+  })
   state = Object.assign({}, state, { board: newBoard })
-  state = cardCreatedText(hm, state,  { x: 1350, y: 100, text: WELCOME_TEXT})
-  state = cardCreatedText(hm, state,  { x: 1350, y: 250, text: USAGE_TEXT })
-  state = cardCreatedText(hm, state,  { x: 1350, y: 750, text: EXAMPLE_TEXT })
-
+  state = cardCreatedText(state,  { x: 1350, y: 100, text: WELCOME_TEXT})
+  state = cardCreatedText(state,  { x: 1350, y: 250, text: USAGE_TEXT })
+  state = cardCreatedText(state,  { x: 1350, y: 750, text: EXAMPLE_TEXT })
   return state
 }
 
-function cardCreatedText(hm, state, { x, y, selected, text }) {
-  return cardCreated(hm, state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
+export function cardCreatedText(state, { x, y, selected, text }) {
+  return cardCreated(state, { x, y, selected, type: 'text', typeAttrs: { text: text } })
 }
 
-function cardCreatedImage(hm, state, { x, y, selected, width, height, hyperfile }) {
-  return cardCreated(hm, state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
+export function cardCreatedImage(state, { x, y, selected, width, height, hyperfile }) {
+  return cardCreated(state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
 }
 
-function cardTextChanged(hm, state, { id, text }) {
-  const newBoard = hm.change(state.board, (b) => {
+export function cardTextChanged(state, { id, text }) {
+  const newBoard = state.hm.change(state.board, (b) => {
     b.cards[id].text = text
   })
   return Object.assign({}, state, {board: newBoard})
 }
 
-function cardTextResized(hm, state, { id, height }) {
-  const newBoard = hm.change(state.board, (b) => {
+export function cardTextResized(state, { id, height }) {
+  const newBoard = state.hm.change(state.board, (b) => {
     const card = b.cards[id]
     card.height = height
   })
   return Object.assign({}, state, {board: newBoard})
 }
 
-function cardInlinedImage(hm, state, { id, path, width, height }) {
-  const newBoard = hm.change(state.board, (b) => {
+export function cardInlinedImage(state, { id, path, width, height }) {
+  const newBoard = state.hm.change(state.board, (b) => {
     const card = b.cards[id]
     card.type = 'image'
     card.path = path
@@ -244,8 +280,8 @@ function cardInlinedImage(hm, state, { id, path, width, height }) {
   return Object.assign({}, state, {board: newBoard})
 }
 
-function cardMoved(hm, state, { id, x, y }) {
-  const newBoard = hm.change(state.board, (b) => {
+export function cardMoved(state, { id, x, y }) {
+  const newBoard = state.hm.change(state.board, (b) => {
     const card = b.cards[id]
     card.x = x
     card.y = y
@@ -253,8 +289,8 @@ function cardMoved(hm, state, { id, x, y }) {
   return Object.assign({}, state, {board: newBoard})
 }
 
-function cardResized(hm, state, {id, width, height }) {
-  const newBoard = hm.change(state.board, (b) => {
+export function cardResized(state, {id, width, height }) {
+  const newBoard = state.hm.change(state.board, (b) => {
     const card = b.cards[id]
     card.width = width
     card.height = height
@@ -262,34 +298,45 @@ function cardResized(hm, state, {id, width, height }) {
   return Object.assign({}, state, {board: newBoard})
 }
 
-function cardSelected(hm, state, { id }) {
+export function cardSelected(state, { id }) {
   return Object.assign({}, state, {selected: id})
 }
 
-function cardUniquelySelected(hm, state, { id }) {
-  return cardSelected(hm, state, { id })
+export function cardUniquelySelected(state, { id }) {
+  return cardSelected(state, { id })
 }
 
-function clearSelections(hm, state) {
+export function clearSelections(state) {
   return Object.assign({}, state, {selected: null})
 }
 
-function cardDeleted(hm, state, { id }) {
-  const newBoard = hm.change(state.board, (b) => {
+export function cardDeleted(state, { id }) {
+  const newBoard = state.hm.change(state.board, (b) => {
     delete b.cards[id]
   })
   return Object.assign({}, state, {board: newBoard})
 }
 
-function documentReady(hm, state, { docId, doc }) {
+export function boardBackspaced(state) {
+  for (let id in state.board.cards) {
+    const card = state.board.cards[id]
+    if ((id === state.selected) && (card.type !== 'text')) {
+      return cardDeleted(state, { id: card.id })
+    }
+  }
+  return state
+}
+
+export function documentReady(state, { docId, doc }) {
   // Case where app is loaded default empty doc.
   if (state.requestedDocId === '') {
-    return Object.assign({}, state, {
+    state = Object.assign({}, state, {
       activeDocId: docId,
       formDocId: docId,
       requestedDocId: docId,
       board: doc
     })
+    return populateDemoBoard(state)
   // Case where an existing doc was opened and is still requested.
   } else if (state.requestedDocId === docId) {
     return Object.assign({}, state, {
@@ -301,84 +348,18 @@ function documentReady(hm, state, { docId, doc }) {
   return state
 }
 
-function documentUpdated(hm, state, { docId, doc }) {
+export function documentUpdated(state, { docId, doc }) {
   if (state.activeDocId !== docId) {
     return state
   }
   return Object.assign({}, state, {board: doc})
 }
 
-function formChanged(hm, state, { docId }) {
+export function formChanged(state, { docId }) {
   return Object.assign({}, state, {formDocId: docId})
 }
 
-function formSubmitted(hm, state) {
-  hm.open(state.formDocId)
+export function formSubmitted(state) {
+  state.hm.open(state.formDocId)
   return Object.assign({}, state, {requestedDocId: state.formDocId})
 }
-
-//// Reducer switch. Cases match 1:1 with action functions above.
-
-function Reducer(hm) {
-  return (state, action) => {
-     log('reduce', action)
-
-    switch (action.type) {
-      case '@@redux/INIT':
-        return state;
-
-      case INITIALIZE_IF_EMPTY:
-        return initializeIfEmpty(hm, state, action);
-
-      case CARD_CREATED_TEXT:
-        return cardCreatedText(hm, state, action)
-
-      case CARD_CREATED_IMAGE:
-        return cardCreatedImage(hm, state, action)
-
-      case CARD_TEXT_CHANGED:
-        return cardTextChanged(hm, state, action)
-
-      case CARD_TEXT_RESIZED:
-        return cardTextResized(hm, state, action)
-
-      case CARD_INLINED_IMAGE:
-        return cardInlinedImage(hm, state, action)
-
-      case CARD_MOVED:
-        return cardMoved(hm, state, action)
-
-      case CARD_RESIZED:
-        return cardResized(hm, state, action)
-
-      case CARD_SELECTED:
-        return cardSelected(hm, state, action)
-
-      case CARD_UNIQUELY_SELECTED:
-        return cardUniquelySelected(hm, state, action)
-
-      case CLEAR_SELECTIONS:
-        return clearSelections(hm, state, action)
-
-      case CARD_DELETED:
-        return cardDeleted(hm, state, action)
-
-      case DOCUMENT_READY:
-        return documentReady(hm, state, action)
-
-      case DOCUMENT_UPDATED:
-        return documentUpdated(hm, state, action)
-
-      case FORM_CHANGED:
-        return formChanged(hm, state, action)
-
-      case FORM_SUBMITTED:
-        return formSubmitted(hm, state, action)
-
-      default:
-        throw new Error(`Unkonwn action: ${action.type}`);
-    }
-  }
-}
-
-export { RootState, Reducer, maybeInlineFile, processImage, fetchImage, snapToGrid, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE }
