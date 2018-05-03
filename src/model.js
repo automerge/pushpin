@@ -3,10 +3,10 @@ import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
 import Debug from 'debug'
-import * as Hyperfile from "./hyperfile"
+import mkdirp from 'mkdirp'
 
 import { INITIALIZE_IF_EMPTY, CARD_CREATED_TEXT, CARD_CREATED_IMAGE, CARD_TEXT_CHANGED, CARD_TEXT_RESIZED, CARD_INLINED_IMAGE, CARD_MOVED, CARD_RESIZED, CARD_SELECTED, CARD_UNIQUELY_SELECTED, CLEAR_SELECTIONS, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED, FORM_CHANGED, FORM_SUBMITTED } from './action-types'
-import HyperFile from "./hyperfile"
+import * as Hyperfile from './hyperfile'
 
 //// Contants
 
@@ -20,15 +20,12 @@ const CARD_MIN_HEIGHT = 60
 const RESIZE_HANDLE_SIZE = 21
 
 const USER = process.env.NAME || "userA"
-const USER_PATH = Path.join(".", USER)
+const USER_PATH = Path.join(".", "data", USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, "hyperfile")
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, "hyperfile-cache")
 
-if(!Fs.existsSync(USER_PATH))
-  Fs.mkdirSync(USER_PATH)
-
-if(!Fs.existsSync(HYPERFILE_CACHE_PATH))
-  Fs.mkdirSync(HYPERFILE_CACHE_PATH)
+mkdirp.sync(HYPERFILE_DATA_PATH)
+mkdirp.sync(HYPERFILE_CACHE_PATH)
 
 const WELCOME_TEXT =
 `## Welcome
