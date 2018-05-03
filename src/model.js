@@ -139,7 +139,7 @@ function maybeInlineFile(dispatch, id, text) {
     return;
   }
   const path = filePatMatch[1];
-  const extension = filePatMatch[2];
+  // const extension = filePatMatch[2]; // unused but kept to remind us it's here
   Fs.stat(path, (err, stat) => {
     if (err || !stat.isFile()) {
       return;
@@ -203,9 +203,9 @@ function initializeIfEmpty(hm, state) {
   const newBoard = hm.change(state.board, b => b.cards = {});
 
   let newState = Object.assign({}, state, { board: newBoard });
-  newState = cardCreatedText(hm, state, { x: 1350, y: 100, text: WELCOME_TEXT });
-  newState = cardCreatedText(hm, state, { x: 1350, y: 250, text: USAGE_TEXT });
-  newState = cardCreatedText(hm, state, { x: 1350, y: 750, text: EXAMPLE_TEXT });
+  newState = cardCreatedText(hm, newState, { x: 1350, y: 100, text: WELCOME_TEXT });
+  newState = cardCreatedText(hm, newState, { x: 1350, y: 250, text: USAGE_TEXT });
+  newState = cardCreatedText(hm, newState, { x: 1350, y: 750, text: EXAMPLE_TEXT });
 
   return newState;
 }

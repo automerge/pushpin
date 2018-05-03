@@ -2,16 +2,11 @@ import Hypercore from 'hypercore';
 import Hyperdiscovery from 'hyperdiscovery';
 import Fs from 'fs';
 import Path from 'path';
-import toBuffer from 'to-buffer';
 
 const hypercoreOptions = { valueEncoding: 'binary' };
 
 function corePath(dataPath, imgId) {
   return Path.join(dataPath, imgId);
-}
-
-function dataPath(dataPath, imgId) {
-  return Path.join(dataPath, imgId, 'data');
 }
 
 function serve(hypercore) {

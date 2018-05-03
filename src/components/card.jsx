@@ -45,7 +45,7 @@ class CardPresentation extends React.PureComponent {
             log(error);
           }
 
-          this.setState({ loading: false, imagePath: '../' + imagePath });
+          this.setState({ loading: false, imagePath: `../${imagePath}` });
         });
       });
     }

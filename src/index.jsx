@@ -1,14 +1,11 @@
-import Debug from 'debug';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import { webFrame } from 'electron';
 import Hypermerge from 'hypermerge';
 import RAM from 'random-access-memory';
 
-import { RootState, Reducer, processImage } from './model';
+import { RootState, Reducer } from './model';
 import { INITIALIZE_IF_EMPTY, CARD_DELETED, DOCUMENT_READY, DOCUMENT_UPDATED } from './action-types';
 import HashForm from './components/hash-form';
 import Board from './components/board';

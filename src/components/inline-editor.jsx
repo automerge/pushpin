@@ -53,7 +53,7 @@ class InlineEditorPresentation extends React.PureComponent {
 
   checkHeight() {
     const localHeight = this.props.selected ? this.refs.editorWrapper.clientHeight : null;
-    if (this.lastLocalHeight != localHeight) {
+    if (this.lastLocalHeight !== localHeight) {
       this.props.onLocalHeight(localHeight);
       this.lastLocalHeight = localHeight;
     }
@@ -73,7 +73,7 @@ class InlineEditorPresentation extends React.PureComponent {
       return;
     }
     const text = Plain.serialize(this.state.value);
-    if (text != '') {
+    if (text !== '') {
       return;
     }
     e.preventDefault()
@@ -86,7 +86,7 @@ class InlineEditorPresentation extends React.PureComponent {
   }
 
   render() {
-    log('render')
+    log('render');
 
     if (this.props.selected) {
       return (

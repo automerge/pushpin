@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Jimp from 'jimp';
 import { remote } from 'electron';
 import Debug from 'debug';
 import Card from './card';
