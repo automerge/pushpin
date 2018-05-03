@@ -1,6 +1,6 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import classNames from 'classnames';
+import React from 'react'
+import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import Debug from 'debug'
 
 import Loop from '../loop'
@@ -32,18 +32,24 @@ class HashForm extends React.PureComponent {
     log('render')
 
     return (
-      <div id='hashForm'>
+      <div id="hashForm">
         <form onSubmit={this.onSubmit}>
           <input
-             type='text'
-             value={this.props.formDocId}
-             onChange={this.onChange}
-             className={classNames(this.props.activeDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
+            type="text"
+            value={this.props.formDocId}
+            onChange={this.onChange}
+            className={classNames(this.props.activeDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
           />
         </form>
       </div>
     )
   }
+}
+
+HashForm.propTypes = {
+  formDocId: PropTypes.string.isRequired,
+  activeDocId: PropTypes.string.isRequired,
+  requestedDocId: PropTypes.string.isRequired,
 }
 
 export default HashForm

@@ -1,15 +1,12 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
-import Path from 'path'
-import Fs from 'fs'
 import Debug from 'debug'
 
 import InlineEditor from './inline-editor'
 import Loop from '../loop'
 import * as Model from '../model'
-import * as Hyperfile from "../hyperfile"
 
 const log = Debug('pushpin:card')
 
@@ -17,7 +14,6 @@ class Card extends React.PureComponent {
   constructor(props) {
     super(props)
     log('constructor')
-
     this.state = {
       moving: false,
       resizing: false,
@@ -41,13 +37,14 @@ class Card extends React.PureComponent {
   }
 
   componentDidMount() {
-    if(this.props.card.type === "image") {
+    if (this.props.card.type === 'image') {
       this.setState({ loading: true }, () => {
         Model.fetchImage(this.props.card.hyperfile, (error, imagePath) => {
-          if(error)
+          if (error) {
             log(error)
+          }
 
-          this.setState({ loading: false, imagePath: "../" + imagePath })
+          this.setState({ loading: false, imagePath: `../${imagePath}` })
         })
       })
     }
@@ -60,8 +57,8 @@ class Card extends React.PureComponent {
   onStart(e, d) {
     log('onStart')
 
-    if (d.deltaX != 0 || d.deltaY != 0) {
-      throw new Error(`Did not expect delta in onStart`)
+    if (d.deltaX !== 0 || d.deltaY !== 0) {
+      throw new Error('Did not expect delta in onStart')
     }
 
     const clickX = d.lastX
@@ -98,10 +95,10 @@ class Card extends React.PureComponent {
     log('onDrag')
 
     if (!this.state.resizing && !this.state.moving) {
-      throw new Error(`Did not expect drag without resize or move`)
+      throw new Error('Did not expect drag without resize or move')
     }
     if (this.state.resizing && this.state.moving) {
-      throw new Error(`Did not expect drag with both resize and move`)
+      throw new Error('Did not expect drag with both resize and move')
     }
 
     const deltaX = d.deltaX
@@ -115,8 +112,8 @@ class Card extends React.PureComponent {
 
     if (this.state.moving) {
       // First guess at change in location given mouse movements.
-      let preClampX = this.state.moveX + deltaX
-      let preClampY = this.state.moveY + deltaY
+      const preClampX = this.state.moveX + deltaX
+      const preClampY = this.state.moveY + deltaY
 
       // Add slack to the values used to calculate bound position. This will
       // ensure that if we start removing slack, the element won't react to
@@ -184,12 +181,12 @@ class Card extends React.PureComponent {
   onStop(e, d) {
     log('onStop')
 
-    if (d.deltaX != 0 || d.deltaY != 0) {
-      throw new Error(`Did not expect delta in onStart`)
+    if (d.deltaX !== 0 || d.deltaY !== 0) {
+      throw new Error('Did not expect delta in onStart')
     }
 
     const card = this.props.card
-    const minDragSelection = this.state.totalDrag < Model.GRID_SIZE/2
+    const minDragSelection = this.state.totalDrag < Model.GRID_SIZE / 2
 
     if (!this.props.selected && minDragSelection) {
       Loop.dispatch(Model.cardUniquelySelected, { id: this.props.card.id })
@@ -205,9 +202,7 @@ class Card extends React.PureComponent {
       updates.moveY = null
       updates.slackX = null
       updates.slackY = null
-    }
-
-    else if (this.state.resizing) {
+    } else if (this.state.resizing) {
       const snapWidth = Model.snapToGrid(this.state.resizeWidth)
       const snapHeight = Model.snapToGrid(this.state.resizeHeight)
       Loop.dispatch(Model.cardResized, { id: card.id, width: snapWidth, height: snapHeight })
@@ -226,7 +221,7 @@ class Card extends React.PureComponent {
 
   onLocalHeight(resizeHeight) {
     log('onLocalheight', resizeHeight)
-    this.setState({resizeHeight: resizeHeight})
+    this.setState({ resizeHeight })
   }
 
   render() {
@@ -238,7 +233,7 @@ class Card extends React.PureComponent {
       height: this.state.resizeHeight || card.height,
       position: 'absolute',
       left: this.state.moveX || card.x,
-      top: this.state.moveY || card.y
+      top: this.state.moveY || card.y,
     }
 
     return (
@@ -255,8 +250,8 @@ class Card extends React.PureComponent {
           className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
           style={style}
         >
-          { card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(this.state) }
-          <span className='cardResizeHandle' />
+          {card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(this.state)}
+          <span className="cardResizeHandle" />
         </div>
       </DraggableCore>
     )
@@ -275,11 +270,25 @@ class Card extends React.PureComponent {
   }
 
   renderImageInner(state) {
-    if(state.loading)
+    if (state.loading) {
       return <h3>Loading</h3>
-    else
-      return <img className='image' src={ state.imagePath } />
+    }
+    return <img className="image" alt="" src={state.imagePath} />
   }
+}
+
+Card.propTypes = {
+  selected: PropTypes.bool.isRequired,
+  card: PropTypes.shape({
+    type: PropTypes.string,
+    id: PropTypes.string,
+    text: PropTypes.string,
+    hyperfile: PropTypes.string,
+    x: PropTypes.number,
+    y: PropTypes.number,
+    height: PropTypes.number,
+    width: PropTypes.number,
+  }).isRequired
 }
 
 export default Card

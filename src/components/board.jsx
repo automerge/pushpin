@@ -1,26 +1,23 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import Jimp from 'jimp'
-import Card from './card'
+import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
 import Loop from '../loop'
+import Card from './card'
 import * as Model from '../model'
 
 const { Menu, MenuItem, dialog } = remote
 
 const log = Debug('pushpin:board')
 
-const withinCard = (card, x, y) => {
-  return (x >= card.x) &&
+const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
          (y >= card.y) &&
          (y <= card.y + card.height)
-}
 
 const withinAnyCard = (cards, x, y) => {
-  for (let id in cards) {
+  for (const id in cards) {
     const card = cards[id]
     if (withinCard(card, x, y)) {
       return true
@@ -47,7 +44,7 @@ class Board extends React.PureComponent {
   componentDidMount() {
     log('componentDidMount')
     document.addEventListener('keydown', this.onKeyDown)
-    window.scrollTo((this.refs.board.clientWidth/2)-(window.innerWidth/2), 0)
+    window.scrollTo((this.boardRef.clientWidth / 2) - (window.innerWidth / 2), 0)
   }
 
   onKeyDown(e) {
@@ -76,57 +73,58 @@ class Board extends React.PureComponent {
     const x = e.pageX
     const y = e.pageY
     const menu = new Menu()
-    menu.append(new MenuItem({label: 'Add Note',  click() {
-      Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
-    }}))
-    menu.append(new MenuItem({label: 'Add Image', click() {
-      dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [{name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif']}]
-      }, (paths) => {
-        // User aborted.
-        if (!paths) {
-          return
-        }
-        if (paths.length !== 1) {
-          throw new Error('Expected exactly one path?')
-        }
-        const path = paths[0]
-        Model.processImage(path, x, y)
-      })
-    }}))
-    menu.popup({window: remote.getCurrentWindow()})
+    menu.append(new MenuItem({ label: 'Add Note',
+      click() {
+        Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
+      } }))
+    menu.append(new MenuItem({ label: 'Add Image',
+      click() {
+        dialog.showOpenDialog({
+          properties: ['openFile'],
+          filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
+        }, (paths) => {
+          // User aborted.
+          if (!paths) {
+            return
+          }
+          if (paths.length !== 1) {
+            throw new Error('Expected exactly one path?')
+          }
+          const path = paths[0]
+          Model.processImage(path, x, y)
+        })
+      } }))
+    menu.popup({ window: remote.getCurrentWindow() })
   }
 
   render() {
     log('render')
 
-    let cardChildren = []
-    for (let id in this.props.cards) {
+    const cardChildren = []
+    for (const id in this.props.cards) {
       const card = this.props.cards[id]
-      cardChildren.push(<Card key={id} card={card} selected={this.props.selected === id}/>)
+      cardChildren.push(<Card key={id} card={card} selected={this.props.selected === id} />)
     }
 
     return (
       <div
-        id='board'
-        className='board'
-        ref='board'
+        id="board"
+        className="board"
+        ref={(e) => { this.boardRef = e }}
         style={boardStyle}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
-        onContextMenu={this.onContextMenu}>
+        onContextMenu={this.onContextMenu}
+      >
         {cardChildren}
       </div>
     )
   }
 }
 
-const mapStateToProps = (state) => {
-  if (!state.board || !state.board.cards) {
-    return {cards: []}
-  }
-  return {cards: state.board.cards, selected: state.selected}
+Board.propTypes = {
+  selected: PropTypes.bool.isRequired,
+  cards: PropTypes.objectOf(Card).isRequired,
 }
 
 export default Board

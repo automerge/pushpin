@@ -1,8 +1,8 @@
 import Debug from 'debug'
 
-var loopSingleton = {}
-
 const log = Debug('pushpin:loop')
+
+const loopSingleton = {}
 
 const init = (state, view, render) => {
   loopSingleton.state = state

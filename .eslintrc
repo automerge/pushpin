@@ -1,10 +1,23 @@
 {
   "extends": "eslint-config-airbnb",
+  "env": {
+    "browser": true,
+    "node": true
+  },
   "rules": {
+    "semi": ["error", "never"],
+    "no-mixed-operators": "off",
+    "class-methods-use-this": "off",
+    "no-unused-vars": ["error", { "args": "none"} ],
+    "comma-dangle": "off",
     "import/extensions": 0,
     "import/no-extraneous-dependencies": 0,
     "import/no-unresolved": [2, { "ignore": ["electron"] }],
     "linebreak-style": 0,
-    "react/prefer-stateless-function": 0
+    "react/prefer-stateless-function": 0,
+    "react/sort-comp": "off",
+    "arrow-parens": "off",
+    "no-use-before-define": "off",
+    "no-shadow": "off"
   }
 }

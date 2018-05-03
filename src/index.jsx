@@ -1,15 +1,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Debug from 'debug'
 
 import Loop from './loop'
 import App from './components/app'
 import * as Model from './model'
 
+// The debug module wants to cache the env['DEBUG'] config, but they get it
+// wrong, at least for the render process. Delete the attempted cache so it
+// doesn't confuse future instances.
+localStorage.removeItem('debug')
 
-const view = (state) => {
-  return <App state={state} />
-}
+const view = (state) =>
+  <App state={state} />
 
 const element = document.getElementById('app')
 
