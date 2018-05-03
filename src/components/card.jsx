@@ -13,11 +13,12 @@ import * as Hyperfile from "../hyperfile"
 
 const log = Debug('pushpin:card')
 
-class CardPresentation extends React.Component {
+class CardPresentation extends React.PureComponent {
 
   constructor(props) {
     super(props)
     log('constructor')
+
     this.state = {
       moving: false,
       resizing: false,
@@ -33,6 +34,11 @@ class CardPresentation extends React.Component {
       loading: false,
       imagePath: null
     }
+
+    this.onStart = this.onStart.bind(this)
+    this.onDrag = this.onDrag.bind(this)
+    this.onStop = this.onStop.bind(this)
+    this.onLocalHeight = this.onLocalHeight.bind(this)
   }
 
   componentDidMount() {
@@ -50,10 +56,6 @@ class CardPresentation extends React.Component {
 
   componentWillReceiveProps(props) {
     log('componentWillReceiveProps')
-  }
-
-  onMouseDown(e) {
-    log('onMouseDown')
   }
 
   onStart(e, d) {
@@ -191,7 +193,7 @@ class CardPresentation extends React.Component {
     const minDragSelection = this.state.totalDrag < GRID_SIZE/2
 
     if (!this.props.selected && minDragSelection) {
-      this.props.onSelected(card.id)
+      this.props.dispatch({type: CARD_UNIQUELY_SELECTED, id: this.props.card.id})
     }
 
     const updates = {}
@@ -199,7 +201,7 @@ class CardPresentation extends React.Component {
     if (this.state.moving) {
       const snapX = snapToGrid(this.state.moveX)
       const snapY = snapToGrid(this.state.moveY)
-      this.props.onMoved(card.id, snapX, snapY)
+      this.props.dispatch({type: CARD_MOVED, id: card.id, x: snapX, y: snapY})
       updates.moveX = null
       updates.moveY = null
       updates.slackX = null
@@ -209,7 +211,7 @@ class CardPresentation extends React.Component {
     else if (this.state.resizing) {
       const snapWidth = snapToGrid(this.state.resizeWidth)
       const snapHeight = snapToGrid(this.state.resizeHeight)
-      this.props.onResized(card.id, snapWidth, snapHeight)
+      this.props.dispatch({type: CARD_RESIZED, id: card.id, width: snapWidth, height: snapHeight})
       updates.resizeWidth = null
       updates.resizeHeight = null
       updates.slackWidth = null
@@ -221,6 +223,11 @@ class CardPresentation extends React.Component {
     updates.totalDrag = null
 
     this.setState(updates)
+  }
+
+  onLocalHeight(resizeHeight) {
+    log('onLocalheight', resizeHeight)
+    this.setState({resizeHeight: resizeHeight})
   }
 
   render() {
@@ -240,10 +247,9 @@ class CardPresentation extends React.Component {
         allowAnyClick={false}
         disabled={false}
         enableUserSelectHack={false}
-        onMouseDown={this.onMouseDown.bind(this)}
-        onStart={this.onStart.bind(this)}
-        onDrag={this.onDrag.bind(this)}
-        onStop={this.onStop.bind(this)}
+        onStart={this.onStart}
+        onDrag={this.onDrag}
+        onStop={this.onStop}
       >
         <div
           id={`card-${card.id}`}
@@ -257,18 +263,13 @@ class CardPresentation extends React.Component {
     )
   }
 
-  onLocalHeight(resizeHeight) {
-    log('onLocalheight', resizeHeight)
-    this.setState({resizeHeight: resizeHeight})
-  }
-
   renderTextInner() {
     return (
       <InlineEditor
         cardId={this.props.card.id}
         text={this.props.card.text}
         selected={this.props.selected}
-        onLocalHeight={this.onLocalHeight.bind(this)}
+        onLocalHeight={this.onLocalHeight}
         cardHeight={this.props.card.height}
       />
     )
@@ -283,17 +284,7 @@ class CardPresentation extends React.Component {
 }
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-    onSelected: (id) => {
-      dispatch({type: CARD_UNIQUELY_SELECTED, id: id})
-    },
-    onMoved: (id, x, y) => {
-      dispatch({type: CARD_MOVED, id: id, x: x, y: y})
-    },
-    onResized: (id, width, height) => {
-      dispatch({type: CARD_RESIZED, id: id, width: width, height: height})
-    }
-  }
+  return { dispatch }
 }
 
 const Card = connect(null, mapDispatchToProps)(CardPresentation)

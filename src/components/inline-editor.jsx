@@ -10,12 +10,15 @@ import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_DELE
 
 const log = Debug('pushpin:inline-editor')
 
-class InlineEditorPresentation extends React.Component {
+class InlineEditorPresentation extends React.PureComponent {
   constructor(props) {
     log('constructor')
     super(props)
     this.state = {value: Plain.deserialize(props.text)}
     this.lastLocalHeight = null
+
+    this.onChange = this.onChange.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
   }
 
   componentDidMount() {
@@ -28,6 +31,16 @@ class InlineEditorPresentation extends React.Component {
     log('componentDidUpdate')
     this.ensureFocus()
     this.checkHeight()
+  }
+
+  componentWillReceiveProps(props) {
+    log('componentWillReceiveProps')
+    if (this.props.selected && !props.selected) {
+      this.props.dispatch({type: CARD_TEXT_CHANGED, id: this.props.cardId, text: Plain.serialize(this.state.value) })
+      maybeInlineFile(this.props.dispatch, this.props.cardId, this.props.text)
+    } else if (!props.selected) {
+      this.setState({value: Plain.deserialize(props.text)})
+    }
   }
 
   ensureFocus() {
@@ -48,7 +61,7 @@ class InlineEditorPresentation extends React.Component {
     if (!this.props.selected) {
       const height = this.refs.renderer.clientHeight
       if (this.props.cardHeight != height) {
-        this.props.onTextResized(this.props.cardId, height)
+        this.props.dispatch({type: CARD_TEXT_RESIZED, id: this.props.cardId, height: height})
       }
     }
   }
@@ -64,17 +77,7 @@ class InlineEditorPresentation extends React.Component {
       return
     }
     e.preventDefault()
-    this.props.onDeleted(this.props.cardId)
-  }
-
-  componentWillReceiveProps(props) {
-    log('componentWillReceiveProps')
-
-    if (this.props.selected && !props.selected) {
-      this.props.onTextChanged(this.props.cardId, Plain.serialize(this.state.value))
-    } else if (!props.selected) {
-      this.setState({value: Plain.deserialize(props.text)})
-    }
+    this.props.dispatch({type: CARD_DELETED, id: this.props.cardId})
   }
 
   onChange({ value }) {
@@ -88,22 +91,22 @@ class InlineEditorPresentation extends React.Component {
     if (this.props.selected) {
       return (
         <div
-          className={'editorWrapper'}
-          ref={'editorWrapper'}
+          className='editorWrapper'
+          ref='editorWrapper'
         >
           <Editor
             value={this.state.value}
-            onChange={this.onChange.bind(this)}
-            onKeyDown={this.onKeyDown.bind(this)}
-            ref={'editor'}
+            onChange={this.onChange}
+            onKeyDown={this.onKeyDown}
+            ref='editor'
           />
         </div>
       )
     } else {
       return (
         <div
-          className={'renderer'}
-          ref={'renderer'}
+          className='renderer'
+          ref='renderer'
         >
           <ReactMarkdown
             source={this.props.text}
@@ -115,25 +118,7 @@ class InlineEditorPresentation extends React.Component {
 }
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-    onTextChanged: (id, text) => {
-      log('onTextChanged')
-      dispatch({type: CARD_TEXT_CHANGED, id: id, text: text })
-      maybeInlineFile(dispatch, id, text)
-    },
-    onSelected: (id) => {
-      log('onSelected')
-      dispatch({type: CARD_UNIQUELY_SELECTED, id: id})
-    },
-    onDeleted: (id) => {
-      log('onDeleted')
-      dispatch({type: CARD_DELETED, id: id})
-    },
-    onTextResized: (id, height) => {
-      log('onTextResized')
-      dispatch({type: CARD_TEXT_RESIZED, id: id, height: height})
-    },
-  }
+  return { dispatch }
 }
 
 const InlineEditor = connect(null, mapDispatchToProps)(InlineEditorPresentation)

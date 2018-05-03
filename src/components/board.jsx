@@ -12,26 +12,102 @@ const { Menu, MenuItem, dialog } = remote
 
 const log = Debug('pushpin:board')
 
-const presentation = ({ cards, selected, onClick, onDoubleClick, onContextMenu }) => {
-  log('render')
+const withinCard = (card, x, y) => {
+  return (x >= card.x) &&
+         (x <= card.x + card.width) &&
+         (y >= card.y) &&
+         (y <= card.y + card.height)
+}
 
-  let cardChildren = []
+const withinAnyCard = (cards, x, y) => {
   for (let id in cards) {
     const card = cards[id]
-    cardChildren.push(<Card key={id} card={card} selected={selected === id}/>)
+    if (withinCard(card, x, y)) {
+      return true
+    }
+  }
+  return false
+}
+
+const boardStyle = {
+  width: BOARD_WIDTH,
+  height: BOARD_HEIGHT
+}
+
+class BoardPresentation extends React.PureComponent {
+  constructor(props) {
+    super(props)
+    log('constructor')
+
+    this.onClick = this.onClick.bind(this)
+    this.onDoubleClick = this.onDoubleClick.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
   }
 
-  return (
-    <div
-      id='board'
-      className='board'
-      style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT}}
-      onClick={(e) => { onClick(e, cards) }}
-      onDoubleClick={onDoubleClick}
-      onContextMenu={onContextMenu}>
-      {cardChildren}
-    </div>
-  )
+  onClick(e) {
+    if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
+      log('onClick')
+      this.props.dispatch({type: CLEAR_SELECTIONS})
+    }
+  }
+
+  onDoubleClick(e) {
+    if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
+      log('onDoubleClick')
+      this.props.dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, text: '', selected: true})
+    }
+  }
+
+  onContextMenu(e) {
+    log('onContextMenu')
+    e.preventDefault()
+    const x = e.pageX
+    const y = e.pageY
+    const menu = new Menu()
+    const dispatch = this.props.dispatch
+    menu.append(new MenuItem({label: 'Add Note',  click() {
+      dispatch({type: CARD_CREATED_TEXT, x: x, y: y, text: '', selected: true})
+    }}))
+    menu.append(new MenuItem({label: 'Add Image', click() {
+      dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif']}]
+      }, (paths) => {
+        // User aborted.
+        if (!paths) {
+          return
+        }
+        if (paths.length !== 1) {
+          throw new Error('Expected exactly one path?')
+        }
+        const path = paths[0]
+        processImage(dispatch, path, x, y)
+      })
+    }}))
+    menu.popup({window: remote.getCurrentWindow()})
+  }
+
+  render() {
+    log('render')
+
+    let cardChildren = []
+    for (let id in this.props.cards) {
+      const card = this.props.cards[id]
+      cardChildren.push(<Card key={id} card={card} selected={this.props.selected === id}/>)
+    }
+
+    return (
+      <div
+        id='board'
+        className='board'
+        style={boardStyle}
+        onClick={this.onClick}
+        onDoubleClick={this.onDoubleClick}
+        onContextMenu={this.onContextMenu}>
+        {cardChildren}
+      </div>
+    )
+  }
 }
 
 const mapStateToProps = (state) => {
@@ -41,71 +117,10 @@ const mapStateToProps = (state) => {
   return {cards: state.board.cards, selected: state.selected}
 }
 
-const rightClickMenu = (dispatch, e) => {
-  const x = e.pageX
-  const y = e.pageY
-  const menu = new Menu()
-  menu.append(new MenuItem({label: 'Add Note',  click() {
-    dispatch({type: CARD_CREATED_TEXT, x: x, y: y, text: '', selected: true})
-  }}))
-  menu.append(new MenuItem({label: 'Add Image', click() {
-    dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif']}]
-    }, (paths) => {
-      // User aborted.
-      if (!paths) {
-        return
-      }
-      if (paths.length !== 1) {
-        throw new Error('Expected exactly one path?')
-      }
-      const path = paths[0]
-      processImage(dispatch, path, x, y)
-      }
-    )
-  }}))
-  return menu
+const mapDispatchToProps = (dispatch) => {
+  return { dispatch }
 }
 
-const withinCard = (card, x, y) => {
-  return (x >= card.x) &&
-         (x <= card.x + card.width) &&
-         (y >= card.y) &&
-         (y <= card.y + card.height)
-}
-
-const mapDispatchToProps = (dispatch, getState) => {
-  return {
-    onClick: (e, cards) => {
-      let clickingInCard = false
-      for (let id in cards) {
-        const card = cards[id]
-        const res = withinCard(card, e.pageX, e.pageY)
-        if (res) {
-          clickingInCard = true
-          return
-        }
-      }
-      if (clickingInCard) {
-        return
-      }
-      log('onClick')
-      dispatch({type: CLEAR_SELECTIONS})
-    },
-    onDoubleClick: (e) => {
-      log('onDoubleClick')
-      dispatch({type: CARD_CREATED_TEXT, x: e.pageX, y: e.pageY, text: '', selected: true})
-    },
-    onContextMenu: (e, ...rest) => {
-      log('onContextMenu')
-      e.preventDefault()
-      const menu = rightClickMenu(dispatch, e)
-      menu.popup({window: remote.getCurrentWindow()})
-    }
-  }
-}
-
-const Board = connect(mapStateToProps, mapDispatchToProps)(presentation)
+const Board = connect(mapStateToProps, mapDispatchToProps)(BoardPresentation)
 
 export default Board
