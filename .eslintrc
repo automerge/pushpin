@@ -5,6 +5,7 @@
     "node": true
   },
   "rules": {
+    "semi": ["error", "never"],
     "no-mixed-operators": "off",
     "class-methods-use-this": "off",
     "no-unused-vars": ["error", { "args": "none"} ],
