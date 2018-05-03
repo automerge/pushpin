@@ -9,8 +9,8 @@ import Debug from 'debug'
 import { snapToGrid, fetchImage, BOARD_WIDTH, BOARD_HEIGHT, GRID_SIZE, CARD_MIN_WIDTH, CARD_MIN_HEIGHT, RESIZE_HANDLE_SIZE } from '../model'
 import InlineEditor from './inline-editor'
 import { CARD_UNIQUELY_SELECTED, CARD_MOVED, CARD_RESIZED } from '../action-types'
-import log from '../log'
 import * as Hyperfile from "../hyperfile"
+
 const log = Debug('pushpin:card')
 
 class CardPresentation extends React.Component {
