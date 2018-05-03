@@ -7,6 +7,7 @@
   "main": "src/electron.js",
   "scripts": {
     "start": "electron-forge start",
+    "start2": "NAME=userA npm start & NAME=userB npm start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
