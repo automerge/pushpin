@@ -1,14 +1,14 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import ReactMarkdown from 'react-markdown'
-import { Editor } from 'slate-react'
-import Plain from 'slate-plain-serializer'
-import Debug from 'debug'
+import React from 'react';
+import { connect } from 'react-redux';
+import ReactMarkdown from 'react-markdown';
+import { Editor } from 'slate-react';
+import Plain from 'slate-plain-serializer';
+import Debug from 'debug';
 
-import { maybeInlineFile } from '../model'
-import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_DELETED } from '../action-types'
+import { maybeInlineFile } from '../model';
+import { CARD_TEXT_CHANGED, CARD_UNIQUELY_SELECTED, CARD_TEXT_RESIZED, CARD_DELETED } from '../action-types';
 
-const log = Debug('pushpin:inline-editor')
+const log = Debug('pushpin:inline-editor');
 
 class InlineEditorPresentation extends React.PureComponent {
   constructor(props) {
@@ -22,15 +22,15 @@ class InlineEditorPresentation extends React.PureComponent {
   }
 
   componentDidMount() {
-    log('componentDidMount')
-    this.ensureFocus()
-    this.checkHeight()
+    log('componentDidMount');
+    this.ensureFocus();
+    this.checkHeight();
   }
 
   componentDidUpdate() {
-    log('componentDidUpdate')
-    this.ensureFocus()
-    this.checkHeight()
+    log('componentDidUpdate');
+    this.ensureFocus();
+    this.checkHeight();
   }
 
   componentWillReceiveProps(props) {
@@ -45,17 +45,17 @@ class InlineEditorPresentation extends React.PureComponent {
 
   ensureFocus() {
     if (this.props.selected && !this.state.value.isFocused) {
-      log('forceFocus')
-      const newValue = this.state.value.change().focus().value
-      this.setState({value: newValue})
+      log('forceFocus');
+      const newValue = this.state.value.change().focus().value;
+      this.setState({ value: newValue });
     }
   }
 
   checkHeight() {
-    const localHeight = this.props.selected ? this.refs.editorWrapper.clientHeight : null
+    const localHeight = this.props.selected ? this.refs.editorWrapper.clientHeight : null;
     if (this.lastLocalHeight != localHeight) {
-      this.props.onLocalHeight(localHeight)
-      this.lastLocalHeight = localHeight
+      this.props.onLocalHeight(localHeight);
+      this.lastLocalHeight = localHeight;
     }
 
     if (!this.props.selected) {
@@ -67,22 +67,22 @@ class InlineEditorPresentation extends React.PureComponent {
   }
 
   onKeyDown(e, change) {
-    log('onKeyDown')
+    log('onKeyDown');
 
     if (e.key !== 'Backspace') {
-      return
+      return;
     }
-    const text = Plain.serialize(this.state.value)
+    const text = Plain.serialize(this.state.value);
     if (text != '') {
-      return
+      return;
     }
     e.preventDefault()
     this.props.dispatch({type: CARD_DELETED, id: this.props.cardId})
   }
 
   onChange({ value }) {
-    log('onChange')
-    this.setState({value: value})
+    log('onChange');
+    this.setState({ value });
   }
 
   render() {

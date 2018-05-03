@@ -45,13 +45,11 @@ class HashFromPresentation extends React.PureComponent {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    activeDocId: state.activeDocId,
-    formDocId: state.formDocId,
-    requestedDocId: state.requestedDocId
-  }
-}
+const mapStateToProps = (state) => ({
+  activeDocId: state.activeDocId,
+  formDocId: state.formDocId,
+  requestedDocId: state.requestedDocId,
+});
 
 const mapDispatchToProps = (dispatch) => {
   return { dispatch }
@@ -59,4 +57,4 @@ const mapDispatchToProps = (dispatch) => {
 
 const HashForm = connect(mapStateToProps, mapDispatchToProps)(HashFromPresentation)
 
-export default HashForm
+export default HashForm;

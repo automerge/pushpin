@@ -1,16 +1,16 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import Jimp from 'jimp'
-import Card from './card'
-import { remote } from 'electron'
-import Debug from 'debug'
+import React from 'react';
+import { connect } from 'react-redux';
+import Jimp from 'jimp';
+import { remote } from 'electron';
+import Debug from 'debug';
+import Card from './card';
 
-import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from '../action-types'
-import { processImage, BOARD_WIDTH, BOARD_HEIGHT } from '../model'
+import { CARD_CREATED_TEXT, CLEAR_SELECTIONS } from '../action-types';
+import { processImage, BOARD_WIDTH, BOARD_HEIGHT } from '../model';
 
-const { Menu, MenuItem, dialog } = remote
+const { Menu, MenuItem, dialog } = remote;
 
-const log = Debug('pushpin:board')
+const log = Debug('pushpin:board');
 
 const withinCard = (card, x, y) => {
   return (x >= card.x) &&
@@ -123,4 +123,4 @@ const mapDispatchToProps = (dispatch) => {
 
 const Board = connect(mapStateToProps, mapDispatchToProps)(BoardPresentation)
 
-export default Board
+export default Board;

@@ -1,21 +1,21 @@
-import Hypercore from "hypercore"
-import Hyperdiscovery from "hyperdiscovery"
-import Fs from "fs"
-import Path from "path"
-import toBuffer from "to-buffer"
+import Hypercore from 'hypercore';
+import Hyperdiscovery from 'hyperdiscovery';
+import Fs from 'fs';
+import Path from 'path';
+import toBuffer from 'to-buffer';
 
-const hypercoreOptions = { valueEncoding: 'binary' }
+const hypercoreOptions = { valueEncoding: 'binary' };
 
 function corePath(dataPath, imgId) {
-  return Path.join(dataPath, imgId)
+  return Path.join(dataPath, imgId);
 }
 
 function dataPath(dataPath, imgId) {
-  return Path.join(dataPath, imgId, 'data')
+  return Path.join(dataPath, imgId, 'data');
 }
 
 function serve(hypercore) {
-  Hyperdiscovery(hypercore)
+  Hyperdiscovery(hypercore);
 }
 
 // Example:
@@ -52,38 +52,38 @@ function serve(hypercore) {
 
 // callback = (err, key)
 export function write(dataPath, imgId, imgPath, callback) {
-  const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions)
-  core.on('error', callback)
+  const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions);
+  core.on('error', callback);
   core.on('ready', () => {
-    const readStream = Fs.createReadStream(imgPath)
-    const writeStream = core.createWriteStream()
+    const readStream = Fs.createReadStream(imgPath);
+    const writeStream = core.createWriteStream();
 
-    readStream.on('error', callback)
-    writeStream.on('error', callback)
+    readStream.on('error', callback);
+    writeStream.on('error', callback);
     writeStream.on('finish', () => {
-      serve(core)
-      callback(null, core.key)
-    })
+      serve(core);
+      callback(null, core.key);
+    });
 
-    readStream.pipe(writeStream)
-  })
+    readStream.pipe(writeStream);
+  });
 }
 
 // callback = (err, blobPath)
 export function fetch(dataPath, imgId, coreKey, callback) {
-  coreKey = Buffer.from(coreKey, "base64")
-  const core = Hypercore(corePath(dataPath, imgId), coreKey, hypercoreOptions)
-  core.on('error', callback)
+  coreKey = Buffer.from(coreKey, 'base64');
+  const core = Hypercore(corePath(dataPath, imgId), coreKey, hypercoreOptions);
+  core.on('error', callback);
   core.on('ready', () => {
-    serve(core)
+    serve(core);
     core.get(0, null, (error, data) => {
-      if(error) {
-        callback(error)
-        return
+      if (error) {
+        callback(error);
+        return;
       }
 
-      const blobPath = Path.join(dataPath, imgId, "data")
-      callback(null, blobPath)
-    })
-  })
+      const blobPath = Path.join(dataPath, imgId, 'data');
+      callback(null, blobPath);
+    });
+  });
 }
