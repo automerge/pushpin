@@ -72,6 +72,13 @@ div.board {
   background-image: url(grid.svg);
 }
 
+div.board::after {
+  position: fixed;
+  top: 40px;
+  right: 5px;
+  content: url(pushpinIcon_Standalone.svg)
+}
+
 div.card {
   background: #ffffff;
 }
@@ -82,6 +89,7 @@ div.card.unselected {
 
 div.card.selected {
   border: 1px solid black;
+  border-top: 8px solid black;
 }
 
 div.card span.cardResizeHandle {
