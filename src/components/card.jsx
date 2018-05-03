@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { DraggableCore } from 'react-draggable';
 import classNames from 'classnames';
 import Debug from 'debug';
@@ -284,6 +285,24 @@ const mapDispatchToProps = (dispatch) => {
   return { dispatch }
 }
 
+CardPresentation.propTypes = {
+  selected: PropTypes.bool.isRequired,
+  onSelected: PropTypes.func.isRequired,
+  onMoved: PropTypes.func.isRequired,
+  onResized: PropTypes.func.isRequired,
+  card: PropTypes.shape({
+    type: PropTypes.string,
+    id: PropTypes.string,
+    text: PropTypes.string,
+    hyperfile: PropTypes.string,
+    x: PropTypes.number,
+    y: PropTypes.number,
+    height: PropTypes.number,
+    width: PropTypes.number,
+  }).isRequired
+};
+
 const Card = connect(null, mapDispatchToProps)(CardPresentation);
+
 
 export default Card;

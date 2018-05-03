@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import Debug from 'debug';
 import Card from './card';

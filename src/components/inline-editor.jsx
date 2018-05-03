@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 import { Editor } from 'slate-react';
 import Plain from 'slate-plain-serializer';
