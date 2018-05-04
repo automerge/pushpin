@@ -2,7 +2,12 @@ import Debug from 'debug'
 
 const log = Debug('pushpin:loop')
 
-const loopSingleton = {}
+const loopSingleton = {
+  state: null,
+  view: null,
+  render: null,
+  current: null,
+}
 
 const init = (state, view, render) => {
   loopSingleton.state = state
@@ -12,6 +17,13 @@ const init = (state, view, render) => {
 }
 
 const dispatch = (fn, args) => {
+  // Avoid running dispatches within each other.
+  if (loopSingleton.current) {
+    process.nextTick(() => { dispatch(fn, args) })
+    return
+  }
+
+  // Check arguments.
   if ((typeof fn) !== 'function') {
     throw new Error(`Expected function, got ${fn}`)
   }
@@ -22,6 +34,7 @@ const dispatch = (fn, args) => {
     throw new Error(`Expected args object, got ${args}`)
   }
 
+  loopSingleton.current = fn.name
   log('dispatch', fn.name, args)
   const newState = fn(loopSingleton.state, args)
 
@@ -31,6 +44,7 @@ const dispatch = (fn, args) => {
 
   loopSingleton.state = newState
   display(loopSingleton)
+  loopSingleton.current = null
 }
 
 const display = (ls) => {

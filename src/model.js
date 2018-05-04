@@ -11,6 +11,9 @@ import { EventEmitter } from 'events'
 import Loop from './loop'
 import * as Hyperfile from './hyperfile'
 
+const log = Debug('pushpin:model')
+
+
 // ## Constants
 
 export const BOARD_WIDTH = 3600
@@ -26,6 +29,9 @@ const USER = process.env.NAME || 'userA'
 const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
+
+
+// ## Demo data
 
 const WELCOME_TEXT =
 `## Welcome
@@ -49,7 +55,10 @@ const EXAMPLE_TEXT =
 
 We've made some initial cards for you to play with. Have fun!`
 
-const log = Debug('pushpin:model')
+const KAY_PATH = './img/kay.jpg'
+const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
+
+
 
 // ## Imperative top-levels.
 
@@ -77,6 +86,49 @@ export function snapToGrid(num) {
     return num - resto
   }
   return num + GRID_SIZE - resto
+}
+
+
+// ## IO helper functions.
+
+export function fetchImage({ imageId, imageExt, key }, callback) {
+  Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blob) => {
+    if (error) {
+      callback(error)
+      return
+    }
+
+    const imagePath = Path.join(HYPERFILE_CACHE_PATH, imageId + imageExt)
+    Fs.writeFile(imagePath, blob, (error) => {
+      if (error) {
+        callback(error)
+        return
+      }
+
+      callback(null, imagePath)
+    })
+  })
+}
+
+// Recognizes absolute local file paths to supported file types.
+const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif))\n\s*$/
+
+// Given the current text for a card indexed by id, sees if it contains only a
+// local file path for a file type by supported by the app. In this case,
+// converts the card from a text card to image card.
+export function maybeInlineFile(id, text) {
+  const filePatMatch = filePat.exec(text)
+  if (!filePatMatch) {
+    return
+  }
+  const path = filePatMatch[1]
+  // const extension = filePatMatch[2]; // unused but kept to remind us it's here
+  Fs.stat(path, (err, stat) => {
+    if (err || !stat.isFile()) {
+      return
+    }
+    Loop.dispatch(processImage, { path, id })
+  })
 }
 
 
@@ -109,46 +161,13 @@ export function init(state) {
   return Object.assign({}, state, { hm })
 }
 
-function copyFile(source, destination, callback) {
-  Fs.readFile(source, (error, data) => {
-    if (error) {
-      callback(error)
-      return
-    }
-
-    Fs.writeFile(destination, data, (error) => {
-      if (error) {
-        callback(error)
-        return
-      }
-
-      callback()
-    })
-  })
-}
-
-export function fetchImage({ imageId, imageExt, key }, callback) {
-  Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blob) => {
-    if (error) {
-      callback(error)
-      return
-    }
-
-    const imagePath = Path.join(HYPERFILE_CACHE_PATH, imageId + imageExt)
-    Fs.writeFile(imagePath, blob, (error) => {
-      if (error) {
-        callback(error)
-        return
-      }
-
-      callback(null, imagePath)
-    })
-  })
-}
-
 // Process the image at the given path, upgrading the card at id to an image
 // card if id is given, otherwise creating a new image card at (x,y).
-export function processImage(path, x, y) {
+// This is structured an action for consistency. It passes through state
+// unchanged. State will be updated in callbacks by redispatching to
+// another action (cardCreatedImage). We could add state to indicate in-
+// progress processing here later if we wanted to.
+export function processImage(state, { path, x, y }) {
   Jimp.read(path, (err, img) => {
     if (err) {
       log('Error loading image?', err)
@@ -178,28 +197,8 @@ export function processImage(path, x, y) {
       })
     })
   })
-}
 
-
-// Recognizes absolute local file paths to supported file types.
-const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif))\n\s*$/
-
-// Given the current text for a card indexed by id, sees if it contains only a
-// local file path for a file type by supported by the app. In this case,
-// converts the card from a text card to image card.
-export function maybeInlineFile(id, text) {
-  const filePatMatch = filePat.exec(text)
-  if (!filePatMatch) {
-    return
-  }
-  const path = filePatMatch[1]
-  // const extension = filePatMatch[2]; // unused but kept to remind us it's here
-  Fs.stat(path, (err, stat) => {
-    if (err || !stat.isFile()) {
-      return
-    }
-    processImage(path, id)
-  })
+  return state
 }
 
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
@@ -242,8 +241,9 @@ function populateDemoBoard(state) {
   newState = cardCreatedText(newState, { x: 1350, y: 250, text: USAGE_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 750, text: EXAMPLE_TEXT })
 
-  processImage("./img/kay.jpg", 1750, 500)
-  processImage("./img/carpenters-workshop.jpg", 1800, 150)
+  // These will be handled async as they require their own IO.
+  Loop.dispatch(processImage, { x: 1750, y: 500, path: KAY_PATH })
+  Loop.dispatch(processImage, { x: 1800, y: 150, path: WORKSHOP_PATH })
 
   return newState
 }
