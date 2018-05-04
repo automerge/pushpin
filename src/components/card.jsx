@@ -14,7 +14,15 @@ class Card extends React.PureComponent {
   constructor(props) {
     super(props)
     log('constructor')
-    this.state = {
+
+    // Tracking is internal, ephemeral state that doesn't directly effect the
+    // rendered view. It's used for move/resize state. We keep this seperate
+    // from this.state below so that we don't need to deal with the fact that
+    // setState is async, which makes computing iterative updates hard. We
+    // do need to copy some resulting values (the properties in both tracking
+    // and state) when they change, but these copies are idempotent and so
+    // easier to reason about.
+    this.tracking = {
       moving: false,
       resizing: false,
       moveX: null,
@@ -26,6 +34,14 @@ class Card extends React.PureComponent {
       slackWidth: null,
       slackHeight: null,
       totalDrag: null,
+    }
+
+    // State directly affects the rendered view.
+    this.state = {
+      moveX: null,
+      moveY: null,
+      resizeWidth: null,
+      resizeHeight: null,
       loading: false,
       imagePath: null
     }
@@ -54,50 +70,62 @@ class Card extends React.PureComponent {
     log('componentWillReceiveProps')
   }
 
+  // Copy view-relevant move/resize state over to React.
+  setDragState() {
+    if (this.tracking.moving) {
+      this.setState({
+        moveX: this.tracking.moveX,
+        moveY: this.tracking.moveY
+      })
+    }
+
+    if (this.tracking.resizing) {
+      this.setState({
+        resizeWidth: this.tracking.resizeWidth,
+        resizeHeight: this.tracking.resizeHeight
+      })
+    }
+  }
+
   onStart(e, d) {
     log('onStart')
-
-    if (d.deltaX !== 0 || d.deltaY !== 0) {
-      throw new Error('Did not expect delta in onStart')
-    }
 
     const clickX = d.lastX
     const clickY = d.lastY
     const card = this.props.card
-    const resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
-                      (clickX <= (card.x + card.width)) &&
-                      (clickY >= (card.y + card.height - Model.RESIZE_HANDLE_SIZE)) &&
-                      (clickY <= (card.y + card.height)))
 
-    const updates = {}
-    updates.resizing = resizing
-    updates.moving = !resizing
-    updates.totalDrag = 0
+    this.tracking.resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
+                              (clickX <= (card.x + card.width)) &&
+                              (clickY >= (card.y + card.height - Model.RESIZE_HANDLE_SIZE)) &&
+                              (clickY <= (card.y + card.height)))
+    this.tracking.moving = !this.tracking.resizing
 
-    if (updates.moving) {
-      updates.moveX = card.x
-      updates.moveY = card.y
-      updates.slackX = 0
-      updates.slackY = 0
+    this.tracking.totalDrag = 0
+
+    if (this.tracking.moving) {
+      this.tracking.moveX = card.x
+      this.tracking.moveY = card.y
+      this.tracking.slackX = 0
+      this.tracking.slackY = 0
+      this.effectDrag(d)
     }
 
-    if (updates.resizing) {
-      updates.resizeWidth = card.width
-      updates.resizeHeight = card.height
-      updates.slackWidth = 0
-      updates.slackHeight = 0
+    if (this.tracking.resizing) {
+      this.tracking.resizeWidth = card.width
+      this.tracking.resizeHeight = card.height
+      this.tracking.slackWidth = 0
+      this.tracking.slackHeight = 0
+      this.effectDrag(d)
     }
 
-    this.setState(updates)
+    this.setDragState()
   }
 
-  onDrag(e, d) {
-    log('onDrag')
-
-    if (!this.state.resizing && !this.state.moving) {
+  effectDrag(d) {
+    if (!this.tracking.resizing && !this.tracking.moving) {
       throw new Error('Did not expect drag without resize or move')
     }
-    if (this.state.resizing && this.state.moving) {
+    if (this.tracking.resizing && this.tracking.moving) {
       throw new Error('Did not expect drag with both resize and move')
     }
 
@@ -107,45 +135,43 @@ class Card extends React.PureComponent {
       return
     }
 
-    const card = this.props.card
-    const updates = {}
+    this.tracking.totalDrag = this.tracking.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
 
-    if (this.state.moving) {
+    const card = this.props.card
+
+    if (this.tracking.moving) {
       // First guess at change in location given mouse movements.
-      const preClampX = this.state.moveX + deltaX
-      const preClampY = this.state.moveY + deltaY
+      const preClampX = this.tracking.moveX + deltaX
+      const preClampY = this.tracking.moveY + deltaY
 
       // Add slack to the values used to calculate bound position. This will
       // ensure that if we start removing slack, the element won't react to
       // it right away until it's been completely removed.
-      let newX = preClampX + this.state.slackX
-      let newY = preClampY + this.state.slackY
+      let newX = preClampX + this.tracking.slackX
+      let newY = preClampY + this.tracking.slackY
 
       // Clamp to ensure card doesn't move beyond the board.
       newX = Math.max(newX, 0)
       newX = Math.min(newX, Model.BOARD_WIDTH - card.width)
+      this.tracking.moveX = newX
       newY = Math.max(newY, 0)
       newY = Math.min(newY, Model.BOARD_HEIGHT - card.height)
+      this.tracking.moveY = newY
 
       // If the numbers changed, we must have introduced some slack.
       // Record it for the next iteration.
-      const newSlackWidth = this.state.slackX + preClampX - newX
-      const newSlackHeight = this.state.slackY + preClampY - newY
-
-      updates.moveX = newX
-      updates.moveY = newY
-      updates.slackX = newSlackWidth
-      updates.slackY = newSlackHeight
+      this.tracking.slackX = this.tracking.slackX + preClampX - newX
+      this.tracking.slackY = this.tracking.slackY + preClampY - newY
     }
 
-    if (this.state.resizing) {
+    if (this.tracking.resizing) {
       // First guess at change in dimensions given mouse movements.
-      let preClampWidth = this.state.resizeWidth + deltaX
-      let preClampHeight = this.state.resizeHeight + deltaY
+      let preClampWidth = this.tracking.resizeWidth + deltaX
+      let preClampHeight = this.tracking.resizeHeight + deltaY
 
       // Maintain aspect ratio on image cards.
       if (card.type !== 'text') {
-        const ratio = this.state.resizeWidth / this.state.resizeHeight
+        const ratio = this.tracking.resizeWidth / this.tracking.resizeHeight
         preClampHeight = preClampWidth / ratio
         preClampWidth = preClampHeight * ratio
       }
@@ -153,70 +179,74 @@ class Card extends React.PureComponent {
       // Add slack to the values used to calculate bound position. This will
       // ensure that if we start removing slack, the element won't react to
       // it right away until it's been completely removed.
-      let newWidth = preClampWidth + this.state.slackWidth
-      let newHeight = preClampHeight + this.state.slackHeight
+      let newWidth = preClampWidth + this.tracking.slackWidth
+      let newHeight = preClampHeight + this.tracking.slackHeight
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
       newWidth = Math.max(Model.CARD_MIN_WIDTH, newWidth)
       newWidth = Math.min(Model.BOARD_WIDTH - card.x, newWidth)
+      this.tracking.resizeWidth = newWidth
       newHeight = Math.max(Model.CARD_MIN_HEIGHT, newHeight)
       newHeight = Math.min(Model.BOARD_HEIGHT - card.y, newHeight)
+      this.tracking.resizeHeight = newHeight
 
       // If the numbers changed, we must have introduced some slack.
       // Record it for the next iteration.
-      const newSlackWidth = this.state.slackWidth + preClampWidth - newWidth
-      const newSlackHeight = this.state.slackHeight + preClampHeight - newHeight
-
-      updates.resizeWidth = newWidth
-      updates.resizeHeight = newHeight
-      updates.slackWidth = newSlackWidth
-      updates.slackHeight = newSlackHeight
+      this.tracking.slackWidth = this.tracking.slackWidth + preClampWidth - newWidth
+      this.tracking.slackHeight = this.tracking.slackHeight + preClampHeight - newHeight
     }
+  }
 
-    updates.totalDrag = this.state.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
-
-    this.setState(updates)
+  onDrag(e, d) {
+    log('onDrag')
+    this.effectDrag(d)
+    this.setDragState()
   }
 
   onStop(e, d) {
     log('onStop')
 
-    if (d.deltaX !== 0 || d.deltaY !== 0) {
-      throw new Error('Did not expect delta in onStart')
-    }
+    this.effectDrag(d)
 
     const card = this.props.card
-    const minDragSelection = this.state.totalDrag < Model.GRID_SIZE / 2
 
+    const minDragSelection = this.tracking.totalDrag < Model.GRID_SIZE / 2
     if (!this.props.selected && minDragSelection) {
       Loop.dispatch(Model.cardUniquelySelected, { id: this.props.card.id })
     }
+    this.tracking.totalDrag = null
 
-    const updates = {}
-
-    if (this.state.moving) {
-      const snapX = Model.snapToGrid(this.state.moveX)
-      const snapY = Model.snapToGrid(this.state.moveY)
-      Loop.dispatch(Model.cardMoved, { id: card.id, x: snapX, y: snapY })
-      updates.moveX = null
-      updates.moveY = null
-      updates.slackX = null
-      updates.slackY = null
-    } else if (this.state.resizing) {
-      const snapWidth = Model.snapToGrid(this.state.resizeWidth)
-      const snapHeight = Model.snapToGrid(this.state.resizeHeight)
-      Loop.dispatch(Model.cardResized, { id: card.id, width: snapWidth, height: snapHeight })
-      updates.resizeWidth = null
-      updates.resizeHeight = null
-      updates.slackWidth = null
-      updates.slackHeight = null
+    if (this.tracking.moving) {
+      this.tracking.moveX = Model.snapToGrid(this.tracking.moveX)
+      this.tracking.moveY = Model.snapToGrid(this.tracking.moveY)
+      this.setDragState()
+      Loop.dispatch(Model.cardMoved, {
+        id: card.id,
+        x: this.tracking.moveX,
+        y: this.tracking.moveY
+      })
+      this.tracking.moveX = null
+      this.tracking.moveY = null
+      this.tracking.slackX = null
+      this.tracking.slackY = null
+      this.tracking.moving = false
     }
 
-    updates.resizing = false
-    updates.moving = false
-    updates.totalDrag = null
-
-    this.setState(updates)
+    if (this.tracking.resizing) {
+      this.tracking.resizeWidth = Model.snapToGrid(this.tracking.resizeWidth)
+      this.tracking.resizeHeight = Model.snapToGrid(this.tracking.resizeHeight)
+      this.setDragState()
+      Loop.dispatch(Model.cardResized, {
+        id: card.id,
+        width: this.tracking.resizeWidth,
+        height: this.tracking.resizeHeight
+      })
+      this.tracking.resizeWidth = null
+      this.tracking.resizeHeight = null
+      this.tracking.slackWidth = null
+      this.tracking.slackHeight = null
+      this.tracking.resizing = false
+    }
   }
 
   onLocalHeight(resizeHeight) {
