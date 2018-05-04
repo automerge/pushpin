@@ -236,6 +236,10 @@ function populateDemoBoard(state) {
   newState = cardCreatedText(newState, { x: 1350, y: 100, text: WELCOME_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 250, text: USAGE_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 750, text: EXAMPLE_TEXT })
+
+  processImage("./img/kay.jpg", 1750, 500)
+  processImage("./img/carpenters-workshop.jpg", 1800, 150)
+
   return newState
 }
 
