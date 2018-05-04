@@ -23,7 +23,6 @@ const createWindow = async () => {
   const isDevMode = process.execPath.match(/[\\/]electron/)
   if (isDevMode) {
     await installExtension(REACT_DEVELOPER_TOOLS)
-    mainWindow.webContents.openDevTools()
   }
 
   // Emitted when the window is closed.
