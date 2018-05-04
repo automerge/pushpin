@@ -40,7 +40,7 @@ App.propTypes = {
     requestedDocId: PropTypes.string,
     selected: PropTypes.string,
     board: PropTypes.shape({
-      cards: PropTypes.array,
+      cards: PropTypes.object,
     }),
   }).isRequired
 }

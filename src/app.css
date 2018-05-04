@@ -68,7 +68,15 @@ div#hashForm input.loading {
 
 
 div.board {
-  background: #fafafa;
+  position: absolute;
+  background-image: url(grid.svg);
+}
+
+div.board::after {
+  position: fixed;
+  top: 40px;
+  right: 5px;
+  content: url(pushpinIcon_Standalone.svg)
 }
 
 div.card {
@@ -76,11 +84,12 @@ div.card {
 }
 
 div.card.unselected {
-  border: 1px solid grey;
+  border-top: 8px solid black;
 }
 
 div.card.selected {
   border: 1px solid black;
+  border-top: 8px solid black;
 }
 
 div.card span.cardResizeHandle {

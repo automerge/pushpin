@@ -14,11 +14,11 @@ import * as Hyperfile from './hyperfile'
 
 export const BOARD_WIDTH = 3600
 export const BOARD_HEIGHT = 1800
-export const GRID_SIZE = 5
+export const GRID_SIZE = 24
 export const CARD_DEFAULT_WIDTH = 300
 export const CARD_DEFAULT_HEIGHT = 100
 export const CARD_MIN_WIDTH = 100
-export const CARD_MIN_HEIGHT = 60
+export const CARD_MIN_HEIGHT = 50
 export const RESIZE_HANDLE_SIZE = 21
 
 const USER = process.env.NAME || 'userA'
@@ -29,7 +29,7 @@ const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
 const WELCOME_TEXT =
 `## Welcome
 
-This is our board demo!`
+This is our demo board!`
 
 const USAGE_TEXT =
 `### Usage

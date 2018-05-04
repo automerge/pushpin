@@ -47,6 +47,11 @@ class Board extends React.PureComponent {
     window.scrollTo((this.boardRef.clientWidth / 2) - (window.innerWidth / 2), 0)
   }
 
+  componentWillUnmount() {
+    log('componentWillUnmount')
+    document.removeEventListener('keydown', this.onKeyDown)
+  }
+
   onKeyDown(e) {
     if (e.key === 'Backspace') {
       Loop.dispatch(Model.boardBackspaced)
@@ -123,8 +128,8 @@ class Board extends React.PureComponent {
 }
 
 Board.propTypes = {
-  selected: PropTypes.bool.isRequired,
-  cards: PropTypes.objectOf(Card).isRequired,
+  selected: PropTypes.string,
+  cards: PropTypes.object.isRequired,
 }
 
 export default Board
