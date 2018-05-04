@@ -6,6 +6,7 @@ import Hypermerge from 'hypermerge'
 import RAM from 'random-access-memory'
 import Debug from 'debug'
 import mkdirp from 'mkdirp'
+import { EventEmitter } from 'events'
 
 import Loop from './loop'
 import * as Hyperfile from './hyperfile'
@@ -55,6 +56,10 @@ const log = Debug('pushpin:model')
 mkdirp.sync(HYPERFILE_DATA_PATH)
 mkdirp.sync(HYPERFILE_CACHE_PATH)
 
+// It's normal for a document with a lot of participants to have a lot of
+// connections, so increase the limit to avoid spurious warnings about
+// emitter leaks.
+EventEmitter.prototype._maxListeners = 50
 
 // ## Pure helper functions.
 
