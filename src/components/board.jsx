@@ -96,7 +96,7 @@ class Board extends React.PureComponent {
             throw new Error('Expected exactly one path?')
           }
           const path = paths[0]
-          Model.processImage(path, x, y)
+          Loop.dispatch(Model.processImage, { path, x, y })
         })
       } }))
     menu.popup({ window: remote.getCurrentWindow() })
