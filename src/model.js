@@ -124,14 +124,21 @@ function copyFile(source, destination, callback) {
 }
 
 export function fetchImage({ imageId, imageExt, key }, callback) {
-  Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blobPath) => {
+  Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blob) => {
     if (error) {
       callback(error)
       return
     }
 
     const imagePath = Path.join(HYPERFILE_CACHE_PATH, imageId + imageExt)
-    copyFile(blobPath, imagePath, error => callback(error, imagePath))
+    Fs.writeFile(imagePath, blob, (error) => {
+      if (error) {
+        callback(error)
+        return
+      }
+
+      callback(null, imagePath)
+    })
   })
 }
 
