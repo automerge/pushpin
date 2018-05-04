@@ -15,10 +15,10 @@ import * as Hyperfile from './hyperfile'
 export const BOARD_WIDTH = 3600
 export const BOARD_HEIGHT = 1800
 export const GRID_SIZE = 24
-export const CARD_DEFAULT_WIDTH = 300
-export const CARD_DEFAULT_HEIGHT = 100
-export const CARD_MIN_WIDTH = 100
-export const CARD_MIN_HEIGHT = 50
+export const CARD_DEFAULT_WIDTH = 336
+export const CARD_DEFAULT_HEIGHT = 96
+export const CARD_MIN_WIDTH = 96
+export const CARD_MIN_HEIGHT = 48
 export const RESIZE_HANDLE_SIZE = 21
 
 const USER = process.env.NAME || 'userA'
