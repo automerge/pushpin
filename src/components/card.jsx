@@ -283,7 +283,7 @@ Card.propTypes = {
     type: PropTypes.string,
     id: PropTypes.string,
     text: PropTypes.string,
-    hyperfile: PropTypes.string,
+    hyperfile: PropTypes.object,
     x: PropTypes.number,
     y: PropTypes.number,
     height: PropTypes.number,
