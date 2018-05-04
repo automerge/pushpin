@@ -232,8 +232,9 @@ class Card extends React.PureComponent {
       width: this.state.resizeWidth || card.width,
       height: this.state.resizeHeight || card.height,
       position: 'absolute',
-      left: this.state.moveX || card.x,
-      top: this.state.moveY || card.y,
+      // move{X,Y} may be 0 which is falsy in JS, so can't use || here.
+      left: this.state.moveX !== null ? this.state.moveX : card.x,
+      top: this.state.moveY !== null ? this.state.moveY : card.y,
     }
 
     return (
