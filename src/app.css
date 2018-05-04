@@ -71,7 +71,15 @@ div.board {
   position: absolute;
   background: #020f44;
   background-image: url(grid.svg);
-  transform: perspective(300px) rotateX(7deg) translateY(-250px);
+  transform: perspective(300px) rotateX(6deg) translateY(-40px);
+}
+
+#container::after {
+  z-index: -100;
+  position: fixed;
+  left: 40%;
+  top: 5%;
+  content: url(sun.svg)
 }
 
 body {
@@ -79,15 +87,15 @@ body {
   background-attachment: fixed;
 }
 
-div.board::after {
+/*div.board::after {
   position: fixed;
   top: 40px;
   right: 5px;
   content: url(pushpinIcon_Standalone.svg)
-}
+}*/
 
 div.card {
-  background: #ffffff;
+  background: #000;
 }
 
 div.card.unselected {
@@ -125,11 +133,24 @@ div.card img.image {
   user-select: none;
 }
 
-div.card.text {
+div.card h2 {
+  font-family: 'Impact', sans-serif;
+  color: #e714cd;
+}
+
+div.card h3 {
+  font-family: 'Impact', sans-serif;
+  color: #e714cd;
+}
+
+div.card {
   cursor: text;
-  color: #444;
-  font-family: 'Georgia', serif;
-  font-size: 14px;
+  color: #e714cd;
+  font-family: 'Futura', sans-serif;
+}
+
+div.card.text {
+  font-size: 18px;
   line-height: 1.5em;
 }
 
