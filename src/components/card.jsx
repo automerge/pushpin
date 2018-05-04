@@ -66,10 +66,6 @@ class Card extends React.PureComponent {
     }
   }
 
-  componentWillReceiveProps(props) {
-    log('componentWillReceiveProps')
-  }
-
   // Copy view-relevant move/resize state over to React.
   setDragState() {
     if (this.tracking.moving) {
