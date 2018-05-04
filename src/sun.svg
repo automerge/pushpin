@@ -1,0 +1,34 @@
+<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="smallGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#33EDBB" stroke-width="1"/>
+    </pattern>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="url(#smallGrid)"/>
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#33EDBB" stroke-width="6"/>
+    </pattern>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.17" result="blurred"></feGaussianBlur>
+    </filter>
+
+    <filter id="roughpaper" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
+    </filter>
+
+    <filter id="crinkled-neon" x="0%" y="0%" width="100%" height="100%">
+      <feDisplacementMap in2="SourceGraphic" in="roughpaper"
+        scale="30" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+
+    <pattern id="pattern-stripe" 
+      width="15" height="15" 
+      patternUnits="userSpaceOnUse">
+      <rect width="100" height="8.5" transform="translate(0,2)" fill="white"></rect>
+    </pattern>
+    <mask id="stripes">
+      <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-stripe)" />
+    </mask>
+  </defs>
+
+  <circle cx="50%" cy="50%" r="30%" fill="#FD06D2" mask="url(#stripes)"/>
+</svg>
