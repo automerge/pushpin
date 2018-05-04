@@ -41,8 +41,7 @@ const USAGE_TEXT =
 * Click and drag anywhere on a card to move it around.
 * Click and drag on the bottom right corner of a card to resize it.
 * Paste an absolute file name to an image as the only text in a card + hit enter, to load that file.
-* Use arrow keys to scroll around the board.
-* Press space + move the mouse to scroll around the board.`
+* Use arrow keys to scroll around the board.`
 
 const EXAMPLE_TEXT =
 `### Example data
