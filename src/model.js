@@ -175,9 +175,7 @@ export function init(state) {
     })
 
     if(state.requestedDocId === '') {
-      const doc = hm.create()
-      const docId = hm.getId(doc)
-      Loop.dispatch(newDocument, { doc, docId })
+      Loop.dispatch(newDocument)
     }
   })
 
@@ -397,7 +395,10 @@ export function boardBackspaced(state) {
   return state
 }
 
-export function newDocument(state, { docId, doc }) {
+export function newDocument(state) {
+  const doc = state.hm.create()
+  const docId = state.hm.getId(doc)
+
   Loop.dispatch(addRecentDoc, { docId })
 
   return populateDemoBoard(Object.assign({}, state, {
