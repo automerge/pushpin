@@ -27,6 +27,7 @@ class App extends React.PureComponent {
         <Board
           cards={this.props.state.board.cards}
           selected={this.props.state.selected}
+          backgroundColor={this.props.state.board.backgroundColor}
         />
       </div>
     )
@@ -39,9 +40,7 @@ App.propTypes = {
     activeDocId: PropTypes.string,
     requestedDocId: PropTypes.string,
     selected: PropTypes.string,
-    board: PropTypes.shape({
-      cards: PropTypes.object,
-    }),
+    board: PropTypes.instanceOf(Board),
   }).isRequired
 }
 
