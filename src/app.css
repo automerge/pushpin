@@ -90,7 +90,7 @@ div.card.text {
 }
 
 div.card.text.selected {
-  outline-top: 4px solid black;
+  outline: 4px solid black;
 }
 
 div.card.selected {
