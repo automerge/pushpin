@@ -43,6 +43,8 @@ table {
 	border-spacing: 0;
 }
 
+/* This imports the whole typeface, which is a TON of things */
+@import '../node_modules/@ibm/plex/css/ibm-plex.css'
 
 /* App Styles */
 
@@ -59,7 +61,7 @@ div#hashForm input {
   text-align: center;
   color: #444;
   font-size: 14px;
-  font-family: 'Courier New', monospace;
+  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
 }
 
 div#hashForm input.loading {
@@ -83,13 +85,16 @@ div.card {
   background: #ffffff;
 }
 
-div.card.unselected {
-  border-top: 8px solid black;
+div.card.text {
+  border-top: 4px solid black;
+}
+
+div.card.text.selected {
+  outline-top: 4px solid black;
 }
 
 div.card.selected {
-  border: 1px solid black;
-  border-top: 8px solid black;
+  outline: solid 2px #102542;
 }
 
 div.card span.cardResizeHandle {
@@ -118,12 +123,21 @@ div.card img.image {
   user-select: none;
 }
 
+div.card.image {
+  padding: 4px;
+}
+
 div.card.text {
   cursor: text;
-  color: #444;
-  font-family: 'Georgia', serif;
-  font-size: 14px;
-  line-height: 1.5em;
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.54;
+  letter-spacing: normal;
+  text-align: left;
+  color: #000000;
 }
 
 div.card.text div.editorWrapper {
@@ -167,9 +181,9 @@ div.renderer a:hover, a:active {
 }
 
 div.renderer h1, h2, h3, h4, h5, h6 {
-  font-weight: normal;
-  color: #111;
-  line-height: 1em;
+  font-weight: bold;
+  line-height: 1.25;
+  color: #102542;
 }
 
 div.renderer h4, h5, h6 {
