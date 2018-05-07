@@ -25,11 +25,13 @@ export const CARD_MIN_WIDTH = 96
 export const CARD_MIN_HEIGHT = 48
 export const RESIZE_HANDLE_SIZE = 21
 
+const RECENT_DOCS_MAX = 5
+
 const USER = process.env.NAME || 'userA'
 const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
-
+const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 
 // ## Demo data
 
@@ -147,18 +149,48 @@ export const empty = {
 
 // Starts IO subsystems and populates associated state.
 export function init(state) {
-  const hm = new Hypermerge({ path: RAM, port: 0 })
+  const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
   hm.once('ready', () => {
     hm.joinSwarm()
+
     hm.on('document:ready', (docId, doc) => {
       Loop.dispatch(documentReady, { docId, doc })
     })
+
     hm.on('document:updated', (docId, doc) => {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
+
     hm.create()
   })
   return Object.assign({}, state, { hm })
+}
+
+function addRecentDoc(state, { docId }) {
+  let recentDocs = getRecentDocs()
+  const recentDocIndex = recentDocs.findIndex(d => d === docId)
+
+  if(Number.isInteger(recentDocIndex))
+    recentDocs = [ docId, ...recentDocs.slice(0, recentDocIndex), ...recentDocs.slice(recentDocIndex + 1) ]
+  else {
+    recentDocs = [ docId, ...recentDocs ]
+    recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
+  }
+
+  Fs.writeFileSync(recentDocsPath(), JSON.stringify(recentDocs))
+
+  return state
+}
+
+function recentDocsPath() {
+  return Path.join(USER_PATH, "recent-docs.json")
+}
+
+export function getRecentDocs() {
+  if(Fs.existsSync(recentDocsPath()))
+    return JSON.parse(Fs.readFileSync(recentDocsPath()))
+  else
+    return []
 }
 
 // Process the image at the given path, upgrading the card at id to an image
@@ -332,21 +364,26 @@ export function boardBackspaced(state) {
 
 export function documentReady(state, { docId, doc }) {
   // Case where app is loaded default empty doc.
-  if (state.requestedDocId === '') {
-    const newState = Object.assign({}, state, {
+  if (state.requestedDocId === '' || !state.hm.has(state.requestedDocId)) {
+    Loop.dispatch(addRecentDoc, { docId })
+
+    return populateDemoBoard(Object.assign({}, state, {
       activeDocId: docId,
       formDocId: docId,
       requestedDocId: docId,
       board: doc,
-    })
-    return populateDemoBoard(newState)
+    }))
   // Case where an existing doc was opened and is still requested.
   } else if (state.requestedDocId === docId) {
+    Loop.dispatch(addRecentDoc, { docId })
+
     return Object.assign({}, state, {
       activeDocId: docId,
-      board: doc,
+      formDocId: docId,
+      board: doc
     })
   }
+
   // Case where an existing doc was opened but is no longer requested.
   return state
 }
