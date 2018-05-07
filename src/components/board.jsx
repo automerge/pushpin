@@ -19,6 +19,17 @@ const withinCard = (card, x, y) => (x >= card.x) &&
 const withinAnyCard = (cards, x, y) =>
   Object.values(cards).some((card) => withinCard(card, x, y))
 
+const BOARD_COLORS = {
+  SNOW: '#f9f9f9',
+  BEIGE: '#cbc5b5',
+  SKY: '#dcf3f6',
+  VIOLET: '#e5dcf6',
+  PINK: '#ffe1e7',
+  HERB: '#daefd2',
+  PEACH: '#ffd2cc',
+  CLOUD: '#d5dfe5'
+}
+
 const boardStyle = {
   width: Model.BOARD_WIDTH,
   height: Model.BOARD_HEIGHT
@@ -101,12 +112,15 @@ class Board extends React.PureComponent {
     const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
       <Card key={id} card={card} selected={this.props.selected === id} />)
 
+    const coloredBoardStyle = boardStyle
+    coloredBoardStyle.backgroundColor = this.props.backgroundColor
+
     return (
       <div
         id="board"
         className="board"
         ref={(e) => { this.boardRef = e }}
-        style={boardStyle}
+        style={coloredBoardStyle}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onContextMenu={this.onContextMenu}
@@ -118,7 +132,12 @@ class Board extends React.PureComponent {
   }
 }
 
+Board.defaultProps = {
+  backgroundColor: BOARD_COLORS.SNOW
+}
+
 Board.propTypes = {
+  backgroundColor: PropTypes.string,
   selected: PropTypes.string,
   cards: PropTypes.shape(PropTypes.objectOf(Card.propTypes)).isRequired,
 }
