@@ -18,6 +18,7 @@
     "react/sort-comp": "off",
     "arrow-parens": "off",
     "no-use-before-define": "off",
-    "no-shadow": "off"
+    "no-shadow": "off",
+    "react/no-did-mount-set-state": "off"
   }
 }
