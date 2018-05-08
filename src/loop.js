@@ -19,7 +19,10 @@ const init = (state, view, render) => {
 const dispatch = (fn, args) => {
   // Avoid running dispatches within each other.
   if (loopSingleton.current) {
-    process.nextTick(() => { dispatch(fn, args) })
+    setTimeout(() => {
+      log('redispatch', fn.name)
+      dispatch(fn, args)
+    }, 0)
     return
   }
 
@@ -35,6 +38,7 @@ const dispatch = (fn, args) => {
   }
 
   loopSingleton.current = fn.name
+  const start = Date.now()
   log('dispatch', fn.name, args)
   const newState = fn(loopSingleton.state, args)
 
@@ -44,6 +48,7 @@ const dispatch = (fn, args) => {
 
   loopSingleton.state = newState
   display(loopSingleton)
+  log('done', fn.name, `${Date.now() - start}ms`)
   loopSingleton.current = null
 }
 
