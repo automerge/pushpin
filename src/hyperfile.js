@@ -51,13 +51,13 @@ export function write(dataPath, imgId, imgPath, callback) {
   core.on('error', callback)
   core.on('ready', () => {
     Fs.readFile(imgPath, (error, image) => {
-      if(error) {
+      if (error) {
         callback(error)
         return
       }
 
       core.append(image, (error) => {
-        if(error) {
+        if (error) {
           callback(error)
           return
         }
