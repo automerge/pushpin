@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Loop from '../loop'
 import * as Model from '../model'
 import HashForm from './hash-form'
+import ColorPicker from './color-picker'
 
 const log = Debug('pushpin:title-bar')
 
@@ -23,9 +25,9 @@ class TitleBar extends React.PureComponent {
     Loop.dispatch(Model.setTitle, newState)
   }
 
-  onChangeBoardBackgroundColor({ boardBackgroundColor }) {
+  onChangeBoardBackgroundColor(color) {
     log('onChangeBoardBackgroundColor')
-    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: boardBackgroundColor })
+    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: color.hex })
   }
 
   onSubmit(e) {
@@ -54,17 +56,21 @@ class TitleBar extends React.PureComponent {
           classInvalid="TitleBar__titleText--invalid"
         />
 
-        <div className="TitleBar__dropDown">
-          &#xf180;
-        </div>
-
-        <RIEInput
-          value={this.props.boardBackgroundColor}
-          change={this.onChangeBoardBackgroundColor}
-          propName="boardBackgroundColor"
-          classLoading="loading"
-          classInvalid="invalid"
-        />
+        <Dropdown>
+          <DropdownTrigger>
+            <div className="TitleBar__dropDown">
+              &#xf180;
+            </div>
+          </DropdownTrigger>
+          <DropdownContent>
+            <ColorPicker
+              color={this.props.boardBackgroundColor}
+              colors={Object.values(Model.BOARD_COLORS)}
+              triangle="hide"
+              onChangeComplete={this.onChangeBoardBackgroundColor}
+            />
+          </DropdownContent>
+        </Dropdown>
 
         <HashForm
           formDocId={this.props.formDocId}
