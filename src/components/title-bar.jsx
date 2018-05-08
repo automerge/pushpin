@@ -8,7 +8,7 @@ import * as Model from '../model'
 import HashForm from './hash-form'
 
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
-import { TwitterPicker } from 'react-color';
+import { TwitterPicker } from 'react-color'
 
 const log = Debug('pushpin:title-bar')
 
@@ -66,6 +66,8 @@ class TitleBar extends React.PureComponent {
           <DropdownContent>
             <TwitterPicker
               color={this.props.boardBackgroundColor}
+              colors={Object.values(Model.BOARD_COLORS)}
+              triangle="hide"
               onChangeComplete={this.onChangeBoardBackgroundColor}
             />
           </DropdownContent>
