@@ -11,7 +11,15 @@ import ColorPicker from './color-picker'
 
 const log = Debug('pushpin:title-bar')
 
-class TitleBar extends React.PureComponent {
+export default class TitleBar extends React.PureComponent {
+  static propTypes = {
+    formDocId: PropTypes.string.isRequired,
+    activeDocId: PropTypes.string.isRequired,
+    requestedDocId: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    boardBackgroundColor: PropTypes.string.isRequired
+  }
+
   constructor(props) {
     super(props)
     log('constructor')
@@ -80,13 +88,3 @@ class TitleBar extends React.PureComponent {
     )
   }
 }
-
-TitleBar.propTypes = {
-  formDocId: PropTypes.string.isRequired,
-  activeDocId: PropTypes.string.isRequired,
-  requestedDocId: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  boardBackgroundColor: PropTypes.string.isRequired
-}
-
-export default TitleBar

@@ -8,7 +8,13 @@ import * as Model from '../model'
 
 const log = Debug('pushpin:hash-form')
 
-class HashForm extends React.PureComponent {
+export default class HashForm extends React.PureComponent {
+  static propTypes = {
+    formDocId: PropTypes.string.isRequired,
+    activeDocId: PropTypes.string.isRequired,
+    requestedDocId: PropTypes.string.isRequired,
+  }
+
   constructor(props) {
     super(props)
     log('constructor')
@@ -45,11 +51,3 @@ class HashForm extends React.PureComponent {
     )
   }
 }
-
-HashForm.propTypes = {
-  formDocId: PropTypes.string.isRequired,
-  activeDocId: PropTypes.string.isRequired,
-  requestedDocId: PropTypes.string.isRequired,
-}
-
-export default HashForm

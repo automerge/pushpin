@@ -24,7 +24,18 @@ const boardStyle = {
   height: Model.BOARD_HEIGHT
 }
 
-class Board extends React.PureComponent {
+export default class Board extends React.PureComponent {
+  static defaultProps = {
+    backgroundColor: '',
+    selected: null
+  }
+
+  static propTypes = {
+    backgroundColor: PropTypes.string,
+    selected: PropTypes.string,
+    cards: PropTypes.shape(PropTypes.objectOf(Card.propTypes)).isRequired,
+  }
+
   constructor(props) {
     super(props)
     log('constructor')
@@ -117,16 +128,3 @@ class Board extends React.PureComponent {
     )
   }
 }
-
-Board.defaultProps = {
-  backgroundColor: '',
-  selected: null
-}
-
-Board.propTypes = {
-  backgroundColor: PropTypes.string,
-  selected: PropTypes.string,
-  cards: PropTypes.shape(PropTypes.objectOf(Card.propTypes)).isRequired,
-}
-
-export default Board
