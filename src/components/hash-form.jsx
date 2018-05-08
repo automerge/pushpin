@@ -32,7 +32,7 @@ class HashForm extends React.PureComponent {
     log('render')
 
     return (
-      <div id="hashForm">
+      <div className="HashForm">
         <form onSubmit={this.onSubmit}>
           <input
             type="text"

@@ -94,7 +94,7 @@ body {
   color: #000000;
 }
 
-div#hashForm {
+.HashForm {
   align-self: right;
   background: blue;
   text-align: center;
@@ -103,7 +103,7 @@ div#hashForm {
   width: 43em;
 }
 
-div#hashForm input {
+.HashForm input {
   background: #ffffff;
   width: 100%;
   height: 28px;
@@ -113,7 +113,7 @@ div#hashForm input {
   font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
 }
 
-div#hashForm input.loading {
+.HashForm input.loading {
   background-color: #fff2cc;
 }
 
