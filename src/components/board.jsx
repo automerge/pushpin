@@ -129,7 +129,6 @@ Board.defaultProps = {
 }
 
 Board.propTypes = {
-  title: PropTypes.string,
   backgroundColor: PropTypes.string,
   selected: PropTypes.string,
   cards: PropTypes.shape(PropTypes.objectOf(Card.propTypes)).isRequired,
