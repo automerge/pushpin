@@ -58,8 +58,6 @@ We've made some initial cards for you to play with. Have fun!`
 const KAY_PATH = './img/kay.jpg'
 const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
-
-
 // ## Imperative top-levels.
 
 mkdirp.sync(HYPERFILE_DATA_PATH)
@@ -68,7 +66,7 @@ mkdirp.sync(HYPERFILE_CACHE_PATH)
 // It's normal for a document with a lot of participants to have a lot of
 // connections, so increase the limit to avoid spurious warnings about
 // emitter leaks.
-EventEmitter.prototype._maxListeners = 50
+EventEmitter.defaultMaxListeners = 50
 
 // ## Pure helper functions.
 
@@ -313,7 +311,7 @@ export function clearSelections(state) {
   return Object.assign({}, state, { selected: null })
 }
 
-export function cardDeleted(state, { id }) {
+export function cardDelete(state, { id }) {
   const newBoard = state.hm.change(state.board, (b) => {
     delete b.cards[id]
   })
@@ -321,12 +319,12 @@ export function cardDeleted(state, { id }) {
 }
 
 export function boardBackspaced(state) {
-  for (const id in state.board.cards) {
-    const card = state.board.cards[id]
-    if ((id === state.selected) && (card.type !== 'text')) {
-      return cardDeleted(state, { id: card.id })
-    }
-  }
+  const deleteCardIDs = Object.entries(state.board.cards)
+    .filter(([id, card]) => (id === state.selected) && (card.type !== 'text'))
+    .map(([id, card]) => id)
+
+  state = deleteCardIDs.reduce((state, id) => (cardDelete(state, { id })), state)
+
   return state
 }
 
