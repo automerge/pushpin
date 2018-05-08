@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 
 import { BOARD_WIDTH, BOARD_HEIGHT } from './model'
@@ -18,6 +18,59 @@ const createWindow = async () => {
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
+
+  // Menubar template
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'New', accelerator: 'CmdOrCtrl+N', click: (item, focusedWindow) => {
+            focusedWindow.webContents.send("newDocument")
+          }
+        }
+      ]
+    },
+    {
+      label: "Edit",
+      submenu: [
+          { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+          { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+          { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+          { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+      ]
+    },
+    {
+      label: "Develop",
+      submenu: [
+        {
+          label: "Refresh", accelerator: 'CmdOrCtrl+R', click: (item, focusedWindow) => {
+            focusedWindow.webContents.reload()
+          }
+        },
+        {
+          label: "Open Inspector", accelerator: 'CmdOrCtrl+Option+I', click: (item, focusedWindow) => {
+            focusedWindow.webContents.toggleDevTools()
+          }
+        }
+      ]
+    }
+  ]
+
+  // macOS requires first menu item be name of the app
+  if (process.platform === 'darwin') {
+    template.unshift({
+      label: app.getName(),
+      submenu: [
+        {role: 'about'},
+        {role: 'quit'}
+      ]
+    })
+  }
+
+  // Create the menubar
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 
   // Open the DevTools if in dev mode.
   const isDevMode = process.execPath.match(/[\\/]electron/)

@@ -36,11 +36,12 @@ export const BOARD_COLORS = {
   CLOUD: '#d5dfe5'
 }
 
+const RECENT_DOCS_MAX = 5
 const USER = process.env.NAME || 'userA'
 const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
-
+const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 
 // ## Demo data
 
@@ -161,19 +162,54 @@ export const empty = {
 
 // Starts IO subsystems and populates associated state.
 export function init(state) {
-  const hm = new Hypermerge({ path: RAM, port: 0 })
+  const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
+  const recentDocs = getRecentDocs()
+  const requestedDocId = recentDocs.length > 0 ? recentDocs[0] : state.requestedDocId
+
   hm.once('ready', () => {
     hm.joinSwarm()
+
     hm.on('document:ready', (docId, doc) => {
       Loop.dispatch(documentReady, { docId, doc })
     })
+
     hm.on('document:updated', (docId, doc) => {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
-    hm.create()
+
+    if(requestedDocId === '') {
+      Loop.dispatch(newDocument)
+    }
   })
 
-  return { ...state, hm }
+  return { ...state, hm, requestedDocId }
+}
+
+function addRecentDoc(state, { docId }) {
+  let recentDocs = getRecentDocs()
+  const recentDocIndex = recentDocs.findIndex(d => d === docId)
+
+  if(Number.isInteger(recentDocIndex))
+    recentDocs = [ docId, ...recentDocs.slice(0, recentDocIndex), ...recentDocs.slice(recentDocIndex + 1) ]
+  else {
+    recentDocs = [ docId, ...recentDocs ]
+    recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
+  }
+
+  Fs.writeFileSync(recentDocsPath(), JSON.stringify(recentDocs))
+
+  return state
+}
+
+function recentDocsPath() {
+  return Path.join(USER_PATH, "recent-docs.json")
+}
+
+export function getRecentDocs() {
+  if(Fs.existsSync(recentDocsPath()))
+    return JSON.parse(Fs.readFileSync(recentDocsPath()))
+  else
+    return []
 }
 
 // Process the image at the given path, upgrading the card at id to an image
@@ -362,23 +398,31 @@ export function boardBackspaced(state) {
   return state
 }
 
+export function newDocument(state) {
+  const doc = state.hm.create()
+  const docId = state.hm.getId(doc)
+
+  Loop.dispatch(addRecentDoc, { docId })
+
+  return populateDemoBoard(Object.assign({}, state, {
+    activeDocId: docId,
+    formDocId: docId,
+    requestedDocId: docId,
+    board: doc,
+  }))
+}
+
 export function documentReady(state, { docId, doc }) {
-  // Case where app is loaded default empty doc.
-  if (state.requestedDocId === '') {
-    const newState = Object.assign({}, state, {
-      activeDocId: docId,
-      formDocId: docId,
-      requestedDocId: docId,
-      board: doc,
-    })
-    return populateDemoBoard(newState)
-  // Case where an existing doc was opened and is still requested.
-  } else if (state.requestedDocId === docId) {
+  if (state.requestedDocId === docId) {
+    Loop.dispatch(addRecentDoc, { docId })
+
     return Object.assign({}, state, {
       activeDocId: docId,
-      board: doc,
+      formDocId: docId,
+      board: doc
     })
   }
+
   // Case where an existing doc was opened but is no longer requested.
   return state
 }
@@ -395,6 +439,17 @@ export function formChanged(state, { docId }) {
 }
 
 export function formSubmitted(state) {
-  state.hm.open(state.formDocId)
+  // If we've already opened the hypermerge doc,
+  // it will not fire a 'document:ready' event if we open it again
+  // so we need to find the doc and manually trigger the action
+  if(state.hm.has(state.formDocId)) {
+    const doc = state.hm.find(state.formDocId)
+    const docId = state.formDocId
+
+    Loop.dispatch(documentReady, { doc, docId })
+  } else {
+    state.hm.open(state.formDocId)
+  }
+
   return Object.assign({}, state, { requestedDocId: state.formDocId })
 }
