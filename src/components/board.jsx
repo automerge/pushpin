@@ -103,7 +103,8 @@ class Board extends React.PureComponent {
 
     const coloredBoardStyle = Object.assign(
       {}, boardStyle,
-      { backgroundColor: this.props.backgroundColor })
+      { backgroundColor: this.props.backgroundColor }
+    )
 
     return (
       <div

@@ -56,8 +56,7 @@ const ColorPicker = ({ onChange, onSwatchHover, hex, colors, width }) => {
             focusStyle={{
               boxShadow: `0 0 4px ${c}`,
             }}
-          />)
-          )
+          />))
         }
         <div style={styles.clear} />
       </div>

@@ -102,7 +102,7 @@ export default class Card extends React.PureComponent {
 
     const clickX = d.lastX
     const clickY = d.lastY
-    const card = this.props.card
+    const { card } = this.props
 
     this.tracking.resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
                               (clickX <= (card.x + card.width)) &&
@@ -139,15 +139,14 @@ export default class Card extends React.PureComponent {
       throw new Error('Did not expect drag with both resize and move')
     }
 
-    const deltaX = d.deltaX
-    const deltaY = d.deltaY
+    const { deltaX, deltaY } = d
     if ((deltaX === 0) && (deltaY === 0)) {
       return
     }
 
     this.tracking.totalDrag = this.tracking.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
 
-    const card = this.props.card
+    const { card } = this.props
 
     if (this.tracking.moving) {
       // First guess at change in location given mouse movements.
@@ -218,7 +217,7 @@ export default class Card extends React.PureComponent {
 
     this.effectDrag(d)
 
-    const card = this.props.card
+    const { card } = this.props
 
     const minDragSelection = this.tracking.totalDrag < Model.GRID_SIZE / 2
     if (!this.props.selected && minDragSelection) {
@@ -267,7 +266,7 @@ export default class Card extends React.PureComponent {
   render() {
     log('render')
 
-    const card = this.props.card
+    const { card } = this.props
     const style = {
       width: this.state.resizeWidth || card.width,
       height: this.state.resizeHeight || card.height,

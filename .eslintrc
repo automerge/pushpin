@@ -21,6 +21,7 @@
     "no-use-before-define": "off",
     "no-shadow": "off",
     "react/no-did-mount-set-state": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "object-curly-newline": "off"
   }
 }
