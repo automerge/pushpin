@@ -25,6 +25,17 @@ export const CARD_MIN_WIDTH = 96
 export const CARD_MIN_HEIGHT = 48
 export const RESIZE_HANDLE_SIZE = 21
 
+export const BOARD_COLORS = {
+  SNOW: '#f9f9f9',
+  BEIGE: '#cbc5b5',
+  SKY: '#dcf3f6',
+  VIOLET: '#e5dcf6',
+  PINK: '#ffe1e7',
+  HERB: '#daefd2',
+  PEACH: '#ffd2cc',
+  CLOUD: '#d5dfe5'
+}
+
 const USER = process.env.NAME || 'userA'
 const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
@@ -137,6 +148,11 @@ export const empty = {
   activeDocId: '',
   requestedDocId: '',
   selected: null,
+  board: {
+    cards: {},
+    backgroundColor: '',
+    title: '',
+  },
   hm: null
 }
 
@@ -200,11 +216,17 @@ export function processImage(state, { path, x, y }) {
 }
 
 export function setTitle(state, { title }) {
-  state.hm.change(state.board, (b) => {
+  const newBoard = state.hm.change(state.board, (b) => {
     b.title = title
   })
+  return Object.assign({}, state, { board: newBoard })
+}
 
-  return state
+export function setBackgroundColor(state, { backgroundColor }) {
+  const newBoard = state.hm.change(state.board, (b) => {
+    b.backgroundColor = backgroundColor
+  })
+  return Object.assign({}, state, { board: newBoard })
 }
 
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
@@ -248,6 +270,7 @@ function populateDemoBoard(state) {
   newState = cardCreatedText(newState, { x: 1350, y: 750, text: EXAMPLE_TEXT })
 
   newState = setTitle(newState, { title: 'Example Board' })
+  newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
 
   // These will be handled async as they require their own IO.
   Loop.dispatch(processImage, { x: 1750, y: 500, path: KAY_PATH })

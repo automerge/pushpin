@@ -44,20 +44,70 @@ table {
 }
 
 /* This imports the whole typeface, which is a TON of things */
-@import '../node_modules/@ibm/plex/css/ibm-plex.css'
+@import '../node_modules/@ibm/plex/css/ibm-plex.css';
+@import '../node_modules/line-awesome/css/line-awesome.min.css';
 
 /* App Styles */
-
-div.TitleBar {
-  position: fixed;
-  top: 0px;
-  height: 24px;
+body {
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.54;
+  letter-spacing: normal;
 }
 
+.TitleBar {
+  position: fixed;
+  top: 0px;
+  height: 44px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+}
+
+.TitleBar__logo {
+  margin-left: 16px;
+  margin-right: 11px;
+}
+
+.TitleBar__titleText {
+  width: 20%;
+}
+
+.TitleBar__dropDown {
+  width: 16px;
+  height: 17px;
+  opacity: 0.75;
+  font-family: LineAwesome;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #000000;
+}
+
+/*
+.TitleBar__titleText::before {
+  margin-left: 16px;
+  margin-right: 16px;
+  height: 28px;
+  width: 28px;
+  content: url(pushpinIcon_Standalone.svg)
+}
+*/
+
 div#hashForm {
+  align-self: right;
   background: blue;
   text-align: center;
-  width: 3600px;
+  width: 20%;
 }
 
 div#hashForm input {
@@ -77,13 +127,6 @@ div#hashForm input.loading {
 div.board {
   position: absolute;
   background-image: url(grid.svg);
-}
-
-div.board::after {
-  position: fixed;
-  top: 40px;
-  right: 5px;
-  content: url(pushpinIcon_Standalone.svg)
 }
 
 div.card {
@@ -134,13 +177,6 @@ div.card.image {
 
 div.card.text {
   cursor: text;
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 13px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 1.54;
-  letter-spacing: normal;
   text-align: left;
   color: #000000;
 }

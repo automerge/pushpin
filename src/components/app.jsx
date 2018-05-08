@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import TitleBar from './title-bar'
-import HashForm from './hash-form'
 import Board from './board'
 
 const log = Debug('pushpin:app')
@@ -20,19 +19,17 @@ class App extends React.PureComponent {
     // Otherwise render the board.
     return (
       <div>
-        <HashForm
-          formDocId={this.props.state.formDocId}
-          activeDocId={this.props.state.activeDocId}
-          requestedDocId={this.props.state.requestedDocId}
-        />
-        <TitleBar
-          title={this.props.state.title}
-          boardBackgroundColor={this.props.state.board.backgroundColor}
-        />
         <Board
           cards={this.props.state.board.cards}
           selected={this.props.state.selected}
           backgroundColor={this.props.state.board.backgroundColor}
+        />
+        <TitleBar
+          title={this.props.state.board.title}
+          boardBackgroundColor={this.props.state.board.backgroundColor}
+          formDocId={this.props.state.formDocId}
+          activeDocId={this.props.state.activeDocId}
+          requestedDocId={this.props.state.requestedDocId}
         />
       </div>
     )
@@ -45,8 +42,7 @@ App.propTypes = {
     activeDocId: PropTypes.string,
     requestedDocId: PropTypes.string,
     selected: PropTypes.string,
-    title: PropTypes.string,
-    board: PropTypes.instanceOf(Board),
+    board: PropTypes.shape(Board.propTypes).isRequired,
   }).isRequired
 }
 
