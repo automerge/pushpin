@@ -2,13 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Loop from '../loop'
 import * as Model from '../model'
 import HashForm from './hash-form'
-
-import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
-import { TwitterPicker } from 'react-color'
+import ColorPicker from './color-picker'
 
 const log = Debug('pushpin:title-bar')
 
@@ -64,7 +63,7 @@ class TitleBar extends React.PureComponent {
             </div>
           </DropdownTrigger>
           <DropdownContent>
-            <TwitterPicker
+            <ColorPicker
               color={this.props.boardBackgroundColor}
               colors={Object.values(Model.BOARD_COLORS)}
               triangle="hide"
