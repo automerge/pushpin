@@ -78,7 +78,7 @@ body {
   width: 16px;
   height: 17px;
   opacity: 0.75;
-  font-family: LineAwesome;
+  font-family: 'LineAwesome';
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -89,21 +89,13 @@ body {
   color: #000000;
 }
 
-/*
-.TitleBar__titleText::before {
-  margin-left: 16px;
-  margin-right: 16px;
-  height: 28px;
-  width: 28px;
-  content: url(pushpinIcon_Standalone.svg)
-}
-*/
-
 div#hashForm {
   align-self: right;
   background: blue;
   text-align: center;
-  width: 20%;
+  margin-left: auto;
+  margin-right: 8px;
+  width: 43em;
 }
 
 div#hashForm input {

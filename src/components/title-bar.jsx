@@ -23,9 +23,9 @@ class TitleBar extends React.PureComponent {
     Loop.dispatch(Model.setTitle, newState)
   }
 
-  onChangeBoardBackgroundColor(newState) {
+  onChangeBoardBackgroundColor({ boardBackgroundColor }) {
     log('onChangeBoardBackgroundColor')
-    Loop.dispatch(Model.setBoardBackgroundColor, newState)
+    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: boardBackgroundColor })
   }
 
   onSubmit(e) {
@@ -48,7 +48,9 @@ class TitleBar extends React.PureComponent {
           classInvalid="TitleBar__titleText--invalid"
         />
         
-        <i className="la la-chevron-circle-down"></i>
+        <div className="TitleBar__dropDown">
+          &#xf180;
+        </div>
 
         <RIEInput
           value={this.props.boardBackgroundColor}
