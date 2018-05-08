@@ -13,15 +13,16 @@ const log = Debug('pushpin:card')
 export default class Card extends React.PureComponent {
   static propTypes = {
     selected: PropTypes.bool.isRequired,
+    uniquelySelected: PropTypes.bool.isRequired,
     card: PropTypes.shape({
       type: PropTypes.string,
       id: PropTypes.string,
-      text: PropTypes.string,
-      hyperfile: PropTypes.object,
       x: PropTypes.number,
       y: PropTypes.number,
       height: PropTypes.number,
       width: PropTypes.number,
+      text: InlineEditor.propTypes.text.isOptional,
+      hyperfile: PropTypes.object.isOptional,
     }).isRequired
   }
 
@@ -63,7 +64,6 @@ export default class Card extends React.PureComponent {
     this.onStart = this.onStart.bind(this)
     this.onDrag = this.onDrag.bind(this)
     this.onStop = this.onStop.bind(this)
-    this.onLocalHeight = this.onLocalHeight.bind(this)
   }
 
   componentDidMount() {
@@ -262,11 +262,6 @@ export default class Card extends React.PureComponent {
     }
   }
 
-  onLocalHeight(resizeHeight) {
-    log('onLocalheight', resizeHeight)
-    this.setState({ resizeHeight })
-  }
-
   render() {
     log('render')
 
@@ -306,10 +301,9 @@ export default class Card extends React.PureComponent {
     return (
       <InlineEditor
         cardId={this.props.card.id}
-        text={this.props.card.text}
-        selected={this.props.selected}
-        onLocalHeight={this.onLocalHeight}
         cardHeight={this.props.card.height}
+        uniquelySelected={this.props.uniquelySelected}
+        text={this.props.card.text}
       />
     )
   }

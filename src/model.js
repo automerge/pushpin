@@ -2,6 +2,7 @@ import uuid from 'uuid/v4'
 import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
+import Automerge from 'automerge'
 import Hypermerge from 'hypermerge'
 import Debug from 'debug'
 import mkdirp from 'mkdirp'
@@ -116,27 +117,6 @@ export function fetchImage({ imageId, imageExt, key }, callback) {
 
       callback(null, imagePath)
     })
-  })
-}
-
-// Recognizes absolute local file paths to supported file types.
-const filePat = /^\s*(\/\S+\.(jpg|jpeg|png|gif))\n\s*$/
-
-// Given the current text for a card indexed by id, sees if it contains only a
-// local file path for a file type by supported by the app. In this case,
-// converts the card from a text card to image card.
-export function maybeInlineFile(id, text) {
-  const filePatMatch = filePat.exec(text)
-  if (!filePatMatch) {
-    return
-  }
-  const path = filePatMatch[1]
-  // const extension = filePatMatch[2]; // unused but kept to remind us it's here
-  Fs.stat(path, (err, stat) => {
-    if (err || !stat.isFile()) {
-      return
-    }
-    Loop.dispatch(processImage, { path, id })
   })
 }
 
@@ -272,7 +252,7 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
   const newBoard = state.hm.change(state.board, (b) => {
     const snapX = snapToGrid(x)
     const snapY = snapToGrid(y)
-    const newCard = { ...typeAttrs,
+    const newCard = {
       id,
       type,
       x: snapX,
@@ -285,7 +265,18 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
       moving: false,
     }
 
-    b.cards[id] = newCard
+    // Apply type-specific attributes. The difference in sequencing between
+    // image and text types is due to weird Automerge interactions that we
+    // should revisit later.
+    if (type === 'image') {
+      Object.assign(newCard, typeAttrs)
+      b.cards[id] = newCard
+    }
+    if (type === 'text') {
+      b.cards[id] = newCard
+      b.cards[id].text = new Automerge.Text()
+      b.cards[id].text.insertAt(0, ...typeAttrs.text.split(''))
+    }
   })
 
   const newSelected = selected ? [id] : []
@@ -324,9 +315,17 @@ export function cardCreatedImage(state, { x, y, selected, width, height, hyperfi
   return cardCreated(state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
 }
 
-export function cardTextChanged(state, { id, text }) {
+export function cardTextChanged(state, { id, at, removedLength, addedText }) {
   const newBoard = state.hm.change(state.board, (b) => {
-    b.cards[id].text = text
+    const { text } = b.cards[id]
+
+    if (removedLength > 0) {
+      text.splice(at, removedLength)
+    }
+
+    if (addedText.length > 0) {
+      text.insertAt(at, ...addedText.split(''))
+    }
   })
   return { ...state, board: newBoard }
 }

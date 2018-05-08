@@ -51,6 +51,8 @@
   "dependencies": {
     "@ibm/plex": "^1.0.2",
     "classnames": "^2.2.5",
+    "codemirror": "^5.37.0",
+    "diff-match-patch": "^1.0.1",
     "electron-compile": "^6.4.2",
     "electron-devtools-installer": "^2.2.4",
     "electron-squirrel-startup": "^1.0.0",
@@ -69,9 +71,7 @@
     "react-measure": "^2.0.2",
     "react-rnd": "^7.4.0",
     "react-simple-dropdown": "^3.2.0",
-    "riek": "^1.1.0",
-    "slate": "^0.33.4",
-    "slate-react": "^0.12.4"
+    "riek": "^1.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.3",

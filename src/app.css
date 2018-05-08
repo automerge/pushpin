@@ -43,7 +43,9 @@ table {
 	border-spacing: 0;
 }
 
+
 /* Dropdown React component functional styles */
+
 .dropdown {
   display: inline-block;
 }
@@ -57,7 +59,9 @@ table {
   display: block;
 }
 
+
 /* App Styles */
+
 body {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
@@ -144,6 +148,7 @@ body {
   align-items: center;
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  z-index: 3;
 }
 
 .TitleBar__logo {
@@ -233,98 +238,110 @@ div.card.image {
   padding: 4px;
 }
 
-div.card.text {
+.InlineEditor {
   cursor: text;
   text-align: left;
   color: #000000;
 }
 
-div.card.text div.editorWrapper {
+.InlineEditor__editor {
   box-sizing: border-box;
   width: 100%;
   padding: 21px;
 }
 
-div.card.text div.renderer {
+.InlineEditor div.CodeMirror {
+  height: auto;
+}
+
+.InlineEditor div.CodeMirror-lines {
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.54;
+  padding: 0;
+}
+
+.InlineEditor pre.CodeMirror-line {
+  padding: 0;
+}
+
+.InlineEditor__renderer {
   box-sizing: border-box;
   width: 100%;
   padding: 21px;
 }
 
-
-/* Markdown Styles: https://simon.lc/sites/markdown/ */
-
-div.renderer a {
+.InlineEditor__renderer a {
   color: #0645ad;
   text-decoration: none;
 }
 
-div.renderer a:visited {
+.InlineEditor__renderer a:visited {
   color: #0b0080;
 }
 
-div.renderer a:hover {
+.InlineEditor__renderer a:hover {
   color: #06e;
 }
 
-div.renderer a:active {
+.InlineEditor__renderer a:active {
   color: #faa700;
 }
 
-div.renderer a:focus {
+.InlineEditor__renderer a:focus {
   outline: thin dotted;
 }
 
-div.renderer a:hover, a:active {
+.InlineEditor__renderer a:hover, a:active {
   outline: 0;
 }
 
-div.renderer h1, h2, h3, h4, h5, h6 {
+.InlineEditor__renderer h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
   line-height: 1.25;
   color: #102542;
 }
 
-div.renderer h4, h5, h6 {
+.InlineEditor__renderer h4, h5, h6 {
   font-weight: bold;
 }
 
-div.renderer h1 {
+.InlineEditor__renderer h1 {
   font-size: 2.5em;
 }
 
-div.renderer h2 {
+.InlineEditor__renderer h2 {
   font-size: 2em;
 }
 
-div.renderer h3 {
+.InlineEditor__renderer h3 {
   font-size: 1.5em;
 }
 
-div.renderer h4 {
+.InlineEditor__renderer h4 {
   font-size: 1.2em;
 }
 
-div.renderer h5 {
+.InlineEditor__renderer h5 {
   font-size: 1em;
 }
 
-div.renderer h6 {
+.InlineEditor__renderer h6 {
   font-size: 0.9em;
 }
 
-div.renderer p {
+.InlineEditor__renderer p {
   margin: 1.5em 0;
 }
 
-div.renderer blockquote {
+.InlineEditor__renderer blockquote {
   color: #666666;
   margin: 0;
   padding-left: 3em;
   border-left: 0.5em #eee solid;
 }
 
-div.renderer hr {
+.InlineEditor__renderer hr {
   display: block;
   border: 0;
   border-top: 1px solid #aaa;
@@ -333,82 +350,81 @@ div.renderer hr {
   padding: 0;
 }
 
-
-div.renderer pre, code, kbd, samp {
+.InlineEditor__rendererpre, code, kbd, samp {
   color: #000;
   font-family: 'Courier New', monospace;
   font-size: 0.98em;
 }
 
-div.renderer pre {
+.InlineEditor__renderer pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-div.renderer b, strong {
+.InlineEditor__renderer b, strong {
   font-weight: bold;
 }
 
-div.renderer dfn {
+.InlineEditor__renderer dfn {
   font-style: italic;
 }
 
-div.renderer ins {
+.InlineEditor__renderer ins {
   background: #ff9;
   color: #000;
   text-decoration: none;
 }
 
-div.renderer mark {
+.InlineEditor__renderer mark {
   background: #ff0;
   color: #000;
   font-style: italic;
   font-weight: bold;
 }
 
-div.renderer sub, sup {
+.InlineEditor__renderer sub, sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
   vertical-align: baseline;
 }
 
-div.renderer sup {
+.InlineEditor__renderer sup {
   top: -0.5em;
 }
 
-div.renderer sub {
+.InlineEditor__renderer sub {
   bottom: -0.25em;
 }
 
-div.renderer ul, ol {
+.InlineEditor__renderer ul, ol {
   list-style-type: disc;
   margin: 1em 0;
   padding: 0 0 0 2em;
 }
 
-div.renderer li p:last-child {
+.InlineEditor__renderer li p:last-child {
   margin: 0;
 }
 
-div.renderer dd {
+.InlineEditor__renderer dd {
   margin: 0 0 0 2em;
 }
 
-div.renderer table {
+.InlineEditor__renderer table {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-div.renderer td {
+.InlineEditor__renderer td {
   vertical-align: top;
 }
 
-div.renderer :first-child {
+.InlineEditor__renderer :first-child {
   margin-top: 0;
 }
 
-div.renderer :last-child {
+.InlineEditor__renderer :last-child {
   margin-bottom: 0;
 }

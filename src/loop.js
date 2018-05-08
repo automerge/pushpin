@@ -38,18 +38,19 @@ const dispatch = (fn, args) => {
   }
 
   loopSingleton.current = fn.name
-  const start = Date.now()
   log('dispatch', fn.name, args)
-  const newState = fn(loopSingleton.state, args)
+  try {
+    const newState = fn(loopSingleton.state, args)
 
-  if ((typeof newState) !== 'object') {
-    throw new Error(`Expected state object, got ${newState}`)
+    if ((typeof newState) !== 'object') {
+      throw new Error(`Expected state object, got ${newState}`)
+    }
+
+    loopSingleton.state = newState
+    display(loopSingleton)
+  } finally {
+    loopSingleton.current = null
   }
-
-  loopSingleton.state = newState
-  display(loopSingleton)
-  log('done', fn.name, `${Date.now() - start}ms`)
-  loopSingleton.current = null
 }
 
 const display = (ls) => {

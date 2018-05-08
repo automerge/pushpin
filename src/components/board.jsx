@@ -116,8 +116,11 @@ export default class Board extends React.PureComponent {
     log('render')
 
     // rework selected functioning, this is a slow implementation
-    const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
-      <Card key={id} card={card} selected={this.props.selected.includes(id)} />)
+    const cardChildren = Object.entries(this.props.cards).map(([id, card]) => {
+      const selected = this.props.selected.includes(id)
+      const uniquelySelected = selected && this.props.selected.length === 1
+      return <Card key={id} card={card} selected={selected} uniquelySelected={uniquelySelected} />
+    })
 
     const contextMenu = (
       <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
