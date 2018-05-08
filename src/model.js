@@ -174,7 +174,11 @@ export function init(state) {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
 
-    hm.create()
+    if(state.requestedDocId === '') {
+      const doc = hm.create()
+      const docId = hm.getId(doc)
+      Loop.dispatch(newDocument, { doc, docId })
+    }
   })
 
   return { ...state, hm }
@@ -393,19 +397,19 @@ export function boardBackspaced(state) {
   return state
 }
 
-export function documentReady(state, { docId, doc }) {
-  // Case where app is loaded default empty doc.
-  if (state.requestedDocId === '' || !state.hm.has(state.requestedDocId)) {
-    Loop.dispatch(addRecentDoc, { docId })
+export function newDocument(state, { docId, doc }) {
+  Loop.dispatch(addRecentDoc, { docId })
 
-    return populateDemoBoard(Object.assign({}, state, {
-      activeDocId: docId,
-      formDocId: docId,
-      requestedDocId: docId,
-      board: doc,
-    }))
-  // Case where an existing doc was opened and is still requested.
-  } else if (state.requestedDocId === docId) {
+  return populateDemoBoard(Object.assign({}, state, {
+    activeDocId: docId,
+    formDocId: docId,
+    requestedDocId: docId,
+    board: doc,
+  }))
+}
+
+export function documentReady(state, { docId, doc }) {
+  if (state.requestedDocId === docId) {
     Loop.dispatch(addRecentDoc, { docId })
 
     return Object.assign({}, state, {
@@ -431,6 +435,17 @@ export function formChanged(state, { docId }) {
 }
 
 export function formSubmitted(state) {
-  state.hm.open(state.formDocId)
+  // If we've already opened the hypermerge doc,
+  // it will not fire a 'document:ready' event if we open it again
+  // so we need to find the doc and manually trigger the action
+  if(state.hm.has(state.formDocId)) {
+    const doc = state.hm.find(state.formDocId)
+    const docId = state.formDocId
+
+    Loop.dispatch(documentReady, { doc, docId })
+  } else {
+    state.hm.open(state.formDocId)
+  }
+
   return Object.assign({}, state, { requestedDocId: state.formDocId })
 }

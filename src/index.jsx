@@ -23,8 +23,9 @@ const init = () => {
   const model = Model.empty
   const recentDocs = Model.getRecentDocs()
 
-  if(recentDocs.length > 0)
+  if(recentDocs.length > 0) {
     model.requestedDocId = recentDocs[0]
+  }
 
   Loop.init(model, view, render)
   Loop.dispatch(Model.init)
