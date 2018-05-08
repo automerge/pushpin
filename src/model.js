@@ -311,7 +311,7 @@ export function clearSelections(state) {
   return Object.assign({}, state, { selected: null })
 }
 
-export function cardDeleted(state, { id }) {
+export function cardDelete(state, { id }) {
   const newBoard = state.hm.change(state.board, (b) => {
     delete b.cards[id]
   })
@@ -319,12 +319,12 @@ export function cardDeleted(state, { id }) {
 }
 
 export function boardBackspaced(state) {
-  for (const id in state.board.cards) {
-    const card = state.board.cards[id]
-    if ((id === state.selected) && (card.type !== 'text')) {
-      return cardDeleted(state, { id: card.id })
-    }
-  }
+  const deleteCardIDs = Object.entries(state.board.cards)
+    .filter(([id, card]) => (id === state.selected) && (card.type !== 'text'))
+    .map(([id, card]) => id)
+
+  state = deleteCardIDs.reduce((state, id) => (cardDelete(state, { id })), state)
+
   return state
 }
 
