@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import reactCSS from 'reactcss'
-import map from 'lodash/map'
 
 import { CustomPicker } from 'react-color'
 import { Swatch } from 'react-color/lib/components/common'
@@ -9,8 +8,7 @@ import { Swatch } from 'react-color/lib/components/common'
 /* This class is adapted from the react-color TwitterPicker
    by stripping out the hex editor and tweaking styles a little */
 
-const ColorPicker = ({ onChange, onSwatchHover, hex, colors, width,
-  className = '' }) => {
+const ColorPicker = ({ onChange, onSwatchHover, hex, colors, width }) => {
   const styles = reactCSS({
     default: {
       card: {
@@ -45,11 +43,11 @@ const ColorPicker = ({ onChange, onSwatchHover, hex, colors, width,
   }
 
   return (
-    <div style={styles.card} className={`color-picker ${className}`}>
+    <div style={styles.card} className="ColorPicker">
       <div style={styles.body}>
-        {map(colors, (c, i) =>
+        {colors.map((c) =>
           (<Swatch
-            key={i}
+            key={c}
             color={c}
             hex={c}
             style={styles.swatch}
@@ -68,25 +66,20 @@ const ColorPicker = ({ onChange, onSwatchHover, hex, colors, width,
 }
 
 ColorPicker.defaultProps = {
+  width: 152,
+  // We don't need default colors for our version, we'll always provide them.
+  colors: [],
   onChange: () => {},
   onSwatchHover: () => {},
-  hex: '',
-  className: 'color-picker'
+  hex: ''
 }
 
 ColorPicker.propTypes = {
   onChange: PropTypes.func,
   onSwatchHover: PropTypes.func,
   hex: PropTypes.string,
-  className: PropTypes.string,
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   colors: PropTypes.arrayOf(PropTypes.string),
-}
-
-ColorPicker.defaultProps = {
-  width: 276,
-  // We don't need default colors for our version, we'll always provide them.
-  colors: []
 }
 
 export default CustomPicker(ColorPicker)

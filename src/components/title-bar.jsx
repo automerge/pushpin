@@ -66,7 +66,6 @@ class TitleBar extends React.PureComponent {
             <ColorPicker
               color={this.props.boardBackgroundColor}
               colors={Object.values(Model.BOARD_COLORS)}
-              triangle="hide"
               onChangeComplete={this.onChangeBoardBackgroundColor}
             />
           </DropdownContent>
