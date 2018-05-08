@@ -58,8 +58,6 @@ We've made some initial cards for you to play with. Have fun!`
 const KAY_PATH = './img/kay.jpg'
 const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
-
-
 // ## Imperative top-levels.
 
 mkdirp.sync(HYPERFILE_DATA_PATH)

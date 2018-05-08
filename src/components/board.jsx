@@ -16,15 +16,8 @@ const withinCard = (card, x, y) => (x >= card.x) &&
          (y >= card.y) &&
          (y <= card.y + card.height)
 
-const withinAnyCard = (cards, x, y) => {
-  for (const id in cards) {
-    const card = cards[id]
-    if (withinCard(card, x, y)) {
-      return true
-    }
-  }
-  return false
-}
+const withinAnyCard = (cards, x, y) =>
+  Object.values(cards).some((card) => withinCard(card, x, y))
 
 const boardStyle = {
   width: Model.BOARD_WIDTH,
@@ -105,11 +98,8 @@ class Board extends React.PureComponent {
   render() {
     log('render')
 
-    const cardChildren = []
-    for (const id in this.props.cards) {
-      const card = this.props.cards[id]
-      cardChildren.push(<Card key={id} card={card} selected={this.props.selected === id} />)
-    }
+    const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
+      <Card key={id} card={card} selected={this.props.selected === id} />)
 
     return (
       <div
@@ -120,6 +110,7 @@ class Board extends React.PureComponent {
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onContextMenu={this.onContextMenu}
+        role="presentation"
       >
         {cardChildren}
       </div>
@@ -129,7 +120,7 @@ class Board extends React.PureComponent {
 
 Board.propTypes = {
   selected: PropTypes.string,
-  cards: PropTypes.object.isRequired,
+  cards: PropTypes.shape(PropTypes.objectOf(Card.propTypes)).isRequired,
 }
 
 export default Board
