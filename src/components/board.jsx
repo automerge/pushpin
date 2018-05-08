@@ -123,7 +123,6 @@ class Board extends React.PureComponent {
 }
 
 Board.defaultProps = {
-  title: '',
   backgroundColor: '',
   selected: null
 }
