@@ -199,6 +199,14 @@ export function processImage(state, { path, x, y }) {
   return state
 }
 
+export function setTitle(state, { title }) {
+  state.hm.change(state.board, (b) => {
+    b.title = title
+  })
+
+  return state
+}
+
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
 
@@ -238,6 +246,8 @@ function populateDemoBoard(state) {
   newState = cardCreatedText(newState, { x: 1350, y: 100, text: WELCOME_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 250, text: USAGE_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 750, text: EXAMPLE_TEXT })
+
+  newState = setTitle(newState, { title: 'Example Board' })
 
   // These will be handled async as they require their own IO.
   Loop.dispatch(processImage, { x: 1750, y: 500, path: KAY_PATH })

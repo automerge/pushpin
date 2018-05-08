@@ -48,6 +48,12 @@ table {
 
 /* App Styles */
 
+div.TitleBar {
+  position: fixed;
+  top: 0px;
+  height: 24px;
+}
+
 div#hashForm {
   background: blue;
   text-align: center;
