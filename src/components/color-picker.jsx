@@ -1,39 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import reactCSS from 'reactcss'
 
 import { CustomPicker } from 'react-color'
 import { Swatch } from 'react-color/lib/components/common'
 
 /* This class is adapted from the react-color TwitterPicker
-   by stripping out the hex editor and tweaking styles a little */
-
-const styles = reactCSS({
-  default: {
-    card: {
-      width: '152px',
-      background: '#fff',
-      border: '0 solid rgba(0,0,0,0.25)',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
-      borderRadius: '2px',
-      position: 'relative',
-    },
-    body: {
-      padding: '8px 0 0 8px',
-    },
-    swatch: {
-      width: '28px',
-      height: '28px',
-      float: 'left',
-      borderRadius: '4px',
-      margin: '0 8px 8px 0',
-    },
-    clear: {
-      clear: 'both',
-    },
-  }
-})
-
+   by stripping out most of the functionality and just leaving swatches */
 class ColorPicker extends React.PureComponent {
   static defaultProps = {
     colors: [],
@@ -59,21 +31,38 @@ class ColorPicker extends React.PureComponent {
 
   render() {
     return (
-      <div style={styles.card} className="ColorPicker">
-        <div style={styles.body}>
+      <div
+        style={{
+          width: '152px',
+          background: '#fff',
+          border: '0 solid rgba(0,0,0,0.25)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+          borderRadius: '2px',
+          position: 'relative',
+        }}
+        className="ColorPicker"
+      >
+        <div style={{ padding: '8px 0 0 8px' }}>
           {this.props.colors.map((c) =>
             (<Swatch
+              className="ColorPicker__swatch"
               key={c}
               color={c}
               hex={c}
-              style={styles.swatch}
+              style={{
+                width: '28px',
+                height: '28px',
+                float: 'left',
+                borderRadius: '4px',
+                margin: '0 8px 8px 0',
+              }}
               onClick={this.handleChange}
               focusStyle={{
                 boxShadow: `0 0 4px ${c}`,
               }}
             />))
           }
-          <div style={styles.clear} />
+          <div style={{ clear: 'both' }} />
         </div>
       </div>
     )
