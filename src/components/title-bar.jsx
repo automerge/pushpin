@@ -38,7 +38,13 @@ class TitleBar extends React.PureComponent {
 
     return (
       <div className="TitleBar">
-        <img className="TitleBar__logo" alt="pushpin logo" src="pushpinIcon_Standalone.svg" width="28" height="28" />
+        <img
+          className="TitleBar__logo"
+          alt="pushpin logo"
+          src="pushpinIcon_Standalone.svg"
+          width="28"
+          height="28"
+        />
         <RIEInput
           value={this.props.title}
           change={this.onChangeTitle}
@@ -47,7 +53,7 @@ class TitleBar extends React.PureComponent {
           classLoading="TitleBar__titleText--loading"
           classInvalid="TitleBar__titleText--invalid"
         />
-        
+
         <div className="TitleBar__dropDown">
           &#xf180;
         </div>
@@ -59,7 +65,6 @@ class TitleBar extends React.PureComponent {
           classLoading="loading"
           classInvalid="invalid"
         />
-        
 
         <HashForm
           formDocId={this.props.formDocId}
@@ -72,6 +77,9 @@ class TitleBar extends React.PureComponent {
 }
 
 TitleBar.propTypes = {
+  formDocId: PropTypes.string.isRequired,
+  activeDocId: PropTypes.string.isRequired,
+  requestedDocId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   boardBackgroundColor: PropTypes.string.isRequired
 }

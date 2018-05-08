@@ -47,11 +47,7 @@ table {
 body {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
   line-height: 1.54;
-  letter-spacing: normal;
 }
 
 .TitleBar {
@@ -80,11 +76,6 @@ body {
   opacity: 0.75;
   font-family: 'LineAwesome';
   font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: normal;
-  letter-spacing: normal;
   text-align: left;
   color: #000000;
 }

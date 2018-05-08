@@ -24,11 +24,4 @@ const init = () => {
   Loop.dispatch(Model.init)
 }
 
-// This doesn't seem to work?
-// We get in the logs "Uncaught (in promise) ..." but this code is not invoked.
-// process.on('unhandledRejection', (err) => {
-//   console.log('our unhandledRejection', err)
-//   process.exit(1)
-// })
-
 init()

@@ -101,7 +101,9 @@ class Board extends React.PureComponent {
     const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
       <Card key={id} card={card} selected={this.props.selected === id} />)
 
-    const coloredBoardStyle = Object.assign({}, boardStyle, { backgroundColor: this.props.backgroundColor })
+    const coloredBoardStyle = Object.assign(
+      {}, boardStyle,
+      { backgroundColor: this.props.backgroundColor })
 
     return (
       <div
@@ -122,7 +124,8 @@ class Board extends React.PureComponent {
 
 Board.defaultProps = {
   title: '',
-  backgroundColor: ''
+  backgroundColor: '',
+  selected: null
 }
 
 Board.propTypes = {
