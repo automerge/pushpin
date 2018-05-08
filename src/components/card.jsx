@@ -10,7 +10,21 @@ import * as Model from '../model'
 
 const log = Debug('pushpin:card')
 
-class Card extends React.PureComponent {
+export default class Card extends React.PureComponent {
+  static propTypes = {
+    selected: PropTypes.bool.isRequired,
+    card: PropTypes.shape({
+      type: PropTypes.string,
+      id: PropTypes.string,
+      text: PropTypes.string,
+      hyperfile: PropTypes.object,
+      x: PropTypes.number,
+      y: PropTypes.number,
+      height: PropTypes.number,
+      width: PropTypes.number,
+    }).isRequired
+  }
+
   constructor(props) {
     super(props)
     log('constructor')
@@ -303,19 +317,3 @@ class Card extends React.PureComponent {
     return <img className="image" alt="" src={state.imagePath} />
   }
 }
-
-Card.propTypes = {
-  selected: PropTypes.bool.isRequired,
-  card: PropTypes.shape({
-    type: PropTypes.string,
-    id: PropTypes.string,
-    text: PropTypes.string,
-    hyperfile: PropTypes.object,
-    x: PropTypes.number,
-    y: PropTypes.number,
-    height: PropTypes.number,
-    width: PropTypes.number,
-  }).isRequired
-}
-
-export default Card

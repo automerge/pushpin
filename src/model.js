@@ -172,7 +172,8 @@ export function init(state) {
     })
     hm.create()
   })
-  return Object.assign({}, state, { hm })
+
+  return { ...state, hm }
 }
 
 // Process the image at the given path, upgrading the card at id to an image
