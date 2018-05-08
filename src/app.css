@@ -43,10 +43,6 @@ table {
 	border-spacing: 0;
 }
 
-/* This imports the whole typeface, which is a TON of things */
-@import '../node_modules/@ibm/plex/css/ibm-plex.css';
-@import '../node_modules/line-awesome/css/line-awesome.min.css';
-
 /* App Styles */
 body {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
