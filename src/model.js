@@ -3,7 +3,6 @@ import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
 import Hypermerge from 'hypermerge'
-import RAM from 'random-access-memory'
 import Debug from 'debug'
 import mkdirp from 'mkdirp'
 import { EventEmitter } from 'events'
@@ -177,7 +176,7 @@ export function init(state) {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
 
-    if(requestedDocId === '') {
+    if (requestedDocId === '') {
       Loop.dispatch(newDocument)
     }
   })
@@ -189,10 +188,12 @@ function addRecentDoc(state, { docId }) {
   let recentDocs = getRecentDocs()
   const recentDocIndex = recentDocs.findIndex(d => d === docId)
 
-  if(Number.isInteger(recentDocIndex))
-    recentDocs = [ docId, ...recentDocs.slice(0, recentDocIndex), ...recentDocs.slice(recentDocIndex + 1) ]
-  else {
-    recentDocs = [ docId, ...recentDocs ]
+  if (Number.isInteger(recentDocIndex)) {
+    recentDocs = [docId,
+      ...recentDocs.slice(0, recentDocIndex),
+      ...recentDocs.slice(recentDocIndex + 1)]
+  } else {
+    recentDocs = [docId, ...recentDocs]
     recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
   }
 
@@ -202,14 +203,14 @@ function addRecentDoc(state, { docId }) {
 }
 
 function recentDocsPath() {
-  return Path.join(USER_PATH, "recent-docs.json")
+  return Path.join(USER_PATH, 'recent-docs.json')
 }
 
 export function getRecentDocs() {
-  if(Fs.existsSync(recentDocsPath()))
+  if (Fs.existsSync(recentDocsPath())) {
     return JSON.parse(Fs.readFileSync(recentDocsPath()))
-  else
-    return []
+  }
+  return []
 }
 
 // Process the image at the given path, upgrading the card at id to an image
@@ -224,8 +225,7 @@ export function processImage(state, { path, x, y }) {
       log('Error loading image?', err)
       return
     }
-    const width = img.bitmap.width
-    const height = img.bitmap.height
+    const { width, height } = img.bitmap
     const [scaledWidth, scaledHeight] = scaleImage(width, height)
     const imageId = uuid()
 
@@ -256,14 +256,14 @@ export function setTitle(state, { title }) {
   const newBoard = state.hm.change(state.board, (b) => {
     b.title = title
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function setBackgroundColor(state, { backgroundColor }) {
   const newBoard = state.hm.change(state.board, (b) => {
     b.backgroundColor = backgroundColor
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
@@ -272,7 +272,7 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
   const newBoard = state.hm.change(state.board, (b) => {
     const snapX = snapToGrid(x)
     const snapY = snapToGrid(y)
-    const newCard = Object.assign({
+    const newCard = { ...typeAttrs,
       id,
       type,
       x: snapX,
@@ -283,14 +283,14 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
       slackHeight: 0,
       resizing: false,
       moving: false,
-    }, typeAttrs)
+    }
 
     b.cards[id] = newCard
   })
 
   const newSelected = selected ? id : state.selected
 
-  return Object.assign({}, state, { board: newBoard, selected: newSelected })
+  return { ...state, board: newBoard, selected: newSelected }
 }
 
 function populateDemoBoard(state) {
@@ -301,7 +301,7 @@ function populateDemoBoard(state) {
   const newBoard = state.hm.change(state.board, (b) => {
     b.cards = {}
   })
-  let newState = Object.assign({}, state, { board: newBoard })
+  let newState = ({}, state, { board: newBoard })
   newState = cardCreatedText(newState, { x: 1350, y: 100, text: WELCOME_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 250, text: USAGE_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 750, text: EXAMPLE_TEXT })
@@ -328,7 +328,7 @@ export function cardTextChanged(state, { id, text }) {
   const newBoard = state.hm.change(state.board, (b) => {
     b.cards[id].text = text
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function cardTextResized(state, { id, height }) {
@@ -336,7 +336,7 @@ export function cardTextResized(state, { id, height }) {
     const card = b.cards[id]
     card.height = height
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function cardInlinedImage(state, { id, path, width, height }) {
@@ -348,7 +348,7 @@ export function cardInlinedImage(state, { id, path, width, height }) {
     card.height = height
     delete card.text
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function cardMoved(state, { id, x, y }) {
@@ -357,7 +357,7 @@ export function cardMoved(state, { id, x, y }) {
     card.x = x
     card.y = y
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function cardResized(state, { id, width, height }) {
@@ -366,11 +366,11 @@ export function cardResized(state, { id, width, height }) {
     card.width = width
     card.height = height
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function cardSelected(state, { id }) {
-  return Object.assign({}, state, { selected: id })
+  return { ...state, selected: id }
 }
 
 export function cardUniquelySelected(state, { id }) {
@@ -378,14 +378,14 @@ export function cardUniquelySelected(state, { id }) {
 }
 
 export function clearSelections(state) {
-  return Object.assign({}, state, { selected: null })
+  return { ...state, selected: null }
 }
 
 export function cardDelete(state, { id }) {
   const newBoard = state.hm.change(state.board, (b) => {
     delete b.cards[id]
   })
-  return Object.assign({}, state, { board: newBoard })
+  return { ...state, board: newBoard }
 }
 
 export function boardBackspaced(state) {
@@ -404,23 +404,23 @@ export function newDocument(state) {
 
   Loop.dispatch(addRecentDoc, { docId })
 
-  return populateDemoBoard(Object.assign({}, state, {
+  return populateDemoBoard({ ...state,
     activeDocId: docId,
     formDocId: docId,
     requestedDocId: docId,
     board: doc,
-  }))
+  })
 }
 
 export function documentReady(state, { docId, doc }) {
   if (state.requestedDocId === docId) {
     Loop.dispatch(addRecentDoc, { docId })
 
-    return Object.assign({}, state, {
+    return { ...state,
       activeDocId: docId,
       formDocId: docId,
       board: doc
-    })
+    }
   }
 
   // Case where an existing doc was opened but is no longer requested.
@@ -431,18 +431,18 @@ export function documentUpdated(state, { docId, doc }) {
   if (state.activeDocId !== docId) {
     return state
   }
-  return Object.assign({}, state, { board: doc })
+  return { ...state, board: doc }
 }
 
 export function formChanged(state, { docId }) {
-  return Object.assign({}, state, { formDocId: docId })
+  return { ...state, formDocId: docId }
 }
 
 export function formSubmitted(state) {
   // If we've already opened the hypermerge doc,
   // it will not fire a 'document:ready' event if we open it again
   // so we need to find the doc and manually trigger the action
-  if(state.hm.has(state.formDocId)) {
+  if (state.hm.has(state.formDocId)) {
     const doc = state.hm.find(state.formDocId)
     const docId = state.formDocId
 
@@ -451,5 +451,5 @@ export function formSubmitted(state) {
     state.hm.open(state.formDocId)
   }
 
-  return Object.assign({}, state, { requestedDocId: state.formDocId })
+  return { ...state, requestedDocId: state.formDocId }
 }

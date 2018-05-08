@@ -101,17 +101,12 @@ class Board extends React.PureComponent {
     const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
       <Card key={id} card={card} selected={this.props.selected === id} />)
 
-    const coloredBoardStyle = Object.assign(
-      {}, boardStyle,
-      { backgroundColor: this.props.backgroundColor }
-    )
-
     return (
       <div
         id="board"
         className="board"
         ref={(e) => { this.boardRef = e }}
-        style={coloredBoardStyle}
+        style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onContextMenu={this.onContextMenu}
