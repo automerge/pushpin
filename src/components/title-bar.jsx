@@ -7,6 +7,9 @@ import Loop from '../loop'
 import * as Model from '../model'
 import HashForm from './hash-form'
 
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
+import { TwitterPicker } from 'react-color';
+
 const log = Debug('pushpin:title-bar')
 
 class TitleBar extends React.PureComponent {
@@ -23,9 +26,9 @@ class TitleBar extends React.PureComponent {
     Loop.dispatch(Model.setTitle, newState)
   }
 
-  onChangeBoardBackgroundColor({ boardBackgroundColor }) {
+  onChangeBoardBackgroundColor(color) {
     log('onChangeBoardBackgroundColor')
-    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: boardBackgroundColor })
+    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: color.hex })
   }
 
   onSubmit(e) {
@@ -54,17 +57,19 @@ class TitleBar extends React.PureComponent {
           classInvalid="TitleBar__titleText--invalid"
         />
 
-        <div className="TitleBar__dropDown">
-          &#xf180;
-        </div>
-
-        <RIEInput
-          value={this.props.boardBackgroundColor}
-          change={this.onChangeBoardBackgroundColor}
-          propName="boardBackgroundColor"
-          classLoading="loading"
-          classInvalid="invalid"
-        />
+        <Dropdown>
+          <DropdownTrigger>
+            <div className="TitleBar__dropDown">
+              &#xf180;
+            </div>
+          </DropdownTrigger>
+          <DropdownContent>
+            <TwitterPicker
+              color={this.props.boardBackgroundColor}
+              onChangeComplete={this.onChangeBoardBackgroundColor}
+            />
+          </DropdownContent>
+        </Dropdown>
 
         <HashForm
           formDocId={this.props.formDocId}
