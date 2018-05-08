@@ -19,6 +19,7 @@
     "arrow-parens": "off",
     "no-use-before-define": "off",
     "no-shadow": "off",
-    "react/no-did-mount-set-state": "off"
+    "react/no-did-mount-set-state": "off",
+    "no-param-reassign": "off"
   }
 }
