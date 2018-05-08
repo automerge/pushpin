@@ -25,31 +25,37 @@ const createWindow = async () => {
       label: 'File',
       submenu: [
         {
-          label: 'New', accelerator: 'CmdOrCtrl+N', click: (item, focusedWindow) => {
-            focusedWindow.webContents.send("newDocument")
+          label: 'New',
+          accelerator: 'CmdOrCtrl+N',
+          click: (item, focusedWindow) => {
+            focusedWindow.webContents.send('newDocument')
           }
         }
       ]
     },
     {
-      label: "Edit",
+      label: 'Edit',
       submenu: [
-          { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-          { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-          { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-          { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+        { label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' }
       ]
     },
     {
-      label: "Develop",
+      label: 'Develop',
       submenu: [
         {
-          label: "Refresh", accelerator: 'CmdOrCtrl+R', click: (item, focusedWindow) => {
+          label: 'Refresh',
+          accelerator: 'CmdOrCtrl+R',
+          click: (item, focusedWindow) => {
             focusedWindow.webContents.reload()
           }
         },
         {
-          label: "Open Inspector", accelerator: 'CmdOrCtrl+Option+I', click: (item, focusedWindow) => {
+          label: 'Open Inspector',
+          accelerator: 'CmdOrCtrl+Option+I',
+          click: (item, focusedWindow) => {
             focusedWindow.webContents.toggleDevTools()
           }
         }
@@ -62,8 +68,8 @@ const createWindow = async () => {
     template.unshift({
       label: app.getName(),
       submenu: [
-        {role: 'about'},
-        {role: 'quit'}
+        { role: 'about' },
+        { role: 'quit' }
       ]
     })
   }
