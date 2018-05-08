@@ -7,7 +7,17 @@ import Board from './board'
 
 const log = Debug('pushpin:app')
 
-class App extends React.PureComponent {
+export default class App extends React.PureComponent {
+  static propTypes = {
+    state: PropTypes.shape({
+      formDocId: PropTypes.string,
+      activeDocId: PropTypes.string,
+      requestedDocId: PropTypes.string,
+      selected: PropTypes.string,
+      board: PropTypes.shape(Board.propTypes).isRequired,
+    }).isRequired
+  }
+
   render() {
     log('render')
 
@@ -35,15 +45,3 @@ class App extends React.PureComponent {
     )
   }
 }
-
-App.propTypes = {
-  state: PropTypes.shape({
-    formDocId: PropTypes.string,
-    activeDocId: PropTypes.string,
-    requestedDocId: PropTypes.string,
-    selected: PropTypes.string,
-    board: PropTypes.shape(Board.propTypes).isRequired,
-  }).isRequired
-}
-
-export default App
