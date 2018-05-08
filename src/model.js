@@ -163,6 +163,9 @@ export const empty = {
 // Starts IO subsystems and populates associated state.
 export function init(state) {
   const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
+  const recentDocs = getRecentDocs()
+  const requestedDocId = recentDocs.length > 0 ? recentDocs[0] : state.requestedDocId
+
   hm.once('ready', () => {
     hm.joinSwarm()
 
@@ -174,12 +177,12 @@ export function init(state) {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
 
-    if(state.requestedDocId === '') {
+    if(requestedDocId === '') {
       Loop.dispatch(newDocument)
     }
   })
 
-  return { ...state, hm }
+  return { ...state, hm, requestedDocId }
 }
 
 function addRecentDoc(state, { docId }) {
