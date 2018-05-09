@@ -27,12 +27,12 @@ const boardStyle = {
 export default class Board extends React.PureComponent {
   static defaultProps = {
     backgroundColor: '',
-    selected: null
+    selected: []
   }
 
   static propTypes = {
     backgroundColor: PropTypes.string,
-    selected: PropTypes.string,
+    selected: PropTypes.arrayOf(PropTypes.string),
     cards: PropTypes.shape(PropTypes.objectOf(Card.propTypes)).isRequired,
   }
 
@@ -109,8 +109,9 @@ export default class Board extends React.PureComponent {
   render() {
     log('render')
 
+    // rework selected functioning, this is a slow implementation
     const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
-      <Card key={id} card={card} selected={this.props.selected === id} />)
+      <Card key={id} card={card} selected={this.props.selected.includes(id)} />)
 
     return (
       <div

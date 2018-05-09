@@ -220,8 +220,12 @@ export default class Card extends React.PureComponent {
     const { card } = this.props
 
     const minDragSelection = this.tracking.totalDrag < Model.GRID_SIZE / 2
-    if (!this.props.selected && minDragSelection) {
-      Loop.dispatch(Model.cardUniquelySelected, { id: this.props.card.id })
+    if (minDragSelection) {
+      if (e.ctrlKey || e.shiftKey) {
+        Loop.dispatch(Model.cardToggleSelection, { id: this.props.card.id })
+      } else {
+        Loop.dispatch(Model.cardUniquelySelected, { id: this.props.card.id })
+      }
     }
     this.tracking.totalDrag = null
 

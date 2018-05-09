@@ -13,7 +13,7 @@ export default class App extends React.PureComponent {
       formDocId: PropTypes.string,
       activeDocId: PropTypes.string,
       requestedDocId: PropTypes.string,
-      selected: PropTypes.string,
+      selected: PropTypes.arrayOf(PropTypes.string),
       board: PropTypes.shape(Board.propTypes).isRequired,
     }).isRequired
   }
