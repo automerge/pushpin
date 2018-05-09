@@ -138,13 +138,15 @@ export default class Board extends React.PureComponent {
 
         <div className="ContextMenu__divider" />
 
-        <ContextMenuItem>
-          <ColorPicker
-            color={this.props.backgroundColor}
-            colors={Object.values(Model.BOARD_COLORS)}
-            onChangeComplete={this.onChangeBoardBackgroundColor}
-          />
-        </ContextMenuItem>
+        <div className="ContextMenu__section">
+          <ContextMenuItem>
+            <ColorPicker
+              color={this.props.backgroundColor}
+              colors={Object.values(Model.BOARD_COLORS)}
+              onChangeComplete={this.onChangeBoardBackgroundColor}
+            />
+          </ContextMenuItem>
+        </div>
       </ContextMenu>
     )
 
