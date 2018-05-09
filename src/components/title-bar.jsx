@@ -14,8 +14,7 @@ export default class TitleBar extends React.PureComponent {
     formDocId: PropTypes.string.isRequired,
     activeDocId: PropTypes.string.isRequired,
     requestedDocId: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    boardBackgroundColor: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired
   }
 
   constructor(props) {
