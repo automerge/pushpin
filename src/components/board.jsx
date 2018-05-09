@@ -2,14 +2,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
+import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Loop from '../loop'
 import Card from './card'
 import * as Model from '../model'
+import ColorPicker from './color-picker'
 
-const { Menu, MenuItem, dialog } = remote
+const { dialog } = remote
 
 const log = Debug('pushpin:board')
+const BOARD_MENU_ID = 'BoardMenu'
+
+const dialogOptions = {
+  properties: ['openFile'],
+  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
+}
 
 const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
@@ -42,7 +50,8 @@ export default class Board extends React.PureComponent {
 
     this.onClick = this.onClick.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
-    this.onContextMenu = this.onContextMenu.bind(this)
+    this.onAddNote = this.onAddNote.bind(this)
+    this.onAddImage = this.onAddImage.bind(this)
   }
 
   componentDidMount() {
@@ -76,34 +85,31 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  onContextMenu(e) {
-    log('onContextMenu')
-    e.preventDefault()
+  onAddNote(e) {
     const x = e.pageX
     const y = e.pageY
-    const menu = new Menu()
-    menu.append(new MenuItem({ label: 'Add Note',
-      click() {
-        Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
-      } }))
-    menu.append(new MenuItem({ label: 'Add Image',
-      click() {
-        dialog.showOpenDialog({
-          properties: ['openFile'],
-          filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
-        }, (paths) => {
-          // User aborted.
-          if (!paths) {
-            return
-          }
-          if (paths.length !== 1) {
-            throw new Error('Expected exactly one path?')
-          }
-          const path = paths[0]
-          Loop.dispatch(Model.processImage, { path, x, y })
-        })
-      } }))
-    menu.popup({ window: remote.getCurrentWindow() })
+    Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
+  }
+
+  onAddImage(e) {
+    const x = e.pageX
+    const y = e.pageY
+    dialog.showOpenDialog(dialogOptions, (paths) => {
+      // User aborted.
+      if (!paths) {
+        return
+      }
+      if (paths.length !== 1) {
+        throw new Error('Expected exactly one path?')
+      }
+      const path = paths[0]
+      Loop.dispatch(Model.processImage, { path, x, y })
+    })
+  }
+
+  onChangeBoardBackgroundColor(color) {
+    log('onChangeBoardBackgroundColor')
+    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: color.hex })
   }
 
   render() {
@@ -113,18 +119,54 @@ export default class Board extends React.PureComponent {
     const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
       <Card key={id} card={card} selected={this.props.selected.includes(id)} />)
 
+    const contextMenu = (
+      <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
+        <div className="ContextMenu__section">
+          <ContextMenuItem onClick={this.onAddNote}>
+            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+              <i className="fa fa-sticky-note" />
+            </div>
+            <span className="ContextMenu__label"> Note </span>
+          </ContextMenuItem>
+
+          <ContextMenuItem onClick={this.onAddImage}>
+            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--file">
+              <i className="fa fa-folder-open" />
+            </div>
+            <span className="ContextMenu__label"> Choose image from file... </span>
+          </ContextMenuItem>
+        </div>
+
+        <div className="ContextMenu__divider" />
+
+        <div className="ContextMenu__section">
+          <ContextMenuItem>
+            <ColorPicker
+              color={this.props.backgroundColor}
+              colors={Object.values(Model.BOARD_COLORS)}
+              onChangeComplete={this.onChangeBoardBackgroundColor}
+            />
+          </ContextMenuItem>
+        </div>
+      </ContextMenu>
+    )
+
     return (
-      <div
-        id="board"
-        className="board"
-        ref={(e) => { this.boardRef = e }}
-        style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
-        onClick={this.onClick}
-        onDoubleClick={this.onDoubleClick}
-        onContextMenu={this.onContextMenu}
-        role="presentation"
-      >
-        {cardChildren}
+      <div>
+        { contextMenu }
+        <ContextMenuTrigger holdToDisplay={-1} id={BOARD_MENU_ID}>
+          <div
+            id="board"
+            className="board"
+            ref={(e) => { this.boardRef = e }}
+            style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
+            onClick={this.onClick}
+            onDoubleClick={this.onDoubleClick}
+            role="presentation"
+          >
+            {cardChildren}
+          </div>
+        </ContextMenuTrigger>
       </div>
     )
   }

@@ -2,12 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
-import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Loop from '../loop'
 import * as Model from '../model'
 import HashForm from './hash-form'
-import ColorPicker from './color-picker'
 
 const log = Debug('pushpin:title-bar')
 
@@ -16,8 +14,7 @@ export default class TitleBar extends React.PureComponent {
     formDocId: PropTypes.string.isRequired,
     activeDocId: PropTypes.string.isRequired,
     requestedDocId: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    boardBackgroundColor: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired
   }
 
   constructor(props) {
@@ -63,21 +60,6 @@ export default class TitleBar extends React.PureComponent {
           classLoading="TitleBar__titleText--loading"
           classInvalid="TitleBar__titleText--invalid"
         />
-
-        <Dropdown>
-          <DropdownTrigger>
-            <div className="TitleBar__dropDown">
-              &#xf180;
-            </div>
-          </DropdownTrigger>
-          <DropdownContent>
-            <ColorPicker
-              color={this.props.boardBackgroundColor}
-              colors={Object.values(Model.BOARD_COLORS)}
-              onChangeComplete={this.onChangeBoardBackgroundColor}
-            />
-          </DropdownContent>
-        </Dropdown>
 
         <HashForm
           formDocId={this.props.formDocId}
