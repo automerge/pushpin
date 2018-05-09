@@ -13,6 +13,11 @@ const { Menu, MenuItem, dialog } = remote
 const log = Debug('pushpin:board')
 const BOARD_MENU_ID = 'BoardMenu'
 
+const dialogOptions = {
+  properties: ['openFile'],
+  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
+}
+
 const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
          (y >= card.y) &&
@@ -44,6 +49,8 @@ export default class Board extends React.PureComponent {
 
     this.onClick = this.onClick.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
+    this.onAddNote = this.onAddNote.bind(this)
+    this.onAddImage = this.onAddImage.bind(this)
   }
 
   componentDidMount() {
@@ -77,34 +84,26 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  onContextMenu(e) {
-    log('onContextMenu')
-    e.preventDefault()
+  onAddNote(e) {
     const x = e.pageX
     const y = e.pageY
-    const menu = new Menu()
-    menu.append(new MenuItem({ label: 'Add Note',
-      click() {
-        Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
-      } }))
-    menu.append(new MenuItem({ label: 'Add Image',
-      click() {
-        dialog.showOpenDialog({
-          properties: ['openFile'],
-          filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
-        }, (paths) => {
-          // User aborted.
-          if (!paths) {
-            return
-          }
-          if (paths.length !== 1) {
-            throw new Error('Expected exactly one path?')
-          }
-          const path = paths[0]
-          Loop.dispatch(Model.processImage, { path, x, y })
-        })
-      } }))
-    menu.popup({ window: remote.getCurrentWindow() })
+    Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
+  }
+
+  onAddImage(e) {
+    const x = e.pageX
+    const y = e.pageY
+    dialog.showOpenDialog(dialogOptions, (paths) => {
+      // User aborted.
+      if (!paths) {
+        return
+      }
+      if (paths.length !== 1) {
+        throw new Error('Expected exactly one path?')
+      }
+      const path = paths[0]
+      Loop.dispatch(Model.processImage, { path, x, y })
+    })
   }
 
   render() {
@@ -116,14 +115,14 @@ export default class Board extends React.PureComponent {
 
     const contextMenu = (
       <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
-        <ContextMenuItem onClick={() => alert('note')}>
+        <ContextMenuItem onClick={this.onAddNote}>
           <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
             <i className="fa fa-sticky-note" />
           </div>
           <span className="ContextMenu__label"> Note </span>
         </ContextMenuItem>
 
-        <ContextMenuItem onClick={() => alert('image')}>
+        <ContextMenuItem onClick={this.onAddImage}>
           <div className="ContextMenu__iconBounding ContextMenu__iconBounding--file">
             <i className="fa fa-folder-open" />
           </div>
