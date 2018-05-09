@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
+import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Loop from '../loop'
 import Card from './card'
@@ -10,6 +11,7 @@ import * as Model from '../model'
 const { Menu, MenuItem, dialog } = remote
 
 const log = Debug('pushpin:board')
+const BOARD_MENU_ID = 'BoardMenu'
 
 const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
@@ -42,7 +44,6 @@ export default class Board extends React.PureComponent {
 
     this.onClick = this.onClick.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
-    this.onContextMenu = this.onContextMenu.bind(this)
   }
 
   componentDidMount() {
@@ -113,18 +114,40 @@ export default class Board extends React.PureComponent {
     const cardChildren = Object.entries(this.props.cards).map(([id, card]) =>
       <Card key={id} card={card} selected={this.props.selected.includes(id)} />)
 
+    const contextMenu = (
+      <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
+        <ContextMenuItem onClick={() => alert('note')}>
+          <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+            <i className="fa fa-sticky-note" />
+          </div>
+          <span className="ContextMenu__label"> Note </span>
+        </ContextMenuItem>
+
+        <ContextMenuItem onClick={() => alert('image')}>
+          <div className="ContextMenu__iconBounding ContextMenu__iconBounding--file">
+            <i className="fa fa-folder-open" />
+          </div>
+          <span className="ContextMenu__label"> Choose image from file... </span>
+        </ContextMenuItem>
+      </ContextMenu>
+    )
+
     return (
-      <div
-        id="board"
-        className="board"
-        ref={(e) => { this.boardRef = e }}
-        style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
-        onClick={this.onClick}
-        onDoubleClick={this.onDoubleClick}
-        onContextMenu={this.onContextMenu}
-        role="presentation"
-      >
-        {cardChildren}
+      <div>
+        { contextMenu }
+        <ContextMenuTrigger id={BOARD_MENU_ID}>
+          <div
+            id="board"
+            className="board"
+            ref={(e) => { this.boardRef = e }}
+            style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
+            onClick={this.onClick}
+            onDoubleClick={this.onDoubleClick}
+            role="presentation"
+          >
+            {cardChildren}
+          </div>
+        </ContextMenuTrigger>
       </div>
     )
   }
