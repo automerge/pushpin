@@ -10,15 +10,7 @@ import * as Model from '../model'
 
 const log = Debug('pushpin:inline-editor')
 
-export default class InlineEditor extends React.PureComponent {
-  static propTypes = {
-    text: PropTypes.string.isRequired,
-    selected: PropTypes.bool.isRequired,
-    cardId: PropTypes.string.isRequired,
-    cardHeight: PropTypes.number.isRequired,
-    onLocalHeight: PropTypes.func.isRequired
-  }
-
+class InlineEditor extends React.PureComponent {
   constructor(props) {
     log('constructor')
     super(props)
@@ -125,3 +117,14 @@ export default class InlineEditor extends React.PureComponent {
     )
   }
 }
+
+InlineEditor.propTypes = {
+  text: PropTypes.string.isRequired,
+  selected: PropTypes.bool.isRequired,
+  cardId: PropTypes.string.isRequired,
+  cardHeight: PropTypes.number.isRequired,
+  onLocalHeight: PropTypes.func.isRequired,
+
+}
+
+export default InlineEditor

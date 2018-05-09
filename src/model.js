@@ -392,7 +392,7 @@ export function clearSelections(state) {
   return { ...state, selected: [] }
 }
 
-export function cardDelete(state, { id }) {
+export function cardDeleted(state, { id }) {
   const newBoard = state.hm.change(state.board, (b) => {
     delete b.cards[id]
   })
@@ -400,12 +400,19 @@ export function cardDelete(state, { id }) {
 }
 
 export function boardBackspaced(state) {
-  // XXX: rewrite this
-  const deleteCardIDs = Object.entries(state.board.cards)
-    .filter(([id, card]) => (state.selected.includes(id)) && (card.type !== 'text'))
-    .map(([id, card]) => id)
+  // backspace on the board can't erase a single text card
+  if (state.selected.length === 1) {
+    const card = state.board.cards[state.selected[0]]
+    if (card && card.type === 'text') {
+      return state
+    }
+  }
 
-  state = deleteCardIDs.reduce((state, id) => (cardDelete(state, { id })), state)
+  // still inefficient, but better
+  const deleteCardIDs = Object.keys(state.board.cards)
+    .filter((id) => (state.selected.includes(id)))
+
+  state = deleteCardIDs.reduce((state, id) => (cardDeleted(state, { id })), state)
 
   return state
 }
