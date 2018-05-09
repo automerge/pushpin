@@ -7,8 +7,9 @@ import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 're
 import Loop from '../loop'
 import Card from './card'
 import * as Model from '../model'
+import ColorPicker from './color-picker'
 
-const { Menu, MenuItem, dialog } = remote
+const { dialog } = remote
 
 const log = Debug('pushpin:board')
 const BOARD_MENU_ID = 'BoardMenu'
@@ -106,6 +107,11 @@ export default class Board extends React.PureComponent {
     })
   }
 
+  onChangeBoardBackgroundColor(color) {
+    log('onChangeBoardBackgroundColor')
+    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: color.hex })
+  }
+
   render() {
     log('render')
 
@@ -127,13 +133,21 @@ export default class Board extends React.PureComponent {
           </div>
           <span className="ContextMenu__label"> Choose image from file... </span>
         </ContextMenuItem>
+
+        <ContextMenuItem>
+          <ColorPicker
+            color={this.props.backgroundColor}
+            colors={Object.values(Model.BOARD_COLORS)}
+            onChangeComplete={this.onChangeBoardBackgroundColor}
+          />
+        </ContextMenuItem>
       </ContextMenu>
     )
 
     return (
       <div>
         { contextMenu }
-        <ContextMenuTrigger holdToDisplay={ -1 } id={BOARD_MENU_ID}>
+        <ContextMenuTrigger holdToDisplay={-1} id={BOARD_MENU_ID}>
           <div
             id="board"
             className="board"
