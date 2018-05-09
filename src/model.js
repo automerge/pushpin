@@ -301,7 +301,7 @@ function populateDemoBoard(state) {
   const newBoard = state.hm.change(state.board, (b) => {
     b.cards = {}
   })
-  let newState = ({}, state, { board: newBoard })
+  let newState = { ...state, board: newBoard }
   newState = cardCreatedText(newState, { x: 1350, y: 100, text: WELCOME_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 250, text: USAGE_TEXT })
   newState = cardCreatedText(newState, { x: 1350, y: 750, text: EXAMPLE_TEXT })
