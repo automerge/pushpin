@@ -41,7 +41,7 @@ export default class Board extends React.PureComponent {
   static propTypes = {
     backgroundColor: PropTypes.string,
     selected: PropTypes.arrayOf(PropTypes.string),
-    cards: PropTypes.shape(PropTypes.objectOf(Card.propTypes)).isRequired,
+    cards: PropTypes.objectOf(Card.propTypes.card).isRequired,
   }
 
   constructor(props) {
