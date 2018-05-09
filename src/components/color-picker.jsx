@@ -30,18 +30,16 @@ class ColorPicker extends React.PureComponent {
   }
 
   render() {
-    const swatches = this.props.colors.map((c) => {
-      return (
-        <div key={c} className="ColorPicker__swatch">
-          <Swatch
-            color={c}
-            hex={c}
-            onClick={this.handleChange}
-            focusStyle={{ boxShadow: `0 0 4px ${c}` }}
-          />
-        </div>
-      )
-    })
+    const swatches = this.props.colors.map((c) => (
+      <div key={c} className="ColorPicker__swatch">
+        <Swatch
+          color={c}
+          hex={c}
+          onClick={this.handleChange}
+          focusStyle={{ boxShadow: `0 0 4px ${c}` }}
+        />
+      </div>
+    ))
 
     return (
       <div className="ColorPicker" >
