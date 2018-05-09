@@ -289,6 +289,7 @@ export default class Card extends React.PureComponent {
           id={`card-${card.id}`}
           className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
           style={style}
+          onContextMenu={e => e.stopPropagation()}
         >
           {card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(this.state)}
           <span className="cardResizeHandle" />
