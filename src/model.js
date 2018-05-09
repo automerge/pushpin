@@ -147,7 +147,7 @@ export const empty = {
   formDocId: '',
   activeDocId: '',
   requestedDocId: '',
-  selected: null,
+  selected: [],
   board: {
     cards: {},
     backgroundColor: '',
@@ -288,7 +288,7 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
     b.cards[id] = newCard
   })
 
-  const newSelected = selected ? id : state.selected
+  const newSelected = selected ? [id] : []
 
   return { ...state, board: newBoard, selected: newSelected }
 }
@@ -369,16 +369,27 @@ export function cardResized(state, { id, width, height }) {
   return { ...state, board: newBoard }
 }
 
+export function cardToggleSelection(state, { id }) {
+  if (state.selected.includes(id)) {
+    return { ...state, selected: state.selected.filter((filterId) => filterId !== id) }
+  }
+  return { ...state, selected: [...state.selected, id] }
+}
+
 export function cardSelected(state, { id }) {
-  return { ...state, selected: id }
+  // allow either an array or a single card to be passed in
+  if (id.constructor !== Array) {
+    id = [id]
+  }
+  return { ...state, selected: [...state.selected, ...id] }
 }
 
 export function cardUniquelySelected(state, { id }) {
-  return cardSelected(state, { id })
+  return { ...state, selected: [id] }
 }
 
 export function clearSelections(state) {
-  return { ...state, selected: null }
+  return { ...state, selected: [] }
 }
 
 export function cardDelete(state, { id }) {
@@ -389,8 +400,9 @@ export function cardDelete(state, { id }) {
 }
 
 export function boardBackspaced(state) {
+  // XXX: rewrite this
   const deleteCardIDs = Object.entries(state.board.cards)
-    .filter(([id, card]) => (id === state.selected) && (card.type !== 'text'))
+    .filter(([id, card]) => (state.selected.includes(id)) && (card.type !== 'text'))
     .map(([id, card]) => id)
 
   state = deleteCardIDs.reduce((state, id) => (cardDelete(state, { id })), state)
