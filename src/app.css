@@ -85,13 +85,8 @@ body {
 }
 
 .TitleBar__dropDown {
-  width: 16px;
-  height: 17px;
   opacity: 0.75;
-  font-family: 'LineAwesome';
   font-size: 16px;
-  text-align: left;
-  color: #000000;
 }
 
 .HashForm {

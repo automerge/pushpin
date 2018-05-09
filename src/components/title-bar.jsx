@@ -67,7 +67,7 @@ export default class TitleBar extends React.PureComponent {
         <Dropdown>
           <DropdownTrigger>
             <div className="TitleBar__dropDown">
-              &#xf180;
+              <i className="fa fa-chevron-circle-down"></i>
             </div>
           </DropdownTrigger>
           <DropdownContent>
