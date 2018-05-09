@@ -64,6 +64,52 @@ body {
   line-height: 1.54;
 }
 
+.ContextMenu {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  min-width: 228px;
+  padding: 5px;
+}
+
+.ContextMenu__iconBounding {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.ContextMenu .react-contextmenu-item {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.ContextMenu .react-contextmenu-item:last-child {
+  margin-bottom: 0px;
+}
+
+.ContextMenu__iconBounding--note {
+  background-image: linear-gradient(135deg, #d2e5f7, #f1dce4);
+  color: #102542;
+}
+
+.ContextMenu__iconBounding--file {
+  background-image: linear-gradient(135deg, #85e2f8, #c7d7e3);
+  color: #006476;
+}
+
+.ContextMenu__iconBounding .fa {
+  font-size: 22px;
+}
+
+.ContextMenu__label {
+  vertical-align: middle;
+}
+
 .TitleBar {
   position: fixed;
   top: 0px;
@@ -113,7 +159,6 @@ body {
 }
 
 div.board {
-  position: absolute;
   background-image: url(grid.svg);
 }
 
