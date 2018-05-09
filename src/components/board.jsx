@@ -134,7 +134,7 @@ export default class Board extends React.PureComponent {
     return (
       <div>
         { contextMenu }
-        <ContextMenuTrigger id={BOARD_MENU_ID}>
+        <ContextMenuTrigger holdToDisplay={ -1 } id={BOARD_MENU_ID}>
           <div
             id="board"
             className="board"
