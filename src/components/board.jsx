@@ -121,19 +121,23 @@ export default class Board extends React.PureComponent {
 
     const contextMenu = (
       <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
-        <ContextMenuItem onClick={this.onAddNote}>
-          <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-            <i className="fa fa-sticky-note" />
-          </div>
-          <span className="ContextMenu__label"> Note </span>
-        </ContextMenuItem>
+        <div className="ContextMenu__section">
+          <ContextMenuItem onClick={this.onAddNote}>
+            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+              <i className="fa fa-sticky-note" />
+            </div>
+            <span className="ContextMenu__label"> Note </span>
+          </ContextMenuItem>
 
-        <ContextMenuItem onClick={this.onAddImage}>
-          <div className="ContextMenu__iconBounding ContextMenu__iconBounding--file">
-            <i className="fa fa-folder-open" />
-          </div>
-          <span className="ContextMenu__label"> Choose image from file... </span>
-        </ContextMenuItem>
+          <ContextMenuItem onClick={this.onAddImage}>
+            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--file">
+              <i className="fa fa-folder-open" />
+            </div>
+            <span className="ContextMenu__label"> Choose image from file... </span>
+          </ContextMenuItem>
+        </div>
+
+        <div className="ContextMenu__divider" />
 
         <ContextMenuItem>
           <ColorPicker
