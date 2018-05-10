@@ -194,6 +194,7 @@ div.board {
 
 div.card {
   background: #ffffff;
+  border: solid 1px #d5dfe5;
 }
 
 div.card.text {
@@ -201,7 +202,7 @@ div.card.text {
 }
 
 div.card.text.selected {
-  outline: 4px solid black;
+  outline: 2px solid black;
 }
 
 div.card.selected {
@@ -230,12 +231,13 @@ div.card {
 div.card img.image {
   height: 100%;
   width: 100%;
+  object-fit: cover;
   pointer-events: none;
   user-select: none;
 }
 
 div.card.image {
-  padding: 4px;
+  padding: 12px;
 }
 
 .CodeMirrorEditor {
@@ -247,7 +249,7 @@ div.card.image {
 .CodeMirrorEditor__editor {
   box-sizing: border-box;
   width: 100%;
-  padding: 21px;
+  padding: 12px;
 }
 
 .CodeMirrorEditor div.CodeMirror {
@@ -298,7 +300,8 @@ div.card.image {
 
 .CodeMirrorEditor__renderer h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
-  line-height: 1.25;
+  line-height: 1.33;
+  letter-spacing: -0.5px;
   color: #102542;
 }
 

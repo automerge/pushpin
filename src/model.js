@@ -27,13 +27,24 @@ export const RESIZE_HANDLE_SIZE = 21
 
 export const BOARD_COLORS = {
   SNOW: '#f9f9f9',
-  BEIGE: '#cbc5b5',
+  BEIGE: '#f3f1ec',
   SKY: '#dcf3f6',
   VIOLET: '#e5dcf6',
   PINK: '#ffe1e7',
   HERB: '#daefd2',
   PEACH: '#ffd2cc',
-  CLOUD: '#d5dfe5'
+  CLOUD: '#d5dfe5',
+}
+
+export const CARD_COLORS = {
+  SNOW: '#ffffff',
+  BEIGE: '#cbc5b5',
+  SKY: '#8edce6',
+  VIOLET: '#a98fdc',
+  PINK: '#ff87a1',
+  HERB: '#b5e6a1',
+  PEACH: '#ff7868',
+  CLOUD: '#e5ebf3',
 }
 
 const RECENT_DOCS_MAX = 5
@@ -257,8 +268,9 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
       type,
       x: snapX,
       y: snapY,
-      width: width || CARD_DEFAULT_WIDTH,
-      height: height || CARD_DEFAULT_HEIGHT,
+      // add +1 to width and height so that the borders cover the grid exactly and each other
+      width: snapToGrid(width || CARD_DEFAULT_WIDTH) + 1,
+      height: snapToGrid(height || CARD_DEFAULT_HEIGHT) + 1,
       slackWidth: 0,
       slackHeight: 0,
       resizing: false,
@@ -333,7 +345,7 @@ export function cardTextChanged(state, { id, at, removedLength, addedText }) {
 export function cardTextResized(state, { id, height }) {
   const newBoard = state.hm.change(state.board, (b) => {
     const card = b.cards[id]
-    card.height = height
+    card.height = snapToGrid(height + (GRID_SIZE / 2)) + 1
   })
   return { ...state, board: newBoard }
 }
@@ -362,8 +374,8 @@ export function cardMoved(state, { id, x, y }) {
 export function cardResized(state, { id, width, height }) {
   const newBoard = state.hm.change(state.board, (b) => {
     const card = b.cards[id]
-    card.width = width
-    card.height = height
+    card.width = snapToGrid(width) + 1
+    card.height = snapToGrid(height) + 1
   })
   return { ...state, board: newBoard }
 }
