@@ -14,7 +14,7 @@ export default class App extends React.PureComponent {
       activeDocId: PropTypes.string,
       requestedDocId: PropTypes.string,
       selected: PropTypes.arrayOf(PropTypes.string),
-      board: PropTypes.shape(Board.propTypes).isRequired,
+      board: PropTypes.shape(Board.propTypes),
     }).isRequired
   }
 
@@ -22,7 +22,7 @@ export default class App extends React.PureComponent {
     log('render')
 
     // Blank while state is initializing.
-    if (!this.props.state.board || Object.keys(this.props.state.board.cards).length === 0) {
+    if (!this.props.state.board || !this.props.state.board.cards) {
       return <div />
     }
 
