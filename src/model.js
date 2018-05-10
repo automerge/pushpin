@@ -78,7 +78,7 @@ mkdirp.sync(HYPERFILE_CACHE_PATH)
 // It's normal for a document with a lot of participants to have a lot of
 // connections, so increase the limit to avoid spurious warnings about
 // emitter leaks.
-EventEmitter.defaultMaxListeners = 50
+EventEmitter.defaultMaxListeners = 100
 
 // ## Pure helper functions.
 
