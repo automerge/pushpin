@@ -230,35 +230,31 @@ export default class Card extends React.PureComponent {
     this.tracking.totalDrag = null
 
     if (this.tracking.moving) {
-      this.tracking.moveX = Model.snapToGrid(this.tracking.moveX)
-      this.tracking.moveY = Model.snapToGrid(this.tracking.moveY)
-      this.setState({ moveX: null, moveY: null })
-      Loop.dispatch(Model.cardMoved, {
-        id: card.id,
-        x: this.tracking.moveX,
-        y: this.tracking.moveY
-      })
+      const x = Model.snapToGrid(this.tracking.moveX)
+      const y = Model.snapToGrid(this.tracking.moveY)
+
       this.tracking.moveX = null
       this.tracking.moveY = null
       this.tracking.slackX = null
       this.tracking.slackY = null
       this.tracking.moving = false
+
+      Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
+      this.setState({ moveX: null, moveY: null })
     }
 
     if (this.tracking.resizing) {
-      this.tracking.resizeWidth = Model.snapToGrid(this.tracking.resizeWidth)
-      this.tracking.resizeHeight = Model.snapToGrid(this.tracking.resizeHeight)
-      this.setState({ resizeWidth: null, resizeHeight: null })
-      Loop.dispatch(Model.cardResized, {
-        id: card.id,
-        width: this.tracking.resizeWidth,
-        height: this.tracking.resizeHeight
-      })
+      const width = Model.snapToGrid(this.tracking.resizeWidth)
+      const height = Model.snapToGrid(this.tracking.resizeHeight)
+
       this.tracking.resizeWidth = null
       this.tracking.resizeHeight = null
       this.tracking.slackWidth = null
       this.tracking.slackHeight = null
       this.tracking.resizing = false
+
+      Loop.dispatch(Model.cardResized, { id: card.id, width, height })
+      this.setState({ resizeWidth: null, resizeHeight: null })
     }
   }
 
