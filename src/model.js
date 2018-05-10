@@ -269,8 +269,8 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
     // image and text types is due to weird Automerge interactions that we
     // should revisit later.
     if (type === 'image') {
-      Object.assign(newCard, typeAttrs)
       b.cards[id] = newCard
+      b.cards[id].hyperfile = typeAttrs.hyperfile
     }
     if (type === 'text') {
       b.cards[id] = newCard
