@@ -67,6 +67,8 @@ export default class Card extends React.PureComponent {
   }
 
   componentDidMount() {
+    this._mounted = true
+
     if (this.props.card.type === 'image') {
       this.setState({ loading: true }, () => {
         Model.fetchImage(this.props.card.hyperfile, (error, imagePath) => {
@@ -74,10 +76,19 @@ export default class Card extends React.PureComponent {
             log(error)
           }
 
+          // This card may have been deleted by the time fetchImage returns,
+          // so check here to see if the component is still mounted
+          if (!this._mounted)
+            return
+
           this.setState({ loading: false, imagePath: `../${imagePath}` })
         })
       })
     }
+  }
+
+  componentWillUnmount() {
+    this._mounted = false
   }
 
   // Copy view-relevant move/resize state over to React.
