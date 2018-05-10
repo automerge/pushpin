@@ -82,19 +82,12 @@ export default class Card extends React.PureComponent {
 
   // Copy view-relevant move/resize state over to React.
   setDragState() {
-    if (this.tracking.moving) {
-      this.setState({
-        moveX: this.tracking.moveX,
-        moveY: this.tracking.moveY
-      })
-    }
-
-    if (this.tracking.resizing) {
-      this.setState({
-        resizeWidth: this.tracking.resizeWidth,
-        resizeHeight: this.tracking.resizeHeight
-      })
-    }
+    this.setState({
+      moveX: this.tracking.moveX,
+      moveY: this.tracking.moveY,
+      resizeWidth: this.tracking.resizeWidth,
+      resizeHeight: this.tracking.resizeHeight
+    })
   }
 
   onStart(e, d) {
@@ -240,7 +233,6 @@ export default class Card extends React.PureComponent {
       this.tracking.moving = false
 
       Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
-      this.setState({ moveX: null, moveY: null })
     }
 
     if (this.tracking.resizing) {
@@ -254,8 +246,9 @@ export default class Card extends React.PureComponent {
       this.tracking.resizing = false
 
       Loop.dispatch(Model.cardResized, { id: card.id, width, height })
-      this.setState({ resizeWidth: null, resizeHeight: null })
     }
+
+    this.setDragState()
   }
 
   render() {
