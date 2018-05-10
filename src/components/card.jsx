@@ -232,7 +232,7 @@ export default class Card extends React.PureComponent {
     if (this.tracking.moving) {
       this.tracking.moveX = Model.snapToGrid(this.tracking.moveX)
       this.tracking.moveY = Model.snapToGrid(this.tracking.moveY)
-      this.setDragState()
+      this.setState({ moveX: null, moveY: null })
       Loop.dispatch(Model.cardMoved, {
         id: card.id,
         x: this.tracking.moveX,
@@ -248,7 +248,7 @@ export default class Card extends React.PureComponent {
     if (this.tracking.resizing) {
       this.tracking.resizeWidth = Model.snapToGrid(this.tracking.resizeWidth)
       this.tracking.resizeHeight = Model.snapToGrid(this.tracking.resizeHeight)
-      this.setDragState()
+      this.setState({ resizeWidth: null, resizeHeight: null })
       Loop.dispatch(Model.cardResized, {
         id: card.id,
         width: this.tracking.resizeWidth,
