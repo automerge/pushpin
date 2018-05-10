@@ -238,110 +238,110 @@ div.card.image {
   padding: 4px;
 }
 
-.InlineEditor {
+.CodeMirrorEditor {
   cursor: text;
   text-align: left;
   color: #000000;
 }
 
-.InlineEditor__editor {
+.CodeMirrorEditor__editor {
   box-sizing: border-box;
   width: 100%;
   padding: 21px;
 }
 
-.InlineEditor div.CodeMirror {
+.CodeMirrorEditor div.CodeMirror {
   height: auto;
 }
 
-.InlineEditor div.CodeMirror-lines {
+.CodeMirrorEditor div.CodeMirror-lines {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
   line-height: 1.54;
   padding: 0;
 }
 
-.InlineEditor pre.CodeMirror-line {
+.CodeMirrorEditor pre.CodeMirror-line {
   padding: 0;
 }
 
-.InlineEditor__renderer {
+.CodeMirrorEditor__renderer {
   box-sizing: border-box;
   width: 100%;
   padding: 21px;
 }
 
-.InlineEditor__renderer a {
+.CodeMirrorEditor__renderer a {
   color: #0645ad;
   text-decoration: none;
 }
 
-.InlineEditor__renderer a:visited {
+.CodeMirrorEditor__renderer a:visited {
   color: #0b0080;
 }
 
-.InlineEditor__renderer a:hover {
+.CodeMirrorEditor__renderer a:hover {
   color: #06e;
 }
 
-.InlineEditor__renderer a:active {
+.CodeMirrorEditor__renderer a:active {
   color: #faa700;
 }
 
-.InlineEditor__renderer a:focus {
+.CodeMirrorEditor__renderer a:focus {
   outline: thin dotted;
 }
 
-.InlineEditor__renderer a:hover, a:active {
+.CodeMirrorEditor__renderer a:hover, a:active {
   outline: 0;
 }
 
-.InlineEditor__renderer h1, h2, h3, h4, h5, h6 {
+.CodeMirrorEditor__renderer h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
   line-height: 1.25;
   color: #102542;
 }
 
-.InlineEditor__renderer h4, h5, h6 {
+.CodeMirrorEditor__renderer h4, h5, h6 {
   font-weight: bold;
 }
 
-.InlineEditor__renderer h1 {
+.CodeMirrorEditor__renderer h1 {
   font-size: 2.5em;
 }
 
-.InlineEditor__renderer h2 {
+.CodeMirrorEditor__renderer h2 {
   font-size: 2em;
 }
 
-.InlineEditor__renderer h3 {
+.CodeMirrorEditor__renderer h3 {
   font-size: 1.5em;
 }
 
-.InlineEditor__renderer h4 {
+.CodeMirrorEditor__renderer h4 {
   font-size: 1.2em;
 }
 
-.InlineEditor__renderer h5 {
+.CodeMirrorEditor__renderer h5 {
   font-size: 1em;
 }
 
-.InlineEditor__renderer h6 {
+.CodeMirrorEditor__renderer h6 {
   font-size: 0.9em;
 }
 
-.InlineEditor__renderer p {
+.CodeMirrorEditor__renderer p {
   margin: 1.5em 0;
 }
 
-.InlineEditor__renderer blockquote {
+.CodeMirrorEditor__renderer blockquote {
   color: #666666;
   margin: 0;
   padding-left: 3em;
   border-left: 0.5em #eee solid;
 }
 
-.InlineEditor__renderer hr {
+.CodeMirrorEditor__renderer hr {
   display: block;
   border: 0;
   border-top: 1px solid #aaa;
@@ -350,81 +350,81 @@ div.card.image {
   padding: 0;
 }
 
-.InlineEditor__rendererpre, code, kbd, samp {
+.CodeMirrorEditor__rendererpre, code, kbd, samp {
   color: #000;
   font-family: 'Courier New', monospace;
   font-size: 0.98em;
 }
 
-.InlineEditor__renderer pre {
+.CodeMirrorEditor__renderer pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-.InlineEditor__renderer b, strong {
+.CodeMirrorEditor__renderer b, strong {
   font-weight: bold;
 }
 
-.InlineEditor__renderer dfn {
+.CodeMirrorEditor__renderer dfn {
   font-style: italic;
 }
 
-.InlineEditor__renderer ins {
+.CodeMirrorEditor__renderer ins {
   background: #ff9;
   color: #000;
   text-decoration: none;
 }
 
-.InlineEditor__renderer mark {
+.CodeMirrorEditor__renderer mark {
   background: #ff0;
   color: #000;
   font-style: italic;
   font-weight: bold;
 }
 
-.InlineEditor__renderer sub, sup {
+.CodeMirrorEditor__renderer sub, sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
   vertical-align: baseline;
 }
 
-.InlineEditor__renderer sup {
+.CodeMirrorEditor__renderer sup {
   top: -0.5em;
 }
 
-.InlineEditor__renderer sub {
+.CodeMirrorEditor__renderer sub {
   bottom: -0.25em;
 }
 
-.InlineEditor__renderer ul, ol {
+.CodeMirrorEditor__renderer ul, ol {
   list-style-type: disc;
   margin: 1em 0;
   padding: 0 0 0 2em;
 }
 
-.InlineEditor__renderer li p:last-child {
+.CodeMirrorEditor__renderer li p:last-child {
   margin: 0;
 }
 
-.InlineEditor__renderer dd {
+.CodeMirrorEditor__renderer dd {
   margin: 0 0 0 2em;
 }
 
-.InlineEditor__renderer table {
+.CodeMirrorEditor__renderer table {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-.InlineEditor__renderer td {
+.CodeMirrorEditor__renderer td {
   vertical-align: top;
 }
 
-.InlineEditor__renderer :first-child {
+.CodeMirrorEditor__renderer :first-child {
   margin-top: 0;
 }
 
-.InlineEditor__renderer :last-child {
+.CodeMirrorEditor__renderer :last-child {
   margin-bottom: 0;
 }

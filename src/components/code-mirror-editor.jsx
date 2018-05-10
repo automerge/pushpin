@@ -8,7 +8,7 @@ import Debug from 'debug'
 import Loop from '../loop'
 import * as Model from '../model'
 
-const log = Debug('pushpin:inline-editor')
+const log = Debug('pushpin:code-mirror-editor')
 
 const invisibleStyle = { visibility: 'hidden', position: 'absolute' }
 const visibleStyle = { }
@@ -44,7 +44,7 @@ const visibleStyle = { }
 //
 // This component is not "pure" in the literal sense. But PureComponent still
 // seems to give the right caching behaviour, so for now we'll extend from it.
-export default class InlineEditor extends React.PureComponent {
+export default class CodeMirrorEditor extends React.PureComponent {
   static propTypes = {
     text: PropTypes.shape({
       objectId: PropTypes.string,
@@ -212,16 +212,16 @@ export default class InlineEditor extends React.PureComponent {
     log('render')
 
     return (
-      <div className="InlineEditor">
+      <div className="CodeMirrorEditor">
         <div
           id={`editor-${this.props.cardId}`}
-          className="InlineEditor__editor"
+          className="CodeMirrorEditor__editor"
           style={this.props.uniquelySelected ? visibleStyle : invisibleStyle}
           ref={this.setEditorRef}
         />
         <div
           id={`renderer-${this.props.cardId}`}
-          className="InlineEditor__renderer"
+          className="CodeMirrorEditor__renderer"
           style={this.props.uniquelySelected ? invisibleStyle : visibleStyle}
           ref={this.setRendererRef}
         >

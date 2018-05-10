@@ -4,7 +4,7 @@ import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
 import Debug from 'debug'
 
-import InlineEditor from './inline-editor'
+import CodeMirrorEditor from './code-mirror-editor'
 import Loop from '../loop'
 import * as Model from '../model'
 
@@ -21,7 +21,7 @@ export default class Card extends React.PureComponent {
       y: PropTypes.number,
       height: PropTypes.number,
       width: PropTypes.number,
-      text: InlineEditor.propTypes.text.isOptional,
+      text: CodeMirrorEditor.propTypes.text.isOptional,
       hyperfile: PropTypes.object.isOptional,
     }).isRequired
   }
@@ -299,7 +299,7 @@ export default class Card extends React.PureComponent {
 
   renderTextInner() {
     return (
-      <InlineEditor
+      <CodeMirrorEditor
         cardId={this.props.card.id}
         cardHeight={this.props.card.height}
         uniquelySelected={this.props.uniquelySelected}
