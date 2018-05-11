@@ -167,21 +167,24 @@ body {
 
 .HashForm {
   align-self: right;
-  background: blue;
   text-align: center;
   margin-left: auto;
-  margin-right: 8px;
-  width: 43em;
 }
 
 .HashForm input {
-  background: #ffffff;
-  width: 100%;
+  background-color: #f3f3f3;
+  width: 40em;
   height: 28px;
   text-align: center;
   color: #444;
-  font-size: 14px;
+  font-size: 12px;
   font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+  border: none;
+  padding: 0;
+  margin-top: 8px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
 }
 
 .HashForm input.loading {
