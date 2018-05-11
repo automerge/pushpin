@@ -47,7 +47,7 @@ table {
 
 :root {
 	--colorBlueBlack: #102542;
-	--colorBlack: #000000;
+	--colorBlack: var(--colorBlack);
 	--colorSecondaryGrey: #637389;
 	--colorPaleGrey: #D5DFE5;
 	--colorInputGrey: #f3f3f3;
@@ -89,7 +89,7 @@ body {
 
 .ContextMenu__divider {
   height: 1px;
-  border-top: 1px solid #EEE;
+  border-top: 1px solid #f3f3f3;
 }
 
 .ContextMenu__section {
@@ -224,7 +224,7 @@ div.board {
 
 div.card {
   background: #ffffff;
-  border: solid 1px #d5dfe5;
+  border: solid 1px var(--colorPaleGrey);
   border-top: 0
 }
 
@@ -277,7 +277,7 @@ div.card.image {
 .CodeMirrorEditor {
   cursor: text;
   text-align: left;
-  color: #000000;
+  color: var(--colorBlack);
 }
 
 .CodeMirrorEditor__editor {
@@ -375,20 +375,20 @@ div.card.image {
   color: #666666;
   margin: 0;
   padding-left: 3em;
-  border-left: 0.5em #eee solid;
+  border-left: 0.5em var(--colorInputGrey) solid;
 }
 
 .CodeMirrorEditor__renderer hr {
   display: block;
   border: 0;
   border-top: 1px solid #aaa;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--colorInputGrey);
   margin: 1em 0;
   padding: 0;
 }
 
 .CodeMirrorEditor__rendererpre, code, kbd, samp {
-  color: #000;
+  color: var(--colorBlack);
 	font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
   font-size: 12px;
 	line-height:16px;
@@ -411,13 +411,13 @@ div.card.image {
 
 .CodeMirrorEditor__renderer ins {
   background: #ff9;
-  color: #000;
+  color: var(--colorBlack);
   text-decoration: none;
 }
 
 .CodeMirrorEditor__renderer mark {
   background: #ff0;
-  color: #000;
+  color: var(--colorBlack);
   font-style: italic;
   font-weight: bold;
 }
