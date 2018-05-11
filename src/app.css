@@ -270,7 +270,7 @@ div.card.image {
 .CodeMirrorEditor__renderer {
   box-sizing: border-box;
   width: 100%;
-  padding: 21px;
+  padding: 12px;
 }
 
 .CodeMirrorEditor__renderer a {
