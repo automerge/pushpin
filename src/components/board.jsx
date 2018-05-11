@@ -151,14 +151,14 @@ export default class Board extends React.PureComponent {
             <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
               <i className="fa fa-sticky-note" />
             </div>
-            <span className="ContextMenu__label"> Note </span>
+            <span className="ContextMenu__label">Note</span>
           </ContextMenuItem>
 
           <ContextMenuItem onClick={this.onAddImage}>
             <div className="ContextMenu__iconBounding ContextMenu__iconBounding--file">
               <i className="fa fa-folder-open" />
             </div>
-            <span className="ContextMenu__label"> Choose image from file... </span>
+            <span className="ContextMenu__label">Choose image from file...</span>
           </ContextMenuItem>
         </div>
 

@@ -43,6 +43,17 @@ table {
 	border-spacing: 0;
 }
 
+/* Variables */
+
+:root {
+	--colorBlueBlack: #102542;
+	--colorBlack: #000000;
+	--colorSecondaryGrey: #637389;
+	--colorPaleGrey: #D5DFE5;
+	--colorInputGrey: #f3f3f3;
+	--colorLink: #0645ad;
+}
+
 
 /* Dropdown React component functional styles */
 
@@ -65,13 +76,14 @@ table {
 body {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
-  line-height: 1.54;
+  line-height: 1.538461538;
+	-webkit-font-smoothing: antialiased;
 }
 
 .ContextMenu {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  width: 210px;
+  width: 224px;
   z-index: 10;
 }
 
@@ -81,33 +93,33 @@ body {
 }
 
 .ContextMenu__section {
-  padding: 10px;
+	padding: 4px 0;
 }
 
 .ContextMenu__iconBounding {
   display: inline-block;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
   vertical-align: middle;
-  margin-right: 5px;
+  margin-right: 8px;
 }
 
 .ContextMenu .react-contextmenu-item {
-  margin-bottom: 5px;
+	padding: 4px 8px;
   cursor: pointer;
 }
-
+insta
 .ContextMenu .react-contextmenu-item:last-child {
   margin-bottom: 0px;
 }
 
 .ContextMenu__iconBounding--note {
   background-image: linear-gradient(135deg, #d2e5f7, #f1dce4);
-  color: #102542;
+  color: var(--colorBlueBlack);
 }
 
 .ContextMenu__iconBounding--file {
@@ -128,15 +140,15 @@ body {
   border: 0 solid rgba(0,0,0,0.25);
   border-radius: 2px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 5px;
-  justify-items: center;
+  grid-template-columns: repeat(6, 1fr);
+  grid-gap: 8px;
 }
 
 .ColorPicker__swatch {
-  width: 38px;
-  height: 38px;
-  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+	overflow: hidden;
 }
 
 .TitleBar {
@@ -153,11 +165,26 @@ body {
 
 .TitleBar__logo {
   margin-left: 16px;
-  margin-right: 11px;
+  margin-right: 8px;
 }
 
 .TitleBar__titleText {
-  width: 20%;
+  width: 224px;
+	padding: 0px 4px;
+	white-space: nowrap;
+	overflow:hidden;
+	text-overflow: ellipsis;
+}
+input.TitleBar__titleText{
+	font-size: 13px;
+	color: black;
+	font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+	background: #F3F3F3;
+	border:0px;
+	outline: none;
+	border-radius: 4px;
+	height: 28px;
+	line-height:28px;
 }
 
 .TitleBar__dropDown {
@@ -166,27 +193,30 @@ body {
 }
 
 .HashForm {
-  align-self: right;
-  background: blue;
-  text-align: center;
   margin-left: auto;
-  margin-right: 8px;
-  width: 43em;
+  margin-right: 16px;
 }
 
 .HashForm input {
-  background: #ffffff;
-  width: 100%;
+	box-sizing: border-box;
+	width: 66ch;
   height: 28px;
-  text-align: center;
-  color: #444;
-  font-size: 14px;
-  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+	font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+	color: var(--colorSecondaryGrey);
+	text-align: center;
+	font-size: 13px;
+	border-radius: 4px;
+	border: 0px;
+}
+.HashForm input:focus {
+	outline: none;
+	background: #F3F3F3;
 }
 
 .HashForm input.loading {
   background-color: #fff2cc;
 }
+
 
 div.board {
   background-image: url(grid.svg);
@@ -199,18 +229,18 @@ div.card {
 }
 
 div.card.text {
-  /* use an inset box-shadow to avoid the mitering of corners with normal borders */ 
+  /* use an inset box-shadow to avoid the mitering of corners with normal borders */
   box-shadow: inset 0 4px 0 0 black;
 }
 
 div.card.text.selected {
-  /* attach the outline to the content, covering the 1px border */ 
+  /* attach the outline to the content, covering the 1px border */
   outline-offset: -1px;
   outline: 2px solid black;
 }
 
 div.card.selected {
-  outline: solid 2px #102542;
+  outline: solid 2px var(--colorBlueBlack);
 }
 
 div.card span.cardResizeHandle {
@@ -306,7 +336,7 @@ div.card.image {
   font-weight: bold;
   line-height: 1.33;
   letter-spacing: -0.5px;
-  color: #102542;
+  color: var(--colorBlueBlack);
 }
 
 .CodeMirrorEditor__renderer h4, h5, h6 {
@@ -314,7 +344,7 @@ div.card.image {
 }
 
 .CodeMirrorEditor__renderer h1 {
-  font-size: 2.5em;
+  font-size: 2.25em;
 }
 
 .CodeMirrorEditor__renderer h2 {
