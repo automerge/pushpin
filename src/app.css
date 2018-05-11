@@ -230,7 +230,7 @@ div.card {
 
 div.card.text {
   /* use an inset box-shadow to avoid the mitering of corners with normal borders */
-  box-shadow: inset 0 4px 0 0 black;
+  box-shadow: inset 0 4px 0 0 var(--colorBlueBlack);
 }
 
 div.card.text.selected {
@@ -389,14 +389,16 @@ div.card.image {
 
 .CodeMirrorEditor__rendererpre, code, kbd, samp {
   color: #000;
-  font-family: 'Courier New', monospace;
-  font-size: 0.98em;
+	font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+  font-size: 12px;
+	line-height:16px;
 }
 
 .CodeMirrorEditor__renderer pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word;
+	tab-size: 2;
 }
 
 .CodeMirrorEditor__renderer b, strong {
