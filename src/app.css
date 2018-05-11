@@ -75,8 +75,8 @@ table {
 
 body {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.538461538;
+  font-size: 14px;
+  line-height: 20px;
 	-webkit-font-smoothing: antialiased;
 }
 
@@ -300,8 +300,8 @@ div.card.image {
 
 .CodeMirrorEditor div.CodeMirror-lines {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.54;
+  font-size: 14px;
+  line-height: 20px;
   padding: 0;
 }
 
@@ -341,42 +341,56 @@ div.card.image {
 }
 
 .CodeMirrorEditor__renderer h1, h2, h3, h4, h5, h6 {
-  font-weight: bold;
-  line-height: 1.33;
-  letter-spacing: -0.5px;
+  font-weight: 600;
   color: var(--colorBlueBlack);
+	margin-bottom:8px;
 }
 
 .CodeMirrorEditor__renderer h4, h5, h6 {
-  font-weight: bold;
+
 }
 
 .CodeMirrorEditor__renderer h1 {
-  font-size: 2.25em;
+  font-size: 18px;
+	line-height: 24px;
+	letter-spacing: -.5px;
+
 }
 
 .CodeMirrorEditor__renderer h2 {
-  font-size: 2em;
+  font-size: 16px;
+	line-height: 20px;
 }
 
 .CodeMirrorEditor__renderer h3 {
-  font-size: 1.5em;
+  font-size: 12px;
+	line-height: 20px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-weight: 500;
 }
 
 .CodeMirrorEditor__renderer h4 {
-  font-size: 1.2em;
+	color: var(--colorSecondaryGrey);
+
+	font-weight:600;
 }
 
 .CodeMirrorEditor__renderer h5 {
-  font-size: 1em;
+	font-size: 12px;
+	font-weight:600;
+	color: var(--colorSecondaryGrey);
 }
 
 .CodeMirrorEditor__renderer h6 {
-  font-size: 0.9em;
+  font-weight:600;
+
 }
 
 .CodeMirrorEditor__renderer p {
-  margin: 1.5em 0;
+	font-size: 14px;
+	line-height:20px;
+	margin-bottom: 8px;
 }
 
 .CodeMirrorEditor__renderer blockquote {
@@ -447,8 +461,9 @@ div.card.image {
 
 .CodeMirrorEditor__renderer ul, ol {
   list-style-type: disc;
-  margin: 1em 0;
-  padding: 0 0 0 2em;
+	margin-left:12px;
+	padding-left: 8px;
+	margin-bottom: 8px;
 }
 
 .CodeMirrorEditor__renderer li p:last-child {
