@@ -50,6 +50,8 @@ export default class Board extends React.PureComponent {
 
     this.onClick = this.onClick.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
+    this.onDragOver = this.onDragOver.bind(this)
+    this.onDrop = this.onDrop.bind(this)
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
   }
@@ -82,6 +84,26 @@ export default class Board extends React.PureComponent {
     if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
       Loop.dispatch(Model.cardCreatedText, { x: e.pageX, y: e.pageY, text: '', selected: true })
+    }
+  }
+
+  onDragOver(e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  onDrop(e) {
+    log('onDrop')
+    e.preventDefault()
+    e.stopPropagation()
+
+    const { length } = e.dataTransfer.files
+    for (let i = 0; i < length; i += 1) {
+      const entry = e.dataTransfer.files[i]
+      Loop.dispatch(Model.processImage, {
+        path: entry.path,
+        x: e.pageX + (i * (Model.GRID_SIZE * 2)),
+        y: e.pageY + (i * (Model.GRID_SIZE * 2)) })
     }
   }
 
@@ -165,6 +187,8 @@ export default class Board extends React.PureComponent {
             style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
             onClick={this.onClick}
             onDoubleClick={this.onDoubleClick}
+            onDragOver={this.onDragOver}
+            onDrop={this.onDrop}
             role="presentation"
           >
             {cardChildren}
