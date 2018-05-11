@@ -195,13 +195,17 @@ div.board {
 div.card {
   background: #ffffff;
   border: solid 1px #d5dfe5;
+  border-top: 0
 }
 
 div.card.text {
-  border-top: 4px solid black;
+  /* use an inset box-shadow to avoid the mitering of corners with normal borders */ 
+  box-shadow: inset 0 4px 0 0 black;
 }
 
 div.card.text.selected {
+  /* attach the outline to the content, covering the 1px border */ 
+  outline-offset: -1px;
   outline: 2px solid black;
 }
 
