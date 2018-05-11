@@ -234,8 +234,8 @@ export default class Card extends React.PureComponent {
     this.tracking.totalDrag = null
 
     if (this.tracking.moving) {
-      const x = Model.snapToGrid(this.tracking.moveX)
-      const y = Model.snapToGrid(this.tracking.moveY)
+      const x = this.tracking.moveX
+      const y = this.tracking.moveY
 
       this.tracking.moveX = null
       this.tracking.moveY = null
@@ -247,8 +247,8 @@ export default class Card extends React.PureComponent {
     }
 
     if (this.tracking.resizing) {
-      const width = Model.snapToGrid(this.tracking.resizeWidth)
-      const height = Model.snapToGrid(this.tracking.resizeHeight)
+      const width = this.tracking.resizeWidth
+      const height = this.tracking.resizeHeight
 
       this.tracking.resizeWidth = null
       this.tracking.resizeHeight = null
