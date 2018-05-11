@@ -8,6 +8,7 @@ import Loop from '../loop'
 import Card from './card'
 import * as Model from '../model'
 import ColorPicker from './color-picker'
+import { getFilesAsync } from '../image-loader'
 
 const { dialog } = remote
 
@@ -52,6 +53,8 @@ export default class Board extends React.PureComponent {
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
+    this.onPaste = this.onPaste.bind(this)
+
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
   }
@@ -97,14 +100,17 @@ export default class Board extends React.PureComponent {
     e.preventDefault()
     e.stopPropagation()
 
-    const { length } = e.dataTransfer.files
-    for (let i = 0; i < length; i += 1) {
-      const entry = e.dataTransfer.files[i]
-      Loop.dispatch(Model.processImage, {
-        path: entry.path,
-        x: e.pageX + (i * (Model.GRID_SIZE * 2)),
-        y: e.pageY + (i * (Model.GRID_SIZE * 2)) })
-    }
+    const files = Array.from(e.dataTransfer.files);
+    console.log(files);
+  }
+
+  async onPaste(e) {
+    log('onPaste')
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = await getFilesAsync(e.clipboardData);
+    console.log(files);
   }
 
   onAddNote(e) {
@@ -189,6 +195,7 @@ export default class Board extends React.PureComponent {
             onDoubleClick={this.onDoubleClick}
             onDragOver={this.onDragOver}
             onDrop={this.onDrop}
+            onPaste={this.onPaste}
             role="presentation"
           >
             {cardChildren}
