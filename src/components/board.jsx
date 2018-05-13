@@ -8,7 +8,6 @@ import Loop from '../loop'
 import Card from './card'
 import * as Model from '../model'
 import ColorPicker from './color-picker'
-import { getFilesAsync } from '../image-loader'
 
 const { dialog } = remote
 
@@ -95,22 +94,67 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
   }
 
-  onDrop(e) {
+  getFiles(dataTransfer) {
+    const files = []
+    for (let i = 0; i < dataTransfer.files.length; i += 1) {
+      const item = dataTransfer.items[i]
+      if (item.kind === 'file') {
+        const file = item.getAsFile()
+        if (file) {
+          files.push(file)
+        }
+      }
+    }
+
+    return files
+  }
+
+  async onDrop(e) {
     log('onDrop')
     e.preventDefault()
     e.stopPropagation()
 
-    const files = Array.from(e.dataTransfer.files);
-    console.log(files);
+    /* Adapted from:
+      https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
+    const { length } = e.dataTransfer.files
+    for (let i = 0; i < length; i += 1) {
+      const entry = e.dataTransfer.files[i]
+
+      const reader = new FileReader()
+
+      const { pageX, pageY } = e
+
+      reader.onload = () =>
+        Loop.dispatch(Model.processImage, {
+          path: entry.name,
+          buffer: Buffer.from(reader.result),
+          x: pageX + (i * (Model.GRID_SIZE * 2)),
+          y: pageY + (i * (Model.GRID_SIZE * 2)) })
+
+      reader.readAsArrayBuffer(entry)
+    }
   }
 
   async onPaste(e) {
     log('onPaste')
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
-    const files = await getFilesAsync(e.clipboardData);
-    console.log(files);
+    const { length } = e.clipboardData.files
+    for (let i = 0; i < length; i += 1) {
+      const entry = e.clipboardData.files[i]
+
+      const reader = new FileReader()
+
+      reader.onload = () =>
+        Loop.dispatch(Model.processImage, {
+          path: entry.name,
+          buffer: Buffer.from(reader.result),
+          x: 100 + (i * (Model.GRID_SIZE * 2)),
+          y: 100 + (i * (Model.GRID_SIZE * 2)) })
+
+      reader.readAsArrayBuffer(entry)
+    }
   }
 
   onAddNote(e) {
