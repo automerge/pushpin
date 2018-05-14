@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
+import { DraggableCore } from 'react-draggable'
 
 import Loop from '../loop'
 import Card from './card'
@@ -56,6 +57,13 @@ export default class Board extends React.PureComponent {
 
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
+
+    this.onStart = this.onStart.bind(this)
+    this.onDrag = this.onDrag.bind(this)
+    this.onStop = this.onStop.bind(this)
+
+    this.tracking = {}
+    this.state = { cards: {} }
   }
 
   componentDidMount() {
@@ -221,6 +229,185 @@ export default class Board extends React.PureComponent {
     Loop.dispatch(Model.setBackgroundColor, { backgroundColor: color.hex })
   }
 
+  // Copy view-relevant move/resize state over to React.
+  setDragState(card, tracking) {
+    const cards = { ...this.state.cards }
+
+    cards[card.id] = {
+      moveX: tracking.moveX,
+      moveY: tracking.moveY,
+      resizeWidth: tracking.resizeWidth,
+      resizeHeight: tracking.resizeHeight
+    }
+
+    this.setState({ cards })
+  }
+
+  onStart(card, e, d) {
+    log('onStart')
+
+    const clickX = d.lastX
+    const clickY = d.lastY
+
+    this.tracking[card.id] = this.tracking[card.id] || {}
+    const tracking = this.tracking[card.id]
+
+    tracking.resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
+                         (clickX <= (card.x + card.width)) &&
+                         (clickY >= (card.y + card.height - Model.RESIZE_HANDLE_SIZE)) &&
+                         (clickY <= (card.y + card.height)))
+
+    tracking.moving = !tracking.resizing
+
+    tracking.totalDrag = 0
+
+    if (tracking.moving) {
+      tracking.moveX = card.x
+      tracking.moveY = card.y
+      tracking.slackX = 0
+      tracking.slackY = 0
+      
+      this.effectDrag(card, tracking, d)
+    }
+
+    if (tracking.resizing) {
+      tracking.resizeWidth = card.width
+      tracking.resizeHeight = card.height
+      tracking.slackWidth = 0
+      tracking.slackHeight = 0
+
+      this.effectDrag(card, tracking, d)
+    }
+
+    this.setDragState(card, tracking)
+  }
+
+  effectDrag(card, tracking, { deltaX, deltaY }) {
+    if (!tracking.resizing && !tracking.moving) {
+      throw new Error('Did not expect drag without resize or move')
+    }
+    if (tracking.resizing && tracking.moving) {
+      throw new Error('Did not expect drag with both resize and move')
+    }
+
+    if ((deltaX === 0) && (deltaY === 0)) {
+      return
+    }
+
+    tracking.totalDrag = tracking.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
+
+    if (tracking.moving) {
+      // First guess at change in location given mouse movements.
+      const preClampX = tracking.moveX + deltaX
+      const preClampY = tracking.moveY + deltaY
+
+      // Add slack to the values used to calculate bound position. This will
+      // ensure that if we start removing slack, the element won't react to
+      // it right away until it's been completely removed.
+      let newX = preClampX + tracking.slackX
+      let newY = preClampY + tracking.slackY
+
+      // Clamp to ensure card doesn't move beyond the board.
+      newX = Math.max(newX, 0)
+      newX = Math.min(newX, Model.BOARD_WIDTH - card.width)
+      tracking.moveX = newX
+      newY = Math.max(newY, 0)
+      newY = Math.min(newY, Model.BOARD_HEIGHT - card.height)
+      tracking.moveY = newY
+
+      // If the numbers changed, we must have introduced some slack.
+      // Record it for the next iteration.
+      tracking.slackX = tracking.slackX + preClampX - newX
+      tracking.slackY = tracking.slackY + preClampY - newY
+    }
+
+    if (tracking.resizing) {
+      // First guess at change in dimensions given mouse movements.
+      let preClampWidth = tracking.resizeWidth + deltaX
+      let preClampHeight = tracking.resizeHeight + deltaY
+
+      // Maintain aspect ratio on image cards.
+      if (card.type !== 'text') {
+        const ratio = tracking.resizeWidth / tracking.resizeHeight
+        preClampHeight = preClampWidth / ratio
+        preClampWidth = preClampHeight * ratio
+      }
+
+      // Add slack to the values used to calculate bound position. This will
+      // ensure that if we start removing slack, the element won't react to
+      // it right away until it's been completely removed.
+      let newWidth = preClampWidth + tracking.slackWidth
+      let newHeight = preClampHeight + tracking.slackHeight
+
+      // Clamp to ensure card doesn't resize beyond the board or min dimensions.
+      newWidth = Math.max(Model.CARD_MIN_WIDTH, newWidth)
+      newWidth = Math.min(Model.BOARD_WIDTH - card.x, newWidth)
+      tracking.resizeWidth = newWidth
+      newHeight = Math.max(Model.CARD_MIN_HEIGHT, newHeight)
+      newHeight = Math.min(Model.BOARD_HEIGHT - card.y, newHeight)
+      tracking.resizeHeight = newHeight
+
+      // If the numbers changed, we must have introduced some slack.
+      // Record it for the next iteration.
+      tracking.slackWidth = tracking.slackWidth + preClampWidth - newWidth
+      tracking.slackHeight = tracking.slackHeight + preClampHeight - newHeight
+    }
+  }
+
+  onDrag(card, e, d) {
+    log('onDrag')
+    const tracking = this.tracking[card.id]
+
+    this.effectDrag(card, tracking, d)
+    this.setDragState(card, tracking)
+  }
+
+  onStop(card, e, d) {
+    log('onStop')
+
+    const tracking = this.tracking[card.id]
+
+    this.effectDrag(card, tracking, d)
+
+    const minDragSelection = tracking.totalDrag < Model.GRID_SIZE / 2
+    if (minDragSelection) {
+      if (e.ctrlKey || e.shiftKey) {
+        Loop.dispatch(Model.cardToggleSelection, { id: card.id })
+      } else {
+        Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
+      }
+    }
+    tracking.totalDrag = null
+
+    if (tracking.moving) {
+      const x = Model.snapToGrid(tracking.moveX)
+      const y = Model.snapToGrid(tracking.moveY)
+
+      tracking.moveX = null
+      tracking.moveY = null
+      tracking.slackX = null
+      tracking.slackY = null
+      tracking.moving = false
+
+      Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
+    }
+
+    if (tracking.resizing) {
+      const width = Model.snapToGrid(tracking.resizeWidth)
+      const height = Model.snapToGrid(tracking.resizeHeight)
+
+      tracking.resizeWidth = null
+      tracking.resizeHeight = null
+      tracking.slackWidth = null
+      tracking.slackHeight = null
+      tracking.resizing = false
+
+      Loop.dispatch(Model.cardResized, { id: card.id, width, height })
+    }
+
+    this.setDragState(card, tracking)
+  }
+
   render() {
     log('render')
 
@@ -228,7 +415,21 @@ export default class Board extends React.PureComponent {
     const cardChildren = Object.entries(this.props.cards).map(([id, card]) => {
       const selected = this.props.selected.includes(id)
       const uniquelySelected = selected && this.props.selected.length === 1
-      return <Card key={id} card={card} selected={selected} uniquelySelected={uniquelySelected} />
+      return (
+        <DraggableCore
+          key={id}
+          allowAnyClick={false}
+          disabled={false}
+          enableUserSelectHack={false}
+          onStart={(e, d) => this.onStart(card, e, d)}
+          onDrag={(e, d) => this.onDrag(card, e, d)}
+          onStop={(e, d) => this.onStop(card, e, d)}
+        >
+          <div>
+            <Card card={card} dragState={this.state.cards[id] || {}} selected={selected} uniquelySelected={uniquelySelected} />
+          </div>
+        </DraggableCore>
+      )
     })
 
     const contextMenu = (
@@ -274,7 +475,6 @@ export default class Board extends React.PureComponent {
             style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
             onClick={this.onClick}
             onDoubleClick={this.onDoubleClick}
-            onDragOver={this.onDragOver}
             onDrop={this.onDrop}
             onPaste={this.onPaste}
             role="presentation"
