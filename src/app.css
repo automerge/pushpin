@@ -417,6 +417,10 @@ div.card.image {
 	margin-bottom: 8px;
 }
 
+.CodeMirrorEditor__renderer code {
+	
+}
+
 .CodeMirrorEditor__renderer pre {
   white-space: pre;
   white-space: pre-wrap;
