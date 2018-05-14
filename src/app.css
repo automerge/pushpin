@@ -367,7 +367,7 @@ div.card.image {
 	line-height: 20px;
 	text-transform: uppercase;
 	letter-spacing: 1px;
-	font-weight: 500;
+	font-weight: 600;
 }
 
 .CodeMirrorEditor__renderer h4 {
@@ -394,26 +394,27 @@ div.card.image {
 }
 
 .CodeMirrorEditor__renderer blockquote {
-  color: #666666;
+  color: var(--colorSecondaryGrey);
   margin: 0;
-  padding-left: 3em;
-  border-left: 0.5em var(--colorInputGrey) solid;
+  padding-left: 12px;
+  border-left: 1px var(--colorSecondaryGrey) solid;
 }
 
 .CodeMirrorEditor__renderer hr {
   display: block;
   border: 0;
-  border-top: 1px solid #aaa;
+  border-top: 1px solid var(--colorInputGrey);
   border-bottom: 1px solid var(--colorInputGrey);
   margin: 1em 0;
   padding: 0;
 }
 
-.CodeMirrorEditor__rendererpre, code, kbd, samp {
+.CodeMirrorEditor__renderer pre, code, kbd, samp {
   color: var(--colorBlack);
 	font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
   font-size: 12px;
 	line-height:16px;
+	margin-bottom: 8px;
 }
 
 .CodeMirrorEditor__renderer pre {
@@ -421,6 +422,10 @@ div.card.image {
   white-space: pre-wrap;
   word-wrap: break-word;
 	tab-size: 2;
+	color: white;
+	background-color: var(--colorBlueBlack);
+	padding: 8px;
+	border-radius: 4px;
 }
 
 .CodeMirrorEditor__renderer b, strong {
