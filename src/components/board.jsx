@@ -259,15 +259,33 @@ export default class Board extends React.PureComponent {
 
     tracking.moving = !tracking.resizing
 
-    tracking.totalDrag = 0
-
     if (tracking.moving) {
-      tracking.moveX = card.x
-      tracking.moveY = card.y
-      tracking.slackX = 0
-      tracking.slackY = 0
-      
-      this.effectDrag(card, tracking, d)
+      if (this.props.selected.length > 0) {
+        const cards = this.props.selected.map(s => this.props.cards[s])
+        cards.push(card)
+        cards.forEach(card => {
+          const t = this.tracking[card.id]
+
+          t.moveX = card.x
+          t.moveY = card.y
+          t.slackX = 0
+          t.slackY = 0
+          t.moving = true
+          t.totalDrag = 0
+
+          this.effectDrag(card, t, d)
+          this.setDragState(card, t)
+        })
+      } else {
+        tracking.moveX = card.x
+        tracking.moveY = card.y
+        tracking.slackX = 0
+        tracking.slackY = 0
+        tracking.totalDrag = 0
+
+        this.effectDrag(card, tracking, d)
+        this.setDragState(card, tracking)
+      }
     }
 
     if (tracking.resizing) {
@@ -277,9 +295,8 @@ export default class Board extends React.PureComponent {
       tracking.slackHeight = 0
 
       this.effectDrag(card, tracking, d)
+      this.setDragState(card, tracking)
     }
-
-    this.setDragState(card, tracking)
   }
 
   effectDrag(card, tracking, { deltaX, deltaY }) {
@@ -356,10 +373,20 @@ export default class Board extends React.PureComponent {
 
   onDrag(card, e, d) {
     log('onDrag')
-    const tracking = this.tracking[card.id]
 
-    this.effectDrag(card, tracking, d)
-    this.setDragState(card, tracking)
+    if(this.props.selected.length > 0) {
+      const cards = this.props.selected.map(s => this.props.cards[s])
+      cards.forEach(card => {
+        const tracking = this.tracking[card.id]
+        this.effectDrag(card, tracking, d)
+        this.setDragState(card, tracking)
+      })
+    } else {
+      const tracking = this.tracking[card.id]
+
+      this.effectDrag(card, tracking, d)
+      this.setDragState(card, tracking)
+    }
   }
 
   onStop(card, e, d) {
@@ -380,16 +407,35 @@ export default class Board extends React.PureComponent {
     tracking.totalDrag = null
 
     if (tracking.moving) {
-      const x = Model.snapToGrid(tracking.moveX)
-      const y = Model.snapToGrid(tracking.moveY)
+      if(this.props.selected.length > 0) {
+        const cards = this.props.selected.map(s => this.props.cards[s])
+        cards.forEach(card => {
+          const t = this.tracking[card.id]
+          const x = Model.snapToGrid(t.moveX)
+          const y = Model.snapToGrid(t.moveY)
 
-      tracking.moveX = null
-      tracking.moveY = null
-      tracking.slackX = null
-      tracking.slackY = null
-      tracking.moving = false
+          t.moveX = null
+          t.moveY = null
+          t.slackX = null
+          t.slackY = null
+          t.moving = false
 
-      Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
+          Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
+          this.setDragState(card, t)
+        })
+      } else {
+        const x = Model.snapToGrid(tracking.moveX)
+        const y = Model.snapToGrid(tracking.moveY)
+
+        tracking.moveX = null
+        tracking.moveY = null
+        tracking.slackX = null
+        tracking.slackY = null
+        tracking.moving = false
+
+        Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
+        this.setDragState(card, tracking)
+      }
     }
 
     if (tracking.resizing) {
@@ -403,9 +449,8 @@ export default class Board extends React.PureComponent {
       tracking.resizing = false
 
       Loop.dispatch(Model.cardResized, { id: card.id, width, height })
+      this.setDragState(card, tracking)
     }
-
-    this.setDragState(card, tracking)
   }
 
   render() {
