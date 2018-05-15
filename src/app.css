@@ -13,45 +13,45 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
-	display: block;
+  display: block;
 }
 body {
-	line-height: 1;
+  line-height: 1;
 }
 ol, ul {
-	list-style: none;
+  list-style: none;
 }
 blockquote, q {
-	quotes: none;
+  quotes: none;
 }
 blockquote:before, blockquote:after,
 q:before, q:after {
-	content: '';
-	content: none;
+  content: '';
+  content: none;
 }
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
 /* Variables */
 
 :root {
-	--colorBlueBlack: #102542;
-	--colorBlack: var(--colorBlack);
-	--colorSecondaryGrey: #637389;
-	--colorPaleGrey: #D5DFE5;
-	--colorInputGrey: #f3f3f3;
-	--colorLink: #0645ad;
+  --colorBlueBlack: #102542;
+  --colorBlack: var(--colorBlack);
+  --colorSecondaryGrey: #637389;
+  --colorPaleGrey: #D5DFE5;
+  --colorInputGrey: #f3f3f3;
+  --colorLink: #0645ad;
 }
 
 
@@ -77,7 +77,7 @@ body {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
-	-webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
 }
 
 .ContextMenu {
@@ -93,7 +93,7 @@ body {
 }
 
 .ContextMenu__section {
-	padding: 4px 0;
+  padding: 4px 0;
 }
 
 .ContextMenu__iconBounding {
@@ -109,7 +109,7 @@ body {
 }
 
 .ContextMenu .react-contextmenu-item {
-	padding: 4px 8px;
+  padding: 4px 8px;
   cursor: pointer;
 }
 insta
@@ -148,7 +148,7 @@ insta
   width: 28px;
   height: 28px;
   border-radius: 2px;
-	overflow: hidden;
+  overflow: hidden;
 }
 
 .TitleBar {
@@ -170,21 +170,21 @@ insta
 
 .TitleBar__titleText {
   width: 224px;
-	padding: 0px 4px;
-	white-space: nowrap;
-	overflow:hidden;
-	text-overflow: ellipsis;
+  padding: 0px 4px;
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
 }
 input.TitleBar__titleText{
-	font-size: 13px;
-	color: black;
-	font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-	background: #F3F3F3;
-	border:0px;
-	outline: none;
-	border-radius: 4px;
-	height: 28px;
-	line-height:28px;
+  font-size: 13px;
+  color: black;
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  background: #F3F3F3;
+  border:0px;
+  outline: none;
+  border-radius: 4px;
+  height: 28px;
+  line-height:28px;
 }
 
 .TitleBar__dropDown {
@@ -206,19 +206,19 @@ input.TitleBar__titleText{
   margin-bottom: 8px;
   margin-left: auto;
   margin-right: 16px;
-	box-sizing: border-box;
-	width: 66ch;
+  box-sizing: border-box;
+  width: 66ch;
   height: 28px;
-	font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
-	color: var(--colorSecondaryGrey);
-	text-align: center;
-	font-size: 13px;
-	border-radius: 4px;
-	border: 0px;
+  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+  color: var(--colorSecondaryGrey);
+  text-align: center;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 0px;
 }
 .HashForm input:focus {
-	outline: none;
-	background: #F3F3F3;
+  outline: none;
+  background: #F3F3F3;
 }
 
 .HashForm input.loading {
@@ -343,43 +343,43 @@ div.card.image {
 .CodeMirrorEditor__renderer h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: var(--colorBlueBlack);
-	margin-bottom:8px;
+  margin-bottom:8px;
 }
 
 .CodeMirrorEditor__renderer h4, h5, h6 {
-
+  /* Placeholder Reminder: We don't anticipate these being used very often */
 }
 
 .CodeMirrorEditor__renderer h1 {
   font-size: 18px;
-	line-height: 24px;
-	letter-spacing: -.5px;
+  line-height: 24px;
+  letter-spacing: -.5px;
 
 }
 
 .CodeMirrorEditor__renderer h2 {
   font-size: 16px;
-	line-height: 20px;
+  line-height: 20px;
 }
 
 .CodeMirrorEditor__renderer h3 {
   font-size: 12px;
-	line-height: 20px;
-	text-transform: uppercase;
-	letter-spacing: 1px;
-	font-weight: 600;
+  line-height: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .CodeMirrorEditor__renderer h4 {
-	color: var(--colorSecondaryGrey);
+  color: var(--colorSecondaryGrey);
 
-	font-weight:600;
+  font-weight:600;
 }
 
 .CodeMirrorEditor__renderer h5 {
-	font-size: 12px;
-	font-weight:600;
-	color: var(--colorSecondaryGrey);
+  font-size: 12px;
+  font-weight:600;
+  color: var(--colorSecondaryGrey);
 }
 
 .CodeMirrorEditor__renderer h6 {
@@ -388,9 +388,9 @@ div.card.image {
 }
 
 .CodeMirrorEditor__renderer p {
-	font-size: 14px;
-	line-height:20px;
-	margin-bottom: 8px;
+  font-size: 14px;
+  line-height:20px;
+  margin-bottom: 8px;
 }
 
 .CodeMirrorEditor__renderer blockquote {
@@ -411,25 +411,25 @@ div.card.image {
 
 .CodeMirrorEditor__renderer pre, code, kbd, samp {
   color: var(--colorBlack);
-	font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
   font-size: 12px;
-	line-height:16px;
-	margin-bottom: 8px;
+  line-height:16px;
+  margin-bottom: 8px;
 }
 
 .CodeMirrorEditor__renderer code {
-	
+
 }
 
 .CodeMirrorEditor__renderer pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word;
-	tab-size: 2;
-	color: white;
-	background-color: var(--colorBlueBlack);
-	padding: 8px;
-	border-radius: 4px;
+  tab-size: 2;
+  color: white;
+  background-color: var(--colorBlueBlack);
+  padding: 8px;
+  border-radius: 4px;
 }
 
 .CodeMirrorEditor__renderer b, strong {
@@ -470,9 +470,9 @@ div.card.image {
 
 .CodeMirrorEditor__renderer ul, ol {
   list-style-type: disc;
-	margin-left:12px;
-	padding-left: 8px;
-	margin-bottom: 8px;
+  margin-left:12px;
+  padding-left: 8px;
+  margin-bottom: 8px;
 }
 
 .CodeMirrorEditor__renderer li p:last-child {
