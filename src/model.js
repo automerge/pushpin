@@ -183,8 +183,11 @@ export const empty = {
   activeDocId: '',
   requestedDocId: '',
   selected: [],
+  workspace: null,
   board: null,
-  hm: null,
+  self: null,
+  identities: {},
+  hm: null
 }
 
 
@@ -196,6 +199,9 @@ export function init(state) {
   const recentDocs = readRecentDocs()
   const requestedDocId = recentDocs.length > 0 ? recentDocs[0] : state.requestedDocId
 
+  const selfIdentityFile = getSelfIdentityFile()
+  const requestedIdentity = selfIdentityFile.selfDocId || ''
+
   hm.once('ready', () => {
     hm.joinSwarm()
 
@@ -206,6 +212,10 @@ export function init(state) {
     hm.on('document:updated', (docId, doc) => {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
+
+    if (requestedIdentity === '') {
+      Loop.dispatch(newIdentity)
+    }
 
     if (requestedDocId === '') {
       Loop.dispatch(newDocument)
@@ -240,6 +250,27 @@ function recentDocsPath() {
 export function getRecentDocs() {
   if (Fs.existsSync(recentDocsPath())) {
     return JSON.parse(Fs.readFileSync(recentDocsPath()))
+  }
+  return []
+}
+
+/* I'm propagating this pattern but I think we want a workspace
+  hypermerge that contains recent-docs and your identity and other things... */
+function saveSelfIdentity(state, { docId }) {
+  const selfIdentityFile = { selfDocId: docId }
+
+  Fs.writeFileSync(selfIdentityFilePath(), JSON.stringify(selfIdentityFile))
+
+  return state
+}
+
+function selfIdentityFilePath() {
+  return Path.join(USER_PATH, 'self-identity.json')
+}
+
+export function getSelfIdentityFile() {
+  if (Fs.existsSync(selfIdentityFilePath())) {
+    return JSON.parse(Fs.readFileSync(selfIdentityFilePath()))
   }
   return []
 }
@@ -481,6 +512,20 @@ export function boardBackspaced(state) {
   state = deleteCardIDs.reduce((state, id) => (cardDeleted(state, { id })), state)
 
   return state
+}
+
+export function newIdentity(state) {
+  const identity = state.hm.create()
+  const docId = state.hm.getId(identity)
+
+  Loop.dispatch(saveSelfIdentity, { docId })
+
+  const nextIdentity = state.hm.change(identity, (i) => {
+    i.name = 'Mysterious Stranger'
+    i.color = '#4df1c3'
+  })
+
+  return { ...state, self: nextIdentity }
 }
 
 export function newDocument(state) {
