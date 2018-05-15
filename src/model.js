@@ -210,8 +210,9 @@ export function getRecentDocs() {
 // unchanged. State will be updated in callbacks by redispatching to
 // another action (cardCreatedImage). We could add state to indicate in-
 // progress processing here later if we wanted to.
-export function processImage(state, { path, x, y }) {
-  Jimp.read(path, (err, img) => {
+export function processImage(state, { path, buffer, x, y }) {
+  const imageSource = buffer || path
+  Jimp.read(imageSource, (err, img) => {
     if (err) {
       log('Error loading image?', err)
       return
@@ -220,7 +221,7 @@ export function processImage(state, { path, x, y }) {
     const [scaledWidth, scaledHeight] = scaleImage(width, height)
     const imageId = uuid()
 
-    Hyperfile.write(HYPERFILE_DATA_PATH, imageId, path, (error, key) => {
+    Hyperfile.writeBuffer(HYPERFILE_DATA_PATH, imageId, buffer, (error, key) => {
       if (error) {
         log(error)
       }

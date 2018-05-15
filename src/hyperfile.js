@@ -46,7 +46,7 @@ function serve(hypercore) {
 //
 
 // callback = (err, key)
-export function write(dataPath, imgId, imgPath, callback) {
+export function write(dataPath, imgId, imgPath, imgBuffer, callback) {
   const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
@@ -65,6 +65,22 @@ export function write(dataPath, imgId, imgPath, callback) {
         serve(core)
         callback(null, core.key)
       })
+    })
+  })
+}
+
+export function writeBuffer(dataPath, imgId, buffer, callback) {
+  const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions)
+  core.on('error', callback)
+  core.on('ready', () => {
+    core.append(buffer, (error) => {
+      if (error) {
+        callback(error)
+        return
+      }
+
+      serve(core)
+      callback(null, core.key)
     })
   })
 }

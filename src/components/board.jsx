@@ -52,6 +52,8 @@ export default class Board extends React.PureComponent {
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
+    this.onPaste = this.onPaste.bind(this)
+
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
   }
@@ -92,18 +94,103 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
   }
 
-  onDrop(e) {
+  getFiles(dataTransfer) {
+    const files = []
+    for (let i = 0; i < dataTransfer.files.length; i += 1) {
+      const item = dataTransfer.items[i]
+      if (item.kind === 'file') {
+        const file = item.getAsFile()
+        if (file) {
+          files.push(file)
+        }
+      }
+    }
+
+    return files
+  }
+
+  async onDrop(e) {
     log('onDrop')
     e.preventDefault()
     e.stopPropagation()
+    const { pageX, pageY } = e
 
+    /* Adapted from:
+      https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
     const { length } = e.dataTransfer.files
     for (let i = 0; i < length; i += 1) {
       const entry = e.dataTransfer.files[i]
-      Loop.dispatch(Model.processImage, {
-        path: entry.path,
-        x: e.pageX + (i * (Model.GRID_SIZE * 2)),
-        y: e.pageY + (i * (Model.GRID_SIZE * 2)) })
+      const reader = new FileReader()
+
+      if (entry.type.match('image/')) {
+        reader.onload = () =>
+          Loop.dispatch(Model.processImage, {
+            path: entry.name,
+            buffer: Buffer.from(reader.result),
+            x: pageX + (i * (Model.GRID_SIZE * 2)),
+            y: pageY + (i * (Model.GRID_SIZE * 2)) })
+        reader.readAsArrayBuffer(entry)
+      } else if (entry.type.match('text/')) {
+        reader.onload = () =>
+          Loop.dispatch(Model.cardCreatedText, {
+            text: reader.result,
+            x: pageX + (i * (Model.GRID_SIZE * 2)),
+            y: pageY + (i * (Model.GRID_SIZE * 2)) })
+        reader.readAsText(entry)
+      }
+    }
+    if (length > 0) { return }
+
+    // If we can't get the item as a bunch of files, let's hope it works as plaintext.
+    const plainText = e.dataTransfer.getData('text/plain')
+    if (plainText) {
+      Loop.dispatch(Model.cardCreatedText, {
+        text: plainText,
+        x: pageX,
+        y: pageY })
+    }
+  }
+
+  /* We can't get the mouse position on a paste event,
+     so we ask the window for the current pageX/Y offsets and just stick the new card
+     100px in from there. */
+  async onPaste(e) {
+    log('onPaste')
+    e.preventDefault()
+    e.stopPropagation()
+
+    const x = window.pageXOffset + 100
+    const y = window.pageYOffset + 100
+
+    const dataTransfer = e.clipboardData
+    // Note that the X/Y coordinates will all be the same for these cards,
+    // and the chromium code supports that... but I can't think of it could happen,
+    // so if you're reading this because it did, sorry!
+    if (dataTransfer.files.length > 0) {
+      Array.from(dataTransfer.files).forEach((file, i) => {
+        // make sure we have an image
+        if (!file.type.match('image/')) {
+          log(`we had a pasted file that was a ${file.type} not an image`)
+          return
+        }
+
+        const reader = new FileReader()
+        reader.onload = () =>
+          Loop.dispatch(Model.processImage, {
+            path: file.name,
+            buffer: Buffer.from(reader.result),
+            x,
+            y })
+        reader.readAsArrayBuffer(file)
+      })
+    }
+
+    const plainTextData = dataTransfer.getData('text/plain')
+    if (plainTextData) {
+      Loop.dispatch(Model.cardCreatedText, {
+        text: plainTextData,
+        x,
+        y })
     }
   }
 
@@ -189,6 +276,7 @@ export default class Board extends React.PureComponent {
             onDoubleClick={this.onDoubleClick}
             onDragOver={this.onDragOver}
             onDrop={this.onDrop}
+            onPaste={this.onPaste}
             role="presentation"
           >
             {cardChildren}
