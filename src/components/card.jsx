@@ -96,8 +96,8 @@ export default class Card extends React.PureComponent {
       width: dragState.resizeWidth ? dragState.resizeWidth : card.width,
       height: dragState.resizeHeight ? dragState.resizeHeight : card.height,
       position: 'absolute',
-      left: dragState.moveX ? dragState.moveX : card.x,
-      top: dragState.moveY ? dragState.moveY : card.y
+      left: Number.isInteger(dragState.moveX) ? dragState.moveX : card.x,
+      top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
     }
 
     return (

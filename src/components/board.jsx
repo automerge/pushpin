@@ -269,7 +269,8 @@ export default class Board extends React.PureComponent {
       }
 
       cards.forEach(card => {
-        const tracking = this.getTracking(card)
+        this.tracking[card.id] = this.tracking[card.id] || {}
+        const tracking = this.tracking[card.id]
 
         tracking.moveX = card.x
         tracking.moveY = card.y
@@ -284,7 +285,8 @@ export default class Board extends React.PureComponent {
     }
 
     if (resizing) {
-      const tracking = this.getTracking(card)
+      this.tracking[card.id] = this.tracking[card.id] || {}
+      const tracking = this.tracking[card.id]
 
       tracking.resizing = true
       tracking.slackWidth = 0
@@ -295,13 +297,6 @@ export default class Board extends React.PureComponent {
       this.effectDrag(card, tracking, d)
       this.setDragState(card, tracking)
     }
-  }
-
-  getTracking(card) {
-    if(!this.tracking[card.id])
-      this.tracking[card.id] = {}
-
-    return this.tracking[card.id]
   }
 
   effectDrag(card, tracking, { deltaX, deltaY }) {
@@ -418,8 +413,8 @@ export default class Board extends React.PureComponent {
 
       cards.forEach(card => {
         const t = this.tracking[card.id]
-        const x = t.moveX ? Model.snapToGrid(t.moveX) : card.x
-        const y = t.moveY ? Model.snapToGrid(t.moveY) : card.y
+        const x = Number.isInteger(t.moveX) ? Model.snapToGrid(t.moveX) : card.x
+        const y = Number.isInteger(t.moveY) ? Model.snapToGrid(t.moveY) : card.y
 
         t.moveX = null
         t.moveY = null
