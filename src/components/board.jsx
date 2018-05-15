@@ -113,52 +113,65 @@ export default class Board extends React.PureComponent {
     log('onDrop')
     e.preventDefault()
     e.stopPropagation()
+    const { pageX, pageY } = e
 
     /* Adapted from:
       https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
     const { length } = e.dataTransfer.files
     for (let i = 0; i < length; i += 1) {
       const entry = e.dataTransfer.files[i]
+      const reader = new FileReader()
 
       if (entry.type.match('image/')) {
-        const reader = new FileReader()
-
-        const { pageX, pageY } = e
-
         reader.onload = () =>
           Loop.dispatch(Model.processImage, {
             path: entry.name,
             buffer: Buffer.from(reader.result),
             x: pageX + (i * (Model.GRID_SIZE * 2)),
             y: pageY + (i * (Model.GRID_SIZE * 2)) })
-
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
-        const reader = new FileReader()
-
-        const { pageX, pageY } = e
-
         reader.onload = () =>
           Loop.dispatch(Model.cardCreatedText, {
             text: reader.result,
             x: pageX + (i * (Model.GRID_SIZE * 2)),
             y: pageY + (i * (Model.GRID_SIZE * 2)) })
-
-        reader.readAsText(entry)
+        reader.readAsArrayBuffer(entry)
       }
+
+      // this return will only happen if we have one or more files,
+      // in which case we don't want to try reprocessing them as "items"
+      // this API is really the absolute pits.
+      return
+    }
+
+    // If we can't get the item as a bunch of files, let's hope it works as plaintext.
+    const plainText = e.dataTransfer.getData('text/plain')
+    if (plainText) {
+      Loop.dispatch(Model.cardCreatedText, {
+        text: plainText,
+        x: pageX,
+        y: pageY })
     }
   }
 
-  // TODO: X/Y positions
+  /* We can't get the mouse position on a paste event,
+     so we ask the window for the current pageX/Y offsets and just stick the new card
+     100px in from there. */
   async onPaste(e) {
     log('onPaste')
     e.preventDefault()
     e.stopPropagation()
 
-    const dataTransfer = e.clipboardData
+    const x = window.pageXOffset + 100
+    const y = window.pageYOffset + 100
 
+    const dataTransfer = e.clipboardData
+    // Note that the X/Y coordinates will all be the same for these cards,
+    // and the chromium code supports that... but I can't think of it could happen,
+    // so if you're reading this because it did, sorry!
     if (dataTransfer.files.length > 0) {
-      Array.from(dataTransfer.files).forEach((file) => {
+      Array.from(dataTransfer.files).forEach((file, i) => {
         // make sure we have an image
         if (!file.type.match('image/')) {
           log(`we had a pasted file that was a ${file.type} not an image`)
@@ -170,8 +183,8 @@ export default class Board extends React.PureComponent {
           Loop.dispatch(Model.processImage, {
             path: file.name,
             buffer: Buffer.from(reader.result),
-            x: 100,
-            y: 100 })
+            x,
+            y })
         reader.readAsArrayBuffer(file)
       })
     }
@@ -180,8 +193,8 @@ export default class Board extends React.PureComponent {
     if (plainTextData) {
       Loop.dispatch(Model.cardCreatedText, {
         text: plainTextData,
-        x: 100,
-        y: 100 })
+        x,
+        y })
     }
   }
 
