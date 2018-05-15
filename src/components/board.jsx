@@ -120,40 +120,68 @@ export default class Board extends React.PureComponent {
     for (let i = 0; i < length; i += 1) {
       const entry = e.dataTransfer.files[i]
 
-      const reader = new FileReader()
+      if (entry.type.match('image/')) {
+        const reader = new FileReader()
 
-      const { pageX, pageY } = e
+        const { pageX, pageY } = e
 
-      reader.onload = () =>
-        Loop.dispatch(Model.processImage, {
-          path: entry.name,
-          buffer: Buffer.from(reader.result),
-          x: pageX + (i * (Model.GRID_SIZE * 2)),
-          y: pageY + (i * (Model.GRID_SIZE * 2)) })
+        reader.onload = () =>
+          Loop.dispatch(Model.processImage, {
+            path: entry.name,
+            buffer: Buffer.from(reader.result),
+            x: pageX + (i * (Model.GRID_SIZE * 2)),
+            y: pageY + (i * (Model.GRID_SIZE * 2)) })
 
-      reader.readAsArrayBuffer(entry)
+        reader.readAsArrayBuffer(entry)
+      } else if (entry.type.match('text/')) {
+        const reader = new FileReader()
+
+        const { pageX, pageY } = e
+
+        reader.onload = () =>
+          Loop.dispatch(Model.cardCreatedText, {
+            text: reader.result,
+            x: pageX + (i * (Model.GRID_SIZE * 2)),
+            y: pageY + (i * (Model.GRID_SIZE * 2)) })
+
+        reader.readAsText(entry)
+      }
     }
   }
 
+  // TODO: X/Y positions
   async onPaste(e) {
     log('onPaste')
     e.preventDefault()
     e.stopPropagation()
 
-    const { length } = e.clipboardData.files
-    for (let i = 0; i < length; i += 1) {
-      const entry = e.clipboardData.files[i]
+    const dataTransfer = e.clipboardData
 
-      const reader = new FileReader()
+    if (dataTransfer.files.length > 0) {
+      Array.from(dataTransfer.files).forEach((file) => {
+        // make sure we have an image
+        if (!file.type.match('image/')) {
+          log(`we had a pasted file that was a ${file.type} not an image`)
+          return
+        }
 
-      reader.onload = () =>
-        Loop.dispatch(Model.processImage, {
-          path: entry.name,
-          buffer: Buffer.from(reader.result),
-          x: 100 + (i * (Model.GRID_SIZE * 2)),
-          y: 100 + (i * (Model.GRID_SIZE * 2)) })
+        const reader = new FileReader()
+        reader.onload = () =>
+          Loop.dispatch(Model.processImage, {
+            path: file.name,
+            buffer: Buffer.from(reader.result),
+            x: 100,
+            y: 100 })
+        reader.readAsArrayBuffer(file)
+      })
+    }
 
-      reader.readAsArrayBuffer(entry)
+    const plainTextData = dataTransfer.getData('text/plain')
+    if (plainTextData) {
+      Loop.dispatch(Model.cardCreatedText, {
+        text: plainTextData,
+        x: 100,
+        y: 100 })
     }
   }
 
