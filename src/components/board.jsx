@@ -136,14 +136,10 @@ export default class Board extends React.PureComponent {
             text: reader.result,
             x: pageX + (i * (Model.GRID_SIZE * 2)),
             y: pageY + (i * (Model.GRID_SIZE * 2)) })
-        reader.readAsArrayBuffer(entry)
+        reader.readAsText(entry)
       }
-
-      // this return will only happen if we have one or more files,
-      // in which case we don't want to try reprocessing them as "items"
-      // this API is really the absolute pits.
-      return
     }
+    if (length > 0) { return }
 
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
