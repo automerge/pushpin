@@ -4,7 +4,6 @@ import classNames from 'classnames'
 import Debug from 'debug'
 
 import CodeMirrorEditor from './code-mirror-editor'
-import Loop from '../loop'
 import * as Model from '../model'
 
 const log = Debug('pushpin:card')
@@ -13,6 +12,12 @@ export default class Card extends React.PureComponent {
   static propTypes = {
     selected: PropTypes.bool.isRequired,
     uniquelySelected: PropTypes.bool.isRequired,
+    dragState: PropTypes.shape({
+      moveX: PropTypes.number,
+      moveY: PropTypes.number,
+      resizeWidth: PropTypes.number,
+      resizeHeight: PropTypes.number,
+    }).isRequired,
     card: PropTypes.shape({
       type: PropTypes.string,
       id: PropTypes.string,
@@ -92,7 +97,7 @@ export default class Card extends React.PureComponent {
 
     const { card, dragState } = this.props
 
-    const style = { 
+    const style = {
       width: dragState.resizeWidth ? dragState.resizeWidth : card.width,
       height: dragState.resizeHeight ? dragState.resizeHeight : card.height,
       position: 'absolute',

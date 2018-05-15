@@ -277,7 +277,7 @@ export default class Board extends React.PureComponent {
           Loop.dispatch(Model.clearSelections)
         }
 
-        cards = [ card ]
+        cards = [card]
       }
 
       cards.forEach(card => {
@@ -388,14 +388,13 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
-    if (tracking.ignoreDrag)
-      return
+    if (tracking.ignoreDrag) { return }
 
     let cards
-    if(this.props.selected.length > 0 && tracking.moving) {
+    if (this.props.selected.length > 0 && tracking.moving) {
       cards = this.props.selected.map(s => this.props.cards[s])
     } else {
-      cards = [ card ]
+      cards = [card]
     }
 
     cards.forEach(c => {
@@ -424,10 +423,11 @@ export default class Board extends React.PureComponent {
 
     if (tracking.moving) {
       let cards
-      if(this.props.selected.length > 0 && this.props.selected.find(s => s === card.id))
+      if (this.props.selected.length > 0 && this.props.selected.find(s => s === card.id)) {
         cards = this.props.selected.map(s => this.props.cards[s])
-      else
-        cards = [ card ]
+      } else {
+        cards = [card]
+      }
 
       cards.forEach(card => {
         const t = this.tracking[card.id]
@@ -480,7 +480,12 @@ export default class Board extends React.PureComponent {
           onStop={(e, d) => this.onStop(card, e, d)}
         >
           <div>
-            <Card card={card} dragState={this.state.cards[id] || {}} selected={selected} uniquelySelected={uniquelySelected} />
+            <Card
+              card={card}
+              dragState={this.state.cards[id] || {}}
+              selected={selected}
+              uniquelySelected={uniquelySelected}
+            />
           </div>
         </DraggableCore>
       )
