@@ -534,6 +534,7 @@ export default class Board extends React.PureComponent {
             style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
             onClick={this.onClick}
             onDoubleClick={this.onDoubleClick}
+            onDragOver={this.onDragOver}
             onDrop={this.onDrop}
             onPaste={this.onPaste}
             role="presentation"
