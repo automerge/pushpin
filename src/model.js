@@ -329,6 +329,17 @@ export function setBackgroundColor(state, { backgroundColor }) {
   return { ...state, board: newBoard }
 }
 
+
+export function addSelfToAuthors(state) {
+  if (state.board.authors.includes(state.self.docId)) {
+    return state
+  }
+  const newBoard = state.hm.change(state.board, (b) => {
+    b.authors = [...b.authors, state.self.docId]
+  })
+  return { ...state, board: newBoard }
+}
+
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
 
@@ -374,6 +385,7 @@ function populateDemoBoard(state) {
 
   const newBoard = changeBoard(state, (b) => {
     b.cards = {}
+    b.authors = []
   })
   let newState = { ...state, board: newBoard }
   newState = cardCreatedText(newState, { x: 1350, y: 100, text: WELCOME_TEXT })
@@ -382,6 +394,8 @@ function populateDemoBoard(state) {
 
   newState = setTitle(newState, { title: 'Example Board' })
   newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
+
+  newState = addSelfToAuthors(newState)
 
   // These will be handled async as they require their own IO.
   Loop.dispatch(processImage, { x: 1750, y: 500, path: KAY_PATH })
@@ -522,6 +536,7 @@ export function newIdentity(state) {
 
   const nextIdentity = state.hm.change(identity, (i) => {
     i.name = 'Mysterious Stranger'
+    i.docId = docId
     i.color = '#4df1c3'
   })
 
