@@ -256,6 +256,18 @@ export default class Board extends React.PureComponent {
 
     const moving = !resizing
 
+    // If user is pressing ctrl or shift, add the card to the
+    // active selection and do not drag the card
+    if (e.ctrlKey || e.shiftKey) {
+      Loop.dispatch(Model.cardToggleSelection, { id: card.id })
+
+      this.tracking[card.id] = this.tracking[card.id] || {}
+      const tracking = this.tracking[card.id]
+      tracking.ignoreDrag = true
+
+      return
+    }
+
     if (moving) {
       let cards
       if (this.props.selected.length > 0 && this.props.selected.find(s => s === card.id)) {
@@ -376,6 +388,9 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
+    if (tracking.ignoreDrag)
+      return
+
     let cards
     if(this.props.selected.length > 0 && tracking.moving) {
       cards = this.props.selected.map(s => this.props.cards[s])
@@ -395,15 +410,16 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
+    if (tracking.ignoreDrag) {
+      tracking.ignoreDrag = null
+      return
+    }
+
     this.effectDrag(card, tracking, d)
 
     const minDragSelection = tracking.totalDrag < Model.GRID_SIZE / 2
-    if (minDragSelection) {
-      if (e.ctrlKey || e.shiftKey) {
-        Loop.dispatch(Model.cardToggleSelection, { id: card.id })
-      } else {
-        Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
-      }
+    if (minDragSelection && !(e.ctrlKey || e.shiftKey)) {
+      Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
     }
 
     if (tracking.moving) {
@@ -415,8 +431,8 @@ export default class Board extends React.PureComponent {
 
       cards.forEach(card => {
         const t = this.tracking[card.id]
-        const x = Number.isInteger(t.moveX) ? Model.snapToGrid(t.moveX) : card.x
-        const y = Number.isInteger(t.moveY) ? Model.snapToGrid(t.moveY) : card.y
+        const x = Model.snapToGrid(t.moveX)
+        const y = Model.snapToGrid(t.moveY)
 
         t.moveX = null
         t.moveY = null
@@ -439,6 +455,7 @@ export default class Board extends React.PureComponent {
       tracking.slackWidth = null
       tracking.slackHeight = null
       tracking.resizing = false
+      tracking.totalDrag = null
 
       Loop.dispatch(Model.cardResized, { id: card.id, width, height })
       this.setDragState(card, tracking)
