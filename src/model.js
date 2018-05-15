@@ -19,10 +19,10 @@ const log = Debug('pushpin:model')
 export const BOARD_WIDTH = 3600
 export const BOARD_HEIGHT = 1800
 export const GRID_SIZE = 24
-export const CARD_DEFAULT_WIDTH = 336
-export const CARD_DEFAULT_HEIGHT = 96
-export const CARD_MIN_WIDTH = 96
-export const CARD_MIN_HEIGHT = 48
+export const CARD_DEFAULT_WIDTH = 337
+export const CARD_DEFAULT_HEIGHT = 97
+export const CARD_MIN_WIDTH = 97
+export const CARD_MIN_HEIGHT = 49
 export const RESIZE_HANDLE_SIZE = 21
 
 export const BOARD_COLORS = {
@@ -53,6 +53,8 @@ const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
 const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
+const RECENT_DOCS_PATH = Path.join(USER_PATH, 'recent-docs.json')
+
 
 // ## Demo data
 
@@ -81,6 +83,7 @@ We've made some initial cards for you to play with. Have fun!`
 const KAY_PATH = './img/kay.jpg'
 const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
+
 // ## Imperative top-levels.
 
 mkdirp.sync(HYPERFILE_DATA_PATH)
@@ -90,6 +93,7 @@ mkdirp.sync(HYPERFILE_CACHE_PATH)
 // connections, so increase the limit to avoid spurious warnings about
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 100
+
 
 // ## Pure helper functions.
 
@@ -101,7 +105,7 @@ function scaleImage(width, height) {
 }
 
 // Snap given num to nearest multiple of our grid size.
-export function snapToGrid(num) {
+function snapToGrid(num) {
   const resto = num % GRID_SIZE
   if (resto <= (GRID_SIZE / 2)) {
     return num - resto
@@ -109,6 +113,28 @@ export function snapToGrid(num) {
   return num + GRID_SIZE - resto
 }
 
+// We have slightly different snap functions for coordinates (x,y) and
+// measures (height, width) because we want the latter to be a bit larger
+// than the grid size to allow overlapping boarders of adjacent elements.
+// We also have a special variant of the measure snap that ensures it only
+// ever increases the measure, which are needed for some types of content
+// (like text which shouldn't get cut off by snapping).
+
+export function snapCoordinateToGrid(coordinate) {
+  return snapToGrid(coordinate)
+}
+
+export function snapMeasureToGrid(measure) {
+  return snapToGrid(measure) + 1
+}
+
+export function snapMeasureOutwardToGrid(measure) {
+  const snapped = snapMeasureToGrid(measure)
+  if (snapped >= measure) {
+    return snapped
+  }
+  return snapped + GRID_SIZE
+}
 
 // ## IO helper functions.
 
@@ -131,6 +157,24 @@ export function fetchImage({ imageId, imageExt, key }, callback) {
   })
 }
 
+// Synchronously read from disk and return the list of recent board doc ids.
+function readRecentDocs() {
+  if (Fs.existsSync(RECENT_DOCS_PATH)) {
+    return JSON.parse(Fs.readFileSync(RECENT_DOCS_PATH))
+  }
+  return []
+}
+
+// Synchronously write to disk the list of recent board doc ids.
+function writeRecentDocs(recentDocs) {
+  Fs.writeFileSync(RECENT_DOCS_PATH, JSON.stringify(recentDocs))
+}
+
+// Helper for state.hm.change so that it's easier to insert debugging.
+function changeBoard(state, changeFn) {
+  return state.hm.change(state.board, changeFn)
+}
+
 
 // ## Initial state. Evolved by actions below.
 
@@ -139,12 +183,8 @@ export const empty = {
   activeDocId: '',
   requestedDocId: '',
   selected: [],
-  board: {
-    cards: {},
-    backgroundColor: '',
-    title: '',
-  },
-  hm: null
+  board: null,
+  hm: null,
 }
 
 
@@ -153,7 +193,7 @@ export const empty = {
 // Starts IO subsystems and populates associated state.
 export function init(state) {
   const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
-  const recentDocs = getRecentDocs()
+  const recentDocs = readRecentDocs()
   const requestedDocId = recentDocs.length > 0 ? recentDocs[0] : state.requestedDocId
 
   hm.once('ready', () => {
@@ -176,7 +216,7 @@ export function init(state) {
 }
 
 function addRecentDoc(state, { docId }) {
-  let recentDocs = getRecentDocs()
+  let recentDocs = readRecentDocs()
   const recentDocIndex = recentDocs.findIndex(d => d === docId)
 
   if (Number.isInteger(recentDocIndex)) {
@@ -188,20 +228,9 @@ function addRecentDoc(state, { docId }) {
     recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
   }
 
-  Fs.writeFileSync(recentDocsPath(), JSON.stringify(recentDocs))
+  writeRecentDocs(recentDocs)
 
   return state
-}
-
-function recentDocsPath() {
-  return Path.join(USER_PATH, 'recent-docs.json')
-}
-
-export function getRecentDocs() {
-  if (Fs.existsSync(recentDocsPath())) {
-    return JSON.parse(Fs.readFileSync(recentDocsPath()))
-  }
-  return []
 }
 
 // Process the image at the given path, upgrading the card at id to an image
@@ -245,14 +274,14 @@ export function processImage(state, { path, buffer, x, y }) {
 }
 
 export function setTitle(state, { title }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  const newBoard = changeBoard(state, (b) => {
     b.title = title
   })
   return { ...state, board: newBoard }
 }
 
 export function setBackgroundColor(state, { backgroundColor }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  const newBoard = changeBoard(state, (b) => {
     b.backgroundColor = backgroundColor
   })
   return { ...state, board: newBoard }
@@ -261,17 +290,16 @@ export function setBackgroundColor(state, { backgroundColor }) {
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
 
-  const newBoard = state.hm.change(state.board, (b) => {
-    const snapX = snapToGrid(x)
-    const snapY = snapToGrid(y)
+  const newBoard = changeBoard(state, (b) => {
+    const snapX = snapCoordinateToGrid(x)
+    const snapY = snapCoordinateToGrid(y)
     const newCard = {
       id,
       type,
       x: snapX,
       y: snapY,
-      // add +1 to width and height so that the borders cover the grid exactly and each other
-      width: snapToGrid(width || CARD_DEFAULT_WIDTH) + 1,
-      height: snapToGrid(height || CARD_DEFAULT_HEIGHT) + 1,
+      width: snapMeasureToGrid(width || CARD_DEFAULT_WIDTH),
+      height: snapMeasureToGrid(height || CARD_DEFAULT_HEIGHT),
       slackWidth: 0,
       slackHeight: 0,
       resizing: false,
@@ -302,7 +330,7 @@ function populateDemoBoard(state) {
     throw new Error('Should only be called on an empty board')
   }
 
-  const newBoard = state.hm.change(state.board, (b) => {
+  const newBoard = changeBoard(state, (b) => {
     b.cards = {}
   })
   let newState = { ...state, board: newBoard }
@@ -329,7 +357,7 @@ export function cardCreatedImage(state, { x, y, selected, width, height, hyperfi
 }
 
 export function cardTextChanged(state, { id, at, removedLength, addedText }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  const newBoard = changeBoard(state, (b) => {
     const { text } = b.cards[id]
 
     if (removedLength > 0) {
@@ -344,15 +372,16 @@ export function cardTextChanged(state, { id, at, removedLength, addedText }) {
 }
 
 export function cardTextResized(state, { id, height }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  const newBoard = changeBoard(state, (b) => {
     const card = b.cards[id]
-    card.height = snapToGrid(height + (GRID_SIZE / 2)) + 1
+    // Ensure  text doesn't stick out of the bottom of card.
+    card.height = snapMeasureOutwardToGrid(height)
   })
   return { ...state, board: newBoard }
 }
 
 export function cardInlinedImage(state, { id, path, width, height }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  const newBoard = changeBoard(state, (b) => {
     const card = b.cards[id]
     card.type = 'image'
     card.path = path
@@ -364,19 +393,33 @@ export function cardInlinedImage(state, { id, path, width, height }) {
 }
 
 export function cardMoved(state, { id, x, y }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  // This gets called when uniqueyly selecting a card, so avoid a document
+  // change if in fact the card hasn't moved mod snapping.
+  const snapX = snapCoordinateToGrid(x)
+  const snapY = snapCoordinateToGrid(y)
+  if (snapX === state.board.cards[id].x && snapY === state.board.cards[id].y) {
+    return state
+  }
+  const newBoard = changeBoard(state, (b) => {
     const card = b.cards[id]
-    card.x = x
-    card.y = y
+    card.x = snapX
+    card.y = snapY
   })
   return { ...state, board: newBoard }
 }
 
 export function cardResized(state, { id, width, height }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  // This gets called when we click the drag corner of a card, so avoid a
+  // document change if in fact the card won't resize mod snapping.
+  const snapWidth = snapMeasureToGrid(width)
+  const snapHeight = snapMeasureToGrid(height)
+  if (snapWidth === state.board.cards[id].width && snapHeight === state.board.cards[id].height) {
+    return state
+  }
+  const newBoard = changeBoard(state, (b) => {
     const card = b.cards[id]
-    card.width = snapToGrid(width) + 1
-    card.height = snapToGrid(height) + 1
+    card.width = snapWidth
+    card.height = snapHeight
   })
   return { ...state, board: newBoard }
 }
@@ -405,7 +448,7 @@ export function clearSelections(state) {
 }
 
 export function cardDeleted(state, { id }) {
-  const newBoard = state.hm.change(state.board, (b) => {
+  const newBoard = changeBoard(state, (b) => {
     delete b.cards[id]
   })
   return { ...state, board: newBoard }
@@ -433,28 +476,31 @@ export function newDocument(state) {
   const doc = state.hm.create()
   const docId = state.hm.getId(doc)
 
-  Loop.dispatch(addRecentDoc, { docId })
-
-  return populateDemoBoard({ ...state,
-    activeDocId: docId,
+  return {
+    ...state,
     formDocId: docId,
     requestedDocId: docId,
-    board: doc,
-  })
+  }
 }
 
 export function documentReady(state, { docId, doc }) {
-  if (state.requestedDocId === docId) {
-    Loop.dispatch(addRecentDoc, { docId })
-
-    return { ...state,
-      activeDocId: docId,
-      formDocId: docId,
-      board: doc
-    }
+  // Case where an existing doc was opened but is no longer requested.
+  if (state.requestedDocId !== docId) {
+    return state
   }
 
-  // Case where an existing doc was opened but is no longer requested.
+  // Case where we've created or opened the requested doc.
+  // It may be an unitialized board in which case we need to populate it.
+  state = { ...state,
+    activeDocId: docId,
+    formDocId: docId,
+    board: doc
+  }
+  if (!state.board.cards) {
+    state = populateDemoBoard(state)
+  }
+  state = addRecentDoc(state, { docId })
+
   return state
 }
 

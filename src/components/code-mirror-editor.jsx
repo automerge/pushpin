@@ -82,15 +82,12 @@ export default class CodeMirrorEditor extends React.PureComponent {
     })
     this.codeMirror.on('change', this.onCodeMirrorChange)
     this.codeMirror.on('update', this.onCodeMirrorRefresh)
-    // Checking the height here ensures we get it before the card is first
-    // painted, which prevents the bottom from jumping around after mounting.
     this.checkHeight()
   }
 
   // This is where we transform declarative updates from React into imperative
   // commands in the editor.
   componentWillReceiveProps(props) {
-    log('componentWillReceiveProps')
     this.ensureContents(props.text)
     this.ensureFocus(props.uniquelySelected)
   }
@@ -126,7 +123,6 @@ export default class CodeMirrorEditor extends React.PureComponent {
   // This is called when the editor redraws, and therefore may have a new
   // height. So we check if we need to record that.
   onCodeMirrorRefresh(codeMirror) {
-    log('onCodeMirrorRefresh')
     this.checkHeight()
   }
 
@@ -188,12 +184,15 @@ export default class CodeMirrorEditor extends React.PureComponent {
     }
   }
 
-  // Ensure the height associated with the card is equal to the greater of the
-  // or renderer height.
+  // Ensure the height associated with the card is equal to the greater of
+  // the {editor height, renderer height, min card height}.
   checkHeight() {
-    const neededHeight = Math.max(this.editorRef.clientHeight, this.rendererRef.clientHeight)
+    const editorHeight = this.editorRef.clientHeight
+    const rendererHeight = this.rendererRef.clientHeight
+    const minHeight = Model.CARD_MIN_HEIGHT
+    const neededHeight = Model.snapMeasureOutwardToGrid(Math.max(editorHeight, rendererHeight, minHeight))
     if (neededHeight !== this.props.cardHeight) {
-      log('forceHeight', neededHeight)
+      log('forceHeight', this.props.cardHeight, editorHeight, rendererHeight, neededHeight)
       Loop.dispatch(Model.cardTextResized, { id: this.props.cardId, height: neededHeight })
     }
   }
