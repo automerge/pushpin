@@ -249,54 +249,59 @@ export default class Board extends React.PureComponent {
     const clickX = d.lastX
     const clickY = d.lastY
 
-    this.tracking[card.id] = this.tracking[card.id] || {}
-    const tracking = this.tracking[card.id]
+    const resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
+                      (clickX <= (card.x + card.width)) &&
+                      (clickY >= (card.y + card.height - Model.RESIZE_HANDLE_SIZE)) &&
+                      (clickY <= (card.y + card.height)))
 
-    tracking.resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
-                         (clickX <= (card.x + card.width)) &&
-                         (clickY >= (card.y + card.height - Model.RESIZE_HANDLE_SIZE)) &&
-                         (clickY <= (card.y + card.height)))
+    const moving = !resizing
 
-    tracking.moving = !tracking.resizing
-
-    if (tracking.moving) {
-      if (this.props.selected.length > 0) {
-        const cards = this.props.selected.map(s => this.props.cards[s])
-        cards.push(card)
-        cards.forEach(card => {
-          const t = this.tracking[card.id]
-
-          t.moveX = card.x
-          t.moveY = card.y
-          t.slackX = 0
-          t.slackY = 0
-          t.moving = true
-          t.totalDrag = 0
-
-          this.effectDrag(card, t, d)
-          this.setDragState(card, t)
-        })
+    if (moving) {
+      let cards
+      if (this.props.selected.length > 0 && this.props.selected.find(s => s === card.id)) {
+        cards = this.props.selected.map(s => this.props.cards[s])
       } else {
+        if (!(e.ctrlKey || e.shiftKey)) {
+          Loop.dispatch(Model.clearSelections)
+        }
+
+        cards = [ card ]
+      }
+
+      cards.forEach(card => {
+        const tracking = this.getTracking(card)
+
         tracking.moveX = card.x
         tracking.moveY = card.y
         tracking.slackX = 0
         tracking.slackY = 0
+        tracking.moving = true
         tracking.totalDrag = 0
 
         this.effectDrag(card, tracking, d)
         this.setDragState(card, tracking)
-      }
+      })
     }
 
-    if (tracking.resizing) {
-      tracking.resizeWidth = card.width
-      tracking.resizeHeight = card.height
+    if (resizing) {
+      const tracking = this.getTracking(card)
+
+      tracking.resizing = true
       tracking.slackWidth = 0
       tracking.slackHeight = 0
+      tracking.resizeWidth = card.width
+      tracking.resizeHeight = card.height
 
       this.effectDrag(card, tracking, d)
       this.setDragState(card, tracking)
     }
+  }
+
+  getTracking(card) {
+    if(!this.tracking[card.id])
+      this.tracking[card.id] = {}
+
+    return this.tracking[card.id]
   }
 
   effectDrag(card, tracking, { deltaX, deltaY }) {
@@ -374,19 +379,18 @@ export default class Board extends React.PureComponent {
   onDrag(card, e, d) {
     log('onDrag')
 
+    let cards
     if(this.props.selected.length > 0) {
-      const cards = this.props.selected.map(s => this.props.cards[s])
-      cards.forEach(card => {
-        const tracking = this.tracking[card.id]
-        this.effectDrag(card, tracking, d)
-        this.setDragState(card, tracking)
-      })
+      cards = this.props.selected.map(s => this.props.cards[s])
     } else {
-      const tracking = this.tracking[card.id]
-
-      this.effectDrag(card, tracking, d)
-      this.setDragState(card, tracking)
+      cards = [ card ]
     }
+
+    cards.forEach(c => {
+      const tracking = this.tracking[c.id]
+      this.effectDrag(c, tracking, d)
+      this.setDragState(c, tracking)
+    })
   }
 
   onStop(card, e, d) {
@@ -404,38 +408,29 @@ export default class Board extends React.PureComponent {
         Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
       }
     }
-    tracking.totalDrag = null
 
     if (tracking.moving) {
-      if(this.props.selected.length > 0) {
-        const cards = this.props.selected.map(s => this.props.cards[s])
-        cards.forEach(card => {
-          const t = this.tracking[card.id]
-          const x = Model.snapToGrid(t.moveX)
-          const y = Model.snapToGrid(t.moveY)
+      let cards
+      if(this.props.selected.length > 0 && this.props.selected.find(s => s === card.id))
+        cards = this.props.selected.map(s => this.props.cards[s])
+      else
+        cards = [ card ]
 
-          t.moveX = null
-          t.moveY = null
-          t.slackX = null
-          t.slackY = null
-          t.moving = false
+      cards.forEach(card => {
+        const t = this.tracking[card.id]
+        const x = t.moveX ? Model.snapToGrid(t.moveX) : card.x
+        const y = t.moveY ? Model.snapToGrid(t.moveY) : card.y
 
-          Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
-          this.setDragState(card, t)
-        })
-      } else {
-        const x = Model.snapToGrid(tracking.moveX)
-        const y = Model.snapToGrid(tracking.moveY)
-
-        tracking.moveX = null
-        tracking.moveY = null
-        tracking.slackX = null
-        tracking.slackY = null
-        tracking.moving = false
+        t.moveX = null
+        t.moveY = null
+        t.slackX = null
+        t.slackY = null
+        t.moving = false
+        t.totalDrag = null
 
         Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
-        this.setDragState(card, tracking)
-      }
+        this.setDragState(card, t)
+      })
     }
 
     if (tracking.resizing) {
