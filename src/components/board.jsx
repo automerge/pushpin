@@ -374,8 +374,10 @@ export default class Board extends React.PureComponent {
   onDrag(card, e, d) {
     log('onDrag')
 
+    const tracking = this.tracking[card.id]
+
     let cards
-    if(this.props.selected.length > 0) {
+    if(this.props.selected.length > 0 && tracking.moving) {
       cards = this.props.selected.map(s => this.props.cards[s])
     } else {
       cards = [ card ]
