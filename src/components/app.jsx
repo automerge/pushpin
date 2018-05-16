@@ -12,8 +12,8 @@ export default class App extends React.PureComponent {
     state: PropTypes.shape({
       formDocId: PropTypes.string,
       activeDocId: PropTypes.string,
-      requestedDocId: PropTypes.string,
       selected: PropTypes.arrayOf(PropTypes.string),
+      workspace: PropTypes.object, // TODO: this should probably be better managed
       board: PropTypes.shape(Board.propTypes),
     }).isRequired
   }
@@ -39,7 +39,7 @@ export default class App extends React.PureComponent {
           boardBackgroundColor={this.props.state.board.backgroundColor}
           formDocId={this.props.state.formDocId}
           activeDocId={this.props.state.activeDocId}
-          requestedDocId={this.props.state.requestedDocId}
+          requestedDocId={this.props.state.workspace.boardId}
         />
       </div>
     )

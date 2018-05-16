@@ -181,7 +181,6 @@ function changeBoard(state, changeFn) {
 export const empty = {
   formDocId: '',
   activeDocId: '',
-  requestedDocId: '',
   selected: [],
   workspace: null,
   board: null,
@@ -196,11 +195,9 @@ export const empty = {
 // Starts IO subsystems and populates associated state.
 export function init(state) {
   const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
-  const recentDocs = readRecentDocs()
-  const requestedDocId = recentDocs.length > 0 ? recentDocs[0] : state.requestedDocId
 
   const workspaceIdFile = getWorkspaceIdFile()
-  const requestedWorkspace = workspaceIdFile.docId || ''
+  const requestedWorkspace = workspaceIdFile.workspaceDocId || ''
 
   hm.once('ready', () => {
     hm.joinSwarm()
@@ -216,13 +213,9 @@ export function init(state) {
     if (requestedWorkspace === '') {
       Loop.dispatch(newWorkspace)
     }
-
-    if (requestedDocId === '') {
-      Loop.dispatch(newDocument)
-    }
   })
 
-  return { ...state, hm, requestedDocId }
+  return { ...state, hm, requestedWorkspace }
 }
 
 function addRecentDoc(state, { docId }) {
@@ -541,7 +534,9 @@ export function newWorkspace(state) {
     i.contacts = []
   })
 
+  // should these be synchronous? does it matter?
   Loop.dispatch(newIdentity)
+  Loop.dispatch(newDocument)
 
   return { ...state, workspace: nextWorkspace }
 }
@@ -549,6 +544,14 @@ export function newWorkspace(state) {
 export function updateWorkspaceSelf(state, { selfDocId }) {
   const nextWorkspace = state.hm.change(state.workspace, (w) => {
     w.selfDocId = selfDocId
+  })
+
+  return { ...state, workspace: nextWorkspace }
+}
+
+export function updateWorkspaceRequestedBoardId(state, { boardId }) {
+  const nextWorkspace = state.hm.change(state.workspace, (w) => {
+    w.boardId = boardId
   })
 
   return { ...state, workspace: nextWorkspace }
@@ -580,32 +583,38 @@ export function identityNameChange(state, { name }) {
 
 export function newDocument(state) {
   const doc = state.hm.create()
-  const docId = state.hm.getId(doc)
+  const boardId = state.hm.getId(doc)
 
+  // hmmm. any thoughts on how to do this idiomatically?
+  const newState = updateWorkspaceRequestedBoardId(state, { boardId })
+
+  // refactor in progress: the requestedDocId is now called workspace.boardId
   return {
-    ...state,
-    formDocId: docId,
-    requestedDocId: docId,
+    ...newState,
+    formDocId: boardId
   }
 }
 
 export function documentReady(state, { docId, doc }) {
-  // Case where an existing doc was opened but is no longer requested.
-  if (state.requestedDocId !== docId) {
-    return state
-  }
-
   if (state.requestedWorkspace === docId) {
-    // TODO: Loop.dispatch(loadWorkspaceIdentities)
+    // TODO: Loop.dispatch(loadWorkspaceIdentities)?
     return { ...state, workspace: doc }
   }
 
-  if (state.requestedDocId === docId) {
-    Loop.dispatch(addRecentDoc, { docId })
+  // Case where an existing doc was opened but is no longer requested.
+  if (!state.workspace || state.workspace.boardId !== docId) {
+    return state
+  }
+
+  if (state.workspace && state.workspace.boardId === docId) {
+    // XXX: we already have this document open... wait, why is this here?
+    Loop.dispatch(addRecentDoc, { docId }) // should i rewrite this? cut it?
   }
 
   // Case where we've created or opened the requested doc.
   // It may be an unitialized board in which case we need to populate it.
+  // these two properties are not part of the workspace document because they
+  // represent transient application state, not something we save.
   state = { ...state,
     activeDocId: docId,
     formDocId: docId,
@@ -643,5 +652,9 @@ export function formSubmitted(state) {
     state.hm.open(state.formDocId)
   }
 
-  return { ...state, requestedDocId: state.formDocId }
+  // hmmm. any thoughts on how to do this idiomatically?
+  const newState = updateWorkspaceRequestedBoardId(state, { boardId: state.formDocId })
+
+  // this is a senseless expansion, but i'm keeping it for consistency
+  return { ...newState }
 }
