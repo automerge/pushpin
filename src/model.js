@@ -543,6 +543,14 @@ export function newIdentity(state) {
   return { ...state, self: nextIdentity }
 }
 
+export function identityNameChange(state, { name }) {
+  const nextIdentity = state.hm.change(state.self, (i) => {
+    i.name = name
+    i.color = '#4df1c3'
+  })
+  return { ...state, self: nextIdentity }
+}
+
 export function newDocument(state) {
   const doc = state.hm.create()
   const docId = state.hm.getId(doc)
