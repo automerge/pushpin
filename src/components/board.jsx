@@ -246,14 +246,7 @@ export default class Board extends React.PureComponent {
   onStart(card, e, d) {
     log('onStart')
 
-    const clickX = d.lastX
-    const clickY = d.lastY
-
-    const resizing = ((clickX >= (card.x + card.width - Model.RESIZE_HANDLE_SIZE)) &&
-                      (clickX <= (card.x + card.width)) &&
-                      (clickY >= (card.y + card.height - Model.RESIZE_HANDLE_SIZE)) &&
-                      (clickY <= (card.y + card.height)))
-
+    const resizing = e.target.className === "cardResizeHandle"
     const moving = !resizing
 
     // If user is pressing ctrl or shift, add the card to the
