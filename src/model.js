@@ -199,9 +199,6 @@ export function init(state) {
   const recentDocs = readRecentDocs()
   const requestedDocId = recentDocs.length > 0 ? recentDocs[0] : state.requestedDocId
 
-  const selfIdentityFile = getSelfIdentityFile()
-  const requestedIdentity = selfIdentityFile.selfDocId || ''
-
   const workspaceIdFile = getWorkspaceIdFile()
   const requestedWorkspace = workspaceIdFile.docId || ''
 
@@ -215,10 +212,6 @@ export function init(state) {
     hm.on('document:updated', (docId, doc) => {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
-
-    if (requestedIdentity === '') {
-      Loop.dispatch(newIdentity)
-    }
 
     if (requestedWorkspace === '') {
       Loop.dispatch(newWorkspace)
@@ -257,27 +250,6 @@ function recentDocsPath() {
 export function getRecentDocs() {
   if (Fs.existsSync(recentDocsPath())) {
     return JSON.parse(Fs.readFileSync(recentDocsPath()))
-  }
-  return []
-}
-
-/* I'm propagating this pattern but I think we want a workspace
-  hypermerge that contains recent-docs and your identity and other things... */
-function saveSelfIdentity(state, { docId }) {
-  const selfIdentityFile = { selfDocId: docId }
-
-  Fs.writeFileSync(selfIdentityFilePath(), JSON.stringify(selfIdentityFile))
-
-  return state
-}
-
-function selfIdentityFilePath() {
-  return Path.join(USER_PATH, 'self-identity.json')
-}
-
-export function getSelfIdentityFile() {
-  if (Fs.existsSync(selfIdentityFilePath())) {
-    return JSON.parse(Fs.readFileSync(selfIdentityFilePath()))
   }
   return []
 }
@@ -423,7 +395,7 @@ function populateDemoBoard(state) {
   newState = setTitle(newState, { title: 'Example Board' })
   newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
 
-  newState = addSelfToAuthors(newState)
+  // newState = addSelfToAuthors(newState)
 
   // These will be handled async as they require their own IO.
   Loop.dispatch(processImage, { x: 1750, y: 500, path: KAY_PATH })
@@ -563,10 +535,20 @@ export function newWorkspace(state) {
   Loop.dispatch(saveWorkspaceId, { docId })
 
   const nextWorkspace = state.hm.change(workspace, (i) => {
-    i.self = ''
+    i.selfDocId = ''
     i.currentDoc = ''
     i.recentDocs = []
     i.contacts = []
+  })
+
+  Loop.dispatch(newIdentity)
+
+  return { ...state, workspace: nextWorkspace }
+}
+
+export function updateWorkspaceSelf(state, { selfDocId }) {
+  const nextWorkspace = state.hm.change(state.workspace, (w) => {
+    w.selfDocId = selfDocId
   })
 
   return { ...state, workspace: nextWorkspace }
@@ -574,17 +556,18 @@ export function newWorkspace(state) {
 
 export function newIdentity(state) {
   const identity = state.hm.create()
-  const docId = state.hm.getId(identity)
+  const selfDocId = state.hm.getId(identity)
 
-  Loop.dispatch(saveSelfIdentity, { docId })
+  // hmmm. any thoughts on how to do this idiomatically?
+  const newState = updateWorkspaceSelf(state, { selfDocId })
 
-  const nextIdentity = state.hm.change(identity, (i) => {
+  const nextIdentity = newState.hm.change(identity, (i) => {
     i.name = 'Mysterious Stranger'
-    i.docId = docId
+    i.docId = selfDocId
     i.color = '#4df1c3'
   })
 
-  return { ...state, self: nextIdentity }
+  return { ...newState, self: nextIdentity }
 }
 
 export function identityNameChange(state, { name }) {
@@ -610,6 +593,15 @@ export function documentReady(state, { docId, doc }) {
   // Case where an existing doc was opened but is no longer requested.
   if (state.requestedDocId !== docId) {
     return state
+  }
+
+  if (state.requestedWorkspace === docId) {
+    // TODO: Loop.dispatch(loadWorkspaceIdentities)
+    return { ...state, workspace: doc }
+  }
+
+  if (state.requestedDocId === docId) {
+    Loop.dispatch(addRecentDoc, { docId })
   }
 
   // Case where we've created or opened the requested doc.
