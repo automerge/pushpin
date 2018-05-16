@@ -80,43 +80,43 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.Share {
+.Share, .Search {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   padding: 0.5em 1em;
 }
 
-.Author {
+.Contact {
   padding: 0.25em 0;
 }
 
-.Author__info, .Author__avatar, .Author__actions {
+.Contact__info, .Contact__avatar, .Contact__actions {
   display: inline-block;
   vertical-align: middle;
 }
 
-.Author__info {
+.Contact__info {
   margin-left: 10px;
   margin-top: -5px;
 }
 
-.Author__avatar img {
+.Contact__avatar img {
   width: 40px;
   height: 40px;
   border-radius: 100%;
   border: 1px solid #AAA;
 }
 
-.Author__info__lastSeen {
+.Contact__info__lastSeen {
   color: #666;
   font-style: italic;
 }
 
-.Author__actions {
+.Contact__actions {
   margin-left: 20px;
 }
 
-.Author__actions i.fa {
+.Contact__actions i.fa {
   font-size: 24px;
   color: #333;
   cursor: pointer;

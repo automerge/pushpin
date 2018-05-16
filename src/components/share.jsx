@@ -1,7 +1,9 @@
 import React from "react"
 import PropTypes from "prop-types"
 
-export default class Share extends React.Component {
+import Contact from "./contact"
+
+export default class Share extends React.PureComponent {
   static propTypes = {
     authors: PropTypes.objectOf(
       PropTypes.shape({
@@ -15,27 +17,11 @@ export default class Share extends React.Component {
     const authors = Object.keys(this.props.authors).map(id => {
       const author = this.props.authors[id]
 
-      return (
-        <div key={id} className="Author">
-          <div className="Author__avatar"><img src={author.avatar} /></div>
-          <div className="Author__info">
-            <div className="Author__info__name">
-              { author.name }
-            </div>
-
-            <div className="Author__info__lastSeen">
-              Last seen 2 days ago
-            </div>
-          </div>
-          <div className="Author__actions">
-            <i className="fa fa-share-alt" />
-          </div>
-        </div>
-      )
+      return <Contact key={id} name={author.name} avatar={author.avatar} />
     })
 
     return (
-      <div className="Share">
+      <div className='Share'>
         { authors }
       </div>
     )
