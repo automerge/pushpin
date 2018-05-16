@@ -36,9 +36,8 @@ const boardStyle = {
 const draggableCards = (cards, selected, card) => {
   if (selected.length > 0 && selected.find(id => id === card.id)) {
     return selected.map(id => cards[id])
-  } else {
-    return [card]
   }
+  return [card]
 }
 
 export default class Board extends React.PureComponent {
@@ -330,11 +329,11 @@ export default class Board extends React.PureComponent {
     const tracking = this.tracking[card.id]
 
     // If we haven't started tracking this drag, initialize tracking
-    if(!(tracking && (tracking.moving || tracking.resizing))) {
-      const resizing = e.target.className === "cardResizeHandle"
+    if (!(tracking && (tracking.moving || tracking.resizing))) {
+      const resizing = e.target.className === 'cardResizeHandle'
       const moving = !resizing
 
-      if(moving) {
+      if (moving) {
         const cards = draggableCards(this.props.cards, this.props.selected, card)
 
         cards.forEach(c => {
@@ -349,7 +348,7 @@ export default class Board extends React.PureComponent {
         })
       }
 
-      if(resizing) {
+      if (resizing) {
         this.tracking[card.id] = {
           resizing: true,
           slackWidth: 0,
@@ -384,7 +383,7 @@ export default class Board extends React.PureComponent {
 
     // If tracking is not initialized, treat this as a click
     if (!(tracking && (tracking.moving || tracking.resizing))) {
-      if(e.ctrlKey || e.shiftKey) {
+      if (e.ctrlKey || e.shiftKey) {
         Loop.dispatch(Model.cardToggleSelection, { id: card.id })
       } else {
         Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
