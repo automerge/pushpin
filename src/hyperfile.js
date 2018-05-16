@@ -20,7 +20,7 @@ function serve(hypercore) {
 //     const kayId = 'asset-1'
 //     const kayPath = './img/kay.jpg'
 //
-//     HyperFile.write(client1Data, kayId, kayPath, (err, coreKey) => {
+//     HyperFile.writePath(client1Data, kayId, kayPath, (err, coreKey) => {
 //       if (err) {
 //         console.error(err)
 //         process.exit(1)
@@ -46,17 +46,17 @@ function serve(hypercore) {
 //
 
 // callback = (err, key)
-export function write(dataPath, imgId, imgPath, imgBuffer, callback) {
-  const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions)
+export function writePath(dataPath, fileId, filePath, callback) {
+  const core = Hypercore(corePath(dataPath, fileId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
-    Fs.readFile(imgPath, (error, image) => {
+    Fs.readFile(filePath, (error, buffer) => {
       if (error) {
         callback(error)
         return
       }
 
-      core.append(image, (error) => {
+      core.append(buffer, (error) => {
         if (error) {
           callback(error)
           return
@@ -69,11 +69,12 @@ export function write(dataPath, imgId, imgPath, imgBuffer, callback) {
   })
 }
 
-export function writeBuffer(dataPath, imgId, buffer, callback) {
-  const core = Hypercore(corePath(dataPath, imgId), hypercoreOptions)
+// callback = (err, key)
+export function writeBuffer(dataPath, fileId, fileBuffer, callback) {
+  const core = Hypercore(corePath(dataPath, fileId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
-    core.append(buffer, (error) => {
+    core.append(fileBuffer, (error) => {
       if (error) {
         callback(error)
         return
@@ -86,9 +87,9 @@ export function writeBuffer(dataPath, imgId, buffer, callback) {
 }
 
 // callback = (err, blob)
-export function fetch(dataPath, imgId, coreKey, callback) {
+export function fetch(dataPath, fileId, coreKey, callback) {
   const coreKeyBuf = Buffer.from(coreKey, 'base64')
-  const core = Hypercore(corePath(dataPath, imgId), coreKeyBuf, hypercoreOptions)
+  const core = Hypercore(corePath(dataPath, fileId), coreKeyBuf, hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
     serve(core)

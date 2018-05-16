@@ -204,8 +204,8 @@ export function getRecentDocs() {
   return []
 }
 
-// Process the image at the given path, upgrading the card at id to an image
-// card if id is given, otherwise creating a new image card at (x,y).
+// Process the image at the given path or in the given buffer, creating a new
+// image card at (x, y).
 // This is structured an action for consistency. It passes through state
 // unchanged. State will be updated in callbacks by redispatching to
 // another action (cardCreatedImage). We could add state to indicate in-
@@ -220,8 +220,8 @@ export function processImage(state, { path, buffer, x, y }) {
     const { width, height } = img.bitmap
     const [scaledWidth, scaledHeight] = scaleImage(width, height)
     const imageId = uuid()
-
-    Hyperfile.writeBuffer(HYPERFILE_DATA_PATH, imageId, buffer, (error, key) => {
+    const writeFn = buffer ? Hyperfile.writeBuffer : Hyperfile.writePath
+    writeFn(HYPERFILE_DATA_PATH, imageId, imageSource, (error, key) => {
       if (error) {
         log(error)
       }
