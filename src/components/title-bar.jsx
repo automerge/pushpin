@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Loop from '../loop'
 import * as Model from '../model'
 import HashForm from './hash-form'
+import Share from './share'
 
 const log = Debug('pushpin:title-bar')
 
@@ -60,6 +62,17 @@ export default class TitleBar extends React.PureComponent {
           classLoading="TitleBar__titleText--loading"
           classInvalid="TitleBar__titleText--invalid"
         />
+
+        <Dropdown>
+           <DropdownTrigger>
+             <div className="TitleBar__dropDown">
+               <i className="fa fa-chevron-circle-down" />
+             </div>
+           </DropdownTrigger>
+           <DropdownContent>
+             <Share authors={{ "1": { name: "Roshan", avatar: "../img/avatar-example.png" }, "2": { name: "Peter" }}} />
+           </DropdownContent>
+         </Dropdown>
 
         <HashForm
           formDocId={this.props.formDocId}
