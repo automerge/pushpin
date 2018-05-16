@@ -33,6 +33,14 @@ const boardStyle = {
   height: Model.BOARD_HEIGHT
 }
 
+const draggableCards(cards, selected, card) {
+  if (selected.length > 0 && selected.find(id => id === card.id)) {
+    cards = selected.map(id => cards[id])
+  } else {
+    cards = [card]
+  }
+}
+
 export default class Board extends React.PureComponent {
   static defaultProps = {
     backgroundColor: '',
@@ -58,7 +66,6 @@ export default class Board extends React.PureComponent {
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
 
-    this.onStart = this.onStart.bind(this)
     this.onDrag = this.onDrag.bind(this)
     this.onStop = this.onStop.bind(this)
 
@@ -243,67 +250,6 @@ export default class Board extends React.PureComponent {
     this.setState({ cards })
   }
 
-  onStart(card, e, d) {
-    log('onStart')
-
-    const resizing = e.target.className === "cardResizeHandle"
-    const moving = !resizing
-
-    // If user is pressing ctrl or shift, add the card to the
-    // active selection and do not drag the card
-    if (e.ctrlKey || e.shiftKey) {
-      Loop.dispatch(Model.cardToggleSelection, { id: card.id })
-
-      this.tracking[card.id] = this.tracking[card.id] || {}
-      const tracking = this.tracking[card.id]
-      tracking.ignoreDrag = true
-
-      return
-    }
-
-    if (moving) {
-      let cards
-      if (this.props.selected.length > 0 && this.props.selected.find(s => s === card.id)) {
-        cards = this.props.selected.map(s => this.props.cards[s])
-      } else {
-        if (!(e.ctrlKey || e.shiftKey)) {
-          Loop.dispatch(Model.clearSelections)
-        }
-
-        cards = [card]
-      }
-
-      cards.forEach(card => {
-        this.tracking[card.id] = this.tracking[card.id] || {}
-        const tracking = this.tracking[card.id]
-
-        tracking.moveX = card.x
-        tracking.moveY = card.y
-        tracking.slackX = 0
-        tracking.slackY = 0
-        tracking.moving = true
-        tracking.totalDrag = 0
-
-        this.effectDrag(card, tracking, d)
-        this.setDragState(card, tracking)
-      })
-    }
-
-    if (resizing) {
-      this.tracking[card.id] = this.tracking[card.id] || {}
-      const tracking = this.tracking[card.id]
-
-      tracking.resizing = true
-      tracking.slackWidth = 0
-      tracking.slackHeight = 0
-      tracking.resizeWidth = card.width
-      tracking.resizeHeight = card.height
-
-      this.effectDrag(card, tracking, d)
-      this.setDragState(card, tracking)
-    }
-  }
-
   effectDrag(card, tracking, { deltaX, deltaY }) {
     if (!tracking.resizing && !tracking.moving) {
       throw new Error('Did not expect drag without resize or move')
@@ -381,20 +327,52 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
-    if (tracking.ignoreDrag) { return }
+    // If we haven't started tracking this drag, initialize tracking
+    if(!(tracking && (tracking.moving || tracking.resizing))) {
+      const resizing = e.target.className === "cardResizeHandle"
+      const moving = !resizing
 
-    let cards
-    if (this.props.selected.length > 0 && tracking.moving) {
-      cards = this.props.selected.map(s => this.props.cards[s])
-    } else {
-      cards = [card]
+      if(moving) {
+        const cards = draggableCards(this.props.cards, this.props.selected, card)
+
+        cards.forEach(c => {
+          this.tracking[c.id] = {
+            moveX: c.x,
+            moveY: c.y,
+            slackX: 0,
+            slackY: 0,
+            totalDrag: 0,
+            moving: true
+          }
+        })
+      }
+
+      if(resizing) {
+        this.tracking[card.id] = {
+          resizing: true,
+          slackWidth: 0,
+          slackHeight: 0,
+          resizeWidth: card.width,
+          resizeHeight: card.height
+        }
+      }
+
+      return
     }
 
-    cards.forEach(c => {
-      const tracking = this.tracking[c.id]
-      this.effectDrag(c, tracking, d)
-      this.setDragState(c, tracking)
-    })
+    if (tracking.moving) {
+      const cards = draggableCards(this.props.cards, this.props.selected, card)
+      cards.forEach(card => {
+        const t = this.tracking[card.id]
+        this.effectDrag(card, t, d)
+        this.setDragState(card, t)
+      })
+    }
+
+    if (tracking.resizing) {
+      this.effectDrag(card, tracking, d)
+      this.setDragState(card, tracking)
+    }
   }
 
   onStop(card, e, d) {
@@ -402,26 +380,19 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
-    if (tracking.ignoreDrag) {
-      tracking.ignoreDrag = null
+    // If tracking is not initialized, treat this as a click
+    if (!(tracking && (tracking.moving || tracking.resizing))) {
+      if(e.ctrlKey || e.shiftKey) {
+        Loop.dispatch(Model.cardToggleSelection, { id: card.id })
+      } else {
+        Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
+      }
+
       return
     }
 
-    this.effectDrag(card, tracking, d)
-
-    const minDragSelection = tracking.totalDrag < Model.GRID_SIZE / 2
-    if (minDragSelection && !(e.ctrlKey || e.shiftKey)) {
-      Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
-    }
-
     if (tracking.moving) {
-      let cards
-      if (this.props.selected.length > 0 && this.props.selected.find(s => s === card.id)) {
-        cards = this.props.selected.map(s => this.props.cards[s])
-      } else {
-        cards = [card]
-      }
-
+      const cards = draggableCards(this.props.cards, this.props.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         const x = Model.snapToGrid(t.moveX)
@@ -468,7 +439,6 @@ export default class Board extends React.PureComponent {
           allowAnyClick={false}
           disabled={false}
           enableUserSelectHack={false}
-          onStart={(e, d) => this.onStart(card, e, d)}
           onDrag={(e, d) => this.onDrag(card, e, d)}
           onStop={(e, d) => this.onStop(card, e, d)}
         >
