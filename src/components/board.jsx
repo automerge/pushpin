@@ -33,11 +33,11 @@ const boardStyle = {
   height: Model.BOARD_HEIGHT
 }
 
-const draggableCards(cards, selected, card) {
+const draggableCards = (cards, selected, card) => {
   if (selected.length > 0 && selected.find(id => id === card.id)) {
-    cards = selected.map(id => cards[id])
+    return selected.map(id => cards[id])
   } else {
-    cards = [card]
+    return [card]
   }
 }
 
