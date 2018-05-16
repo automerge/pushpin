@@ -397,8 +397,8 @@ export default class Board extends React.PureComponent {
       const cards = draggableCards(this.props.cards, this.props.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
-        const x = Model.snapToGrid(t.moveX)
-        const y = Model.snapToGrid(t.moveY)
+        const x = t.moveX
+        const y = t.moveY
 
         t.moveX = null
         t.moveY = null
@@ -413,8 +413,8 @@ export default class Board extends React.PureComponent {
     }
 
     if (tracking.resizing) {
-      const width = Model.snapToGrid(tracking.resizeWidth)
-      const height = Model.snapToGrid(tracking.resizeHeight)
+      const width = tracking.resizeWidth
+      const height = tracking.resizeHeight
 
       tracking.resizeWidth = null
       tracking.resizeHeight = null
