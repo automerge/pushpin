@@ -202,6 +202,9 @@ export function init(state) {
   const selfIdentityFile = getSelfIdentityFile()
   const requestedIdentity = selfIdentityFile.selfDocId || ''
 
+  const workspaceIdFile = getWorkspaceIdFile()
+  const requestedWorkspace = workspaceIdFile.docId || ''
+
   hm.once('ready', () => {
     hm.joinSwarm()
 
@@ -215,6 +218,10 @@ export function init(state) {
 
     if (requestedIdentity === '') {
       Loop.dispatch(newIdentity)
+    }
+
+    if (requestedWorkspace === '') {
+      Loop.dispatch(newWorkspace)
     }
 
     if (requestedDocId === '') {
@@ -273,6 +280,27 @@ export function getSelfIdentityFile() {
     return JSON.parse(Fs.readFileSync(selfIdentityFilePath()))
   }
   return []
+}
+
+/* I'm propagating this pattern but I think we want a workspace
+  hypermerge that contains recent-docs and your identity and other things... */
+function saveWorkspaceId(state, { docId }) {
+  const workspaceIdFile = { workspaceDocId: docId }
+
+  Fs.writeFileSync(workspaceIdFilePath(), JSON.stringify(workspaceIdFile))
+
+  return state
+}
+
+function workspaceIdFilePath() {
+  return Path.join(USER_PATH, 'workspace-id.json')
+}
+
+export function getWorkspaceIdFile() {
+  if (Fs.existsSync(workspaceIdFilePath())) {
+    return JSON.parse(Fs.readFileSync(workspaceIdFilePath()))
+  }
+  return {}
 }
 
 // Process the image at the given path or in the given buffer, creating a new
@@ -526,6 +554,22 @@ export function boardBackspaced(state) {
   state = deleteCardIDs.reduce((state, id) => (cardDeleted(state, { id })), state)
 
   return state
+}
+
+export function newWorkspace(state) {
+  const workspace = state.hm.create()
+  const docId = state.hm.getId(workspace)
+
+  Loop.dispatch(saveWorkspaceId, { docId })
+
+  const nextWorkspace = state.hm.change(workspace, (i) => {
+    i.self = ''
+    i.currentDoc = ''
+    i.recentDocs = []
+    i.contacts = []
+  })
+
+  return { ...state, workspace: nextWorkspace }
 }
 
 export function newIdentity(state) {
