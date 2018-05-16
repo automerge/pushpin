@@ -17,7 +17,7 @@ export default class Share extends React.PureComponent {
     const authors = Object.keys(this.props.authors).map(id => {
       const author = this.props.authors[id]
 
-      return <Contact key={id} name={author.name} avatar={author.avatar} />
+      return <Contact key={id} name={author.name} avatar={author.avatar} share="hidden" />
     })
 
     return (
