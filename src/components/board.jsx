@@ -324,6 +324,8 @@ export default class Board extends React.PureComponent {
 
   onDrag(card, e, d) {
     log('onDrag')
+    e.preventDefault()
+    e.stopPropagation()
 
     const tracking = this.tracking[card.id]
 
