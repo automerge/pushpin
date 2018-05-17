@@ -5,21 +5,37 @@ export default class Contact extends React.PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
     avatar: PropTypes.string,
-    actions: PropTypes.arrayOf(PropTypes.string)
+    actions: PropTypes.arrayOf(PropTypes.string),
+    onShare: PropTypes.func,
+    onUnshare: PropTypes.func
   }
 
   static defaultProps = {
-    actions: []
+    actions: [],
+    onShare: () => {},
+    onUnshare: () => {}
   }
 
   render() {
     const actions = []
     if (this.props.actions.includes('share')) {
-      actions.push(<i key='share' className='fa fa-share-alt' />)
+      actions.push((
+        <i
+          key='share'
+          className='fa fa-share-alt'
+          onClick={this.props.onShare}
+        />
+      ))
     }
 
     if (this.props.actions.includes('unshare')) {
-      actions.push(<i key='unshare' className='fa fa-ban' />)
+      actions.push((
+        <i
+          key='unshare'
+          className='fa fa-ban'
+          onClick={this.props.onUnshare}
+        />
+      ))
     }
 
     return (

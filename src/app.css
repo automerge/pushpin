@@ -146,10 +146,12 @@ body {
 
 .Notification__actions__view {
   color: #1e73e7;
+  cursor: pointer;
 }
 
 .Notification__actions__archive {
   color: #f87060;
+  cursor: pointer;
   margin-left: 10px;
 }
 

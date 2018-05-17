@@ -35,7 +35,7 @@ export default class App extends React.PureComponent {
           backgroundColor={this.props.state.board.backgroundColor}
         />
         <TitleBar
-          title={this.props.state.board.title}
+          board={this.props.state.board}
           boardBackgroundColor={this.props.state.board.backgroundColor}
           formDocId={this.props.state.formDocId}
           // activeDocId={this.props.state.activeDocId}
