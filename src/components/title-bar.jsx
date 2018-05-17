@@ -73,6 +73,7 @@ export default class TitleBar extends React.PureComponent {
           width="28"
           height="28"
         />
+
         <RIEInput
           value={this.props.board.title}
           change={this.onChangeTitle}

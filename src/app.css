@@ -303,13 +303,30 @@ insta
   z-index: 3;
 }
 
+
+.TitleBar .dropdown {
+  margin-left: 10px;
+}
+
+.TitleBar .dropdown:last-child {
+  margin-right: 10px;
+}
+
+.TitleBar .dropdown__trigger .fa {
+  font-size: 20px;
+}
+
+.TitleBar .dropdown__content {
+  top: 55px;
+  right: 10px;
+}
+
 .TitleBar__logo {
   margin-left: 16px;
   margin-right: 8px;
 }
 
 .TitleBar__titleText {
-  width: 224px;
   padding: 0px 4px;
   white-space: nowrap;
   overflow:hidden;
@@ -333,9 +350,7 @@ input.TitleBar__titleText{
 }
 
 .HashForm {
-  align-self: right;
-  text-align: center;
-  margin-left: auto;
+  margin: 0 auto;
 }
 
 .HashForm input {
