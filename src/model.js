@@ -597,30 +597,33 @@ export function newDocument(state) {
 }
 
 export function identityOfferThisDocumentToFirstContact(state) {
-  state = identityOfferDocumentToIdentity(state, {
+  return identityOfferDocumentToIdentity(state, {
     identityId: Object.keys(state.contacts)[0],
     sharedDocId: state.workspace.boardId
   })
-  return state
 }
 
 export function identityOfferDocumentToIdentity(state, { identityId, sharedDocId }) {
-  const self = state.hm.change(state.self, (self) => {
-    if (!self.offeredIds) {
-      self.offeredIds = {}
+  log('identityOfferDocumentToIdentity.start', identityId, sharedDocId)
+  const self = state.hm.change(state.self, (s) => {
+    if (!s.offeredIds) {
+      s.offeredIds = {}
     }
 
-    if (!self.offeredIds[identityId]) {
-      self.offeredIds[identityId] = []
+    if (!s.offeredIds[identityId]) {
+      s.offeredIds[identityId] = []
     }
 
-    self.offeredIds[identityId].push(sharedDocId)
+    s.offeredIds[identityId].push(sharedDocId)
   })
+  log('identityOfferDocumentToIdentity.newSelf', self)
   return { ...state, self }
 }
 
 function identityUpdated(state, { contactId }) {
+  log('identityUpdated.start', contactId)
   if (!(state.contacts && state.contacts[contactId] && state.contacts[contactId].offers)) {
+    log('identityUpdated.short', state.contacts)
     return state
   }
 
@@ -628,6 +631,7 @@ function identityUpdated(state, { contactId }) {
   let { workspace } = state
   const offeredIds = state.contacts[contactId].offeredIds[state.workspace.selfId] || []
 
+  log('identityUpdated.iterate', offeredIds)
   offeredIds.forEach((offeredId) => {
     Loop.dispatch(openDocument, { docId: offeredId })
     workspace = state.hm.change(workspace, (ws) => {
@@ -673,7 +677,9 @@ export function documentReady(state, { docId, doc }) {
     }
 
     if (!state.board.cards) {
+      log('documentReady.populateStart', state)
       state = populateDemoBoard(state)
+      log('documentReady.populateFinish', state)
     }
 
     state = addSelfToAuthors(state)
