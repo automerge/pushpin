@@ -53,8 +53,6 @@ const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
 const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
-const RECENT_DOCS_PATH = Path.join(USER_PATH, 'recent-docs.json')
-
 
 // ## Demo data
 
@@ -157,19 +155,6 @@ export function fetchImage({ imageId, imageExt, key }, callback) {
   })
 }
 
-// Synchronously read from disk and return the list of recent board doc ids.
-function readRecentDocs() {
-  if (Fs.existsSync(RECENT_DOCS_PATH)) {
-    return JSON.parse(Fs.readFileSync(RECENT_DOCS_PATH))
-  }
-  return []
-}
-
-// Synchronously write to disk the list of recent board doc ids.
-function writeRecentDocs(recentDocs) {
-  Fs.writeFileSync(RECENT_DOCS_PATH, JSON.stringify(recentDocs))
-}
-
 // Helper for state.hm.change so that it's easier to insert debugging.
 function changeBoard(state, changeFn) {
   return state.hm.change(state.board, changeFn)
@@ -219,32 +204,29 @@ export function init(state) {
 }
 
 function addRecentDoc(state, { docId }) {
-  let recentDocs = readRecentDocs()
-  const recentDocIndex = recentDocs.findIndex(d => d === docId)
-
-  if (Number.isInteger(recentDocIndex)) {
-    recentDocs = [docId,
-      ...recentDocs.slice(0, recentDocIndex),
-      ...recentDocs.slice(recentDocIndex + 1)]
-  } else {
-    recentDocs = [docId, ...recentDocs]
-    recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
+  if (!state.workspace) {
+    log('addRecentDoc called with no workspace!')
+    // maybe this should be a more violent error
+    return state
   }
 
-  writeRecentDocs(recentDocs)
+  const workspace = state.hm.change(state.workspace, (workspace) => {
+    let recentDocs = state.workspace.recentDocs || []
+    const recentDocIndex = recentDocs.findIndex(d => d === docId)
 
-  return state
-}
+    if (Number.isInteger(recentDocIndex)) {
+      recentDocs = [docId,
+        ...recentDocs.slice(0, recentDocIndex),
+        ...recentDocs.slice(recentDocIndex + 1)]
+    } else {
+      recentDocs = [docId, ...recentDocs]
+      recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
+    }
 
-function recentDocsPath() {
-  return Path.join(USER_PATH, 'recent-docs.json')
-}
+    workspace.recentDocs = recentDocs
+  })
 
-export function getRecentDocs() {
-  if (Fs.existsSync(recentDocsPath())) {
-    return JSON.parse(Fs.readFileSync(recentDocsPath()))
-  }
-  return []
+  return { ...state, workspace }
 }
 
 /* I'm propagating this pattern but I think we want a workspace
@@ -529,7 +511,6 @@ export function newWorkspace(state) {
 
   const nextWorkspace = state.hm.change(workspace, (i) => {
     i.selfDocId = ''
-    i.currentDoc = ''
     i.recentDocs = []
     i.contacts = []
   })
@@ -601,14 +582,21 @@ export function documentReady(state, { docId, doc }) {
     return { ...state, workspace: doc }
   }
 
-  // Case where an existing doc was opened but is no longer requested.
-  if (!state.workspace || state.workspace.boardId !== docId) {
+  if (!state.workspace) {
     return state
   }
 
-  if (state.workspace && state.workspace.boardId === docId) {
-    // XXX: we already have this document open... wait, why is this here?
-    Loop.dispatch(addRecentDoc, { docId }) // should i rewrite this? cut it?
+  if (state.workspace.selfDocId === docId) {
+    return { ...state, self: doc }
+  }
+
+  if (state.workspace.selfDocId === docId) {
+    return { ...state, self: doc }
+  }
+
+  // Case where an existing doc was opened but is no longer requested.
+  if (!state.workspace || state.workspace.boardId !== docId) {
+    return state
   }
 
   // Case where we've created or opened the requested doc.
@@ -620,9 +608,12 @@ export function documentReady(state, { docId, doc }) {
     formDocId: docId,
     board: doc
   }
+
+  // xxx why?
   if (!state.board.cards) {
     state = populateDemoBoard(state)
   }
+
   state = addRecentDoc(state, { docId })
 
   return state
