@@ -12,7 +12,7 @@ const log = Debug('pushpin:title-bar')
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
     formDocId: PropTypes.string.isRequired,
-    activeDocId: PropTypes.string.isRequired,
+    // activeDocId: PropTypes.string.isRequired,
     requestedDocId: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired
   }
@@ -63,7 +63,7 @@ export default class TitleBar extends React.PureComponent {
 
         <HashForm
           formDocId={this.props.formDocId}
-          activeDocId={this.props.activeDocId}
+          // activeDocId={this.props.activeDocId}
           requestedDocId={this.props.requestedDocId}
         />
       </div>

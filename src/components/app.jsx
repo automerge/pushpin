@@ -11,7 +11,7 @@ export default class App extends React.PureComponent {
   static propTypes = {
     state: PropTypes.shape({
       formDocId: PropTypes.string,
-      activeDocId: PropTypes.string,
+      // activeDocId: PropTypes.string,
       selected: PropTypes.arrayOf(PropTypes.string),
       workspace: PropTypes.object, // TODO: this should probably be better managed
       board: PropTypes.shape(Board.propTypes),
@@ -38,7 +38,7 @@ export default class App extends React.PureComponent {
           title={this.props.state.board.title}
           boardBackgroundColor={this.props.state.board.backgroundColor}
           formDocId={this.props.state.formDocId}
-          activeDocId={this.props.state.activeDocId}
+          // activeDocId={this.props.state.activeDocId}
           requestedDocId={this.props.state.workspace.boardId}
         />
       </div>

@@ -11,7 +11,7 @@ const log = Debug('pushpin:hash-form')
 export default class HashForm extends React.PureComponent {
   static propTypes = {
     formDocId: PropTypes.string.isRequired,
-    activeDocId: PropTypes.string.isRequired,
+    // activeDocId: PropTypes.string.isRequired,
     requestedDocId: PropTypes.string.isRequired,
   }
 
@@ -44,7 +44,8 @@ export default class HashForm extends React.PureComponent {
             type="text"
             value={this.props.formDocId}
             onChange={this.onChange}
-            className={classNames(this.props.activeDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
+            // className={classNames(this.props.activeDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
+            className={classNames(this.props.requestedDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
           />
         </form>
       </div>
