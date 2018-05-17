@@ -80,19 +80,50 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.Share, .Settings {
+.Settings {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   padding: 0.5em 1em;
 }
 
-.Contact {
-  padding: 0.25em 0;
+.Share {
+  padding-top: 1em;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
 }
 
-.Contact__info, .Contact__avatar, .Contact__actions {
-  display: inline-block;
-  vertical-align: middle;
+.Share__section {
+  padding: 0.5em 1em;
+  border-top: 1px solid #e9edf0;
+}
+
+.Share h6 {
+  margin-left: 1em;
+  font-size: 12px;
+  color: #637389;
+}
+
+.Contact {
+  padding: 0.25em 0;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+}
+
+.Contact .fa {
+  visibility: hidden;
+}
+
+.Contact:hover .fa {
+  visibility: visible;
+}
+
+.Contact .fa.fa-ban {
+  color: #f87060;
+}
+
+.Contact .fa.fa-share-alt {
+  color: #1e73e7;
 }
 
 .Contact__info {
@@ -100,10 +131,22 @@ body {
   margin-top: -5px;
 }
 
-.Contact__avatar img {
+.Contact__avatar {
+  position: relative;
   width: 40px;
   height: 40px;
-  border-radius: 100%;
+  border: 1px solid #AAA;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
+}
+
+.Contact__avatar img {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   border: 1px solid #AAA;
 }
 
@@ -113,7 +156,7 @@ body {
 }
 
 .Contact__actions {
-  margin-left: 20px;
+  margin-left: auto;
 }
 
 .Contact__actions i.fa {
@@ -384,11 +427,16 @@ div.card.image {
   outline: thin dotted;
 }
 
-.CodeMirrorEditor__renderer a:hover, a:active {
+.CodeMirrorEditor__renderer a:hover, .CodeMirrorEditor__renderer a:active {
   outline: 0;
 }
 
-.CodeMirrorEditor__renderer h1, h2, h3, h4, h5, h6 {
+.CodeMirrorEditor__renderer h1, 
+.CodeMirrorEditor__renderer h2, 
+.CodeMirrorEditor__renderer h3, 
+.CodeMirrorEditor__renderer h4, 
+.CodeMirrorEditor__renderer h5, 
+.CodeMirrorEditor__renderer h6 {
   font-weight: 600;
   color: var(--colorBlueBlack);
   margin-bottom:8px;
