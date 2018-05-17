@@ -306,13 +306,21 @@ export function setBackgroundColor(state, { backgroundColor }) {
 
 
 export function addSelfToAuthors(state) {
-  if (state.board.authors.includes(state.self.docId)) {
+  if (state.board.authors.includes(state.workspace.selfDocId)) {
     return state
   }
-  const newBoard = state.hm.change(state.board, (b) => {
-    b.authors = [...b.authors, state.self.docId]
+  const board = state.hm.change(state.board, (b) => {
+    b.authors = [...b.authors, state.workspace.selfDocId]
   })
-  return { ...state, board: newBoard }
+  return { ...state, board }
+}
+
+export function addAuthorsToContacts(state) {
+  const workspace = state.hm.change(state.workspace, (w) => {
+    // this is probably not very conflict avoidey: talk to Martin?
+    w.contacts = [...(new Set([...state.board.authors, ...w.contacts]))]
+  })
+  return { ...state, workspace }
 }
 
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
@@ -370,7 +378,7 @@ function populateDemoBoard(state) {
   newState = setTitle(newState, { title: 'Example Board' })
   newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
 
-  // newState = addSelfToAuthors(newState)
+  newState = addSelfToAuthors(newState)
 
   // These will be handled async as they require their own IO.
   Loop.dispatch(processImage, { x: 1750, y: 500, path: KAY_PATH })
@@ -613,6 +621,9 @@ export function documentReady(state, { docId, doc }) {
   if (!state.board.cards) {
     state = populateDemoBoard(state)
   }
+
+  state = addSelfToAuthors(state)
+  state = addAuthorsToContacts(state)
 
   state = addRecentDoc(state, { docId })
 
