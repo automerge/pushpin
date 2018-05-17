@@ -123,6 +123,36 @@ body {
   background: #ffffff;
 }
 
+.Share__notifications {
+  padding-bottom: 1px;
+}
+
+.Notification {
+  margin: 1em;
+  border: 1px solid #e9edf0;
+  border-radius: 4px;
+  padding: 1em;
+}
+
+.Notification p {
+  color: #637389;
+  font-size: 12px;
+}
+
+.Notification__actions {
+  display: flex;
+  margin-top: 10px;
+}
+
+.Notification__actions__view {
+  color: #1e73e7;
+}
+
+.Notification__actions__archive {
+  color: #f87060;
+  margin-left: 10px;
+}
+
 .Contact {
   padding: 0.5em 1em;
   display: flex;

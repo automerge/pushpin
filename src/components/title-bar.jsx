@@ -54,6 +54,9 @@ export default class TitleBar extends React.PureComponent {
       contacts: {
         "3": { name: "Mark" },
         "4": { name: "Ignatius" }
+      },
+      notifications: {
+        "A": { type: "Invitation", sender: { name: "PVH" }, board: { title: "Pushpin Demo" }}
       }
     }
 

@@ -10,13 +10,32 @@ export default class Share extends React.PureComponent {
         name: PropTypes.string.isRequired,
         avatar: PropTypes.string.isOptional
       })
-    ).isRequired
+    ),
+    contacts: PropTypes.objectOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        avatar: PropTypes.string.isOptional
+      })
+    ),
+    notifications: PropTypes.objectOf(
+      PropTypes.shape({
+        type: PropTypes.string.isRequired,
+        sender: PropTypes.object.isRequired,
+        board: PropTypes.object.isRequired
+      })
+    )
+  }
+
+  static defaultProps = {
+    authors: {},
+    contacts: {},
+    notifications: {}
   }
 
   constructor() {
     super()
 
-    this.state = { tab: "contacts" }
+    this.state = { tab: 'notifications' }
   }
 
   renderContacts() {
@@ -50,8 +69,31 @@ export default class Share extends React.PureComponent {
   }
 
   renderNotifications() {
+    const notifications = Object.keys(this.props.notifications).map(id => {
+      const notification = this.props.notifications[id]
+
+      return (
+        <div key={id} className='Notification'>
+          <p>You received...</p>
+          <h4>{ notification.board.title }</h4>
+          <p>From { notification.sender.name }</p>
+
+          <div className='Notification__actions'>
+            <div className='Notification__actions__view'>
+              <i className='fa fa-arrow-right' /> View
+            </div>
+            <div className='Notification__actions__archive'>
+              <i className='fa fa-archive' /> Archive
+            </div>
+          </div>
+        </div>
+      )
+    })
+
     return (
-      <h1>Notifications</h1>
+      <div className='Share__notifications'>
+        { notifications }
+      </div>
     )
   }
 
