@@ -83,6 +83,12 @@ export default class TitleBar extends React.PureComponent {
           classInvalid="TitleBar__titleText--invalid"
         />
 
+        <HashForm
+          formDocId={this.props.formDocId}
+          // activeDocId={this.props.activeDocId}
+          requestedDocId={this.props.requestedDocId}
+        />
+
         <Dropdown>
           <DropdownTrigger>
             <div className="TitleBar__dropDown">
@@ -104,12 +110,6 @@ export default class TitleBar extends React.PureComponent {
             <Settings />
           </DropdownContent>
         </Dropdown>
-
-        <HashForm
-          formDocId={this.props.formDocId}
-          // activeDocId={this.props.activeDocId}
-          requestedDocId={this.props.requestedDocId}
-        />
       </div>
     )
   }
