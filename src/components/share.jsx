@@ -1,32 +1,26 @@
-import React from "react"
-import PropTypes from "prop-types"
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import Contact from "./contact"
+import Contact from './contact'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
-    authors: PropTypes.objectOf(
-      PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        avatar: PropTypes.string.isOptional
-      })
-    ),
+    authors: PropTypes.objectOf(PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      avatar: PropTypes.string.isOptional
+    })),
     board: PropTypes.shape({
       title: PropTypes.string.isRequired
     }).isRequired,
-    contacts: PropTypes.objectOf(
-      PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        avatar: PropTypes.string.isOptional
-      })
-    ),
-    notifications: PropTypes.objectOf(
-      PropTypes.shape({
-        type: PropTypes.string.isRequired,
-        sender: PropTypes.object.isRequired,
-        board: PropTypes.object.isRequired
-      })
-    )
+    contacts: PropTypes.objectOf(PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      avatar: PropTypes.string.isOptional
+    })),
+    notifications: PropTypes.objectOf(PropTypes.shape({
+      type: PropTypes.string.isRequired,
+      sender: PropTypes.object.isRequired,
+      board: PropTypes.object.isRequired
+    }))
   }
 
   static defaultProps = {
@@ -42,11 +36,11 @@ export default class Share extends React.PureComponent {
   }
 
   handleShare(e, contact) {
-    alert(`Share "${ this.props.board.title }" with ${ contact.name }`)
+    alert(`Share '${this.props.board.title}' with ${contact.name}`)
   }
 
   handleUnshare(e, contact) {
-    alert(`Unshare "${ this.props.board.title }" from ${ contact.name }`)
+    alert(`Unshare '${this.props.board.title}' from ${contact.name}`)
   }
 
   renderContacts() {
@@ -57,7 +51,7 @@ export default class Share extends React.PureComponent {
           key={id}
           name={author.name}
           avatar={author.avatar}
-          actions={["unshare"]}
+          actions={['unshare']}
           onUnshare={e => this.handleUnshare(e, author)}
         />
       )
@@ -70,7 +64,7 @@ export default class Share extends React.PureComponent {
           key={id}
           name={contact.name}
           avatar={contact.avatar}
-          actions={["share"]}
+          actions={['share']}
           onShare={e => this.handleShare(e, contact)}
         />
       )
@@ -79,15 +73,15 @@ export default class Share extends React.PureComponent {
     return (
       <div>
         <h6>On Board</h6>
-        <div className='Share__section'>
-          <div className='Share__authors'>
+        <div className="Share__section">
+          <div className="Share__authors">
             { authors }
           </div>
         </div>
 
         <h6>All</h6>
-        <div className='Share__section'>
-          <div className='Share__contacts'>
+        <div className="Share__section">
+          <div className="Share__contacts">
             { contacts }
           </div>
         </div>
@@ -100,23 +94,25 @@ export default class Share extends React.PureComponent {
       const notification = this.props.notifications[id]
 
       return (
-        <div key={id} className='Notification'>
+        <div key={id} className="Notification">
           <p>You received...</p>
           <h4>{ notification.board.title }</h4>
           <p>From { notification.sender.name }</p>
 
-          <div className='Notification__actions'>
+          <div className="Notification__actions">
             <div
-              className='Notification__actions__view'
-              onClick={e => alert(`View ${ notification.board.title }`)}
+              role='button'
+              className="Notification__actions__view"
+              onClick={e => alert(`View ${notification.board.title}`)}
             >
-              <i className='fa fa-arrow-right' /> View
+              <i className="fa fa-arrow-right" /> View
             </div>
             <div
-              className='Notification__actions__archive'
-              onClick={e => alert(`Archive ${ notification.board.title }`)}
+              role="button"
+              className="Notification__actions__archive"
+              onClick={e => alert(`Archive ${notification.board.title}`)}
             >
-              <i className='fa fa-archive' /> Archive
+              <i className="fa fa-archive" /> Archive
             </div>
           </div>
         </div>
@@ -124,37 +120,34 @@ export default class Share extends React.PureComponent {
     })
 
     return (
-      <div className='Share__notifications'>
+      <div className="Share__notifications">
         { notifications }
       </div>
     )
   }
 
   tabClasses(name) {
-    if(this.state.tab === name)
-      return 'Share__tabs__tab Share__tabs__tab--active'
-    else
-      return 'Share__tabs__tab'
+    if (this.state.tab === name) { return 'Share__tabs__tab Share__tabs__tab--active' }
+    return 'Share__tabs__tab'
   }
 
   render() {
     let body
 
-    if(this.state.tab === 'contacts')
-      body = this.renderContacts()
-    else if(this.state.tab === 'notifications')
-      body = this.renderNotifications()
+    if (this.state.tab === 'contacts') { body = this.renderContacts() } else if (this.state.tab === 'notifications') { body = this.renderNotifications() }
 
     return (
-      <div className='Share'>
-        <div className='Share__tabs'>
+      <div className="Share">
+        <div className="Share__tabs">
           <div
+            role="button"
             className={this.tabClasses('contacts')}
             onClick={() => this.setState({ tab: 'contacts' })}
           >
-            <i className='fa fa-group' /> Contacts
+            <i className="fa fa-group" /> Contacts
           </div>
           <div
+            role="button"
             className={this.tabClasses('notifications')}
             onClick={() => this.setState({ tab: 'notifications' })}
           >

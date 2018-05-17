@@ -11,6 +11,7 @@ export default class Contact extends React.PureComponent {
   }
 
   static defaultProps = {
+    avatar: '',
     actions: [],
     onShare: () => {},
     onUnshare: () => {}
@@ -21,8 +22,9 @@ export default class Contact extends React.PureComponent {
     if (this.props.actions.includes('share')) {
       actions.push((
         <i
-          key='share'
-          className='fa fa-share-alt'
+          role="button"
+          key="share"
+          className="fa fa-share-alt"
           onClick={this.props.onShare}
         />
       ))
@@ -31,23 +33,24 @@ export default class Contact extends React.PureComponent {
     if (this.props.actions.includes('unshare')) {
       actions.push((
         <i
-          key='unshare'
-          className='fa fa-ban'
+          role="button"
+          key="unshare"
+          className="fa fa-ban"
           onClick={this.props.onUnshare}
         />
       ))
     }
 
     return (
-      <div className='Contact'>
-        <div className='Contact__avatar'><img src={this.props.avatar} /></div>
-        <div className='Contact__info'>
-          <div className='Contact__info__name'>
+      <div className="Contact">
+        <div className="Contact__avatar"><img alt="avatar" src={this.props.avatar} /></div>
+        <div className="Contact__info">
+          <div className="Contact__info__name">
             { this.props.name }
           </div>
         </div>
 
-        <div className='Contact__actions'> { actions } </div>
+        <div className="Contact__actions"> { actions } </div>
       </div>
     )
   }
