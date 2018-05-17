@@ -190,7 +190,11 @@ export default class CodeMirrorEditor extends React.PureComponent {
     const editorHeight = this.editorRef.clientHeight
     const rendererHeight = this.rendererRef.clientHeight
     const minHeight = Model.CARD_MIN_HEIGHT
-    const neededHeight = Model.snapMeasureOutwardToGrid(Math.max(editorHeight, rendererHeight, minHeight))
+    const neededHeight = Model.snapMeasureOutwardToGrid(Math.max(
+      editorHeight,
+      rendererHeight,
+      minHeight
+    ))
     if (neededHeight !== this.props.cardHeight) {
       log('forceHeight', this.props.cardHeight, editorHeight, rendererHeight, neededHeight)
       Loop.dispatch(Model.cardTextResized, { id: this.props.cardId, height: neededHeight })

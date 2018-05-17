@@ -62,6 +62,7 @@ export default class Board extends React.PureComponent {
     this.onDrop = this.onDrop.bind(this)
     this.onPaste = this.onPaste.bind(this)
 
+    this.onShittyOffer = this.onShittyOffer.bind(this)
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
 
@@ -206,6 +207,10 @@ export default class Board extends React.PureComponent {
         x,
         y })
     }
+  }
+
+  onShittyOffer(e) {
+    Loop.dispatch(Model.identityOfferThisDocumentToFirstContact)
   }
 
   onAddNote(e) {
@@ -458,6 +463,13 @@ export default class Board extends React.PureComponent {
     const contextMenu = (
       <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
         <div className="ContextMenu__section">
+          <ContextMenuItem onClick={this.onShittyOffer}>
+            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+              <i className="fa fa-sticky-note" />
+            </div>
+            <span className="ContextMenu__label">Offer this board to first contact</span>
+          </ContextMenuItem>
+
           <ContextMenuItem onClick={this.onAddNote}>
             <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
               <i className="fa fa-sticky-note" />

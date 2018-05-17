@@ -47,7 +47,6 @@ export const CARD_COLORS = {
   CLOUD: '#e5ebf3',
 }
 
-const RECENT_DOCS_MAX = 5
 const USER = process.env.NAME || 'userA'
 const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
@@ -202,34 +201,32 @@ export function init(state) {
   return { ...state, hm, requestedWorkspace }
 }
 
-function addRecentDoc(state, { docId }) {
+function workspaceSeeBoardId(state, { docId }) {
   if (!state.workspace) {
-    log('addRecentDoc called with no workspace!')
+    log('workspaceSeeBoardId called with no workspace!')
     // maybe this should be a more violent error
     return state
   }
 
   const workspace = state.hm.change(state.workspace, (workspace) => {
-    let recentDocs = state.workspace.recentDocs || []
-    const recentDocIndex = recentDocs.findIndex(d => d === docId)
+    let library = state.workspace.seenBoardIds || []
+    const seenDocIndex = library.findIndex(d => d === docId)
 
-    if (Number.isInteger(recentDocIndex)) {
-      recentDocs = [docId,
-        ...recentDocs.slice(0, recentDocIndex),
-        ...recentDocs.slice(recentDocIndex + 1)]
+    if (Number.isInteger(seenDocIndex)) {
+      library = [docId,
+        ...library.slice(0, seenDocIndex),
+        ...library.slice(seenDocIndex + 1)]
     } else {
-      recentDocs = [docId, ...recentDocs]
-      recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
+      library = [docId, ...library]
     }
 
-    workspace.recentDocs = recentDocs
+    workspace.seenBoardIds = library
   })
 
   return { ...state, workspace }
 }
 
-/* I'm propagating this pattern but I think we want a workspace
-  hypermerge that contains recent-docs and your identity and other things... */
+/* The current workspace ID is stored in a JSON file to boot strap the system. */
 function saveWorkspaceId(state, { docId }) {
   const workspaceIdFile = { workspaceDocId: docId }
 
@@ -533,7 +530,8 @@ export function newWorkspace(state) {
 
   const nextWorkspace = state.hm.change(workspace, (i) => {
     i.selfId = ''
-    i.recentDocs = []
+    i.seenBoardIds = []
+    i.offeredIds = []
     i.contactIds = []
   })
 
@@ -598,6 +596,50 @@ export function newDocument(state) {
   }
 }
 
+export function identityOfferThisDocumentToFirstContact(state) {
+  state = identityOfferDocumentToIdentity(state, {
+    identityId: Object.keys(state.contacts)[0],
+    sharedDocId: state.workspace.boardId
+  })
+  return state
+}
+
+export function identityOfferDocumentToIdentity(state, { identityId, sharedDocId }) {
+  const self = state.hm.change(state.self, (self) => {
+    if (!self.offeredIds) {
+      self.offeredIds = {}
+    }
+
+    if (!self.offeredIds[identityId]) {
+      self.offeredIds[identityId] = []
+    }
+
+    self.offeredIds[identityId].push(sharedDocId)
+  })
+  return { ...state, self }
+}
+
+function identityUpdated(state, { contactId }) {
+  if (!(state.contacts && state.contacts[contactId] && state.contacts[contactId].offers)) {
+    return state
+  }
+
+  // we'll iterate changes for each new offer onto the workspace
+  let { workspace } = state
+  const offeredIds = state.contacts[contactId].offeredIds[state.workspace.selfId] || []
+
+  offeredIds.forEach((offeredId) => {
+    Loop.dispatch(openDocument, { docId: offeredId })
+    workspace = state.hm.change(workspace, (ws) => {
+      const offeredIdsSet = new Set(ws.offeredIds)
+      if (!offeredIdsSet.has(offeredId)) {
+        state.offeredIds.push({ offeredId, offererId: contactId })
+      }
+    })
+  })
+  return { ...state, workspace }
+}
+
 export function documentReady(state, { docId, doc }) {
   if (state.requestedWorkspace === docId) {
     // TODO: this should be a thing that is listening on the workspace document
@@ -635,10 +677,8 @@ export function documentReady(state, { docId, doc }) {
     }
 
     state = addSelfToAuthors(state)
-    // this should happen whenever board.authors changes
     state = addAuthorsToContacts(state)
-
-    state = addRecentDoc(state, { docId })
+    state = workspaceSeeBoardId(state, { docId })
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
@@ -667,9 +707,19 @@ export function documentUpdated(state, { docId, doc }) {
   const contactIds = state.workspace && state.workspace.contactIds ?
     state.workspace.contactIds : []
   if (contactIds.includes(docId)) {
+    Loop.dispatch(identityUpdated, { contactId: docId })
     return { ...state, contacts: { ...state.contacts, [docId]: doc } }
   }
-  // this is probably an unopened board, then. just return. we don't care about this update.
+
+  // this won't work with invitations, since presumably they are not yet in your seenBoardIds
+  const seenBoardIds = state.workspace && state.workspace.seenBoardIds ?
+    state.workspace.seenBoardIds : []
+  if (seenBoardIds.includes(docId)) {
+    return { ...state, boards: { ...state.boards, [docId]: doc } }
+  }
+
+  // what's all this, then? how did we get here?
+  log('somehow we loaded a document we know nothing about', docId, doc)
   return state
 }
 
@@ -692,6 +742,7 @@ export function openDocument(state, { docId }) {
   // so we need to find the doc and manually trigger the action
   if (state.hm.has(docId)) {
     const doc = state.hm.find(docId)
+    // oh this is probably a race
     Loop.dispatch(documentReady, { doc, docId })
   } else {
     state.hm.open(docId)
