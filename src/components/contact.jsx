@@ -11,7 +11,7 @@ export default class Contact extends React.PureComponent {
   }
 
   static defaultProps = {
-    avatar: '',
+    avatar: '../img/default-avatar.png',
     actions: [],
     onShare: () => {},
     onUnshare: () => {}
