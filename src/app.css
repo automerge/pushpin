@@ -87,13 +87,12 @@ body {
 }
 
 .Share {
-  padding-top: 1em;
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  min-width: 275px;
 }
 
 .Share__section {
-  padding: 0.5em 1em;
   border-top: 1px solid #e9edf0;
 }
 
@@ -101,11 +100,31 @@ body {
   margin-left: 1em;
   font-size: 12px;
   color: #637389;
+  margin-top: 10px;
+}
+
+.Share__tabs {
+  display: flex;
+}
+
+.Share__tabs .fa.fa-group {
+  font-size: 16px;
+}
+
+.Share__tabs__tab {
+  flex-grow: 1;
+  text-align: center;
+  background: #f3f3f3;
+  padding: 1em 0;
+  cursor: pointer;
+}
+
+.Share__tabs__tab--active {
+  background: #ffffff;
 }
 
 .Contact {
-  padding: 0.25em 0;
-  min-width: 200px;
+  padding: 0.5em 1em;
   display: flex;
   align-items: center;
 }
@@ -116,6 +135,10 @@ body {
 
 .Contact:hover .fa {
   visibility: visible;
+}
+
+.Contact:hover {
+  background: #f3f3f3;
 }
 
 .Contact .fa.fa-ban {
