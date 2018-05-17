@@ -165,12 +165,11 @@ function changeBoard(state, changeFn) {
 
 export const empty = {
   formDocId: '',
-  activeDocId: '',
   selected: [],
   workspace: null,
   board: null,
   self: null,
-  identities: {},
+  contacts: {},
   hm: null
 }
 
@@ -306,21 +305,36 @@ export function setBackgroundColor(state, { backgroundColor }) {
 
 
 export function addSelfToAuthors(state) {
-  if (state.board.authors.includes(state.workspace.selfDocId)) {
+  if (state.board.authorIds.includes(state.workspace.selfId)) {
     return state
   }
   const board = state.hm.change(state.board, (b) => {
-    b.authors = [...b.authors, state.workspace.selfDocId]
+    b.authorIds = [...b.authorIds, state.workspace.selfId]
   })
   return { ...state, board }
 }
 
 export function addAuthorsToContacts(state) {
-  const workspace = state.hm.change(state.workspace, (w) => {
-    // this is probably not very conflict avoidey: talk to Martin?
-    w.contacts = [...(new Set([...state.board.authors, ...w.contacts]))]
-  })
-  return { ...state, workspace }
+  const incomingContacts = state.board.authorIds
+  const { selfId, contactIds } = state.workspace
+
+  // #accidentallyQuadratic?
+  const oldContactsSet = new Set(contactIds)
+  const addedContacts = incomingContacts.filter(contactId =>
+    (!oldContactsSet.has(contactId) && contactId !== selfId))
+
+  if (addedContacts.length > 0) {
+    const workspace = state.hm.change(state.workspace, (w) => {
+      // this is probably not very conflict avoidey: talk to Martin?
+      w.contactIds.push(...addedContacts)
+    })
+
+    addedContacts.forEach((contactId) => Loop.dispatch(openDocument, { docId: contactId }))
+    return { ...state, workspace }
+  }
+
+  // nothing added, nothing to do
+  return state
 }
 
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
@@ -368,7 +382,7 @@ function populateDemoBoard(state) {
 
   const newBoard = changeBoard(state, (b) => {
     b.cards = {}
-    b.authors = []
+    b.authorIds = []
   })
   let newState = { ...state, board: newBoard }
   newState = cardCreatedText(newState, { x: 1350, y: 100, text: WELCOME_TEXT })
@@ -518,9 +532,9 @@ export function newWorkspace(state) {
   Loop.dispatch(saveWorkspaceId, { docId })
 
   const nextWorkspace = state.hm.change(workspace, (i) => {
-    i.selfDocId = ''
+    i.selfId = ''
     i.recentDocs = []
-    i.contacts = []
+    i.contactIds = []
   })
 
   // should these be synchronous? does it matter?
@@ -530,9 +544,9 @@ export function newWorkspace(state) {
   return { ...state, workspace: nextWorkspace }
 }
 
-export function updateWorkspaceSelf(state, { selfDocId }) {
+export function updateWorkspaceSelf(state, { selfId }) {
   const nextWorkspace = state.hm.change(state.workspace, (w) => {
-    w.selfDocId = selfDocId
+    w.selfId = selfId
   })
 
   return { ...state, workspace: nextWorkspace }
@@ -548,14 +562,14 @@ export function updateWorkspaceRequestedBoardId(state, { boardId }) {
 
 export function newIdentity(state) {
   const identity = state.hm.create()
-  const selfDocId = state.hm.getId(identity)
+  const selfId = state.hm.getId(identity)
 
   // hmmm. any thoughts on how to do this idiomatically?
-  const newState = updateWorkspaceSelf(state, { selfDocId })
+  const newState = updateWorkspaceSelf(state, { selfId })
 
   const nextIdentity = newState.hm.change(identity, (i) => {
     i.name = 'Mysterious Stranger'
-    i.docId = selfDocId
+    i.docId = selfId
     i.color = '#4df1c3'
   })
 
@@ -586,7 +600,15 @@ export function newDocument(state) {
 
 export function documentReady(state, { docId, doc }) {
   if (state.requestedWorkspace === docId) {
-    // TODO: Loop.dispatch(loadWorkspaceIdentities)?
+    // TODO: this should be a thing that is listening on the workspace document
+    // xxx: move this into newDocument?
+    Loop.dispatch(openDocument, { docId: doc.boardId })
+    Loop.dispatch(openDocument, { docId: doc.selfId })
+
+    doc.contactIds.forEach((id) => {
+      Loop.dispatch(openDocument, { docId: id })
+    })
+
     return { ...state, workspace: doc }
   }
 
@@ -594,47 +616,61 @@ export function documentReady(state, { docId, doc }) {
     return state
   }
 
-  if (state.workspace.selfDocId === docId) {
+  if (state.workspace.selfId === docId) {
     return { ...state, self: doc }
   }
 
-  if (state.workspace.selfDocId === docId) {
-    return { ...state, self: doc }
+  if (state.workspace.boardId === docId) {
+    // Case where we've created or opened the requested doc.
+    // It may be an unitialized board in which case we need to populate it.
+    // these two properties are not part of the workspace document because they
+    // represent transient application state, not something we save.
+    state = { ...state,
+      formDocId: docId,
+      board: doc
+    }
+
+    if (!state.board.cards) {
+      state = populateDemoBoard(state)
+    }
+
+    state = addSelfToAuthors(state)
+    // this should happen whenever board.authors changes
+    state = addAuthorsToContacts(state)
+
+    state = addRecentDoc(state, { docId })
   }
 
-  // Case where an existing doc was opened but is no longer requested.
-  if (!state.workspace || state.workspace.boardId !== docId) {
-    return state
+  const contactIds = state.workspace && state.workspace.contactIds ?
+    state.workspace.contactIds : []
+  if (contactIds.includes(docId)) {
+    return { ...state, contacts: { ...state.contacts, [docId]: doc } }
   }
-
-  // Case where we've created or opened the requested doc.
-  // It may be an unitialized board in which case we need to populate it.
-  // these two properties are not part of the workspace document because they
-  // represent transient application state, not something we save.
-  state = { ...state,
-    activeDocId: docId,
-    formDocId: docId,
-    board: doc
-  }
-
-  // xxx why?
-  if (!state.board.cards) {
-    state = populateDemoBoard(state)
-  }
-
-  state = addSelfToAuthors(state)
-  state = addAuthorsToContacts(state)
-
-  state = addRecentDoc(state, { docId })
 
   return state
 }
 
 export function documentUpdated(state, { docId, doc }) {
-  if (state.activeDocId !== docId) {
-    return state
+  switch (docId) {
+    /* we probably need to think about the old activeDocId thing to avoid bugs */
+    case (state.requestedWorkspace):
+      return { ...state, workspace: doc }
+    case (state.workspace.selfId):
+      return { ...state, self: doc }
+    case (state.workspace.boardId):
+      // XXX: horrifying hack -- this didn't trigger at first. why?
+      Loop.dispatch(addAuthorsToContacts)
+      return { ...state, board: doc }
+    default:
+      break
   }
-  return { ...state, board: doc }
+  const contactIds = state.workspace && state.workspace.contactIds ?
+    state.workspace.contactIds : []
+  if (contactIds.includes(docId)) {
+    return { ...state, contacts: { ...state.contacts, [docId]: doc } }
+  }
+  // this is probably an unopened board, then. just return. we don't care about this update.
+  return state
 }
 
 export function formChanged(state, { docId }) {
@@ -642,21 +678,24 @@ export function formChanged(state, { docId }) {
 }
 
 export function formSubmitted(state) {
+  Loop.dispatch(openDocument, { docId: state.formDocId })
+  Loop.dispatch(updateWorkspaceRequestedBoardId, { boardId: state.formDocId })
+
+  // this is a senseless expansion, but i'm keeping it for consistency
+  return state
+}
+
+/* The hypermerge interface is awful. */
+export function openDocument(state, { docId }) {
   // If we've already opened the hypermerge doc,
   // it will not fire a 'document:ready' event if we open it again
   // so we need to find the doc and manually trigger the action
-  if (state.hm.has(state.formDocId)) {
-    const doc = state.hm.find(state.formDocId)
-    const docId = state.formDocId
-
+  if (state.hm.has(docId)) {
+    const doc = state.hm.find(docId)
     Loop.dispatch(documentReady, { doc, docId })
   } else {
-    state.hm.open(state.formDocId)
+    state.hm.open(docId)
   }
 
-  // hmmm. any thoughts on how to do this idiomatically?
-  const newState = updateWorkspaceRequestedBoardId(state, { boardId: state.formDocId })
-
-  // this is a senseless expansion, but i'm keeping it for consistency
-  return { ...newState }
+  return state
 }
