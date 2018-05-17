@@ -80,7 +80,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.Share, .Search {
+.Share, .Settings {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   padding: 0.5em 1em;

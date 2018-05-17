@@ -8,7 +8,7 @@ import Loop from '../loop'
 import * as Model from '../model'
 import HashForm from './hash-form'
 import Share from './share'
-import Search from "./search"
+import Settings from "./settings"
 
 const log = Debug('pushpin:title-bar')
 
@@ -78,11 +78,11 @@ export default class TitleBar extends React.PureComponent {
         <Dropdown>
            <DropdownTrigger>
              <div className="TitleBar__dropDown">
-               <i className="fa fa-chevron-circle-down" />
+               <i className="fa fa-gear" />
              </div>
            </DropdownTrigger>
            <DropdownContent>
-             <Search results={[{type: "contact", name: "Mark", avatar: "../img/avatar-example.png" }]} />
+             <Settings />
            </DropdownContent>
          </Dropdown>
 
