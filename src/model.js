@@ -528,11 +528,11 @@ export function newWorkspace(state) {
 
   Loop.dispatch(saveWorkspaceId, { docId })
 
-  const nextWorkspace = state.hm.change(workspace, (i) => {
-    i.selfId = ''
-    i.seenBoardIds = []
-    i.offeredIds = []
-    i.contactIds = []
+  const nextWorkspace = state.hm.change(workspace, (ws) => {
+    ws.selfId = ''
+    ws.seenBoardIds = []
+    ws.offeredIds = []
+    ws.contactIds = []
   })
 
   // should these be synchronous? does it matter?
@@ -622,7 +622,8 @@ export function identityOfferDocumentToIdentity(state, { identityId, sharedDocId
 
 function identityUpdated(state, { contactId }) {
   log('identityUpdated.start', contactId)
-  if (!(state.contacts && state.contacts[contactId] && state.contacts[contactId].offers)) {
+  if (!(state.contacts && state.contacts[contactId] &&
+        state.contacts[contactId].offeredIds)) {
     log('identityUpdated.short', state.contacts)
     return state
   }
@@ -637,7 +638,7 @@ function identityUpdated(state, { contactId }) {
     workspace = state.hm.change(workspace, (ws) => {
       const offeredIdsSet = new Set(ws.offeredIds)
       if (!offeredIdsSet.has(offeredId)) {
-        state.offeredIds.push({ offeredId, offererId: contactId })
+        ws.offeredIds.push({ offeredId, offererId: contactId })
       }
     })
   })
