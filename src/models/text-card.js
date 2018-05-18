@@ -1,6 +1,6 @@
 import * as Board from './board'
 
-export function cardCreatedText(state, { x, y, selected, text }) {
+export function create(state, { x, y, selected, text }) {
   return Board.cardCreated(state, { x, y, selected, type: 'text', typeAttrs: { text } })
 }
 

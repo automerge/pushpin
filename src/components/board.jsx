@@ -96,7 +96,7 @@ export default class Board extends React.PureComponent {
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      Loop.dispatch(TextCard.cardCreatedText, { x: e.pageX, y: e.pageY, text: '', selected: true })
+      Loop.dispatch(TextCard.create, { x: e.pageX, y: e.pageY, text: '', selected: true })
     }
   }
 
@@ -135,7 +135,7 @@ export default class Board extends React.PureComponent {
 
       if (entry.type.match('image/')) {
         reader.onload = () =>
-          Loop.dispatch(ImageCard.processImage, {
+          Loop.dispatch(ImageCard.importImageThenCreate, {
             path: entry.name,
             buffer: Buffer.from(reader.result),
             x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
@@ -143,7 +143,7 @@ export default class Board extends React.PureComponent {
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
         reader.onload = () =>
-          Loop.dispatch(TextCard.cardCreatedText, {
+          Loop.dispatch(TextCard.create, {
             text: reader.result,
             x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
             y: pageY + (i * (BoardModel.GRID_SIZE * 2)) })
@@ -156,7 +156,7 @@ export default class Board extends React.PureComponent {
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
     if (plainText) {
-      Loop.dispatch(TextCard.cardCreatedText, {
+      Loop.dispatch(TextCard.create, {
         text: plainText,
         x: pageX,
         y: pageY })
@@ -188,7 +188,7 @@ export default class Board extends React.PureComponent {
 
         const reader = new FileReader()
         reader.onload = () =>
-          Loop.dispatch(ImageCard.processImage, {
+          Loop.dispatch(ImageCard.importImageThenCreate, {
             path: file.name,
             buffer: Buffer.from(reader.result),
             x,
@@ -199,7 +199,7 @@ export default class Board extends React.PureComponent {
 
     const plainTextData = dataTransfer.getData('text/plain')
     if (plainTextData) {
-      Loop.dispatch(TextCard.cardCreatedText, {
+      Loop.dispatch(TextCard.create, {
         text: plainTextData,
         x,
         y })
@@ -209,10 +209,9 @@ export default class Board extends React.PureComponent {
   onAddNote(e) {
     const x = e.pageX
     const y = e.pageY
-    // one of these or something like this?
-    // Loop.dispatch(TextCard.newTextCard, { x, y, text:'', selected: true })
-    // Loop.dispatch(Board.createCard {x, y, cardType: TextCard, selected: true })
-    Loop.dispatch(TextCard.cardCreatedText, { x, y, text: '', selected: true })
+    // TODO: this should be
+    // Loop.dispatch(Board.addCard, {x, y, type: TextCard, args: [], selected: false} )
+    Loop.dispatch(TextCard.create, { x, y, text: '', selected: true })
   }
 
   onAddImage(e) {
@@ -227,7 +226,8 @@ export default class Board extends React.PureComponent {
         throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
-      Loop.dispatch(ImageCard.processImage, { path, x, y })
+      // Loop.dispatch(Board.addCard, {x, y, type: ImageCard, args: path, selected: false} )
+      Loop.dispatch(ImageCard.importImageThenCreate, { path, x, y })
     })
   }
 

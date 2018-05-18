@@ -78,7 +78,7 @@ export function addAuthorsToContacts(state) {
 }
 
 
-export function newWorkspace(state) {
+export function create(state) {
   const workspace = state.hm.create()
   const docId = state.hm.getId(workspace)
 
@@ -92,8 +92,8 @@ export function newWorkspace(state) {
   })
 
   // should these be synchronous? does it matter?
-  Loop.dispatch(Identity.newIdentity)
-  Loop.dispatch(Board.newDocument)
+  Loop.dispatch(Identity.create)
+  Loop.dispatch(Board.create)
 
   return { ...state, workspace: nextWorkspace }
 }

@@ -6,7 +6,7 @@ import * as Model from './model'
 
 const log = Debug('pushpin:identity')
 
-export function newIdentity(state) {
+export function create(state) {
   const identity = state.hm.create()
   const selfId = state.hm.getId(identity)
 

@@ -14,7 +14,9 @@ localStorage.removeItem('debug')
 
 // should this be here?
 ipcRenderer.on('newDocument', () => {
-  Loop.dispatch(Board.newDocument)
+  // eventually we may want to decide contextually how to interpret this
+  // but for now, we can just make a new board and trust the app will open it
+  Loop.dispatch(Board.create)
 })
 
 const view = (state) =>

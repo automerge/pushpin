@@ -23,13 +23,13 @@ const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
 mkdirp.sync(HYPERFILE_DATA_PATH)
 mkdirp.sync(HYPERFILE_CACHE_PATH)
 
-// Process the image at the given path or in the given buffer, creating a new
+// Import the image at the given path or in the given buffer, creating a new
 // image card at (x, y).
 // This is structured an action for consistency. It passes through state
 // unchanged. State will be updated in callbacks by redispatching to
-// another action (cardCreatedImage). We could add state to indicate in-
+// another action (create). We could add state to indicate in-
 // progress processing here later if we wanted to.
-export function processImage(state, { path, buffer, x, y }) {
+export function importImageThenCreate(state, { path, buffer, x, y }) {
   const imageSource = buffer || path
   Jimp.read(imageSource, (err, img) => {
     if (err) {
@@ -45,7 +45,7 @@ export function processImage(state, { path, buffer, x, y }) {
         log(error)
       }
 
-      Loop.dispatch(cardCreatedImage, {
+      Loop.dispatch(create, {
         width: scaledWidth,
         height: scaledHeight,
         x,
@@ -63,7 +63,7 @@ export function processImage(state, { path, buffer, x, y }) {
   return state
 }
 
-export function cardCreatedImage(state, { x, y, selected, width, height, hyperfile }) {
+export function create(state, { x, y, selected, width, height, hyperfile }) {
   return Board.cardCreated(state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
 }
 
