@@ -223,22 +223,19 @@ body {
 }
 
 .Avatar {
+  box-sizing: border-box;
   position: relative;
   width: 40px;
   height: 40px;
-  border: 1px solid #AAA;
   border-radius: 50%;
   box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
+  padding:2px;
 }
 
 .Avatar img {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 1px solid #AAA;
 }
 
 .Contact {
