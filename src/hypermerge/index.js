@@ -3,8 +3,11 @@ const Automerge = require('automerge')
 const Multicore = require('./multicore')
 const discoverySwarm = require('discovery-swarm')
 const swarmDefaults = require('datland-swarm-defaults')
+const Debug = require('debug')
 
-// The first block is used for metadata:
+const log = Debug('hypermerge:index')
+
+// The first block is used for metadata.
 const START_BLOCK = 1
 const METADATA = {
   hypermerge: 1
@@ -15,21 +18,23 @@ const METADATA = {
  * @typedef {object} Document
  */
 
-/**
- * Create and share Automerge documents using peer-to-peer networking.
- *
- * @param {Object} options
- * @param {string} options.path - path to directory used to store multiple
- *   hypercores
- * @param {number} [options.port=0] - port number to listen on
- */
+// TODO: `path` should be something like `storage`.
 
+/**
+ * Creates a new Hypermerge instance that manages a set of documents.
+ * All previously opened documents are automatically re-opened.
+ * @param {object} options
+ * @param {string} options.path - path to directory used to store hypercores
+ * @param {boolean} [options.immutableApi=false] - whether to use Immutable.js Automerge API
+ * @param {number} [options.port=0] - port number to listen on
+ * @param {object} [defaultMetadata={}] - default metadata that should be written for new docs
+ */
 module.exports = class Hypermerge extends EventEmitter {
-  constructor ({path, port = 0, immutableApi = false, defaultMetadata}) {
+  constructor({ path, port = 0, immutableApi = false, defaultMetadata = {} }) {
     super()
 
     this.immutableApi = immutableApi
-    this.defaultMetadata = defaultMetadata || {}
+    this.defaultMetadata = defaultMetadata
     this.port = port
     this.isReady = false
     this.feeds = {}
@@ -48,28 +53,27 @@ module.exports = class Hypermerge extends EventEmitter {
   }
 
   /**
-   * Have any automerge documents been built?
-   *
-   * @param {filterCallback} [f] - a filter function
-   * @returns {boolean}
+   * Returns `true` if `docId` has been opened.
    */
-  any (f = () => true) {
-    return Object.keys(this.docs).some(id => f(this.docs[id], id))
-  }
-
-  has (docId) {
+  has(docId) {
     return !!this.docs[docId]
   }
 
-  find (docId) {
+  /**
+   * Returns the document for the given docId.
+   * Throws if the document has not been opened yet.
+   */
+  find(docId) {
     const doc = this.docs[docId]
 
-    if (!doc) throw new Error(`Cannot find document. open(docId) first. docId: ${docId}`)
+    if (!doc) {
+      throw new Error(`Cannot find document. open(docId) first. docId: ${docId}`)
+    }
 
     return doc
   }
 
-  set (doc) {
+  set(doc) {
     const docId = this.getId(doc)
     this.docs[docId] = doc
     return doc
@@ -77,29 +81,39 @@ module.exports = class Hypermerge extends EventEmitter {
 
   /**
    * Opens an existing document.
+   * Will download the document over the network if `hm.joinSwarm()` was called.
+   * The document is opened asynchronously; listen for the `'document:ready'` event
+   * to get the document when it has finished opening.
    *
    * @param {string} docId - docId of document to open
    */
-  open (docId, metadata = null) {
+  open(docId, metadata = null) {
     this._ensureReady()
 
-    if (this.docs[docId]) return this.docs[docId]
+    if (this.docs[docId]) {
+      return
+    }
 
     // we haven't seen this doc before:
     this.feed(docId)
   }
 
   /**
-   * Creates an automerge document backed by a new hypercore.
+   * Creates an automerge document backed by a new Hypercore.
+   *
+   * If metadata is passed, it will be associated with the newly created document.
+   * Some metadata properties are assigned automatically by Hypermerge:
+   *  - docId: An id for this document. Forking a document creates a new docId.
+   *  - groupId: An id for this group of documents. Forking a document keeps the groupId.
    *
    * @param {object} metadata - metadata to be associated with this document
    */
-  create (metadata = {}) {
+  create(metadata = {}) {
     this._ensureReady()
     return this._create(metadata)
   }
 
-  _create (metadata, parentMetadata = {}) {
+  _create(metadata, parentMetadata = {}) {
     const feed = this.feed()
     const actorId = feed.key.toString('hex')
 
@@ -122,7 +136,10 @@ module.exports = class Hypermerge extends EventEmitter {
     return doc
   }
 
-  change (doc, message = null, changeFn) {
+  /**
+   * Shorthand for `hm.update(Automerge.change(doc, changeFn))`.
+   */
+  change(doc, message = null, changeFn) {
     return this.update(Automerge.change(doc, message, changeFn))
   }
 
@@ -132,7 +149,7 @@ module.exports = class Hypermerge extends EventEmitter {
    *
    * @param {Object} doc - document to find changes for
    */
-  update (doc) {
+  update(doc) {
     this._ensureReady()
 
     const actorId = this.getActorId(doc)
@@ -140,7 +157,7 @@ module.exports = class Hypermerge extends EventEmitter {
     const pDoc = this.find(docId)
 
     const changes = Automerge.getChanges(pDoc, doc)
-      .filter(({actor}) => actor === actorId)
+      .filter(({ actor }) => actor === actorId)
 
     this._addToMaxRequested(docId, actorId, changes.length)
 
@@ -154,28 +171,34 @@ module.exports = class Hypermerge extends EventEmitter {
   /**
    * Creates a new actor hypercore feed and automerge document, with
    * an empty change that depends on the document for another actor.
+   * The metadata of the new document will contain a `parentId` property.
    *
    * @param {string} parentId - id of document to fork
    */
-  fork (parentId) {
+  fork(parentId) {
     this._ensureReady()
 
     const parent = this.find(parentId)
-    const doc = this._create({parentId}, this.metadata(parentId))
+    const doc = this._create({ parentId }, this.metadata(parentId))
 
     return this.change(
       Automerge.merge(doc, parent),
       `Forked from ${parentId}`,
-      () => {})
+      () => {}
+    )
   }
 
   /**
    * Takes all the changes from a document (sourceId) and adds them to
-   * another document (destId).
+   * another document (destId). Returns the merged document.
+   *
+   * The source and destination docs must have come from the same root document.
+   * e.g. The source doc was a `.fork()` of the destination doc, or visa-versa.
+   *
    * @param {string} destId - docId to merge changes into
    * @param {string} sourceId - docId to copy changes from
    */
-  merge (destId, sourceId) {
+  merge(destId, sourceId) {
     this._ensureReady()
 
     const dest = this.find(destId)
@@ -184,7 +207,8 @@ module.exports = class Hypermerge extends EventEmitter {
     return this.change(
       Automerge.merge(dest, source),
       `Merged with ${sourceId}`,
-      () => {})
+      () => {}
+    )
   }
 
   /**
@@ -193,7 +217,7 @@ module.exports = class Hypermerge extends EventEmitter {
    * Leaves the network swarm. Doesn't remove files from disk.
    * @param {string} docId
    */
-  delete (docId) {
+  delete(docId) {
     const doc = this.find(docId)
     this.core.archiver.remove(docId)
     delete this.feeds[docId]
@@ -202,13 +226,13 @@ module.exports = class Hypermerge extends EventEmitter {
     return doc
   }
 
-  message (actorId, msg) {
+  message(actorId, msg) {
     this.feed(actorId).peers.forEach(peer => {
       this._messagePeer(peer, msg)
     })
   }
 
-  length (actorId) {
+  length(actorId) {
     return this._feed(actorId).length
   }
 
@@ -218,133 +242,160 @@ module.exports = class Hypermerge extends EventEmitter {
    * @param {string} actorId - actor id
    * @returns {boolean}
    */
-  isWritable (actorId) {
+  isWritable(actorId) {
     return this._feed(actorId).writable
   }
 
-  isOpened (actorId) {
+  isOpened(actorId) {
     return this._feed(actorId).opened
   }
 
-  isMissingDeps (docId) {
+  /**
+   * Returns `true` if the document specified by `docId` is missing changes
+   * from other actors. They may still be downloading from the network.
+   */
+  isMissingDeps(docId) {
     const deps = Automerge.getMissingDeps(this.find(docId))
     return !!Object.keys(deps).length
   }
 
-  empty (actorId) {
+  empty(actorId) {
     return this.immutableApi
       ? Automerge.initImmutable(actorId)
       : Automerge.init(actorId)
   }
 
-  metadatas (docId) {
+  /**
+   * Returns the list of metadata objects corresponding to the list of actors
+   * that have edited this document.
+   */
+  metadatas(docId) {
     const actorIds = this.docIndex[docId] || []
     return actorIds.map(actorId => this.metadata(actorId))
   }
 
-  metadata (actorId) {
+  metadata(actorId) {
     return this.metaIndex[actorId]
   }
 
-  isDocId (actorId) {
+  isDocId(actorId) {
     return this.actorToId(actorId) === actorId
   }
 
-  getId (doc) {
+  /**
+   * Returns the `docId` for the given `doc`.
+   */
+  getId(doc) {
     return this.actorToId(this.getActorId(doc))
   }
 
-  actorToId (actorId) {
-    const {docId} = this.metadata(actorId)
+  actorToId(actorId) {
+    const { docId } = this.metadata(actorId)
     return docId
   }
 
-  getActorId (doc) {
+  getActorId(doc) {
     return doc._actorId
   }
 
-  clock (doc) {
+  getClock(doc) {
     return doc._state.getIn(['opSet', 'clock'])
   }
 
-  _feed (actorId = null) {
+  _feed(actorId = null) {
     const key = actorId ? Buffer.from(actorId, 'hex') : null
     return this.core.createFeed(key)
   }
 
-  feed (actorId = null) {
+  feed(actorId = null) {
     this._ensureReady()
 
-    if (actorId && this.feeds[actorId]) return this.feeds[actorId]
+    if (actorId && this.feeds[actorId]) {
+      return this.feeds[actorId]
+    }
 
     return this._trackFeed(this._feed(actorId))
   }
 
-  isDocReady (docId) {
+  isDocReady(docId) {
     return this.readyIndex[docId]
   }
 
-  replicate (opts) {
+  replicate(opts) {
     return this.core.replicate(opts)
   }
 
-  joinSwarm (opts = {}) {
+  // TODO: should be automatic?
+
+  /**
+   * Joins the network swarm for all documents managed by this Hypermerge instance.
+   * Must be called after `'ready'` has been emitted. `opts` are passed to discovery-swarm.
+   */
+  joinSwarm(opts = {}) {
     this._ensureReady()
 
-    const {archiver} = this.core
-
-    const sw = this.swarm = discoverySwarm(swarmDefaults(Object.assign({
+    this.swarm = discoverySwarm(swarmDefaults(Object.assign({
       port: this.port,
       hash: false,
       encrypt: true,
       stream: opts => this.replicate(opts)
     }, opts)))
 
-    sw.join(archiver.changes.discoveryKey)
+    this.swarm.join(this.core.archiver.changes.discoveryKey)
 
     Object.values(this.feeds).forEach(feed => {
-      sw.join(feed.discoveryKey)
+      this.swarm.join(feed.discoveryKey)
     })
 
-    archiver.on('add', feed => {
-      sw.join(feed.discoveryKey)
+    this.core.archiver.on('add', feed => {
+      this.swarm.join(feed.discoveryKey)
     })
 
-    archiver.on('remove', feed => {
-      sw.leave(feed.discoveryKey)
+    this.core.archiver.on('remove', feed => {
+      this.swarm.leave(feed.discoveryKey)
     })
 
-    sw.listen(this.port)
+    this.swarm.listen(this.port)
 
-    sw.once('error', err => {
-      console.error('Swarm error:', err)
-      console.log('Swarm re-listening')
-      sw.listen()
+    this.swarm.once('error', err => {
+      log('Swarm error:', err)
+      log('Swarm re-listening')
+      this.swarm.listen()
     })
 
     return this
   }
 
-  _appendMetadata (actorId, metadata) {
-    if (this.length(actorId) > 0) throw new Error(`Metadata can only be set if feed is empty.`)
+  _appendMetadata(actorId, metadata) {
+    if (this.length(actorId) > 0) {
+      throw new Error('Metadata can only be set if feed is empty.')
+    }
 
     this._setMetadata(actorId, metadata)
 
     return this._append(actorId, metadata)
   }
 
-  _append (actorId, change) {
+  _append(actorId, change) {
     return this._appendAll(actorId, [change])
   }
 
-  _appendAll (actorId, changes) {
+  // Append all given `changes` to feed for `actorId`. Returns a promise that
+  // resolves with no value on completion, or rejects with an error if one occurs.
+  _appendAll(actorId, changes) {
     const blocks = changes.map(change => JSON.stringify(change))
-    return _promise(cb => {
-      this.feed(actorId).append(blocks, cb)
+    return new Promise((resolve, reject) => {
+      this.feed(actorId).append(blocks, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
     })
   }
 
-  _trackFeed (feed) {
+  _trackFeed(feed) {
     const actorId = feed.key.toString('hex')
 
     this.feeds[actorId] = feed
@@ -357,24 +408,26 @@ module.exports = class Hypermerge extends EventEmitter {
     return feed
   }
 
-  _onFeedReady (actorId, feed) {
+  _onFeedReady(actorId, feed) {
     return () => {
       this._loadMetadata(actorId)
-      .then(() => {
-        const docId = this.actorToId(actorId)
+        .then(() => {
+          const docId = this.actorToId(actorId)
 
-        this._createDocIfMissing(docId, actorId)
+          this._createDocIfMissing(docId, actorId)
 
-        feed.on('download', this._onDownload(docId, actorId))
+          feed.on('download', this._onDownload(docId, actorId))
 
-        return this._loadAllBlocks(actorId)
-          .then(() => {
-            if (actorId !== docId) return
+          return this._loadAllBlocks(actorId)
+            .then(() => {
+              if (actorId !== docId) {
+                return
+              }
 
-            this.readyIndex[docId] = true
-            this._emitReady(docId)
-          })
-      })
+              this.readyIndex[docId] = true
+              this._emitReady(docId)
+            })
+        })
 
       /**
        * Emitted when a hypercore feed is ready.
@@ -386,8 +439,10 @@ module.exports = class Hypermerge extends EventEmitter {
     }
   }
 
-  _createDocIfMissing (docId, actorId) {
-    if (this.docs[docId]) return
+  _createDocIfMissing(docId, actorId) {
+    if (this.docs[docId]) {
+      return
+    }
 
     // TODO extra, empty hypercores are still being created
 
@@ -398,144 +453,174 @@ module.exports = class Hypermerge extends EventEmitter {
     const parentMetadata = this.metadata(actorId)
 
     // TODO might need an empty commit to be included in other vector clocks:
-    return this._create({docId}, parentMetadata)
+    this._create({ docId }, parentMetadata)
   }
 
-  _initFeeds (actorIds) {
-    return Promise.all(
-      actorIds.map(actorId => {
-        // don't load metadata if the feed is empty:
-        if (this.length(actorId) === 0) {
-          console.log('skipping feed init', actorId)
-          return Promise.resolve(null)
-        }
+  _initFeeds(actorIds) {
+    const promises = actorIds.map((actorId) => {
+      // Don't load metadata if the feed is empty.
+      if (this.length(actorId) === 0) {
+        log('skipping feed init', actorId)
+        return Promise.resolve(null)
+      }
 
-        return this._loadMetadata(actorId)
-        .then(({docId}) => {
+      return this._loadMetadata(actorId)
+        .then(({ docId }) => {
           if (this.isWritable(actorId)) {
             this.docs[docId] = this.empty(actorId)
           }
         })
         .then(() => actorId)
-      }))
-  }
-
-  _loadMetadata (actorId) {
-    if (this.metaIndex[actorId]) return Promise.resolve(this.metaIndex[actorId])
-
-    return _promise(cb => {
-      this._feed(actorId).get(0, cb)
     })
-    .then(data => this._setMetadata(actorId, JSON.parse(data)))
+    return Promise.all(promises)
   }
 
-  _setMetadata (actorId, metadata) {
-    if (this.metaIndex[actorId]) return this.metaIndex[actorId]
+  _loadMetadata(actorId) {
+    if (this.metaIndex[actorId]) {
+      return Promise.resolve(this.metaIndex[actorId])
+    }
+
+    return new Promise((resolve, reject) => {
+      this._feed(actorId).get(0, (err, data) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
+    })
+      .then(data => this._setMetadata(actorId, JSON.parse(data)))
+  }
+
+  _setMetadata(actorId, metadata) {
+    if (this.metaIndex[actorId]) {
+      return this.metaIndex[actorId]
+    }
 
     this.metaIndex[actorId] = metadata
-    const {docId, groupId} = metadata
+    const { docId, groupId } = metadata
 
-    if (!this.groupIndex[groupId]) this.groupIndex[groupId] = []
+    if (!this.groupIndex[groupId]) {
+      this.groupIndex[groupId] = []
+    }
     this.groupIndex[groupId].push(actorId)
 
-    if (!this.docIndex[docId]) this.docIndex[docId] = []
+    if (!this.docIndex[docId]) {
+      this.docIndex[docId] = []
+    }
     this.docIndex[docId].push(actorId)
 
     return metadata
   }
 
-  _loadAllBlocks (actorId) {
+  _loadAllBlocks(actorId) {
     return this._loadOwnBlocks(actorId)
-    .then(() => this._loadMissingBlocks(actorId))
+      .then(() => this._loadMissingBlocks(actorId))
   }
 
-  _loadOwnBlocks (actorId) {
+  _loadOwnBlocks(actorId) {
     const docId = this.actorToId(actorId)
 
     return this._loadBlocks(docId, actorId, this.length(actorId))
   }
 
-  _loadMissingBlocks (actorId) {
+  _loadMissingBlocks(actorId) {
     const docId = this.actorToId(actorId)
 
-    if (docId !== actorId) return
+    if (docId !== actorId) {
+      return Promise.resolve()
+    }
 
     const deps = Automerge.getMissingDeps(this.find(docId))
 
-    return Promise.all(Object.keys(deps).map(actor => {
+    return Promise.all(Object.keys(deps).map((actor) => {
       const last = deps[actor] + 1 // last is exclusive
-
       return this._loadBlocks(docId, actor, last)
     }))
   }
 
-  _loadBlocks (docId, actorId, last) {
+  _loadBlocks(docId, actorId, last) {
     const first = this._maxRequested(docId, actorId, last)
 
-    // Stop requesting if done:
-    if (first >= last) return Promise.resolve()
+    // Stop requesting if done.
+    if (first >= last) {
+      return Promise.resolve()
+    }
 
     return this._getBlockRange(actorId, first, last)
-    .then(blocks => this._applyBlocks(docId, blocks))
-    .then(() => this._loadMissingBlocks(docId))
+      .then(blocks => this._applyBlocks(docId, blocks))
+      .then(() => this._loadMissingBlocks(docId))
   }
 
-  _getBlockRange (actorId, first, last) {
+  _getBlockRange(actorId, first, last) {
     const length = Math.max(0, last - first)
 
     return Promise.all(Array(length).fill().map((_, i) =>
       this._getBlock(actorId, first + i)))
   }
 
-  _getBlock (actorId, index) {
-    return _promise(cb => {
-      this.feed(actorId).get(index, cb)
+  _getBlock(actorId, index) {
+    return new Promise((resolve, reject) => {
+      this.feed(actorId).get(index, (err, data) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
     })
   }
 
-  _applyBlock (docId, block) {
+  _applyBlock(docId, block) {
     return this._applyBlocks(docId, [block])
   }
 
-  _applyBlocks (docId, blocks) {
+  _applyBlocks(docId, blocks) {
     return this._applyChanges(docId, blocks.map(block => JSON.parse(block)))
   }
 
-  _applyChanges (docId, changes) {
+  _applyChanges(docId, changes) {
     return changes.length > 0
       ? this._setRemote(Automerge.applyChanges(this.find(docId), changes))
       : this.find(docId)
   }
 
-  // tracks which blocks have been requested for a given doc,
-  // so we know not to request them again
-  _maxRequested (docId, actorId, max) {
-    if (!this.requestedBlocks[docId]) this.requestedBlocks[docId] = {}
+  // Tracks which blocks have been requested for a given doc,
+  // so we know not to request them again.
+  _maxRequested(docId, actorId, max) {
+    if (!this.requestedBlocks[docId]) {
+      this.requestedBlocks[docId] = {}
+    }
 
     const current = this.requestedBlocks[docId][actorId] || START_BLOCK
     this.requestedBlocks[docId][actorId] = Math.max(max, current)
     return current
   }
 
-  _addToMaxRequested (docId, actorId, x) {
-    if (!this.requestedBlocks[docId]) this.requestedBlocks[docId] = {}
+  _addToMaxRequested(docId, actorId, x) {
+    if (!this.requestedBlocks[docId]) {
+      this.requestedBlocks[docId] = {}
+    }
     this.requestedBlocks[docId][actorId] = (this.requestedBlocks[docId][actorId] || START_BLOCK) + x
   }
 
-  _setRemote (doc) {
+  _setRemote(doc) {
     const docId = this.getId(doc)
 
     this.set(doc)
 
+    // TODO: Need to remove this isMissingDeps check to prevent race.
     if (this.readyIndex[docId] && !this.isMissingDeps(docId)) {
       const pDoc = this.pDocs[docId]
 
       this.pDocs[docId] = doc
 
       /**
-       * Emitted when an updated document has been downloaded.
+       * Emitted when an updated document has been downloaded. Not emitted
+       * after local calls to `.update()` or `.change()`.
        *
        * @event document:updated
+       *
        * @param {string} docId - the hex id representing this document
        * @param {Document} document - automerge document
        * @param {Document} prevDocument - previous version of the document
@@ -544,106 +629,128 @@ module.exports = class Hypermerge extends EventEmitter {
     }
   }
 
-  _shareDoc (doc) {
-    const {groupId} = this.metadata(this.getActorId(doc))
+  _shareDoc(doc) {
+    const { groupId } = this.metadata(this.getActorId(doc))
     const keys = this.groupIndex[groupId]
-    this.message(groupId, {type: 'FEEDS_SHARED', keys})
+    this.message(groupId, { type: 'FEEDS_SHARED', keys })
   }
 
-  _relatedKeys (actorId) {
-    const {groupId} = this.metadata(actorId)
+  _relatedKeys(actorId) {
+    const { groupId } = this.metadata(actorId)
     return this.groupIndex[groupId]
   }
 
-  _messagePeer (peer, msg) {
+  _messagePeer(peer, msg) {
     const data = Buffer.from(JSON.stringify(msg))
     peer.stream.extension('hypermerge', data)
   }
 
-  _onMulticoreReady () {
+  _onMulticoreReady() {
     return () => {
       const actorIds =
         Object.values(this.core.archiver.feeds)
-        .map(feed => feed.key.toString('hex'))
+          .map(feed => feed.key.toString('hex'))
 
       this._initFeeds(actorIds)
-      .then(() => {
-        this.isReady = true
-        actorIds.forEach(actorId => this.feed(actorId))
-        this.emit('ready', this)
-      })
+        .then(() => {
+          this.isReady = true
+          actorIds.forEach(actorId => this.feed(actorId))
+
+          /**
+           * Emitted when all document metadata has been loaded from storage, and the
+           * Hypermerge instance is ready for use. Documents will continue loading from
+           * storage and the network. Required before `.create()`, `.open()`, etc. can be used.
+           *
+           * @event ready
+           */
+          this.emit('ready')
+        })
     }
   }
 
-  _onDownload (docId, actorId) {
+  _onDownload(docId, actorId) {
     return (index, data) => {
       this._applyBlock(docId, data)
       this._loadMissingBlocks(docId)
     }
   }
 
-  _onPeerAdded (actorId) {
-    return peer => {
+  _onPeerAdded(actorId) {
+    return (peer) => {
       peer.stream.on('extension', this._onExtension(actorId, peer))
 
       this._loadMetadata(actorId)
-      .then(() => {
-        if (!this.isDocId(actorId)) return
+        .then(() => {
+          if (!this.isDocId(actorId)) {
+            return
+          }
 
-        const keys = this._relatedKeys(actorId)
-        this._messagePeer(peer, {type: 'FEEDS_SHARED', keys})
+          const keys = this._relatedKeys(actorId)
+          this._messagePeer(peer, { type: 'FEEDS_SHARED', keys })
 
-        this.emit('peer:joined', actorId, peer)
-      })
+          /**
+           * Emitted when a network peer has connected.
+           *
+           * @event peer:left
+           *
+           * @param {string} actorId - the actorId of the connected peer
+           * @param {object} peer - information about the connected peer
+           */
+          this.emit('peer:joined', actorId, peer)
+        })
     }
   }
 
-  _onPeerRemoved (actorId) {
+  _onPeerRemoved(actorId) {
     return peer => {
       this._loadMetadata(actorId)
-      .then(() => {
-        if (!this.isDocId(actorId)) return
+        .then(() => {
+          if (!this.isDocId(actorId)) {
+            return
+          }
 
-        this.emit('peer:left', actorId, peer)
-      })
+          /**
+           * Emitted when a network peer has disconnected.
+           *
+           * @event peer:left
+           *
+           * @param {string} actorId - the actorId of the disconnected peer
+           * @param {object} peer - information about the disconnected peer
+           */
+          this.emit('peer:left', actorId, peer)
+        })
     }
   }
 
-  _onExtension (actorId, peer) {
+  // TODO: what to do about these undocumented events?
+
+  _onExtension(actorId, peer) {
     return (name, data) => {
       switch (name) {
         case 'hypermerge':
-          return this._onMessage(actorId, peer, data)
+          this._onMessage(actorId, peer, data)
+          break
         default:
           this.emit('peer:extension', actorId, name, data, peer)
       }
     }
   }
 
-  _onMessage (actorId, peer, data) {
+  _onMessage(actorId, peer, data) {
     const msg = JSON.parse(data)
 
     switch (msg.type) {
       case 'FEEDS_SHARED':
-        return msg.keys.map(actorId => this.feed(actorId))
+        msg.keys.forEach((actorId) => {
+          this.feed(actorId)
+        })
+        break
       default:
         this.emit('peer:message', actorId, peer, msg)
     }
   }
 
-  _onConnection (docId, actorId) {
-    return (conn, info) => {
-      console.log('_onConnection', conn, info)
-    }
-  }
-
-  _onListening () {
-    return (...args) => {
-      // console.log('_onListening', ...args)
-    }
-  }
-
-  _emitReady (docId) {
+  _emitReady(docId) {
     const doc = this.find(docId)
     this.pDocs[docId] = doc
 
@@ -651,21 +758,16 @@ module.exports = class Hypermerge extends EventEmitter {
      * Emitted when a document has been fully loaded.
      *
      * @event document:ready
+     *
      * @param {string} docId - the hex id representing this document
      * @param {Document} document - automerge document
      */
     this.emit('document:ready', docId, doc)
   }
 
-  _ensureReady () {
-    if (!this.isReady) throw new Error('Hypermerge is not ready yet. Use .once("ready") first.')
+  _ensureReady() {
+    if (!this.isReady) {
+      throw new Error('Hypermerge is not ready yet. Use .once("ready") first.')
+    }
   }
-}
-
-function _promise (f) {
-  return new Promise((resolve, reject) => {
-    f((err, x) => {
-      err ? reject(err) : resolve(x)
-    })
-  })
 }
