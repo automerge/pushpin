@@ -9,6 +9,26 @@ import * as Identity from './identity'
 
 const log = Debug('pushpin:workspace')
 
+export function create(state) {
+  const workspace = state.hm.create()
+  const docId = state.hm.getId(workspace)
+
+  Loop.dispatch(saveWorkspaceId, { docId })
+
+  const nextWorkspace = state.hm.change(workspace, (ws) => {
+    ws.selfId = ''
+    ws.seenBoardIds = []
+    ws.offeredIds = []
+    ws.contactIds = []
+  })
+
+  // should these be synchronous? does it matter?
+  Loop.dispatch(Identity.create)
+  Loop.dispatch(Board.create)
+
+  return { ...state, workspace: nextWorkspace }
+}
+
 export function workspaceSeeBoardId(state, { docId }) {
   if (!state.workspace) {
     log('workspaceSeeBoardId called with no workspace!')
@@ -75,27 +95,6 @@ export function addAuthorsToContacts(state) {
 
   // nothing added, nothing to do
   return state
-}
-
-
-export function create(state) {
-  const workspace = state.hm.create()
-  const docId = state.hm.getId(workspace)
-
-  Loop.dispatch(saveWorkspaceId, { docId })
-
-  const nextWorkspace = state.hm.change(workspace, (ws) => {
-    ws.selfId = ''
-    ws.seenBoardIds = []
-    ws.offeredIds = []
-    ws.contactIds = []
-  })
-
-  // should these be synchronous? does it matter?
-  Loop.dispatch(Identity.create)
-  Loop.dispatch(Board.create)
-
-  return { ...state, workspace: nextWorkspace }
 }
 
 export function updateWorkspaceSelf(state, { selfId }) {
