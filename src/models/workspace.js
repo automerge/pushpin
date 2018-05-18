@@ -2,7 +2,7 @@ import Fs from 'fs'
 import Path from 'path'
 import Debug from 'debug'
 
-import Loop from './loop'
+import Loop from '../loop'
 import * as Model from './model'
 import * as Board from './board'
 import * as Identity from './identity'

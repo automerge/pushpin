@@ -5,7 +5,7 @@ import { RIEInput } from 'riek'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Loop from '../loop'
-import * as Board from '../board'
+import * as Board from '../models/board'
 import HashForm from './hash-form'
 import Share from './share'
 import Settings from './settings'

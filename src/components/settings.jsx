@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import { remote } from 'electron'
 
 import Loop from '../loop'
-import { IMAGE_DIALOG_OPTIONS } from '../model'
-import { identitySelfNameChange, identitySelfAvatarChange } from '../identity'
+import { IMAGE_DIALOG_OPTIONS } from '../models/model'
+import { identitySelfNameChange, identitySelfAvatarChange } from '../models/identity'
 
 const { dialog } = remote
 // import Debug from 'debug'

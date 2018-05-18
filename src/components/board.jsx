@@ -7,10 +7,10 @@ import { DraggableCore } from 'react-draggable'
 
 import Loop from '../loop'
 import Card from './card'
-import * as BoardModel from '../board'
 import ColorPicker from './color-picker'
-import * as TextCard from '../text-card'
-import * as ImageCard from '../image-card'
+import * as BoardModel from '../models/board'
+import * as TextCard from '../models/text-card'
+import * as ImageCard from '../models/image-card'
 
 const { dialog } = remote
 

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 
 import Contact from './contact'
 import Loop from '../loop'
-import * as Model from '../model'
-import * as Identity from '../identity'
+import * as Model from '../models/model'
+import * as Identity from '../models/identity'
 
 export default class Share extends React.PureComponent {
   static propTypes = {

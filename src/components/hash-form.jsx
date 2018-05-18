@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import Debug from 'debug'
 
 import Loop from '../loop'
-import * as Model from '../model'
+import * as Model from '../models/model'
 
 const log = Debug('pushpin:hash-form')
 

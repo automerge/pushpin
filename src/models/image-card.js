@@ -6,8 +6,8 @@ import mkdirp from 'mkdirp'
 import Jimp from 'jimp'
 import uuid from 'uuid/v4'
 
-import Loop from './loop'
-import * as Hyperfile from './hyperfile'
+import Loop from '../loop'
+import * as Hyperfile from '../hyperfile'
 import * as Board from './board'
 
 const log = Debug('pushpin:image')

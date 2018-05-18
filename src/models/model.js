@@ -3,8 +3,8 @@ import Debug from 'debug'
 import { EventEmitter } from 'events'
 import Path from 'path'
 
-import Loop from './loop'
-import Hypermerge from './hypermerge'
+import Loop from '../loop'
+import Hypermerge from '../hypermerge'
 import * as Workspace from './workspace'
 import * as Board from './board'
 

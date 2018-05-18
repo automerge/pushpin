@@ -4,8 +4,8 @@ import { ipcRenderer } from 'electron'
 
 import Loop from './loop'
 import App from './components/app'
-import * as Model from './model'
-import * as Board from './board'
+import * as Model from './models/model'
+import * as Board from './models/board'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it

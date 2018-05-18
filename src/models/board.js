@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4'
 import Automerge from 'automerge'
 
-import Loop from './loop'
+import Loop from '../loop'
 import * as Workspace from './workspace'
 import * as ImageCard from './image-card'
 import * as TextCard from './text-card'
