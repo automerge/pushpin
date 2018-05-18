@@ -138,7 +138,7 @@ export function documentUpdated(state, { docId, doc }) {
       return { ...state, self: doc }
     case (state.workspace.boardId): // same here
       // XXX: horrifying hack -- this didn't trigger at first. why?
-      Loop.dispatch(Workspace.updateAuthorIdsWithContacts)
+      Loop.dispatch(Workspace.updateContactIds, { candidateContactIds: doc.authorIds })
       return { ...state, board: doc }
     default:
       break
