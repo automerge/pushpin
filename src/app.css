@@ -93,13 +93,14 @@ body {
   border-radius: 4px;
   overflow: hidden;
   width: 296px;
-  padding-bottom:8px;
+  padding: 4px 0px;
 }
 
 .Settings__title {
-  font-size: 20px;
-  line-height: 24px;
-  color: var(--colorSecondaryGrey);
+  text-align: center;
+  font-size: 14px;
+  line-height: 28px;
+  color: var(--colorBlueBlack);
 }
 
 .Settings h6 {
@@ -109,7 +110,7 @@ body {
   color: var(--colorBlueBlack);
 }
 .Settings .Settings__section {
-  padding: 8px;
+  padding: 4px 8px;
 }
 .Settings input {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
@@ -120,13 +121,15 @@ body {
   box-sizing: border-box;
   height: 32px;
   width: 100%;
-  font-size: 16px;
   border-radius: 4px;
   background: #F3F3F3;
   border: 0px;
   outline: none;
+  margin-bottom:4px;
 }
-
+.Settings .AvatarGroup {
+  margin-bottom: 8px;
+}
 .Settings .Avatar, .Settings__setAvatar {
   display: inline-block;
   vertical-align: middle;
@@ -139,6 +142,7 @@ body {
 
 .Share {
   background-color: #ffffff;
+  color: var(--colorBlueBlack);
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   width: 296px;
   border-radius: 4px;
