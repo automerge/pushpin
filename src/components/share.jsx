@@ -41,7 +41,6 @@ export default class Share extends React.PureComponent {
   }
 
   handleShare(e, contact) {
-    alert(`Share '${this.props.board.title}' with ${contact.name}\n (to: ${contact.docId}, doc: ${board.docId})`)
     Loop.dispatch(
       Model.identityOfferDocumentToIdentity,
       { identityId: contact.docId, sharedDocId: this.props.board.docId }
@@ -103,8 +102,7 @@ export default class Share extends React.PureComponent {
   }
 
   renderNotifications() {
-    const notifications = this.props.notifications.map(notification => {
-      return (
+    const notifications = this.props.notifications.map(notification => (
         <div key={notification.sender.name + "-" + notification.board.title} className="Notification">
           <p>You received...</p>
           <h4>{ notification.board.title }</h4>
@@ -127,8 +125,7 @@ export default class Share extends React.PureComponent {
             </div>
           </div>
         </div>
-      )
-    })
+      ))
 
     return (
       <div className="Share__notifications">
