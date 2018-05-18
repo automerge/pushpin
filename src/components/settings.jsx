@@ -53,7 +53,7 @@ export default class Settings extends React.PureComponent {
         </div>
         <div className="Settings__section">
           <h6>Avatar</h6>
-          <div className="AvatarGroup">
+          <div className="Settings__avatarGroup">
             <div className="Avatar">
               <img src={this.props.avatar} />
             </div>

@@ -127,7 +127,7 @@ body {
   outline: none;
   margin-bottom:4px;
 }
-.Settings .AvatarGroup {
+.Settings .Settings__avatarGroup {
   margin-bottom: 8px;
 }
 .Settings .Avatar, .Settings__setAvatar {
