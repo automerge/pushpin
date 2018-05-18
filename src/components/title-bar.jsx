@@ -20,7 +20,7 @@ export default class TitleBar extends React.PureComponent {
     board: PropTypes.shape({
       title: PropTypes.string.isRequired
     }),
-    self: PropTypes.shape({ 
+    self: PropTypes.shape({
       name: PropTypes.string.isRequired
     })
   }
@@ -73,46 +73,44 @@ export default class TitleBar extends React.PureComponent {
 
     const notifications = []
     state.workspace.offeredIds.forEach(offer => {
-      const contact = state.contacts[offer.offererId]
+      const contact = state.contacts[offer.offererId] || { name: `Loading ${offer.offererId}` }
 
-      if(state.offeredDocs && state.offeredDocs[offer.offeredId]) {
+      if (state.offeredDocs && state.offeredDocs[offer.offeredId]) {
         const board = state.offeredDocs[offer.offeredId]
-        notifications.push({ type: "Invitation", sender: contact, board: board })
+        notifications.push({ type: 'Invitation', sender: contact, board })
       }
     })
 
-    let shareData = {
+    const filteredContacts = Object.keys(state.contacts || {})
+      .filter(contactId => (!state.board.authorIds.includes(contactId)))
+      .reduce((res, key) => { res[key] = state.contacts[key]; return res }, {})
+
+    const shareData = {
       authors: {},
       board: this.props.board,
-      contacts: state.contacts || {},
-      notifications: notifications
+      contacts: filteredContacts,
+      notifications
     }
 
     // remember to exclude yourself from the authors list (maybe?)
-    if (state.board && state.board.authors) {
-      shareData = { ...shareData,
-        authors: state.board.authors.map((a) =>
-          (state.contacts && state.contacts[a] ? state.contacts[a] : { name: 'ErrNo' })), }
-    }
+    if (state.board && state.board.authorIds) {
+      shareData.authors = state.board.authorIds.map((authorId) => {
+        if (state.workspace && state.self && authorId === state.workspace.selfId) {
+          // we're not a "contact", but show us in the authors list if we're there
+          return { name: `You (${state.self.name || 'loading'})` }
+        } else if (state.contacts && state.contacts[authorId]) {
+          // otherwise we should have this contact in our contacts list...
+          return state.contacts[authorId]
+        }
 
-    // This line totally doesn't work but is directionally correct.
-    /*
-    if (state.workspace && state.workspace.offeredIds) {
-      shareData.notifications = { ...state.workspace.offeredIds.map((offer, idx) => ([idx,
-        { type: 'Invitation',
-          sender: {
-            name: state.contacts && state.contacts[offer.offerrerId] ?
-              state.contacts[offer.offererId].name : offer.offererId
-          },
-          board: {
-            title: state.boards && state.boards[offer.offeredId] ?
-              state.boards[offer.offeredId].title : 'Title Not Loaded',
-            docId: state.boards && state.boards[offer.offeredId] ?
-              state.boards[offer.offeredId].docId : offer.offeredId
-          }
-        }])) }
+        // and if we don't, make up a stub
+        return { name: 'ErrNo' }
+        /* TODO improve this: really, we want to increase the likelihood of good output here.
+               that means either caching values we want to show in the host document and swapping
+               for newer versions as required or maybe guaranteeing load order better (or both)
+               or perhaps leave out loading values so we don't see bogus data? */
+      })
     }
-    */
 
     return (
       <div className="TitleBar">
@@ -157,7 +155,7 @@ export default class TitleBar extends React.PureComponent {
             </div>
           </DropdownTrigger>
           <DropdownContent>
-            <Settings name={"Roshan"} />
+            <Settings name="Roshan" />
           </DropdownContent>
         </Dropdown>
       </div>

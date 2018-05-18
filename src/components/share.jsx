@@ -86,8 +86,7 @@ export default class Share extends React.PureComponent {
             { authors }
           </div>
         </div>
-
-        <h6>All</h6>
+        { (contacts.length > 0) && <h6>All</h6> }
         <div className="Share__section">
           <div className="Share__contacts">
             { contacts }
@@ -103,29 +102,31 @@ export default class Share extends React.PureComponent {
 
   renderNotifications() {
     const notifications = this.props.notifications.map(notification => (
-        <div key={notification.sender.name + "-" + notification.board.title} className="Notification">
-          <p>You received...</p>
-          <h4>{ notification.board.title }</h4>
-          <p>From { notification.sender.name }</p>
+      // we should create a more unique key; do we want to allow the same share multiple times?
+      // i'm going to block it on the send side for now
+      <div key={`${notification.sender.name}-${notification.board.title}`} className="Notification">
+        <p>You received...</p>
+        <h4>{ notification.board.title }</h4>
+        <p>From { notification.sender.name }</p>
 
-          <div className="Notification__actions">
-            <div
-              role="button"
-              className="Notification__actions__view"
-              onClick={e => this.acceptNotification(notification)}
-            >
-              <i className="fa fa-arrow-right" /> View
-            </div>
-            <div
-              role="button"
-              className="Notification__actions__archive"
-              onClick={e => alert(`Archive ${notification.board.title}`)}
-            >
-              <i className="fa fa-archive" /> Archive
-            </div>
+        <div className="Notification__actions">
+          <div
+            role="button"
+            className="Notification__actions__view"
+            onClick={e => this.acceptNotification(notification)}
+          >
+            <i className="fa fa-arrow-right" /> View
+          </div>
+          <div
+            role="button"
+            className="Notification__actions__archive"
+            onClick={e => alert(`Archive ${notification.board.title}`)}
+          >
+            <i className="fa fa-archive" /> Archive
           </div>
         </div>
-      ))
+      </div>
+    ))
 
     return (
       <div className="Share__notifications">
