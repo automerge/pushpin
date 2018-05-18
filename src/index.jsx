@@ -5,14 +5,16 @@ import { ipcRenderer } from 'electron'
 import Loop from './loop'
 import App from './components/app'
 import * as Model from './model'
+import * as Board from './board'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
 // doesn't confuse future instances.
 localStorage.removeItem('debug')
 
+// should this be here?
 ipcRenderer.on('newDocument', () => {
-  Loop.dispatch(Model.newDocument)
+  Loop.dispatch(Board.newDocument)
 })
 
 const view = (state) =>

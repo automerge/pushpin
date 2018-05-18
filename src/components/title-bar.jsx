@@ -5,7 +5,7 @@ import { RIEInput } from 'riek'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Loop from '../loop'
-import * as Model from '../model'
+import * as Board from '../board'
 import HashForm from './hash-form'
 import Share from './share'
 import Settings from './settings'
@@ -36,12 +36,12 @@ export default class TitleBar extends React.PureComponent {
 
   onChangeTitle(newState) {
     log('onChangeTitle')
-    Loop.dispatch(Model.setTitle, newState)
+    Loop.dispatch(Board.setTitle, newState)
   }
 
   onChangeBoardBackgroundColor(color) {
     log('onChangeBoardBackgroundColor')
-    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: color.hex })
+    Loop.dispatch(Board.setBackgroundColor, { backgroundColor: color.hex })
   }
 
   onSubmit(e) {

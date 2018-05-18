@@ -4,6 +4,7 @@ import Debug from 'debug'
 
 import Loop from './loop'
 import * as Model from './model'
+import * as Board from './board'
 import * as Identity from './identity'
 
 const log = Debug('pushpin:workspace')
@@ -68,7 +69,7 @@ export function addAuthorsToContacts(state) {
       w.contactIds.push(...addedContacts)
     })
 
-    addedContacts.forEach((contactId) => Loop.dispatch(Model.openDocument, { docId: contactId }))
+    addedContacts.forEach((contactId) => Loop.dispatch(Board.openDocument, { docId: contactId }))
     return { ...state, workspace }
   }
 
@@ -92,7 +93,7 @@ export function newWorkspace(state) {
 
   // should these be synchronous? does it matter?
   Loop.dispatch(Identity.newIdentity)
-  Loop.dispatch(Model.newDocument)
+  Loop.dispatch(Board.newDocument)
 
   return { ...state, workspace: nextWorkspace }
 }
@@ -128,12 +129,12 @@ export function identityUpdated(state, { contactId }) {
 
   log('identityUpdated.iterate', offeredIds)
   offeredIds.forEach((offeredId) => {
-    Loop.dispatch(Model.openDocument, { docId: offeredId })
+    Loop.dispatch(Board.openDocument, { docId: offeredId })
     workspace = state.hm.change(workspace, (ws) => {
       const offeredIdsSet = new Set(ws.offeredIds)
       if (!offeredIdsSet.has(offeredId)) {
         ws.offeredIds.push({ offeredId, offererId: contactId })
-        Loop.dispatch(Model.openDocument, { docId: offeredId })
+        Loop.dispatch(Board.openDocument, { docId: offeredId })
       }
     })
   })

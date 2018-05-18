@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import Debug from 'debug'
 
 import CodeMirrorEditor from './code-mirror-editor'
-import * as Model from '../model'
+import * as ImageCard from '../image'
 
 const log = Debug('pushpin:card')
 
@@ -71,7 +71,7 @@ export default class Card extends React.PureComponent {
 
     if (this.props.card.type === 'image') {
       this.setState({ loading: true }, () => {
-        Model.fetchImage(this.props.card.hyperfile, (error, imagePath) => {
+        ImageCard.fetchImage(this.props.card.hyperfile, (error, imagePath) => {
           if (error) {
             log(error)
           }

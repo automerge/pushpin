@@ -6,7 +6,8 @@ import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 
 import Loop from '../loop'
-import * as Model from '../model'
+import * as TextCard from '../text'
+import * as Board from '../board'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -98,7 +99,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
   onBackspace(codeMirror) {
     log('onBackspace')
     if (codeMirror.getValue() === '') {
-      Loop.dispatch(Model.cardDeleted, { id: this.props.cardId })
+      Loop.dispatch(Board.cardDeleted, { id: this.props.cardId })
     }
     return CodeMirror.Pass
   }
@@ -117,7 +118,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
     const at = codeMirror.indexFromPos(change.from)
     const removedLength = change.removed.join('\n').length
     const addedText = change.text.join('\n')
-    Loop.dispatch(Model.cardTextChanged, { id: this.props.cardId, at, removedLength, addedText })
+    Loop.dispatch(TextCard.cardTextChanged, { id: this.props.cardId, at, removedLength, addedText })
   }
 
   // This is called when the editor redraws, and therefore may have a new
@@ -189,15 +190,15 @@ export default class CodeMirrorEditor extends React.PureComponent {
   checkHeight() {
     const editorHeight = this.editorRef.clientHeight
     const rendererHeight = this.rendererRef.clientHeight
-    const minHeight = Model.CARD_MIN_HEIGHT
-    const neededHeight = Model.snapMeasureOutwardToGrid(Math.max(
+    const minHeight = Board.CARD_MIN_HEIGHT
+    const neededHeight = Board.snapMeasureOutwardToGrid(Math.max(
       editorHeight,
       rendererHeight,
       minHeight
     ))
     if (neededHeight !== this.props.cardHeight) {
       log('forceHeight', this.props.cardHeight, editorHeight, rendererHeight, neededHeight)
-      Loop.dispatch(Model.cardTextResized, { id: this.props.cardId, height: neededHeight })
+      Loop.dispatch(TextCard.cardTextResized, { id: this.props.cardId, height: neededHeight })
     }
   }
 

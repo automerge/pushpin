@@ -7,8 +7,10 @@ import { DraggableCore } from 'react-draggable'
 
 import Loop from '../loop'
 import Card from './card'
-import * as Model from '../model'
+import * as BoardModel from '../board'
 import ColorPicker from './color-picker'
+import * as TextCard from '../text'
+import * as ImageCard from '../image'
 
 const { dialog } = remote
 
@@ -24,8 +26,8 @@ const withinAnyCard = (cards, x, y) =>
   Object.values(cards).some((card) => withinCard(card, x, y))
 
 const boardStyle = {
-  width: Model.BOARD_WIDTH,
-  height: Model.BOARD_HEIGHT
+  width: BoardModel.BOARD_WIDTH,
+  height: BoardModel.BOARD_HEIGHT
 }
 
 const draggableCards = (cards, selected, card) => {
@@ -80,21 +82,21 @@ export default class Board extends React.PureComponent {
 
   onKeyDown(e) {
     if (e.key === 'Backspace') {
-      Loop.dispatch(Model.boardBackspaced)
+      Loop.dispatch(BoardModel.boardBackspaced)
     }
   }
 
   onClick(e) {
     if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
       log('onClick')
-      Loop.dispatch(Model.clearSelections)
+      Loop.dispatch(BoardModel.clearSelections)
     }
   }
 
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      Loop.dispatch(Model.cardCreatedText, { x: e.pageX, y: e.pageY, text: '', selected: true })
+      Loop.dispatch(TextCard.cardCreatedText, { x: e.pageX, y: e.pageY, text: '', selected: true })
     }
   }
 
@@ -133,18 +135,19 @@ export default class Board extends React.PureComponent {
 
       if (entry.type.match('image/')) {
         reader.onload = () =>
-          Loop.dispatch(Model.processImage, {
+          Loop.dispatch(ImageCard.processImage, {
             path: entry.name,
             buffer: Buffer.from(reader.result),
-            x: pageX + (i * (Model.GRID_SIZE * 2)),
-            y: pageY + (i * (Model.GRID_SIZE * 2)) })
+            x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
+            y: pageY + (i * (BoardModel.GRID_SIZE * 2)) })
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
         reader.onload = () =>
-          Loop.dispatch(Model.cardCreatedText, {
+          Loop.dispatch(TextCard.cardCreatedText, {
             text: reader.result,
-            x: pageX + (i * (Model.GRID_SIZE * 2)),
-            y: pageY + (i * (Model.GRID_SIZE * 2)) })
+            x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
+            y: pageY + (i * (BoardModel.GRID_SIZE * 2)) })
+          // we probably shouldn't expose grid_size to here?
         reader.readAsText(entry)
       }
     }
@@ -153,7 +156,7 @@ export default class Board extends React.PureComponent {
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
     if (plainText) {
-      Loop.dispatch(Model.cardCreatedText, {
+      Loop.dispatch(TextCard.cardCreatedText, {
         text: plainText,
         x: pageX,
         y: pageY })
@@ -185,7 +188,7 @@ export default class Board extends React.PureComponent {
 
         const reader = new FileReader()
         reader.onload = () =>
-          Loop.dispatch(Model.processImage, {
+          Loop.dispatch(ImageCard.processImage, {
             path: file.name,
             buffer: Buffer.from(reader.result),
             x,
@@ -196,7 +199,7 @@ export default class Board extends React.PureComponent {
 
     const plainTextData = dataTransfer.getData('text/plain')
     if (plainTextData) {
-      Loop.dispatch(Model.cardCreatedText, {
+      Loop.dispatch(TextCard.cardCreatedText, {
         text: plainTextData,
         x,
         y })
@@ -206,13 +209,16 @@ export default class Board extends React.PureComponent {
   onAddNote(e) {
     const x = e.pageX
     const y = e.pageY
-    Loop.dispatch(Model.cardCreatedText, { x, y, text: '', selected: true })
+    // one of these or something like this?
+    // Loop.dispatch(TextCard.newTextCard, { x, y, text:'', selected: true })
+    // Loop.dispatch(Board.createCard {x, y, cardType: TextCard, selected: true })
+    Loop.dispatch(TextCard.cardCreatedText, { x, y, text: '', selected: true })
   }
 
   onAddImage(e) {
     const x = e.pageX
     const y = e.pageY
-    dialog.showOpenDialog(Model.IMAGE_DIALOG_OPTIONS, (paths) => {
+    dialog.showOpenDialog(ImageCard.IMAGE_DIALOG_OPTIONS, (paths) => {
       // User aborted.
       if (!paths) {
         return
@@ -221,13 +227,13 @@ export default class Board extends React.PureComponent {
         throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
-      Loop.dispatch(Model.processImage, { path, x, y })
+      Loop.dispatch(ImageCard.processImage, { path, x, y })
     })
   }
 
   onChangeBoardBackgroundColor(color) {
     log('onChangeBoardBackgroundColor')
-    Loop.dispatch(Model.setBackgroundColor, { backgroundColor: color.hex })
+    Loop.dispatch(BoardModel.setBackgroundColor, { backgroundColor: color.hex })
   }
 
   // Copy view-relevant move/resize state over to React.
@@ -271,10 +277,10 @@ export default class Board extends React.PureComponent {
 
       // Clamp to ensure card doesn't move beyond the board.
       newX = Math.max(newX, 0)
-      newX = Math.min(newX, Model.BOARD_WIDTH - card.width)
+      newX = Math.min(newX, BoardModel.BOARD_WIDTH - card.width)
       tracking.moveX = newX
       newY = Math.max(newY, 0)
-      newY = Math.min(newY, Model.BOARD_HEIGHT - card.height)
+      newY = Math.min(newY, BoardModel.BOARD_HEIGHT - card.height)
       tracking.moveY = newY
 
       // If the numbers changed, we must have introduced some slack.
@@ -302,11 +308,11 @@ export default class Board extends React.PureComponent {
       let newHeight = preClampHeight + tracking.slackHeight
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
-      newWidth = Math.max(Model.CARD_MIN_WIDTH, newWidth)
-      newWidth = Math.min(Model.BOARD_WIDTH - card.x, newWidth)
+      newWidth = Math.max(BoardModel.CARD_MIN_WIDTH, newWidth)
+      newWidth = Math.min(BoardModel.BOARD_WIDTH - card.x, newWidth)
       tracking.resizeWidth = newWidth
-      newHeight = Math.max(Model.CARD_MIN_HEIGHT, newHeight)
-      newHeight = Math.min(Model.BOARD_HEIGHT - card.y, newHeight)
+      newHeight = Math.max(BoardModel.CARD_MIN_HEIGHT, newHeight)
+      newHeight = Math.min(BoardModel.BOARD_HEIGHT - card.y, newHeight)
       tracking.resizeHeight = newHeight
 
       // If the numbers changed, we must have introduced some slack.
@@ -379,9 +385,9 @@ export default class Board extends React.PureComponent {
     // If tracking is not initialized, treat this as a click
     if (!(tracking && (tracking.moving || tracking.resizing))) {
       if (e.ctrlKey || e.shiftKey) {
-        Loop.dispatch(Model.cardToggleSelection, { id: card.id })
+        Loop.dispatch(BoardModel.cardToggleSelection, { id: card.id })
       } else {
-        Loop.dispatch(Model.cardUniquelySelected, { id: card.id })
+        Loop.dispatch(BoardModel.cardUniquelySelected, { id: card.id })
       }
 
       return
@@ -401,7 +407,7 @@ export default class Board extends React.PureComponent {
         t.moving = false
         t.totalDrag = null
 
-        Loop.dispatch(Model.cardMoved, { id: card.id, x, y })
+        Loop.dispatch(BoardModel.cardMoved, { id: card.id, x, y })
         this.setDragState(card, t)
       })
     }
@@ -417,7 +423,7 @@ export default class Board extends React.PureComponent {
       tracking.resizing = false
       tracking.totalDrag = null
 
-      Loop.dispatch(Model.cardResized, { id: card.id, width, height })
+      Loop.dispatch(BoardModel.cardResized, { id: card.id, width, height })
       this.setDragState(card, tracking)
     }
   }
@@ -474,7 +480,7 @@ export default class Board extends React.PureComponent {
           <ContextMenuItem>
             <ColorPicker
               color={this.props.backgroundColor}
-              colors={Object.values(Model.BOARD_COLORS)}
+              colors={Object.values(BoardModel.BOARD_COLORS)}
               onChangeComplete={this.onChangeBoardBackgroundColor}
             />
           </ContextMenuItem>
