@@ -307,14 +307,19 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
       b.cards[id] = newCard
       b.cards[id].hyperfile = typeAttrs.hyperfile
     }
+
     if (type === 'text') {
       b.cards[id] = newCard
-      b.cards[id].text = new Automerge.Text()
-      b.cards[id].text.insertAt(0, ...typeAttrs.text.split(''))
+      b.cards[id].docId = typeAttrs.docId
     }
   })
 
+  let newDocs = state.docs
+  if(type === 'text') {
+    newDocs = { ...newDocs, [typeAttrs.docId]: typeAttrs.doc }
+  }
+
   const newSelected = selected ? [id] : []
 
-  return { ...state, board: newBoard, selected: newSelected }
+  return { ...state, docs: newDocs, board: newBoard, selected: newSelected }
 }

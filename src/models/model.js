@@ -40,7 +40,8 @@ export const empty = {
   board: null,
   self: null,
   contacts: {},
-  hm: null
+  hm: null,
+  docs: {}
 }
 
 // Starts IO subsystems and populates associated state.
@@ -96,6 +97,16 @@ export function documentReady(state, { docId, doc }) {
     state = { ...state, offeredDocs }
   }
 
+  if(state.board && state.board.cards) {
+    const cardDocIds = Object.values(state.board.cards).map(c => c.docId)
+    let newDocs = state.docs
+
+    if(cardDocIds.includes(docId)) {
+      newDocs = { ...newDocs, [docId]: doc }
+      state = { ...state, docs: newDocs }
+    }
+  }
+
   if (state.workspace.boardId === docId) {
     // Case where we've created or opened the requested doc.
     // It may be an unitialized board in which case we need to populate it.
@@ -118,6 +129,10 @@ export function documentReady(state, { docId, doc }) {
       { candidateContactIds: state.board.authorIds }
     )
     state = Workspace.updateSeenBoardIds(state, { docId })
+
+    Object.values(state.board.cards).forEach(c => {
+      Loop.dispatch(openDocument, { docId: c.docId })
+    })
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
