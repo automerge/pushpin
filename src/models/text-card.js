@@ -16,16 +16,18 @@ export function create(state, { x, y, selected, text }) {
 }
 
 export function cardTextChanged(state, { id, at, removedLength, addedText }) {
-  const newBoard = Board.changeBoard(state, (b) => {
-    const { text } = b.cards[id]
-
+  const cardDocId = state.board.cards[id].docId
+  const cardDoc = state.hm.change(state.docs[cardDocId], (d) => {
     if (removedLength > 0) {
-      text.splice(at, removedLength)
+      d.text.splice(at, removedLength)
     }
 
     if (addedText.length > 0) {
-      text.insertAt(at, ...addedText.split(''))
+      d.text.insertAt(at, ...addedText.split(''))
     }
   })
-  return { ...state, board: newBoard }
+
+  const docs = { ...state.docs, [cardDocId]: cardDoc }
+
+  return { ...state, docs }
 }

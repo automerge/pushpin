@@ -158,6 +158,13 @@ export function documentUpdated(state, { docId, doc }) {
     default:
       break
   }
+
+  const cardDocIds = state.board && state.board.cards ? Object.values(state.board.cards).map(c => c.docId) : []
+  if (cardDocIds.includes(docId)) {
+    const newDocs = { ...state.docs, [docId]: doc }
+    return { ...state, docs: newDocs }
+  }
+
   const contactIds = state.workspace && state.workspace.contactIds ?
     state.workspace.contactIds : []
   if (contactIds.includes(docId)) {
