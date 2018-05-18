@@ -98,6 +98,10 @@ export default class Share extends React.PureComponent {
     )
   }
 
+  acceptNotification(notification) {
+    Loop.dispatch(Model.openAndRequestBoard, { docId: notification.board.docId })
+  }
+
   renderNotifications() {
     const notifications = this.props.notifications.map(notification => {
       return (
@@ -110,7 +114,7 @@ export default class Share extends React.PureComponent {
             <div
               role="button"
               className="Notification__actions__view"
-              onClick={e => alert(`View ${notification.board.title}`)}
+              onClick={e => this.acceptNotification(notification)}
             >
               <i className="fa fa-arrow-right" /> View
             </div>

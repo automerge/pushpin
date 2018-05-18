@@ -671,7 +671,7 @@ export function documentReady(state, { docId, doc }) {
   if (state.workspace.offeredIds.map(o => o.offeredId).includes(docId)) {
     const offeredDocs = state.offeredDocs || {}
     offeredDocs[docId] = doc
-    return { ...state, offeredDocs }
+    state = { ...state, offeredDocs }
   }
 
   if (state.workspace.boardId === docId) {
@@ -744,6 +744,14 @@ export function formChanged(state, { docId }) {
 export function formSubmitted(state) {
   Loop.dispatch(openDocument, { docId: state.formDocId })
   Loop.dispatch(updateWorkspaceRequestedBoardId, { boardId: state.formDocId })
+
+  // this is a senseless expansion, but i'm keeping it for consistency
+  return state
+}
+
+export function openAndRequestBoard(state, { docId }) {
+  Loop.dispatch(openDocument, { docId })
+  Loop.dispatch(updateWorkspaceRequestedBoardId, { boardId: docId })
 
   // this is a senseless expansion, but i'm keeping it for consistency
   return state
