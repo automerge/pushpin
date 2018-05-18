@@ -47,6 +47,11 @@ export const CARD_COLORS = {
   CLOUD: '#e5ebf3',
 }
 
+export const IMAGE_DIALOG_OPTIONS = {
+  properties: ['openFile'],
+  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
+}
+
 const USER = process.env.NAME || 'userA'
 const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')

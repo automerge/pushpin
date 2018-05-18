@@ -19,6 +19,9 @@ export default class TitleBar extends React.PureComponent {
     requestedDocId: PropTypes.string.isRequired,
     board: PropTypes.shape({
       title: PropTypes.string.isRequired
+    }),
+    self: PropTypes.shape({ 
+      name: PropTypes.string.isRequired
     })
   }
 
@@ -127,7 +130,7 @@ export default class TitleBar extends React.PureComponent {
             </div>
           </DropdownTrigger>
           <DropdownContent>
-            <Settings />
+            <Settings name={"Roshan"} />
           </DropdownContent>
         </Dropdown>
       </div>

@@ -43,6 +43,7 @@ export default class App extends React.PureComponent {
           formDocId={this.props.state.formDocId}
           // activeDocId={this.props.state.activeDocId}
           requestedDocId={this.props.state.workspace.boardId}
+          self={this.props.state.self}
         />
       </div>
     )

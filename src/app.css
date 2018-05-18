@@ -54,6 +54,12 @@ table {
   --colorLink: #0645ad;
 }
 
+/* Global */
+
+a {
+  cursor: pointer;
+}
+
 
 /* Dropdown React component functional styles */
 
@@ -83,7 +89,43 @@ body {
 .Settings {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  padding: 0.5em 1em;
+  padding: 0.5em 1em 1.25em;
+}
+
+.Settings__title {
+  text-transform: uppercase;
+  color: var(--colorSecondaryGrey);
+  margin-bottom: 20px;
+}
+
+.Settings h6 {
+  margin-top: 20px;
+}
+
+.Settings input {
+  color: #444;
+  padding: 0 8px;
+  margin: 10px 16px 10px auto;
+  box-sizing: border-box;
+  height: 28px;
+  color: var(--colorSecondaryGrey);
+  width: 100%;
+  font-size: 16px;
+  border-radius: 4px;
+  background: #F3F3F3;
+  border: 0px;
+  outline: none;
+}
+
+.Settings .Avatar, .Settings__setAvatar {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 10px;
+}
+
+.Settings__setAvatar {
+  margin-left: 20px;
+  color: #1e73e7;
 }
 
 .Share {
@@ -99,7 +141,7 @@ body {
 .Share h6 {
   margin-left: 1em;
   font-size: 12px;
-  color: #637389;
+  color: var(--colorSecondaryGrey);
   margin-top: 10px;
 }
 
@@ -135,7 +177,7 @@ body {
 }
 
 .Notification p {
-  color: #637389;
+  color: var(--colorSecondaryGrey);
   font-size: 12px;
 }
 
@@ -153,6 +195,25 @@ body {
   color: #f87060;
   cursor: pointer;
   margin-left: 10px;
+}
+
+.Avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #AAA;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
+}
+
+.Avatar img {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #AAA;
 }
 
 .Contact {
@@ -184,25 +245,6 @@ body {
 .Contact__info {
   margin-left: 10px;
   margin-top: -5px;
-}
-
-.Contact__avatar {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border: 1px solid #AAA;
-  border-radius: 50%;
-  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
-}
-
-.Contact__avatar img {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid #AAA;
 }
 
 .Contact__info__lastSeen {
@@ -332,6 +374,7 @@ insta
   overflow:hidden;
   text-overflow: ellipsis;
 }
+
 input.TitleBar__titleText{
   font-size: 13px;
   color: black;

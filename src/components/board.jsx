@@ -15,11 +15,6 @@ const { dialog } = remote
 const log = Debug('pushpin:board')
 const BOARD_MENU_ID = 'BoardMenu'
 
-const dialogOptions = {
-  properties: ['openFile'],
-  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
-}
-
 const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
          (y >= card.y) &&
@@ -217,7 +212,7 @@ export default class Board extends React.PureComponent {
   onAddImage(e) {
     const x = e.pageX
     const y = e.pageY
-    dialog.showOpenDialog(dialogOptions, (paths) => {
+    dialog.showOpenDialog(Model.IMAGE_DIALOG_OPTIONS, (paths) => {
       // User aborted.
       if (!paths) {
         return
