@@ -87,28 +87,38 @@ body {
 }
 
 .Settings {
+  box-sizing: border-box;
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  padding: 0.5em 1em 1.25em;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 296px;
+  padding-bottom:8px;
 }
 
 .Settings__title {
-  text-transform: uppercase;
+  font-size: 20px;
+  line-height: 24px;
   color: var(--colorSecondaryGrey);
-  margin-bottom: 20px;
 }
 
 .Settings h6 {
-  margin-top: 20px;
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 8px;
+  color: var(--colorBlueBlack);
 }
-
+.Settings .Settings__section {
+  padding: 8px;
+}
 .Settings input {
-  color: #444;
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--colorBlueBlack);
   padding: 0 8px;
-  margin: 10px 16px 10px auto;
   box-sizing: border-box;
-  height: 28px;
-  color: var(--colorSecondaryGrey);
+  height: 32px;
   width: 100%;
   font-size: 16px;
   border-radius: 4px;
@@ -120,11 +130,10 @@ body {
 .Settings .Avatar, .Settings__setAvatar {
   display: inline-block;
   vertical-align: middle;
-  margin-top: 10px;
 }
 
 .Settings__setAvatar {
-  margin-left: 20px;
+  margin-left: 8px;
   color: #1e73e7;
 }
 
