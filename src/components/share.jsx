@@ -21,7 +21,7 @@ export default class Share extends React.PureComponent {
       name: PropTypes.string.isRequired,
       avatar: PropTypes.string.isOptional
     })),
-    notifications: PropTypes.objectOf(PropTypes.shape({
+    notifications: PropTypes.arrayOf(PropTypes.shape({
       type: PropTypes.string.isRequired,
       sender: PropTypes.object.isRequired,
       board: PropTypes.object.isRequired
@@ -31,7 +31,7 @@ export default class Share extends React.PureComponent {
   static defaultProps = {
     authors: {},
     contacts: {},
-    notifications: {}
+    notifications: []
   }
 
   constructor() {
@@ -99,11 +99,9 @@ export default class Share extends React.PureComponent {
   }
 
   renderNotifications() {
-    const notifications = Object.keys(this.props.notifications).map(id => {
-      const notification = this.props.notifications[id]
-
+    const notifications = this.props.notifications.map(notification => {
       return (
-        <div key={id} className="Notification">
+        <div key={notification.sender.name + "-" + notification.board.title} className="Notification">
           <p>You received...</p>
           <h4>{ notification.board.title }</h4>
           <p>From { notification.sender.name }</p>
