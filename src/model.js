@@ -11,6 +11,7 @@ import Loop from './loop'
 import Hypermerge from './hypermerge'
 import * as Hyperfile from './hyperfile'
 import * as Workspace from './workspace'
+import * as Identity from './identity'
 
 const log = Debug('pushpin:model')
 
@@ -53,7 +54,7 @@ export const IMAGE_DIALOG_OPTIONS = {
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
 }
 
-const USER = process.env.NAME || 'userA'
+export const USER = process.env.NAME || 'userA'
 export const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
@@ -464,35 +465,6 @@ export function boardBackspaced(state) {
   return state
 }
 
-export function newIdentity(state) {
-  const identity = state.hm.create()
-  const selfId = state.hm.getId(identity)
-
-  // hmmm. any thoughts on how to do this idiomatically?
-  const newState = Workspace.updateWorkspaceSelf(state, { selfId })
-
-  const nextIdentity = newState.hm.change(identity, (i) => {
-    i.name = `The Mysterious ${USER}`
-    i.docId = selfId
-    i.color = '#4df1c3'
-  })
-
-  return { ...newState, self: nextIdentity }
-}
-
-export function identitySelfNameChange(state, { name }) {
-  const nextIdentity = state.hm.change(state.self, (i) => {
-    i.name = name
-  })
-  return { ...state, self: nextIdentity }
-}
-
-export function identitySelfAvatarChange(state, { avatar }) {
-  const nextIdentity = state.hm.change(state.self, (i) => {
-    i.avatar = avatar
-  })
-  return { ...state, self: nextIdentity }
-}
 
 export function newDocument(state) {
   const doc = state.hm.create()
@@ -506,23 +478,6 @@ export function newDocument(state) {
     ...newState,
     formDocId: boardId
   }
-}
-
-export function identityOfferDocumentToIdentity(state, { identityId, sharedDocId }) {
-  log('identityOfferDocumentToIdentity.start', identityId, sharedDocId)
-  const self = state.hm.change(state.self, (s) => {
-    if (!s.offeredIds) {
-      s.offeredIds = {}
-    }
-
-    if (!s.offeredIds[identityId]) {
-      s.offeredIds[identityId] = []
-    }
-
-    s.offeredIds[identityId].push(sharedDocId)
-  })
-  log('identityOfferDocumentToIdentity.newSelf', self)
-  return { ...state, self }
 }
 
 export function documentReady(state, { docId, doc }) {

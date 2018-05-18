@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import Contact from './contact'
 import Loop from '../loop'
 import * as Model from '../model'
+import * as Identity from '../identity'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
@@ -42,7 +43,7 @@ export default class Share extends React.PureComponent {
 
   handleShare(e, contact) {
     Loop.dispatch(
-      Model.identityOfferDocumentToIdentity,
+      Identity.identityOfferDocumentToIdentity,
       { identityId: contact.docId, sharedDocId: this.props.board.docId }
     )
   }

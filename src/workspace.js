@@ -4,6 +4,7 @@ import Debug from 'debug'
 
 import Loop from './loop'
 import * as Model from './model'
+import * as Identity from './identity'
 
 const log = Debug('pushpin:workspace')
 
@@ -90,7 +91,7 @@ export function newWorkspace(state) {
   })
 
   // should these be synchronous? does it matter?
-  Loop.dispatch(Model.newIdentity)
+  Loop.dispatch(Identity.newIdentity)
   Loop.dispatch(Model.newDocument)
 
   return { ...state, workspace: nextWorkspace }
