@@ -10,6 +10,7 @@ import { EventEmitter } from 'events'
 import Loop from './loop'
 import Hypermerge from './hypermerge'
 import * as Hyperfile from './hyperfile'
+import * as Workspace from './workspace'
 
 const log = Debug('pushpin:model')
 
@@ -53,7 +54,7 @@ export const IMAGE_DIALOG_OPTIONS = {
 }
 
 const USER = process.env.NAME || 'userA'
-const USER_PATH = Path.join('.', 'data', USER)
+export const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
 const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
@@ -184,7 +185,7 @@ export const empty = {
 export function init(state) {
   const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
 
-  const workspaceIdFile = getWorkspaceIdFile()
+  const workspaceIdFile = Workspace.getWorkspaceIdFile()
   const requestedWorkspace = workspaceIdFile.workspaceDocId || ''
 
   hm.once('ready', () => {
@@ -199,57 +200,13 @@ export function init(state) {
     })
 
     if (requestedWorkspace === '') {
-      Loop.dispatch(newWorkspace)
+      Loop.dispatch(Workspace.newWorkspace)
     }
   })
 
   return { ...state, hm, requestedWorkspace }
 }
 
-function workspaceSeeBoardId(state, { docId }) {
-  if (!state.workspace) {
-    log('workspaceSeeBoardId called with no workspace!')
-    // maybe this should be a more violent error
-    return state
-  }
-
-  const workspace = state.hm.change(state.workspace, (workspace) => {
-    let library = state.workspace.seenBoardIds || []
-    const seenDocIndex = library.findIndex(d => d === docId)
-
-    if (Number.isInteger(seenDocIndex)) {
-      library = [docId,
-        ...library.slice(0, seenDocIndex),
-        ...library.slice(seenDocIndex + 1)]
-    } else {
-      library = [docId, ...library]
-    }
-
-    workspace.seenBoardIds = library
-  })
-
-  return { ...state, workspace }
-}
-
-/* The current workspace ID is stored in a JSON file to boot strap the system. */
-function saveWorkspaceId(state, { docId }) {
-  const workspaceIdFile = { workspaceDocId: docId }
-
-  Fs.writeFileSync(workspaceIdFilePath(), JSON.stringify(workspaceIdFile))
-
-  return state
-}
-
-function workspaceIdFilePath() {
-  return Path.join(USER_PATH, 'workspace-id.json')
-}
-
-export function getWorkspaceIdFile() {
-  if (Fs.existsSync(workspaceIdFilePath())) {
-    return JSON.parse(Fs.readFileSync(workspaceIdFilePath()))
-  }
-  return {}
-}
 
 // Process the image at the given path or in the given buffer, creating a new
 // image card at (x, y).
@@ -316,28 +273,6 @@ export function addSelfToAuthors(state) {
   return { ...state, board }
 }
 
-export function addAuthorsToContacts(state) {
-  const incomingContacts = state.board.authorIds
-  const { selfId, contactIds } = state.workspace
-
-  // #accidentallyQuadratic?
-  const oldContactsSet = new Set(contactIds)
-  const addedContacts = incomingContacts.filter(contactId =>
-    (!oldContactsSet.has(contactId) && contactId !== selfId))
-
-  if (addedContacts.length > 0) {
-    const workspace = state.hm.change(state.workspace, (w) => {
-      // this is probably not very conflict avoidey: talk to Martin?
-      w.contactIds.push(...addedContacts)
-    })
-
-    addedContacts.forEach((contactId) => Loop.dispatch(openDocument, { docId: contactId }))
-    return { ...state, workspace }
-  }
-
-  // nothing added, nothing to do
-  return state
-}
 
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
@@ -529,48 +464,12 @@ export function boardBackspaced(state) {
   return state
 }
 
-export function newWorkspace(state) {
-  const workspace = state.hm.create()
-  const docId = state.hm.getId(workspace)
-
-  Loop.dispatch(saveWorkspaceId, { docId })
-
-  const nextWorkspace = state.hm.change(workspace, (ws) => {
-    ws.selfId = ''
-    ws.seenBoardIds = []
-    ws.offeredIds = []
-    ws.contactIds = []
-  })
-
-  // should these be synchronous? does it matter?
-  Loop.dispatch(newIdentity)
-  Loop.dispatch(newDocument)
-
-  return { ...state, workspace: nextWorkspace }
-}
-
-export function updateWorkspaceSelf(state, { selfId }) {
-  const nextWorkspace = state.hm.change(state.workspace, (w) => {
-    w.selfId = selfId
-  })
-
-  return { ...state, workspace: nextWorkspace }
-}
-
-export function updateWorkspaceRequestedBoardId(state, { boardId }) {
-  const nextWorkspace = state.hm.change(state.workspace, (w) => {
-    w.boardId = boardId
-  })
-
-  return { ...state, workspace: nextWorkspace }
-}
-
 export function newIdentity(state) {
   const identity = state.hm.create()
   const selfId = state.hm.getId(identity)
 
   // hmmm. any thoughts on how to do this idiomatically?
-  const newState = updateWorkspaceSelf(state, { selfId })
+  const newState = Workspace.updateWorkspaceSelf(state, { selfId })
 
   const nextIdentity = newState.hm.change(identity, (i) => {
     i.name = `The Mysterious ${USER}`
@@ -600,7 +499,7 @@ export function newDocument(state) {
   const boardId = state.hm.getId(doc)
 
   // hmmm. any thoughts on how to do this idiomatically?
-  const newState = updateWorkspaceRequestedBoardId(state, { boardId })
+  const newState = Workspace.updateWorkspaceRequestedBoardId(state, { boardId })
 
   // refactor in progress: the requestedDocId is now called workspace.boardId
   return {
@@ -624,32 +523,6 @@ export function identityOfferDocumentToIdentity(state, { identityId, sharedDocId
   })
   log('identityOfferDocumentToIdentity.newSelf', self)
   return { ...state, self }
-}
-
-function identityUpdated(state, { contactId }) {
-  log('identityUpdated.start', contactId)
-  if (!(state.contacts && state.contacts[contactId] &&
-        state.contacts[contactId].offeredIds)) {
-    log('identityUpdated.short', state.contacts)
-    return state
-  }
-
-  // we'll iterate changes for each new offer onto the workspace
-  let { workspace } = state
-  const offeredIds = state.contacts[contactId].offeredIds[state.workspace.selfId] || []
-
-  log('identityUpdated.iterate', offeredIds)
-  offeredIds.forEach((offeredId) => {
-    Loop.dispatch(openDocument, { docId: offeredId })
-    workspace = state.hm.change(workspace, (ws) => {
-      const offeredIdsSet = new Set(ws.offeredIds)
-      if (!offeredIdsSet.has(offeredId)) {
-        ws.offeredIds.push({ offeredId, offererId: contactId })
-        Loop.dispatch(openDocument, { docId: offeredId })
-      }
-    })
-  })
-  return { ...state, workspace }
 }
 
 export function documentReady(state, { docId, doc }) {
@@ -697,8 +570,8 @@ export function documentReady(state, { docId, doc }) {
     }
 
     state = addSelfToAuthors(state)
-    state = addAuthorsToContacts(state)
-    state = workspaceSeeBoardId(state, { docId })
+    state = Workspace.addAuthorsToContacts(state)
+    state = Workspace.workspaceSeeBoardId(state, { docId })
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
@@ -719,7 +592,7 @@ export function documentUpdated(state, { docId, doc }) {
       return { ...state, self: doc }
     case (state.workspace.boardId): // same here
       // XXX: horrifying hack -- this didn't trigger at first. why?
-      Loop.dispatch(addAuthorsToContacts)
+      Loop.dispatch(Workspace.addAuthorsToContacts)
       return { ...state, board: doc }
     default:
       break
@@ -727,7 +600,7 @@ export function documentUpdated(state, { docId, doc }) {
   const contactIds = state.workspace && state.workspace.contactIds ?
     state.workspace.contactIds : []
   if (contactIds.includes(docId)) {
-    Loop.dispatch(identityUpdated, { contactId: docId })
+    Loop.dispatch(Workspace.identityUpdated, { contactId: docId })
     return { ...state, contacts: { ...state.contacts, [docId]: doc } }
   }
 
@@ -749,7 +622,7 @@ export function formChanged(state, { docId }) {
 
 export function formSubmitted(state) {
   Loop.dispatch(openDocument, { docId: state.formDocId })
-  Loop.dispatch(updateWorkspaceRequestedBoardId, { boardId: state.formDocId })
+  Loop.dispatch(Workspace.updateWorkspaceRequestedBoardId, { boardId: state.formDocId })
 
   // this is a senseless expansion, but i'm keeping it for consistency
   return state
@@ -757,7 +630,7 @@ export function formSubmitted(state) {
 
 export function openAndRequestBoard(state, { docId }) {
   Loop.dispatch(openDocument, { docId })
-  Loop.dispatch(updateWorkspaceRequestedBoardId, { boardId: docId })
+  Loop.dispatch(Workspace.updateWorkspaceRequestedBoardId, { boardId: docId })
 
   // this is a senseless expansion, but i'm keeping it for consistency
   return state
