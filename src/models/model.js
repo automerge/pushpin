@@ -27,14 +27,12 @@ export const USER = process.env.NAME || 'userA'
 export const USER_PATH = Path.join('.', 'data', USER)
 const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 
-
 // It's normal for a document with a lot of participants to have a lot of
 // connections, so increase the limit to avoid spurious warnings about
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 100
 
 // ## Initial state. Evolved by actions below.
-
 export const empty = {
   formDocId: '',
   selected: [],
@@ -44,9 +42,6 @@ export const empty = {
   contacts: {},
   hm: null
 }
-
-
-// ## Action functions. Evolve loop state and may also re-dispatch subsequent actions.
 
 // Starts IO subsystems and populates associated state.
 export function init(state) {
