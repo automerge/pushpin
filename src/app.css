@@ -64,7 +64,7 @@ a {
 /* Dropdown React component functional styles */
 
 .dropdown {
-  display: inline-block;
+  /* display: inline-block; */
 }
 
 .dropdown__content {
@@ -358,7 +358,7 @@ insta
 .TitleBar {
   position: fixed;
   top: 0px;
-  height: 44px;
+  height: 40px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -369,24 +369,39 @@ insta
 
 
 .TitleBar .dropdown {
-  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width:40px;
+  height:40px;
 }
 
 .TitleBar .dropdown:last-child {
-  margin-right: 10px;
+  margin-right: 8px;
 }
-
+.TitleBar .dropdown__trigger {
+  width:32px;
+  height:32px;
+  border-radius: 16px;
+}
+.TitleBar .dropdown.dropdown--active .dropdown__trigger {
+  background-color: var(--colorPaleGrey);
+}
 .TitleBar .dropdown__trigger .fa {
-  font-size: 20px;
+  color: var(--colorBlueBlack);
+  font-size: 24px;
+  line-height: 30px; /* this is a slight hack */
+  width:32px;
+  text-align: center;
 }
 
 .TitleBar .dropdown__content {
-  top: 55px;
-  right: 10px;
+  top: 52px;
+  right: 12px;
 }
 
 .TitleBar__logo {
-  margin-left: 16px;
+  margin-left: 12px;
   margin-right: 8px;
 }
 
@@ -410,8 +425,7 @@ input.TitleBar__titleText{
 }
 
 .TitleBar__dropDown {
-  opacity: 0.75;
-  font-size: 16px;
+
 }
 
 .HashForm {
