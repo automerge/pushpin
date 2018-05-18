@@ -47,7 +47,7 @@ export const empty = {
 export function init(state) {
   const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
 
-  const requestedWorkspace = Workspace.getBootStrapWorkspaceId() || ''
+  const requestedWorkspace = Workspace.getBootstrapWorkspaceId() || ''
 
   hm.once('ready', () => {
     hm.joinSwarm()

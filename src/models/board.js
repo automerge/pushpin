@@ -99,7 +99,8 @@ export function populateDemoBoard(state) {
 }
 
 // Helper for state.hm.change so that it's easier to insert debugging.
-function changeBoard(state, changeFn) {
+// still used by text-card.js#cardTextChanged (at least)
+export function changeBoard(state, changeFn) {
   return state.hm.change(state.board, changeFn)
 }
 
@@ -169,6 +170,15 @@ export function cardMoved(state, { id, x, y }) {
     card.y = snapY
   })
   return { ...state, board: newBoard }
+}
+
+export function cardResizeHeightRoundingUp(state, { id, width, height }) {
+  const snapHeight = snapMeasureOutwardToGrid(Math.max(height, CARD_MIN_HEIGHT))
+  const board = changeBoard(state, (b) => {
+    const card = b.cards[id]
+    card.height = snapHeight
+  })
+  return { ...state, board }
 }
 
 export function cardResized(state, { id, width, height }) {

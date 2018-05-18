@@ -190,15 +190,16 @@ export default class CodeMirrorEditor extends React.PureComponent {
   checkHeight() {
     const editorHeight = this.editorRef.clientHeight
     const rendererHeight = this.rendererRef.clientHeight
-    const minHeight = Board.CARD_MIN_HEIGHT
-    const neededHeight = Board.snapMeasureOutwardToGrid(Math.max(
+    const neededHeight = Math.max(
       editorHeight,
-      rendererHeight,
-      minHeight
-    ))
+      rendererHeight
+    )
     if (neededHeight !== this.props.cardHeight) {
       log('forceHeight', this.props.cardHeight, editorHeight, rendererHeight, neededHeight)
-      Loop.dispatch(TextCard.cardTextResized, { id: this.props.cardId, height: neededHeight })
+      Loop.dispatch(Board.cardResizeHeightRoundingUp, {
+        id: this.props.cardId,
+        height: neededHeight
+      })
     }
   }
 

@@ -6,7 +6,7 @@ import Loop from '../loop'
 
 // we should make the avatar image a proper ImageCard
 import { IMAGE_DIALOG_OPTIONS } from '../models/image-card'
-import { selfNameChange, updateSelfAvatar } from '../models/identity'
+import * as Identity from '../models/identity'
 
 const { dialog } = remote
 // import Debug from 'debug'
@@ -39,13 +39,13 @@ export default class Settings extends React.PureComponent {
       }
       const path = paths[0]
       // this should create a hyperfile and set the avatar to that, i suppose
-      Loop.dispatch(updateSelfAvatar, { avatar: path })
+      Loop.dispatch(Identity.updateSelfAvatar, { avatar: path })
     })
   }
 
   setName(e) {
     const name = e.target.value
-    Loop.dispatch(selfNameChange, { name })
+    Loop.dispatch(Identity.updateSelfName, { name })
   }
 
   render() {
