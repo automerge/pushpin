@@ -639,6 +639,7 @@ function identityUpdated(state, { contactId }) {
       const offeredIdsSet = new Set(ws.offeredIds)
       if (!offeredIdsSet.has(offeredId)) {
         ws.offeredIds.push({ offeredId, offererId: contactId })
+        Loop.dispatch(openDocument, { docId: offeredId })
       }
     })
   })
@@ -665,6 +666,12 @@ export function documentReady(state, { docId, doc }) {
 
   if (state.workspace.selfId === docId) {
     return { ...state, self: doc }
+  }
+
+  if (state.workspace.offeredIds.map(o => o.offeredId).includes(docId)) {
+    const offeredDocs = state.offeredDocs || {}
+    offeredDocs[docId] = doc
+    return { ...state, offeredDocs }
   }
 
   if (state.workspace.boardId === docId) {
