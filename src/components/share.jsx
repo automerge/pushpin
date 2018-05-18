@@ -130,7 +130,12 @@ export default class Share extends React.PureComponent {
 
     return (
       <div className="Share__notifications">
-        { notifications }
+        { notifications.length > 0 ? notifications :
+        <div className="Share__notifications--empty">
+          Nobody has shared any documents with you.
+          Documents are like love. You have got to give
+          a little to get a little.
+        </div> }
       </div>
     )
   }
@@ -143,6 +148,8 @@ export default class Share extends React.PureComponent {
   render() {
     let body
 
+    // XXX if notifications is empty, let's default to contacts.
+    // NB: i have not implemented this, i'm just leaving a note to myself
     if (this.state.tab === 'contacts') { body = this.renderContacts() } else if (this.state.tab === 'notifications') { body = this.renderNotifications() }
 
     return (

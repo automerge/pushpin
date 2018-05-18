@@ -584,7 +584,13 @@ export function newIdentity(state) {
 export function identitySelfNameChange(state, { name }) {
   const nextIdentity = state.hm.change(state.self, (i) => {
     i.name = name
-    i.color = '#4df1c3'
+  })
+  return { ...state, self: nextIdentity }
+}
+
+export function identitySelfAvatarChange(state, { avatar }) {
+  const nextIdentity = state.hm.change(state.self, (i) => {
+    i.avatar = avatar
   })
   return { ...state, self: nextIdentity }
 }

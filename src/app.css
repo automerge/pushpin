@@ -169,6 +169,12 @@ body {
   padding-bottom: 1px;
 }
 
+.Share__notifications--empty {
+  width: 260px;
+  padding: 12px;
+  color: #637389;
+}
+
 .Notification {
   margin: 1em;
   border: 1px solid #e9edf0;

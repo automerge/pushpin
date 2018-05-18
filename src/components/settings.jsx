@@ -1,17 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { remote } from 'electron'
-import Debug from 'debug'
 
 import Loop from '../loop'
-import { IMAGE_DIALOG_OPTIONS, identitySelfNameChange } from '../model'
+import { IMAGE_DIALOG_OPTIONS, identitySelfNameChange, identitySelfAvatarChange } from '../model'
 
 const { dialog } = remote
-const log = Debug('pushpin:settings')
+// import Debug from 'debug'
+// const log = Debug('pushpin:settings')
 
 export default class Settings extends React.PureComponent {
   static propTypes = {
-    self: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
     avatar: PropTypes.string,
   }
 
@@ -36,7 +36,7 @@ export default class Settings extends React.PureComponent {
       }
       const path = paths[0]
       // this should create a hyperfile and set the avatar to that, i suppose
-      alert(`Set avatar to ${path}`)
+      Loop.dispatch(identitySelfAvatarChange, { avatar: path })
     })
   }
 
