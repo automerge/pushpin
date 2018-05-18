@@ -23,6 +23,7 @@
     "react/no-did-mount-set-state": "off",
     "no-param-reassign": "off",
     "object-curly-newline": "off",
-    "curly": ["error", "all"]
+    "curly": ["error", "all"],
+    "no-underscore-dangle": "off"
   }
 }
