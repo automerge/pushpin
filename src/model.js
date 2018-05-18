@@ -3,12 +3,12 @@ import Fs from 'fs'
 import Path from 'path'
 import Jimp from 'jimp'
 import Automerge from 'automerge'
-import Hypermerge from 'hypermerge'
 import Debug from 'debug'
 import mkdirp from 'mkdirp'
 import { EventEmitter } from 'events'
 
 import Loop from './loop'
+import Hypermerge from './hypermerge'
 import * as Hyperfile from './hyperfile'
 
 const log = Debug('pushpin:model')
