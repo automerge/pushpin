@@ -35,6 +35,9 @@ export default class App extends React.PureComponent {
           backgroundColor={this.props.state.board.backgroundColor}
         />
         <TitleBar
+          // don't do this, this is bad,
+          // but this is just to speed up wiring in the share dialogue
+          state={this.props.state}
           board={this.props.state.board}
           boardBackgroundColor={this.props.state.board.backgroundColor}
           formDocId={this.props.state.formDocId}

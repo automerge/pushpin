@@ -48,6 +48,7 @@ export default class TitleBar extends React.PureComponent {
   render() {
     log('render')
 
+    /*
     const shareData = {
       authors: {
         1: { name: 'Roshan', avatar: '../img/avatar-example.png' },
@@ -62,6 +63,25 @@ export default class TitleBar extends React.PureComponent {
         A: { type: 'Invitation', sender: { name: 'Pvh' }, board: { title: 'Pushpin Demo' } },
         B: { type: 'Invitation', sender: { name: 'Ignatius' }, board: { title: 'Pokemon research' } }
       }
+    }
+    */
+
+    const { state } = this.props
+    let shareData = {
+      authors: {},
+      board: this.props.board,
+      contacts: state.contacts || {},
+      notifications: {
+        A: { type: 'Invitation', sender: { name: 'Pvh' }, board: { title: 'Pushpin Demo' } },
+        B: { type: 'Invitation', sender: { name: 'Ignatius' }, board: { title: 'Pokemon research' } }
+      }
+    }
+
+    // remember to exclude yourself from the authors list (maybe?)
+    if (state.board && state.board.authors) {
+      shareData = { ...shareData,
+        authors: state.board.authors.map((a) =>
+          (state.contacts && state.contacts[a] ? state.contacts[a] : { name: 'ErrNo' })), }
     }
 
     return (

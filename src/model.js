@@ -376,8 +376,10 @@ function populateDemoBoard(state) {
   if (state.board.cards) {
     throw new Error('Should only be called on an empty board')
   }
-
+  // not sure if this is an antipattern
+  const boardDocId = state.hm.getId(state.board)
   const newBoard = changeBoard(state, (b) => {
+    b.docId = boardDocId
     b.cards = {}
     b.authorIds = []
   })
@@ -566,7 +568,7 @@ export function newIdentity(state) {
   const newState = updateWorkspaceSelf(state, { selfId })
 
   const nextIdentity = newState.hm.change(identity, (i) => {
-    i.name = 'Mysterious Stranger'
+    i.name = `The Mysterious ${USER}`
     i.docId = selfId
     i.color = '#4df1c3'
   })
@@ -594,13 +596,6 @@ export function newDocument(state) {
     ...newState,
     formDocId: boardId
   }
-}
-
-export function identityOfferThisDocumentToFirstContact(state) {
-  return identityOfferDocumentToIdentity(state, {
-    identityId: Object.keys(state.contacts)[0],
-    sharedDocId: state.workspace.boardId
-  })
 }
 
 export function identityOfferDocumentToIdentity(state, { identityId, sharedDocId }) {

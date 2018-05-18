@@ -2,17 +2,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Contact from './contact'
+import Loop from '../loop'
+import * as Model from '../model'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
     authors: PropTypes.objectOf(PropTypes.shape({
+      docId: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       avatar: PropTypes.string.isOptional
     })),
     board: PropTypes.shape({
+      docId: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired
     }).isRequired,
     contacts: PropTypes.objectOf(PropTypes.shape({
+      docId: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       avatar: PropTypes.string.isOptional
     })),
@@ -36,7 +41,11 @@ export default class Share extends React.PureComponent {
   }
 
   handleShare(e, contact) {
-    alert(`Share '${this.props.board.title}' with ${contact.name}`)
+    alert(`Share '${this.props.board.title}' with ${contact.name}\n (to: ${contact.docId}, doc: ${board.docId})`)
+    Loop.dispatch(
+      Model.identityOfferDocumentToIdentity,
+      { identityId: contact.docId, sharedDocId: this.props.board.docId }
+    )
   }
 
   handleUnshare(e, contact) {
@@ -101,7 +110,7 @@ export default class Share extends React.PureComponent {
 
           <div className="Notification__actions">
             <div
-              role='button'
+              role="button"
               className="Notification__actions__view"
               onClick={e => alert(`View ${notification.board.title}`)}
             >
