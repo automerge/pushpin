@@ -71,14 +71,21 @@ export default class TitleBar extends React.PureComponent {
 
     const { state } = this.props
 
+    const notifications = []
+    state.workspace.offeredIds.forEach(offer => {
+      const contact = state.contacts[offer.offererId]
+
+      if(state.offeredDocs && state.offeredDocs[offer.offeredId]) {
+        const board = state.offeredDocs[offer.offeredId]
+        notifications.push({ type: "Invitation", sender: contact, board: board })
+      }
+    })
+
     let shareData = {
       authors: {},
       board: this.props.board,
       contacts: state.contacts || {},
-      notifications: {
-        A: { type: 'Invitation', sender: { name: 'Pvh' }, board: { title: 'Pushpin Demo' } },
-        B: { type: 'Invitation', sender: { name: 'Ignatius' }, board: { title: 'Pokemon research' } }
-      }
+      notifications: notifications
     }
 
     // remember to exclude yourself from the authors list (maybe?)
