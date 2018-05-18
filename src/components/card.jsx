@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import Debug from 'debug'
 
 import CodeMirrorEditor from './code-mirror-editor'
-import * as ImageCard from '../image'
+import * as ImageCard from '../image-card'
 
 const log = Debug('pushpin:card')
 

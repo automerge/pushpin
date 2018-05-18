@@ -3,8 +3,8 @@ import Automerge from 'automerge'
 
 import Loop from './loop'
 import * as Workspace from './workspace'
-import * as ImageCard from './image'
-import * as TextCard from './text'
+import * as ImageCard from './image-card'
+import * as TextCard from './text-card'
 
 // Board constants
 

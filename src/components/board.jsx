@@ -9,8 +9,8 @@ import Loop from '../loop'
 import Card from './card'
 import * as BoardModel from '../board'
 import ColorPicker from './color-picker'
-import * as TextCard from '../text'
-import * as ImageCard from '../image'
+import * as TextCard from '../text-card'
+import * as ImageCard from '../image-card'
 
 const { dialog } = remote
 

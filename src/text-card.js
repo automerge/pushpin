@@ -22,7 +22,7 @@ export function cardTextChanged(state, { id, at, removedLength, addedText }) {
 export function cardTextResized(state, { id, height }) {
   const newBoard = Board.changeBoard(state, (b) => {
     const card = b.cards[id]
-    // Ensure  text doesn't stick out of the bottom of card.
+    // Ensure text doesn't stick out of the bottom of card.
     card.height = Board.snapMeasureOutwardToGrid(height)
   })
   return { ...state, board: newBoard }

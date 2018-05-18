@@ -6,7 +6,7 @@ import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 
 import Loop from '../loop'
-import * as TextCard from '../text'
+import * as TextCard from '../text-card'
 import * as Board from '../board'
 
 const log = Debug('pushpin:code-mirror-editor')
