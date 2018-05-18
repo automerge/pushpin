@@ -14,6 +14,7 @@ export default class App extends React.PureComponent {
       // activeDocId: PropTypes.string,
       selected: PropTypes.arrayOf(PropTypes.string),
       workspace: PropTypes.object, // TODO: this should probably be better managed
+      self: PropTypes.object, // TODO: better validation as well?
       board: PropTypes.shape(Board.propTypes),
     }).isRequired
   }

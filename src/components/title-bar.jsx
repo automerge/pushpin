@@ -19,10 +19,11 @@ export default class TitleBar extends React.PureComponent {
     requestedDocId: PropTypes.string.isRequired,
     board: PropTypes.shape({
       title: PropTypes.string.isRequired
-    }),
+    }).isRequired,
     self: PropTypes.shape({
-      name: PropTypes.string.isRequired
-    })
+      name: PropTypes.string.isRequired,
+      avatar: PropTypes.string.isRequired
+    }).isRequired
   }
 
   constructor(props) {
@@ -155,7 +156,12 @@ export default class TitleBar extends React.PureComponent {
             </div>
           </DropdownTrigger>
           <DropdownContent>
-            <Settings name="Roshan" />
+            <Settings
+              name={this.props.self && this.props.self.name ?
+                this.props.self.name : 'Self not loaded'}
+              avatar={this.props.self && this.props.self.avatar ?
+                this.props.self.avatar : '../img/default-avatar.png'}
+            />
           </DropdownContent>
         </Dropdown>
       </div>

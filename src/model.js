@@ -581,7 +581,7 @@ export function newIdentity(state) {
   return { ...newState, self: nextIdentity }
 }
 
-export function identityNameChange(state, { name }) {
+export function identitySelfNameChange(state, { name }) {
   const nextIdentity = state.hm.change(state.self, (i) => {
     i.name = name
     i.color = '#4df1c3'
@@ -709,9 +709,9 @@ export function documentUpdated(state, { docId, doc }) {
     /* we probably need to think about the old activeDocId thing to avoid bugs */
     case (state.requestedWorkspace):
       return { ...state, workspace: doc }
-    case (state.workspace.selfId):
+    case (state.workspace.selfId): // this is a race, since workspace can be null :(
       return { ...state, self: doc }
-    case (state.workspace.boardId):
+    case (state.workspace.boardId): // same here
       // XXX: horrifying hack -- this didn't trigger at first. why?
       Loop.dispatch(addAuthorsToContacts)
       return { ...state, board: doc }
