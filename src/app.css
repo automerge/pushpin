@@ -187,10 +187,11 @@ body {
 }
 
 .Notification {
-  margin: 1em;
+  margin: 8px;
   border: 1px solid #e9edf0;
   border-radius: 4px;
-  padding: 1em;
+  padding: 8px;
+  padding-bottom: 0px;
 }
 
 .Notification p {
@@ -200,18 +201,25 @@ body {
 
 .Notification__actions {
   display: flex;
-  margin-top: 10px;
+  padding: 4px 0px;
+}
+.Notification__actions .fa {
+  font-size: 16px; line-height: 32px;
+  margin-right: 2px;
 }
 
 .Notification__actions__view {
   color: #1e73e7;
   cursor: pointer;
+  margin-right:8px;
+  line-height:32px;
 }
 
 .Notification__actions__archive {
   color: #f87060;
   cursor: pointer;
-  margin-left: 10px;
+  margin-right:8px;
+  line-height:32px;
 }
 
 .Avatar {
@@ -241,6 +249,7 @@ body {
 
 .Contact .fa {
   visibility: hidden;
+  padding: 4px;
 }
 
 .Contact:hover .fa {
@@ -260,8 +269,7 @@ body {
 }
 
 .Contact__info {
-  margin-left: 10px;
-  margin-top: -5px;
+  margin-left: 8px;
 }
 
 .Contact__info__lastSeen {
