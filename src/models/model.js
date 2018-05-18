@@ -47,8 +47,7 @@ export const empty = {
 export function init(state) {
   const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
 
-  const workspaceIdFile = Workspace.getWorkspaceIdFile()
-  const requestedWorkspace = workspaceIdFile.workspaceDocId || ''
+  const requestedWorkspace = Workspace.getBootStrapWorkspaceId() || ''
 
   hm.once('ready', () => {
     hm.joinSwarm()
@@ -114,8 +113,11 @@ export function documentReady(state, { docId, doc }) {
     }
 
     state = Board.addSelfToAuthors(state)
-    state = Workspace.addAuthorsToContacts(state)
-    state = Workspace.workspaceSeeBoardId(state, { docId })
+    state = Workspace.updateContactIds(
+      state,
+      { candidateContactIds: state.board.authorIds }
+    )
+    state = Workspace.updateSeenBoardIds(state, { docId })
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
@@ -136,7 +138,7 @@ export function documentUpdated(state, { docId, doc }) {
       return { ...state, self: doc }
     case (state.workspace.boardId): // same here
       // XXX: horrifying hack -- this didn't trigger at first. why?
-      Loop.dispatch(Workspace.addAuthorsToContacts)
+      Loop.dispatch(Workspace.updateAuthorIdsWithContacts)
       return { ...state, board: doc }
     default:
       break
@@ -144,7 +146,7 @@ export function documentUpdated(state, { docId, doc }) {
   const contactIds = state.workspace && state.workspace.contactIds ?
     state.workspace.contactIds : []
   if (contactIds.includes(docId)) {
-    Loop.dispatch(Workspace.identityUpdated, { contactId: docId })
+    Loop.dispatch(Workspace.onIdentityUpdated, { contactId: docId })
     return { ...state, contacts: { ...state.contacts, [docId]: doc } }
   }
 
@@ -166,14 +168,14 @@ export function formChanged(state, { docId }) {
 
 export function formSubmitted(state) {
   Loop.dispatch(openDocument, { docId: state.formDocId })
-  Loop.dispatch(Workspace.updateWorkspaceRequestedBoardId, { boardId: state.formDocId })
+  Loop.dispatch(Workspace.updateBoardId, { boardId: state.formDocId })
 
   return state
 }
 
 export function openAndRequestBoard(state, { docId }) {
   Loop.dispatch(openDocument, { docId })
-  Loop.dispatch(Workspace.updateWorkspaceRequestedBoardId, { boardId: docId })
+  Loop.dispatch(Workspace.updateBoardId, { boardId: docId })
 
   return state
 }

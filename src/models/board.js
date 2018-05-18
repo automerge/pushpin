@@ -33,7 +33,7 @@ export function create(state) {
   const boardId = state.hm.getId(doc)
 
   // hmmm. any thoughts on how to do this idiomatically?
-  const newState = Workspace.updateWorkspaceRequestedBoardId(state, { boardId })
+  const newState = Workspace.updateBoardId(state, { boardId })
 
   // refactor in progress: the requestedDocId is now called workspace.boardId
   return {
@@ -99,8 +99,7 @@ export function populateDemoBoard(state) {
 }
 
 // Helper for state.hm.change so that it's easier to insert debugging.
-// temporarily exported
-export function changeBoard(state, changeFn) {
+function changeBoard(state, changeFn) {
   return state.hm.change(state.board, changeFn)
 }
 
@@ -132,7 +131,7 @@ export function clearSelections(state) {
   return { ...state, selected: [] }
 }
 
-export function boardBackspaced(state) {
+export function deleteSelections(state) {
   // backspace on the board can't erase a single text card
   if (state.selected.length === 1) {
     const card = state.board.cards[state.selected[0]]
@@ -225,6 +224,7 @@ function snapMeasureToGrid(measure) {
   return snapToGrid(measure) + 1
 }
 
+// XXX: stop exporting this
 export function snapMeasureOutwardToGrid(measure) {
   const snapped = snapMeasureToGrid(measure)
   if (snapped >= measure) {

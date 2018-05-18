@@ -16,6 +16,11 @@ const log = Debug('pushpin:image')
 export const USER = process.env.NAME || 'userA'
 export const USER_PATH = Path.join('.', 'data', USER)
 
+export const IMAGE_DIALOG_OPTIONS = {
+  properties: ['openFile'],
+  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
+}
+
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
 
@@ -68,17 +73,14 @@ export function create(state, { x, y, selected, width, height, hyperfile }) {
 }
 
 // Pick a resonable initial display scale for an image of given dimensions.
-export function scaleImage(width, height) {
+function scaleImage(width, height) {
   const scaledWidth = Board.CARD_DEFAULT_WIDTH
   const scaledHeight = height * (scaledWidth / width)
   return [scaledWidth, scaledHeight]
 }
 
-export const IMAGE_DIALOG_OPTIONS = {
-  properties: ['openFile'],
-  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
-}
-
+// TODO: this is probably not an ideal factoring. i wonder if we can register
+// a hyperfile/hypercore protocol to serve up file contents...
 export function fetchImage({ imageId, imageExt, key }, callback) {
   Hyperfile.fetch(HYPERFILE_DATA_PATH, imageId, key, (error, blob) => {
     if (error) {

@@ -29,9 +29,9 @@ export function create(state) {
   return { ...state, workspace: nextWorkspace }
 }
 
-export function workspaceSeeBoardId(state, { docId }) {
+export function updateSeenBoardIds(state, { docId }) {
   if (!state.workspace) {
-    log('workspaceSeeBoardId called with no workspace!')
+    log('updateSeenBoardIdsIfNeeded called with no workspace!')
     // maybe this should be a more violent error
     return state
   }
@@ -54,33 +54,12 @@ export function workspaceSeeBoardId(state, { docId }) {
   return { ...state, workspace }
 }
 
-/* The current workspace ID is stored in a JSON file to boot strap the system. */
-function saveWorkspaceId(state, { docId }) {
-  const workspaceIdFile = { workspaceDocId: docId }
-
-  Fs.writeFileSync(workspaceIdFilePath(), JSON.stringify(workspaceIdFile))
-
-  return state
-}
-
-function workspaceIdFilePath() {
-  return Path.join(Model.USER_PATH, 'workspace-id.json')
-}
-
-export function getWorkspaceIdFile() {
-  if (Fs.existsSync(workspaceIdFilePath())) {
-    return JSON.parse(Fs.readFileSync(workspaceIdFilePath()))
-  }
-  return {}
-}
-
-export function addAuthorsToContacts(state) {
-  const incomingContacts = state.board.authorIds
+export function updateContactIds(state, { candidateContactIds }) {
   const { selfId, contactIds } = state.workspace
 
   // #accidentallyQuadratic?
   const oldContactsSet = new Set(contactIds)
-  const addedContacts = incomingContacts.filter(contactId =>
+  const addedContacts = candidateContactIds.filter(contactId =>
     (!oldContactsSet.has(contactId) && contactId !== selfId))
 
   if (addedContacts.length > 0) {
@@ -97,7 +76,7 @@ export function addAuthorsToContacts(state) {
   return state
 }
 
-export function updateWorkspaceSelf(state, { selfId }) {
+export function updateSelfId(state, { selfId }) {
   const nextWorkspace = state.hm.change(state.workspace, (w) => {
     w.selfId = selfId
   })
@@ -105,16 +84,20 @@ export function updateWorkspaceSelf(state, { selfId }) {
   return { ...state, workspace: nextWorkspace }
 }
 
-export function updateWorkspaceRequestedBoardId(state, { boardId }) {
+export function updateBoardId(state, { boardId }) {
   const nextWorkspace = state.hm.change(state.workspace, (w) => {
     w.boardId = boardId
   })
 
+  // should we be responsbile for opening the new board here? cc//choxi
+
   return { ...state, workspace: nextWorkspace }
 }
 
-// this is really like... workspaceOnIdentityUpdated()
-export function identityUpdated(state, { contactId }) {
+/**
+ * we listen to Identity documents to see if anyone has initiated a share with us
+ */
+export function onIdentityUpdated(state, { contactId }) {
   log('identityUpdated.start', contactId)
   if (!(state.contacts && state.contacts[contactId] &&
         state.contacts[contactId].offeredIds)) {
@@ -138,4 +121,29 @@ export function identityUpdated(state, { contactId }) {
     })
   })
   return { ...state, workspace }
+}
+
+/**
+ * We bootstrap off the workspace ID, and these functions deal with the JSON file for that.
+ */
+function saveWorkspaceId(state, { docId }) {
+  const workspaceIdFile = { workspaceDocId: docId }
+
+  Fs.writeFileSync(workspaceIdFilePath(), JSON.stringify(workspaceIdFile))
+
+  return state
+}
+
+function workspaceIdFilePath() {
+  return Path.join(Model.USER_PATH, 'workspace-id.json')
+}
+
+export function getBootstrapWorkspaceId() {
+  if (Fs.existsSync(workspaceIdFilePath())) {
+    const json = JSON.parse(Fs.readFileSync(workspaceIdFilePath()))
+    if (json.workspaceDocId) {
+      return json.workspaceDocId
+    }
+  }
+  return ''
 }

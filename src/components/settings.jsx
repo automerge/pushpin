@@ -3,8 +3,10 @@ import PropTypes from 'prop-types'
 import { remote } from 'electron'
 
 import Loop from '../loop'
-import { IMAGE_DIALOG_OPTIONS } from '../models/model'
-import { identitySelfNameChange, identitySelfAvatarChange } from '../models/identity'
+
+// we should make the avatar image a proper ImageCard
+import { IMAGE_DIALOG_OPTIONS } from '../models/image-card'
+import { selfNameChange, updateSelfAvatar } from '../models/identity'
 
 const { dialog } = remote
 // import Debug from 'debug'
@@ -37,13 +39,13 @@ export default class Settings extends React.PureComponent {
       }
       const path = paths[0]
       // this should create a hyperfile and set the avatar to that, i suppose
-      Loop.dispatch(identitySelfAvatarChange, { avatar: path })
+      Loop.dispatch(updateSelfAvatar, { avatar: path })
     })
   }
 
   setName(e) {
     const name = e.target.value
-    Loop.dispatch(identitySelfNameChange, { name })
+    Loop.dispatch(selfNameChange, { name })
   }
 
   render() {
