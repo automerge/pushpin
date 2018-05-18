@@ -11,9 +11,10 @@ export default class App extends React.PureComponent {
   static propTypes = {
     state: PropTypes.shape({
       formDocId: PropTypes.string,
-      activeDocId: PropTypes.string,
-      requestedDocId: PropTypes.string,
+      // activeDocId: PropTypes.string,
       selected: PropTypes.arrayOf(PropTypes.string),
+      workspace: PropTypes.object, // TODO: this should probably be better managed
+      self: PropTypes.object, // TODO: better validation as well?
       board: PropTypes.shape(Board.propTypes),
     }).isRequired
   }
@@ -35,11 +36,15 @@ export default class App extends React.PureComponent {
           backgroundColor={this.props.state.board.backgroundColor}
         />
         <TitleBar
-          title={this.props.state.board.title}
+          // don't do this, this is bad,
+          // but this is just to speed up wiring in the share dialogue
+          state={this.props.state}
+          board={this.props.state.board}
           boardBackgroundColor={this.props.state.board.backgroundColor}
           formDocId={this.props.state.formDocId}
-          activeDocId={this.props.state.activeDocId}
-          requestedDocId={this.props.state.requestedDocId}
+          // activeDocId={this.props.state.activeDocId}
+          requestedDocId={this.props.state.workspace.boardId}
+          self={this.props.state.self}
         />
       </div>
     )

@@ -54,11 +54,17 @@ table {
   --colorLink: #0645ad;
 }
 
+/* Global */
+
+a {
+  cursor: pointer;
+}
+
 
 /* Dropdown React component functional styles */
 
 .dropdown {
-  display: inline-block;
+  /* display: inline-block; */
 }
 
 .dropdown__content {
@@ -78,6 +84,217 @@ body {
   font-size: 14px;
   line-height: 20px;
   -webkit-font-smoothing: antialiased;
+}
+
+.Settings {
+  box-sizing: border-box;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+  width: 296px;
+  padding: 4px 0px;
+}
+
+.Settings__title {
+  text-align: center;
+  font-size: 14px;
+  line-height: 28px;
+  color: var(--colorBlueBlack);
+}
+
+.Settings h6 {
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 8px;
+  color: var(--colorBlueBlack);
+}
+.Settings .Settings__section {
+  padding: 4px 8px;
+}
+.Settings input {
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--colorBlueBlack);
+  padding: 0 8px;
+  box-sizing: border-box;
+  height: 32px;
+  width: 100%;
+  border-radius: 4px;
+  background: #F3F3F3;
+  border: 0px;
+  outline: none;
+  margin-bottom:4px;
+}
+.Settings .Settings__avatarGroup {
+  margin-bottom: 8px;
+}
+.Settings .Avatar, .Settings__setAvatar {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.Settings__setAvatar {
+  margin-left: 8px;
+  color: #1e73e7;
+}
+
+.Share {
+  background-color: #ffffff;
+  color: var(--colorBlueBlack);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  width: 296px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.Share__section {
+  border-top: 1px solid #e9edf0;
+  padding: 4px 0px;
+}
+
+.Share h6 {
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height:16px;
+  color: var(--colorSecondaryGrey);
+}
+
+.Share__tabs {
+  display: flex;
+}
+
+.Share__tabs .fa.fa-group {
+  font-size: 16px;
+  margin-right: 4px;
+}
+
+.Share__tabs__tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 16px;
+  flex-grow: 1;
+  text-align: center;
+  background: #f3f3f3;
+  padding: 12px 0;
+  cursor: pointer;
+  color: var(--colorSecondaryGrey);
+}
+
+.Share__tabs__tab--active {
+  background: #ffffff;
+  color: var(--colorBlueBlack);
+}
+
+.Share__notifications {
+}
+
+.Share__notifications--empty {
+  font-size: 14px; line-height: 20px;
+  padding: 16px;
+  color: var(--colorSecondaryGrey);
+  text-align: center;
+}
+
+.Notification {
+  margin: 8px;
+  border: 1px solid #e9edf0;
+  border-radius: 4px;
+  padding: 8px;
+  padding-bottom: 0px;
+}
+
+.Notification p {
+  color: var(--colorSecondaryGrey);
+  font-size: 12px;
+}
+
+.Notification__actions {
+  display: flex;
+  padding: 4px 0px;
+}
+.Notification__actions .fa {
+  font-size: 16px; line-height: 32px;
+  margin-right: 2px;
+}
+
+.Notification__actions__view {
+  color: #1e73e7;
+  cursor: pointer;
+  margin-right:8px;
+  line-height:32px;
+}
+
+.Notification__actions__archive {
+  color: #f87060;
+  cursor: pointer;
+  margin-right:8px;
+  line-height:32px;
+}
+
+.Avatar {
+  box-sizing: border-box;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
+  padding:2px;
+}
+
+.Avatar img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.Contact {
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.Contact .fa {
+  visibility: hidden;
+  padding: 4px;
+}
+
+.Contact:hover .fa {
+  visibility: visible;
+}
+
+.Contact:hover {
+  background: #f3f3f3;
+}
+
+.Contact .fa.fa-ban {
+  color: #f87060;
+}
+
+.Contact .fa.fa-share-alt {
+  color: #1e73e7;
+}
+
+.Contact__info {
+  margin-left: 8px;
+}
+
+.Contact__info__lastSeen {
+  color: #666;
+  font-style: italic;
+}
+
+.Contact__actions {
+  margin-left: auto;
+}
+
+.Contact__actions i.fa {
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
 }
 
 .ContextMenu {
@@ -154,7 +371,7 @@ insta
 .TitleBar {
   position: fixed;
   top: 0px;
-  height: 44px;
+  height: 40px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -163,18 +380,51 @@ insta
   z-index: 3;
 }
 
+
+.TitleBar .dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width:40px;
+  height:40px;
+}
+
+.TitleBar .dropdown:last-child {
+  margin-right: 8px;
+}
+.TitleBar .dropdown__trigger {
+  width:32px;
+  height:32px;
+  border-radius: 16px;
+}
+.TitleBar .dropdown.dropdown--active .dropdown__trigger {
+  background-color: var(--colorPaleGrey);
+}
+.TitleBar .dropdown__trigger .fa {
+  color: var(--colorBlueBlack);
+  font-size: 24px;
+  line-height: 30px; /* this is a slight hack */
+  width:32px;
+  text-align: center;
+}
+
+.TitleBar .dropdown__content {
+  top: 52px;
+  right: 12px;
+}
+
 .TitleBar__logo {
-  margin-left: 16px;
+  margin-left: 12px;
   margin-right: 8px;
 }
 
 .TitleBar__titleText {
-  width: 224px;
   padding: 0px 4px;
   white-space: nowrap;
   overflow:hidden;
   text-overflow: ellipsis;
 }
+
 input.TitleBar__titleText{
   font-size: 13px;
   color: black;
@@ -188,14 +438,11 @@ input.TitleBar__titleText{
 }
 
 .TitleBar__dropDown {
-  opacity: 0.75;
-  font-size: 16px;
+
 }
 
 .HashForm {
-  align-self: right;
-  text-align: center;
-  margin-left: auto;
+  margin: 0 auto;
 }
 
 .HashForm input {
@@ -342,11 +589,16 @@ div.card.image {
   outline: thin dotted;
 }
 
-.CodeMirrorEditor__renderer a:hover, a:active {
+.CodeMirrorEditor__renderer a:hover, .CodeMirrorEditor__renderer a:active {
   outline: 0;
 }
 
-.CodeMirrorEditor__renderer h1, h2, h3, h4, h5, h6 {
+.CodeMirrorEditor__renderer h1,
+.CodeMirrorEditor__renderer h2,
+.CodeMirrorEditor__renderer h3,
+.CodeMirrorEditor__renderer h4,
+.CodeMirrorEditor__renderer h5,
+.CodeMirrorEditor__renderer h6 {
   font-weight: 600;
   color: var(--colorBlueBlack);
   margin-bottom:8px;

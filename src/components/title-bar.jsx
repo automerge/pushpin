@@ -2,19 +2,28 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Loop from '../loop'
 import * as Model from '../model'
 import HashForm from './hash-form'
+import Share from './share'
+import Settings from './settings'
 
 const log = Debug('pushpin:title-bar')
 
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
     formDocId: PropTypes.string.isRequired,
-    activeDocId: PropTypes.string.isRequired,
+    // activeDocId: PropTypes.string.isRequired,
     requestedDocId: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired
+    board: PropTypes.shape({
+      title: PropTypes.string.isRequired
+    }).isRequired,
+    self: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      avatar: PropTypes.string.isRequired
+    }).isRequired
   }
 
   constructor(props) {
@@ -43,6 +52,67 @@ export default class TitleBar extends React.PureComponent {
   render() {
     log('render')
 
+    /*
+    const shareData = {
+      authors: {
+        1: { name: 'Roshan', avatar: '../img/avatar-example.png' },
+        2: { name: 'Peter' }
+      },
+      board: this.props.board,
+      contacts: {
+        3: { name: 'Mark' },
+        4: { name: 'Ignatius' }
+      },
+      notifications: {
+        A: { type: 'Invitation', sender: { name: 'Pvh' }, board: { title: 'Pushpin Demo' } },
+        B: { type: 'Invitation', sender: { name: 'Ignatius' }, board: { title: 'Pokemon research' } }
+      }
+    }
+    */
+
+    const { state } = this.props
+
+    const notifications = []
+    state.workspace.offeredIds.forEach(offer => {
+      const contact = state.contacts[offer.offererId] || { name: `Loading ${offer.offererId}` }
+
+      if (state.offeredDocs && state.offeredDocs[offer.offeredId]) {
+        const board = state.offeredDocs[offer.offeredId]
+        notifications.push({ type: 'Invitation', sender: contact, board })
+      }
+    })
+
+    const filteredContacts = Object.keys(state.contacts || {})
+      .filter(contactId => (!state.board.authorIds.includes(contactId)))
+      .reduce((res, key) => { res[key] = state.contacts[key]; return res }, {})
+
+    const shareData = {
+      authors: {},
+      board: this.props.board,
+      contacts: filteredContacts,
+      notifications
+    }
+
+    // remember to exclude yourself from the authors list (maybe?)
+    if (state.board && state.board.authorIds) {
+      shareData.authors = state.board.authorIds.map((authorId) => {
+        if (state.workspace && state.self && authorId === state.workspace.selfId) {
+          // we're not a "contact", but show us in the authors list if we're there
+          return { name: `You (${state.self.name || 'loading'})` }
+        } else if (state.contacts && state.contacts[authorId]) {
+          // otherwise we should have this contact in our contacts list...
+          return state.contacts[authorId]
+        }
+
+        // and if we don't, make up a stub
+        return { name: 'ErrNo' }
+        /* TODO improve this: really, we want to increase the likelihood of good output here.
+               that means either caching values we want to show in the host document and swapping
+               for newer versions as required or maybe guaranteeing load order better (or both)
+               or perhaps leave out loading values so we don't see bogus data? */
+      })
+    }
+
     return (
       <div className="TitleBar">
         <img
@@ -52,8 +122,9 @@ export default class TitleBar extends React.PureComponent {
           width="28"
           height="28"
         />
+
         <RIEInput
-          value={this.props.title}
+          value={this.props.board.title}
           change={this.onChangeTitle}
           propName="title"
           className="TitleBar__titleText"
@@ -63,9 +134,36 @@ export default class TitleBar extends React.PureComponent {
 
         <HashForm
           formDocId={this.props.formDocId}
-          activeDocId={this.props.activeDocId}
+          // activeDocId={this.props.activeDocId}
           requestedDocId={this.props.requestedDocId}
         />
+
+        <Dropdown>
+          <DropdownTrigger>
+            <div className="TitleBar__dropDown">
+              <i className="fa fa-group" />
+            </div>
+          </DropdownTrigger>
+          <DropdownContent>
+            <Share {...shareData} />
+          </DropdownContent>
+        </Dropdown>
+
+        <Dropdown>
+          <DropdownTrigger>
+            <div className="TitleBar__dropDown">
+              <i className="fa fa-gear" />
+            </div>
+          </DropdownTrigger>
+          <DropdownContent>
+            <Settings
+              name={this.props.self && this.props.self.name ?
+                this.props.self.name : 'Self not loaded'}
+              avatar={this.props.self && this.props.self.avatar ?
+                this.props.self.avatar : '../img/default-avatar.png'}
+            />
+          </DropdownContent>
+        </Dropdown>
       </div>
     )
   }

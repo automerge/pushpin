@@ -47,14 +47,16 @@ export const CARD_COLORS = {
   CLOUD: '#e5ebf3',
 }
 
-const RECENT_DOCS_MAX = 5
+export const IMAGE_DIALOG_OPTIONS = {
+  properties: ['openFile'],
+  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
+}
+
 const USER = process.env.NAME || 'userA'
 const USER_PATH = Path.join('.', 'data', USER)
 const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
 const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
 const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
-const RECENT_DOCS_PATH = Path.join(USER_PATH, 'recent-docs.json')
-
 
 // ## Demo data
 
@@ -157,19 +159,6 @@ export function fetchImage({ imageId, imageExt, key }, callback) {
   })
 }
 
-// Synchronously read from disk and return the list of recent board doc ids.
-function readRecentDocs() {
-  if (Fs.existsSync(RECENT_DOCS_PATH)) {
-    return JSON.parse(Fs.readFileSync(RECENT_DOCS_PATH))
-  }
-  return []
-}
-
-// Synchronously write to disk the list of recent board doc ids.
-function writeRecentDocs(recentDocs) {
-  Fs.writeFileSync(RECENT_DOCS_PATH, JSON.stringify(recentDocs))
-}
-
 // Helper for state.hm.change so that it's easier to insert debugging.
 function changeBoard(state, changeFn) {
   return state.hm.change(state.board, changeFn)
@@ -180,11 +169,12 @@ function changeBoard(state, changeFn) {
 
 export const empty = {
   formDocId: '',
-  activeDocId: '',
-  requestedDocId: '',
   selected: [],
+  workspace: null,
   board: null,
-  hm: null,
+  self: null,
+  contacts: {},
+  hm: null
 }
 
 
@@ -193,8 +183,9 @@ export const empty = {
 // Starts IO subsystems and populates associated state.
 export function init(state) {
   const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
-  const recentDocs = readRecentDocs()
-  const requestedDocId = recentDocs.length > 0 ? recentDocs[0] : state.requestedDocId
+
+  const workspaceIdFile = getWorkspaceIdFile()
+  const requestedWorkspace = workspaceIdFile.workspaceDocId || ''
 
   hm.once('ready', () => {
     hm.joinSwarm()
@@ -207,41 +198,57 @@ export function init(state) {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
 
-    if (requestedDocId === '') {
-      Loop.dispatch(newDocument)
+    if (requestedWorkspace === '') {
+      Loop.dispatch(newWorkspace)
     }
   })
 
-  return { ...state, hm, requestedDocId }
+  return { ...state, hm, requestedWorkspace }
 }
 
-function addRecentDoc(state, { docId }) {
-  let recentDocs = readRecentDocs()
-  const recentDocIndex = recentDocs.findIndex(d => d === docId)
-
-  if (Number.isInteger(recentDocIndex)) {
-    recentDocs = [docId,
-      ...recentDocs.slice(0, recentDocIndex),
-      ...recentDocs.slice(recentDocIndex + 1)]
-  } else {
-    recentDocs = [docId, ...recentDocs]
-    recentDocs = recentDocs.slice(0, RECENT_DOCS_MAX)
+function workspaceSeeBoardId(state, { docId }) {
+  if (!state.workspace) {
+    log('workspaceSeeBoardId called with no workspace!')
+    // maybe this should be a more violent error
+    return state
   }
 
-  writeRecentDocs(recentDocs)
+  const workspace = state.hm.change(state.workspace, (workspace) => {
+    let library = state.workspace.seenBoardIds || []
+    const seenDocIndex = library.findIndex(d => d === docId)
+
+    if (Number.isInteger(seenDocIndex)) {
+      library = [docId,
+        ...library.slice(0, seenDocIndex),
+        ...library.slice(seenDocIndex + 1)]
+    } else {
+      library = [docId, ...library]
+    }
+
+    workspace.seenBoardIds = library
+  })
+
+  return { ...state, workspace }
+}
+
+/* The current workspace ID is stored in a JSON file to boot strap the system. */
+function saveWorkspaceId(state, { docId }) {
+  const workspaceIdFile = { workspaceDocId: docId }
+
+  Fs.writeFileSync(workspaceIdFilePath(), JSON.stringify(workspaceIdFile))
 
   return state
 }
 
-function recentDocsPath() {
-  return Path.join(USER_PATH, 'recent-docs.json')
+function workspaceIdFilePath() {
+  return Path.join(USER_PATH, 'workspace-id.json')
 }
 
-export function getRecentDocs() {
-  if (Fs.existsSync(recentDocsPath())) {
-    return JSON.parse(Fs.readFileSync(recentDocsPath()))
+export function getWorkspaceIdFile() {
+  if (Fs.existsSync(workspaceIdFilePath())) {
+    return JSON.parse(Fs.readFileSync(workspaceIdFilePath()))
   }
-  return []
+  return {}
 }
 
 // Process the image at the given path or in the given buffer, creating a new
@@ -298,6 +305,40 @@ export function setBackgroundColor(state, { backgroundColor }) {
   return { ...state, board: newBoard }
 }
 
+
+export function addSelfToAuthors(state) {
+  if (state.board.authorIds.includes(state.workspace.selfId)) {
+    return state
+  }
+  const board = state.hm.change(state.board, (b) => {
+    b.authorIds = [...b.authorIds, state.workspace.selfId]
+  })
+  return { ...state, board }
+}
+
+export function addAuthorsToContacts(state) {
+  const incomingContacts = state.board.authorIds
+  const { selfId, contactIds } = state.workspace
+
+  // #accidentallyQuadratic?
+  const oldContactsSet = new Set(contactIds)
+  const addedContacts = incomingContacts.filter(contactId =>
+    (!oldContactsSet.has(contactId) && contactId !== selfId))
+
+  if (addedContacts.length > 0) {
+    const workspace = state.hm.change(state.workspace, (w) => {
+      // this is probably not very conflict avoidey: talk to Martin?
+      w.contactIds.push(...addedContacts)
+    })
+
+    addedContacts.forEach((contactId) => Loop.dispatch(openDocument, { docId: contactId }))
+    return { ...state, workspace }
+  }
+
+  // nothing added, nothing to do
+  return state
+}
+
 export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
   const id = uuid()
 
@@ -340,9 +381,12 @@ function populateDemoBoard(state) {
   if (state.board.cards) {
     throw new Error('Should only be called on an empty board')
   }
-
+  // not sure if this is an antipattern
+  const boardDocId = state.hm.getId(state.board)
   const newBoard = changeBoard(state, (b) => {
+    b.docId = boardDocId
     b.cards = {}
+    b.authorIds = []
   })
   let newState = { ...state, board: newBoard }
   newState = cardCreatedText(newState, { x: 1350, y: 100, text: WELCOME_TEXT })
@@ -351,6 +395,8 @@ function populateDemoBoard(state) {
 
   newState = setTitle(newState, { title: 'Example Board' })
   newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
+
+  newState = addSelfToAuthors(newState)
 
   // These will be handled async as they require their own IO.
   Loop.dispatch(processImage, { x: 1750, y: 500, path: KAY_PATH })
@@ -483,43 +529,218 @@ export function boardBackspaced(state) {
   return state
 }
 
+export function newWorkspace(state) {
+  const workspace = state.hm.create()
+  const docId = state.hm.getId(workspace)
+
+  Loop.dispatch(saveWorkspaceId, { docId })
+
+  const nextWorkspace = state.hm.change(workspace, (ws) => {
+    ws.selfId = ''
+    ws.seenBoardIds = []
+    ws.offeredIds = []
+    ws.contactIds = []
+  })
+
+  // should these be synchronous? does it matter?
+  Loop.dispatch(newIdentity)
+  Loop.dispatch(newDocument)
+
+  return { ...state, workspace: nextWorkspace }
+}
+
+export function updateWorkspaceSelf(state, { selfId }) {
+  const nextWorkspace = state.hm.change(state.workspace, (w) => {
+    w.selfId = selfId
+  })
+
+  return { ...state, workspace: nextWorkspace }
+}
+
+export function updateWorkspaceRequestedBoardId(state, { boardId }) {
+  const nextWorkspace = state.hm.change(state.workspace, (w) => {
+    w.boardId = boardId
+  })
+
+  return { ...state, workspace: nextWorkspace }
+}
+
+export function newIdentity(state) {
+  const identity = state.hm.create()
+  const selfId = state.hm.getId(identity)
+
+  // hmmm. any thoughts on how to do this idiomatically?
+  const newState = updateWorkspaceSelf(state, { selfId })
+
+  const nextIdentity = newState.hm.change(identity, (i) => {
+    i.name = `The Mysterious ${USER}`
+    i.docId = selfId
+    i.color = '#4df1c3'
+  })
+
+  return { ...newState, self: nextIdentity }
+}
+
+export function identitySelfNameChange(state, { name }) {
+  const nextIdentity = state.hm.change(state.self, (i) => {
+    i.name = name
+  })
+  return { ...state, self: nextIdentity }
+}
+
+export function identitySelfAvatarChange(state, { avatar }) {
+  const nextIdentity = state.hm.change(state.self, (i) => {
+    i.avatar = avatar
+  })
+  return { ...state, self: nextIdentity }
+}
+
 export function newDocument(state) {
   const doc = state.hm.create()
-  const docId = state.hm.getId(doc)
+  const boardId = state.hm.getId(doc)
 
+  // hmmm. any thoughts on how to do this idiomatically?
+  const newState = updateWorkspaceRequestedBoardId(state, { boardId })
+
+  // refactor in progress: the requestedDocId is now called workspace.boardId
   return {
-    ...state,
-    formDocId: docId,
-    requestedDocId: docId,
+    ...newState,
+    formDocId: boardId
   }
 }
 
-export function documentReady(state, { docId, doc }) {
-  // Case where an existing doc was opened but is no longer requested.
-  if (state.requestedDocId !== docId) {
+export function identityOfferDocumentToIdentity(state, { identityId, sharedDocId }) {
+  log('identityOfferDocumentToIdentity.start', identityId, sharedDocId)
+  const self = state.hm.change(state.self, (s) => {
+    if (!s.offeredIds) {
+      s.offeredIds = {}
+    }
+
+    if (!s.offeredIds[identityId]) {
+      s.offeredIds[identityId] = []
+    }
+
+    s.offeredIds[identityId].push(sharedDocId)
+  })
+  log('identityOfferDocumentToIdentity.newSelf', self)
+  return { ...state, self }
+}
+
+function identityUpdated(state, { contactId }) {
+  log('identityUpdated.start', contactId)
+  if (!(state.contacts && state.contacts[contactId] &&
+        state.contacts[contactId].offeredIds)) {
+    log('identityUpdated.short', state.contacts)
     return state
   }
 
-  // Case where we've created or opened the requested doc.
-  // It may be an unitialized board in which case we need to populate it.
-  state = { ...state,
-    activeDocId: docId,
-    formDocId: docId,
-    board: doc
+  // we'll iterate changes for each new offer onto the workspace
+  let { workspace } = state
+  const offeredIds = state.contacts[contactId].offeredIds[state.workspace.selfId] || []
+
+  log('identityUpdated.iterate', offeredIds)
+  offeredIds.forEach((offeredId) => {
+    Loop.dispatch(openDocument, { docId: offeredId })
+    workspace = state.hm.change(workspace, (ws) => {
+      const offeredIdsSet = new Set(ws.offeredIds)
+      if (!offeredIdsSet.has(offeredId)) {
+        ws.offeredIds.push({ offeredId, offererId: contactId })
+        Loop.dispatch(openDocument, { docId: offeredId })
+      }
+    })
+  })
+  return { ...state, workspace }
+}
+
+export function documentReady(state, { docId, doc }) {
+  if (state.requestedWorkspace === docId) {
+    // TODO: this should be a thing that is listening on the workspace document
+    // xxx: move this into newDocument?
+    Loop.dispatch(openDocument, { docId: doc.boardId })
+    Loop.dispatch(openDocument, { docId: doc.selfId })
+
+    doc.contactIds.forEach((id) => {
+      Loop.dispatch(openDocument, { docId: id })
+    })
+
+    return { ...state, workspace: doc }
   }
-  if (!state.board.cards) {
-    state = populateDemoBoard(state)
+
+  if (!state.workspace) {
+    return state
   }
-  state = addRecentDoc(state, { docId })
+
+  if (state.workspace.selfId === docId) {
+    return { ...state, self: doc }
+  }
+
+  if (state.workspace.offeredIds.map(o => o.offeredId).includes(docId)) {
+    const offeredDocs = state.offeredDocs || {}
+    offeredDocs[docId] = doc
+    state = { ...state, offeredDocs }
+  }
+
+  if (state.workspace.boardId === docId) {
+    // Case where we've created or opened the requested doc.
+    // It may be an unitialized board in which case we need to populate it.
+    // these two properties are not part of the workspace document because they
+    // represent transient application state, not something we save.
+    state = { ...state,
+      formDocId: docId,
+      board: doc
+    }
+
+    if (!state.board.cards) {
+      log('documentReady.populateStart', state)
+      state = populateDemoBoard(state)
+      log('documentReady.populateFinish', state)
+    }
+
+    state = addSelfToAuthors(state)
+    state = addAuthorsToContacts(state)
+    state = workspaceSeeBoardId(state, { docId })
+  }
+
+  const contactIds = state.workspace && state.workspace.contactIds ?
+    state.workspace.contactIds : []
+  if (contactIds.includes(docId)) {
+    return { ...state, contacts: { ...state.contacts, [docId]: doc } }
+  }
 
   return state
 }
 
 export function documentUpdated(state, { docId, doc }) {
-  if (state.activeDocId !== docId) {
-    return state
+  switch (docId) {
+    /* we probably need to think about the old activeDocId thing to avoid bugs */
+    case (state.requestedWorkspace):
+      return { ...state, workspace: doc }
+    case (state.workspace.selfId): // this is a race, since workspace can be null :(
+      return { ...state, self: doc }
+    case (state.workspace.boardId): // same here
+      // XXX: horrifying hack -- this didn't trigger at first. why?
+      Loop.dispatch(addAuthorsToContacts)
+      return { ...state, board: doc }
+    default:
+      break
   }
-  return { ...state, board: doc }
+  const contactIds = state.workspace && state.workspace.contactIds ?
+    state.workspace.contactIds : []
+  if (contactIds.includes(docId)) {
+    Loop.dispatch(identityUpdated, { contactId: docId })
+    return { ...state, contacts: { ...state.contacts, [docId]: doc } }
+  }
+
+  // this won't work with invitations, since presumably they are not yet in your seenBoardIds
+  const seenBoardIds = state.workspace && state.workspace.seenBoardIds ?
+    state.workspace.seenBoardIds : []
+  if (seenBoardIds.includes(docId)) {
+    return { ...state, boards: { ...state.boards, [docId]: doc } }
+  }
+
+  // what's all this, then? how did we get here?
+  log('somehow we loaded a document we know nothing about', docId, doc)
+  return state
 }
 
 export function formChanged(state, { docId }) {
@@ -527,17 +748,33 @@ export function formChanged(state, { docId }) {
 }
 
 export function formSubmitted(state) {
+  Loop.dispatch(openDocument, { docId: state.formDocId })
+  Loop.dispatch(updateWorkspaceRequestedBoardId, { boardId: state.formDocId })
+
+  // this is a senseless expansion, but i'm keeping it for consistency
+  return state
+}
+
+export function openAndRequestBoard(state, { docId }) {
+  Loop.dispatch(openDocument, { docId })
+  Loop.dispatch(updateWorkspaceRequestedBoardId, { boardId: docId })
+
+  // this is a senseless expansion, but i'm keeping it for consistency
+  return state
+}
+
+/* The hypermerge interface is awful. */
+export function openDocument(state, { docId }) {
   // If we've already opened the hypermerge doc,
   // it will not fire a 'document:ready' event if we open it again
   // so we need to find the doc and manually trigger the action
-  if (state.hm.has(state.formDocId)) {
-    const doc = state.hm.find(state.formDocId)
-    const docId = state.formDocId
-
+  if (state.hm.has(docId)) {
+    const doc = state.hm.find(docId)
+    // oh this is probably a race
     Loop.dispatch(documentReady, { doc, docId })
   } else {
-    state.hm.open(state.formDocId)
+    state.hm.open(docId)
   }
 
-  return { ...state, requestedDocId: state.formDocId }
+  return state
 }

@@ -8,6 +8,7 @@
   "scripts": {
     "start": "electron-forge start",
     "start2": "NAME=userA npm start & NAME=userB npm start",
+    "start3": "NAME=userA npm start & NAME=userB npm start & NAME=userC npm start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
