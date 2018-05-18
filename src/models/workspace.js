@@ -68,7 +68,7 @@ export function updateContactIds(state, { candidateContactIds }) {
       w.contactIds.push(...addedContacts)
     })
 
-    addedContacts.forEach((contactId) => Loop.dispatch(Board.openDocument, { docId: contactId }))
+    addedContacts.forEach((contactId) => Loop.dispatch(Model.openDocument, { docId: contactId }))
     return { ...state, workspace }
   }
 
