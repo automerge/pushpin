@@ -70,6 +70,7 @@ export default class TitleBar extends React.PureComponent {
     */
 
     const { state } = this.props
+
     let shareData = {
       authors: {},
       board: this.props.board,
@@ -86,6 +87,25 @@ export default class TitleBar extends React.PureComponent {
         authors: state.board.authors.map((a) =>
           (state.contacts && state.contacts[a] ? state.contacts[a] : { name: 'ErrNo' })), }
     }
+
+    // This line totally doesn't work but is directionally correct.
+    /*
+    if (state.workspace && state.workspace.offeredIds) {
+      shareData.notifications = { ...state.workspace.offeredIds.map((offer, idx) => ([idx,
+        { type: 'Invitation',
+          sender: {
+            name: state.contacts && state.contacts[offer.offerrerId] ?
+              state.contacts[offer.offererId].name : offer.offererId
+          },
+          board: {
+            title: state.boards && state.boards[offer.offeredId] ?
+              state.boards[offer.offeredId].title : 'Title Not Loaded',
+            docId: state.boards && state.boards[offer.offeredId] ?
+              state.boards[offer.offeredId].docId : offer.offeredId
+          }
+        }])) }
+    }
+    */
 
     return (
       <div className="TitleBar">
