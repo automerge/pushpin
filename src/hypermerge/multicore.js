@@ -26,14 +26,14 @@ class Multicore extends EventEmitter {
     this._ensureReady()
     log('createFeed', key && key.toString('hex'))
 
+    // Create a key pair if we're making a feed from scratch.
     if (!key) {
-      // create key pair
       const keyPair = crypto.keyPair()
       key = keyPair.publicKey
       opts.secretKey = keyPair.secretKey
     }
-    const dk = Hypercore.discoveryKey(toBuffer(key, 'hex')).toString('hex')
 
+    const dk = Hypercore.discoveryKey(toBuffer(key, 'hex')).toString('hex')
     const { archiver } = this
 
     if (archiver.feeds[dk]) {
