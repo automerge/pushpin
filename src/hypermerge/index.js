@@ -27,7 +27,7 @@ const METADATA = {
  * @param {number} [options.port=0] - port number to listen on
  * @param {object} [defaultMetadata={}] - default metadata that should be written for new docs
  */
-module.exports = class Hypermerge extends EventEmitter {
+class Hypermerge extends EventEmitter {
   constructor({ path, port = 0, immutableApi = false, defaultMetadata = {} }) {
     super()
 
@@ -782,3 +782,5 @@ module.exports = class Hypermerge extends EventEmitter {
     }
   }
 }
+
+module.exports = Hypermerge
