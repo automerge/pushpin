@@ -418,7 +418,7 @@ class Hypermerge extends EventEmitter {
 
   _trackFeed(feed) {
     const actorId = feed.key.toString('hex')
-    log('_trackFeed', feed)
+    log('_trackFeed', actorId)
 
     this.feeds[actorId] = feed
 
