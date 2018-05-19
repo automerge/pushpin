@@ -22,13 +22,13 @@ const METADATA = {
  * Creates a new Hypermerge instance that manages a set of documents.
  * All previously opened documents are automatically re-opened.
  * @param {object} options
- * @param {string} options.path - path to directory used to store hypercores
+ * @param {object} options.storage - config compatible with Hypercore constructor storage param
  * @param {boolean} [options.immutableApi=false] - whether to use Immutable.js Automerge API
  * @param {number} [options.port=0] - port number to listen on
  * @param {object} [defaultMetadata={}] - default metadata that should be written for new docs
  */
 class Hypermerge extends EventEmitter {
-  constructor({ path, port = 0, immutableApi = false, defaultMetadata = {} }) {
+  constructor({ storage, port = 0, immutableApi = false, defaultMetadata = {} }) {
     super()
 
     this.immutableApi = immutableApi
@@ -46,7 +46,7 @@ class Hypermerge extends EventEmitter {
     this.requestedBlocks = {} // docId -> actorId -> blockIndex (exclusive)
 
     this._onMulticoreReady = this._onMulticoreReady.bind(this)
-    this.core = new Multicore(path)
+    this.core = new Multicore(storage)
     this.core.on('ready', this._onMulticoreReady)
   }
 
