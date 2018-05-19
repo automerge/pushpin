@@ -1,52 +1,16 @@
 const { EventEmitter } = require('events')
-const protocol = require('hypercore-protocol')
-const Archiver = require('hypercore-archiver')
-const hypercore = require('hypercore')
+const HypercoreProtocol = require('hypercore-protocol')
+const HypercoreArchiver = require('hypercore-archiver')
+const Hypercore = require('hypercore')
 const crypto = require('hypercore/lib/crypto')
 const thunky = require('thunky')
 const toBuffer = require('to-buffer')
-
-// Monkey-patch hypercore-archiver so we can create a Hypercore
-// directly in the archive
-
-Archiver.prototype.createFeed = function createFeed(key, opts) {
-  const self = this
-  opts = opts || {}
-  if (!key) {
-    // create key pair
-    const keyPair = crypto.keyPair()
-    key = keyPair.publicKey
-    opts.secretKey = keyPair.secretKey
-  }
-  const dk = hypercore.discoveryKey(toBuffer(key, 'hex')).toString('hex')
-
-  if (this.feeds[dk]) {
-    return this.feeds[dk]
-  }
-
-  opts.sparse = this.sparse
-  const feed = hypercore(storage(key), key, opts)
-  this.feeds[dk] = feed
-
-  this.changes.append({ type: 'add', key: key.toString('hex') })
-  this.emit('add', feed)
-
-  return feed
-
-  // copied from hypercore-archiver.prototype._add()
-  function storage(key) {
-    const dk = hypercore.discoveryKey(key).toString('hex')
-    const prefix = `${dk.slice(0, 2)}/${dk.slice(2, 4)}/${dk.slice(4)}/`
-
-    return (name) => self.storage.feeds(prefix + name)
-  }
-}
 
 class Multicore extends EventEmitter {
   constructor(storage, opts) {
     super()
     opts = opts || {}
-    this.archiver = new Archiver(storage)
+    this.archiver = new HypercoreArchiver(storage)
     this.ready = thunky(open)
     const self = this
 
@@ -63,7 +27,35 @@ class Multicore extends EventEmitter {
     if (!this.opened) {
       throw new Error('multicore not ready, use .ready()')
     }
-    return this.archiver.createFeed(key, opts)
+    const archiver = this.archiver
+    opts = opts || {}
+    if (!key) {
+      // create key pair
+      const keyPair = crypto.keyPair()
+      key = keyPair.publicKey
+      opts.secretKey = keyPair.secretKey
+    }
+    const dk = Hypercore.discoveryKey(toBuffer(key, 'hex')).toString('hex')
+
+    if (archiver.feeds[dk]) {
+      return archiver.feeds[dk]
+    }
+
+    opts.sparse = archiver.sparse
+    const feed = Hypercore(storage(key), key, opts)
+    archiver.feeds[dk] = feed
+
+    archiver.changes.append({ type: 'add', key: key.toString('hex') })
+    archiver.emit('add', feed)
+
+    return feed
+
+    function storage(key) {
+      const dk = Hypercore.discoveryKey(key).toString('hex')
+      const prefix = `${dk.slice(0, 2)}/${dk.slice(2, 4)}/${dk.slice(4)}/`
+
+      return (name) => archiver.storage.feeds(prefix + name)
+    }
   }
 
   replicate(opts) {
@@ -76,12 +68,12 @@ class Multicore extends EventEmitter {
     }
 
     if (opts.key) {
-      opts.discoveryKey = hypercore.discoveryKey(toBuffer(opts.key, 'hex'))
+      opts.discoveryKey = Hypercore.discoveryKey(toBuffer(opts.key, 'hex'))
     }
 
     const { archiver } = this
 
-    const stream = protocol({
+    const stream = HypercoreProtocol({
       live: true,
       id: archiver.changes.id,
       encrypt: opts.encrypt,
