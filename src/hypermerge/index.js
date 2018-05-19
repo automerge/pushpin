@@ -259,16 +259,6 @@ module.exports = class Hypermerge extends EventEmitter {
     return this._feed(actorId).opened
   }
 
-  /**
-   * Returns `true` if the document specified by `docId` is missing changes
-   * from other actors. They may still be downloading from the network.
-   */
-  _isMissingDeps(docId) {
-    log('_isMissingDeps', docId)
-    const deps = Automerge.getMissingDeps(this.find(docId))
-    return !!Object.keys(deps).length
-  }
-
   empty(actorId) {
     return this.immutableApi
       ? Automerge.initImmutable(actorId)
@@ -632,7 +622,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
     this.set(doc)
 
-    if (this.readyIndex[docId] && !this._isMissingDeps(docId)) {
+    if (this.readyIndex[docId]) {
       const pDoc = this.pDocs[docId]
 
       this.pDocs[docId] = doc
