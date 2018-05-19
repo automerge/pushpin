@@ -7,6 +7,13 @@ const Debug = require('debug')
 
 const log = Debug('hypermerge:index')
 
+// TODO: basic model
+// actorId
+// docId
+// feedId
+// groupId
+// docId == actorId for writable
+
 // The first block is used for metadata.
 const START_BLOCK = 1
 const METADATA = {
@@ -246,7 +253,9 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
-   * Is the hypercore writable?
+   * Returns true if the Hypercore corresponding to the given actorId is
+   * writable. For each doc managed by hypermerge we should have one Hypercore
+   * that we created and that's writable by us. The others will not be.
    *
    * @param {string} actorId - actor id
    * @returns {boolean}
@@ -457,6 +466,11 @@ class Hypermerge extends EventEmitter {
     this._create({ docId }, parentMetadata)
   }
 
+  // Initialize in-memory data structures corresponding to the feeds we already
+  // know about. Sets metadata for each feed, and creates and empty doc
+  // corresponding to each Hypermerge doc. These docs will later be updated in
+  // memory as we load changes from the corresponding Hypercores from disk and
+  // network.
   _initFeeds(actorIds) {
     log('_initFeeds')
     const promises = actorIds.map((actorId) => {
