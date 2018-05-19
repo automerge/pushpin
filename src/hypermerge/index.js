@@ -2,7 +2,7 @@ const EventEmitter = require('events')
 const Automerge = require('automerge')
 const Multicore = require('./multicore')
 const discoverySwarm = require('discovery-swarm')
-const swarmDefaults = require('datland-swarm-defaults')
+const swarmDefaults = require('dat-swarm-defaults')
 const Debug = require('debug')
 
 const log = Debug('hypermerge:index')
@@ -485,8 +485,8 @@ class Hypermerge extends EventEmitter {
           if (this.isWritable(actorId)) {
             this.docs[docId] = this.empty(actorId)
           }
+          return actorId
         })
-        .then(() => actorId)
     })
     return Promise.all(promises)
   }
