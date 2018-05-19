@@ -317,6 +317,12 @@ class Hypermerge extends EventEmitter {
     return this.core.createFeed(key)
   }
 
+  // Finds or creates, and returns, a tracked feed.
+  // There are three cases:
+  // * `actorId` is not given, and we create a new feed with a random actorId.
+  // * `actorId` is given but we don't have a feed yet because we just found
+  //   out about it from another user - create the feed with the given actorId.
+  // * `actorId` is given and we know of the feed already - return from cache.
   feed(actorId = null) {
     this._ensureReady()
 
@@ -385,6 +391,8 @@ class Hypermerge extends EventEmitter {
     return this._append(actorId, metadata)
   }
 
+  // App the given `change` to feed for `actorId`. Returns a promise that
+  // resolves with no value on completion, or rejects with an error if one occurs.
   _append(actorId, change) {
     log('_append', actorId)
     return this._appendAll(actorId, [change])
@@ -468,9 +476,11 @@ class Hypermerge extends EventEmitter {
 
   // Initialize in-memory data structures corresponding to the feeds we already
   // know about. Sets metadata for each feed, and creates and empty doc
-  // corresponding to each Hypermerge doc. These docs will later be updated in
-  // memory as we load changes from the corresponding Hypercores from disk and
-  // network.
+  // corresponding to each Hypermerge doc. These docs will later (not here) be
+  // updated in memory as we load changes from the corresponding Hypercores
+  // from disk and network.
+  //
+  // Returns a promise that resolves when all this work is complete.
   _initFeeds(actorIds) {
     log('_initFeeds')
     const promises = actorIds.map((actorId) => {
@@ -485,7 +495,6 @@ class Hypermerge extends EventEmitter {
           if (this.isWritable(actorId)) {
             this.docs[docId] = this.empty(actorId)
           }
-          return actorId
         })
     })
     return Promise.all(promises)
@@ -673,6 +682,7 @@ class Hypermerge extends EventEmitter {
 
   _onMulticoreReady() {
     log('_onMulticoreReady')
+
     const actorIds =
       Object.values(this.core.archiver.feeds)
         .map(feed => feed.key.toString('hex'))
