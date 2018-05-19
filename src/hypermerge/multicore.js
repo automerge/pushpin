@@ -34,24 +34,24 @@ class Multicore extends EventEmitter {
     }
 
     const dk = Hypercore.discoveryKey(toBuffer(key, 'hex')).toString('hex')
-    const { archiver } = this
 
-    if (archiver.feeds[dk]) {
-      return archiver.feeds[dk]
+    if (this.archiver.feeds[dk]) {
+      return this.archiver.feeds[dk]
     }
 
-    opts.sparse = archiver.sparse
+    opts.sparse = this.archiver.sparse
     const feed = Hypercore(this._feedStorage(key), key, opts)
-    archiver.feeds[dk] = feed
+    this.archiver.feeds[dk] = feed
 
-    archiver.changes.append({ type: 'add', key: key.toString('hex') })
-    archiver.emit('add', feed)
+    this.archiver.changes.append({ type: 'add', key: key.toString('hex') })
+    this.archiver.emit('add', feed)
 
     return feed
   }
 
-  // Returns a RandomAccessStorage function for the given feed key.
-  // Uses git-style ab/cd/* directory spreading.
+  // Returns a RandomAccessStorage function for the given public feed key.
+  // Uses git-style ab/cd/* namespacing and passes that to the underlying
+  // storage function given in the constructor.
   _feedStorage(key) {
     const dk = Hypercore.discoveryKey(key).toString('hex')
     const prefix = `${dk.slice(0, 2)}/${dk.slice(2, 4)}/${dk.slice(4)}/`
