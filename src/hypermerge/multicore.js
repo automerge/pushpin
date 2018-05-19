@@ -10,29 +10,24 @@ const Debug = require('debug')
 const log = Debug('hypermerge:multicore')
 
 class Multicore extends EventEmitter {
-  constructor(storage, opts) {
+  constructor(storage) {
     super()
     log('constructor', storage)
 
-    opts = opts || {}
     this.archiver = new HypercoreArchiver(storage)
-    this.ready = thunky(open)
+    this.isReady = false
     const self = this
-
-    function open(cb) {
-      self.opened = true
-      self.archiver.on('ready', () => {
-        self.emit('ready')
-        cb()
-      })
-    }
+    this.archiver.on('ready', () => {
+      self.isReady = true
+      self.emit('ready')
+    })
   }
 
   createFeed(key, opts) {
-    if (!this.opened) {
-      throw new Error('multicore not ready, use .ready()')
+    if (!this.isReady) {
+      throw new Error('Multicore not yet ready')
     }
-    log('createFeed', key)
+    log('createFeed', key && key.toString('hex'))
 
     const archiver = this.archiver
     opts = opts || {}
@@ -95,80 +90,73 @@ class Multicore extends EventEmitter {
     }
 
     function add(dk) {
-      log('replicate.add', dk)
+      const hex = dk.toString('hex')
+      log('replicate.add', hex)
 
-      archiver.ready((err) => {
-        if (err) {
-          stream.destroy(err)
-          return
-        }
+      if (stream.destroyed) {
+        return
+      }
+
+      const changesHex = archiver.changes.discoveryKey.toString('hex')
+
+      const archive = archiver.archives[hex]
+      if (archive) {
+        onarchive()
+        return
+      }
+
+      const feed = changesHex === hex ? archiver.changes : archiver.feeds[hex]
+      if (feed) {
+        onfeed()
+      }
+
+      function onarchive() {
+        log('replicate.onarchive')
+
+        archive.metadata.replicate({
+          stream,
+          live: true
+        })
+        archive.content.replicate({
+          stream,
+          live: true
+        })
+      }
+
+      function onfeed() {
+        log('replicate.onfeed')
 
         if (stream.destroyed) {
           return
         }
 
-        const hex = dk.toString('hex')
-        const changesHex = archiver.changes.discoveryKey.toString('hex')
+        stream.on('close', onclose)
+        stream.on('end', onclose)
 
-        const archive = archiver.archives[hex]
-        if (archive) {
-          onarchive()
-          return
-        }
+        feed.on('_archive', onarchive)
+        feed.replicate({
+          stream,
+          live: true
+        })
 
-        const feed = changesHex === hex ? archiver.changes : archiver.feeds[hex]
-        if (feed) {
-          onfeed()
+        function onclose() {
+          log('replicate.onclose')
+          feed.removeListener('_archive', onarchive)
         }
 
         function onarchive() {
           log('replicate.onarchive')
-
-          archive.metadata.replicate({
-            stream,
-            live: true
-          })
-          archive.content.replicate({
-            stream,
-            live: true
-          })
-        }
-
-        function onfeed() {
-          log('replicate.onfeed')
-
           if (stream.destroyed) {
             return
           }
 
-          stream.on('close', onclose)
-          stream.on('end', onclose)
-
-          feed.on('_archive', onarchive)
-          feed.replicate({
+          const { content } = archiver.archives[hex]
+          content.replicate({
             stream,
             live: true
           })
-
-          function onclose() {
-            log('replicate.onclose')
-            feed.removeListener('_archive', onarchive)
-          }
-
-          function onarchive() {
-            log('replicate.onarchive')
-            if (stream.destroyed) {
-              return
-            }
-
-            const { content } = archiver.archives[hex]
-            content.replicate({
-              stream,
-              live: true
-            })
-          }
         }
-      })
+      }
     }
 
     return stream

@@ -45,9 +45,9 @@ module.exports = class Hypermerge extends EventEmitter {
     this.metaIndex = {} // actorId -> metadata
     this.requestedBlocks = {} // docId -> actorId -> blockIndex (exclusive)
 
+    this._onMulticoreReady = this._onMulticoreReady.bind(this)
     this.core = new Multicore(path)
-
-    this.core.ready(this._onMulticoreReady())
+    this.core.on('ready', this._onMulticoreReady)
   }
 
   /**
@@ -668,27 +668,25 @@ module.exports = class Hypermerge extends EventEmitter {
   }
 
   _onMulticoreReady() {
-    return () => {
-      log('_onMulticoreReady')
-      const actorIds =
-        Object.values(this.core.archiver.feeds)
-          .map(feed => feed.key.toString('hex'))
+    log('_onMulticoreReady')
+    const actorIds =
+      Object.values(this.core.archiver.feeds)
+        .map(feed => feed.key.toString('hex'))
 
-      this._initFeeds(actorIds)
-        .then(() => {
-          this.isReady = true
-          actorIds.forEach(actorId => this.feed(actorId))
+    this._initFeeds(actorIds)
+      .then(() => {
+        this.isReady = true
+        actorIds.forEach(actorId => this.feed(actorId))
 
-          /**
-           * Emitted when all document metadata has been loaded from storage, and the
-           * Hypermerge instance is ready for use. Documents will continue loading from
-           * storage and the network. Required before `.create()`, `.open()`, etc. can be used.
-           *
-           * @event ready
-           */
-          this.emit('ready')
-        })
-    }
+        /**
+         * Emitted when all document metadata has been loaded from storage, and the
+         * Hypermerge instance is ready for use. Documents will continue loading from
+         * storage and the network. Required before `.create()`, `.open()`, etc. can be used.
+         *
+         * @event ready
+         */
+        this.emit('ready')
+      })
   }
 
   _onDownload(docId, actorId) {
