@@ -307,6 +307,8 @@ class Hypermerge extends EventEmitter {
     return doc._actorId
   }
 
+  // Returns the Immutable.Map vector clock for the given doc, of
+  // actorId => visibleThroughSeq.
   getClock(doc) {
     return doc._state.getIn(['opSet', 'clock'])
   }
