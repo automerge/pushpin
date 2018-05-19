@@ -73,6 +73,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   set(doc) {
     const docId = this.getId(doc)
+    log('set', docId)
     this.docs[docId] = doc
     return doc
   }
@@ -87,6 +88,7 @@ module.exports = class Hypermerge extends EventEmitter {
    */
   open(docId, metadata = null) {
     this._ensureReady()
+    log('open', docId)
 
     if (this.docs[docId]) {
       return
@@ -108,12 +110,14 @@ module.exports = class Hypermerge extends EventEmitter {
    */
   create(metadata = {}) {
     this._ensureReady()
+    log('create')
     return this._create(metadata)
   }
 
   _create(metadata, parentMetadata = {}) {
     const feed = this.feed()
     const actorId = feed.key.toString('hex')
+    log('_create', actorId)
 
     // Merge together the various sources of metadata, from lowest-priority to
     // highest priority.
@@ -139,6 +143,8 @@ module.exports = class Hypermerge extends EventEmitter {
    * Shorthand for `hm.update(Automerge.change(doc, changeFn))`.
    */
   change(doc, message = null, changeFn) {
+    const docId = this.getId(doc)
+    log('change', docId)
     return this.update(Automerge.change(doc, message, changeFn))
   }
 
@@ -154,6 +160,7 @@ module.exports = class Hypermerge extends EventEmitter {
     const actorId = this.getActorId(doc)
     const docId = this.actorToId(actorId)
     const pDoc = this.find(docId)
+    log('update', docId, actorId)
 
     const changes = Automerge.getChanges(pDoc, doc)
       .filter(({ actor }) => actor === actorId)
@@ -176,6 +183,7 @@ module.exports = class Hypermerge extends EventEmitter {
    */
   fork(parentId) {
     this._ensureReady()
+    log('fork', parentId)
 
     const parent = this.find(parentId)
     const doc = this._create({ parentId }, this.metadata(parentId))
@@ -199,6 +207,7 @@ module.exports = class Hypermerge extends EventEmitter {
    */
   merge(destId, sourceId) {
     this._ensureReady()
+    log('merge', destId, sourceId)
 
     const dest = this.find(destId)
     const source = this.find(sourceId)
@@ -217,6 +226,7 @@ module.exports = class Hypermerge extends EventEmitter {
    * @param {string} docId
    */
   delete(docId) {
+    log('delete', docId)
     const doc = this.find(docId)
     this.core.archiver.remove(docId)
     delete this.feeds[docId]
@@ -254,6 +264,7 @@ module.exports = class Hypermerge extends EventEmitter {
    * from other actors. They may still be downloading from the network.
    */
   isMissingDeps(docId) {
+    log('isMissingDeps', docId)
     const deps = Automerge.getMissingDeps(this.find(docId))
     return !!Object.keys(deps).length
   }
@@ -303,6 +314,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _feed(actorId = null) {
     const key = actorId ? Buffer.from(actorId, 'hex') : null
+    log('_feed', actorId)
     return this.core.createFeed(key)
   }
 
@@ -313,6 +325,7 @@ module.exports = class Hypermerge extends EventEmitter {
       return this.feeds[actorId]
     }
 
+    log('feed.init', actorId)
     return this._trackFeed(this._feed(actorId))
   }
 
@@ -330,6 +343,7 @@ module.exports = class Hypermerge extends EventEmitter {
    */
   joinSwarm(opts = {}) {
     this._ensureReady()
+    log('joinSwarm')
 
     this.swarm = discoverySwarm(swarmDefaults(Object.assign({
       port: this.port,
@@ -355,8 +369,7 @@ module.exports = class Hypermerge extends EventEmitter {
     this.swarm.listen(this.port)
 
     this.swarm.once('error', err => {
-      log('Swarm error:', err)
-      log('Swarm re-listening')
+      log('joinSwarm.error', err)
       this.swarm.listen()
     })
 
@@ -374,12 +387,14 @@ module.exports = class Hypermerge extends EventEmitter {
   }
 
   _append(actorId, change) {
+    log('_append', actorId)
     return this._appendAll(actorId, [change])
   }
 
   // Append all given `changes` to feed for `actorId`. Returns a promise that
   // resolves with no value on completion, or rejects with an error if one occurs.
   _appendAll(actorId, changes) {
+    log('_appendAll', actorId)
     const blocks = changes.map(change => JSON.stringify(change))
     return new Promise((resolve, reject) => {
       this.feed(actorId).append(blocks, (err) => {
@@ -394,6 +409,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _trackFeed(feed) {
     const actorId = feed.key.toString('hex')
+    log('_trackFeed', feed)
 
     this.feeds[actorId] = feed
 
@@ -407,6 +423,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _onFeedReady(actorId, feed) {
     return () => {
+      log('_onFeedReady', actorId)
       this._loadMetadata(actorId)
         .then(() => {
           const docId = this.actorToId(actorId)
@@ -451,10 +468,11 @@ module.exports = class Hypermerge extends EventEmitter {
   }
 
   _initFeeds(actorIds) {
+    log('_initFeeds')
     const promises = actorIds.map((actorId) => {
       // Don't load metadata if the feed is empty.
       if (this.length(actorId) === 0) {
-        log('skipping feed init', actorId)
+        log('_initFeeds.skipEmpty', actorId)
         return Promise.resolve(null)
       }
 
@@ -508,18 +526,21 @@ module.exports = class Hypermerge extends EventEmitter {
   }
 
   _loadAllBlocks(actorId) {
+    log('_loadAllBlocks', actorId)
     return this._loadOwnBlocks(actorId)
       .then(() => this._loadMissingBlocks(actorId))
   }
 
   _loadOwnBlocks(actorId) {
     const docId = this.actorToId(actorId)
+    log('_loadOwnBlocks', docId, actorId)
 
     return this._loadBlocks(docId, actorId, this.length(actorId))
   }
 
   _loadMissingBlocks(actorId) {
     const docId = this.actorToId(actorId)
+    log('_loadMissingBlocks', docId, actorId)
 
     if (docId !== actorId) {
       return Promise.resolve()
@@ -535,6 +556,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _loadBlocks(docId, actorId, last) {
     const first = this._maxRequested(docId, actorId, last)
+    log('_loadBlocks', docId, actorId, first, last)
 
     // Stop requesting if done.
     if (first >= last) {
@@ -548,17 +570,20 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _getBlockRange(actorId, first, last) {
     const length = Math.max(0, last - first)
+    log('_getBlockRange', actorId, first, last)
 
     return Promise.all(Array(length).fill().map((_, i) =>
       this._getBlock(actorId, first + i)))
   }
 
   _getBlock(actorId, index) {
+    log('_getBlock.start', actorId, index)
     return new Promise((resolve, reject) => {
       this.feed(actorId).get(index, (err, data) => {
         if (err) {
           reject(err)
         } else {
+          log('_getBlock.resolve', actorId, index)
           resolve(data)
         }
       })
@@ -566,14 +591,17 @@ module.exports = class Hypermerge extends EventEmitter {
   }
 
   _applyBlock(docId, block) {
+    log('_applyBlock', docId)
     return this._applyBlocks(docId, [block])
   }
 
   _applyBlocks(docId, blocks) {
+    log('_applyBlocks', docId)
     return this._applyChanges(docId, blocks.map(block => JSON.parse(block)))
   }
 
   _applyChanges(docId, changes) {
+    log('_applyChanges', docId)
     return changes.length > 0
       ? this._setRemote(Automerge.applyChanges(this.find(docId), changes))
       : this.find(docId)
@@ -600,6 +628,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _setRemote(doc) {
     const docId = this.getId(doc)
+    log('_setRemote', docId)
 
     this.set(doc)
 
@@ -640,6 +669,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _onMulticoreReady() {
     return () => {
+      log('_onMulticoreReady')
       const actorIds =
         Object.values(this.core.archiver.feeds)
           .map(feed => feed.key.toString('hex'))
@@ -663,6 +693,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _onDownload(docId, actorId) {
     return (index, data) => {
+      log('_onDownload', docId, actorId, index)
       this._applyBlock(docId, data)
       this._loadMissingBlocks(docId)
     }
@@ -743,6 +774,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _emitReady(docId) {
     const doc = this.find(docId)
+    log('_emitReady', docId)
     this.pDocs[docId] = doc
 
     /**
