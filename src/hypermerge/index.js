@@ -18,8 +18,6 @@ const METADATA = {
  * @typedef {object} Document
  */
 
-// TODO: `path` should be something like `storage`.
-
 /**
  * Creates a new Hypermerge instance that manages a set of documents.
  * All previously opened documents are automatically re-opened.
@@ -117,7 +115,8 @@ module.exports = class Hypermerge extends EventEmitter {
     const feed = this.feed()
     const actorId = feed.key.toString('hex')
 
-    // TODO this is a little wacky:
+    // Merge together the various sources of metadata, from lowest-priority to
+    // highest priority.
     metadata = Object.assign(
       {},
       METADATA,
@@ -325,8 +324,6 @@ module.exports = class Hypermerge extends EventEmitter {
     return this.core.replicate(opts)
   }
 
-  // TODO: should be automatic?
-
   /**
    * Joins the network swarm for all documents managed by this Hypermerge instance.
    * Must be called after `'ready'` has been emitted. `opts` are passed to discovery-swarm.
@@ -444,15 +441,12 @@ module.exports = class Hypermerge extends EventEmitter {
       return
     }
 
-    // TODO extra, empty hypercores are still being created
-
     if (this.isWritable(actorId)) {
       this.docs[docId] = this.empty(actorId)
     }
 
     const parentMetadata = this.metadata(actorId)
 
-    // TODO might need an empty commit to be included in other vector clocks:
     this._create({ docId }, parentMetadata)
   }
 
@@ -609,7 +603,6 @@ module.exports = class Hypermerge extends EventEmitter {
 
     this.set(doc)
 
-    // TODO: Need to remove this isMissingDeps check to prevent race.
     if (this.readyIndex[docId] && !this.isMissingDeps(docId)) {
       const pDoc = this.pDocs[docId]
 
@@ -721,8 +714,6 @@ module.exports = class Hypermerge extends EventEmitter {
         })
     }
   }
-
-  // TODO: what to do about these undocumented events?
 
   _onExtension(actorId, peer) {
     return (name, data) => {
