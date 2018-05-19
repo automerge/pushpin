@@ -8,6 +8,11 @@ const Debug = require('debug')
 
 const log = Debug('hypermerge:multicore')
 
+// Notes:
+// * discovery keys := digest('hypercore', publicKey)
+// * this.archiver.feeds indexed by discovery key, hex string representation
+// * appends change (just adds?) to a feed (where exactly?) for each tracked core
+// * replication??
 class Multicore extends EventEmitter {
   constructor(storage) {
     super()
