@@ -5,10 +5,15 @@ const Hypercore = require('hypercore')
 const crypto = require('hypercore/lib/crypto')
 const thunky = require('thunky')
 const toBuffer = require('to-buffer')
+const Debug = require('debug')
+
+const log = Debug('hypermerge:multicore')
 
 class Multicore extends EventEmitter {
   constructor(storage, opts) {
     super()
+    log('constructor', storage)
+
     opts = opts || {}
     this.archiver = new HypercoreArchiver(storage)
     this.ready = thunky(open)
@@ -27,6 +32,8 @@ class Multicore extends EventEmitter {
     if (!this.opened) {
       throw new Error('multicore not ready, use .ready()')
     }
+    log('createFeed', key)
+
     const archiver = this.archiver
     opts = opts || {}
     if (!key) {
@@ -59,6 +66,8 @@ class Multicore extends EventEmitter {
   }
 
   replicate(opts) {
+    log('replicate')
+
     if (!opts) {
       opts = {}
     }
@@ -86,6 +95,8 @@ class Multicore extends EventEmitter {
     }
 
     function add(dk) {
+      log('replicate.add', dk)
+
       archiver.ready((err) => {
         if (err) {
           stream.destroy(err)
@@ -111,6 +122,8 @@ class Multicore extends EventEmitter {
         }
 
         function onarchive() {
+          log('replicate.onarchive')
+
           archive.metadata.replicate({
             stream,
             live: true
@@ -122,6 +135,8 @@ class Multicore extends EventEmitter {
         }
 
         function onfeed() {
+          log('replicate.onfeed')
+
           if (stream.destroyed) {
             return
           }
@@ -136,10 +151,12 @@ class Multicore extends EventEmitter {
           })
 
           function onclose() {
+            log('replicate.onclose')
             feed.removeListener('_archive', onarchive)
           }
 
           function onarchive() {
+            log('replicate.onarchive')
             if (stream.destroyed) {
               return
             }
