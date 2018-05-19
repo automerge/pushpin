@@ -28,7 +28,7 @@ class Multicore extends EventEmitter {
     }
     log('createFeed', key && key.toString('hex'))
 
-    const archiver = this.archiver
+    const { archiver } = this
     opts = opts || {}
     if (!key) {
       // create key pair
