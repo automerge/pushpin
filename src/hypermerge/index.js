@@ -34,11 +34,11 @@ class Hypermerge extends EventEmitter {
     this.immutableApi = immutableApi
     this.defaultMetadata = defaultMetadata
     this.port = port
+
     this.isReady = false
     this.feeds = {}
     this.pDocs = {} // index of docs previously emitted by `document:updated`
     this.docs = {}
-
     this.readyIndex = {} // docId -> Boolean
     this.groupIndex = {} // groupId -> [actorId]
     this.docIndex = {} // docId -> [actorId]
