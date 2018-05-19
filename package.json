@@ -76,7 +76,6 @@
     "react-rnd": "^7.4.0",
     "react-simple-dropdown": "^3.2.0",
     "riek": "^1.1.0",
-    "thunky": "^1.0.2",
     "to-buffer": "^1.1.0"
   },
   "devDependencies": {

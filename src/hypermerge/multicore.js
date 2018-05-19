@@ -3,7 +3,6 @@ const HypercoreProtocol = require('hypercore-protocol')
 const HypercoreArchiver = require('hypercore-archiver')
 const Hypercore = require('hypercore')
 const crypto = require('hypercore/lib/crypto')
-const thunky = require('thunky')
 const toBuffer = require('to-buffer')
 const Debug = require('debug')
 
