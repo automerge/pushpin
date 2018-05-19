@@ -778,7 +778,7 @@ module.exports = class Hypermerge extends EventEmitter {
 
   _ensureReady() {
     if (!this.isReady) {
-      throw new Error('Hypermerge is not ready yet. Use .once("ready") first.')
+      throw new Error('The Hypermerge instance is not ready yet. Use .on("ready") first.')
     }
   }
 }

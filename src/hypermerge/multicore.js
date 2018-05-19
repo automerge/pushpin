@@ -23,9 +23,7 @@ class Multicore extends EventEmitter {
   }
 
   createFeed(key, opts) {
-    if (!this.isReady) {
-      throw new Error('Multicore not yet ready')
-    }
+    this._ensureReady()
     log('createFeed', key && key.toString('hex'))
 
     const { archiver } = this
@@ -60,6 +58,7 @@ class Multicore extends EventEmitter {
   }
 
   replicate(opts) {
+    this._ensureReady()
     log('replicate')
 
     if (!opts) {
@@ -159,6 +158,12 @@ class Multicore extends EventEmitter {
     }
 
     return stream
+  }
+
+  _ensureReady() {
+    if (!this.isReady) {
+      throw new Error('The HypercoreArchiver instance is not ready yet. Use .on("ready") first.')
+    }
   }
 }
 
