@@ -502,6 +502,10 @@ class Hypermerge extends EventEmitter {
     return Promise.all(promises)
   }
 
+  // Ensures that metadata for the feed corresponding to `actorId` has been
+  // loaded from disk and set in memory. Will only load from disk once as
+  // metadata is immutable.
+  // Returns a Promise resolving to the metadata.
   _loadMetadata(actorId) {
     if (this.metaIndex[actorId]) {
       return Promise.resolve(this.metaIndex[actorId])
@@ -519,6 +523,8 @@ class Hypermerge extends EventEmitter {
       .then(data => this._setMetadata(actorId, JSON.parse(data)))
   }
 
+  // Sets the given `metadata` in memory for the given `actorId`.
+  // Does not write to disk: see `_appendMetadata`.
   _setMetadata(actorId, metadata) {
     if (this.metaIndex[actorId]) {
       return this.metaIndex[actorId]
