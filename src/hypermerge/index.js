@@ -628,7 +628,7 @@ class Hypermerge extends EventEmitter {
     if (changes.length > 0) {
       const oldDoc = this.find(docId)
       const newDoc = Automerge.applyChanges(oldDoc, changes)
-      this._setRemote(newDoc)
+      this._setRemote(docId, newDoc)
     }
   }
 
@@ -660,12 +660,13 @@ class Hypermerge extends EventEmitter {
     this.docs[docId] = doc
   }
 
-  _setRemote(doc) {
-    const docId = this.getId(doc)
+  // Updates our register of Automerge docs, setting `docId` to point to the
+  // given `doc`. Will emit `document:updated` (if the doc is ready), so
+  // appropriate for updates to the doc due to remote sources.
+  _setRemote(docId, doc) {
     log('_setRemote', docId)
 
     this._set(docId, doc)
-
     if (this.readyIndex[docId]) {
       /**
        * Emitted when an updated document has been downloaded. Not emitted
