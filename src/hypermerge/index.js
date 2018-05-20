@@ -813,6 +813,8 @@ class Hypermerge extends EventEmitter {
     }
   }
 
+  // Throws an error if the Hypermerge instance isn't ready yet. Call at the top
+  // of any function in which this invariant should be true.
   _ensureReady() {
     if (!this.isReady) {
       throw new Error('The Hypermerge instance is not ready yet. Use .on("ready") first.')
