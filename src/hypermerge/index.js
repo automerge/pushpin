@@ -339,10 +339,6 @@ class Hypermerge extends EventEmitter {
     return this._trackFeed(this._feed(actorId))
   }
 
-  isDocReady(docId) {
-    return this.readyIndex[docId]
-  }
-
   replicate(opts) {
     return this.core.replicate(opts)
   }
