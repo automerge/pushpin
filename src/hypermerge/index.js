@@ -15,8 +15,11 @@ const log = Debug('hypermerge:index')
 // docId == actorId for writable
 // actorId persistent for the same device/user over time, across restarts
 
-// The first block is used for metadata.
+// The first block of each Hypercore feed is used for metadata.
 const START_BLOCK = 1
+
+// One piece of metadata every feed will have indicates that the feed is
+// managed by Hypermerge.
 const METADATA = {
   hypermerge: 1
 }
