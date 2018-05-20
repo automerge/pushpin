@@ -271,6 +271,10 @@ class Hypermerge extends EventEmitter {
     return this.metaIndex[actorId]
   }
 
+  /**
+   * Send the given `msg`, which can be any JSON.stringify-able data, to all
+   * peers currently listening on the feed for `actorId`.
+   */
   message(actorId, msg) {
     this._trackedFeed(actorId).peers.forEach(peer => {
       this._messagePeer(peer, msg)
