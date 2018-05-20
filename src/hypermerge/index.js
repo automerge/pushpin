@@ -102,7 +102,7 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
-   * Creates an automerge document backed by a new Hypercore.
+   * Creates an Automerge document backed by a new Hypercore.
    *
    * If metadata is passed, it will be associated with the newly created document.
    * Some metadata properties are assigned automatically by Hypermerge:
@@ -153,7 +153,7 @@ class Hypermerge extends EventEmitter {
 
   /**
    * Finds any new changes for the submitted doc for the actor,
-   * and appends the changes to the actor's hypercore feed.
+   * and appends the changes to the actor's Hypercore feed.
    *
    * @param {Object} doc - document to find changes for
    */
@@ -176,7 +176,7 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
-   * Creates a new actor hypercore feed and automerge document, with
+   * Creates a new actor Hypercore feed and Automerge document, with
    * an empty change that depends on the document for another actor.
    * The metadata of the new document will contain a `parentId` property.
    *
@@ -221,7 +221,7 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
-   * Removes hypercore feed for an actor and automerge doc.
+   * Removes Hypercore feed for an actor and Automerge doc.
    *
    * Leaves the network swarm. Doesn't remove files from disk.
    * @param {string} docId
@@ -438,7 +438,7 @@ class Hypermerge extends EventEmitter {
                * @event document:ready
                *
                * @param {string} docId - the hex id representing this document
-               * @param {Document} document - automerge document
+               * @param {Document} document - Automerge document
                */
               const doc = this.find(docId)
               this.emit('document:ready', docId, doc)
@@ -673,7 +673,7 @@ class Hypermerge extends EventEmitter {
        * @event document:updated
        *
        * @param {string} docId - the hex id representing this document
-       * @param {Document} doc - automerge document
+       * @param {Document} doc - Automerge document
        */
       this.emit('document:updated', docId, doc)
     }
