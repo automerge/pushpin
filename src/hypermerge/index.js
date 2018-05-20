@@ -262,6 +262,9 @@ class Hypermerge extends EventEmitter {
     return actorIds.map(actorId => this.metadata(actorId))
   }
 
+  /**
+  * Returns the metadata object for the given `actorId`.
+  */
   metadata(actorId) {
     return this.metaIndex[actorId]
   }
