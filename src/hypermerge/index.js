@@ -449,17 +449,18 @@ class Hypermerge extends EventEmitter {
               }
 
               this.readyIndex[docId] = true
-              this._emitReady(docId)
+              /**
+               * Emitted when a document has been fully loaded.
+               *
+               * @event document:ready
+               *
+               * @param {string} docId - the hex id representing this document
+               * @param {Document} document - automerge document
+               */
+              const doc = this.find(docId)
+              this.emit('document:ready', docId, doc)
             })
         })
-
-      /**
-       * Emitted when a hypercore feed is ready.
-       *
-       * @event feed:ready
-       * @param {object} feed - hypercore feed
-       */
-      this.emit('feed:ready', feed)
     }
   }
 
@@ -794,21 +795,6 @@ class Hypermerge extends EventEmitter {
       default:
         this.emit('peer:message', actorId, peer, msg)
     }
-  }
-
-  _emitReady(docId) {
-    const doc = this.find(docId)
-    log('_emitReady', docId)
-
-    /**
-     * Emitted when a document has been fully loaded.
-     *
-     * @event document:ready
-     *
-     * @param {string} docId - the hex id representing this document
-     * @param {Document} document - automerge document
-     */
-    this.emit('document:ready', docId, doc)
   }
 
   _ensureReady() {
