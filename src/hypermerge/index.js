@@ -418,6 +418,13 @@ class Hypermerge extends EventEmitter {
     return feed
   }
 
+  // Returns a callback to run when the given `feed`, corresponding to the
+  // given `actorId`, is ready.
+  // Callback will load metadata for the feed, ensure we have an in-memory
+  // doc corresponding to the logical doc of which the feed is a part, set
+  // up download callback, and load & apply all existing blocks in the feed
+  // plus their dependencies. Finally, it will emit `document:ready` when
+  // the doc is indeed ready.
   _onFeedReady(actorId, feed) {
     return () => {
       log('_onFeedReady', actorId)
