@@ -81,13 +81,6 @@ class Hypermerge extends EventEmitter {
     return doc
   }
 
-  set(doc) {
-    const docId = this.getId(doc)
-    log('set', docId)
-    this.docs[docId] = doc
-    return doc
-  }
-
   /**
    * Opens an existing document.
    * Will download the document over the network if `hm.joinSwarm()` was called.
@@ -655,6 +648,13 @@ class Hypermerge extends EventEmitter {
       this.requestedBlocks[docId] = {}
     }
     this.requestedBlocks[docId][actorId] = (this.requestedBlocks[docId][actorId] || START_BLOCK) + x
+  }
+
+  _set(doc) {
+    const docId = this.getId(doc)
+    log('set', docId)
+    this.docs[docId] = doc
+    return doc
   }
 
   _setRemote(doc) {
