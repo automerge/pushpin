@@ -384,14 +384,15 @@ class Hypermerge extends EventEmitter {
     return this
   }
 
+  // Append the given `metadata` for the given `actorId` to the corresponding
+  // feed, and also set that metadata in memory.
   _appendMetadata(actorId, metadata) {
     if (this.length(actorId) > 0) {
       throw new Error('Metadata can only be set if feed is empty.')
     }
 
     this._setMetadata(actorId, metadata)
-
-    return this._append(actorId, metadata)
+    this._append(actorId, metadata)
   }
 
   // App the given `change` to feed for `actorId`. Returns a promise that
