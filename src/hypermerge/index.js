@@ -189,10 +189,10 @@ class Hypermerge extends EventEmitter {
       .filter(({ actor }) => actor === actorId)
 
     this._addToMaxRequested(docId, actorId, changes.length)
-
     this._appendAll(actorId, changes)
+    this._set(docId, doc)
 
-    return this._set(doc)
+    return doc
   }
 
   /**
@@ -293,10 +293,11 @@ class Hypermerge extends EventEmitter {
       { docId: actorId }, // set the docId to this core's actorId by default
       metadata // directly provided metadata should override everything else
     )
+    const docId = metadata.docId
+    const doc = this._empty(actorId)
 
     this._appendMetadata(actorId, metadata)
-
-    const doc = this._set(this._empty(actorId))
+    this._set(docId, doc)
     this._shareDoc(doc)
 
     return doc
@@ -650,18 +651,20 @@ class Hypermerge extends EventEmitter {
     this.requestedBlocks[docId][actorId] = (this.requestedBlocks[docId][actorId] || START_BLOCK) + x
   }
 
-  _set(doc) {
-    const docId = this.getId(doc)
+  // Updates our register of Automerge docs, setting `docId` to point to the
+  // given `doc`. Will not emit `document:updated`, so should only be used
+  // when registering our own updates or by a caller that will themself emit
+  // the event.
+  _set(docId, doc) {
     log('set', docId)
     this.docs[docId] = doc
-    return doc
   }
 
   _setRemote(doc) {
     const docId = this.getId(doc)
     log('_setRemote', docId)
 
-    this._set(doc)
+    this._set(docId, doc)
 
     if (this.readyIndex[docId]) {
       /**
