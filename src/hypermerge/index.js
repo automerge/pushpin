@@ -275,7 +275,8 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
-   * Returns the `docId` for the given `doc`.
+   * Returns the `docId` for the given `doc`. Note that this is id of the logical
+   * doc managed by Hypermerge, and not neccisarily the Automerge doc id.
    */
   getId(doc) {
     return this.actorToId(this.getActorId(doc))
@@ -286,14 +287,9 @@ class Hypermerge extends EventEmitter {
     return docId
   }
 
+  // Returns our own actorId for the given `doc`.
   getActorId(doc) {
     return doc._actorId
-  }
-
-  // Returns the Immutable.Map vector clock for the given doc, of
-  // actorId => visibleThroughSeq.
-  getClock(doc) {
-    return doc._state.getIn(['opSet', 'clock'])
   }
 
   // Finds or creates, and returns, a feed that is not yet tracked. See `feed`
