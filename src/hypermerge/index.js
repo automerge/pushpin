@@ -136,7 +136,7 @@ class Hypermerge extends EventEmitter {
 
     this._appendMetadata(actorId, metadata)
 
-    const doc = this.set(this._empty(actorId))
+    const doc = this._set(this._empty(actorId))
     this._shareDoc(doc)
 
     return doc
@@ -172,7 +172,7 @@ class Hypermerge extends EventEmitter {
 
     this._appendAll(actorId, changes)
 
-    return this.set(doc)
+    return this._set(doc)
   }
 
   /**
@@ -241,20 +241,10 @@ class Hypermerge extends EventEmitter {
     })
   }
 
+  // Returns the number of blocks available for the feed corresponding to the
+  // given `actorId`.
   length(actorId) {
     return this._feed(actorId).length
-  }
-
-  /**
-   * Returns true if the Hypercore corresponding to the given actorId is
-   * writable. For each doc managed by hypermerge we should have one Hypercore
-   * that we created and that's writable by us. The others will not be.
-   *
-   * @param {string} actorId - actor id
-   * @returns {boolean}
-   */
-  isWritable(actorId) {
-    return this._feed(actorId).writable
   }
 
   // Returns an empty Automerge document with the given `actorId`. Used as the
@@ -457,12 +447,24 @@ class Hypermerge extends EventEmitter {
     }
   }
 
+  /**
+   * Returns true if the Hypercore corresponding to the given actorId is
+   * writable. For each doc managed by hypermerge we should have one Hypercore
+   * that we created and that's writable by us. The others will not be.
+   *
+   * @param {string} actorId - actor id
+   * @returns {boolean}
+   */
+  _isWritable(actorId) {
+    return this._feed(actorId).writable
+  }
+
   _createDocIfMissing(docId, actorId) {
     if (this.docs[docId]) {
       return
     }
 
-    if (this.isWritable(actorId)) {
+    if (this._isWritable(actorId)) {
       this.docs[docId] = this._empty(actorId)
     }
 
@@ -489,7 +491,7 @@ class Hypermerge extends EventEmitter {
 
       return this._loadMetadata(actorId)
         .then(({ docId }) => {
-          if (this.isWritable(actorId)) {
+          if (this._isWritable(actorId)) {
             this.docs[docId] = this._empty(actorId)
           }
         })
@@ -661,7 +663,7 @@ class Hypermerge extends EventEmitter {
     const docId = this.getId(doc)
     log('_setRemote', docId)
 
-    this.set(doc)
+    this._set(doc)
 
     if (this.readyIndex[docId]) {
       /**
