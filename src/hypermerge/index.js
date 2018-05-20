@@ -458,14 +458,9 @@ class Hypermerge extends EventEmitter {
     }
   }
 
-  /**
-   * Returns true if the Hypercore corresponding to the given actorId is
-   * writable. For each doc managed by hypermerge we should have one Hypercore
-   * that we created and that's writable by us. The others will not be.
-   *
-   * @param {string} actorId - actor id
-   * @returns {boolean}
-   */
+  // Returns true if the Hypercore corresponding to the given actorId is
+  // writable. For each doc managed by hypermerge we should have one Hypercore
+  // that we created and that's writable by us. The others will not be.
   _isWritable(actorId) {
     return this._feed(actorId).writable
   }
