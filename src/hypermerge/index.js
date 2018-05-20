@@ -261,10 +261,6 @@ class Hypermerge extends EventEmitter {
     return this._feed(actorId).writable
   }
 
-  isOpened(actorId) {
-    return this._feed(actorId).opened
-  }
-
   // Returns an empty Automerge document with the given `actorId`. Used as the
   // starting point for building up an in-memory doc for this process.
   _empty(actorId) {
