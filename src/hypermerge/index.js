@@ -465,6 +465,11 @@ class Hypermerge extends EventEmitter {
     return this._feed(actorId).writable
   }
 
+  // Ensures that we have both an in-memory doc and a feed for the given `docId`.
+  // We pass `actorId` because the in-memory doc should have our `actorId`, and
+  // so we only create it when it's missing and this condition is true. We will
+  // need to create the on-disk feed for `docId` when we have a doc shared with
+  // us from another user.
   _createDocIfMissing(docId, actorId) {
     if (this.docs[docId]) {
       return
