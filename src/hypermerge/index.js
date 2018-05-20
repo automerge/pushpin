@@ -96,9 +96,7 @@ class Hypermerge extends EventEmitter {
     if (this.docs[docId]) {
       return
     }
-
-    // we haven't seen this doc before:
-    this.feed(docId)
+    this._trackedFeed(docId)
   }
 
   /**
@@ -118,7 +116,7 @@ class Hypermerge extends EventEmitter {
   }
 
   _create(metadata, parentMetadata = {}) {
-    const feed = this.feed()
+    const feed = this._trackedFeed()
     const actorId = feed.key.toString('hex')
     log('_create', actorId)
 
@@ -236,7 +234,7 @@ class Hypermerge extends EventEmitter {
   }
 
   message(actorId, msg) {
-    this.feed(actorId).peers.forEach(peer => {
+    this._trackedFeed(actorId).peers.forEach(peer => {
       this._messagePeer(peer, msg)
     })
   }
@@ -308,7 +306,7 @@ class Hypermerge extends EventEmitter {
   // * `actorId` is given but we don't have a feed yet because we just found
   //   out about it from another user - create the feed with the given actorId.
   // * `actorId` is given and we know of the feed already - return from cache.
-  feed(actorId = null) {
+  _trackedFeed(actorId = null) {
     this._ensureReady()
 
     if (actorId && this.feeds[actorId]) {
@@ -386,7 +384,7 @@ class Hypermerge extends EventEmitter {
     log('_appendAll', actorId)
     const blocks = changes.map(change => JSON.stringify(change))
     return new Promise((resolve, reject) => {
-      this.feed(actorId).append(blocks, (err) => {
+      this._trackedFeed(actorId).append(blocks, (err) => {
         if (err) {
           reject(err)
         } else {
@@ -593,7 +591,7 @@ class Hypermerge extends EventEmitter {
   _getBlock(actorId, index) {
     log('_getBlock.start', actorId, index)
     return new Promise((resolve, reject) => {
-      this.feed(actorId).get(index, (err, data) => {
+      this._trackedFeed(actorId).get(index, (err, data) => {
         if (err) {
           reject(err)
         } else {
@@ -701,7 +699,7 @@ class Hypermerge extends EventEmitter {
     this._initFeeds(actorIds)
       .then(() => {
         this.isReady = true
-        actorIds.forEach(actorId => this.feed(actorId))
+        actorIds.forEach(actorId => this._trackedFeed(actorId))
 
         /**
          * Emitted when all document metadata has been loaded from storage, and the
@@ -787,7 +785,7 @@ class Hypermerge extends EventEmitter {
     switch (msg.type) {
       case 'FEEDS_SHARED':
         msg.keys.forEach((actorId) => {
-          this.feed(actorId)
+          this._trackedFeed(actorId)
         })
         break
       default:
