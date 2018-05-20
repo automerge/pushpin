@@ -317,7 +317,7 @@ class Hypermerge extends EventEmitter {
     return this._trackFeed(this._feed(actorId))
   }
 
-  replicate(opts) {
+  _replicate(opts) {
     return this.core.replicate(opts)
   }
 
@@ -333,7 +333,7 @@ class Hypermerge extends EventEmitter {
       port: this.port,
       hash: false,
       encrypt: true,
-      stream: opts => this.replicate(opts)
+      stream: opts => this._replicate(opts)
     }, opts)))
 
     this.swarm.join(this.core.archiver.changes.discoveryKey)
