@@ -13,6 +13,7 @@ const log = Debug('hypermerge:index')
 // feedId
 // groupId
 // docId == actorId for writable
+// actorId persistent for the same device/user over time, across restarts
 
 // The first block is used for metadata.
 const START_BLOCK = 1
@@ -44,7 +45,6 @@ class Hypermerge extends EventEmitter {
 
     this.isReady = false
     this.feeds = {}
-    this.pDocs = {} // index of docs previously emitted by `document:updated`
     this.docs = {}
     this.readyIndex = {} // docId -> Boolean
     this.groupIndex = {} // groupId -> [actorId]
@@ -176,8 +176,6 @@ class Hypermerge extends EventEmitter {
 
     this._appendAll(actorId, changes)
 
-    this.pDocs[docId] = doc
-
     return this.set(doc)
   }
 
@@ -238,7 +236,6 @@ class Hypermerge extends EventEmitter {
     this.core.archiver.remove(docId)
     delete this.feeds[docId]
     delete this.docs[docId]
-    delete this.pDocs[docId]
     return doc
   }
 
@@ -313,13 +310,17 @@ class Hypermerge extends EventEmitter {
     return doc._state.getIn(['opSet', 'clock'])
   }
 
+  // Finds or creates, and returns, a feed that is not yet tracked. See `feed`
+  // for cases for `actorId`.
   _feed(actorId = null) {
     const key = actorId ? Buffer.from(actorId, 'hex') : null
     log('_feed', actorId)
     return this.core.createFeed(key)
   }
 
-  // Finds or creates, and returns, a tracked feed.
+  // Finds or creates, and returns, a tracked feed. This means that updates to
+  // the feed will cause updates to in-memory docs, emit events, etc.
+  //
   // There are three cases:
   // * `actorId` is not given, and we create a new feed with a random actorId.
   // * `actorId` is given but we don't have a feed yet because we just found
@@ -441,7 +442,7 @@ class Hypermerge extends EventEmitter {
 
           feed.on('download', this._onDownload(docId, actorId))
 
-          return this._loadAllBlocks(actorId)
+          return this._loadBlocksWithDependencies(docId, actorId, this.length(actorId))
             .then(() => {
               if (actorId !== docId) {
                 return
@@ -505,7 +506,8 @@ class Hypermerge extends EventEmitter {
   // Ensures that metadata for the feed corresponding to `actorId` has been
   // loaded from disk and set in memory. Will only load from disk once as
   // metadata is immutable.
-  // Returns a Promise resolving to the metadata.
+  //
+  // Returns a promise resolving to the metadata.
   _loadMetadata(actorId) {
     if (this.metaIndex[actorId]) {
       return Promise.resolve(this.metaIndex[actorId])
@@ -546,38 +548,16 @@ class Hypermerge extends EventEmitter {
     return metadata
   }
 
-  _loadAllBlocks(actorId) {
-    log('_loadAllBlocks', actorId)
-    return this._loadOwnBlocks(actorId)
-      .then(() => this._loadMissingBlocks(actorId))
-  }
-
-  _loadOwnBlocks(actorId) {
-    const docId = this.actorToId(actorId)
-    log('_loadOwnBlocks', docId, actorId)
-
-    return this._loadBlocks(docId, actorId, this.length(actorId))
-  }
-
-  _loadMissingBlocks(actorId) {
-    const docId = this.actorToId(actorId)
-    log('_loadMissingBlocks', docId, actorId)
-
-    if (docId !== actorId) {
-      return Promise.resolve()
-    }
-
-    const deps = Automerge.getMissingDeps(this.find(docId))
-
-    return Promise.all(Object.keys(deps).map((actor) => {
-      const last = deps[actor] + 1 // last is exclusive
-      return this._loadBlocks(docId, actor, last)
-    }))
-  }
-
-  _loadBlocks(docId, actorId, last) {
+  // Loads all blocks for the given `docId` + `actorId`, and applies them
+  // to the corresponding in-memory document. Also loads and applies all blocks
+  // on which any of those changes depend, recursively.
+  //
+  // Returns a promise that resolves when this completes.
+  //
+  // NOTE: RACE!!
+  _loadBlocksWithDependencies(docId, actorId, last) {
     const first = this._maxRequested(docId, actorId, last)
-    log('_loadBlocks', docId, actorId, first, last)
+    log('_loadBlocksWithDependencies', docId, actorId, first, last)
 
     // Stop requesting if done.
     if (first >= last) {
@@ -586,9 +566,28 @@ class Hypermerge extends EventEmitter {
 
     return this._getBlockRange(actorId, first, last)
       .then(blocks => this._applyBlocks(docId, blocks))
-      .then(() => this._loadMissingBlocks(docId))
+      .then(() => this._loadMissingDependencyBlocks(docId))
   }
 
+  // Loads and applies all blocks depended on by changes currently applied to
+  // the doc for the given `docId`, recursively.
+  //
+  // Returns a promise that resolves when this completes.
+  //
+  // NOTE: RACE!!
+  _loadMissingDependencyBlocks(docId) {
+    log('_loadMissingDependencyBlocks', docId)
+
+    const doc = this.find(docId)
+    const deps = Automerge.getMissingDeps(doc)
+    return Promise.all(Object.keys(deps).map((actorId) => {
+      const last = deps[actorId] + 1 // last is exclusive
+      return this._loadBlocksWithDependencies(docId, actorId, last)
+    }))
+  }
+
+  // Returns a promise that resolves to an array of blocks corresponding to the
+  // arguments, once all of those fetches are complete.
   _getBlockRange(actorId, first, last) {
     const length = Math.max(0, last - first)
     log('_getBlockRange', actorId, first, last)
@@ -597,6 +596,8 @@ class Hypermerge extends EventEmitter {
       this._getBlock(actorId, first + i)))
   }
 
+  // Returns a promise that resolves to the block in the feed for `actorId` at
+  // the given `index`, when that fetch is complete.
   _getBlock(actorId, index) {
     log('_getBlock.start', actorId, index)
     return new Promise((resolve, reject) => {
@@ -611,21 +612,29 @@ class Hypermerge extends EventEmitter {
     })
   }
 
+  // Applies the given `blocks` to the in-memory doc corresponding to the
+  // given `docId`.
   _applyBlock(docId, block) {
     log('_applyBlock', docId)
-    return this._applyBlocks(docId, [block])
+    this._applyBlocks(docId, [block])
   }
 
+  // Applies the given `blocks` to the in-memory doc corresponding to the
+  // given `docId`.
   _applyBlocks(docId, blocks) {
     log('_applyBlocks', docId)
-    return this._applyChanges(docId, blocks.map(block => JSON.parse(block)))
+    this._applyChanges(docId, blocks.map(block => JSON.parse(block)))
   }
 
+  // Applies the given `changes` to the in-memory doc corresponding to the
+  // given `docId`.
   _applyChanges(docId, changes) {
     log('_applyChanges', docId)
-    return changes.length > 0
-      ? this._setRemote(Automerge.applyChanges(this.find(docId), changes))
-      : this.find(docId)
+    if (changes.length > 0) {
+      const oldDoc = this.find(docId)
+      const newDoc = Automerge.applyChanges(oldDoc, changes)
+      this._setRemote(newDoc)
+    }
   }
 
   // Tracks which blocks have been requested for a given doc,
@@ -654,10 +663,6 @@ class Hypermerge extends EventEmitter {
     this.set(doc)
 
     if (this.readyIndex[docId]) {
-      const pDoc = this.pDocs[docId]
-
-      this.pDocs[docId] = doc
-
       /**
        * Emitted when an updated document has been downloaded. Not emitted
        * after local calls to `.update()` or `.change()`.
@@ -665,10 +670,9 @@ class Hypermerge extends EventEmitter {
        * @event document:updated
        *
        * @param {string} docId - the hex id representing this document
-       * @param {Document} document - automerge document
-       * @param {Document} prevDocument - previous version of the document
+       * @param {Document} doc - automerge document
        */
-      this.emit('document:updated', docId, doc, pDoc)
+      this.emit('document:updated', docId, doc)
     }
   }
 
@@ -715,7 +719,7 @@ class Hypermerge extends EventEmitter {
     return (index, data) => {
       log('_onDownload', docId, actorId, index)
       this._applyBlock(docId, data)
-      this._loadMissingBlocks(docId)
+      this._loadMissingDependencyBlocks(docId)
     }
   }
 
@@ -795,7 +799,6 @@ class Hypermerge extends EventEmitter {
   _emitReady(docId) {
     const doc = this.find(docId)
     log('_emitReady', docId)
-    this.pDocs[docId] = doc
 
     /**
      * Emitted when a document has been fully loaded.

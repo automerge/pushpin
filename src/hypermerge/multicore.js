@@ -60,7 +60,7 @@ class Multicore extends EventEmitter {
   _feedStorage(key) {
     const dk = Hypercore.discoveryKey(key).toString('hex')
     const prefix = `${dk.slice(0, 2)}/${dk.slice(2, 4)}/${dk.slice(4)}/`
-    return (name) =>  this.archiver.storage.feeds(prefix + name)
+    return (name) => this.archiver.storage.feeds(prefix + name)
   }
 
   replicate(opts) {
