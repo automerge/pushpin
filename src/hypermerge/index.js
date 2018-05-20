@@ -140,7 +140,7 @@ class Hypermerge extends EventEmitter {
 
     this._appendMetadata(actorId, metadata)
 
-    const doc = this.set(this.empty(actorId))
+    const doc = this.set(this._empty(actorId))
     this._shareDoc(doc)
 
     return doc
@@ -265,7 +265,9 @@ class Hypermerge extends EventEmitter {
     return this._feed(actorId).opened
   }
 
-  empty(actorId) {
+  // Returns an empty Automerge document with the given `actorId`. Used as the
+  // starting point for building up an in-memory doc for this process.
+  _empty(actorId) {
     return this.immutableApi
       ? Automerge.initImmutable(actorId)
       : Automerge.init(actorId)
@@ -469,7 +471,7 @@ class Hypermerge extends EventEmitter {
     }
 
     if (this.isWritable(actorId)) {
-      this.docs[docId] = this.empty(actorId)
+      this.docs[docId] = this._empty(actorId)
     }
 
     const parentMetadata = this.metadata(actorId)
@@ -496,7 +498,7 @@ class Hypermerge extends EventEmitter {
       return this._loadMetadata(actorId)
         .then(({ docId }) => {
           if (this.isWritable(actorId)) {
-            this.docs[docId] = this.empty(actorId)
+            this.docs[docId] = this._empty(actorId)
           }
         })
     })
