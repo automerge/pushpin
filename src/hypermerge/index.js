@@ -241,7 +241,7 @@ class Hypermerge extends EventEmitter {
 
   // Returns the number of blocks available for the feed corresponding to the
   // given `actorId`.
-  length(actorId) {
+  _length(actorId) {
     return this._feed(actorId).length
   }
 
@@ -363,7 +363,7 @@ class Hypermerge extends EventEmitter {
   // Append the given `metadata` for the given `actorId` to the corresponding
   // feed, and also set that metadata in memory.
   _appendMetadata(actorId, metadata) {
-    if (this.length(actorId) > 0) {
+    if (this._length(actorId) > 0) {
       throw new Error('Metadata can only be set if feed is empty.')
     }
 
@@ -419,7 +419,7 @@ class Hypermerge extends EventEmitter {
 
           feed.on('download', this._onDownload(docId, actorId))
 
-          return this._loadBlocksWithDependencies(docId, actorId, this.length(actorId))
+          return this._loadBlocksWithDependencies(docId, actorId, this._length(actorId))
             .then(() => {
               if (actorId !== docId) {
                 return
@@ -478,7 +478,7 @@ class Hypermerge extends EventEmitter {
     log('_initFeeds')
     const promises = actorIds.map((actorId) => {
       // Don't load metadata if the feed is empty.
-      if (this.length(actorId) === 0) {
+      if (this._length(actorId) === 0) {
         log('_initFeeds.skipEmpty', actorId)
         return Promise.resolve(null)
       }
