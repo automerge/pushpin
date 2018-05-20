@@ -61,6 +61,45 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
+   * Joins the network swarm for all documents managed by this Hypermerge instance.
+   * Must be called after `'ready'` has been emitted. `opts` are passed to discovery-swarm.
+   */
+  joinSwarm(opts = {}) {
+    this._ensureReady()
+    log('joinSwarm')
+
+    this.swarm = discoverySwarm(swarmDefaults(Object.assign({
+      port: this.port,
+      hash: false,
+      encrypt: true,
+      stream: opts => this._replicate(opts)
+    }, opts)))
+
+    this.swarm.join(this.core.archiver.changes.discoveryKey)
+
+    Object.values(this.feeds).forEach(feed => {
+      this.swarm.join(feed.discoveryKey)
+    })
+
+    this.core.archiver.on('add', feed => {
+      this.swarm.join(feed.discoveryKey)
+    })
+
+    this.core.archiver.on('remove', feed => {
+      this.swarm.leave(feed.discoveryKey)
+    })
+
+    this.swarm.listen(this.port)
+
+    this.swarm.once('error', err => {
+      log('joinSwarm.error', err)
+      this.swarm.listen()
+    })
+
+    return this
+  }
+
+  /**
    * Returns `true` if `docId` has been opened.
    */
   has(docId) {
@@ -79,6 +118,14 @@ class Hypermerge extends EventEmitter {
     }
 
     return doc
+  }
+
+  /**
+   * Returns the `docId` for the given `doc`. Note that this is id of the logical
+   * doc managed by Hypermerge, and not neccisarily the Automerge doc id.
+   */
+  getId(doc) {
+    return this._actorToId(this._getActorId(doc))
   }
 
   /**
@@ -115,31 +162,6 @@ class Hypermerge extends EventEmitter {
     return this._create(metadata)
   }
 
-  _create(metadata, parentMetadata = {}) {
-    const feed = this._trackedFeed()
-    const actorId = feed.key.toString('hex')
-    log('_create', actorId)
-
-    // Merge together the various sources of metadata, from lowest-priority to
-    // highest priority.
-    metadata = Object.assign(
-      {},
-      METADATA,
-      { groupId: actorId }, // default to self if parent doesn't have groupId
-      parentMetadata, // metadata of the parent feed to this feed (e.g. when opening, forking)
-      this.defaultMetadata, // user-specified default metadata
-      { docId: actorId }, // set the docId to this core's actorId by default
-      metadata // directly provided metadata should override everything else
-    )
-
-    this._appendMetadata(actorId, metadata)
-
-    const doc = this._set(this._empty(actorId))
-    this._shareDoc(doc)
-
-    return doc
-  }
-
   /**
    * Shorthand for `hm.update(Automerge.change(doc, changeFn))`.
    */
@@ -158,8 +180,8 @@ class Hypermerge extends EventEmitter {
   update(doc) {
     this._ensureReady()
 
-    const actorId = this.getActorId(doc)
-    const docId = this.actorToId(actorId)
+    const actorId = this._getActorId(doc)
+    const docId = this._actorToId(actorId)
     const pDoc = this.find(docId)
     log('update', docId, actorId)
 
@@ -233,26 +255,6 @@ class Hypermerge extends EventEmitter {
     return doc
   }
 
-  message(actorId, msg) {
-    this._trackedFeed(actorId).peers.forEach(peer => {
-      this._messagePeer(peer, msg)
-    })
-  }
-
-  // Returns the number of blocks available for the feed corresponding to the
-  // given `actorId`.
-  _length(actorId) {
-    return this._feed(actorId).length
-  }
-
-  // Returns an empty Automerge document with the given `actorId`. Used as the
-  // starting point for building up an in-memory doc for this process.
-  _empty(actorId) {
-    return this.immutableApi
-      ? Automerge.initImmutable(actorId)
-      : Automerge.init(actorId)
-  }
-
   /**
    * Returns the list of metadata objects corresponding to the list of actors
    * that have edited this document.
@@ -269,27 +271,65 @@ class Hypermerge extends EventEmitter {
     return this.metaIndex[actorId]
   }
 
+  message(actorId, msg) {
+    this._trackedFeed(actorId).peers.forEach(peer => {
+      this._messagePeer(peer, msg)
+    })
+  }
+
+  _create(metadata, parentMetadata = {}) {
+    const feed = this._trackedFeed()
+    const actorId = feed.key.toString('hex')
+    log('_create', actorId)
+
+    // Merge together the various sources of metadata, from lowest-priority to
+    // highest priority.
+    metadata = Object.assign(
+      {},
+      METADATA,
+      { groupId: actorId }, // default to self if parent doesn't have groupId
+      parentMetadata, // metadata of the parent feed to this feed (e.g. when opening, forking)
+      this.defaultMetadata, // user-specified default metadata
+      { docId: actorId }, // set the docId to this core's actorId by default
+      metadata // directly provided metadata should override everything else
+    )
+
+    this._appendMetadata(actorId, metadata)
+
+    const doc = this._set(this._empty(actorId))
+    this._shareDoc(doc)
+
+    return doc
+  }
+
+  // Returns the number of blocks available for the feed corresponding to the
+  // given `actorId`.
+  _length(actorId) {
+    return this._feed(actorId).length
+  }
+
+  // Returns an empty Automerge document with the given `actorId`. Used as the
+  // starting point for building up an in-memory doc for this process.
+  _empty(actorId) {
+    return this.immutableApi
+      ? Automerge.initImmutable(actorId)
+      : Automerge.init(actorId)
+  }
+
   // Returns true if the given `actorId` corresponds to a doc with a matching id.
   // This occurs when we this actor originally created the doc.
   _isDocId(actorId) {
-    return this.actorToId(actorId) === actorId
+    return this._actorToId(actorId) === actorId
   }
 
-  /**
-   * Returns the `docId` for the given `doc`. Note that this is id of the logical
-   * doc managed by Hypermerge, and not neccisarily the Automerge doc id.
-   */
-  getId(doc) {
-    return this.actorToId(this.getActorId(doc))
-  }
-
-  actorToId(actorId) {
+  // Returns the logical doc id corresponding to the given `actorId`.
+  _actorToId(actorId) {
     const { docId } = this.metadata(actorId)
     return docId
   }
 
   // Returns our own actorId for the given `doc`.
-  getActorId(doc) {
+  _getActorId(doc) {
     return doc._actorId
   }
 
@@ -322,45 +362,6 @@ class Hypermerge extends EventEmitter {
 
   _replicate(opts) {
     return this.core.replicate(opts)
-  }
-
-  /**
-   * Joins the network swarm for all documents managed by this Hypermerge instance.
-   * Must be called after `'ready'` has been emitted. `opts` are passed to discovery-swarm.
-   */
-  joinSwarm(opts = {}) {
-    this._ensureReady()
-    log('joinSwarm')
-
-    this.swarm = discoverySwarm(swarmDefaults(Object.assign({
-      port: this.port,
-      hash: false,
-      encrypt: true,
-      stream: opts => this._replicate(opts)
-    }, opts)))
-
-    this.swarm.join(this.core.archiver.changes.discoveryKey)
-
-    Object.values(this.feeds).forEach(feed => {
-      this.swarm.join(feed.discoveryKey)
-    })
-
-    this.core.archiver.on('add', feed => {
-      this.swarm.join(feed.discoveryKey)
-    })
-
-    this.core.archiver.on('remove', feed => {
-      this.swarm.leave(feed.discoveryKey)
-    })
-
-    this.swarm.listen(this.port)
-
-    this.swarm.once('error', err => {
-      log('joinSwarm.error', err)
-      this.swarm.listen()
-    })
-
-    return this
   }
 
   // Append the given `metadata` for the given `actorId` to the corresponding
@@ -416,7 +417,7 @@ class Hypermerge extends EventEmitter {
       log('_onFeedReady', actorId)
       this._loadMetadata(actorId)
         .then(() => {
-          const docId = this.actorToId(actorId)
+          const docId = this._actorToId(actorId)
 
           this._createDocIfMissing(docId, actorId)
 
@@ -677,7 +678,7 @@ class Hypermerge extends EventEmitter {
   }
 
   _shareDoc(doc) {
-    const { groupId } = this.metadata(this.getActorId(doc))
+    const { groupId } = this.metadata(this._getActorId(doc))
     const keys = this.groupIndex[groupId]
     this.message(groupId, { type: 'FEEDS_SHARED', keys })
   }
