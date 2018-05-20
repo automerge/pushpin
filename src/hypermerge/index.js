@@ -284,7 +284,9 @@ class Hypermerge extends EventEmitter {
     return this.metaIndex[actorId]
   }
 
-  isDocId(actorId) {
+  // Returns true if the given `actorId` corresponds to a doc with a matching id.
+  // This occurs when we this actor originally created the doc.
+  _isDocId(actorId) {
     return this.actorToId(actorId) === actorId
   }
 
@@ -731,7 +733,7 @@ class Hypermerge extends EventEmitter {
 
       this._loadMetadata(actorId)
         .then(() => {
-          if (!this.isDocId(actorId)) {
+          if (!this._isDocId(actorId)) {
             return
           }
 
@@ -755,7 +757,7 @@ class Hypermerge extends EventEmitter {
     return peer => {
       this._loadMetadata(actorId)
         .then(() => {
-          if (!this.isDocId(actorId)) {
+          if (!this._isDocId(actorId)) {
             return
           }
 
