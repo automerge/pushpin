@@ -78,10 +78,15 @@ const createWindow = async () => {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 
-  // Open the DevTools if in dev mode.
+  // Install DevTools if in dev mode. Open dev tools if indicated by env.
   const isDevMode = process.execPath.match(/[\\/]electron/)
+  const openDevTools = process.env.OPEN_DEV_TOOLS
+  console.log('openDevTools', openDevTools, JSON.stringify(openDevTools))
   if (isDevMode) {
     await installExtension(REACT_DEVELOPER_TOOLS)
+    if (openDevTools) {
+      mainWindow.webContents.openDevTools()
+    }
   }
 
   // Emitted when the window is closed.

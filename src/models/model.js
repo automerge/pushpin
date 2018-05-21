@@ -46,7 +46,7 @@ export const empty = {
 
 // Starts IO subsystems and populates associated state.
 export function init(state) {
-  const hm = new Hypermerge({ path: HYPERMERGE_PATH, port: 0 })
+  const hm = new Hypermerge({ storage: HYPERMERGE_PATH, port: 0 })
 
   const requestedWorkspace = Workspace.getBootstrapWorkspaceId() || ''
 

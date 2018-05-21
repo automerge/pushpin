@@ -50,16 +50,16 @@
     }
   },
   "dependencies": {
-    "automerge": "^0.7.0",
     "@ibm/plex": "^1.0.2",
+    "automerge": "^0.7.8",
     "classnames": "^2.2.5",
     "codemirror": "^5.37.0",
     "diff-match-patch": "^1.0.1",
     "electron-compile": "^6.4.2",
     "electron-devtools-installer": "^2.2.4",
     "electron-squirrel-startup": "^1.0.0",
-    "hypercore": "^6.12.0",
-    "hypercore-archiver": "^4.4.1",
+    "hypercore": "^6.14.0",
+    "hypercore-archiver": "^4.6.0",
     "hypercore-protocol": "^6.5.1",
     "hyperdiscovery": "^7.1.0",
     "immutable": "^3.8.2",
@@ -76,7 +76,6 @@
     "react-rnd": "^7.4.0",
     "react-simple-dropdown": "^3.2.0",
     "riek": "^1.1.0",
-    "thunky": "^1.0.2",
     "to-buffer": "^1.1.0"
   },
   "devDependencies": {
