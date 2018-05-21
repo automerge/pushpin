@@ -97,11 +97,11 @@ export function documentReady(state, { docId, doc }) {
     state = { ...state, offeredDocs }
   }
 
-  if(state.board && state.board.cards) {
+  if (state.board && state.board.cards) {
     const cardDocIds = Object.values(state.board.cards).map(c => c.docId)
     let newDocs = state.docs
 
-    if(cardDocIds.includes(docId)) {
+    if (cardDocIds.includes(docId)) {
       newDocs = { ...newDocs, [docId]: doc }
       state = { ...state, docs: newDocs }
     }
