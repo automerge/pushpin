@@ -436,9 +436,11 @@ class Hypermerge extends EventEmitter {
 
           feed.on('download', this._onDownload(docId, actorId))
 
+          const ourActorId = this.docs[docId]._actorId
+
           return this._loadBlocksWithDependencies(docId, actorId, this._length(actorId))
             .then(() => {
-              if (actorId !== docId) {
+              if (actorId !== ourActorId) {
                 return
               }
 
