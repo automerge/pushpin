@@ -3,8 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import Debug from 'debug'
 
-import CodeMirrorEditor from './code-mirror-editor'
-import * as ImageCard from '../models/image-card'
+import Content from './content'
 
 const log = Debug('pushpin:card')
 
@@ -24,10 +23,7 @@ export default class Card extends React.PureComponent {
       x: PropTypes.number,
       y: PropTypes.number,
       height: PropTypes.number,
-      width: PropTypes.number,
-      text: CodeMirrorEditor.propTypes.text.isOptional,
-      hyperfile: PropTypes.object.isOptional,
-      doc: PropTypes.object.isOptional
+      width: PropTypes.number
     }).isRequired
   }
 
@@ -55,42 +51,6 @@ export default class Card extends React.PureComponent {
       slackHeight: null,
       totalDrag: null,
     }
-
-    // State directly affects the rendered view.
-    this.state = {
-      moveX: null,
-      moveY: null,
-      resizeWidth: null,
-      resizeHeight: null,
-      loading: false,
-      imagePath: null
-    }
-  }
-
-  componentDidMount() {
-    this.mounted = true
-
-    if (this.props.card.type === 'image') {
-      this.setState({ loading: true }, () => {
-        ImageCard.fetchImage(this.props.card.hyperfile, (error, imagePath) => {
-          if (error) {
-            log(error)
-          }
-
-          // This card may have been deleted by the time fetchImage returns,
-          // so check here to see if the component is still mounted
-          if (!this.mounted) {
-            return
-          }
-
-          this.setState({ loading: false, imagePath: `../${imagePath}` })
-        })
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    this.mounted = false
   }
 
   render() {
@@ -113,31 +73,12 @@ export default class Card extends React.PureComponent {
         style={style}
         onContextMenu={e => e.stopPropagation()}
       >
-        {card.type === 'text' ? this.renderTextInner(card) : this.renderImageInner(this.state)}
+        <Content
+          card={this.props.card}
+          uniquelySelected={this.props.uniquelySelected}
+        />
         <span className="cardResizeHandle" />
       </div>
     )
-  }
-
-  renderTextInner() {
-    if (this.props.card.doc) {
-      return (
-        <CodeMirrorEditor
-          cardId={this.props.card.id}
-          cardHeight={this.props.card.height}
-          uniquelySelected={this.props.uniquelySelected}
-          text={this.props.card.doc.text}
-        />
-      )
-    }
-
-    return <p>Loading...</p>
-  }
-
-  renderImageInner(state) {
-    if (state.loading) {
-      return <h3>Loading</h3>
-    }
-    return <img className="image" alt="" src={state.imagePath} />
   }
 }
