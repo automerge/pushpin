@@ -159,7 +159,8 @@ export function documentUpdated(state, { docId, doc }) {
       break
   }
 
-  const cardDocIds = state.board && state.board.cards ? Object.values(state.board.cards).map(c => c.docId) : []
+  const cardDocIds = state.board && state.board.cards ?
+    Object.values(state.board.cards).map(c => c.docId) : []
   if (cardDocIds.includes(docId)) {
     const newDocs = { ...state.docs, [docId]: doc }
     return { ...state, docs: newDocs }

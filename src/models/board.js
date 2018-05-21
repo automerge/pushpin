@@ -1,5 +1,4 @@
 import uuid from 'uuid/v4'
-import Automerge from 'automerge'
 
 import Loop from '../loop'
 import * as Workspace from './workspace'
@@ -315,7 +314,7 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
   })
 
   let newDocs = state.docs
-  if(type === 'text') {
+  if (type === 'text') {
     newDocs = { ...newDocs, [typeAttrs.docId]: typeAttrs.doc }
   }
 

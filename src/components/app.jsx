@@ -27,7 +27,7 @@ export default class App extends React.PureComponent {
       return <div />
     }
 
-    const cards = {} 
+    const cards = {}
     Object.keys(this.props.state.board.cards).forEach(id => {
       let card = this.props.state.board.cards[id]
       card = { ...card, doc: this.props.state.docs[card.docId] }
