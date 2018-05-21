@@ -15,7 +15,7 @@ export default class Content extends React.PureComponent {
       id: PropTypes.string,
       height: PropTypes.number,
       hyperfile: PropTypes.object.isOptional,
-      doc: CodeMirrorEditor.propTypes.text.isOptional,
+      doc: CodeMirrorEditor.propTypes.doc.isOptional,
     }).isRequired
   }
 
@@ -66,7 +66,7 @@ export default class Content extends React.PureComponent {
           cardId={this.props.card.id}
           cardHeight={this.props.card.height}
           uniquelySelected={this.props.uniquelySelected}
-          text={this.props.card.doc.text}
+          doc={this.props.card.doc}
         />
       )
     }

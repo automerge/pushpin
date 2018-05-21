@@ -47,7 +47,8 @@ const visibleStyle = { }
 // seems to give the right caching behaviour, so for now we'll extend from it.
 export default class CodeMirrorEditor extends React.PureComponent {
   static propTypes = {
-    text: PropTypes.shape({
+    doc: PropTypes.shape({
+      text: PropTypes.string,
       objectId: PropTypes.string,
       join: PropTypes.func.isRequired,
     }).isRequired,
@@ -74,7 +75,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
     // according to the size of the text, without scrollbars or wrapping.
     this.codeMirror = CodeMirror(this.editorRef, {
       extraKeys: { Backspace: this.onBackspace },
-      value: this.props.text.join(''),
+      value: this.props.doc.text.join(''),
       autofocus: this.props.uniquelySelected,
       lineNumbers: false,
       lineWrapping: true,
@@ -89,7 +90,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
   // This is where we transform declarative updates from React into imperative
   // commands in the editor.
   componentWillReceiveProps(props) {
-    this.ensureContents(props.text)
+    this.ensureContents(props.doc)
     this.ensureFocus(props.uniquelySelected)
   }
 
@@ -128,10 +129,12 @@ export default class CodeMirrorEditor extends React.PureComponent {
   }
 
   // When we get a new text prop, ensure that the editor contents reflect that.
-  ensureContents(text) {
+  ensureContents(doc) {
+    const { text } = doc
+
     // Short circuit if the text didn't change. This happens when a prop
     // besides text changed.
-    if (this.props.text === text) {
+    if (this.props.doc === doc) {
       return
     }
 
@@ -231,7 +234,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
           ref={this.setRendererRef}
         >
           <ReactMarkdown
-            source={this.props.text.join('')}
+            source={this.props.doc.text.join('')}
           />
         </div>
       </div>
