@@ -120,7 +120,7 @@ export default class Card extends React.PureComponent {
   }
 
   renderTextInner() {
-    if(this.props.card.doc) {
+    if (this.props.card.doc) {
       return (
         <CodeMirrorEditor
           cardId={this.props.card.id}
