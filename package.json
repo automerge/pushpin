@@ -12,10 +12,11 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --cache --color --ext .jsx,.js src"
+    "lint": "eslint --cache --color --ext .jsx,.js src",
+    "test": "electron-mocha --renderer test/**/*.jsx --compilers js:babel-core/register,jsx:babel-core/register"
   },
   "keywords": [],
-  "author": "mmcgrana",
+  "author": "inkandswitch",
   "license": "MIT",
   "config": {
     "forge": {
@@ -35,17 +36,17 @@
         "packageManager": "npm"
       },
       "electronWinstallerConfig": {
-        "name": "my_new_project"
+        "name": "pushpin"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
       "github_repository": {
-        "owner": "",
-        "name": ""
+        "owner": "inkandswitch",
+        "name": "pushpin"
       },
       "windowsStoreConfig": {
         "packageName": "",
-        "name": "mynewproject"
+        "name": "pushpin"
       }
     }
   },
@@ -57,6 +58,7 @@
     "diff-match-patch": "^1.0.1",
     "electron-compile": "^6.4.2",
     "electron-devtools-installer": "^2.2.4",
+    "electron-mocha": "^6.0.2",
     "electron-squirrel-startup": "^1.0.0",
     "hypercore": "^6.14.0",
     "hypercore-archiver": "^4.6.0",
@@ -88,10 +90,14 @@
     "babel-preset-react": "^6.24.1",
     "electron-forge": "^5.2.1",
     "electron-prebuilt-compile": "1.8.4",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-15": "^1.0.5",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.10.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.7.0"
+    "eslint-plugin-react": "^7.7.0",
+    "mocha": "^5.2.0",
+    "react-test-renderer": "^15.6.2"
   }
 }
