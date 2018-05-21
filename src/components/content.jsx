@@ -14,8 +14,8 @@ export default class Content extends React.PureComponent {
       type: PropTypes.string,
       id: PropTypes.string,
       height: PropTypes.number,
-      text: CodeMirrorEditor.propTypes.text.isOptional,
       hyperfile: PropTypes.object.isOptional,
+      doc: CodeMirrorEditor.propTypes.text.isOptional,
     }).isRequired
   }
 
@@ -60,14 +60,18 @@ export default class Content extends React.PureComponent {
   }
 
   renderTextInner() {
-    return (
-      <CodeMirrorEditor
-        cardId={this.props.card.id}
-        cardHeight={this.props.card.height}
-        uniquelySelected={this.props.uniquelySelected}
-        text={this.props.card.text}
-      />
-    )
+    if (this.props.card.doc) {
+      return (
+        <CodeMirrorEditor
+          cardId={this.props.card.id}
+          cardHeight={this.props.card.height}
+          uniquelySelected={this.props.uniquelySelected}
+          text={this.props.card.doc.text}
+        />
+      )
+    }
+
+    return <p>Loading...</p>
   }
 
   renderImageInner(state) {
