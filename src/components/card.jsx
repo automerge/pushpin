@@ -7,6 +7,13 @@ import Content from './content'
 
 const log = Debug('pushpin:card')
 
+/**
+ * Card
+ *
+ * A card's responsibility is to keep track of dragging, selection, and position,
+ * and to host a piece of <Content/>.
+ *
+ */
 export default class Card extends React.PureComponent {
   static propTypes = {
     selected: PropTypes.bool.isRequired,
