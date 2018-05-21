@@ -13,7 +13,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --cache --color --ext .jsx,.js src",
-    "test": "electron-mocha --renderer test/**/*.jsx --compilers js:babel-core/register,jsx:babel-core/register"
+    "test": "electron-mocha --renderer test/**/*.jsx"
   },
   "keywords": [],
   "author": "inkandswitch",

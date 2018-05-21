@@ -36,6 +36,9 @@ describe('<Card />', () => {
     }
 
     const wrapper = shallow(<Card.default {...props} />)
-    assert.equal(wrapper, wrapper)
+
+    it('should equal itself', () => {
+      assert.equal(wrapper, wrapper)
+    })
   })
 })
