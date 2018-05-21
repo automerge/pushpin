@@ -82,7 +82,7 @@ export default class Board extends React.PureComponent {
 
   onKeyDown(e) {
     if (e.key === 'Backspace') {
-      Loop.dispatch(BoardModel.boardBackspaced)
+      Loop.dispatch(BoardModel.deleteSelections)
     }
   }
 
