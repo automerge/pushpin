@@ -79,9 +79,11 @@ export function documentReady(state, { docId, doc }) {
     Loop.dispatch(openDocument, { docId: doc.boardId })
     Loop.dispatch(openDocument, { docId: doc.selfId })
 
-    doc.contactIds.forEach((id) => {
-      Loop.dispatch(openDocument, { docId: id })
-    })
+    if (doc.contactIds) {
+      doc.contactIds.forEach((id) => {
+        Loop.dispatch(openDocument, { docId: id })
+      })
+    }
 
     return { ...state, workspace: doc }
   }

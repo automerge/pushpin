@@ -25,7 +25,7 @@ export default class Content extends React.PureComponent {
 
     // State directly affects the rendered view.
     this.state = {
-      loading: false
+      loading: true
     }
   }
 
@@ -43,19 +43,17 @@ export default class Content extends React.PureComponent {
   componentDidMount() {
     this.mounted = true
 
-    this.setState({ loading: true }, () => {
-      this.getHypermergeDoc(this.props.card.docId, (error, doc) => {
-        if (error) {
-          log(error)
-        }
+    this.getHypermergeDoc(this.props.card.docId, (error, doc) => {
+      if (error) {
+        log(error)
+      }
 
-        // This card may have been deleted by the time fetchHypermergeDoc returns,
-        // so check here to see if the component is still mounted
-        if (!this.mounted) {
-          return
-        }
-        this.setState({ loading: false, doc })
-      })
+      // This card may have been deleted by the time fetchHypermergeDoc returns,
+      // so check here to see if the component is still mounted
+      if (!this.mounted) {
+        return
+      }
+      this.setState({ loading: false, doc })
     })
 
     if (this.props.card.type === 'image') {

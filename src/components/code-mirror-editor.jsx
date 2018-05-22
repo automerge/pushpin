@@ -48,7 +48,7 @@ const visibleStyle = { }
 export default class CodeMirrorEditor extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
-      text: PropTypes.string,
+      text: PropTypes.object,
       objectId: PropTypes.string,
       join: PropTypes.func.isRequired,
     }).isRequired,
