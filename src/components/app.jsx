@@ -31,7 +31,7 @@ export default class App extends React.PureComponent {
     return (
       <div>
         <Board
-          cards={cards}
+          cards={this.props.state.board.cards}
           selected={this.props.state.selected}
           backgroundColor={this.props.state.board.backgroundColor}
         />
