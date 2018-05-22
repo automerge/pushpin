@@ -29,8 +29,34 @@ export default class Content extends React.PureComponent {
     }
   }
 
+  getHypermergeDoc(docId, cb) {
+    window.hm.on('document:ready', (id, doc) => {
+      if(id !== docId) {
+        return
+      }
+
+      // unregister listener
+      cb(null, doc)
+    })
+  }
+
   componentDidMount() {
     this.mounted = true
+
+    this.setState({ loading: true }, () => {
+      this.getHypermergeDoc(this.props.card.docId, (error, doc) => {
+        if (error) {
+          log(error)
+        }
+
+        // This card may have been deleted by the time fetchHypermergeDoc returns,
+        // so check here to see if the component is still mounted
+        if (!this.mounted) {
+          return
+        }
+        this.setState({ loading: false, doc })
+      })
+    })
 
     if (this.props.card.type === 'image') {
       this.setState({ loading: true }, () => {
@@ -56,22 +82,26 @@ export default class Content extends React.PureComponent {
   }
 
   render() {
-    return this.props.card.type === 'text' ? this.renderTextInner(this.props.card) : this.renderImageInner(this.state)
-  }
-
-  renderTextInner() {
-    if (this.props.card.doc) {
-      return (
-        <CodeMirrorEditor
-          cardId={this.props.card.id}
-          cardHeight={this.props.card.height}
-          uniquelySelected={this.props.uniquelySelected}
-          doc={this.props.card.doc}
-        />
-      )
+    if (this.props.card.type === 'image') {
+      return <p>Images not yet supported.</p>
     }
 
-    return <p>Loading...</p>
+    const TypeToTag = {
+      text: CodeMirrorEditor
+    }
+    const TagName = TypeToTag[this.props.card.type]
+
+    if (this.state.loading) {
+      return <p>Loading...</p> // stand-in content could go here
+    }
+
+    return (<TagName
+      cardId={this.props.card.id}
+      docId={this.props.card.docId}
+      cardHeight={this.props.card.height}
+      uniquelySelected={this.props.uniquelySelected}
+      doc={this.state.doc}
+    />) // how do we push other props down?
   }
 
   renderImageInner(state) {

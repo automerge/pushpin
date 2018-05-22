@@ -47,6 +47,7 @@ export const empty = {
 // Starts IO subsystems and populates associated state.
 export function init(state) {
   const hm = new Hypermerge({ storage: HYPERMERGE_PATH, port: 0 })
+  window.hm = hm
 
   const requestedWorkspace = Workspace.getBootstrapWorkspaceId() || ''
 
@@ -63,6 +64,8 @@ export function init(state) {
 
     if (requestedWorkspace === '') {
       Loop.dispatch(Workspace.create)
+    } else {
+      Loop.dispatch(openDocument, { docId: requestedWorkspace })
     }
   })
 
