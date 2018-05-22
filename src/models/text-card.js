@@ -11,7 +11,7 @@ export function create(state, { x, y, selected, text }) {
   })
   const docId = state.hm.getId(doc)
 
-  Loop.dispatch(Board.cardCreated, { x, y, selected, type: 'text', typeAttrs: { doc, docId } })
+  Loop.dispatch(Board.cardCreated, { x, y, selected, type: 'text', docId, doc })
 
   return state
 }

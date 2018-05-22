@@ -295,7 +295,7 @@ export default class Board extends React.PureComponent {
       let preClampHeight = tracking.resizeHeight + deltaY
 
       // Maintain aspect ratio on image cards.
-      if (card.type !== 'text') {
+      if (card.type === 'image') {
         const ratio = tracking.resizeWidth / tracking.resizeHeight
         preClampHeight = preClampWidth / ratio
         preClampWidth = preClampHeight * ratio

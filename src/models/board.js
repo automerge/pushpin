@@ -280,7 +280,7 @@ export function addSelfToAuthors(state) {
  */
 
 
-export function cardCreated(state, { x, y, width, height, selected, type, typeAttrs }) {
+export function cardCreated(state, { x, y, width, height, selected, type, docId, doc }) {
   const id = uuid()
 
   const newBoard = changeBoard(state, (b) => {
@@ -289,6 +289,7 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
     const newCard = {
       id,
       type,
+      docId,
       x: snapX,
       y: snapY,
       width: snapMeasureToGrid(width || CARD_DEFAULT_WIDTH),
@@ -298,25 +299,14 @@ export function cardCreated(state, { x, y, width, height, selected, type, typeAt
       resizing: false,
       moving: false,
     }
-
+    b.cards[id] = newCard
     // Apply type-specific attributes. The difference in sequencing between
     // image and text types is due to weird Automerge interactions that we
     // should revisit later.
-    if (type === 'image') {
-      b.cards[id] = newCard
-      b.cards[id].hyperfile = typeAttrs.hyperfile
-    }
-
-    if (type === 'text') {
-      b.cards[id] = newCard
-      b.cards[id].docId = typeAttrs.docId
-    }
   })
 
   let newDocs = state.docs
-  if (type === 'text') {
-    newDocs = { ...newDocs, [typeAttrs.docId]: typeAttrs.doc }
-  }
+  newDocs = { ...newDocs, [docId]: doc }
 
   const newSelected = selected ? [id] : []
 

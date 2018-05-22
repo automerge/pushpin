@@ -69,7 +69,15 @@ export function importImageThenCreate(state, { path, buffer, x, y }) {
 }
 
 export function create(state, { x, y, selected, width, height, hyperfile }) {
-  return Board.cardCreated(state, { x, y, selected, width, height, type: 'image', typeAttrs: { hyperfile } })
+  let doc = state.hm.create()
+  doc = state.hm.change(doc, d => {
+    d.hyperfileId = hyperfile.key
+    d.imageId = hyperfile.imageId
+    d.imageExt = hyperfile.imageExt
+  })
+  const docId = state.hm.getId(doc)
+
+  return Board.cardCreated(state, { x, y, width, height, selected, type: 'image', docId, doc })
 }
 
 // Pick a resonable initial display scale for an image of given dimensions.
