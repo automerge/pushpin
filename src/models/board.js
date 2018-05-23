@@ -276,3 +276,14 @@ export function cardCreated(state, { x, y, width, height, type, docId, doc }) {
 
   return { ...state, docs: newDocs, board: newBoard }
 }
+
+export function addCard(state, { x, y, type, selected, initialState }) {
+  let doc = state.hm.create()
+  const docId = state.hm.getId(doc)
+
+  doc = state.hm.change(doc, d => d = initialState)
+
+  Loop.dispatch(Board.cardCreated, { x, y, type, selected, docId, doc })
+
+  return state
+}
