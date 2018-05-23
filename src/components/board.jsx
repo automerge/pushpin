@@ -39,14 +39,15 @@ const draggableCards = (cards, selected, card) => {
 
 export default class Board extends React.PureComponent {
   static defaultProps = {
-    backgroundColor: '',
     selected: []
   }
 
   static propTypes = {
-    backgroundColor: PropTypes.string,
+    doc: PropTypes.shape({
+      backgroundColor: PropTypes.string,
+      cards: PropTypes.objectOf(Card.propTypes.card).isRequired
+    }).isRequired,
     selected: PropTypes.arrayOf(PropTypes.string),
-    cards: PropTypes.objectOf(Card.propTypes.card).isRequired,
   }
 
   constructor(props) {
@@ -87,14 +88,14 @@ export default class Board extends React.PureComponent {
   }
 
   onClick(e) {
-    if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
+    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onClick')
       Loop.dispatch(BoardModel.clearSelections)
     }
   }
 
   onDoubleClick(e) {
-    if (!withinAnyCard(this.props.cards, e.pageX, e.pageY)) {
+    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
       Loop.dispatch(TextCard.create, { x: e.pageX, y: e.pageY, text: '', selected: true })
     }
@@ -335,7 +336,7 @@ export default class Board extends React.PureComponent {
       const moving = !resizing
 
       if (moving) {
-        const cards = draggableCards(this.props.cards, this.props.selected, card)
+        const cards = draggableCards(this.props.doc.cards, this.props.selected, card)
 
         cards.forEach(c => {
           this.tracking[c.id] = {
@@ -363,7 +364,7 @@ export default class Board extends React.PureComponent {
     }
 
     if (tracking.moving) {
-      const cards = draggableCards(this.props.cards, this.props.selected, card)
+      const cards = draggableCards(this.props.doc.cards, this.props.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         this.effectDrag(card, t, d)
@@ -394,7 +395,7 @@ export default class Board extends React.PureComponent {
     }
 
     if (tracking.moving) {
-      const cards = draggableCards(this.props.cards, this.props.selected, card)
+      const cards = draggableCards(this.props.doc.cards, this.props.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         const x = t.moveX
@@ -431,8 +432,9 @@ export default class Board extends React.PureComponent {
   render() {
     log('render')
 
+    const cards = this.props.doc.cards || {}
     // rework selected functioning, this is a slow implementation
-    const cardChildren = Object.entries(this.props.cards).map(([id, card]) => {
+    const cardChildren = Object.entries(cards).map(([id, card]) => {
       const selected = this.props.selected.includes(id)
       const uniquelySelected = selected && this.props.selected.length === 1
       return (
@@ -479,7 +481,7 @@ export default class Board extends React.PureComponent {
         <div className="ContextMenu__section">
           <ContextMenuItem>
             <ColorPicker
-              color={this.props.backgroundColor}
+              color={this.props.doc.backgroundColor}
               colors={Object.values(BoardModel.BOARD_COLORS)}
               onChangeComplete={this.onChangeBoardBackgroundColor}
             />
@@ -496,7 +498,7 @@ export default class Board extends React.PureComponent {
             id="board"
             className="board"
             ref={(e) => { this.boardRef = e }}
-            style={{ ...boardStyle, backgroundColor: this.props.backgroundColor }}
+            style={{ ...boardStyle, backgroundColor: this.props.doc.backgroundColor }}
             onClick={this.onClick}
             onDoubleClick={this.onDoubleClick}
             onDragOver={this.onDragOver}

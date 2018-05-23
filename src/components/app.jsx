@@ -31,9 +31,8 @@ export default class App extends React.PureComponent {
     return (
       <div>
         <Board
-          cards={this.props.state.board.cards}
+          doc={this.props.state.board}
           selected={this.props.state.selected}
-          backgroundColor={this.props.state.board.backgroundColor}
         />
         <TitleBar
           // don't do this, this is bad,
