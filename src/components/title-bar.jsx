@@ -87,7 +87,7 @@ export default class TitleBar extends React.PureComponent {
       .reduce((res, key) => { res[key] = state.contacts[key]; return res }, {})
 
     const shareData = {
-      authors: {},
+      authors: [],
       board: this.props.board,
       contacts: filteredContacts,
       notifications
