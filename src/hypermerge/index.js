@@ -725,6 +725,7 @@ class Hypermerge extends EventEmitter {
     this._initFeeds(actorIds)
       .then(() => {
         this.isReady = true
+        actorIds.forEach(actorId => this._trackedFeed(actorId))
 
         /**
          * Emitted when all document metadata has been loaded from storage, and the
