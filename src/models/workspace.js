@@ -111,12 +111,12 @@ export function onIdentityUpdated(state, { contactId }) {
 
   log('identityUpdated.iterate', offeredIds)
   offeredIds.forEach((offeredId) => {
-    Loop.dispatch(Board.openDocument, { docId: offeredId })
+    Loop.dispatch(Model.openDocument, { docId: offeredId })
     workspace = state.hm.change(workspace, (ws) => {
       const offeredIdsSet = new Set(ws.offeredIds)
       if (!offeredIdsSet.has(offeredId)) {
         ws.offeredIds.push({ offeredId, offererId: contactId })
-        Loop.dispatch(Board.openDocument, { docId: offeredId })
+        Loop.dispatch(Model.openDocument, { docId: offeredId })
       }
     })
   })

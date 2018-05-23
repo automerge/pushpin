@@ -43,7 +43,7 @@ export default class Share extends React.PureComponent {
 
   handleShare(e, contact) {
     Loop.dispatch(
-      Identity.identityOfferDocumentToIdentity,
+      Identity.updateSelfOfferDocumentToIdentity,
       { identityId: contact.docId, sharedDocId: this.props.board.docId }
     )
   }
