@@ -32,7 +32,7 @@ export default class Content extends React.PureComponent {
   }
 
   onChange(changeBlock) {
-    const doc = window.hm.change(doc, changeBlock)
+    const doc = window.hm.change(this.state.doc, changeBlock)
     this.setState({ ...this.state, doc })
   }
 

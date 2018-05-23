@@ -16,19 +16,3 @@ export function create(state, { x, y, selected, text }) {
   return state
 }
 
-export function cardTextChanged(state, { id, at, removedLength, addedText }) {
-  const cardDocId = state.board.cards[id].docId
-  const cardDoc = state.hm.change(state.docs[cardDocId], (d) => {
-    if (removedLength > 0) {
-      d.text.splice(at, removedLength)
-    }
-
-    if (addedText.length > 0) {
-      d.text.insertAt(at, ...addedText.split(''))
-    }
-  })
-
-  const docs = { ...state.docs, [cardDocId]: cardDoc }
-
-  return { ...state, docs }
-}

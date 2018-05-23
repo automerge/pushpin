@@ -63,9 +63,6 @@ export default class CodeMirrorEditor extends React.PureComponent {
     this.onCodeMirrorRefresh = this.onCodeMirrorRefresh.bind(this)
     this.setEditorRef = this.setEditorRef.bind(this)
     this.setRendererRef = this.setRendererRef.bind(this)
-
-    const { doc } = this.props
-    this.state = { doc }
   }
 
   // When the components mounts, and we therefore have refs to the DOM,
@@ -101,7 +98,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
   onBackspace(codeMirror) {
     log('onBackspace')
     if (codeMirror.getValue() === '') {
-      Loop.dispatch(Board.cardDeleted, { id: this.props.cardId })
+      // Loop.dispatch(Board.cardDeleted, { id: this.props.cardId })
     }
     return CodeMirror.Pass
   }
@@ -190,6 +187,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
   }
 
   cardTextChanged({ id, at, removedLength, addedText }) {
+    // this onChange function will update the hypermerge document and rerender the component
     this.props.onChange((d) => {
       if (removedLength > 0) {
         d.text.splice(at, removedLength)
@@ -199,8 +197,6 @@ export default class CodeMirrorEditor extends React.PureComponent {
         d.text.insertAt(at, ...addedText.split(''))
       }
     })
-
-    this.setState({ ...this.state, doc })
   }
 
   // Ensure the height associated with the card is equal to the greater of
@@ -214,10 +210,10 @@ export default class CodeMirrorEditor extends React.PureComponent {
     )
     if (neededHeight !== this.props.cardHeight) {
       log('forceHeight', this.props.cardHeight, editorHeight, rendererHeight, neededHeight)
-      Loop.dispatch(Board.cardResizeHeightRoundingUp, {
+      /* Loop.dispatch(Board.cardResizeHeightRoundingUp, {
         id: this.props.cardId,
         height: neededHeight
-      })
+      }) */
     }
   }
 
@@ -249,7 +245,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
           ref={this.setRendererRef}
         >
           <ReactMarkdown
-            source={this.state.doc.text.join('')}
+            source={this.props.doc.text.join('')}
           />
         </div>
       </div>
