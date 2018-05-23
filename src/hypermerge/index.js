@@ -107,6 +107,13 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
+   * Returns true if `document:ready` has already been emitted for this doc.
+   */
+  isReady(docId) {
+    return !!this.readyIndex[docId]
+  }
+
+  /**
    * Returns the document for the given docId.
    * Throws if the document has not been opened yet.
    */
@@ -135,19 +142,28 @@ class Hypermerge extends EventEmitter {
   /**
    * Opens an existing document.
    * Will download the document over the network if `hm.joinSwarm()` was called.
-   * The document is opened asynchronously; listen for the `'document:ready'` event
-   * to get the document when it has finished opening.
+   * The document is opened asynchronously, and a promise is returned with the
+   * opened document after it is 'ready'.
    *
    * @param {string} docId - docId of document to open
+   * @returns {Promise.<Document>}
    */
   open(docId, metadata = null) {
     this._ensureReady()
     log('open', docId)
-
-    if (this.docs[docId]) {
-      return
-    }
     this._trackedFeed(docId)
+
+    if (this.readyIndex[docId]) {
+      return Promise.resolve(this.docs[docId])
+    } else {
+      return new Promise((res, rej) => {
+        this.on('document:ready', (updatedId, doc) => {
+          if (docId === updatedId) {
+            res(doc)
+          }
+        })
+      })
+    }
   }
 
   /**

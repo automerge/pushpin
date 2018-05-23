@@ -208,18 +208,12 @@ export function openAndRequestBoard(state, { docId }) {
   return state
 }
 
-/* The hypermerge interface is awful. */
+/* The hypermerge interface is awesome! *ahem* */
 export function openDocument(state, { docId }) {
-  // If we've already opened the hypermerge doc,
-  // it will not fire a 'document:ready' event if we open it again
-  // so we need to find the doc and manually trigger the action
-  if (state.hm.has(docId)) {
-    const doc = state.hm.find(docId)
-    // oh this is probably a race
-    Loop.dispatch(documentReady, { doc, docId })
-  } else {
-    state.hm.open(docId)
-  }
+  state.hm.open(docId)
+    .then(doc => {
+      Loop.dispatch(documentReady, {doc, docId})
+    })
 
   return state
 }

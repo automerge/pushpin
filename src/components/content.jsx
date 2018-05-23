@@ -30,22 +30,12 @@ export default class Content extends React.PureComponent {
   }
 
   getHypermergeDoc(docId, cb) {
-    if (window.hm.has(docId)) {
-      const doc = window.hm.find(docId)
-      if (doc) {
-        cb(null, doc)
-        return
-      }
-    }
     window.hm.open(docId)
-    window.hm.on('document:ready', (id, doc) => {
-      if (id !== docId) {
-        return
-      }
-
-      // unregister listener
-      cb(null, doc)
-    })
+      .then(doc => {
+        cb(null, doc)
+      }, err => {
+        cb(err)
+      })
   }
 
   componentDidMount() {
