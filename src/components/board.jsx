@@ -72,7 +72,6 @@ export default class Board extends React.PureComponent {
   componentDidMount() {
     log('componentDidMount')
     document.addEventListener('keydown', this.onKeyDown)
-    window.scrollTo((this.boardRef.clientWidth / 2) - (window.innerWidth / 2), 0)
   }
 
   componentWillUnmount() {
