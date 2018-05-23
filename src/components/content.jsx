@@ -4,6 +4,7 @@ import Debug from 'debug'
 
 import CodeMirrorEditor from './code-mirror-editor'
 import ImageCard from './image-card'
+import Board from './board'
 
 const log = Debug('pushpin:content')
 
@@ -29,6 +30,14 @@ export default class Content extends React.PureComponent {
   }
 
   getHypermergeDoc(docId, cb) {
+    if (window.hm.has(docId)) {
+      const doc = window.hm.find(docId)
+      if (doc) {
+        cb(null, doc)
+        return
+      }
+    }
+    window.hm.open(docId)
     window.hm.on('document:ready', (id, doc) => {
       if (id !== docId) {
         return
@@ -63,7 +72,8 @@ export default class Content extends React.PureComponent {
   render() {
     const TypeToTag = {
       text: CodeMirrorEditor,
-      image: ImageCard
+      image: ImageCard,
+      board: Board
     }
     const TagName = TypeToTag[this.props.card.type]
 

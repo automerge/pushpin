@@ -4,6 +4,7 @@ import Debug from 'debug'
 
 import TitleBar from './title-bar'
 import Board from './board'
+import Content from './content'
 
 const log = Debug('pushpin:app')
 
@@ -30,9 +31,7 @@ export default class App extends React.PureComponent {
     // Otherwise render the board.
     return (
       <div>
-        <Board
-          doc={this.props.state.board}
-        />
+        <Content card={{ type: 'board', docId: this.props.state.workspace.boardId }} />
         <TitleBar
           // don't do this, this is bad,
           // but this is just to speed up wiring in the share dialogue

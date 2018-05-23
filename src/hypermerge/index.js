@@ -111,6 +111,10 @@ class Hypermerge extends EventEmitter {
    * Throws if the document has not been opened yet.
    */
   find(docId) {
+    if (this.readyIndex[docId]) {
+      return this.docs[docId]
+    }
+
     const doc = this.docs[docId]
 
     if (!doc) {
