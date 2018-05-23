@@ -301,7 +301,7 @@ class Hypermerge extends EventEmitter {
       { docId: actorId }, // set the docId to this core's actorId by default
       metadata // directly provided metadata should override everything else
     )
-    const docId = metadata.docId
+    const { docId } = metadata
     const doc = this._empty(actorId)
 
     this._appendMetadata(actorId, metadata)

@@ -65,7 +65,7 @@ export default class TitleBar extends React.PureComponent {
       },
       notifications: {
         A: { type: 'Invitation', sender: { name: 'Pvh' }, board: { title: 'Pushpin Demo' } },
-        B: { type: 'Invitation', sender: { name: 'Ignatius' }, board: { title: 'Pokemon research' } }
+        B: { type: 'Invitation', sender: { name: 'Ignatius' }, board: { title: 'Pokemon info' } }
       }
     }
     */
