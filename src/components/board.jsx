@@ -42,7 +42,8 @@ export default class Board extends React.PureComponent {
     doc: PropTypes.shape({
       backgroundColor: PropTypes.string,
       cards: PropTypes.objectOf(Card.propTypes.card).isRequired
-    }).isRequired
+    }).isRequired,
+    onChange: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -85,7 +86,7 @@ export default class Board extends React.PureComponent {
           return
         }
       }
-      Loop.dispatch(BoardModel.cardDeleted, { id: this.state.selected })
+      BoardModel.cardDeleted(this.props.onChange, this.props.doc, { id: this.state.selected })
     }
   }
 
@@ -421,7 +422,7 @@ export default class Board extends React.PureComponent {
         t.moving = false
         t.totalDrag = null
 
-        Loop.dispatch(BoardModel.cardMoved, { id: card.id, x, y })
+        BoardModel.cardMoved(this.props.onChange, this.props.doc, { id: card.id, x, y })
         this.setDragState(card, t)
       })
     }
@@ -437,7 +438,7 @@ export default class Board extends React.PureComponent {
       tracking.resizing = false
       tracking.totalDrag = null
 
-      Loop.dispatch(BoardModel.cardResized, { id: card.id, width, height })
+      BoardModel.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
       this.setDragState(card, tracking)
     }
   }

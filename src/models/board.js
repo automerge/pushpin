@@ -109,57 +109,53 @@ export function changeBoard(state, changeFn) {
  *
  */
 
-export function cardMoved(state, { id, x, y }) {
+export function cardMoved(onChange, doc, { id, x, y }) {
   // This gets called when uniqueyly selecting a card, so avoid a document
   // change if in fact the card hasn't moved mod snapping.
   const snapX = snapCoordinateToGrid(x)
   const snapY = snapCoordinateToGrid(y)
-  if (snapX === state.board.cards[id].x && snapY === state.board.cards[id].y) {
-    return state
+  if (snapX === doc.cards[id].x && snapY === doc.cards[id].y) {
+    return
   }
-  const newBoard = changeBoard(state, (b) => {
+  onChange((b) => {
     const card = b.cards[id]
     card.x = snapX
     card.y = snapY
   })
-  return { ...state, board: newBoard }
 }
 
-export function cardResizeHeightRoundingUp(state, { id, width, height }) {
+export function cardResizeHeightRoundingUp(onChange, doc, { id, width, height }) {
   const snapHeight = snapMeasureOutwardToGrid(Math.max(height, CARD_MIN_HEIGHT))
-  const board = changeBoard(state, (b) => {
+  onChange((b) => {
     const card = b.cards[id]
     card.height = snapHeight
   })
-  return { ...state, board }
 }
 
-export function cardResized(state, { id, width, height }) {
+export function cardResized(onChange, doc, { id, width, height }) {
   // This gets called when we click the drag corner of a card, so avoid a
   // document change if in fact the card won't resize mod snapping.
   const snapWidth = snapMeasureToGrid(width)
   const snapHeight = snapMeasureToGrid(height)
-  if (snapWidth === state.board.cards[id].width && snapHeight === state.board.cards[id].height) {
-    return state
+  if (snapWidth === doc.cards[id].width && doc.cards[id].height) {
+    return
   }
-  const newBoard = changeBoard(state, (b) => {
+  onChange((b) => {
     const card = b.cards[id]
     card.width = snapWidth
     card.height = snapHeight
   })
-  return { ...state, board: newBoard }
 }
 
-export function cardDeleted(state, { id }) {
+export function cardDeleted(onChange, doc, { id }) {
   // allow either an array or a single card to be passed in
   if (id.constructor !== Array) {
     id = [id]
   }
 
-  const newBoard = changeBoard(state, (b) => {
+  onChange((b) => {
     id.forEach((id) => delete b.cards[id])
   })
-  return { ...state, board: newBoard }
 }
 
 /**
