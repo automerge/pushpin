@@ -8,6 +8,7 @@ const log = Debug('pushpin:image-card')
 export default class ImageCard extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired
   }
 
   constructor(props) {

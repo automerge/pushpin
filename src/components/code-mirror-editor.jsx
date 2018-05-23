@@ -6,7 +6,6 @@ import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 
 import Loop from '../loop'
-import * as TextCard from '../models/text-card'
 import * as Board from '../models/board'
 
 const log = Debug('pushpin:code-mirror-editor')
@@ -48,11 +47,9 @@ const visibleStyle = { }
 export default class CodeMirrorEditor extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
-      text: PropTypes.shape({
-        objectId: PropTypes.string.isRequired,
-        join: PropTypes.func.isRequired,
-      }),
+      text: PropTypes.object,
     }).isRequired,
+    onChange: PropTypes.func.isRequired,
     uniquelySelected: PropTypes.bool.isRequired,
     cardId: PropTypes.string.isRequired,
     cardHeight: PropTypes.number.isRequired,
@@ -66,6 +63,9 @@ export default class CodeMirrorEditor extends React.PureComponent {
     this.onCodeMirrorRefresh = this.onCodeMirrorRefresh.bind(this)
     this.setEditorRef = this.setEditorRef.bind(this)
     this.setRendererRef = this.setRendererRef.bind(this)
+
+    const { doc } = this.props
+    this.state = { doc }
   }
 
   // When the components mounts, and we therefore have refs to the DOM,
@@ -120,7 +120,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
     const at = codeMirror.indexFromPos(change.from)
     const removedLength = change.removed.join('\n').length
     const addedText = change.text.join('\n')
-    Loop.dispatch(TextCard.cardTextChanged, { id: this.props.cardId, at, removedLength, addedText })
+    this.cardTextChanged({ at, removedLength, addedText })
   }
 
   // This is called when the editor redraws, and therefore may have a new
@@ -189,6 +189,20 @@ export default class CodeMirrorEditor extends React.PureComponent {
     }
   }
 
+  cardTextChanged({ id, at, removedLength, addedText }) {
+    this.props.onChange((d) => {
+      if (removedLength > 0) {
+        d.text.splice(at, removedLength)
+      }
+
+      if (addedText.length > 0) {
+        d.text.insertAt(at, ...addedText.split(''))
+      }
+    })
+
+    this.setState({ ...this.state, doc })
+  }
+
   // Ensure the height associated with the card is equal to the greater of
   // the {editor height, renderer height, min card height}.
   checkHeight() {
@@ -235,7 +249,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
           ref={this.setRendererRef}
         >
           <ReactMarkdown
-            source={this.props.doc.text.join('')}
+            source={this.state.doc.text.join('')}
           />
         </div>
       </div>

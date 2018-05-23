@@ -23,10 +23,17 @@ export default class Content extends React.PureComponent {
     super(props)
     log('constructor')
 
+    this.onChange = this.onChange.bind(this)
+
     // State directly affects the rendered view.
     this.state = {
       loading: true
     }
+  }
+
+  onChange(changeBlock) {
+    const doc = window.hm.change(doc, changeBlock)
+    this.setState({ ...this.state, doc })
   }
 
   getHypermergeDoc(docId, cb) {
@@ -36,6 +43,15 @@ export default class Content extends React.PureComponent {
       }, err => {
         cb(err)
       })
+    // XXX fixme: lol
+    window.hm.on('document:updated', (id, doc) => {
+      if (id !== docId) {
+        return
+      }
+
+      // unregister listener
+      cb(null, doc)
+    })
   }
 
   componentDidMount() {
@@ -77,6 +93,7 @@ export default class Content extends React.PureComponent {
       docId={this.props.card.docId}
       cardHeight={this.props.card.height}
       uniquelySelected={this.props.uniquelySelected}
+      onChange={this.onChange}
       doc={this.state.doc}
     />) // how do we push other props down?
   }
