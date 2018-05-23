@@ -8,7 +8,7 @@ import * as Identity from '../models/identity'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
-    authors: PropTypes.objectOf(PropTypes.shape({
+    authors: PropTypes.arrayOf(PropTypes.shape({
       docId: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       avatar: PropTypes.string.isOptional
@@ -30,7 +30,7 @@ export default class Share extends React.PureComponent {
   }
 
   static defaultProps = {
-    authors: {},
+    authors: [],
     contacts: {},
     notifications: []
   }
