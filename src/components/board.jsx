@@ -53,13 +53,13 @@ export default class Board extends React.PureComponent {
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
+    this.onDrag = this.onDrag.bind(this)
+    this.onStop = this.onStop.bind(this)
     this.onPaste = this.onPaste.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
 
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
-
-    this.onDrag = this.onDrag.bind(this)
-    this.onStop = this.onStop.bind(this)
 
     this.tracking = {}
     this.state = { cards: {}, selected: [] }
@@ -78,7 +78,14 @@ export default class Board extends React.PureComponent {
 
   onKeyDown(e) {
     if (e.key === 'Backspace') {
-      Loop.dispatch(BoardModel.deleteSelections, { selectedIds: this.state.selected })
+      // backspace on the board can't erase a single text card
+      if (this.state.selected.length === 1) {
+        const card = this.props.doc.cards[this.state.selected[0]]
+        if (card && card.type === 'text') {
+          return
+        }
+      }
+      Loop.dispatch(BoardModel.cardDeleted, { id: this.state.selected })
     }
   }
 

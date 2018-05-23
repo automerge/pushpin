@@ -105,31 +105,6 @@ export function changeBoard(state, changeFn) {
 
 /**
  *
- * Selection management actions
- *
- */
-
-// XXX deleteCard should just accept an array
-export function deleteSelections(state, { selectedIds }) {
-  // backspace on the board can't erase a single text card
-  if (selectedIds.length === 1) {
-    const card = state.board.cards[selectedIds[0]]
-    if (card && card.type === 'text') {
-      return state
-    }
-  }
-
-  // still inefficient, but better
-  const deleteCardIDs = Object.keys(state.board.cards)
-    .filter((id) => (selectedIds.includes(id)))
-
-  state = deleteCardIDs.reduce((state, id) => (cardDeleted(state, { id })), state)
-
-  return state
-}
-
-/**
- *
  * Card placement / manipulation actions
  *
  */
@@ -176,8 +151,13 @@ export function cardResized(state, { id, width, height }) {
 }
 
 export function cardDeleted(state, { id }) {
+  // allow either an array or a single card to be passed in
+  if (id.constructor !== Array) {
+    id = [id]
+  }
+
   const newBoard = changeBoard(state, (b) => {
-    delete b.cards[id]
+    id.forEach((id) => delete b.cards[id])
   })
   return { ...state, board: newBoard }
 }
