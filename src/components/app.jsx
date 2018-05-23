@@ -31,7 +31,7 @@ export default class App extends React.PureComponent {
     // Otherwise render the board.
     return (
       <div>
-        <Content card={{ type: 'board', docId: this.props.state.workspace.boardId }} />
+        <Board doc={this.props.state.board} />
         <TitleBar
           // don't do this, this is bad,
           // but this is just to speed up wiring in the share dialogue
