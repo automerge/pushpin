@@ -192,8 +192,7 @@ function snapMeasureToGrid(measure) {
   return snapToGrid(measure) + 1
 }
 
-// XXX: stop exporting this
-export function snapMeasureOutwardToGrid(measure) {
+function snapMeasureOutwardToGrid(measure) {
   const snapped = snapMeasureToGrid(measure)
   if (snapped >= measure) {
     return snapped
