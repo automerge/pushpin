@@ -62,6 +62,7 @@ export default class Board extends React.PureComponent {
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
     this.onChangeBoardBackgroundColor = this.onChangeBoardBackgroundColor.bind(this)
+    this.onAddToggle = this.onAddToggle.bind(this)
 
     this.tracking = {}
     this.state = { cards: {}, selected: [] }
@@ -217,6 +218,12 @@ export default class Board extends React.PureComponent {
     // TODO: this should be
     // Loop.dispatch(Board.addCard, {x, y, type: TextCard, args: [], selected: false} )
     Loop.dispatch(TextCard.create, { x, y, text: '', selected: true })
+  }
+
+  onAddToggle(e) {
+    const x = e.pageX
+    const y = e.pageY
+    Loop.dispatch(BoardModel.addCard, {x, y, type: 'toggle', selected: true, initialState: { toggled: false }} )
   }
 
   onAddImage(e) {
@@ -480,6 +487,13 @@ export default class Board extends React.PureComponent {
               <i className="fa fa-sticky-note" />
             </div>
             <span className="ContextMenu__label">Note</span>
+          </ContextMenuItem>
+
+          <ContextMenuItem onClick={this.onAddToggle}>
+            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+              <i className="fa fa-sticky-note" />
+            </div>
+            <span className="ContextMenu__label">Toggle</span>
           </ContextMenuItem>
 
           <ContextMenuItem onClick={this.onAddImage}>

@@ -5,6 +5,7 @@ import Debug from 'debug'
 import CodeMirrorEditor from './code-mirror-editor'
 import ImageCard from './image-card'
 import Board from './board'
+import Toggle from './toggle'
 
 const log = Debug('pushpin:content')
 
@@ -79,7 +80,8 @@ export default class Content extends React.PureComponent {
     const TypeToTag = {
       text: CodeMirrorEditor,
       image: ImageCard,
-      board: Board
+      board: Board,
+      toggle: Toggle
     }
     const TagName = TypeToTag[this.props.card.type]
 
