@@ -19,6 +19,16 @@ export default class App extends React.PureComponent {
     }).isRequired
   }
 
+  constructor(props) {
+    super(props)
+    this.onChange = this.onChange.bind(this)
+  }
+
+  onChange(changeBlock) {
+    const doc = window.hm.change(this.props.state.board, changeBlock)
+    this.setState({ ...this.state, board: doc })
+  }
+
   render() {
     log('render')
 
@@ -30,7 +40,7 @@ export default class App extends React.PureComponent {
     // Otherwise render the board.
     return (
       <div>
-        <Board doc={this.props.state.board} />
+        <Board doc={this.props.state.board} onChange={this.onChange} />
         <TitleBar
           // don't do this, this is bad,
           // but this is just to speed up wiring in the share dialogue

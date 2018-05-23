@@ -60,6 +60,7 @@ export default class Board extends React.PureComponent {
 
     this.onAddNote = this.onAddNote.bind(this)
     this.onAddImage = this.onAddImage.bind(this)
+    this.onChangeBoardBackgroundColor = this.onChangeBoardBackgroundColor.bind(this)
 
     this.tracking = {}
     this.state = { cards: {}, selected: [] }
@@ -236,7 +237,7 @@ export default class Board extends React.PureComponent {
 
   onChangeBoardBackgroundColor(color) {
     log('onChangeBoardBackgroundColor')
-    Loop.dispatch(BoardModel.setBackgroundColor, { backgroundColor: color.hex })
+    BoardModel.newSetBackgroundColor(this.props.onChange, this.props.doc, { backgroundColor: color.hex })
   }
 
   // Copy view-relevant move/resize state over to React.
