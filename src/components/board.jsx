@@ -38,16 +38,11 @@ const draggableCards = (cards, selected, card) => {
 }
 
 export default class Board extends React.PureComponent {
-  static defaultProps = {
-    selected: []
-  }
-
   static propTypes = {
     doc: PropTypes.shape({
       backgroundColor: PropTypes.string,
       cards: PropTypes.objectOf(Card.propTypes.card).isRequired
-    }).isRequired,
-    selected: PropTypes.arrayOf(PropTypes.string),
+    }).isRequired
   }
 
   constructor(props) {
@@ -67,7 +62,7 @@ export default class Board extends React.PureComponent {
     this.onStop = this.onStop.bind(this)
 
     this.tracking = {}
-    this.state = { cards: {} }
+    this.state = { cards: {}, selected: [] }
   }
 
   componentDidMount() {
@@ -83,21 +78,22 @@ export default class Board extends React.PureComponent {
 
   onKeyDown(e) {
     if (e.key === 'Backspace') {
-      Loop.dispatch(BoardModel.deleteSelections)
+      Loop.dispatch(BoardModel.deleteSelections, { selectedIds: this.state.selected })
     }
   }
 
   onClick(e) {
     if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onClick')
-      Loop.dispatch(BoardModel.clearSelections)
+      this.setState({ ...this.state, selected: [] })
     }
   }
 
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      Loop.dispatch(TextCard.create, { x: e.pageX, y: e.pageY, text: '', selected: true })
+      // PRE-MERGE TODO: need a way to start out selected
+      Loop.dispatch(TextCard.create, { x: e.pageX, y: e.pageY, text: '' })
     }
   }
 
@@ -336,7 +332,7 @@ export default class Board extends React.PureComponent {
       const moving = !resizing
 
       if (moving) {
-        const cards = draggableCards(this.props.doc.cards, this.props.selected, card)
+        const cards = draggableCards(this.props.doc.cards, this.state.selected, card)
 
         cards.forEach(c => {
           this.tracking[c.id] = {
@@ -364,7 +360,7 @@ export default class Board extends React.PureComponent {
     }
 
     if (tracking.moving) {
-      const cards = draggableCards(this.props.doc.cards, this.props.selected, card)
+      const cards = draggableCards(this.props.doc.cards, this.state.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         this.effectDrag(card, t, d)
@@ -381,21 +377,31 @@ export default class Board extends React.PureComponent {
   onStop(card, e, d) {
     log('onStop')
 
-    const tracking = this.tracking[card.id]
+    const { id } = card
+    const { selected } = this.state
+    const tracking = this.tracking[id]
 
     // If tracking is not initialized, treat this as a click
     if (!(tracking && (tracking.moving || tracking.resizing))) {
       if (e.ctrlKey || e.shiftKey) {
-        Loop.dispatch(BoardModel.cardToggleSelection, { id: card.id })
+        if (selected.includes(card.id)) {
+          // remove from the current state if we have it
+          this.setState({ ...this.state,
+            selected: selected.filter((filterId) => filterId !== id) })
+        } else {
+          // add to the current state if we don't
+          this.setState({ ...this.state, selected: [...selected, id] })
+        }
       } else {
-        Loop.dispatch(BoardModel.cardUniquelySelected, { id: card.id })
+        // otherwise we don't have shift/ctrl, so just set selection to this
+        this.setState({ ...this.state, selected: [card.id] })
       }
 
       return
     }
 
     if (tracking.moving) {
-      const cards = draggableCards(this.props.doc.cards, this.props.selected, card)
+      const cards = draggableCards(this.props.doc.cards, this.state.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         const x = t.moveX
@@ -435,8 +441,8 @@ export default class Board extends React.PureComponent {
     const cards = this.props.doc.cards || {}
     // rework selected functioning, this is a slow implementation
     const cardChildren = Object.entries(cards).map(([id, card]) => {
-      const selected = this.props.selected.includes(id)
-      const uniquelySelected = selected && this.props.selected.length === 1
+      const selected = this.state.selected.includes(id)
+      const uniquelySelected = selected && this.state.selected.length === 1
       return (
         <DraggableCore
           key={id}

@@ -108,33 +108,12 @@ export function changeBoard(state, changeFn) {
  * Selection management actions
  *
  */
-export function cardToggleSelection(state, { id }) {
-  if (state.selected.includes(id)) {
-    return { ...state, selected: state.selected.filter((filterId) => filterId !== id) }
-  }
-  return { ...state, selected: [...state.selected, id] }
-}
 
-export function cardSelected(state, { id }) {
-  // allow either an array or a single card to be passed in
-  if (id.constructor !== Array) {
-    id = [id]
-  }
-  return { ...state, selected: [...state.selected, ...id] }
-}
-
-export function cardUniquelySelected(state, { id }) {
-  return { ...state, selected: [id] }
-}
-
-export function clearSelections(state) {
-  return { ...state, selected: [] }
-}
-
-export function deleteSelections(state) {
+// XXX deleteCard should just accept an array
+export function deleteSelections(state, { selectedIds }) {
   // backspace on the board can't erase a single text card
-  if (state.selected.length === 1) {
-    const card = state.board.cards[state.selected[0]]
+  if (selectedIds.length === 1) {
+    const card = state.board.cards[selectedIds[0]]
     if (card && card.type === 'text') {
       return state
     }
@@ -142,7 +121,7 @@ export function deleteSelections(state) {
 
   // still inefficient, but better
   const deleteCardIDs = Object.keys(state.board.cards)
-    .filter((id) => (state.selected.includes(id)))
+    .filter((id) => (selectedIds.includes(id)))
 
   state = deleteCardIDs.reduce((state, id) => (cardDeleted(state, { id })), state)
 
@@ -280,7 +259,7 @@ export function addSelfToAuthors(state) {
  */
 
 
-export function cardCreated(state, { x, y, width, height, selected, type, docId, doc }) {
+export function cardCreated(state, { x, y, width, height, type, docId, doc }) {
   const id = uuid()
 
   const newBoard = changeBoard(state, (b) => {
@@ -308,7 +287,5 @@ export function cardCreated(state, { x, y, width, height, selected, type, docId,
   let newDocs = state.docs
   newDocs = { ...newDocs, [docId]: doc }
 
-  const newSelected = selected ? [id] : []
-
-  return { ...state, docs: newDocs, board: newBoard, selected: newSelected }
+  return { ...state, docs: newDocs, board: newBoard }
 }

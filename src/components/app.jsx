@@ -32,7 +32,6 @@ export default class App extends React.PureComponent {
       <div>
         <Board
           doc={this.props.state.board}
-          selected={this.props.state.selected}
         />
         <TitleBar
           // don't do this, this is bad,
