@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 import Debug from 'debug'
 
 import Loop from '../loop'
@@ -12,7 +11,7 @@ export default class HashForm extends React.PureComponent {
   static propTypes = {
     formDocId: PropTypes.string.isRequired,
     // activeDocId: PropTypes.string.isRequired,
-    requestedDocId: PropTypes.string.isRequired,
+    // requestedDocId: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -37,6 +36,7 @@ export default class HashForm extends React.PureComponent {
   render() {
     log('render')
 
+    // Should go back to checking activeDocId === requestedDocId for className
     return (
       <div className="HashForm">
         <form onSubmit={this.onSubmit}>
@@ -44,8 +44,7 @@ export default class HashForm extends React.PureComponent {
             type="text"
             value={this.props.formDocId}
             onChange={this.onChange}
-            // className={classNames(this.props.activeDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
-            className={classNames(this.props.requestedDocId === this.props.requestedDocId ? 'loaded' : 'loading')}
+            className="loaded"
           />
         </form>
       </div>

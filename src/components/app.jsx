@@ -4,7 +4,6 @@ import Debug from 'debug'
 
 import TitleBar from './title-bar'
 import Board from './board'
-import Content from './content'
 
 const log = Debug('pushpin:app')
 
