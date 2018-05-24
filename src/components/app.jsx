@@ -4,6 +4,8 @@ import Debug from 'debug'
 
 import TitleBar from './title-bar'
 import Board from './board'
+import * as BoardModel from '../models/board'
+import Loop from '../loop'
 
 const log = Debug('pushpin:app')
 
@@ -26,7 +28,7 @@ export default class App extends React.PureComponent {
 
   onChange(changeBlock) {
     const doc = window.hm.change(this.props.state.board, changeBlock)
-    this.setState({ ...this.state, board: doc })
+    Loop.dispatch(BoardModel.setBoardState, { board: doc })
   }
 
   render() {
