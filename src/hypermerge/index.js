@@ -155,15 +155,15 @@ class Hypermerge extends EventEmitter {
 
     if (this.readyIndex[docId]) {
       return Promise.resolve(this.docs[docId])
-    } else {
-      return new Promise((res, rej) => {
-        this.on('document:ready', (updatedId, doc) => {
-          if (docId === updatedId) {
-            res(doc)
-          }
-        })
-      })
     }
+
+    return new Promise((res, rej) => {
+      this.on('document:ready', (updatedId, doc) => {
+        if (docId === updatedId) {
+          res(doc)
+        }
+      })
+    })
   }
 
   /**
