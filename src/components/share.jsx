@@ -42,6 +42,7 @@ export default class Share extends React.PureComponent {
   }
 
   handleShare(e, contact) {
+    // i deleted board.docId
     Loop.dispatch(
       Identity.updateSelfOfferDocumentToIdentity,
       { identityId: contact.docId, sharedDocId: this.props.board.docId }
@@ -98,6 +99,7 @@ export default class Share extends React.PureComponent {
   }
 
   acceptNotification(notification) {
+    // i deleted board.docId
     Loop.dispatch(Model.openAndRequestBoard, { docId: notification.board.docId })
   }
 

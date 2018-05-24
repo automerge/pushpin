@@ -9,13 +9,40 @@ import Loop from '../loop'
 import Card from './card'
 import ColorPicker from './color-picker'
 import * as BoardModel from '../models/board'
-import * as TextCard from '../models/text-card'
-import * as ImageCard from '../models/image-card'
+import Content from './content'
+import uuid from 'uuid/v4'
 
 const { dialog } = remote
 
 const log = Debug('pushpin:board')
 const BOARD_MENU_ID = 'BoardMenu'
+
+// ## Demo data
+
+const WELCOME_TEXT =
+`## Welcome
+
+This is our demo board!`
+
+const USAGE_TEXT =
+`### Usage
+
+* Double-click to create a new text card.
+* Right-click to create a new text or image card.
+* Click on a card to edit its text.
+* Write Markdown in cards for formatting.
+* Click and drag anywhere on a card to move it around.
+* Click and drag on the bottom right corner of a card to resize it.
+* Paste an absolute file name to an image as the only text in a card + hit enter, to load that file.
+* Use arrow keys to scroll around the board.`
+
+const EXAMPLE_TEXT =
+`### Example data
+
+We've made some initial cards for you to play with. Have fun!`
+
+const KAY_PATH = './img/kay.jpg'
+const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
 const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
@@ -67,8 +94,37 @@ export default class Board extends React.PureComponent {
     this.state = { cards: {}, selected: [] }
   }
 
+  static initializeDocument(onChange) {
+    onChange((b) => {
+      b.title = 'No Title'
+      b.color = BoardModel.BOARD_COLORS.SKY
+      b.authorIds = []
+    })
+  }
+
+  populateDemoBoard() {
+    this.props.onChange((b) => {
+      b.cards = {}
+    })
+    this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
+    this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
+    this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
+
+    // this.setTitle(, { title: 'Example Board' })
+    // newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
+
+    // newState = addSelfToAuthors(newState)
+
+    // These will be handled async as they require their own IO.
+    // Loop.dispatch(ImageCard.importImageThenCreate, { x: 550, y: 500, path: KAY_PATH })
+    // Loop.dispatch(ImageCard.importImageThenCreate, { x: 600, y: 150, path: WORKSHOP_PATH })
+  }
+
   componentDidMount() {
     log('componentDidMount')
+    if (!this.props.doc.cards) {
+      this.populateDemoBoard()
+    }
     document.addEventListener('keydown', this.onKeyDown)
   }
 
@@ -236,9 +292,40 @@ export default class Board extends React.PureComponent {
     })
   }
 
+  createCard({ x, y, width, height, type, typeAttrs }) {
+    const id = uuid()
+
+    const { docId } = Content.initializeContentDoc(type, typeAttrs)
+
+    const doc = this.props.onChange((b) => {
+      const snapX = BoardModel.snapCoordinateToGrid(x)
+      const snapY = BoardModel.snapCoordinateToGrid(y)
+      const newCard = {
+        id,
+        type,
+        docId,
+        x: snapX,
+        y: snapY,
+        width: BoardModel.snapMeasureToGrid(width || BoardModel.CARD_DEFAULT_WIDTH),
+        height: BoardModel.snapMeasureToGrid(height || BoardModel.CARD_DEFAULT_HEIGHT),
+        slackWidth: 0,
+        slackHeight: 0,
+        resizing: false,
+        moving: false,
+      }
+      b.cards[id] = newCard
+    })
+
+    return doc
+  }
+
   onChangeBoardBackgroundColor(color) {
     log('onChangeBoardBackgroundColor')
-    BoardModel.newSetBackgroundColor(this.props.onChange, this.props.doc, { backgroundColor: color.hex })
+    BoardModel.newSetBackgroundColor(
+      this.props.onChange,
+      this.props.doc,
+      { backgroundColor: color.hex }
+    )
   }
 
   // Copy view-relevant move/resize state over to React.

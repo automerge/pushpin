@@ -8,6 +8,13 @@ import Board from './board'
 
 const log = Debug('pushpin:content')
 
+const TypeToTag = {
+  text: CodeMirrorEditor,
+  image: ImageCard,
+  board: Board
+}
+
+
 export default class Content extends React.PureComponent {
   static propTypes = {
     uniquelySelected: PropTypes.bool.isRequired,
@@ -31,9 +38,25 @@ export default class Content extends React.PureComponent {
     }
   }
 
+  static initializeContentDoc(type, typeAttrs) {
+    const { hm } = window // still not a great idea
+    const documentInitializationFunction = TypeToTag[type].initializeDocument
+
+    let doc = hm.create()
+    const onChange = (cb) => {
+      doc = hm.change(doc, cb)
+    }
+
+    documentInitializationFunction(onChange, typeAttrs)
+    const docId = hm.getId(doc)
+
+    return docId
+  }
+
   onChange(changeBlock) {
     const doc = window.hm.change(this.state.doc, changeBlock)
     this.setState({ ...this.state, doc })
+    return doc
   }
 
   getHypermergeDoc(docId, cb) {
@@ -76,11 +99,6 @@ export default class Content extends React.PureComponent {
   }
 
   render() {
-    const TypeToTag = {
-      text: CodeMirrorEditor,
-      image: ImageCard,
-      board: Board
-    }
     const TagName = TypeToTag[this.props.card.type]
 
     if (this.state.loading) {

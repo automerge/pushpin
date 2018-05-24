@@ -122,20 +122,14 @@ export function documentReady(state, { docId, doc }) {
       board: doc
     }
 
-    if (!state.board.cards) {
-      log('documentReady.populateStart', state)
-      state = Board.populateDemoBoard(state)
-      log('documentReady.populateFinish', state)
-    }
-
-    state = Board.addSelfToAuthors(state)
+    // state = Board.addSelfToAuthors(state)
     state = Workspace.updateContactIds(
       state,
       { candidateContactIds: state.board.authorIds }
     )
     state = Workspace.updateSeenBoardIds(state, { docId })
 
-    Object.values(state.board.cards).forEach(c => {
+    Object.values(state.board.cards || []).forEach(c => {
       Loop.dispatch(openDocument, { docId: c.docId })
     })
   }

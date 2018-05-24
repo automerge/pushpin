@@ -4,9 +4,11 @@ import ReactMarkdown from 'react-markdown'
 import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
+import Automerge from 'automerge'
 
 import Loop from '../loop'
 import * as Board from '../models/board'
+
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -54,6 +56,14 @@ export default class CodeMirrorEditor extends React.PureComponent {
     cardId: PropTypes.string.isRequired,
     cardHeight: PropTypes.number.isRequired,
   }
+
+  static initializeDocument(onChange, { text }) {
+    onChange(d => {
+      d.text = new Automerge.Text()
+      d.text.insertAt(0, ...text.split(''))
+    })
+  }
+
 
   constructor(props) {
     log('constructor')

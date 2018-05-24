@@ -35,7 +35,7 @@ export default class App extends React.PureComponent {
     log('render')
 
     // Blank while state is initializing.
-    if (!this.props.state.board || !this.props.state.board.cards) {
+    if (!this.props.state.board) {
       return <div />
     }
 

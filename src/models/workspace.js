@@ -5,17 +5,19 @@ import Debug from 'debug'
 import Loop from '../loop'
 import * as Model from './model'
 import * as Board from './board'
+
+import BoardComponent from '../components/board'
 import * as Identity from './identity'
 
 const log = Debug('pushpin:workspace')
 
 export function create(state) {
-  const workspace = state.hm.create()
+  let workspace = state.hm.create()
   const docId = state.hm.getId(workspace)
 
   Loop.dispatch(saveWorkspaceId, { docId })
 
-  const nextWorkspace = state.hm.change(workspace, (ws) => {
+  workspace = state.hm.change(workspace, (ws) => {
     ws.selfId = ''
     ws.seenBoardIds = []
     ws.offeredIds = []
@@ -24,9 +26,19 @@ export function create(state) {
 
   // should these be synchronous? does it matter?
   Loop.dispatch(Identity.create)
-  Loop.dispatch(Board.create)
 
-  return { ...state, workspace: nextWorkspace }
+  const doc = state.hm.create()
+  const onChange = function onChange(cb) {
+    state.hm.change(doc, cb)
+  }
+
+  const boardId = state.hm.getId(doc)
+  workspace = state.hm.change(workspace, (ws) => {
+    ws.boardId = boardId
+  })
+  BoardComponent.initializeDocument(onChange)
+
+  return { ...state, workspace }
 }
 
 export function updateSeenBoardIds(state, { docId }) {

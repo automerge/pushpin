@@ -1,9 +1,7 @@
-import uuid from 'uuid/v4'
+
 
 import Loop from '../loop'
 import * as Workspace from './workspace'
-import * as ImageCard from './image-card'
-import * as TextCard from './text-card'
 
 // Board constants
 
@@ -41,61 +39,6 @@ export function create(state) {
   }
 }
 
-// ## Demo data
-
-const WELCOME_TEXT =
-`## Welcome
-
-This is our demo board!`
-
-const USAGE_TEXT =
-`### Usage
-
-* Double-click to create a new text card.
-* Right-click to create a new text or image card.
-* Click on a card to edit its text.
-* Write Markdown in cards for formatting.
-* Click and drag anywhere on a card to move it around.
-* Click and drag on the bottom right corner of a card to resize it.
-* Paste an absolute file name to an image as the only text in a card + hit enter, to load that file.
-* Use arrow keys to scroll around the board.`
-
-const EXAMPLE_TEXT =
-`### Example data
-
-We've made some initial cards for you to play with. Have fun!`
-
-const KAY_PATH = './img/kay.jpg'
-const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
-
-// this really should not need exporting
-export function populateDemoBoard(state) {
-  if (state.board.cards) {
-    throw new Error('Should only be called on an empty board')
-  }
-  // not sure if this is an antipattern
-  const boardDocId = state.hm.getId(state.board)
-  const newBoard = changeBoard(state, (b) => {
-    b.docId = boardDocId
-    b.cards = {}
-    b.authorIds = []
-  })
-  let newState = { ...state, board: newBoard }
-  newState = TextCard.create(newState, { x: 150, y: 100, text: WELCOME_TEXT })
-  newState = TextCard.create(newState, { x: 150, y: 250, text: USAGE_TEXT })
-  newState = TextCard.create(newState, { x: 150, y: 750, text: EXAMPLE_TEXT })
-
-  newState = setTitle(newState, { title: 'Example Board' })
-  newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
-
-  newState = addSelfToAuthors(newState)
-
-  // These will be handled async as they require their own IO.
-  Loop.dispatch(ImageCard.importImageThenCreate, { x: 550, y: 500, path: KAY_PATH })
-  Loop.dispatch(ImageCard.importImageThenCreate, { x: 600, y: 150, path: WORKSHOP_PATH })
-
-  return newState
-}
 
 // Helper for state.hm.change so that it's easier to insert debugging.
 // still used by text-card.js#cardTextChanged (at least)
@@ -170,7 +113,7 @@ export function cardDeleted(onChange, doc, { id }) {
  */
 
 // Snap given num to nearest multiple of our grid size.
-function snapToGrid(num) {
+export function snapToGrid(num) {
   const resto = num % GRID_SIZE
   if (resto <= (GRID_SIZE / 2)) {
     return num - resto
@@ -185,15 +128,15 @@ function snapToGrid(num) {
 // ever increases the measure, which are needed for some types of content
 // (like text which shouldn't get cut off by snapping).
 
-function snapCoordinateToGrid(coordinate) {
+export function snapCoordinateToGrid(coordinate) {
   return snapToGrid(coordinate)
 }
 
-function snapMeasureToGrid(measure) {
+export function snapMeasureToGrid(measure) {
   return snapToGrid(measure) + 1
 }
 
-function snapMeasureOutwardToGrid(measure) {
+export function snapMeasureOutwardToGrid(measure) {
   const snapped = snapMeasureToGrid(measure)
   if (snapped >= measure) {
     return snapped

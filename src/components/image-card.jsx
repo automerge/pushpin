@@ -17,6 +17,14 @@ export default class ImageCard extends React.PureComponent {
     this.state = { imageContentReady: false }
   }
 
+  static initializeDocument(onChange, { hyperfile }) {
+    onChange(d => {
+      d.hyperfileId = hyperfile.key
+      d.imageId = hyperfile.imageId
+      d.imageExt = hyperfile.imageExt
+    })
+  }
+
   componentDidMount() {
     this.mounted = true
     this.setState({ imageContentReady: false }, () => {
