@@ -4,9 +4,9 @@ import ReactMarkdown from 'react-markdown'
 import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
+import Automerge from 'automerge'
 
-import Loop from '../loop'
-import * as Board from '../models/board'
+import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -252,3 +252,16 @@ export default class CodeMirrorEditor extends React.PureComponent {
     )
   }
 }
+
+ContentTypes.register({
+  component: CodeMirrorEditor,
+  type: 'text',
+  name: 'Text',
+  icon: 'sticky-note',
+  initialize: (doc, args) => {
+    doc.text = new Automerge.Text()
+    if (args && args.text) {
+      doc.text.insertAt(0, ...args.text.split(''))
+    }
+  }
+})

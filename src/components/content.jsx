@@ -2,9 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
+import ContentTypes from '../content-types'
+
+// Import these even though we don't use them, to be sure they register with ContentTypes.
 import CodeMirrorEditor from './code-mirror-editor'
 import ImageCard from './image-card'
-import Board from './board'
 import Toggle from './toggle'
 
 const log = Debug('pushpin:content')
@@ -77,20 +79,17 @@ export default class Content extends React.PureComponent {
   }
 
   render() {
-    const TypeToTag = {
-      text: CodeMirrorEditor,
-      image: ImageCard,
-      board: Board,
-      toggle: Toggle
+    const contentType = ContentTypes.list().find((contentType) => contentType.type === this.props.card.type)
+    if (!contentType) {
+      throw new Error(`Could not find component of type ${this.props.card.type}`)
     }
-    const TagName = TypeToTag[this.props.card.type]
 
     if (this.state.loading) {
       // stand-in content could go here
       return <p>Loading...</p>
     }
 
-    return (<TagName
+    return (<contentType.component
       cardId={this.props.card.id}
       docId={this.props.card.docId}
       cardHeight={this.props.card.height}

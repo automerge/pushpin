@@ -2,8 +2,8 @@ import uuid from 'uuid/v4'
 
 import Loop from '../loop'
 import * as Workspace from './workspace'
-import * as ImageCard from './image-card'
-import * as TextCard from './text-card'
+import ContentTypes from '../content-types'
+// import * as ImageCard from './image-card'
 
 // Board constants
 
@@ -81,9 +81,26 @@ export function populateDemoBoard(state) {
     b.authorIds = []
   })
   let newState = { ...state, board: newBoard }
-  newState = TextCard.create(newState, { x: 150, y: 100, text: WELCOME_TEXT })
-  newState = TextCard.create(newState, { x: 150, y: 250, text: USAGE_TEXT })
-  newState = TextCard.create(newState, { x: 150, y: 750, text: EXAMPLE_TEXT })
+
+  const textType = ContentTypes.list().find((t) => t.type === 'text')
+  newState = addCard(newState, {
+    x: 150,
+    y: 250,
+    contentType: textType,
+    args: { text: USAGE_TEXT }
+  })
+  newState = addCard(newState, {
+    x: 150,
+    y: 100,
+    contentType: textType,
+    args: { text: WELCOME_TEXT }
+  })
+  newState = addCard(newState, {
+    x: 150,
+    y: 750,
+    contentType: textType,
+    args: { text: EXAMPLE_TEXT }
+  })
 
   newState = setTitle(newState, { title: 'Example Board' })
   newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
@@ -91,8 +108,8 @@ export function populateDemoBoard(state) {
   newState = addSelfToAuthors(newState)
 
   // These will be handled async as they require their own IO.
-  Loop.dispatch(ImageCard.importImageThenCreate, { x: 550, y: 500, path: KAY_PATH })
-  Loop.dispatch(ImageCard.importImageThenCreate, { x: 600, y: 150, path: WORKSHOP_PATH })
+  // Loop.dispatch(ImageCard.importImageThenCreate, { x: 550, y: 500, path: KAY_PATH })
+  // Loop.dispatch(ImageCard.importImageThenCreate, { x: 600, y: 150, path: WORKSHOP_PATH })
 
   return newState
 }
@@ -277,13 +294,13 @@ export function cardCreated(state, { x, y, width, height, type, docId, doc }) {
   return { ...state, docs: newDocs, board: newBoard }
 }
 
-export function addCard(state, { x, y, type, selected, initialState }) {
+export function addCard(state, { x, y, contentType, args, selected }) {
   let doc = state.hm.create()
   const docId = state.hm.getId(doc)
 
-  doc = state.hm.change(doc, d => d = initialState)
+  doc = state.hm.change(doc, (doc) => { contentType.initialize(doc, args) })
 
-  Loop.dispatch(Board.cardCreated, { x, y, type, selected, docId, doc })
+  Loop.dispatch(cardCreated, { x, y, type: contentType.type, selected, docId, doc })
 
   return state
 }
