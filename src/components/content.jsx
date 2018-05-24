@@ -2,18 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import CodeMirrorEditor from './code-mirror-editor'
-import ImageCard from './image-card'
-import Board from './board'
-
 const log = Debug('pushpin:content')
-
-const TypeToTag = {
-  text: CodeMirrorEditor,
-  image: ImageCard,
-  board: Board
-}
-
 
 export default class Content extends React.PureComponent {
   static propTypes = {
@@ -24,6 +13,11 @@ export default class Content extends React.PureComponent {
       height: PropTypes.number,
       docId: PropTypes.string,
     }).isRequired
+  }
+
+  static typeToTag = {}
+  static registerType(type, component) {
+    this.typeToTag[type] = component
   }
 
   constructor(props) {
@@ -40,7 +34,7 @@ export default class Content extends React.PureComponent {
 
   static initializeContentDoc(type, typeAttrs) {
     const { hm } = window // still not a great idea
-    const documentInitializationFunction = TypeToTag[type].initializeDocument
+    const documentInitializationFunction = Content.typeToTag[type].initializeDocument
 
     let doc = hm.create()
     const onChange = (cb) => {
@@ -99,7 +93,7 @@ export default class Content extends React.PureComponent {
   }
 
   render() {
-    const TagName = TypeToTag[this.props.card.type]
+    const TagName = Content.typeToTag[this.props.card.type]
 
     if (this.state.loading) {
       // stand-in content could go here

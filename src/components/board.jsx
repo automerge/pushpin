@@ -99,13 +99,11 @@ export default class Board extends React.PureComponent {
       b.title = 'No Title'
       b.color = BoardModel.BOARD_COLORS.SKY
       b.authorIds = []
+      b.cards = {}
     })
   }
 
   populateDemoBoard() {
-    this.props.onChange((b) => {
-      b.cards = {}
-    })
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
@@ -122,7 +120,7 @@ export default class Board extends React.PureComponent {
 
   componentDidMount() {
     log('componentDidMount')
-    if (!this.props.doc.cards) {
+    if (Object.keys(this.props.doc.cards).length === 0) {
       this.populateDemoBoard()
     }
     document.addEventListener('keydown', this.onKeyDown)
@@ -294,10 +292,9 @@ export default class Board extends React.PureComponent {
 
   createCard({ x, y, width, height, type, typeAttrs }) {
     const id = uuid()
+    const docId = Content.initializeContentDoc(type, typeAttrs)
 
-    const { docId } = Content.initializeContentDoc(type, typeAttrs)
-
-    const doc = this.props.onChange((b) => {
+    this.props.onChange((b) => {
       const snapX = BoardModel.snapCoordinateToGrid(x)
       const snapY = BoardModel.snapCoordinateToGrid(y)
       const newCard = {
@@ -315,8 +312,6 @@ export default class Board extends React.PureComponent {
       }
       b.cards[id] = newCard
     })
-
-    return doc
   }
 
   onChangeBoardBackgroundColor(color) {

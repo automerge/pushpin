@@ -5,6 +5,7 @@ import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 import Automerge from 'automerge'
+import Content from './content'
 
 import Loop from '../loop'
 import * as Board from '../models/board'

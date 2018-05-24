@@ -3,9 +3,17 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import TitleBar from './title-bar'
-import Board from './board'
 import * as BoardModel from '../models/board'
 import Loop from '../loop'
+import Content from './content'
+
+import Board from './board'
+import ImageCard from './image-card'
+import CodeMirrorEditor from './code-mirror-editor'
+
+Content.registerType('board', Board)
+Content.registerType('image', ImageCard)
+Content.registerType('text', CodeMirrorEditor)
 
 const log = Debug('pushpin:app')
 
@@ -16,19 +24,9 @@ export default class App extends React.PureComponent {
       // activeDocId: PropTypes.string,
       selected: PropTypes.arrayOf(PropTypes.string),
       workspace: PropTypes.object, // TODO: this should probably be better managed
-      self: PropTypes.object, // TODO: better validation as well?
-      board: PropTypes.shape(Board.propTypes),
+      self: PropTypes.object // TODO: better validation as well?
+      // board: PropTypes.shape(Board.propTypes),
     }).isRequired
-  }
-
-  constructor(props) {
-    super(props)
-    this.onChange = this.onChange.bind(this)
-  }
-
-  onChange(changeBlock) {
-    const doc = window.hm.change(this.props.state.board, changeBlock)
-    Loop.dispatch(BoardModel.setBoardState, { board: doc })
   }
 
   render() {
@@ -39,21 +37,20 @@ export default class App extends React.PureComponent {
       return <div />
     }
 
+    const contentProps = {
+      uniquelySelected: false,
+      card: {
+        type: 'board',
+        id: '1',
+        height: 800,
+        docId: window.hm.getId(this.props.state.board),
+      }
+    }
+
     // Otherwise render the board.
     return (
       <div>
-        <Board doc={this.props.state.board} onChange={this.onChange} />
-        <TitleBar
-          // don't do this, this is bad,
-          // but this is just to speed up wiring in the share dialogue
-          state={this.props.state}
-          board={this.props.state.board}
-          boardBackgroundColor={this.props.state.board.backgroundColor}
-          formDocId={this.props.state.formDocId}
-          // activeDocId={this.props.state.activeDocId}
-          requestedDocId={this.props.state.workspace.boardId}
-          self={this.props.state.self}
-        />
+        <Content {...contentProps} />
       </div>
     )
   }

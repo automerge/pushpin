@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import * as ImageCardModel from '../models/image-card'
+import Content from './content'
 import Debug from 'debug'
 
 const log = Debug('pushpin:image-card')
