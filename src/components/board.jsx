@@ -52,11 +52,6 @@ const withinCard = (card, x, y) => (x >= card.x) &&
 const withinAnyCard = (cards, x, y) =>
   Object.values(cards).some((card) => withinCard(card, x, y))
 
-const boardStyle = {
-  width: BoardModel.BOARD_WIDTH,
-  height: BoardModel.BOARD_HEIGHT
-}
-
 const draggableCards = (cards, selected, card) => {
   if (selected.length > 0 && selected.find(id => id === card.id)) {
     return selected.map(id => cards[id])
@@ -290,7 +285,7 @@ export default class Board extends React.PureComponent {
     })
   }
 
-  createCard({ x, y, width, height, type, typeAttrs }) {
+  createCard(state, { x, y, width, height, type, typeAttrs }) {
     const id = uuid()
     const docId = Content.initializeContentDoc(type, typeAttrs)
 
@@ -594,7 +589,7 @@ export default class Board extends React.PureComponent {
             id="board"
             className="board"
             ref={(e) => { this.boardRef = e }}
-            style={{ ...boardStyle, backgroundColor: this.props.doc.backgroundColor }}
+            style={{ backgroundColor: this.props.doc.backgroundColor }}
             onClick={this.onClick}
             onDoubleClick={this.onDoubleClick}
             onDragOver={this.onDragOver}

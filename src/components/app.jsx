@@ -48,10 +48,6 @@ export default class App extends React.PureComponent {
     }
 
     // Otherwise render the board.
-    return (
-      <div>
-        <Content {...contentProps} />
-      </div>
-    )
+    return <Content {...contentProps} />
   }
 }

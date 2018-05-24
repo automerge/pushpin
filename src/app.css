@@ -79,6 +79,11 @@ a {
 
 /* App Styles */
 
+html, body, #app, [data-reactroot], .react-contextmenu-wrapper, .board {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
