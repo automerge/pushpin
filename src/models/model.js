@@ -212,7 +212,7 @@ export function openAndRequestBoard(state, { docId }) {
 export function openDocument(state, { docId }) {
   state.hm.open(docId)
     .then(doc => {
-      Loop.dispatch(documentReady, {doc, docId})
+      Loop.dispatch(documentReady, { doc, docId })
     })
 
   return state
