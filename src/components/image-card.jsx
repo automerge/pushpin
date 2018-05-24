@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as ImageCardModel from '../models/image-card'
 import Content from './content'
+import * as Hyperfile from '../hyperfile'
 import Debug from 'debug'
+import uuid from 'uuid/v4'
 
 const log = Debug('pushpin:image-card')
 
@@ -18,35 +19,59 @@ export default class ImageCard extends React.PureComponent {
     this.state = { imageContentReady: false }
   }
 
-  static initializeDocument(onChange, { hyperfile }) {
-    onChange(d => {
-      d.hyperfileId = hyperfile.key
-      d.imageId = hyperfile.imageId
-      d.imageExt = hyperfile.imageExt
-    })
+  static initializeDocument(onChange, { path }) {
+    onChange(d => d.path = path)
   }
 
   componentDidMount() {
     this.mounted = true
-    this.setState({ imageContentReady: false }, () => {
-      const hyperFile = {
-        key: this.props.doc.hyperfileId,
-        imageId: this.props.doc.imageId,
-        imageExt: this.props.doc.imageExt
+
+    if (this.props.doc.path) {
+      this.uploadImage()
+    }
+
+    if (this.props.doc.hyperfile) {
+      this.fetchImage()
+    }
+  }
+
+  componentWillUpdate() {
+    if (this.props.doc.path) {
+      this.uploadImage()
+    }
+
+    if (this.props.doc.hyperfile) {
+      this.fetchImage()
+    }
+  }
+
+  uploadImage() {
+    const fileId = uuid()
+    Hyperfile.writePath(fileId, this.props.doc.path, (err, hyperfile) => {
+      if (err) {
+        log(err)
       }
-      ImageCardModel.fetchImage(hyperFile, (error, imagePath) => {
-        if (error) {
-          log(error)
-        }
 
-        // This card may have been deleted by the time fetchImage returns,
-        // so check here to see if the component is still mounted
-        if (!this.mounted) {
-          return
-        }
-
-        this.setState({ imageContentReady: true, imagePath: `../${imagePath}` })
+      this.props.onChange(d => {
+        delete d.path
+        d.hyperfile = hyperfile
       })
+    })
+  }
+
+  fetchImage() {
+    Hyperfile.fetch(this.props.doc.hyperfile, (error, imagePath) => {
+      if (error) {
+        log(error)
+      }
+
+      // This card may have been deleted by the time fetchImage returns,
+      // so check here to see if the component is still mounted
+      if (!this.mounted) {
+        return
+      }
+
+      this.setState({ imageContentReady: true, imagePath: `../${imagePath}` })
     })
   }
 
@@ -55,6 +80,7 @@ export default class ImageCard extends React.PureComponent {
   }
 
   render() {
+    log('render')
     if (!this.state.imageContentReady) {
       return <p>Fetching {this.props.doc.imageId}</p>
       // we should put useful stand-in content here, like alt-text or a caption

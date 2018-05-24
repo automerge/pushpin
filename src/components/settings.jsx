@@ -5,7 +5,7 @@ import { remote } from 'electron'
 import Loop from '../loop'
 
 // we should make the avatar image a proper ImageCard
-import { IMAGE_DIALOG_OPTIONS } from '../models/image-card'
+import { IMAGE_DIALOG_OPTIONS } from '../constants'
 import * as Identity from '../models/identity'
 
 const { dialog } = remote

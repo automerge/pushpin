@@ -2,6 +2,15 @@ import Hypercore from 'hypercore'
 import Hyperdiscovery from 'hyperdiscovery'
 import Fs from 'fs'
 import Path from 'path'
+import mkdirp from 'mkdirp'
+
+const USER = process.env.NAME || 'userA'
+const USER_PATH = Path.join('.', 'data', USER)
+const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
+const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
+
+mkdirp.sync(HYPERFILE_DATA_PATH)
+mkdirp.sync(HYPERFILE_CACHE_PATH)
 
 const hypercoreOptions = { valueEncoding: 'binary' }
 
@@ -46,7 +55,8 @@ function serve(hypercore) {
 //
 
 // callback = (err, key)
-export function writePath(dataPath, fileId, filePath, callback) {
+export function writePath(fileId, filePath, callback) {
+  const dataPath = HYPERFILE_DATA_PATH
   const core = Hypercore(corePath(dataPath, fileId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
@@ -62,15 +72,22 @@ export function writePath(dataPath, fileId, filePath, callback) {
           return
         }
 
+        const hyperfile = {
+          key: core.key.toString('base64'),
+          fileId,
+          fileExt: Path.extname(filePath),
+        }
+
         serve(core)
-        callback(null, core.key)
+        callback(null, hyperfile)
       })
     })
   })
 }
 
 // callback = (err, key)
-export function writeBuffer(dataPath, fileId, fileBuffer, callback) {
+export function writeBuffer(fileId, fileBuffer, callback) {
+  const dataPath = HYPERFILE_DATA_PATH
   const core = Hypercore(corePath(dataPath, fileId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
@@ -87,8 +104,9 @@ export function writeBuffer(dataPath, fileId, fileBuffer, callback) {
 }
 
 // callback = (err, blob)
-export function fetch(dataPath, fileId, coreKey, callback) {
-  const coreKeyBuf = Buffer.from(coreKey, 'base64')
+export function fetch({ fileId, fileExt, key }, callback) {
+  const dataPath = HYPERFILE_DATA_PATH
+  const coreKeyBuf = Buffer.from(key, 'base64')
   const core = Hypercore(corePath(dataPath, fileId), coreKeyBuf, hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
@@ -99,7 +117,15 @@ export function fetch(dataPath, fileId, coreKey, callback) {
         return
       }
 
-      callback(null, data)
+      const imagePath = Path.join(HYPERFILE_CACHE_PATH, fileId + fileExt)
+      Fs.writeFile(imagePath, data, (error) => {
+        if (error) {
+          callback(error)
+          return
+        }
+
+        callback(null, imagePath)
+      })
     })
   })
 }

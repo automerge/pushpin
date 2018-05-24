@@ -37,12 +37,13 @@ export default class Content extends React.PureComponent {
     const documentInitializationFunction = Content.typeToTag[type].initializeDocument
 
     let doc = hm.create()
+    const docId = hm.getId(doc)
+
     const onChange = (cb) => {
       doc = hm.change(doc, cb)
     }
 
     documentInitializationFunction(onChange, typeAttrs)
-    const docId = hm.getId(doc)
 
     return docId
   }
