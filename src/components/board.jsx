@@ -263,9 +263,8 @@ export default class Board extends React.PureComponent {
   onAddNote(e) {
     const x = e.pageX
     const y = e.pageY
-    // TODO: this should be
-    // Loop.dispatch(Board.addCard, {x, y, type: TextCard, args: [], selected: false} )
-    Loop.dispatch(TextCard.create, { x, y, text: '', selected: true })
+
+    this.createCard({ x, y, type: 'text', typeAttrs: { text: ''} })
   }
 
   onAddImage(e) {
@@ -285,7 +284,7 @@ export default class Board extends React.PureComponent {
     })
   }
 
-  createCard(state, { x, y, width, height, type, typeAttrs }) {
+  createCard({ x, y, width, height, type, typeAttrs }) {
     const id = uuid()
     const docId = Content.initializeContentDoc(type, typeAttrs)
 
