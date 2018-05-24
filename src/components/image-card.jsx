@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Content from './content'
-import * as Hyperfile from '../hyperfile'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
+
+import * as Hyperfile from '../hyperfile'
+import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:image-card')
 
@@ -82,9 +83,16 @@ export default class ImageCard extends React.PureComponent {
   render() {
     log('render')
     if (!this.state.imageContentReady) {
-      return <p>Fetching {this.props.doc.imageId}</p>
+      return <p>Fetching {this.props.doc.path}</p>
       // we should put useful stand-in content here, like alt-text or a caption
     }
     return <img className="image" alt="" src={this.state.imagePath} />
   }
 }
+
+ContentTypes.register({
+  component: ImageCard,
+  type: 'image',
+  name: 'Image',
+  icon: 'image'
+})

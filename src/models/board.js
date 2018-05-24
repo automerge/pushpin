@@ -1,7 +1,6 @@
-
-
 import Loop from '../loop'
 import * as Workspace from './workspace'
+import ContentTypes from '../content-types'
 
 // Board constants
 
@@ -38,7 +37,6 @@ export function create(state) {
     formDocId: boardId
   }
 }
-
 
 // Helper for state.hm.change so that it's easier to insert debugging.
 // still used by text-card.js#cardTextChanged (at least)
@@ -218,4 +216,15 @@ export function cardCreated(state, { x, y, width, height, type, docId, doc }) {
   newDocs = { ...newDocs, [docId]: doc }
 
   return { ...state, docs: newDocs, board: newBoard }
+}
+
+export function addCard(state, { x, y, contentType, args, selected }) {
+  let doc = state.hm.create()
+  const docId = state.hm.getId(doc)
+
+  doc = state.hm.change(doc, (doc) => { contentType.initialize(doc, args) })
+
+  Loop.dispatch(cardCreated, { x, y, type: contentType.type, selected, docId, doc })
+
+  return state
 }

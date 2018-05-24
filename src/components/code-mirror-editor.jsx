@@ -5,11 +5,7 @@ import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 import Automerge from 'automerge'
-import Content from './content'
-
-import Loop from '../loop'
-import * as Board from '../models/board'
-
+import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -263,3 +259,10 @@ export default class CodeMirrorEditor extends React.PureComponent {
     )
   }
 }
+
+ContentTypes.register({
+  component: CodeMirrorEditor,
+  type: 'text',
+  name: 'Text',
+  icon: 'sticky-note'
+})

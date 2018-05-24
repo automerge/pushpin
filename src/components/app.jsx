@@ -11,10 +11,6 @@ import Board from './board'
 import ImageCard from './image-card'
 import CodeMirrorEditor from './code-mirror-editor'
 
-Content.registerType('board', Board)
-Content.registerType('image', ImageCard)
-Content.registerType('text', CodeMirrorEditor)
-
 const log = Debug('pushpin:app')
 
 export default class App extends React.PureComponent {

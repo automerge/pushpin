@@ -2,6 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
+import ContentTypes from '../content-types'
+
+// Import these even though we don't use them, to be sure they register with ContentTypes.
+import CodeMirrorEditor from './code-mirror-editor'
+import ImageCard from './image-card'
+import Toggle from './toggle'
+
 const log = Debug('pushpin:content')
 
 export default class Content extends React.PureComponent {
@@ -13,11 +20,6 @@ export default class Content extends React.PureComponent {
       height: PropTypes.number,
       docId: PropTypes.string,
     }).isRequired
-  }
-
-  static typeToTag = {}
-  static registerType(type, component) {
-    this.typeToTag[type] = component
   }
 
   constructor(props) {
@@ -34,7 +36,8 @@ export default class Content extends React.PureComponent {
 
   static initializeContentDoc(type, typeAttrs) {
     const { hm } = window // still not a great idea
-    const documentInitializationFunction = Content.typeToTag[type].initializeDocument
+    const contentType = ContentTypes.list().find(contentType => contentType.type === type)
+    const documentInitializationFunction = contentType.component.initializeDocument
 
     let doc = hm.create()
     const docId = hm.getId(doc)
@@ -94,14 +97,17 @@ export default class Content extends React.PureComponent {
   }
 
   render() {
-    const TagName = Content.typeToTag[this.props.card.type]
+    const contentType = ContentTypes.list().find((contentType) => contentType.type === this.props.card.type)
+    if (!contentType) {
+      throw new Error(`Could not find component of type ${this.props.card.type}`)
+    }
 
     if (this.state.loading) {
       // stand-in content could go here
       return <p>Loading...</p>
     }
 
-    return (<TagName
+    return (<contentType.component
       cardId={this.props.card.id}
       docId={this.props.card.docId}
       cardHeight={this.props.card.height}

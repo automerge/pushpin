@@ -5,12 +5,14 @@ import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import { DraggableCore } from 'react-draggable'
 import uuid from 'uuid/v4'
+import classNames from 'classNames'
 
 import Loop from '../loop'
 import Card from './card'
 import ColorPicker from './color-picker'
 import * as BoardModel from '../models/board'
 import Content from './content'
+import ContentTypes from '../content-types'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 
 const { dialog } = remote
@@ -82,8 +84,8 @@ export default class Board extends React.PureComponent {
     this.onPaste = this.onPaste.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
 
-    this.onAddNote = this.onAddNote.bind(this)
-    this.onAddImage = this.onAddImage.bind(this)
+    this.addContent = this.addContent.bind(this)
+
     this.onChangeBoardBackgroundColor = this.onChangeBoardBackgroundColor.bind(this)
 
     this.tracking = {}
@@ -151,8 +153,8 @@ export default class Board extends React.PureComponent {
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      // PRE-MERGE TODO: need a way to start out selected
-      Loop.dispatch(TextCard.create, { x: e.pageX, y: e.pageY, text: '' })
+      const textType = ContentTypes.list().find((t) => t.type === 'text')
+      Loop.dispatch(BoardModel.addCard, { x: e.pageX, y: e.pageY, contentType: textType, selected: true })
     }
   }
 
@@ -198,13 +200,16 @@ export default class Board extends React.PureComponent {
             y: pageY + (i * (BoardModel.GRID_SIZE * 2)) })
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
-        reader.onload = () =>
-          Loop.dispatch(TextCard.create, {
-            text: reader.result,
+        reader.onload = () => {
+          const textType = ContentTypes.list().find((t) => t.type === 'text')
+          Loop.dispatch(BoardModel.addCard, {
             x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
-            y: pageY + (i * (BoardModel.GRID_SIZE * 2)) })
-          // we probably shouldn't expose grid_size to here?
-        reader.readAsText(entry)
+            y: pageY + (i * (BoardModel.GRID_SIZE * 2)),
+            contentType: textType,
+            args: { text: reader.readAsText(entry) },
+            selected: true
+          })
+        }
       }
     }
     if (length > 0) { return }
@@ -212,10 +217,14 @@ export default class Board extends React.PureComponent {
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
     if (plainText) {
-      Loop.dispatch(TextCard.create, {
-        text: plainText,
+      const textType = ContentTypes.list().find((t) => t.type === 'text')
+      Loop.dispatch(BoardModel.addCard, {
         x: pageX,
-        y: pageY })
+        y: pageY,
+        contentType: textType,
+        args: { text: plainText },
+        selected: true
+      })
     }
   }
 
@@ -255,23 +264,20 @@ export default class Board extends React.PureComponent {
 
     const plainTextData = dataTransfer.getData('text/plain')
     if (plainTextData) {
-      Loop.dispatch(TextCard.create, {
-        text: plainTextData,
-        x,
-        y })
+      const textType = ContentTypes.list().find((t) => t.type === 'text')
+      Loop.dispatch(BoardModel.addCard, { x, y, contentType: textType, args: { text: plainTextData }, selected: true })
     }
   }
 
-  onAddNote(e) {
+  addContent(e, contentType) {
     const x = e.pageX
     const y = e.pageY
 
-    this.createCard({ x, y, type: 'text', typeAttrs: { text: ''} })
-  }
+    if (contentType.type !== 'image') {
+      this.createCard({ x, y, type: contentType.type, typeAttrs: { text: ''} })
+      return
+    }
 
-  onAddImage(e) {
-    const x = e.pageX
-    const y = e.pageY
     dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
       // User aborted.
       if (!paths) {
@@ -549,22 +555,23 @@ export default class Board extends React.PureComponent {
       )
     })
 
+    // We should optimize to avoid creating a new function for onClick each render.
+    const createMenuItems = ContentTypes.list().map((contentType) => {
+      return (
+        <ContextMenuItem onClick={(e) => { this.addContent(e, contentType) }}>
+          <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+            <i className={classNames('fa', `fa-${contentType.icon}`)} />
+          </div>
+          <span className="ContextMenu__label">{contentType.name}</span>
+        </ContextMenuItem>
+      )
+    })
+
     const contextMenu = (
       <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
-        <div className="ContextMenu__section">
-          <ContextMenuItem onClick={this.onAddNote}>
-            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-              <i className="fa fa-sticky-note" />
-            </div>
-            <span className="ContextMenu__label">Note</span>
-          </ContextMenuItem>
 
-          <ContextMenuItem onClick={this.onAddImage}>
-            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--file">
-              <i className="fa fa-folder-open" />
-            </div>
-            <span className="ContextMenu__label">Choose image from file...</span>
-          </ContextMenuItem>
+        <div className="ContextMenu__section">
+          { createMenuItems }
         </div>
 
         <div className="ContextMenu__divider" />
@@ -604,3 +611,10 @@ export default class Board extends React.PureComponent {
     )
   }
 }
+
+ContentTypes.register({
+  component: Board,
+  type: 'board',
+  name: 'Board',
+  icon: 'sticky-note'
+})
