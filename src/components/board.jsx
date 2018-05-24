@@ -4,6 +4,7 @@ import { remote } from 'electron'
 import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import { DraggableCore } from 'react-draggable'
+import * as ImageModel from '../models/image-card'
 
 import Loop from '../loop'
 import Card from './card'
@@ -99,6 +100,7 @@ export default class Board extends React.PureComponent {
   }
 
   populateDemoBoard() {
+    // TODO: Only the last card is being populated right now
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
@@ -270,7 +272,7 @@ export default class Board extends React.PureComponent {
   onAddImage(e) {
     const x = e.pageX
     const y = e.pageY
-    dialog.showOpenDialog(ImageCard.IMAGE_DIALOG_OPTIONS, (paths) => {
+    dialog.showOpenDialog(ImageModel.IMAGE_DIALOG_OPTIONS, (paths) => {
       // User aborted.
       if (!paths) {
         return
@@ -279,8 +281,9 @@ export default class Board extends React.PureComponent {
         throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
-      // Loop.dispatch(Board.addCard, {x, y, type: ImageCard, args: path, selected: false} )
-      Loop.dispatch(ImageCard.importImageThenCreate, { path, x, y })
+      ImageModel.importImageThenCreate({ path, x, y }, ({ width, height, x, y, hyperfile }) => {
+        this.createCard({ x, y, width, height, type: 'image', typeAttrs: { hyperfile }})
+      })
     })
   }
 

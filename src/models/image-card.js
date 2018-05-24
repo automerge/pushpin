@@ -33,7 +33,7 @@ mkdirp.sync(HYPERFILE_CACHE_PATH)
 // unchanged. State will be updated in callbacks by redispatching to
 // another action (create). We could add state to indicate in-
 // progress processing here later if we wanted to.
-export function importImageThenCreate(createCardCallback, { path, buffer, x, y }) {
+export function importImageThenCreate({ path, buffer, x, y }, callback) {
   const imageSource = buffer || path
   Jimp.read(imageSource, (err, img) => {
     if (err) {
@@ -49,18 +49,13 @@ export function importImageThenCreate(createCardCallback, { path, buffer, x, y }
         log(error)
       }
 
-      Loop.dispatch(create, {
-        width: scaledWidth,
-        height: scaledHeight,
-        x,
-        y,
-        selected: true,
-        hyperfile: {
-          key: key.toString('base64'),
-          imageId,
-          imageExt: Path.extname(path),
-        },
-      })
+      const hyperfile = {
+        key: key.toString('base64'),
+        imageId,
+        imageExt: Path.extname(path),
+      }
+
+      callback({ width: scaledWidth, height: scaledHeight, x, y, hyperfile })
     })
   })
 }
