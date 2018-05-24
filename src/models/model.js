@@ -150,18 +150,15 @@ export function documentReady(state, { docId, doc }) {
 }
 
 export function documentUpdated(state, { docId, doc }) {
-  switch (docId) {
-    /* we probably need to think about the old activeDocId thing to avoid bugs */
-    case (state.requestedWorkspace):
-      return { ...state, workspace: doc }
-    case (state.workspace.selfId): // this is a race, since workspace can be null :(
+  if (docId === state.requestedWorkspace) {
+    return { ...state, workspace: doc }
+  } else if (state.workspace) {
+    if (docId === state.workspace.selfId) {
       return { ...state, self: doc }
-    case (state.workspace.boardId): // same here
-      // XXX: horrifying hack -- this didn't trigger at first. why?
+    } else if (docId === state.workspace.boardId) {
       Loop.dispatch(Workspace.updateContactIds, { candidateContactIds: doc.authorIds })
       return { ...state, board: doc }
-    default:
-      break
+    }
   }
 
   const cardDocIds = state.board && state.board.cards ?
