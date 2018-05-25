@@ -4,7 +4,6 @@ import Debug from 'debug'
 import { RIEInput } from 'riek'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
-import Loop from '../loop'
 import HashForm from './hash-form'
 import Share from './share'
 import Settings from './settings'

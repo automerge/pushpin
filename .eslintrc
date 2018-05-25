@@ -25,6 +25,8 @@
     "no-param-reassign": "off",
     "object-curly-newline": "off",
     "curly": ["error", "all"],
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "jsx-a11y/interactive-supports-focus": "off",
+    "jsx-a11y/click-events-have-key-events": "off"
   }
 }
