@@ -26,11 +26,6 @@ export function create(state) {
   }
 }
 
-// Helper for state.hm.change so that it's easier to insert debugging.
-export function changeBoard(state, changeFn) {
-  return state.hm.change(state.board, changeFn)
-}
-
 /**
  *
  * Card placement / manipulation actions
@@ -131,7 +126,7 @@ export function snapMeasureOutwardToGrid(measure) {
  */
 
 export function setTitle(state, { title }) {
-  const newBoard = changeBoard(state, (b) => {
+  const newBoard = state.hm.change(state.board, (b) => {
     b.title = title
   })
   return { ...state, board: newBoard }
@@ -139,7 +134,7 @@ export function setTitle(state, { title }) {
 
 // XXX delete this
 export function setBackgroundColor(state, { backgroundColor }) {
-  const newBoard = changeBoard(state, (b) => {
+  const newBoard = state.hm.change(state.board, (b) => {
     b.backgroundColor = backgroundColor
   })
   return { ...state, board: newBoard }
@@ -172,7 +167,7 @@ export function addSelfToAuthors(state) {
 export function cardCreated(state, { x, y, width, height, type, docId, doc }) {
   const id = uuid()
 
-  const newBoard = changeBoard(state, (b) => {
+  const newBoard = state.hm.change(state.board, (b) => {
     const snapX = snapCoordinateToGrid(x)
     const snapY = snapCoordinateToGrid(y)
     const newCard = {
