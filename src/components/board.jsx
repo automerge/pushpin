@@ -401,7 +401,7 @@ export default class Board extends React.PureComponent {
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
       newWidth = Math.max(BoardModel.CARD_MIN_WIDTH, newWidth)
-      newWidth = Math.min(BoardModel.BOARD_WIDTH - card.x, newWidth)
+      newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
       tracking.resizeWidth = newWidth
       newHeight = Math.max(BoardModel.CARD_MIN_HEIGHT, newHeight)
       newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
