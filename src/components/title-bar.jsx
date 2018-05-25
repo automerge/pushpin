@@ -31,17 +31,11 @@ export default class TitleBar extends React.PureComponent {
     log('constructor')
 
     this.onChange = this.onChangeTitle.bind(this)
-    this.onSubmit = this.onChangeBoardBackgroundColor.bind(this)
   }
 
   onChangeTitle(newState) {
     log('onChangeTitle')
     Loop.dispatch(Board.setTitle, newState)
-  }
-
-  onChangeBoardBackgroundColor(color) {
-    log('onChangeBoardBackgroundColor')
-    Loop.dispatch(Board.setBackgroundColor, { backgroundColor: color.hex })
   }
 
   onSubmit(e) {
