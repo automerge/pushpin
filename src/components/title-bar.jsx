@@ -21,7 +21,12 @@ export default class TitleBar extends React.PureComponent {
     self: PropTypes.shape({
       name: PropTypes.string.isRequired,
       avatar: PropTypes.string.isRequired
-    }).isRequired
+    }).isRequired,
+    onBoardIdChanged: PropTypes.func
+  }
+
+  static defaultProps = {
+    onBoardIdChanged: () => {}
   }
 
   onSubmit(e) {
@@ -88,9 +93,8 @@ export default class TitleBar extends React.PureComponent {
         <Content card={{type: 'board-title', docId: this.props.doc.boardId}} />
 
         <HashForm
-          formDocId={this.props.formDocId}
-          // activeDocId={this.props.activeDocId}
-          requestedDocId={this.props.requestedDocId}
+          formDocId={this.props.doc.boardId}
+          onChanged={this.props.onBoardIdChanged}
         />
 
         <Dropdown>

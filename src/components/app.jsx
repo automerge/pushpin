@@ -4,6 +4,7 @@ import Debug from 'debug'
 
 import * as BoardModel from '../models/board'
 import Loop from '../loop'
+import ContentTypes from '../content-types'
 
 import Content from './content'
 import Board from './board'
@@ -26,13 +27,18 @@ export default class App extends React.PureComponent {
     }).isRequired
   }
 
+  constructor(props) {
+    super(props)
+    this.state = { boardId: this.props.state.workspace.boardId }
+    this.updateBoardId = this.updateBoardId.bind(this)
+  }
+
+  updateBoardId(id) {
+    this.setState({ boardId: id })
+  }
+
   render() {
     log('render')
-
-    // Blank while state is initializing.
-    if (!this.props.state.board) {
-      return <div />
-    }
 
     const contentProps = {
       uniquelySelected: false,
@@ -40,22 +46,29 @@ export default class App extends React.PureComponent {
         type: 'board',
         id: '1',
         height: 800,
-        docId: window.hm.getId(this.props.state.board),
+        docId: this.state.boardId,
       }
     }
 
     // Otherwise render the board.
     return <div>
       <Content
-        card={{type: 'title-bar', docId: window.hm.getId(this.props.state.workspace)}}
+        card={{type: 'title-bar',type: 'title-bar', docId: window.hm.getId(this.props.state.workspace)}}
         state={this.props.state}
         board={this.props.state.board}
-        boardBackgroundColor={this.props.state.board.backgroundColor}
         formDocId={this.props.state.formDocId}
         requestedDocId={this.props.state.workspace.boardId}
         self={this.props.state.self}
+        onBoardIdChanged={this.updateBoardId}
       />
       <Content {...contentProps} />
     </div>
   }
 }
+
+ContentTypes.register({
+  component: App,
+  type: 'app',
+  name: 'App',
+  icon: 'sticky-note'
+})

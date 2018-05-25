@@ -4,6 +4,7 @@ import { ipcRenderer } from 'electron'
 
 import Loop from './loop'
 import App from './components/app'
+import Content from './components/content'
 import * as Model from './models/model'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
@@ -19,8 +20,12 @@ ipcRenderer.on('newDocument', () => {
   // Loop.dispatch(Board.create)
 })
 
-const view = (state) =>
-  <App state={state} />
+const view = (state) => {
+  if(window.hm && state.workspace)
+    return <Content state={state} card={{type: 'app', docId: window.hm.getId(state.workspace)}} />
+  else
+    return <p>Loading...</p>
+}
 
 const element = document.getElementById('app')
 
