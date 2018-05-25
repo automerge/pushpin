@@ -115,12 +115,7 @@ export default class TitleBar extends React.PureComponent {
             </div>
           </DropdownTrigger>
           <DropdownContent>
-            <Settings
-              name={this.props.self && this.props.self.name ?
-                this.props.self.name : 'Self not loaded'}
-              avatar={this.props.self && this.props.self.avatar ?
-                this.props.self.avatar : '../img/default-avatar.png'}
-            />
+            <Content card={{type: 'settings', docId: this.props.doc.selfId}} />
           </DropdownContent>
         </Dropdown>
       </div>

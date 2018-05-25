@@ -95,6 +95,20 @@ export default class Content extends React.PureComponent {
     })
   }
 
+  componentWillUpdate(nextProps, nextState) {
+    log('componentWillUpdate')
+
+    if (nextProps.card.docId !== this.props.card.docId) {
+      this.getHypermergeDoc(nextProps.card.docId, (error, doc) => {
+        if (error) {
+          log(error)
+        }
+
+        this.setState({ loading: false, doc })
+      })
+    }
+  }
+
   componentWillUnmount() {
     this.mounted = false
   }
@@ -108,7 +122,9 @@ export default class Content extends React.PureComponent {
   }
 
   render() {
+    log('render')
     const contentType = ContentTypes.list().find((ct) => ct.type === this.props.card.type)
+
     if (!contentType) {
       throw new Error(`Could not find component of type ${this.props.card.type}`)
     }
