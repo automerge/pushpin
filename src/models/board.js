@@ -10,7 +10,6 @@ export const CARD_DEFAULT_WIDTH = 337
 export const CARD_DEFAULT_HEIGHT = 97
 export const CARD_MIN_WIDTH = 97
 export const CARD_MIN_HEIGHT = 49
-export const RESIZE_HANDLE_SIZE = 21
 
 export function create(state) {
   const doc = state.hm.create()
