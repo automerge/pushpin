@@ -10,7 +10,7 @@ import ImageCard from './image-card'
 import Toggle from './toggle'
 
 const log = Debug('pushpin:content')
-const FILTERED_PROPS = [ "card" ]
+const FILTERED_PROPS = ['card']
 
 export default class Content extends React.PureComponent {
   static propTypes = {
@@ -143,7 +143,7 @@ export default class Content extends React.PureComponent {
         cardHeight={this.props.card.height}
         onChange={this.onChange}
         doc={this.state.doc}
-        { ...filteredProps }
+        {...filteredProps}
       />
     )
   }

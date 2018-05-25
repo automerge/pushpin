@@ -12,10 +12,10 @@ import * as Model from './models/model'
 localStorage.removeItem('debug')
 
 const view = (state) => {
-  if(window.hm && state.workspace)
-    return <Content state={state} card={{type: 'app', docId: window.hm.getId(state.workspace)}} />
-  else
-    return <p>Loading...</p>
+  if (window.hm && state.workspace) {
+    return <Content state={state} card={{ type: 'app', docId: window.hm.getId(state.workspace) }} />
+  }
+  return <p>Loading...</p>
 }
 
 const element = document.getElementById('app')

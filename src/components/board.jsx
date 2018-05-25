@@ -123,7 +123,7 @@ export default class Board extends React.PureComponent {
     onChange((b) => {
       b.title = 'No Title'
       b.color = BOARD_COLORS.SKY
-      b.authorIds = [ selfId ]
+      b.authorIds = [selfId]
       b.cards = {}
     })
   }

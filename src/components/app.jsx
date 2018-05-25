@@ -66,18 +66,20 @@ export default class App extends React.PureComponent {
     }
 
     // Otherwise render the board.
-    return <div>
-      <Content
-        card={{type: 'title-bar',type: 'title-bar', docId: window.hm.getId(this.props.doc)}}
-        state={this.props.state}
-        board={this.props.state.board}
-        formDocId={this.props.state.formDocId}
-        requestedDocId={this.props.state.workspace.boardId}
-        self={this.props.state.self}
-        onBoardIdChanged={this.openBoard}
-      />
-      <Content {...contentProps} />
-    </div>
+    return (
+      <div>
+        <Content
+          card={{ type: 'title-bar', docId: window.hm.getId(this.props.doc) }}
+          state={this.props.state}
+          board={this.props.state.board}
+          formDocId={this.props.state.formDocId}
+          requestedDocId={this.props.state.workspace.boardId}
+          self={this.props.state.self}
+          onBoardIdChanged={this.openBoard}
+        />
+        <Content {...contentProps} />
+      </div>
+    )
   }
 }
 

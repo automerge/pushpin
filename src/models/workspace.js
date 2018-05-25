@@ -25,7 +25,6 @@ export function create(state) {
 
   const identity = state.hm.create()
   const selfId = state.hm.getId(identity)
-
   const nextIdentity = state.hm.change(identity, (i) => {
     i.name = `The Mysterious ${Model.USER}`
     i.docId = selfId
