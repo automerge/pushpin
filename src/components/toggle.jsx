@@ -24,7 +24,9 @@ export default class Toggle extends React.PureComponent {
   }
 
   toggle() {
-    this.props.onChange(doc => doc.toggled = !doc.toggled)
+    this.props.onChange((doc) => {
+      doc.toggled = !doc.toggled
+    })
   }
 
   render() {
