@@ -58,6 +58,12 @@ export default class Card extends React.PureComponent {
       slackHeight: null,
       totalDrag: null,
     }
+
+    this.stopPropagation = this.stopPropagation.bind(this)
+  }
+
+  stopPropagation(e) {
+    e.stopPropagation()
   }
 
   render() {
@@ -78,7 +84,7 @@ export default class Card extends React.PureComponent {
         id={`card-${card.id}`}
         className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
         style={style}
-        onContextMenu={e => e.stopPropagation()}
+        onContextMenu={this.stopPropagation}
       >
         <Content
           card={this.props.card}
