@@ -168,8 +168,7 @@ export default class Board extends React.PureComponent {
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      const textType = ContentTypes.list().find((t) => t.type === 'text')
-      Loop.dispatch(BoardModel.addCard, { x: e.pageX, y: e.pageY, contentType: textType, selected: true })
+      this.createCard({ x: e.pageX, y: e.pageY, type: 'text' })
     }
   }
 

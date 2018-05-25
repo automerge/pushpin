@@ -34,7 +34,7 @@ export default class Content extends React.PureComponent {
     }
   }
 
-  static initializeContentDoc(type, typeAttrs) {
+  static initializeContentDoc(type, typeAttrs={}) {
     const { hm } = window // still not a great idea
     const contentType = ContentTypes.list().find(contentType => contentType.type === type)
     const documentInitializationFunction = contentType.component.initializeDocument

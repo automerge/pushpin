@@ -57,7 +57,9 @@ export default class CodeMirrorEditor extends React.PureComponent {
   static initializeDocument(onChange, { text }) {
     onChange(d => {
       d.text = new Automerge.Text()
-      d.text.insertAt(0, ...text.split(''))
+      if (text) {
+        d.text.insertAt(0, ...text.split(''))
+      }
     })
   }
 
