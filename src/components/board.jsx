@@ -32,6 +32,9 @@ const BOARD_COLORS = {
   CLOUD: '#d5dfe5',
 }
 
+const BOARD_WIDTH = 3600
+const BOARD_HEIGHT = 1800
+
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 

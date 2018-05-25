@@ -4,8 +4,6 @@ import * as Workspace from './workspace'
 
 // Board constants
 
-export const BOARD_WIDTH = 3600
-export const BOARD_HEIGHT = 1800
 export const GRID_SIZE = 24
 
 export const CARD_DEFAULT_WIDTH = 337
