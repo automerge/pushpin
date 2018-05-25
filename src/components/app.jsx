@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 
-import * as BoardModel from '../models/board'
 import Loop from '../loop'
 import ContentTypes from '../content-types'
 
