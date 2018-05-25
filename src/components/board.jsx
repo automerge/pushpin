@@ -589,12 +589,10 @@ export default class Board extends React.PureComponent {
     )
 
     return (
-      <div>
+      <div className="board">
         { contextMenu }
         <ContextMenuTrigger holdToDisplay={-1} id={BOARD_MENU_ID}>
           <div
-            id="board"
-            className="board"
             ref={(e) => { this.boardRef = e }}
             style={{ backgroundColor: this.props.doc.backgroundColor }}
             onClick={this.onClick}
