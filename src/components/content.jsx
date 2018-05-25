@@ -34,7 +34,7 @@ export default class Content extends React.PureComponent {
     }
   }
 
-  static initializeContentDoc(type, typeAttrs={}) {
+  static initializeContentDoc(type, typeAttrs = {}) {
     const { hm } = window // still not a great idea
     const contentType = ContentTypes.list().find(contentType => contentType.type === type)
     const documentInitializationFunction = contentType.component.initializeDocument
@@ -100,7 +100,7 @@ export default class Content extends React.PureComponent {
   }
 
   render() {
-    const contentType = ContentTypes.list().find((contentType) => contentType.type === this.props.card.type)
+    const contentType = ContentTypes.list().find((ct) => ct.type === this.props.card.type)
     if (!contentType) {
       throw new Error(`Could not find component of type ${this.props.card.type}`)
     }

@@ -712,7 +712,11 @@ export default class Board extends React.PureComponent {
       <div
         className="board"
         ref={(e) => { this.boardRef = e }}
-        style={{ backgroundColor: this.props.doc.backgroundColor, width: BOARD_WIDTH, height: BOARD_HEIGHT }}
+        style={{
+          backgroundColor: this.props.doc.backgroundColor,
+          width: BOARD_WIDTH,
+          height: BOARD_HEIGHT
+        }}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onDragOver={this.onDragOver}
