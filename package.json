@@ -78,6 +78,7 @@
     "react-simple-dropdown": "^3.2.0",
     "react-toggle": "4.0.2",
     "riek": "^1.1.0",
+    "tmp": "0.0.33",
     "to-buffer": "^1.1.0"
   },
   "devDependencies": {

@@ -6,8 +6,9 @@ import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 're
 import { DraggableCore } from 'react-draggable'
 import uuid from 'uuid/v4'
 import classNames from 'classnames'
+import Tmp from 'tmp'
+import Fs from 'fs'
 
-import Loop from '../loop'
 import Card from './card'
 import ColorPicker from './color-picker'
 import Content from './content'
@@ -199,7 +200,6 @@ export default class Board extends React.PureComponent {
   }
 
   async onDrop(e) {
-    log('onDrop')
     e.preventDefault()
     e.stopPropagation()
     const { pageX, pageY } = e
@@ -210,14 +210,12 @@ export default class Board extends React.PureComponent {
     for (let i = 0; i < length; i += 1) {
       const entry = e.dataTransfer.files[i]
       const reader = new FileReader()
-
+      const x = pageX + (i * (GRID_SIZE * 2))
+      const y = pageY + (i * (GRID_SIZE * 2))
       if (entry.type.match('image/')) {
-        reader.onload = () =>
-          Loop.dispatch(ImageCard.importImageThenCreate, {
-            path: entry.name,
-            buffer: Buffer.from(reader.result),
-            x: pageX + (i * (GRID_SIZE * 2)),
-            y: pageY + (i * (GRID_SIZE * 2)) })
+        reader.onload = () => {
+          this.createImageCardFromReader(x, y, reader)
+        }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
         reader.onload = () => {
@@ -263,12 +261,9 @@ export default class Board extends React.PureComponent {
         }
 
         const reader = new FileReader()
-        reader.onload = () =>
-          Loop.dispatch(ImageCard.importImageThenCreate, {
-            path: file.name,
-            buffer: Buffer.from(reader.result),
-            x,
-            y })
+        reader.onload = () => {
+          this.createImageCardFromReader(x, y, reader)
+        }
         reader.readAsArrayBuffer(file)
       })
     }
@@ -298,6 +293,25 @@ export default class Board extends React.PureComponent {
       }
       const path = paths[0]
       this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+    })
+  }
+
+  // Bridge that enables up to create image cards - which currently require a
+  // local file path, when the browser APIs only give us a FileReader on paste
+  // and drop.
+  // For now we write temp files, though we should do something more efficient
+  // here eventually.
+  createImageCardFromReader(x, y, reader) {
+    Tmp.file((err, path, fd, cleanup) => {
+      if (err) {
+        throw err
+      }
+      Fs.appendFile(path, Buffer.from(reader.result), (err) => {
+        if (err) {
+          throw err
+        }
+        this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+      })
     })
   }
 
