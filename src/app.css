@@ -491,7 +491,8 @@ div.board {
 div.card {
   background: #ffffff;
   border: solid 1px var(--colorPaleGrey);
-  border-top: 0
+  border-top: 0;
+  overflow: hidden;
 }
 
 div.card.text {
