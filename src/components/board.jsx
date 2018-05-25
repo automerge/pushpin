@@ -273,7 +273,7 @@ export default class Board extends React.PureComponent {
     const y = e.pageY
 
     if (contentType.type !== 'image') {
-      this.createCard({ x, y, type: contentType.type, typeAttrs: { text: ''} })
+      this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
       return
     }
 
@@ -286,7 +286,7 @@ export default class Board extends React.PureComponent {
         throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
-      this.createCard({ x, y, type: 'image', typeAttrs: { path }})
+      this.createCard({ x, y, type: 'image', typeAttrs: { path } })
     })
   }
 
@@ -555,16 +555,14 @@ export default class Board extends React.PureComponent {
     })
 
     // We should optimize to avoid creating a new function for onClick each render.
-    const createMenuItems = ContentTypes.list().map((contentType) => {
-      return (
-        <ContextMenuItem key={contentType.type} onClick={(e) => { this.addContent(e, contentType) }}>
-          <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-            <i className={classNames('fa', `fa-${contentType.icon}`)} />
-          </div>
-          <span className="ContextMenu__label">{contentType.name}</span>
-        </ContextMenuItem>
-      )
-    })
+    const createMenuItems = ContentTypes.list().map((contentType) => (
+      <ContextMenuItem key={contentType.type} onClick={(e) => { this.addContent(e, contentType) }}>
+        <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+          <i className={classNames('fa', `fa-${contentType.icon}`)} />
+        </div>
+        <span className="ContextMenu__label">{contentType.name}</span>
+      </ContextMenuItem>
+    ))
 
     const contextMenu = (
       <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
@@ -588,19 +586,20 @@ export default class Board extends React.PureComponent {
     )
 
     return (
-      <div className="board">
+      <div
+        className="board"
+        ref={(e) => { this.boardRef = e }}
+        style={{ backgroundColor: this.props.doc.backgroundColor }}
+        onClick={this.onClick}
+        onDoubleClick={this.onDoubleClick}
+        onDragOver={this.onDragOver}
+        onDrop={this.onDrop}
+        onPaste={this.onPaste}
+        role="presentation"
+      >
         { contextMenu }
         <ContextMenuTrigger holdToDisplay={-1} id={BOARD_MENU_ID}>
-          <div
-            ref={(e) => { this.boardRef = e }}
-            style={{ backgroundColor: this.props.doc.backgroundColor }}
-            onClick={this.onClick}
-            onDoubleClick={this.onDoubleClick}
-            onDragOver={this.onDragOver}
-            onDrop={this.onDrop}
-            onPaste={this.onPaste}
-            role="presentation"
-          >
+          <div>
             {cardChildren}
           </div>
         </ContextMenuTrigger>
