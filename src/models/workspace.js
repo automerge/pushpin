@@ -3,7 +3,6 @@ import Debug from 'debug'
 
 import Loop from '../loop'
 import * as Model from './model'
-import * as Board from './board'
 
 import BoardComponent from '../components/board'
 import * as Identity from './identity'
