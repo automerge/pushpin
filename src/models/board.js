@@ -69,17 +69,6 @@ export function cardResized(onChange, doc, { id, width, height }) {
   })
 }
 
-export function cardDeleted(onChange, doc, { id }) {
-  // allow either an array or a single card to be passed in
-  if (id.constructor !== Array) {
-    id = [id]
-  }
-
-  onChange((b) => {
-    id.forEach((id) => delete b.cards[id])
-  })
-}
-
 /**
  *
  * Grid manipulation functions
@@ -139,49 +128,4 @@ export function addSelfToAuthors(state) {
     b.authorIds = [...b.authorIds, state.workspace.selfId]
   })
   return { ...state, board }
-}
-
-/**
- *
- * Card Creation
- * This stuff needs to be creating subclasses / variations on cards
- * for images / text but we haven't figured that out yet.
- */
-
-
-export function cardCreated(state, { x, y, width, height, type, docId, doc }) {
-  const id = uuid()
-
-  const newBoard = state.hm.change(state.board, (b) => {
-    const snapX = snapCoordinateToGrid(x)
-    const snapY = snapCoordinateToGrid(y)
-    const newCard = {
-      id,
-      type,
-      docId,
-      x: snapX,
-      y: snapY,
-      width: snapMeasureToGrid(width || CARD_DEFAULT_WIDTH),
-      height: snapMeasureToGrid(height || CARD_DEFAULT_HEIGHT),
-      slackWidth: 0,
-      slackHeight: 0,
-      resizing: false,
-      moving: false,
-    }
-    b.cards[id] = newCard
-  })
-
-  let newDocs = state.docs
-  newDocs = { ...newDocs, [docId]: doc }
-
-  return { ...state, docs: newDocs, board: newBoard }
-}
-
-export function addCard(state, { x, y, contentType, args, selected }) {
-  let doc = state.hm.create()
-  const docId = state.hm.getId(doc)
-
-  doc = state.hm.change(doc, (doc) => { contentType.component.initializeDocument(doc, args) })
-
-  return cardCreated(state, { x, y, type: contentType.type, selected, docId, doc })
 }
