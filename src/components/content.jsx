@@ -52,7 +52,10 @@ export default class Content extends React.PureComponent {
   }
 
   onChange(changeBlock) {
-    const doc = window.hm.change(this.state.doc, changeBlock)
+    // We can read the old version of th doc from this.state.doc because
+    // setState is not immediate and so this.state may not yet reflect the
+    // latest version of the doc.
+    const doc = window.hm.change(window.hm.find(this.props.card.docId), changeBlock)
     this.setState({ ...this.state, doc })
     return doc
   }
