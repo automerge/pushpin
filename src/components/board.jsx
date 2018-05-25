@@ -237,7 +237,7 @@ export default class Board extends React.PureComponent {
 
   /* We can't get the mouse position on a paste event,
      so we ask the window for the current pageX/Y offsets and just stick the new card
-     100px in from there. */
+     100px in from there. (The new React might support this through pointer events.) */
   async onPaste(e) {
     log('onPaste')
     e.preventDefault()
@@ -594,7 +594,7 @@ export default class Board extends React.PureComponent {
       <div
         className="board"
         ref={(e) => { this.boardRef = e }}
-        style={{ backgroundColor: this.props.doc.backgroundColor }}
+        style={{ backgroundColor: this.props.doc.backgroundColor, width: BOARD_WIDTH, height: BOARD_HEIGHT }}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onDragOver={this.onDragOver}

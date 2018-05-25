@@ -181,7 +181,7 @@ export function addCard(state, { x, y, contentType, args, selected }) {
   let doc = state.hm.create()
   const docId = state.hm.getId(doc)
 
-  doc = state.hm.change(doc, (doc) => { contentType.initialize(doc, args) })
+  doc = state.hm.change(doc, (doc) => { contentType.component.initializeDocument(doc, args) })
 
   return cardCreated(state, { x, y, type: contentType.type, selected, docId, doc })
 }
