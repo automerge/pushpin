@@ -67,8 +67,8 @@ const EXAMPLE_TEXT =
 
 We've made some initial cards for you to play with. Have fun!`
 
-// const KAY_PATH = './img/kay.jpg'
-// const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
+const KAY_PATH = './img/kay.jpg'
+const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
 const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
@@ -131,14 +131,11 @@ export default class Board extends React.PureComponent {
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
+    this.createCard({ type: 'image', x: 550, y: 500, typeAttrs: { path: KAY_PATH } })
+    this.createCard({ type: 'image', x: 600, y: 150, typeAttrs: { path: WORKSHOP_PATH } })
 
     // this.setTitle(, { title: 'Example Board' })
-
     // newState = addSelfToAuthors(newState)
-
-    // These will be handled async as they require their own IO.
-    // Loop.dispatch(ImageCard.importImageThenCreate, { x: 550, y: 500, path: KAY_PATH })
-    // Loop.dispatch(ImageCard.importImageThenCreate, { x: 600, y: 150, path: WORKSHOP_PATH })
   }
 
   componentDidMount() {
