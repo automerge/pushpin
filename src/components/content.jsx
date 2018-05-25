@@ -10,6 +10,7 @@ import ImageCard from './image-card'
 import Toggle from './toggle'
 
 const log = Debug('pushpin:content')
+const FILTERED_PROPS = [ "card" ]
 
 export default class Content extends React.PureComponent {
   static propTypes = {
@@ -99,6 +100,14 @@ export default class Content extends React.PureComponent {
     this.mounted = false
   }
 
+  filterProps(props) {
+    const filtered = {}
+    Object.keys(props).filter(key => !FILTERED_PROPS.include(key)).forEach(key => {
+      filtered[key] = props[key]
+    })
+    return filtered
+  }
+
   render() {
     const contentType = ContentTypes.list().find((ct) => ct.type === this.props.card.type)
     if (!contentType) {
@@ -110,13 +119,17 @@ export default class Content extends React.PureComponent {
       return <p>Loading...</p>
     }
 
-    return (<contentType.component
-      cardId={this.props.card.id}
-      docId={this.props.card.docId}
-      cardHeight={this.props.card.height}
-      uniquelySelected={this.props.uniquelySelected}
-      onChange={this.onChange}
-      doc={this.state.doc}
-    />) // how do we push other props down?
+    const filteredProps = this.filteredProps(this.props)
+
+    return (
+      <contentType.component
+        cardId={this.props.card.id}
+        docId={this.props.card.docId}
+        cardHeight={this.props.card.height}
+        onChange={this.onChange}
+        doc={this.state.doc}
+        { ...filteredProps }
+      />
+    )
   }
 }

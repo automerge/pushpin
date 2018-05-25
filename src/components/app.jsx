@@ -37,6 +37,16 @@ export default class App extends React.PureComponent {
     }
 
     // Otherwise render the board.
-    return <Content {...contentProps} />
+    return <div>
+      <TitleBar
+        state={this.props.state}
+        board={this.props.state.board}
+        boardBackgroundColor={this.props.state.board.backgroundColor}
+        formDocId={this.props.state.formDocId}
+        requestedDocId={this.props.state.workspace.boardId}
+        self={this.props.state.self}
+      />
+      <Content {...contentProps} />
+    </div>
   }
 }

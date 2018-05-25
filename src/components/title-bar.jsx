@@ -13,7 +13,6 @@ const log = Debug('pushpin:title-bar')
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
     formDocId: PropTypes.string.isRequired,
-    // activeDocId: PropTypes.string.isRequired,
     requestedDocId: PropTypes.string.isRequired,
     board: PropTypes.shape({
       title: PropTypes.string.isRequired
@@ -44,24 +43,6 @@ export default class TitleBar extends React.PureComponent {
 
   render() {
     log('render')
-
-    /*
-    const shareData = {
-      authors: {
-        1: { name: 'Roshan', avatar: '../img/avatar-example.png' },
-        2: { name: 'Peter' }
-      },
-      board: this.props.board,
-      contacts: {
-        3: { name: 'Mark' },
-        4: { name: 'Ignatius' }
-      },
-      notifications: {
-        A: { type: 'Invitation', sender: { name: 'Pvh' }, board: { title: 'Pushpin Demo' } },
-        B: { type: 'Invitation', sender: { name: 'Ignatius' }, board: { title: 'Pokemon info' } }
-      }
-    }
-    */
 
     const { state } = this.props
 
