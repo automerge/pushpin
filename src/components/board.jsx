@@ -271,8 +271,7 @@ export default class Board extends React.PureComponent {
 
     const plainTextData = dataTransfer.getData('text/plain')
     if (plainTextData) {
-      const textType = ContentTypes.list().find((t) => t.type === 'text')
-      Loop.dispatch(BoardModel.addCard, { x, y, contentType: textType, args: { text: plainTextData }, selected: true })
+      this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
     }
   }
 
