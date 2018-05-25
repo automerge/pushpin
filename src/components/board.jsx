@@ -62,8 +62,8 @@ const EXAMPLE_TEXT =
 
 We've made some initial cards for you to play with. Have fun!`
 
-const KAY_PATH = './img/kay.jpg'
-const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
+// const KAY_PATH = './img/kay.jpg'
+// const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
 const withinCard = (card, x, y) => (x >= card.x) &&
          (x <= card.x + card.width) &&
