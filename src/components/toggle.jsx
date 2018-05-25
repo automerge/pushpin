@@ -1,9 +1,17 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactToggle from 'react-toggle'
 
 import ContentTypes from '../content-types'
 
 export default class Toggle extends React.PureComponent {
+  static propTypes = {
+    doc: PropTypes.shape({
+      toggled: PropTypes.boolean,
+    }).isRequired,
+    onChange: PropTypes.func.isRequired
+  }
+
   static initializeDocument(onChange) {
     onChange((doc) => {
       doc.toggled = false
