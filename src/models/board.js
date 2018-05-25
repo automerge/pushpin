@@ -207,9 +207,6 @@ export function cardCreated(state, { x, y, width, height, type, docId, doc }) {
       moving: false,
     }
     b.cards[id] = newCard
-    // Apply type-specific attributes. The difference in sequencing between
-    // image and text types is due to weird Automerge interactions that we
-    // should revisit later.
   })
 
   let newDocs = state.docs
