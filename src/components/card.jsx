@@ -7,13 +7,6 @@ import Content from './content'
 
 const log = Debug('pushpin:card')
 
-/**
- * Card
- *
- * A card's responsibility is to keep track of dragging, selection, and position,
- * and to host a piece of <Content/>.
- *
- */
 export default class Card extends React.PureComponent {
   static propTypes = {
     selected: PropTypes.bool.isRequired,
@@ -37,27 +30,6 @@ export default class Card extends React.PureComponent {
   constructor(props) {
     super(props)
     log('constructor')
-
-    // Tracking is internal, ephemeral state that doesn't directly effect the
-    // rendered view. It's used for move/resize state. We keep this seperate
-    // from this.state below so that we don't need to deal with the fact that
-    // setState is async, which makes computing iterative updates hard. We
-    // do need to copy some resulting values (the properties in both tracking
-    // and state) when they change, but these copies are idempotent and so
-    // easier to reason about.
-    this.tracking = {
-      moving: false,
-      resizing: false,
-      moveX: null,
-      moveY: null,
-      slackX: null,
-      slackY: null,
-      resizeWidth: null,
-      resizeHeight: null,
-      slackWidth: null,
-      slackHeight: null,
-      totalDrag: null,
-    }
 
     this.stopPropagation = this.stopPropagation.bind(this)
   }
