@@ -5,7 +5,6 @@ import { ipcRenderer } from 'electron'
 import Loop from './loop'
 import App from './components/app'
 import * as Model from './models/model'
-import * as Board from './models/board'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
@@ -16,7 +15,8 @@ localStorage.removeItem('debug')
 ipcRenderer.on('newDocument', () => {
   // eventually we may want to decide contextually how to interpret this
   // but for now, we can just make a new board and trust the app will open it
-  Loop.dispatch(Board.create)
+  // pvh broke this too
+  // Loop.dispatch(Board.create)
 })
 
 const view = (state) =>

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import TitleBar from './title-bar'
-import * as BoardModel from '../models/board'
 import Loop from '../loop'
 import Content from './content'
 

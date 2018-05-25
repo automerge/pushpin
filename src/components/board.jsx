@@ -10,7 +10,6 @@ import classNames from 'classnames'
 import Loop from '../loop'
 import Card from './card'
 import ColorPicker from './color-picker'
-import * as BoardModel from '../models/board'
 import Content from './content'
 import ContentTypes from '../content-types'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
@@ -34,6 +33,12 @@ const BOARD_COLORS = {
 
 const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
+const GRID_SIZE = 24
+
+const CARD_DEFAULT_WIDTH = 337
+const CARD_DEFAULT_HEIGHT = 97
+const CARD_MIN_WIDTH = 97
+const CARD_MIN_HEIGHT = 49
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
@@ -83,6 +88,8 @@ const draggableCards = (cards, selected, card) => {
 export default class Board extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
+      title: PropTypes.string,
+      authorIds: PropTypes.arrayOf(PropTypes.string),
       backgroundColor: PropTypes.string,
       cards: PropTypes.objectOf(Card.propTypes.card).isRequired
     }).isRequired,
@@ -212,14 +219,14 @@ export default class Board extends React.PureComponent {
           Loop.dispatch(ImageCard.importImageThenCreate, {
             path: entry.name,
             buffer: Buffer.from(reader.result),
-            x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
-            y: pageY + (i * (BoardModel.GRID_SIZE * 2)) })
+            x: pageX + (i * (GRID_SIZE * 2)),
+            y: pageY + (i * (GRID_SIZE * 2)) })
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
         reader.onload = () => {
           this.createCard({
-            x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
-            y: pageY + (i * (BoardModel.GRID_SIZE * 2)),
+            x: pageX + (i * (GRID_SIZE * 2)),
+            y: pageY + (i * (GRID_SIZE * 2)),
             type: 'text',
             typeAttrs: { text: reader.readAsText(entry) }
           })
@@ -302,16 +309,16 @@ export default class Board extends React.PureComponent {
     const docId = Content.initializeContentDoc(type, typeAttrs)
 
     this.props.onChange((b) => {
-      const snapX = BoardModel.snapCoordinateToGrid(x)
-      const snapY = BoardModel.snapCoordinateToGrid(y)
+      const snapX = this.snapCoordinateToGrid(x)
+      const snapY = this.snapCoordinateToGrid(y)
       const newCard = {
         id,
         type,
         docId,
         x: snapX,
         y: snapY,
-        width: BoardModel.snapMeasureToGrid(width || BoardModel.CARD_DEFAULT_WIDTH),
-        height: BoardModel.snapMeasureToGrid(height || BoardModel.CARD_DEFAULT_HEIGHT),
+        width: this.snapMeasureToGrid(width || CARD_DEFAULT_WIDTH),
+        height: this.snapMeasureToGrid(height || CARD_DEFAULT_HEIGHT),
         slackWidth: 0,
         slackHeight: 0,
         resizing: false,
@@ -332,11 +339,111 @@ export default class Board extends React.PureComponent {
     })
   }
 
+  /* Note that the next two methods aren't currently used directly by board.jsx */
+  /* As such, I have not actually run them to see if they're useful. */
+  changeTitle(title) {
+    log('changeTitle')
+    this.props.onChange((b) => {
+      b.title = title
+    })
+  }
+
+  addSelfToAuthors(selfId) {
+    const { authorIds } = this.props.doc
+    if (authorIds.includes(selfId)) {
+      return
+    }
+    this.props.onChange((b) => {
+      b.authorIds.push(selfId)
+    })
+  }
+
   changeBackgroundColor(color) {
     log('changeBackgroundColor')
     this.props.onChange((b) => {
       b.backgroundColor = color.hex
     })
+  }
+  /**
+   *
+   * Card placement / manipulation actions
+   *
+   */
+
+  cardMoved(onChange, doc, { id, x, y }) {
+    // This gets called when uniquely selecting a card, so avoid a document
+    // change if in fact the card hasn't moved mod snapping.
+    const snapX = this.snapCoordinateToGrid(x)
+    const snapY = this.snapCoordinateToGrid(y)
+    if (snapX === doc.cards[id].x && snapY === doc.cards[id].y) {
+      return
+    }
+    onChange((b) => {
+      const card = b.cards[id]
+      card.x = snapX
+      card.y = snapY
+    })
+  }
+
+  cardResizeHeightRoundingUp(onChange, doc, { id, width, height }) {
+    const snapHeight = this.snapMeasureOutwardToGrid(Math.max(height, CARD_MIN_HEIGHT))
+    onChange((b) => {
+      const card = b.cards[id]
+      card.height = snapHeight
+    })
+  }
+
+  cardResized(onChange, doc, { id, width, height }) {
+    // This gets called when we click the drag corner of a card, so avoid a
+    // document change if in fact the card won't resize mod snapping.
+    const snapWidth = this.snapMeasureToGrid(width)
+    const snapHeight = this.snapMeasureToGrid(height)
+    if (snapWidth === doc.cards[id].width && doc.cards[id].height) {
+      return
+    }
+    onChange((b) => {
+      const card = b.cards[id]
+      card.width = snapWidth
+      card.height = snapHeight
+    })
+  }
+
+  /**
+   *
+   * Grid manipulation functions
+   *
+   */
+
+  // Snap given num to nearest multiple of our grid size.
+  snapToGrid(num) {
+    const resto = num % GRID_SIZE
+    if (resto <= (GRID_SIZE / 2)) {
+      return num - resto
+    }
+    return num + GRID_SIZE - resto
+  }
+
+  // We have slightly different snap functions for coordinates (x,y) and
+  // measures (height, width) because we want the latter to be a bit larger
+  // than the grid size to allow overlapping boarders of adjacent elements.
+  // We also have a special variant of the measure snap that ensures it only
+  // ever increases the measure, which are needed for some types of content
+  // (like text which shouldn't get cut off by snapping).
+
+  snapCoordinateToGrid(coordinate) {
+    return this.snapToGrid(coordinate)
+  }
+
+  snapMeasureToGrid(measure) {
+    return this.snapToGrid(measure) + 1
+  }
+
+  snapMeasureOutwardToGrid(measure) {
+    const snapped = this.snapMeasureToGrid(measure)
+    if (snapped >= measure) {
+      return snapped
+    }
+    return snapped + GRID_SIZE
   }
 
   // Copy view-relevant move/resize state over to React.
@@ -411,10 +518,10 @@ export default class Board extends React.PureComponent {
       let newHeight = preClampHeight + tracking.slackHeight
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
-      newWidth = Math.max(BoardModel.CARD_MIN_WIDTH, newWidth)
+      newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
       newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
       tracking.resizeWidth = newWidth
-      newHeight = Math.max(BoardModel.CARD_MIN_HEIGHT, newHeight)
+      newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
       newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
       tracking.resizeHeight = newHeight
 
@@ -520,7 +627,7 @@ export default class Board extends React.PureComponent {
         t.moving = false
         t.totalDrag = null
 
-        BoardModel.cardMoved(this.props.onChange, this.props.doc, { id: card.id, x, y })
+        this.cardMoved(this.props.onChange, this.props.doc, { id: card.id, x, y })
         this.setDragState(card, t)
       })
     }
@@ -536,7 +643,7 @@ export default class Board extends React.PureComponent {
       tracking.resizing = false
       tracking.totalDrag = null
 
-      BoardModel.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
+      this.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
       this.setDragState(card, tracking)
     }
   }
