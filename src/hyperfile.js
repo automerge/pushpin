@@ -4,10 +4,7 @@ import Fs from 'fs'
 import Path from 'path'
 import mkdirp from 'mkdirp'
 
-const USER = process.env.NAME || 'userA'
-const USER_PATH = Path.join('.', 'data', USER)
-const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
-const HYPERFILE_CACHE_PATH = Path.join(USER_PATH, 'hyperfile-cache')
+import { HYPERFILE_DATA_PATH, HYPERFILE_CACHE_PATH } from './constants'
 
 mkdirp.sync(HYPERFILE_DATA_PATH)
 mkdirp.sync(HYPERFILE_CACHE_PATH)
@@ -56,8 +53,7 @@ function serve(hypercore) {
 
 // callback = (err, key)
 export function writePath(fileId, filePath, callback) {
-  const dataPath = HYPERFILE_DATA_PATH
-  const core = Hypercore(corePath(dataPath, fileId), hypercoreOptions)
+  const core = Hypercore(corePath(HYPERFILE_DATA_PATH, fileId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
     Fs.readFile(filePath, (error, buffer) => {
@@ -87,8 +83,7 @@ export function writePath(fileId, filePath, callback) {
 
 // callback = (err, key)
 export function writeBuffer(fileId, fileBuffer, callback) {
-  const dataPath = HYPERFILE_DATA_PATH
-  const core = Hypercore(corePath(dataPath, fileId), hypercoreOptions)
+  const core = Hypercore(corePath(HYPERFILE_DATA_PATH, fileId), hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
     core.append(fileBuffer, (error) => {
@@ -105,9 +100,8 @@ export function writeBuffer(fileId, fileBuffer, callback) {
 
 // callback = (err, blob)
 export function fetch({ fileId, fileExt, key }, callback) {
-  const dataPath = HYPERFILE_DATA_PATH
   const coreKeyBuf = Buffer.from(key, 'base64')
-  const core = Hypercore(corePath(dataPath, fileId), coreKeyBuf, hypercoreOptions)
+  const core = Hypercore(corePath(HYPERFILE_DATA_PATH, fileId), coreKeyBuf, hypercoreOptions)
   core.on('error', callback)
   core.on('ready', () => {
     serve(core)

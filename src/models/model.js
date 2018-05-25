@@ -1,21 +1,13 @@
-
 import Debug from 'debug'
 import { EventEmitter } from 'events'
-import Path from 'path'
 
 import Loop from '../loop'
 import Hypermerge from '../hypermerge'
 import * as Workspace from './workspace'
 import * as Board from './board'
+import { HYPERMERGE_PATH } from '../constants'
 
 const log = Debug('pushpin:model')
-
-
-// ## Constants
-
-export const USER = process.env.NAME || 'userA'
-export const USER_PATH = Path.join('.', 'data', USER)
-const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 
 // It's normal for a document with a lot of participants to have a lot of
 // connections, so increase the limit to avoid spurious warnings about

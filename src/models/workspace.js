@@ -1,5 +1,4 @@
 import Fs from 'fs'
-import Path from 'path'
 import Debug from 'debug'
 
 import Loop from '../loop'
@@ -8,6 +7,7 @@ import * as Board from './board'
 
 import BoardComponent from '../components/board'
 import * as Identity from './identity'
+import { WORKSPACE_ID_PATH } from '../constants'
 
 const log = Debug('pushpin:workspace')
 
@@ -141,18 +141,14 @@ export function onIdentityUpdated(state, { contactId }) {
 function saveWorkspaceId(state, { docId }) {
   const workspaceIdFile = { workspaceDocId: docId }
 
-  Fs.writeFileSync(workspaceIdFilePath(), JSON.stringify(workspaceIdFile))
+  Fs.writeFileSync(WORKSPACE_ID_PATH, JSON.stringify(workspaceIdFile))
 
   return state
 }
 
-function workspaceIdFilePath() {
-  return Path.join(Model.USER_PATH, 'workspace-id.json')
-}
-
 export function getBootstrapWorkspaceId() {
-  if (Fs.existsSync(workspaceIdFilePath())) {
-    const json = JSON.parse(Fs.readFileSync(workspaceIdFilePath()))
+  if (Fs.existsSync(WORKSPACE_ID_PATH)) {
+    const json = JSON.parse(Fs.readFileSync(WORKSPACE_ID_PATH))
     if (json.workspaceDocId) {
       return json.workspaceDocId
     }
