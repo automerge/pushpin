@@ -47,7 +47,7 @@ export default class TitleBar extends React.PureComponent {
           height="28"
         />
 
-        <Content card={{type: 'board-title', docId: this.props.doc.boardId}} />
+        <Content card={{ type: 'board-title', docId: this.props.doc.boardId }} />
 
         <HashForm
           formDocId={this.props.doc.boardId}
@@ -62,9 +62,9 @@ export default class TitleBar extends React.PureComponent {
           </DropdownTrigger>
           <DropdownContent>
             <Content
-              card={{type: 'share', docId: this.props.doc.boardId}}
-              offeredIds={ this.props.doc.offeredIds }
-              contactIds={ this.props.doc.contactIds }
+              card={{ type: 'share', docId: this.props.doc.boardId }}
+              offeredIds={this.props.doc.offeredIds}
+              contactIds={this.props.doc.contactIds}
             />
           </DropdownContent>
         </Dropdown>
@@ -76,7 +76,7 @@ export default class TitleBar extends React.PureComponent {
             </div>
           </DropdownTrigger>
           <DropdownContent>
-            <Content card={{type: 'settings', docId: this.props.doc.selfId}} />
+            <Content card={{ type: 'settings', docId: this.props.doc.selfId }} />
           </DropdownContent>
         </Dropdown>
       </div>
