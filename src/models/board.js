@@ -69,17 +69,6 @@ export function cardResized(onChange, doc, { id, width, height }) {
   })
 }
 
-export function cardDeleted(onChange, doc, { id }) {
-  // allow either an array or a single card to be passed in
-  if (id.constructor !== Array) {
-    id = [id]
-  }
-
-  onChange((b) => {
-    id.forEach((id) => delete b.cards[id])
-  })
-}
-
 /**
  *
  * Grid manipulation functions

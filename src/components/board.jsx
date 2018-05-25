@@ -102,6 +102,8 @@ export default class Board extends React.PureComponent {
     this.onPaste = this.onPaste.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
 
+    this.createCard = this.createCard.bind(this)
+    this.deleteCard = this.deleteCard.bind(this)
     this.addContent = this.addContent.bind(this)
     this.changeBackgroundColor = this.changeBackgroundColor.bind(this)
 
@@ -154,7 +156,7 @@ export default class Board extends React.PureComponent {
           return
         }
       }
-      BoardModel.cardDeleted(this.props.onChange, this.props.doc, { id: this.state.selected })
+      this.deleteCard(this.state.selected)
     }
   }
 
@@ -316,6 +318,17 @@ export default class Board extends React.PureComponent {
         moving: false,
       }
       b.cards[id] = newCard
+    })
+  }
+
+  deleteCard(id) {
+    // allow either an array or a single card to be passed in
+    if (id.constructor !== Array) {
+      id = [id]
+    }
+
+    this.props.onChange((b) => {
+      id.forEach((id) => delete b.cards[id])
     })
   }
 
