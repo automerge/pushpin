@@ -5,7 +5,7 @@ import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
 import { DraggableCore } from 'react-draggable'
 import uuid from 'uuid/v4'
-import classNames from 'classNames'
+import classNames from 'classnames'
 
 import Loop from '../loop'
 import Card from './card'
