@@ -31,11 +31,6 @@ export function changeBoard(state, changeFn) {
   return state.hm.change(state.board, changeFn)
 }
 
-/* This is a transitional support function for the JSX to receive onChange updates */
-export function setBoardState(state, { board }) {
-  return { ...state, board }
-}
-
 /**
  *
  * Card placement / manipulation actions
