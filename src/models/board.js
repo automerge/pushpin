@@ -1,5 +1,4 @@
 import * as Workspace from './workspace'
-import ContentTypes from '../content-types'
 
 // Board constants
 
