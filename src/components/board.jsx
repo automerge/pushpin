@@ -558,7 +558,7 @@ export default class Board extends React.PureComponent {
     // We should optimize to avoid creating a new function for onClick each render.
     const createMenuItems = ContentTypes.list().map((contentType) => {
       return (
-        <ContextMenuItem onClick={(e) => { this.addContent(e, contentType) }}>
+        <ContextMenuItem key={contentType.type} onClick={(e) => { this.addContent(e, contentType) }}>
           <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
             <i className={classNames('fa', `fa-${contentType.icon}`)} />
           </div>
