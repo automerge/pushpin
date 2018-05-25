@@ -125,7 +125,6 @@ export default class Board extends React.PureComponent {
     this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
 
     // this.setTitle(, { title: 'Example Board' })
-    // newState = setBackgroundColor(newState, { backgroundColor: BOARD_COLORS.SKY })
 
     // newState = addSelfToAuthors(newState)
 

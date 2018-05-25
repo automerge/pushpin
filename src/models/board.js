@@ -131,14 +131,6 @@ export function setTitle(state, { title }) {
   return { ...state, board: newBoard }
 }
 
-// XXX delete this
-export function setBackgroundColor(state, { backgroundColor }) {
-  const newBoard = state.hm.change(state.board, (b) => {
-    b.backgroundColor = backgroundColor
-  })
-  return { ...state, board: newBoard }
-}
-
 export function newSetBackgroundColor(onChange, doc, { backgroundColor }) {
   onChange((b) => {
     b.backgroundColor = backgroundColor
