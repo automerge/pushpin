@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from 'electron'
+import { app, BrowserWindow, Menu, shell } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -14,6 +14,17 @@ const createWindow = async () => {
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
+
+  function isSafeishURL(url) {
+    return url.startsWith('http:') || url.startsWith('https:')
+  }
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    event.preventDefault()
+    if (isSafeishURL(url)) {
+      shell.openExternal(url)
+    }
+  })
 
   // Menubar template
   const template = [
