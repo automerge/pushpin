@@ -231,14 +231,7 @@ export default class Board extends React.PureComponent {
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
     if (plainText) {
-      const textType = ContentTypes.list().find((t) => t.type === 'text')
-      Loop.dispatch(BoardModel.addCard, {
-        x: pageX,
-        y: pageY,
-        contentType: textType,
-        args: { text: plainText },
-        selected: true
-      })
+      this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
     }
   }
 
