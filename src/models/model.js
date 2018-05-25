@@ -12,16 +12,6 @@ const log = Debug('pushpin:model')
 
 
 // ## Constants
-export const CARD_COLORS = {
-  SNOW: '#ffffff',
-  BEIGE: '#cbc5b5',
-  SKY: '#8edce6',
-  VIOLET: '#a98fdc',
-  PINK: '#ff87a1',
-  HERB: '#b5e6a1',
-  PEACH: '#ff7868',
-  CLOUD: '#e5ebf3',
-}
 
 export const USER = process.env.NAME || 'userA'
 export const USER_PATH = Path.join('.', 'data', USER)
