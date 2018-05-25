@@ -18,7 +18,22 @@ import { IMAGE_DIALOG_OPTIONS } from '../constants'
 const { dialog } = remote
 
 const log = Debug('pushpin:board')
+
 const BOARD_MENU_ID = 'BoardMenu'
+
+const BOARD_COLORS = {
+  SNOW: '#f9f9f9',
+  BEIGE: '#f3f1ec',
+  SKY: '#dcf3f6',
+  VIOLET: '#e5dcf6',
+  PINK: '#ffe1e7',
+  HERB: '#daefd2',
+  PEACH: '#ffd2cc',
+  CLOUD: '#d5dfe5',
+}
+
+// We don't want to compute a new array in every render.
+const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
 // ## Demo data
 
@@ -95,7 +110,7 @@ export default class Board extends React.PureComponent {
   static initializeDocument(onChange) {
     onChange((b) => {
       b.title = 'No Title'
-      b.color = BoardModel.BOARD_COLORS.SKY
+      b.color = BOARD_COLORS.SKY
       b.authorIds = []
       b.cards = {}
     })
@@ -577,7 +592,7 @@ export default class Board extends React.PureComponent {
           <ContextMenuItem>
             <ColorPicker
               color={this.props.doc.backgroundColor}
-              colors={Object.values(BoardModel.BOARD_COLORS)}
+              colors={BOARD_COLOR_VALUES}
               onChangeComplete={this.onChangeBoardBackgroundColor}
             />
           </ContextMenuItem>

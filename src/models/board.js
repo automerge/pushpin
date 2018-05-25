@@ -4,16 +4,6 @@ import ContentTypes from '../content-types'
 
 // Board constants
 
-export const BOARD_COLORS = {
-  SNOW: '#f9f9f9',
-  BEIGE: '#f3f1ec',
-  SKY: '#dcf3f6',
-  VIOLET: '#e5dcf6',
-  PINK: '#ffe1e7',
-  HERB: '#daefd2',
-  PEACH: '#ffd2cc',
-  CLOUD: '#d5dfe5',
-}
 export const BOARD_WIDTH = 3600
 export const BOARD_HEIGHT = 1800
 export const GRID_SIZE = 24
