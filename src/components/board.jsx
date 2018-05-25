@@ -377,10 +377,10 @@ export default class Board extends React.PureComponent {
 
       // Clamp to ensure card doesn't move beyond the board.
       newX = Math.max(newX, 0)
-      newX = Math.min(newX, BoardModel.BOARD_WIDTH - card.width)
+      newX = Math.min(newX, BOARD_WIDTH - card.width)
       tracking.moveX = newX
       newY = Math.max(newY, 0)
-      newY = Math.min(newY, BoardModel.BOARD_HEIGHT - card.height)
+      newY = Math.min(newY, BOARD_HEIGHT - card.height)
       tracking.moveY = newY
 
       // If the numbers changed, we must have introduced some slack.
@@ -412,7 +412,7 @@ export default class Board extends React.PureComponent {
       newWidth = Math.min(BoardModel.BOARD_WIDTH - card.x, newWidth)
       tracking.resizeWidth = newWidth
       newHeight = Math.max(BoardModel.CARD_MIN_HEIGHT, newHeight)
-      newHeight = Math.min(BoardModel.BOARD_HEIGHT - card.y, newHeight)
+      newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
       tracking.resizeHeight = newHeight
 
       // If the numbers changed, we must have introduced some slack.
