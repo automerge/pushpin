@@ -88,7 +88,7 @@ export function cardDeleted(onChange, doc, { id }) {
  */
 
 // Snap given num to nearest multiple of our grid size.
-export function snapToGrid(num) {
+function snapToGrid(num) {
   const resto = num % GRID_SIZE
   if (resto <= (GRID_SIZE / 2)) {
     return num - resto
