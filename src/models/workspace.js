@@ -23,8 +23,13 @@ export function create(state) {
     ws.contactIds = []
   })
 
-  // should these be synchronous? does it matter?
-  Loop.dispatch(Identity.create)
+  const identity = state.hm.create()
+  const selfId = state.hm.getId(identity)
+
+  const nextIdentity = state.hm.change(identity, (i) => {
+    i.name = `The Mysterious ${Model.USER}`
+    i.docId = selfId
+  })
 
   const doc = state.hm.create()
   const onChange = function onChange(cb) {
@@ -34,8 +39,10 @@ export function create(state) {
   const boardId = state.hm.getId(doc)
   workspace = state.hm.change(workspace, (ws) => {
     ws.boardId = boardId
+    ws.selfId = selfId
   })
-  BoardComponent.initializeDocument(onChange)
+
+  BoardComponent.initializeDocument(onChange, { selfId })
 
   return { ...state, workspace }
 }

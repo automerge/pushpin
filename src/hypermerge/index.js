@@ -211,6 +211,7 @@ class Hypermerge extends EventEmitter {
     this._addToMaxRequested(docId, actorId, changes.length)
     this._appendAll(actorId, changes)
     this._set(docId, doc)
+    this.emit('document:updated', docId, doc)
 
     return doc
   }

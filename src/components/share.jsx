@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Contact from './contact'
+import Content from './content'
+import ContentTypes from '../content-types'
 import Loop from '../loop'
 import * as Model from '../models/model'
 import * as Identity from '../models/identity'
@@ -54,26 +56,22 @@ export default class Share extends React.PureComponent {
   }
 
   renderContacts() {
-    const authors = Object.keys(this.props.authors).map(id => {
-      const author = this.props.authors[id]
+    const authors = this.props.doc.authorIds.map(id => {
       return (
-        <Contact
+        <Content
           key={id}
-          name={author.name}
-          avatar={author.avatar}
+          card={{type: 'contact', docId: id }}
           actions={['unshare']}
           onUnshare={e => this.handleUnshare(e, author)}
         />
       )
     })
 
-    const contacts = Object.keys(this.props.contacts).map(id => {
-      const contact = this.props.contacts[id]
+    const contacts = this.props.contactIds.map(id => {
       return (
-        <Contact
+        <Content
           key={id}
-          name={contact.name}
-          avatar={contact.avatar}
+          card={{type: 'contact', docId: id }}
           actions={['share']}
           onShare={e => this.handleShare(e, contact)}
         />
@@ -179,3 +177,10 @@ export default class Share extends React.PureComponent {
     )
   }
 }
+
+ContentTypes.register({
+  component: Share,
+  type: 'share',
+  name: 'Share',
+  icon: 'sticky-note'
+})

@@ -21,11 +21,17 @@ export default class HashForm extends React.PureComponent {
     super(props)
     log('constructor')
 
+    this.state = { value: this.props.formDocId }
     this.onSubmit = this.onSubmit.bind(this)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ value: nextProps.formDocId })
   }
 
   onSubmit(e) {
     log('onSubmit')
+    e.preventDefault()
     this.props.onChanged(this.input.value)
   }
 
@@ -39,7 +45,8 @@ export default class HashForm extends React.PureComponent {
           <input
             type="text"
             className="loaded"
-            defaultValue={this.props.formDocId}
+            value={this.state.value}
+            onChange={e => this.setState({ value: e.target.value })}
             ref={node => this.input = node}
           />
         </form>

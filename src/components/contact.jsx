@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import ContentTypes from '../content-types'
+
 export default class Contact extends React.PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
@@ -43,15 +45,23 @@ export default class Contact extends React.PureComponent {
 
     return (
       <div className="Contact">
-        <div className="Avatar"><img alt="avatar" src={this.props.avatar} /></div>
+        <div className="Avatar">
+          <img alt="avatar" src={this.props.doc.avatar} />
+        </div>
         <div className="Contact__info">
           <div className="Contact__info__name">
-            { this.props.name }
+            { this.props.doc.name }
           </div>
         </div>
-
         <div className="Contact__actions"> { actions } </div>
       </div>
     )
   }
 }
+
+ContentTypes.register({
+  component: Contact,
+  type: 'contact',
+  name: 'Contact',
+  icon: 'sticky-note'
+})

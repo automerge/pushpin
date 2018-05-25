@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { ipcRenderer } from 'electron'
 
 import Loop from './loop'
 import App from './components/app'
@@ -11,14 +10,6 @@ import * as Model from './models/model'
 // wrong, at least for the render process. Delete the attempted cache so it
 // doesn't confuse future instances.
 localStorage.removeItem('debug')
-
-// should this be here?
-ipcRenderer.on('newDocument', () => {
-  // eventually we may want to decide contextually how to interpret this
-  // but for now, we can just make a new board and trust the app will open it
-  // pvh broke this too
-  // Loop.dispatch(Board.create)
-})
 
 const view = (state) => {
   if(window.hm && state.workspace)
