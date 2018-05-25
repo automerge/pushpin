@@ -131,12 +131,6 @@ export function setTitle(state, { title }) {
   return { ...state, board: newBoard }
 }
 
-export function newSetBackgroundColor(onChange, doc, { backgroundColor }) {
-  onChange((b) => {
-    b.backgroundColor = backgroundColor
-  })
-}
-
 export function addSelfToAuthors(state) {
   if (state.board.authorIds.includes(state.workspace.selfId)) {
     return state

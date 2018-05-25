@@ -103,8 +103,7 @@ export default class Board extends React.PureComponent {
     this.onKeyDown = this.onKeyDown.bind(this)
 
     this.addContent = this.addContent.bind(this)
-
-    this.onChangeBoardBackgroundColor = this.onChangeBoardBackgroundColor.bind(this)
+    this.changeBackgroundColor = this.changeBackgroundColor.bind(this)
 
     this.tracking = {}
     this.state = { cards: {}, selected: [] }
@@ -331,13 +330,11 @@ export default class Board extends React.PureComponent {
     })
   }
 
-  onChangeBoardBackgroundColor(color) {
-    log('onChangeBoardBackgroundColor')
-    BoardModel.newSetBackgroundColor(
-      this.props.onChange,
-      this.props.doc,
-      { backgroundColor: color.hex }
-    )
+  changeBackgroundColor(color) {
+    log('changeBackgroundColor')
+    this.props.onChange((b) => {
+      b.backgroundColor = color.hex
+    })
   }
 
   // Copy view-relevant move/resize state over to React.
@@ -595,7 +592,7 @@ export default class Board extends React.PureComponent {
             <ColorPicker
               color={this.props.doc.backgroundColor}
               colors={BOARD_COLOR_VALUES}
-              onChangeComplete={this.onChangeBoardBackgroundColor}
+              onChangeComplete={this.changeBackgroundColor}
             />
           </ContextMenuItem>
         </div>
