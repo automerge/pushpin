@@ -1,4 +1,3 @@
-import Loop from '../loop'
 import * as Workspace from './workspace'
 import ContentTypes from '../content-types'
 
@@ -211,7 +210,5 @@ export function addCard(state, { x, y, contentType, args, selected }) {
 
   doc = state.hm.change(doc, (doc) => { contentType.initialize(doc, args) })
 
-  Loop.dispatch(cardCreated, { x, y, type: contentType.type, selected, docId, doc })
-
-  return state
+  return cardCreated(state, { x, y, type: contentType.type, selected, docId, doc })
 }
