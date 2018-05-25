@@ -4,7 +4,7 @@ import { EventEmitter } from 'events'
 import Loop from '../loop'
 import Hypermerge from '../hypermerge'
 import * as Workspace from './workspace'
-import * as Board from './board'
+// import * as Board from './board'
 import { HYPERMERGE_PATH } from '../constants'
 
 const log = Debug('pushpin:model')
