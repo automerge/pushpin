@@ -1,12 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import { RIEInput } from 'riek'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import HashForm from './hash-form'
 import Share from './share'
 import Settings from './settings'
+import Content from './content'
+import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:title-bar')
 
@@ -21,19 +22,6 @@ export default class TitleBar extends React.PureComponent {
       name: PropTypes.string.isRequired,
       avatar: PropTypes.string.isRequired
     }).isRequired
-  }
-
-  constructor(props) {
-    super(props)
-    log('constructor')
-
-    this.onChange = this.onChangeTitle.bind(this)
-  }
-
-  onChangeTitle(newState) {
-    log('onChangeTitle')
-    // this wasn't working anyway
-    // Loop.dispatch(Board.setTitle, newState)
   }
 
   onSubmit(e) {
@@ -97,14 +85,7 @@ export default class TitleBar extends React.PureComponent {
           height="28"
         />
 
-        <RIEInput
-          value={this.props.board.title}
-          change={this.onChangeTitle}
-          propName="title"
-          className="TitleBar__titleText"
-          classLoading="TitleBar__titleText--loading"
-          classInvalid="TitleBar__titleText--invalid"
-        />
+        <Content card={{type: 'board-title', docId: this.props.doc.boardId}} />
 
         <HashForm
           formDocId={this.props.formDocId}
@@ -142,3 +123,10 @@ export default class TitleBar extends React.PureComponent {
     )
   }
 }
+
+ContentTypes.register({
+  component: TitleBar,
+  type: 'title-bar',
+  name: 'Title Bar',
+  icon: 'sticky-note'
+})

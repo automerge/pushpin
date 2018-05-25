@@ -14,7 +14,6 @@ const FILTERED_PROPS = [ "card" ]
 
 export default class Content extends React.PureComponent {
   static propTypes = {
-    uniquelySelected: PropTypes.bool.isRequired,
     card: PropTypes.shape({
       type: PropTypes.string,
       id: PropTypes.string,
@@ -102,7 +101,7 @@ export default class Content extends React.PureComponent {
 
   filterProps(props) {
     const filtered = {}
-    Object.keys(props).filter(key => !FILTERED_PROPS.include(key)).forEach(key => {
+    Object.keys(props).filter(key => !FILTERED_PROPS.includes(key)).forEach(key => {
       filtered[key] = props[key]
     })
     return filtered
@@ -119,7 +118,7 @@ export default class Content extends React.PureComponent {
       return <p>Loading...</p>
     }
 
-    const filteredProps = this.filteredProps(this.props)
+    const filteredProps = this.filterProps(this.props)
 
     return (
       <contentType.component

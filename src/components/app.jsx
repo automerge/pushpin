@@ -2,7 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
+import * as BoardModel from '../models/board'
+import Loop from '../loop'
+
 import Content from './content'
+import Board from './board'
+import ImageCard from './image-card'
+import CodeMirrorEditor from './code-mirror-editor'
+import TitleBar from './title-bar'
+import BoardTitle from './board-title'
 
 const log = Debug('pushpin:app')
 
@@ -38,7 +46,8 @@ export default class App extends React.PureComponent {
 
     // Otherwise render the board.
     return <div>
-      <TitleBar
+      <Content
+        card={{type: 'title-bar', docId: window.hm.getId(this.props.state.workspace)}}
         state={this.props.state}
         board={this.props.state.board}
         boardBackgroundColor={this.props.state.board.backgroundColor}
