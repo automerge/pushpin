@@ -215,13 +215,11 @@ export default class Board extends React.PureComponent {
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
         reader.onload = () => {
-          const textType = ContentTypes.list().find((t) => t.type === 'text')
-          Loop.dispatch(BoardModel.addCard, {
+          this.createCard({
             x: pageX + (i * (BoardModel.GRID_SIZE * 2)),
             y: pageY + (i * (BoardModel.GRID_SIZE * 2)),
-            contentType: textType,
-            args: { text: reader.readAsText(entry) },
-            selected: true
+            type: 'text',
+            typeAttrs: { text: reader.readAsText(entry) }
           })
         }
       }
