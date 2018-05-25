@@ -1,3 +1,5 @@
+import uuid from 'uuid/v4'
+
 import * as Workspace from './workspace'
 
 // Board constants
