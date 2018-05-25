@@ -27,7 +27,6 @@ export function create(state) {
 }
 
 // Helper for state.hm.change so that it's easier to insert debugging.
-// still used by text-card.js#cardTextChanged (at least)
 export function changeBoard(state, changeFn) {
   return state.hm.change(state.board, changeFn)
 }
