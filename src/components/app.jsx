@@ -2,13 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import TitleBar from './title-bar'
-import Loop from '../loop'
 import Content from './content'
-
-import Board from './board'
-import ImageCard from './image-card'
-import CodeMirrorEditor from './code-mirror-editor'
 
 const log = Debug('pushpin:app')
 
