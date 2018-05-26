@@ -130,8 +130,7 @@ export default class Content extends React.PureComponent {
     }
 
     if (this.state.loading) {
-      // stand-in content could go here
-      return <p>Loading...</p>
+      return null
     }
 
     const filteredProps = this.filterProps(this.props)

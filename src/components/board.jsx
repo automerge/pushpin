@@ -129,14 +129,12 @@ export default class Board extends React.PureComponent {
   }
 
   populateDemoBoard() {
+    this.changeTitle('Example Board')
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
     this.createCard({ type: 'image', x: 550, y: 500, typeAttrs: { path: KAY_PATH } })
     this.createCard({ type: 'image', x: 600, y: 150, typeAttrs: { path: WORKSHOP_PATH } })
-
-    // this.setTitle(, { title: 'Example Board' })
-    // newState = addSelfToAuthors(newState)
   }
 
   componentDidMount() {
