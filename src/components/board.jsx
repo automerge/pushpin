@@ -278,7 +278,8 @@ export default class Board extends React.PureComponent {
     const y = e.pageY
 
     if (contentType.type !== 'image') {
-      this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
+      const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
+      this.selectOnly(cardId)
       return
     }
 
