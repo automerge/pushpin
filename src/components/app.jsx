@@ -3,15 +3,18 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 
-import Loop from '../loop'
 import ContentTypes from '../content-types'
-
 import Content from './content'
+
+// We load these modules here so that the content registry will have them
+// and we supppress the eslint warning just for this file here.
+/* eslint no-unused-vars: ["error", { "varsIgnorePattern": "[A-Z]\w+" }] */
 import Board from './board'
 import ImageCard from './image-card'
 import CodeMirrorEditor from './code-mirror-editor'
 import TitleBar from './title-bar'
 import BoardTitle from './board-title'
+
 
 const log = Debug('pushpin:app')
 
@@ -19,12 +22,16 @@ export default class App extends React.PureComponent {
   static propTypes = {
     state: PropTypes.shape({
       formDocId: PropTypes.string,
-      // activeDocId: PropTypes.string,
       selected: PropTypes.arrayOf(PropTypes.string),
-      workspace: PropTypes.object, // TODO: this should probably be better managed
-      self: PropTypes.object // TODO: better validation as well?
-      // board: PropTypes.shape(Board.propTypes),
-    }).isRequired
+      workspace: PropTypes.object,
+      self: PropTypes.object,
+      board: PropTypes.object,
+    }).isRequired,
+    doc: PropTypes.shape({
+      boardId: PropTypes.string.isRequired,
+      selfId: PropTypes.string.isRequired
+    }).isRequired,
+    onChange: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -34,7 +41,7 @@ export default class App extends React.PureComponent {
 
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
-      this.props.onChange(d => d.boardId = docId)
+      this.props.onChange(d => { d.boardId = docId })
     })
   }
 

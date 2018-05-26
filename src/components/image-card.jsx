@@ -10,7 +10,12 @@ const log = Debug('pushpin:image-card')
 
 export default class ImageCard extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.object.isRequired,
+    doc: PropTypes.shape({
+      path: PropTypes.string,
+      hyperfile: PropTypes.shape({
+        key: PropTypes.string
+      })
+    }).isRequired,
     onChange: PropTypes.func.isRequired
   }
 
