@@ -762,5 +762,6 @@ ContentTypes.register({
   component: Board,
   type: 'board',
   name: 'Board',
-  icon: 'sticky-note'
+  icon: 'sticky-note',
+  unlisted: true,
 })

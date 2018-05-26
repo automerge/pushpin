@@ -18,14 +18,14 @@ export default class BoardTitle extends React.Component {
   }
 
   render() {
-    return <RIEInput
+    return (<RIEInput
       value={this.props.doc.title}
       change={this.onChangeTitle}
       propName="title"
       className="TitleBar__titleText"
       classLoading="TitleBar__titleText--loading"
       classInvalid="TitleBar__titleText--invalid"
-    />
+    />)
   }
 }
 
@@ -33,5 +33,6 @@ ContentTypes.register({
   component: BoardTitle,
   type: 'board-title',
   name: 'Board Title',
-  icon: 'sticky-note'
+  icon: 'sticky-note',
+  unlisted: true,
 })

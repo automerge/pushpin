@@ -63,5 +63,6 @@ ContentTypes.register({
   component: Contact,
   type: 'contact',
   name: 'Contact',
-  icon: 'sticky-note'
+  icon: 'sticky-note',
+  unlisted: true,
 })

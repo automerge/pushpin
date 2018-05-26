@@ -88,5 +88,6 @@ ContentTypes.register({
   component: TitleBar,
   type: 'title-bar',
   name: 'Title Bar',
-  icon: 'sticky-note'
+  icon: 'sticky-note',
+  unlisted: true,
 })

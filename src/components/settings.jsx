@@ -43,8 +43,8 @@ export default class Settings extends React.PureComponent {
 
   render() {
     let avatar
-    if(this.props.doc.avatarDocId) {
-      avatar = <Content card={{type: 'image', docId: this.props.doc.avatarDocId}} />
+    if (this.props.doc.avatarDocId) {
+      avatar = <Content card={{ type: 'image', docId: this.props.doc.avatarDocId }} />
     } else {
       avatar = <img src="../img/default-avatar.png" />
     }
@@ -76,5 +76,6 @@ ContentTypes.register({
   component: Settings,
   type: 'settings',
   name: 'Settings',
-  icon: 'sticky-note'
+  icon: 'sticky-note',
+  unlisted: true,
 })

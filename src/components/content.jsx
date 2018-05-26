@@ -4,11 +4,6 @@ import Debug from 'debug'
 
 import ContentTypes from '../content-types'
 
-// Import these even though we don't use them, to be sure they register with ContentTypes.
-import CodeMirrorEditor from './code-mirror-editor'
-import ImageCard from './image-card'
-import Toggle from './toggle'
-
 const log = Debug('pushpin:content')
 const FILTERED_PROPS = ['card']
 
@@ -36,7 +31,9 @@ export default class Content extends React.PureComponent {
 
   static initializeContentDoc(type, typeAttrs = {}) {
     const { hm } = window // still not a great idea
-    const contentType = ContentTypes.list().find(contentType => contentType.type === type)
+    const contentType = ContentTypes
+      .list({ withUnlisted: true })
+      .find(contentType => contentType.type === type)
     const documentInitializationFunction = contentType.component.initializeDocument
 
     let doc = hm.create()
@@ -123,7 +120,9 @@ export default class Content extends React.PureComponent {
 
   render() {
     log('render')
-    const contentType = ContentTypes.list().find((ct) => ct.type === this.props.card.type)
+    const contentType = ContentTypes
+      .list({ withUnlisted: true })
+      .find((ct) => ct.type === this.props.card.type)
 
     if (!contentType) {
       throw new Error(`Could not find component of type ${this.props.card.type}`)

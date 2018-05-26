@@ -56,27 +56,23 @@ export default class Share extends React.PureComponent {
   }
 
   renderContacts() {
-    const authors = this.props.doc.authorIds.map(id => {
-      return (
+    const authors = this.props.doc.authorIds.map(id => (
         <Content
           key={id}
           card={{type: 'contact', docId: id }}
           actions={['unshare']}
           onUnshare={e => this.handleUnshare(e, author)}
         />
-      )
-    })
+      ))
 
-    const contacts = this.props.contactIds.map(id => {
-      return (
+    const contacts = this.props.contactIds.map(id => (
         <Content
           key={id}
           card={{type: 'contact', docId: id }}
           actions={['share']}
           onShare={e => this.handleShare(e, contact)}
         />
-      )
-    })
+      ))
 
     return (
       <div>
@@ -182,5 +178,6 @@ ContentTypes.register({
   component: Share,
   type: 'share',
   name: 'Share',
-  icon: 'sticky-note'
+  icon: 'sticky-note',
+  unlisted: 'true',
 })

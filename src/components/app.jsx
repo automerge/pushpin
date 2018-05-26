@@ -14,7 +14,7 @@ import ImageCard from './image-card'
 import CodeMirrorEditor from './code-mirror-editor'
 import TitleBar from './title-bar'
 import BoardTitle from './board-title'
-
+import Toggle from './toggle'
 
 const log = Debug('pushpin:app')
 
@@ -94,5 +94,6 @@ ContentTypes.register({
   component: App,
   type: 'app',
   name: 'App',
-  icon: 'sticky-note'
+  icon: 'sticky-note',
+  unlisted: true,
 })
