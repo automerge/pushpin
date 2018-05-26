@@ -5,6 +5,10 @@ import ContentTypes from '../content-types'
 
 export default class Contact extends React.PureComponent {
   static propTypes = {
+    doc: PropTypes.shape({
+      avatar: PropTypes.object,
+      name: PropTypes.string,
+    }).isRequired,
     name: PropTypes.string.isRequired,
     avatar: PropTypes.string,
     actions: PropTypes.arrayOf(PropTypes.string),
