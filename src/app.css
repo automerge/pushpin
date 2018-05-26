@@ -492,7 +492,16 @@ div.card {
   background: #ffffff;
   border: solid 1px var(--colorPaleGrey);
   border-top: 0;
-  overflow: hidden;
+  overflow: auto; 
+}
+
+div.card::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+div.card::-webkit-scrollbar-track {
+  background: #ddd;
 }
 
 div.card.text {

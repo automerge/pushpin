@@ -123,7 +123,9 @@ export default class Board extends React.PureComponent {
     onChange((b) => {
       b.title = 'No Title'
       b.color = BOARD_COLORS.SKY
-      b.authorIds = [selfId]
+      if (selfId) {
+        b.authorIds = [selfId]
+      } // XXX choxi what should we do here for the right click menu?
       b.cards = {}
     })
   }
