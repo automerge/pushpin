@@ -3,10 +3,12 @@ import PropTypes from 'prop-types'
 import Playground from 'component-playground'
 
 /* eslint-disable max-statements */
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable react/require-default-props */
 
 import 'babel-polyfill'
 import { transform } from 'babel-standalone'
-import ReactDOM, { render, unmountComponentAtNode } from 'react-dom'
+import ReactDOM, { render } from 'react-dom'
 import ReactDOMServer from 'react-dom/server'
 import Codemirror from 'react-codemirror2'
 import ContentTypes from '../content-types'
@@ -56,13 +58,15 @@ const wrapMap = {
     let first = true
 
     for (const key in obj) {
-      pairs.push(<span key={key}>
-        <span style={{ color: '#8A6BA1' }}>
-          {(first ? '' : ', ') + key}
+      pairs.push((
+        <span key={key}>
+          <span style={{ color: '#8A6BA1' }}>
+            {(first ? '' : ', ') + key}
+          </span>
+          {': '}
+          {wrapMap[`wrap${getType(obj[key])}`](obj[key])}
         </span>
-        {': '}
-        {wrapMap[`wrap${getType(obj[key])}`](obj[key])}
-      </span>)
+      ))
 
       first = false
     }
@@ -80,206 +84,6 @@ const wrapMap = {
 
   wrapundefined() {
     return (<span style={{ color: '#777' }}>undefined</span>)
-  }
-}
-
-class EsPreview extends React.Component {
-  static propTypes = {
-    code: PropTypes.string.isRequired,
-    scope: PropTypes.object.isRequired
-  };
-
-  _compileCode = () => {
-    const { code, scope } = this.props
-    return transform(`
-      ((${Object.keys(scope).join(',')}) => {
-        var list = [];
-        var console = { log(...x) {
-          list.push({val: x, multipleArgs: x.length !== 1})
-        }};
-        ${code}
-        return list;
-      });
-    `, { presets: ['es2015', 'react', 'stage-1'] }).code
-  };
-
-  _setTimeout = (...args) => {
-    clearTimeout(this.timeoutID); //eslint-disable-line
-    this.timeoutID = setTimeout.apply(null, args); //eslint-disable-line
-  };
-
-  _executeCode = () => {
-    const mountNode = this.mount
-
-    try {
-      unmountComponentAtNode(mountNode)
-    } catch (e) {
-      console.error(e); //eslint-disable-line
-    }
-
-    try {
-      const { scope } = this.props
-      const tempScope = []
-      Object.keys(scope).forEach((s) => tempScope.push(scope[s]))
-      tempScope.push(mountNode)
-      const compiledCode = this._compileCode()
-      class Comp extends React.Component {
-        _createConsoleLine = ({ val, multipleArgs }) => (
-          <span style={{ marginRight: '20px' }}>
-            {multipleArgs ?
-              val.map((y) => this._createConsoleLine([y], false)) :
-              wrapMap[`wrap${getType(val[0])}`](val[0])}
-          </span>
-        );
-
-        render() {
-          return (
-            <div style={{ padding: 15, fontFamily: 'Consolas, Courier, monospace' }}>
-              {
-                eval(compiledCode).apply(null, tempScope).map((x, i) => ( //eslint-disable-line
-                  <div
-                    key={i}
-                    style={{
-                      borderBottom: '1px solid #ccc',
-                      padding: '4px 0'
-                    }}
-                  >
-                    {this._createConsoleLine(x)}
-                  </div>
-                ))
-              }
-            </div>
-          )
-        }
-      }
-      render(<Comp />, mountNode)
-    } catch (err) {
-      this._setTimeout(() => {
-        render(
-          <div className="playgroundError">{err.toString()}</div>,
-          mountNode
-        )
-      }, 500)
-    }
-  };
-
-  componentDidMount = () => {
-    this._executeCode()
-  };
-
-  componentDidUpdate = (prevProps) => {
-    clearTimeout(this.timeoutID); //eslint-disable-line
-    if (this.props.code !== prevProps.code) {
-      this._executeCode()
-    }
-  }
-
-  render() {
-    return (
-      <div ref={(c) => { this.mount = c }} />
-    )
-  }
-}
-
-const propTypesArray = [{
-  key: 'array',
-  test: PropTypes.array,
-  isRequired: PropTypes.array.isRequired
-}, {
-  key: 'boolean',
-  test: PropTypes.bool,
-  isRequired: PropTypes.bool.isRequired
-}, {
-  key: 'function',
-  test: PropTypes.func,
-  isRequired: PropTypes.func.isRequired
-}, {
-  key: 'number',
-  test: PropTypes.number,
-  isRequired: PropTypes.number.isRequired
-}, {
-  key: 'object',
-  test: PropTypes.object,
-  isRequired: PropTypes.array.isRequired
-}, {
-  key: 'string',
-  test: PropTypes.string,
-  isRequired: PropTypes.string.isRequired
-}, {
-  key: 'node',
-  test: PropTypes.node,
-  isRequired: PropTypes.node.isRequired
-}, {
-  key: 'element',
-  test: PropTypes.element,
-  isRequired: PropTypes.element.isRequired
-}]
-
-const getReactPropType = (propTypeFunc) => {
-  let name = 'custom'
-  let isRequired = false
-
-  propTypesArray.some((propType) => {
-    if (propTypeFunc === propType.test) {
-      name = propType.key
-      return true
-    }
-    if (propTypeFunc === propType.isRequired) {
-      name = propType.key
-      isRequired = true
-      return true
-    }
-    return false
-  })
-  return { name, isRequired }
-}
-
-
-class Doc extends React.Component {
-  static defaultProps = {
-    propDescriptionMap: {},
-    ignore: []
-  };
-
-  static propTypes = {
-    componentClass: PropTypes.func,
-    ignore: PropTypes.array,
-    propDescriptionMap: PropTypes.object
-  };
-
-  render() {
-    const propTypes = []
-    const {
-      componentClass,
-      ignore,
-      propDescriptionMap
-    } = this.props
-    for (const propName in componentClass.propTypes) {
-      if (ignore.indexOf(propName)) {
-        propTypes.push({
-          propName,
-          type: getReactPropType(componentClass.propTypes[propName]),
-          description: propDescriptionMap[propName] || ''
-        })
-      }
-    }
-
-    return (
-      <div className="playgroundDocs">
-        <ul>
-          {
-            propTypes.map((propObj) => (
-              <li key={propObj.propName}>
-                <b>{`${propObj.propName}: `}</b>
-                <i>{propObj.type.name}</i>
-                {propObj.description && ` - ${propObj.description}`}
-                <b>{`${propObj.type.isRequired ? ' required' : ''}`}</b>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    )
   }
 }
 
@@ -466,12 +270,9 @@ class ReactPlayground extends React.Component {
     codeText: PropTypes.string.isRequired,
     scope: PropTypes.object.isRequired,
     collapsableCode: PropTypes.bool,
-    docClass: PropTypes.func,
-    propDescriptionMap: PropTypes.object,
     theme: PropTypes.string,
     selectedLines: PropTypes.array,
     noRender: PropTypes.bool,
-    es6Console: PropTypes.bool,
     context: PropTypes.object,
     initiallyExpanded: PropTypes.bool,
     previewComponent: PropTypes.node
@@ -508,24 +309,14 @@ class ReactPlayground extends React.Component {
     const {
       collapsableCode,
       context,
-      docClass,
-      es6Console,
       noRender,
       previewComponent,
-      propDescriptionMap,
       scope,
       selectedLines,
       theme } = this.props
 
     return (
       <div className={`playground${collapsableCode ? ' collapsableCode' : ''}`}>
-        {
-          docClass ?
-            <Doc
-              componentClass={docClass}
-              propDescriptionMap={propDescriptionMap}
-            /> : null
-        }
         <div className={`playgroundCode${expandedCode ? ' expandedCode' : ''}`}>
           <Editor
             className="playgroundStage"
@@ -536,29 +327,14 @@ class ReactPlayground extends React.Component {
             theme={theme}
           />
         </div>
-        {
-          collapsableCode ?
-            <div className="playgroundToggleCodeBar">
-              <span className="playgroundToggleCodeLink" onClick={this._toggleCode}>
-                {expandedCode ? 'collapse' : 'expand'}
-              </span>
-            </div> : null
-        }
         <div className="playgroundPreview">
-          {
-            es6Console ?
-              <EsPreview
-                code={code}
-                scope={scope}
-              /> :
-              <Preview
-                context={context}
-                code={code}
-                scope={scope}
-                noRender={noRender}
-                previewComponent={previewComponent}
-              />
-          }
+          <Preview
+            context={context}
+            code={code}
+            scope={scope}
+            noRender={noRender}
+            previewComponent={previewComponent}
+          />
         </div>
       </div>
     )
