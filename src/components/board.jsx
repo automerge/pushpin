@@ -173,7 +173,8 @@ export default class Board extends React.PureComponent {
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      this.createCard({ x: e.pageX, y: e.pageY, type: 'text' })
+      const cardId = this.createCard({ x: e.pageX, y: e.pageY, type: 'text' })
+      this.selectOnly(cardId)
     }
   }
 
@@ -335,6 +336,8 @@ export default class Board extends React.PureComponent {
       }
       b.cards[id] = newCard
     })
+
+    return id
   }
 
   deleteCard(id) {
@@ -596,27 +599,35 @@ export default class Board extends React.PureComponent {
     }
   }
 
+  selectToggle(cardId) {
+    const { selected } = this.state
+
+    if (selected.includes(cardId)) {
+      // remove from the current state if we have it
+      this.setState({ ...this.state,
+        selected: selected.filter((filterId) => filterId !== cardId) })
+    } else {
+      // add to the current state if we don't
+      this.setState({ ...this.state, selected: [...selected, cardId] })
+    }
+  }
+  selectOnly(cardId) {
+    this.setState({ ...this.state, selected: [cardId] })
+  }
+
   onStop(card, e, d) {
     log('onStop')
 
     const { id } = card
-    const { selected } = this.state
     const tracking = this.tracking[id]
 
     // If tracking is not initialized, treat this as a click
     if (!(tracking && (tracking.moving || tracking.resizing))) {
       if (e.ctrlKey || e.shiftKey) {
-        if (selected.includes(card.id)) {
-          // remove from the current state if we have it
-          this.setState({ ...this.state,
-            selected: selected.filter((filterId) => filterId !== id) })
-        } else {
-          // add to the current state if we don't
-          this.setState({ ...this.state, selected: [...selected, id] })
-        }
+        this.selectToggle(id)
       } else {
         // otherwise we don't have shift/ctrl, so just set selection to this
-        this.setState({ ...this.state, selected: [card.id] })
+        this.selectOnly(id)
       }
 
       return
