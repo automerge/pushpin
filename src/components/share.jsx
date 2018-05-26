@@ -43,10 +43,27 @@ export default class Share extends React.PureComponent {
     this.state = { tab: 'notifications' }
   }
 
+  // this probably doesn't work here...
+  updateSelfOfferDocumentToIdentity(state, { identityId, sharedDocId }) {
+    const self = state.hm.change(state.self, (s) => {
+      if (!s.offeredIds) {
+        s.offeredIds = {}
+      }
+
+      if (!s.offeredIds[identityId]) {
+        s.offeredIds[identityId] = []
+      }
+
+      s.offeredIds[identityId].push(sharedDocId)
+    })
+    return { ...state, self }
+  }
+
   handleShare(e, contact) {
-    // i deleted board.docId
+    // i deleted board.docId and broke the updateSelfOfferDocumentToIdentity,
+    // but at least I pasted the code above ^^^^
     Loop.dispatch(
-      Identity.updateSelfOfferDocumentToIdentity,
+      this.updateSelfOfferDocumentToIdentity,
       { identityId: contact.docId, sharedDocId: this.props.board.docId }
     )
   }
