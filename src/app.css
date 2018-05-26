@@ -305,7 +305,7 @@ body {
 .ContextMenu {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  width: 224px;
+  width: 232px;
   z-index: 10;
 }
 
@@ -357,18 +357,26 @@ insta
   vertical-align: middle;
 }
 
+.ContextMenu h6 {
+  padding-left: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 8px;
+  color: var(--colorBlueBlack);
+}
+
 .ColorPicker {
   background: #fff;
   border: 0 solid rgba(0,0,0,0.25);
   border-radius: 2px;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   grid-gap: 8px;
 }
 
 .ColorPicker__swatch {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 2px;
   overflow: hidden;
 }

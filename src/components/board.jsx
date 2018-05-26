@@ -29,7 +29,6 @@ const BOARD_COLORS = {
   PINK: '#ffe1e7',
   HERB: '#daefd2',
   PEACH: '#ffd2cc',
-  CLOUD: '#d5dfe5',
 }
 
 const BOARD_WIDTH = 3600
@@ -717,9 +716,10 @@ export default class Board extends React.PureComponent {
           { createMenuItems }
         </div>
 
-        <div className="ContextMenu__divider" />
 
         <div className="ContextMenu__section">
+          <h6>Board Color</h6>
+          <div className="ContextMenu__divider" />
           <ContextMenuItem>
             <ColorPicker
               color={this.props.doc.backgroundColor}
