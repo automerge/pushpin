@@ -495,13 +495,23 @@ div.card {
   overflow: auto; 
 }
 
-div.card::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+
+.card::-webkit-scrollbar
+{
+  width: 6px;
+  height: 6px;
 }
 
-div.card::-webkit-scrollbar-track {
-  background: #ddd;
+.card::-webkit-scrollbar-track
+{
+	background-color: var(--colorPaleGrey);
+}
+
+.card::-webkit-scrollbar-thumb
+{
+  width: 8px;
+  height: 8px;
+	background-color: #000000;
 }
 
 div.card.text {
