@@ -10,7 +10,6 @@ import 'babel-polyfill'
 import { transform } from 'babel-standalone'
 import ReactDOM, { render } from 'react-dom'
 import ReactDOMServer from 'react-dom/server'
-import Codemirror from 'react-codemirror2'
 import ContentTypes from '../content-types'
 
 const getType = function getType(el) {
@@ -194,70 +193,6 @@ class Preview extends React.Component {
   }
 }
 
-class Editor extends React.Component {
-  static propTypes = {
-    className: PropTypes.string,
-    codeText: PropTypes.string,
-    external: PropTypes.bool,
-    onChange: PropTypes.func,
-    readOnly: PropTypes.bool,
-    selectedLines: PropTypes.array,
-    style: PropTypes.object,
-    theme: PropTypes.string
-  };
-
-  componentDidMount = () => {
-    const editor = this.editor.editor
-    this.highlightSelectedLines(editor, this.props.selectedLines)
-  };
-
-  highlightSelectedLines = (editor, selectedLines) => {
-    if (Array.isArray(selectedLines)) {
-      selectedLines.forEach((lineNumber) =>
-        editor.addLineClass(lineNumber, 'wrap', 'CodeMirror-activeline-background'))
-    }
-  };
-
-  updateCode = (editor, meta, code) => {
-    if (!this.props.readOnly && this.props.onChange) {
-      this.props.onChange(code)
-    }
-  };
-
-  render() {
-    const {
-      className,
-      external,
-      style,
-      codeText,
-      theme,
-      readOnly
-    } = this.props
-
-    const options = {
-      mode: 'jsx',
-      lineNumbers: false,
-      lineWrapping: true,
-      smartIndent: false,
-      matchBrackets: true,
-      theme,
-      readOnly
-    }
-
-    return (
-      <Codemirror
-        ref={(c) => { this.editor = c }}
-        className={className}
-        external={external}
-        options={options}
-        style={style}
-        value={codeText}
-        onChange={this.updateCode}
-      />
-    )
-  }
-}
-
 class ReactPlayground extends React.Component {
   static defaultProps = {
     theme: 'monokai',
@@ -311,22 +246,10 @@ class ReactPlayground extends React.Component {
       context,
       noRender,
       previewComponent,
-      scope,
-      selectedLines,
-      theme } = this.props
+      scope } = this.props
 
     return (
       <div className={`playground${collapsableCode ? ' collapsableCode' : ''}`}>
-        <div className={`playgroundCode${expandedCode ? ' expandedCode' : ''}`}>
-          <Editor
-            className="playgroundStage"
-            codeText={code}
-            external={external}
-            onChange={this._handleCodeChange}
-            selectedLines={selectedLines}
-            theme={theme}
-          />
-        </div>
         <div className="playgroundPreview">
           <Preview
             context={context}
