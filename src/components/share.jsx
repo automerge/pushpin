@@ -6,7 +6,6 @@ import Content from './content'
 import ContentTypes from '../content-types'
 import Loop from '../loop'
 import * as Model from '../models/model'
-import * as Identity from '../models/identity'
 
 export default class Share extends React.PureComponent {
   static propTypes = {

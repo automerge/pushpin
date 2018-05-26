@@ -15,6 +15,7 @@ import CodeMirrorEditor from './code-mirror-editor'
 import TitleBar from './title-bar'
 import BoardTitle from './board-title'
 import Toggle from './toggle'
+import ContentPreview from './playground'
 
 const log = Debug('pushpin:app')
 

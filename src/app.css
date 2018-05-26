@@ -550,6 +550,7 @@ div.card span.cardResizeHandle {
   background-repeat: no-repeat;
   background-origin: content-box;
   cursor: se-resize;
+  z-index: 999;
 }
 
 div.card {

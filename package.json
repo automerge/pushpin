@@ -53,8 +53,11 @@
   "dependencies": {
     "@ibm/plex": "^1.0.2",
     "automerge": "^0.7.8",
+    "babel-polyfill": "^6.26.0",
+    "babel-standalone": "^6.26.0",
     "classnames": "^2.2.5",
     "codemirror": "^5.37.0",
+    "component-playground": "^3.1.2",
     "diff-match-patch": "^1.0.1",
     "electron-compile": "^6.4.2",
     "electron-devtools-installer": "^2.2.4",
