@@ -11,80 +11,7 @@ import { transform } from 'babel-standalone'
 import ReactDOM, { render } from 'react-dom'
 import ReactDOMServer from 'react-dom/server'
 import ContentTypes from '../content-types'
-
-const getType = function getType(el) {
-  let t = typeof el
-
-  if (Array.isArray(el)) {
-    t = 'array'
-  } else if (el === null) {
-    t = 'null'
-  }
-
-  return t
-}
-
-const wrapMap = {
-  wrapnumber(num) {
-    return (<span style={{ color: '#6170d5' }}>{num}</span>)
-  },
-
-  wrapstring(str) {
-    return (<span style={{ color: '#F2777A' }}>{`'${str}'`}</span>)
-  },
-
-  wrapboolean(bool) {
-    return (<span style={{ color: '#48A1CF' }}>{bool ? 'true' : 'false'}</span>)
-  },
-
-  wraparray(arr) {
-    return (
-      <span>
-        {'['}
-        {arr.map((entry, i) => (
-          <span key={i}>
-            {wrapMap[`wrap${getType(entry)}`](entry)}
-            {i !== arr.length - 1 ? ', ' : ''}
-          </span>
-          ))}
-        {']'}
-      </span>
-    )
-  },
-
-  wrapobject(obj) {
-    const pairs = []
-    let first = true
-
-    for (const key in obj) {
-      pairs.push((
-        <span key={key}>
-          <span style={{ color: '#8A6BA1' }}>
-            {(first ? '' : ', ') + key}
-          </span>
-          {': '}
-          {wrapMap[`wrap${getType(obj[key])}`](obj[key])}
-        </span>
-      ))
-
-      first = false
-    }
-
-    return (<i>{'Object {'}{pairs}{'}'}</i>)
-  },
-
-  wrapfunction() {
-    return (<i style={{ color: '#48A1CF' }}>function</i>)
-  },
-
-  wrapnull() {
-    return (<span style={{ color: '#777' }}>null</span>)
-  },
-
-  wrapundefined() {
-    return (<span style={{ color: '#777' }}>undefined</span>)
-  }
-}
+import { RIEInput } from 'riek'
 
 class Preview extends React.Component {
   static defaultProps = {
@@ -195,27 +122,20 @@ class Preview extends React.Component {
 
 class ReactPlayground extends React.Component {
   static defaultProps = {
-    theme: 'monokai',
     noRender: true,
-    context: {},
-    initiallyExpanded: false
+    context: {}
   };
 
   static propTypes = {
     codeText: PropTypes.string.isRequired,
     scope: PropTypes.object.isRequired,
-    collapsableCode: PropTypes.bool,
-    theme: PropTypes.string,
-    selectedLines: PropTypes.array,
     noRender: PropTypes.bool,
     context: PropTypes.object,
-    initiallyExpanded: PropTypes.bool,
     previewComponent: PropTypes.node
   };
 
   state = {
     code: this.props.codeText,
-    expandedCode: this.props.initiallyExpanded,
     external: true
   };
 
@@ -242,14 +162,13 @@ class ReactPlayground extends React.Component {
   render() {
     const { code, external, expandedCode } = this.state
     const {
-      collapsableCode,
       context,
       noRender,
       previewComponent,
       scope } = this.props
 
     return (
-      <div className={`playground${collapsableCode ? ' collapsableCode' : ''}`}>
+      <div className="playground">
         <div className="playgroundPreview">
           <Preview
             context={context}
@@ -298,7 +217,15 @@ class ContentPlayground extends React.PureComponent {
   }
 
   render() {
-    return <ReactPlayground codeText={this.props.doc.text} scope={{ React, ReactDOM }} noRender={false} />
+    return (
+      <div>
+        <ReactPlayground
+          codeText={this.props.doc.text}
+          scope={{ React, ReactDOM }}
+          noRender={false}
+        />
+      </div>
+    )
   }
 }
 
