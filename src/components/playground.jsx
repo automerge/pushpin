@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Playground from 'component-playground'
+import Automerge from 'automerge'
 
 /* eslint-disable max-statements */
 /* eslint-disable react/forbid-prop-types */
@@ -11,7 +12,6 @@ import { transform } from 'babel-standalone'
 import ReactDOM, { render } from 'react-dom'
 import ReactDOMServer from 'react-dom/server'
 import ContentTypes from '../content-types'
-import { RIEInput } from 'riek'
 
 class Preview extends React.Component {
   static defaultProps = {
@@ -136,31 +136,22 @@ class ReactPlayground extends React.Component {
 
   state = {
     code: this.props.codeText,
-    external: true
   };
 
   componentWillReceiveProps = (nextProps) => {
     this.setState({
       code: nextProps.codeText,
-      external: true
     })
   };
 
   _handleCodeChange = (code) => {
     this.setState({
-      code,
-      external: false
-    })
-  };
-
-  _toggleCode = () => {
-    this.setState({
-      expandedCode: !this.state.expandedCode
+      code
     })
   };
 
   render() {
-    const { code, external, expandedCode } = this.state
+    const { code } = this.state
     const {
       context,
       noRender,
@@ -193,26 +184,29 @@ class ContentPlayground extends React.PureComponent {
   }
 
   static initializeDocument(onChange) {
-    onChange((doc) => {
-      doc.text = `class Button extends React.Component {
-        state = { counter: 1 };
-        
-        handleClick = () => {
-          this.setState((prevState) => ({
-            counter: prevState.counter + 1 
-          }));
-        };
-        
-        render() {
-          return (
-            <button onClick={this.handleClick}>
-              {this.state.counter}
-            </button>
-          );
-        }
+    const defaultText = `class Button extends React.Component {
+      state = { counter: 1 };
+      
+      handleClick = () => {
+        this.setState((prevState) => ({
+          counter: prevState.counter + 1 
+        }));
+      };
+      
+      render() {
+        return (
+          <button onClick={this.handleClick}>
+            {this.state.counter}
+          </button>
+        );
       }
-      ReactDOM.render(<Button/>, mountNode);
-      `
+    }
+    ReactDOM.render(<Button/>, mountNode);
+    `
+
+    onChange((doc) => {
+      doc.text = new Automerge.Text()
+      doc.text.insertAt(0, ...defaultText.split(''))
     })
   }
 
@@ -220,7 +214,7 @@ class ContentPlayground extends React.PureComponent {
     return (
       <div>
         <ReactPlayground
-          codeText={this.props.doc.text}
+          codeText={this.props.doc.text.join('')}
           scope={{ React, ReactDOM }}
           noRender={false}
         />
