@@ -30,6 +30,40 @@ const METADATA = {
  */
 
 /**
+   * Experimental second open
+   */
+class DocHandle extends EventEmitter {
+  constructor(hm, docId, doc) {
+    super()
+    this.hm = hm
+    this.docId = docId
+    this.doc = doc
+
+    this.onUpdated = this.onUpdated.bind(this)
+    this.hm.on('document:updated', this.onUpdated)
+  }
+
+  docId() {
+    return this.docId
+  }
+
+  doc() {
+    return this.doc
+  }
+
+  change(cb) {
+    this.doc = this.hm.change(this, cb)
+  }
+
+  onUpdated(docId, doc) {
+    if (docId !== this.docId) {
+      return // blech
+    }
+    this.emit('document:updated', doc)
+  }
+}
+
+/**
  * Creates a new Hypermerge instance that manages a set of documents.
  * All previously opened documents are automatically re-opened.
  * @param {object} options
@@ -161,6 +195,25 @@ class Hypermerge extends EventEmitter {
       this.on('document:ready', (updatedId, doc) => {
         if (docId === updatedId) {
           res(doc)
+        }
+      })
+    })
+  }
+
+  // this is not a good name
+  openHandle(docId) {
+    this._ensureReady()
+    log('open2', docId)
+    this._trackedFeed(docId)
+
+    if (this.readyIndex[docId]) {
+      return Promise.resolve(new DocHandle(this, docId, this.docs[docId]))
+    }
+
+    return new Promise((res, rej) => {
+      this.on('document:ready', (updatedId, doc) => {
+        if (docId === updatedId) {
+          res(new DocHandle(this, docId, doc))
         }
       })
     })

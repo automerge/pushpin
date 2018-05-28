@@ -55,21 +55,13 @@ export default class Content extends React.PureComponent {
   }
 
   getHypermergeDoc(docId, cb) {
-    window.hm.open(docId)
-      .then(doc => {
-        cb(null, doc)
+    window.hm.openHandle(docId)
+      .then(handle => {
+        handle.on('updated', (handle) => cb(null, handle.doc()))
+        cb(null, handle.doc)
       }, err => {
         cb(err)
       })
-    // XXX fixme: lol
-    window.hm.on('document:updated', (id, doc) => {
-      if (id !== docId) {
-        return
-      }
-
-      // unregister listener
-      cb(null, doc)
-    })
   }
 
   componentDidMount() {
