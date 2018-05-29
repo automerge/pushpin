@@ -359,23 +359,13 @@ export default class Board extends React.PureComponent {
     })
   }
 
-  // Note: not currently used so unsure if it works.
-  addSelfToAuthors(selfId) {
-    const { authorIds } = this.props.doc
-    if (authorIds.includes(selfId)) {
-      return
-    }
-    this.props.onChange((b) => {
-      b.authorIds.push(selfId)
-    })
-  }
-
   changeBackgroundColor(color) {
     log('changeBackgroundColor')
     this.props.onChange((b) => {
       b.backgroundColor = color.hex
     })
   }
+
   /**
    *
    * Card placement / manipulation actions
