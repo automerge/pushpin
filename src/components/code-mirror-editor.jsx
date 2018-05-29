@@ -59,6 +59,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
     this.onCodeMirrorChange = this.onCodeMirrorChange.bind(this)
     this.setEditorRef = this.setEditorRef.bind(this)
     this.editorRef = null
+    this.mounted = false
   }
 
   // When the components mounts, and we therefore have refs to the DOM,
@@ -69,21 +70,32 @@ export default class CodeMirrorEditor extends React.PureComponent {
     // according to the size of the text, without scrollbars or wrapping.
     this.codeMirror = CodeMirror(this.editorRef, {
       extraKeys: { Backspace: this.onBackspace },
-      value: this.props.doc.text.join(''),
       autofocus: this.props.uniquelySelected,
       lineNumbers: false,
       lineWrapping: true,
       scrollbarStyle: 'null',
       viewportMargin: Infinity,
     })
+    if (this.props.doc.text) {
+      this.codeMirror.setValue(this.props.doc.text.join(''))
+    }
     this.codeMirror.on('change', this.onCodeMirrorChange)
+    this.mounted = true
+  }
+
+  componentWillUnmount() {
+    this.mounted = false
   }
 
   // This is where we transform declarative updates from React into imperative
   // commands in the editor.
   componentWillReceiveProps(props) {
-    this.ensureContents(props.doc)
-    this.ensureFocus(props.uniquelySelected)
+    // It's possible to receive props before mounting - in that case just
+    // accept without action and the editor will start with the right contents.
+    if (this.mounted) {
+      this.ensureContents(props.doc)
+      this.ensureFocus(props.uniquelySelected)
+    }
   }
 
   // This is fired whenever we hit backspace while editing. If the editor is
