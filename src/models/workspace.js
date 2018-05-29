@@ -5,7 +5,6 @@ import Loop from '../loop'
 import * as Model from './model'
 
 import BoardComponent from '../components/board'
-import * as Identity from './identity'
 import { WORKSPACE_ID_PATH } from '../constants'
 
 const log = Debug('pushpin:workspace')
