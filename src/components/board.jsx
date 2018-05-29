@@ -352,8 +352,6 @@ export default class Board extends React.PureComponent {
     })
   }
 
-  /* Note that the next two methods aren't currently used directly by board.jsx */
-  /* As such, I have not actually run them to see if they're useful. */
   changeTitle(title) {
     log('changeTitle')
     this.props.onChange((b) => {
@@ -361,6 +359,7 @@ export default class Board extends React.PureComponent {
     })
   }
 
+  // Note: not currently used so unsure if it works.
   addSelfToAuthors(selfId) {
     const { authorIds } = this.props.doc
     if (authorIds.includes(selfId)) {
