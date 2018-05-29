@@ -56,10 +56,9 @@ const USAGE_TEXT =
 * Double-click to create a new text card.
 * Right-click to create a new text or image card.
 * Click on a card to edit its text.
-* Write Markdown in cards for formatting.
 * Click and drag anywhere on a card to move it around.
 * Click and drag on the bottom right corner of a card to resize it.
-* Paste an absolute file name to an image as the only text in a card + hit enter, to load that file.
+* Drop or paste content onto the board to create corresponding cards.
 * Use arrow keys to scroll around the board.`
 
 const EXAMPLE_TEXT =
