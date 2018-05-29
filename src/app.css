@@ -534,7 +534,16 @@ div.card img.image {
 div.card.image {
   padding: 12px;
 }
-
+/* Typography */
+  .Type--primary {
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .Type--secondary {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--colorSecondaryGrey);
+  }
 
 /* Popover Menus */
 .PopOverWrapper {
@@ -543,7 +552,10 @@ div.card.image {
   min-height: 8px;
   border-radius: 4px;
   min-width: 296px;
+  max-height: 480px;
+  overflow-y: scroll;
 }
+
 /* Buttons */
 .ButtonAction {
   color: var(--colorSecondaryGrey);
@@ -597,7 +609,6 @@ div.card.image {
 }
 
 .ListMenu .ListMenu__item:hover{
-  background-color: var(--colorInputGrey);
 }
 
 .ListMenu .Thumbnail {
