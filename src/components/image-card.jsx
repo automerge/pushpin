@@ -23,6 +23,7 @@ export default class ImageCard extends React.PureComponent {
     super(props)
     log('constructor')
     this.state = { imageContentReady: false }
+    this.workImage()
   }
 
   static initializeDocument(onChange, { path, buffer }) {
@@ -32,18 +33,21 @@ export default class ImageCard extends React.PureComponent {
   }
 
   componentDidMount() {
+    log('componentDidMount')
     this.mounted = true
-
-    if (this.props.doc.path) {
-      this.uploadImage()
-    }
-
-    if (this.props.doc.hyperfile) {
-      this.fetchImage()
-    }
   }
 
-  componentWillUpdate() {
+  componentWillUnmount() {
+    log('componentWillUnmount')
+    this.mounted = false
+  }
+
+  componentDidUpdate() {
+    log('componentDidUpdate')
+    this.workImage()
+  }
+
+  workImage() {
     if (this.props.doc.path) {
       this.uploadImage()
     }
@@ -81,10 +85,6 @@ export default class ImageCard extends React.PureComponent {
 
       this.setState({ imageContentReady: true, imagePath: `../${imagePath}` })
     })
-  }
-
-  componentWillUnmount() {
-    this.mounted = false
   }
 
   render() {
