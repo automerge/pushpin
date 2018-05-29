@@ -535,6 +535,10 @@ div.card.image {
   padding: 12px;
 }
 /* Typography */
+  .Type--header {
+    font-size: 14px;
+    font-weight: 400;
+  }
   .Type--primary {
     font-size: 14px;
     font-weight: 400;
@@ -590,6 +594,16 @@ div.card.image {
   padding: 4px 0px;
 }
 
+.ListMenu__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 8px;
+  line-height: 24px;
+  height:40px;
+  border-bottom:1px solid var(--colorPaleGrey);
+}
+
 .ListMenu__segment {
   padding: 4px 8px;
   font-size: 12px;
@@ -642,7 +656,7 @@ div.card.image {
   line-height: 16px;
   flex-grow: 1;
   text-align: center;
-  background: #f3f3f3;
+  background: var(--colorPaleGrey);
   padding: 12px 0;
   cursor: pointer;
   color: var(--colorSecondaryGrey);

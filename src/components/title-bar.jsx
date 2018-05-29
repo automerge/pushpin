@@ -148,18 +148,107 @@ export default class TitleBar extends React.PureComponent {
           <DropdownContent>
             <div className="PopOverWrapper">
               <div className="ListMenu">
+                <div className="ListMenu__header">
+                  <p className="Type--header">Label</p>
+                </div>
                 <div className="Tabs">
                   <div role="button" className="Tabs__tab Tabs__tab--active">
-                    <i className="fa fa-share-alt" /> Share
+                    <i className="fa fa-share-alt" />
+                    <p className="Type--primary">Label</p>
                   </div>
                   <div role="button" className="Tabs__tab">
-                    <i className="fa fa-star" /> Friends
+                    <i className="fa fa-star" />
+                    <p className="Type--primary">Label</p>
                   </div>
                 </div>
                 <div className="ListMenu__segment">
                   Label
                 </div>
                 <div className="ListMenu__section">
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <div className="Label">
+                      <p className="Type--primary">Label</p>
+                      <p className="Type--secondary">Secondary Label</p>
+                    </div>
+                    <div className="Actions">
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <div className="Label">
+                      <p className="Type--primary">Label</p>
+                      <p className="Type--secondary">Secondary Label</p>
+                    </div>
+                    <div className="Actions">
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <div className="Label">
+                      <p className="Type--primary">Label</p>
+                      <p className="Type--secondary">Secondary Label</p>
+                    </div>
+                    <div className="Actions">
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <div className="Label">
+                      <p className="Type--primary">Label</p>
+                      <p className="Type--secondary">Secondary Label</p>
+                    </div>
+                    <div className="Actions">
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <div className="Label">
+                      <p className="Type--primary">Label</p>
+                      <p className="Type--secondary">Secondary Label</p>
+                    </div>
+                    <div className="Actions">
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <div className="Label">
+                      <p className="Type--primary">Label</p>
+                      <p className="Type--secondary">Secondary Label</p>
+                    </div>
+                    <div className="Actions">
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
                   <div className="ListMenu__item">
                     <div className="Thumbnail">
                       <div className="Avatar">
