@@ -71,21 +71,11 @@ export default class TitleBar extends React.PureComponent {
                         <img src="../img/default-avatar.png" width="36"/>
                       </div>
                     </div>
-                    <p>Label</p>
-                    <div className="Actions">
-                      <div className="ButtonAction ButtonAction--destructive"><i className="fa fa-ban"/></div>
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    <div className="Label">
+                      <p className="Type--primary">Label</p>
+                      <p className="Type--secondary">Secondary Label</p>
                     </div>
-                  </div>
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <p>Label</p>
                     <div className="Actions">
-                      <div className="ButtonAction ButtonAction--destructive"><i className="fa fa-ban"/></div>
                       <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
                     </div>
                   </div>
