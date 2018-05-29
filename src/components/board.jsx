@@ -543,11 +543,13 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
-    if (!card.width || !card.height) {
+    if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
       this.props.onChange(b => {
         b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth
         b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight
       })
+
+      card = this.props.doc.cards[card.id]
     }
 
     // If we haven't started tracking this drag, initialize tracking
