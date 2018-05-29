@@ -19,7 +19,7 @@ export default class BoardTitle extends React.Component {
 
   render() {
     return (<RIEInput
-      value={this.props.doc.title}
+      value={this.props.doc.title || ''}
       change={this.onChangeTitle}
       propName="title"
       className="TitleBar__titleText"

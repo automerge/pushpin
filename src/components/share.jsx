@@ -17,7 +17,7 @@ export default class Share extends React.PureComponent {
     board: PropTypes.shape({
       docId: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired
-    }).isRequired,
+    }),
     contacts: PropTypes.objectOf(PropTypes.shape({
       docId: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,

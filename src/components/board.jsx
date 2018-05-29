@@ -90,7 +90,7 @@ export default class Board extends React.PureComponent {
       title: PropTypes.string,
       authorIds: PropTypes.arrayOf(PropTypes.string),
       backgroundColor: PropTypes.string,
-      cards: PropTypes.objectOf(Card.propTypes.card).isRequired
+      cards: PropTypes.objectOf(Card.propTypes.card)
     }).isRequired,
     onChange: PropTypes.func.isRequired
   }
@@ -139,7 +139,7 @@ export default class Board extends React.PureComponent {
 
   componentDidMount() {
     log('componentDidMount')
-    if (Object.keys(this.props.doc.cards).length === 0) {
+    if (this.props.doc.cards && Object.keys(this.props.doc.cards).length === 0) {
       this.populateDemoBoard()
     }
     document.addEventListener('keydown', this.onKeyDown)
