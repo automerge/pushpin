@@ -8,7 +8,6 @@ import ContentTypes from '../content-types'
 
 // we should make the avatar image a proper ImageCard
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
-import * as Identity from '../models/identity'
 import Content from './content'
 
 const { dialog } = remote
