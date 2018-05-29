@@ -13,14 +13,11 @@ const log = Debug('pushpin:title-bar')
 
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
-    formDocId: PropTypes.string.isRequired,
-    requestedDocId: PropTypes.string.isRequired,
-    board: PropTypes.shape({
-      title: PropTypes.string.isRequired
-    }).isRequired,
-    self: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      avatar: PropTypes.string.isRequired
+    doc: PropTypes.shape({
+      selfId: PropTypes.string,
+      boardId: PropTypes.string,
+      offeredIds: PropTypes.arrayOf(PropTypes.string),
+      contactIds: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
     onBoardIdChanged: PropTypes.func
   }
