@@ -336,12 +336,9 @@ div.board {
 }
 
 div.card {
-  background: #ffffff;
-  border: solid 1px var(--colorPaleGrey);
   border-top: 0;
   overflow: auto; 
 }
-
 
 .card::-webkit-scrollbar
 {
@@ -389,10 +386,16 @@ div.card span.cardResizeHandle {
   background-repeat: no-repeat;
   background-origin: content-box;
   cursor: se-resize;
+  visibility: hidden;
 }
 
-div.card {
+.card:hover .cardResizeHandle {
+  visibility: visible;
+}
+
+.card {
   box-sizing: border-box;
+  display: flex;
 }
 
 div.card img.image {
@@ -405,6 +408,19 @@ div.card img.image {
 
 div.card.image {
   padding: 12px;
+  box-sizing: border-box;
+  background: white;
+  border: solid 1px var(--colorPaleGrey);
+}
+
+.react-toggle {
+  margin: auto;
+}
+
+.react-toggle-track-check, .react-toggle-track-x {
+  margin-top: 0;
+  margin-bottom: 0;
+  top: 7px;
 }
 /* Typography */
 .Label {
@@ -589,6 +605,10 @@ div.card.image {
   cursor: text;
   text-align: left;
   color: var(--colorBlack);
+  background: white;
+  border: solid 1px var(--colorPaleGrey);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .CodeMirrorEditor__editor {
