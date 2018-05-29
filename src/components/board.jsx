@@ -402,7 +402,7 @@ export default class Board extends React.PureComponent {
     // document change if in fact the card won't resize mod snapping.
     const snapWidth = this.snapMeasureToGrid(width)
     const snapHeight = this.snapMeasureToGrid(height)
-    if (snapWidth === doc.cards[id].width && doc.cards[id].height) {
+    if (snapWidth === doc.cards[id].width && snapHeight === doc.cards[id].height) {
       return
     }
     onChange((b) => {
