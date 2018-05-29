@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
@@ -114,6 +115,7 @@ export default class Board extends React.PureComponent {
     this.changeBackgroundColor = this.changeBackgroundColor.bind(this)
 
     this.tracking = {}
+    this.cardRefs = {}
     this.state = { cards: {}, selected: [] }
   }
 
@@ -328,8 +330,8 @@ export default class Board extends React.PureComponent {
         docId,
         x: snapX,
         y: snapY,
-        width: this.snapMeasureToGrid(width || CARD_DEFAULT_WIDTH),
-        height: this.snapMeasureToGrid(height || CARD_DEFAULT_HEIGHT),
+        width: width ? this.snapMeasureToGrid(width) : null,
+        height: height ? this.snapMeasureToGrid(height) : null,
         slackWidth: 0,
         slackHeight: 0,
         resizing: false,
@@ -541,6 +543,13 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
+    if (!card.width || !card.height) {
+      this.props.onChange(b => {
+        b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth
+        b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight
+      })
+    }
+
     // If we haven't started tracking this drag, initialize tracking
     if (!(tracking && (tracking.moving || tracking.resizing))) {
       const resizing = e.target.className === 'cardResizeHandle'
@@ -677,6 +686,7 @@ export default class Board extends React.PureComponent {
         >
           <div>
             <Card
+              ref={node => this.cardRefs[id] = node}
               card={card}
               dragState={this.state.cards[id] || {}}
               selected={selected}
