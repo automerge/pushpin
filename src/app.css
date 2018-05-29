@@ -535,6 +535,86 @@ div.card.image {
   padding: 12px;
 }
 
+
+/* Popover Menus */
+.PopOverWrapper {
+  background-color: #fff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  min-height: 8px;
+  border-radius: 4px;
+  min-width: 296px;
+}
+/* Buttons */
+.ButtonAction {
+  color: var(--colorSecondaryGrey);
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.ButtonAction--destructive {
+  color: var(--colorLink);
+}
+.ButtonAction:hover {
+  background-color: rgba(0,0,0,.075);
+}
+
+.ButtonAction .fa {
+  color: inherit;
+  font-size: 24px;
+}
+
+/* List Menus */
+.Avatar {
+
+}
+.ListMenu {
+  padding: 4px 0px;
+}
+
+.ListMenu__section {
+  padding: 4px 0px;
+}
+
+.ListMenu__segment {
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--colorSecondaryGrey);
+  border-bottom:1px solid var(--colorPaleGrey);
+}
+
+.ListMenu .ListMenu__item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  color: var(--colorBlueBlack);
+  line-height:16px;
+  min-height: 32px;
+}
+
+.ListMenu .ListMenu__item:hover{
+  background-color: var(--colorInputGrey);
+}
+
+.ListMenu .Thumbnail {
+  flex:none;
+  margin-right: 8px;
+}
+
+.ListMenu .Actions {
+  flex: none;
+  display: flex;
+  margin-left: auto;
+}
+
+.ListMenu .Actions > * {
+  margin-left: 8px;
+}
+
 .CodeMirrorEditor {
   cursor: text;
   text-align: left;

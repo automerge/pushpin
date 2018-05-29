@@ -10,6 +10,7 @@ import HashForm from './hash-form'
 import Share from './share'
 import Settings from './settings'
 
+
 const log = Debug('pushpin:title-bar')
 
 export default class TitleBar extends React.PureComponent {
@@ -137,6 +138,49 @@ export default class TitleBar extends React.PureComponent {
           // activeDocId={this.props.activeDocId}
           requestedDocId={this.props.requestedDocId}
         />
+
+        <Dropdown>
+          <DropdownTrigger>
+            <div className="TitleBar__dropDown">
+              <i className="fa fa-train" />
+            </div>
+          </DropdownTrigger>
+          <DropdownContent>
+            <div className="PopOverWrapper">
+              <div className="ListMenu">
+                <div className="ListMenu__segment">
+                  Label
+                </div>
+                <div className="ListMenu__section">
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <p>Label</p>
+                    <div className="Actions">
+                      <div className="ButtonAction ButtonAction--destructive"><i className="fa fa-ban"/></div>
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
+                  <div className="ListMenu__item">
+                    <div className="Thumbnail">
+                      <div className="Avatar">
+                        <img src="../img/default-avatar.png" width="36"/>
+                      </div>
+                    </div>
+                    <p>Label</p>
+                    <div className="Actions">
+                      <div className="ButtonAction ButtonAction--destructive"><i className="fa fa-ban"/></div>
+                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DropdownContent>
+        </Dropdown>
 
         <Dropdown>
           <DropdownTrigger>
