@@ -60,6 +60,7 @@ table {
   --colorInputGrey: #f3f3f3;
   --colorLink: #0645ad;
   --colorDestructive: #F87060;
+  --zIndexCard: 1;
 }
 
 /* Global */
@@ -340,6 +341,7 @@ div.board {
   max-height: 100%;
   max-width: 100%;
   min-width: 20px;
+  z-index: var(--zIndexCard);
 }
 
 .card .card__scrollarea {
