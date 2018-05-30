@@ -148,9 +148,6 @@ body {
   color: #1e73e7;
 }
 
-.Share__notifications {
-}
-
 .Notification {
   margin: 8px;
   border: 1px solid #e9edf0;
@@ -162,30 +159,6 @@ body {
 .Notification p {
 
 }
-
-.Notification__actions {
-  display: flex;
-  padding: 4px 0px;
-}
-.Notification__actions .fa {
-  font-size: 16px; line-height: 32px;
-  margin-right: 2px;
-}
-
-.Notification__actions__view {
-  color: #1e73e7;
-  cursor: pointer;
-  margin-right:8px;
-  line-height:32px;
-}
-
-.Notification__actions__archive {
-  color: #f87060;
-  cursor: pointer;
-  margin-right:8px;
-  line-height:32px;
-}
-
 .Avatar {
   box-sizing: border-box;
   position: relative;
