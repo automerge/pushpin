@@ -132,14 +132,19 @@ export default class Share extends React.PureComponent {
     return (
       <div className="ListMenu__section">
         { notifications.length > 0 ? notifications :
-        <div className="ListMenu__grouped">
-          <i className="fa fa-info-circle"/>
-          <p className="Type--primary">
-            Nobody has shared any documents with you.
-            Documents are like love. You have got to give
-            a little to get a little.
-          </p>
-        </div> }
+          <div className="ListMenu__item">
+            <div className="ListMenu__grouped">
+              <div className="ListMenu__typegroup">
+                <i className="fa fa-info-circle"/>
+                <p className="Type--primary">
+                  Nobody has shared any documents with you.
+                  Documents are like love. You have got to give
+                  a little to get a little.
+                </p>
+              </div>
+            </div>
+          </div>
+         }
       </div>
     )
   }
