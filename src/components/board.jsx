@@ -276,6 +276,8 @@ export default class Board extends React.PureComponent {
   }
 
   addContent(e, contentType) {
+    e.stopPropagation()
+
     const x = e.pageX
     const y = e.pageY
 
