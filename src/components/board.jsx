@@ -556,8 +556,10 @@ export default class Board extends React.PureComponent {
     // If the card has no fixed dimensions yet, get its current rendered dimensions
     if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
       this.props.onChange(b => {
-        b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth
-        b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight
+        // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
+        // this prevents visual changes like scrollbar from triggering on drag
+        b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth + 1
+        b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
       })
 
       card = this.props.doc.cards[card.id]
