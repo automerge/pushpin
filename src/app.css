@@ -364,6 +364,7 @@ div.card {
 div.card.text {
   /* use an inset box-shadow to avoid the mitering of corners with normal borders */
   box-shadow: inset 0 4px 0 0 var(--colorBlueBlack);
+  min-width: 48px;
 }
 
 div.card.text.selected {
