@@ -513,18 +513,6 @@ export default class Board extends React.PureComponent {
         return
       }
 
-      // Maintain aspect ratio on image cards.
-      if (card.type === 'image') {
-        const ratio = tracking.resizeWidth / tracking.resizeHeight
-        // Dimensions need to be integers
-        preClampHeight = Math.round(preClampWidth / ratio)
-        preClampWidth = Math.round(preClampHeight * ratio)
-      }
-
-      if (preClampWidth <= 0 || preClampHeight <= 0) {
-        return
-      }
-
       // Add slack to the values used to calculate bound position. This will
       // ensure that if we start removing slack, the element won't react to
       // it right away until it's been completely removed.
