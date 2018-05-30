@@ -63,7 +63,8 @@ export default class Share extends React.PureComponent {
     }
 
     // add ourselves to the authors if we haven't yet
-    if (selfId && !authorIds.includes(selfId)) {
+    // note that we guard against an empty authorIds
+    if (selfId && boardDoc.authorIds && !authorIds.includes(selfId)) {
       // XXX JANK -- get rid of all these window.hm calls
       window.hm.change(boardDoc, (board) => {
         board.authorIds.push(selfId)
