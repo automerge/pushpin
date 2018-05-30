@@ -84,13 +84,13 @@ export default class TitleBar extends React.PureComponent {
                   <div className="ListMenu__item">
                     <div className="ListMenu__grouped">
                       <div className="ListMenu__typegroup">
-                        <div><i className="fa fa-info-circle"></i></div>
+                        <div><i className="fa fa-info-circle" /></div>
                         <p className="Type--primary">Sorry, nothing to see here.</p>
                         <p className="Type--secondary">Try making more friends</p>
                       </div>
                       <div className="ButtonGroup">
                         <div role="button" className="ButtonAction">
-                          <i className="fa fa-arrow-left"/>
+                          <i className="fa fa-arrow-left" />
                           <p className="ButtonAction__label">View</p>
                         </div>
                       </div>
@@ -101,7 +101,7 @@ export default class TitleBar extends React.PureComponent {
                   <div className="ListMenu__item">
                     <div className="ListMenu__thumbnail">
                       <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
+                        <img alt="Avatar" src="../img/default-avatar.png" width="36" />
                       </div>
                     </div>
                     <div className="Label">
@@ -109,7 +109,7 @@ export default class TitleBar extends React.PureComponent {
                       <p className="Type--secondary">Secondary Label</p>
                     </div>
                     <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
+                      <div className="ButtonAction"><i className="fa fa-share-alt" /></div>
                     </div>
                   </div>
                 </div>

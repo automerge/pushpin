@@ -28,7 +28,7 @@ export default class Contact extends React.PureComponent {
     if (this.props.actions.includes('share')) {
       actions.push((
         <div role="button" key="share" onClick={this.props.onShare} className="ButtonAction ButtonAction--primary">
-          <i className="fa fa-share-alt"/>
+          <i className="fa fa-share-alt" />
         </div>
       ))
     }
@@ -36,7 +36,7 @@ export default class Contact extends React.PureComponent {
     if (this.props.actions.includes('unshare')) {
       actions.push((
         <div role="button" key="unshare" onClick={this.props.onUnshare} className="ButtonAction ButtonAction--destructive">
-          <i className="fa fa-ban"/>
+          <i className="fa fa-ban" />
         </div>
       ))
     }

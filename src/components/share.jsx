@@ -94,7 +94,7 @@ export default class Share extends React.PureComponent {
       <div>
         <div className="ListMenu__segment">On Board</div>
         <div className="ListMenu__section">
-            { authors }
+          { authors }
         </div>
         { (contacts.length > 0) && <div className="ListMenu__segment">All</div> }
         <div className="ListMenu__section">
@@ -136,30 +136,30 @@ export default class Share extends React.PureComponent {
               <i className="fa fa-archive" />
               <p className="ButtonAction__label">Archive</p>
             </div>
+          </div>
         </div>
       </div>
-    </div>
     ))
 
     return (
       <div className="ListMenu__section">
         { notifications.length > 0 ? notifications :
-          <div className="ListMenu__item">
-            <div className="ListMenu__grouped">
-              <div className="ListMenu__typegroup">
-                <i className="fa fa-info-circle"/>
-                <p className="Type--primary">
-                  Nothing here!.
-                </p>
-                <p className="Type--secondary">
-                  Documents are like love. You have got to give
-                  a little to get a little.
-                </p>
-              </div>
+        <div className="ListMenu__item">
+          <div className="ListMenu__grouped">
+            <div className="ListMenu__typegroup">
+              <i className="fa fa-info-circle" />
+              <p className="Type--primary">
+                Nothing here!.
+              </p>
+              <p className="Type--secondary">
+                Documents are like love. You have got to give
+                a little to get a little.
+              </p>
             </div>
           </div>
-         }
-      </div>
+        </div>
+       }
+    </div>
     )
   }
 
@@ -194,8 +194,8 @@ export default class Share extends React.PureComponent {
               Notifications
             </div>
           </div>
-        { body }
-      </div>
+          { body }
+        </div>
       </div>
     )
   }
