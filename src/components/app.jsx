@@ -50,6 +50,9 @@ export default class App extends React.PureComponent {
       this.props.onChange(d => {
         d.boardId = id
 
+        if (!doc.authorIds) {
+          return
+        }
         doc.authorIds.forEach(authorId => {
           if (!d.contactIds.includes(authorId)) {
             d.contactIds.push(authorId)
