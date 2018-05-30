@@ -45,7 +45,7 @@ export default class Settings extends React.PureComponent {
     if (this.props.doc.avatarDocId) {
       avatar = <Content card={{ type: 'image', docId: this.props.doc.avatarDocId }} />
     } else {
-      avatar = <img src="../img/default-avatar.png" />
+      avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
 
     return (

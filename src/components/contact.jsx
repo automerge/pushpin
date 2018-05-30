@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
+import Content from './content'
 
 export default class Contact extends React.PureComponent {
   static propTypes = {
@@ -38,12 +39,17 @@ export default class Contact extends React.PureComponent {
       ))
     }
 
+    let avatar
+    if (this.props.doc.avatarDocId) {
+      avatar = <Content card={{ type: 'image', docId: this.props.doc.avatarDocId }} />
+    } else {
+      avatar = <img alt="avatar" src="../img/default-avatar.png" />
+    }
+
     return (
-      <div className="ListMenu__item">
-        <div className="ListMenu__thumbnail">
-          <div className="Avatar">
-            <img alt="avatar" src={this.props.doc.avatar} />
-          </div>
+      <div className="Contact">
+        <div className="Avatar">
+          { avatar }
         </div>
         <div className="Label">
           <p className="Type--primary">
