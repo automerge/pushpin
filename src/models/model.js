@@ -127,7 +127,6 @@ export function documentUpdated(state, { docId, doc }) {
     if (docId === state.workspace.selfId) {
       return { ...state, self: doc }
     } else if (docId === state.workspace.boardId) {
-      Loop.dispatch(Workspace.updateContactIds, { candidateContactIds: doc.authorIds })
       return { ...state, board: doc }
     }
   }
