@@ -94,12 +94,10 @@ export default class Share extends React.PureComponent {
       <div>
         <div className="ListMenu__segment">On Board</div>
         <div className="ListMenu__section">
-          <div className="Share__authors">
             { authors }
-          </div>
         </div>
-        { (contacts.length > 0) && <h6>All</h6> }
-        <div className="Share__section">
+        { (contacts.length > 0) && <div className="ListMenu__segment">All</div> }
+        <div className="ListMenu__section">
           { contacts }
         </div>
       </div>
