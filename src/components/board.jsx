@@ -294,7 +294,8 @@ export default class Board extends React.PureComponent {
         throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
-      this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+      this.selectOnly(cardId)
     })
   }
 
