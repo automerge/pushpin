@@ -92,17 +92,15 @@ export default class Share extends React.PureComponent {
 
     return (
       <div>
-        <h6>On Board</h6>
-        <div className="Share__section">
+        <div className="ListMenu__segment">On Board</div>
+        <div className="ListMenu__section">
           <div className="Share__authors">
             { authors }
           </div>
         </div>
         { (contacts.length > 0) && <h6>All</h6> }
         <div className="Share__section">
-          <div className="Share__contacts">
-            { contacts }
-          </div>
+          { contacts }
         </div>
       </div>
     )
@@ -142,20 +140,23 @@ export default class Share extends React.PureComponent {
     ))
 
     return (
-      <div className="Share__notifications">
+      <div className="ListMenu__section">
         { notifications.length > 0 ? notifications :
-        <div className="Share__notifications--empty">
-          Nobody has shared any documents with you.
-          Documents are like love. You have got to give
-          a little to get a little.
+        <div className="ListMenu__empty">
+          <i className="fa fa-info-circle"/>
+          <p className="Type--primary">
+            Nobody has shared any documents with you.
+            Documents are like love. You have got to give
+            a little to get a little.
+          </p>
         </div> }
       </div>
     )
   }
 
   tabClasses(name) {
-    if (this.state.tab === name) { return 'Share__tabs__tab Share__tabs__tab--active' }
-    return 'Share__tabs__tab'
+    if (this.state.tab === name) { return 'Tabs__tab Tabs__tab--active' }
+    return 'Tabs__tab'
   }
 
   render() {
@@ -166,25 +167,26 @@ export default class Share extends React.PureComponent {
     if (this.state.tab === 'contacts') { body = this.renderContacts() } else if (this.state.tab === 'notifications') { body = this.renderNotifications() }
 
     return (
-      <div className="Share">
-        <div className="Share__tabs">
-          <div
-            role="button"
-            className={this.tabClasses('contacts')}
-            onClick={() => this.setState({ tab: 'contacts' })}
-          >
-            <i className="fa fa-group" /> Contacts
+      <div className="PopOverWrapper">
+        <div className="ListMenu">
+          <div className="Tabs">
+            <div
+              role="button"
+              className={this.tabClasses('contacts')}
+              onClick={() => this.setState({ tab: 'contacts' })}
+            >
+              <i className="fa fa-group" /> Contacts
+            </div>
+            <div
+              role="button"
+              className={this.tabClasses('notifications')}
+              onClick={() => this.setState({ tab: 'notifications' })}
+            >
+              Notifications
+            </div>
           </div>
-          <div
-            role="button"
-            className={this.tabClasses('notifications')}
-            onClick={() => this.setState({ tab: 'notifications' })}
-          >
-            Notifications
-          </div>
-        </div>
-
         { body }
+      </div>
       </div>
     )
   }

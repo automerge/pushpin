@@ -77,20 +77,12 @@ export default class TitleBar extends React.PureComponent {
                 <div className="ListMenu__segment">
                   Label
                 </div>
+
                 <div className="ListMenu__section">
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <div className="Label">
-                      <p className="Type--primary">Label</p>
-                      <p className="Type--secondary">Secondary Label</p>
-                    </div>
-                    <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
-                    </div>
+                  <div className="ListMenu__empty">
+                    <div><i className="fa fa-info-circle"></i></div>
+                    <p className="Type--primary">Sorry, nothing to see here.</p>
+                    <p className="Type--secondary">Try making more friends</p>
                   </div>
                   <div className="ListMenu__item">
                     <div className="Thumbnail">
@@ -106,90 +98,7 @@ export default class TitleBar extends React.PureComponent {
                       <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
                     </div>
                   </div>
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <div className="Label">
-                      <p className="Type--primary">Label</p>
-                      <p className="Type--secondary">Secondary Label</p>
-                    </div>
-                    <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
-                    </div>
-                  </div>
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <div className="Label">
-                      <p className="Type--primary">Label</p>
-                      <p className="Type--secondary">Secondary Label</p>
-                    </div>
-                    <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
-                    </div>
-                  </div>
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <div className="Label">
-                      <p className="Type--primary">Label</p>
-                      <p className="Type--secondary">Secondary Label</p>
-                    </div>
-                    <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
-                    </div>
-                  </div>
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <div className="Label">
-                      <p className="Type--primary">Label</p>
-                      <p className="Type--secondary">Secondary Label</p>
-                    </div>
-                    <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
-                    </div>
-                  </div>
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <div className="Label">
-                      <p className="Type--primary">Label</p>
-                      <p className="Type--secondary">Secondary Label</p>
-                    </div>
-                    <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
-                    </div>
-                  </div>
-                  <div className="ListMenu__item">
-                    <div className="Thumbnail">
-                      <div className="Avatar">
-                        <img src="../img/default-avatar.png" width="36"/>
-                      </div>
-                    </div>
-                    <div className="Label">
-                      <p className="Type--primary">Label</p>
-                      <p className="Type--secondary">Secondary Label</p>
-                    </div>
-                    <div className="Actions">
-                      <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             </div>
