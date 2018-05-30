@@ -138,7 +138,6 @@ export default class Content extends React.PureComponent {
       <contentType.component
         cardId={this.props.card.id}
         docId={this.props.card.docId}
-        cardHeight={this.props.card.height}
         onChange={this.onChange}
         doc={this.state.doc}
         {...filteredProps}
