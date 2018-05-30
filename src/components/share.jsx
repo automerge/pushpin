@@ -9,13 +9,14 @@ import * as Model from '../models/model'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
-    authorIds: PropTypes.arrayOf(PropTypes.string),
-    contactIds: PropTypes.arrayOf(PropTypes.string),
-    notifications: PropTypes.arrayOf(PropTypes.shape({
-      type: PropTypes.string.isRequired,
-      sender: PropTypes.object.isRequired,
-      board: PropTypes.object.isRequired
-    }))
+    doc: PropTypes.shape({
+      authorIds: PropTypes.arrayOf(PropTypes.string),
+      contactIds: PropTypes.arrayOf(PropTypes.string),
+      notifications: PropTypes.arrayOf(PropTypes.shape({
+        type: PropTypes.string.isRequired,
+        sender: PropTypes.object.isRequired,
+        board: PropTypes.object.isRequired
+      })) })
   }
 
   static defaultProps = {
@@ -102,7 +103,10 @@ export default class Share extends React.PureComponent {
 
     const contactIds = this.props.doc.contactIds || []
 
-    const contacts = contactIds.map(id => (
+    // this .filter is probably very slow if you have a lot of authors
+    const filteredContactIds = contactIds.filter(contactId => (!authorIds.includes(contactId)))
+
+    const contacts = filteredContactIds.map(id => (
       <Content
         key={id}
         card={{ type: 'contact', docId: id }}
