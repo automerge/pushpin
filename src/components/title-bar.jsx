@@ -172,7 +172,7 @@ export default class TitleBar extends React.PureComponent {
                     <p className="Type--secondary">Try making more friends</p>
                   </div>
                   <div className="ListMenu__item">
-                    <div className="Thumbnail">
+                    <div className="ListMenu__thumbnail">
                       <div className="Avatar">
                         <img src="../img/default-avatar.png" width="36"/>
                       </div>
