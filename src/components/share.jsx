@@ -9,20 +9,8 @@ import * as Model from '../models/model'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
-    authors: PropTypes.arrayOf(PropTypes.shape({
-      docId: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      avatar: PropTypes.string.isOptional
-    })),
-    board: PropTypes.shape({
-      docId: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired
-    }),
-    contacts: PropTypes.objectOf(PropTypes.shape({
-      docId: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      avatar: PropTypes.string.isOptional
-    })),
+    authorIds: PropTypes.arrayOf(PropTypes.string),
+    contactIds: PropTypes.arrayOf(PropTypes.string),
     notifications: PropTypes.arrayOf(PropTypes.shape({
       type: PropTypes.string.isRequired,
       sender: PropTypes.object.isRequired,
@@ -31,8 +19,8 @@ export default class Share extends React.PureComponent {
   }
 
   static defaultProps = {
-    authors: [],
-    contacts: {},
+    authorIds: [],
+    contactIds: [],
     notifications: []
   }
 
@@ -40,6 +28,36 @@ export default class Share extends React.PureComponent {
     super()
 
     this.state = { tab: 'notifications' }
+  }
+
+  getHypermergeDoc(docId, cb) {
+    window.hm.open(docId)
+      .then(doc => {
+        cb(null, doc)
+      }, err => {
+        cb(err)
+      })
+    // XXX fixme: lol
+    window.hm.on('document:updated', (id, doc) => {
+      if (id !== docId) {
+        return
+      }
+
+      // unregister listener
+      cb(null, doc)
+    })
+  }
+
+  maybeBoardIdChanged() {
+    if (this.props.doc.boardId && this.props.doc.boardId !== this.state.boardId) {
+      this.getHypermergeDoc(this.props.doc.boardId, (docId, doc) => {
+        this.setState({ boardId: docId, boardDoc: doc })
+      })
+    }
+  }
+
+  componentWillMount() {
+    this.maybeBoardIdChanged()
   }
 
   // this probably doesn't work here...
@@ -59,6 +77,7 @@ export default class Share extends React.PureComponent {
   }
 
   handleShare(e, contact) {
+    // TODO
     // i deleted board.docId and broke the updateSelfOfferDocumentToIdentity,
     // but at least I pasted the code above ^^^^
     Loop.dispatch(
@@ -68,25 +87,27 @@ export default class Share extends React.PureComponent {
   }
 
   handleUnshare(e, contact) {
-    alert(`Unshare '${this.props.board.title}' Received from ${contact.name}`)
+    alert(`Unshare '${this.state.boardDoc.title}' from ${contact.name}`)
   }
 
   renderContacts() {
-    const authors = this.props.doc.authorIds.map(id => (
+    const authorIds = this.state.boardDoc && this.state.boardDoc.authorIds || []
+
+    const authors = authorIds.map(id => (
       <Content
         key={id}
         card={{ type: 'contact', docId: id }}
-        actions={['unshare']}
-        onUnshare={e => this.handleUnshare(e, author)}
       />
     ))
 
-    const contacts = this.props.contactIds.map(id => (
+    const contactIds = this.props.doc.contactIds || []
+
+    const contacts = contactIds.map(id => (
       <Content
         key={id}
         card={{ type: 'contact', docId: id }}
         actions={['share']}
-        onShare={e => this.handleShare(e, contact)}
+        onShare={e => this.handleShare(e, id)}
       />
     ))
 

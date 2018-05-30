@@ -14,6 +14,7 @@ const log = Debug('pushpin:title-bar')
 
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
+    docId: PropTypes.string.isRequired,
     doc: PropTypes.shape({
       selfId: PropTypes.string,
       boardId: PropTypes.string,
@@ -60,8 +61,9 @@ export default class TitleBar extends React.PureComponent {
           </DropdownTrigger>
           <DropdownContent>
             <Content
-              card={{ type: 'share', docId: this.props.doc.boardId }}
+              card={{ type: 'share', docId: this.props.docId }}
               offeredIds={this.props.doc.offeredIds}
+              authorIds={this.props.doc.authorIds}
               contactIds={this.props.doc.contactIds}
             />
           </DropdownContent>
