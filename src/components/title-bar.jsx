@@ -21,16 +21,18 @@ export default class TitleBar extends React.PureComponent {
       offeredIds: PropTypes.arrayOf(PropTypes.string),
       contactIds: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
-    onBoardIdChanged: PropTypes.func
+    onChange: PropTypes.func.isRequired
   }
 
-  static defaultProps = {
-    onBoardIdChanged: () => {}
+  constructor(props) {
+    super(props)
+    this.openBoard = this.openBoard.bind(this)
   }
 
-  onSubmit(e) {
-    log('onSubmit')
-    e.preventDefault()
+  openBoard(id) {
+    this.props.onChange(d => {
+      d.boardId = id
+    })
   }
 
   render() {
@@ -50,7 +52,7 @@ export default class TitleBar extends React.PureComponent {
 
         <HashForm
           formDocId={this.props.doc.boardId}
-          onChanged={this.props.onBoardIdChanged}
+          onChanged={this.openBoard}
         />
 
         <Dropdown>
@@ -62,9 +64,6 @@ export default class TitleBar extends React.PureComponent {
           <DropdownContent>
             <Content
               card={{ type: 'share', docId: this.props.docId }}
-              offeredIds={this.props.doc.offeredIds}
-              authorIds={this.props.doc.authorIds}
-              contactIds={this.props.doc.contactIds}
             />
           </DropdownContent>
         </Dropdown>

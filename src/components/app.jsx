@@ -58,6 +58,7 @@ export default class App extends React.PureComponent {
 
     // Otherwise render the board.
     return (
+      // XXX we probably don't want to pass in all these props here
       <div>
         <Content
           card={{ type: 'title-bar', docId: window.hm.getId(this.props.doc) }}
@@ -66,7 +67,6 @@ export default class App extends React.PureComponent {
           formDocId={this.props.state.formDocId}
           requestedDocId={this.props.state.workspace.boardId}
           self={this.props.state.self}
-          onBoardIdChanged={this.openBoard}
         />
         <Content {...contentProps} />
       </div>
