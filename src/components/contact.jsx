@@ -6,18 +6,15 @@ import ContentTypes from '../content-types'
 export default class Contact extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
-      avatar: PropTypes.object,
+      avatarDocId: PropTypes.string,
       name: PropTypes.string,
     }).isRequired,
-    name: PropTypes.string.isRequired,
-    avatar: PropTypes.string,
-    actions: PropTypes.arrayOf(PropTypes.string),
+    actions: PropTypes.arrayOf(PropTypes.string).isRequired,
     onShare: PropTypes.func,
     onUnshare: PropTypes.func
   }
 
   static defaultProps = {
-    avatar: '../img/default-avatar.png',
     actions: [],
     onShare: () => {},
     onUnshare: () => {}
