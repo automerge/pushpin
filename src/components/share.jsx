@@ -49,27 +49,32 @@ export default class Share extends React.PureComponent {
       })
   }
 
-  addSelfToAuthorsIfNecessary(workspaceDoc, boardDoc) {
-    const { authorIds } = boardDoc
-    const { selfId } = workspaceDoc
-    if (!authorIds || !selfId) {
-      return
+  updateIdentityReferences(workspaceDoc, boardDoc) {
+    const { authorIds = [] } = boardDoc
+    const { selfId, contactIds = [] } = workspaceDoc
+
+
+    // add any never-before seen authors to our contacts
+    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !selfId === a)
+    if (newContactIds.length > 0) {
+      window.hm.change(workspaceDoc, (workspace) => {
+        workspace.contactIds.push(...newContactIds)
+      })
     }
 
-    if (authorIds.includes(selfId)) {
-      return
+    // add ourselves to the authors if we haven't yet
+    if (selfId && !authorIds.includes(selfId)) {
+      // XXX JANK -- get rid of all these window.hm calls
+      window.hm.change(boardDoc, (board) => {
+        board.authorIds.push(selfId)
+      })
     }
-
-    // XXX JANK
-    window.hm.change(boardDoc, (b) => {
-      b.authorIds.push(selfId)
-    })
   }
 
   openBoardDocument() {
     if (this.props.doc.boardId && this.props.doc.boardId !== this.state.boardId) {
       this.getHypermergeDoc(this.props.doc.boardId, (err, doc) => {
-        this.addSelfToAuthorsIfNecessary(this.props.doc, doc)
+        this.updateIdentityReferences(this.props.doc, doc)
         this.setState({ boardId: this.props.doc.boardId, boardDoc: doc })
       })
     }

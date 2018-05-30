@@ -37,28 +37,9 @@ export default class App extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.openBoard = this.openBoard.bind(this)
-
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
       this.props.onChange(d => { d.boardId = docId })
-    })
-  }
-
-  openBoard(id) {
-    window.hm.open(id).then(doc => {
-      this.props.onChange(d => {
-        d.boardId = id
-
-        if (!doc.authorIds) {
-          return
-        }
-        doc.authorIds.forEach(authorId => {
-          if (!d.contactIds.includes(authorId)) {
-            d.contactIds.push(authorId)
-          }
-        })
-      })
     })
   }
 

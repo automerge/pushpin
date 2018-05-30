@@ -104,13 +104,6 @@ export function documentReady(state, { docId, doc }) {
       board: doc
     }
 
-    // state = Board.addSelfToAuthors(state)
-    if (state.board.authorIds) {
-      state = Workspace.updateContactIds(
-        state,
-        { candidateContactIds: state.board.authorIds }
-      )
-    }
     state = Workspace.updateSeenBoardIds(state, { docId })
 
     Object.values(state.board.cards || []).forEach(c => {

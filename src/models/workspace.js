@@ -69,28 +69,6 @@ export function updateSeenBoardIds(state, { docId }) {
   return { ...state, workspace }
 }
 
-export function updateContactIds(state, { candidateContactIds }) {
-  const { selfId, contactIds } = state.workspace
-
-  // #accidentallyQuadratic?
-  const oldContactsSet = new Set(contactIds)
-  const addedContacts = candidateContactIds.filter(contactId =>
-    (!oldContactsSet.has(contactId) && contactId !== selfId))
-
-  if (addedContacts.length > 0) {
-    const workspace = state.hm.change(state.workspace, (w) => {
-      // this is probably not very conflict avoidey: talk to Martin?
-      w.contactIds.push(...addedContacts)
-    })
-
-    addedContacts.forEach((contactId) => Loop.dispatch(Model.openDocument, { docId: contactId }))
-    return { ...state, workspace }
-  }
-
-  // nothing added, nothing to do
-  return state
-}
-
 export function updateSelfId(state, { selfId }) {
   const nextWorkspace = state.hm.change(state.workspace, (w) => {
     w.selfId = selfId
