@@ -616,6 +616,7 @@ div.card.image {
   background: white;
   border: solid 1px var(--colorPaleGrey);
   overflow: auto;
+  max-width: 400px;
 }
 
 .CodeMirrorEditor__editor {
