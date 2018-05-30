@@ -23,7 +23,6 @@ export default class ImageCard extends React.PureComponent {
     super(props)
     log('constructor')
     this.state = { imageContentReady: false }
-    this.workImage()
   }
 
   static initializeDocument(onChange, { path, buffer }) {
@@ -34,6 +33,7 @@ export default class ImageCard extends React.PureComponent {
 
   componentDidMount() {
     log('componentDidMount')
+    this.workImage()
     this.mounted = true
   }
 
