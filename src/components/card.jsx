@@ -44,8 +44,8 @@ export default class Card extends React.PureComponent {
     const { card, dragState } = this.props
 
     const style = {
-      width: dragState.resizeWidth ? dragState.resizeWidth : card.width,
-      minHeight: dragState.resizeHeight ? dragState.resizeHeight : card.height,
+      width: Number.isInteger(dragState.resizeWidth) ? dragState.resizeWidth : card.width,
+      minHeight: Number.isInteger(dragState.resizeHeight) ? dragState.resizeHeight : card.height,
       position: 'absolute',
       left: Number.isInteger(dragState.moveX) ? dragState.moveX : card.x,
       top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y

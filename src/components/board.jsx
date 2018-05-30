@@ -476,8 +476,6 @@ export default class Board extends React.PureComponent {
       return
     }
 
-    tracking.totalDrag = tracking.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
-
     if (tracking.moving) {
       // First guess at change in location given mouse movements.
       const preClampX = tracking.moveX + deltaX
@@ -511,8 +509,13 @@ export default class Board extends React.PureComponent {
       // Maintain aspect ratio on image cards.
       if (card.type === 'image') {
         const ratio = tracking.resizeWidth / tracking.resizeHeight
-        preClampHeight = preClampWidth / ratio
-        preClampWidth = preClampHeight * ratio
+        // Dimensions need to be integers
+        preClampHeight = Math.round(preClampWidth / ratio)
+        preClampWidth = Math.round(preClampHeight * ratio)
+      }
+
+      if (preClampWidth <= 0 || preClampHeight <= 0) {
+        return
       }
 
       // Add slack to the values used to calculate bound position. This will
@@ -522,11 +525,7 @@ export default class Board extends React.PureComponent {
       let newHeight = preClampHeight + tracking.slackHeight
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
-      newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
-      newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
       tracking.resizeWidth = newWidth
-      newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
-      newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
       tracking.resizeHeight = newHeight
 
       // If the numbers changed, we must have introduced some slack.
@@ -543,6 +542,7 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
+    // If the card has no fixed dimensions yet, get its current rendered dimensions
     if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
       this.props.onChange(b => {
         b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth
@@ -566,7 +566,6 @@ export default class Board extends React.PureComponent {
             moveY: c.y,
             slackX: 0,
             slackY: 0,
-            totalDrag: 0,
             moving: true
           }
         })
@@ -646,7 +645,6 @@ export default class Board extends React.PureComponent {
         t.slackX = null
         t.slackY = null
         t.moving = false
-        t.totalDrag = null
 
         this.cardMoved(this.props.onChange, this.props.doc, { id: card.id, x, y })
         this.setDragState(card, t)
@@ -662,7 +660,6 @@ export default class Board extends React.PureComponent {
       tracking.slackWidth = null
       tracking.slackHeight = null
       tracking.resizing = false
-      tracking.totalDrag = null
 
       this.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
       this.setDragState(card, tracking)

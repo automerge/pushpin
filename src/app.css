@@ -338,6 +338,9 @@ div.board {
 div.card {
   border-top: 0;
   overflow: auto; 
+  max-height: 100%;
+  max-width: 100%;
+  min-width: 20px;
 }
 
 .card::-webkit-scrollbar
