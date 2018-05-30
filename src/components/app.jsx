@@ -56,7 +56,6 @@ export default class App extends React.PureComponent {
       }
     }
 
-    // Otherwise render the board.
     return (
       // XXX we probably don't want to pass in all these props here
       <div>
