@@ -410,8 +410,6 @@ div.card span.cardResizeHandle {
 .card {
   box-sizing: border-box;
   display: flex;
-  background: white;
-  border: solid 1px var(--colorPaleGrey);
 }
 
 div.card img.image {
@@ -625,6 +623,8 @@ div.card.image {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  background: white;
+  border: solid 1px var(--colorPaleGrey);
 }
 
 .CodeMirrorEditor__editor {
