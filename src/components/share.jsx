@@ -34,31 +34,50 @@ export default class Share extends React.PureComponent {
   getHypermergeDoc(docId, cb) {
     window.hm.open(docId)
       .then(doc => {
+        // XXX fixme: lol
+        window.hm.on('document:updated', (id, doc) => {
+          if (id !== docId) {
+            return
+          }
+
+          // unregister listener
+          cb(null, doc)
+        })
         cb(null, doc)
       }, err => {
         cb(err)
       })
-    // XXX fixme: lol
-    window.hm.on('document:updated', (id, doc) => {
-      if (id !== docId) {
-        return
-      }
+  }
 
-      // unregister listener
-      cb(null, doc)
+  addSelfToAuthorsIfNecessary(workspaceDoc, boardDoc) {
+    const { authorIds } = boardDoc
+    const { selfId } = workspaceDoc
+    if (!authorIds || !selfId) {
+      return
+    }
+
+    if (authorIds.includes(selfId)) {
+      return
+    }
+
+    // XXX JANK
+    window.hm.change(boardDoc, (b) => {
+      b.authorIds.push(selfId)
     })
   }
 
-  maybeBoardIdChanged() {
+  openBoardDocument() {
     if (this.props.doc.boardId && this.props.doc.boardId !== this.state.boardId) {
-      this.getHypermergeDoc(this.props.doc.boardId, (docId, doc) => {
-        this.setState({ boardId: docId, boardDoc: doc })
+      this.getHypermergeDoc(this.props.doc.boardId, (err, doc) => {
+        this.addSelfToAuthorsIfNecessary(this.props.doc, doc)
+        this.setState({ boardId: this.props.doc.boardId, boardDoc: doc })
       })
     }
   }
 
-  componentWillMount() {
-    this.maybeBoardIdChanged()
+  // XXX will this work right as the document changes?
+  componentDidUpdate() {
+    this.openBoardDocument()
   }
 
   // this probably doesn't work here...
