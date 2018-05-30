@@ -4,6 +4,7 @@ import classNames from 'classnames'
 import Debug from 'debug'
 
 import Content from './content'
+import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:card')
 
@@ -51,6 +52,11 @@ export default class Card extends React.PureComponent {
       top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
     }
 
+    const { type } = card
+    const contentType = ContentTypes
+      .list({ withUnlisted: true })
+      .find(contentType => contentType.type === type)
+
     return (
       <div
         id={`card-${card.id}`}
@@ -62,7 +68,7 @@ export default class Card extends React.PureComponent {
           card={this.props.card}
           uniquelySelected={this.props.uniquelySelected}
         />
-        <span className="cardResizeHandle" />
+        { contentType.resizable !== false && <span className="cardResizeHandle" /> }
       </div>
     )
   }
