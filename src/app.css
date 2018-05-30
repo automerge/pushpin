@@ -160,8 +160,7 @@ body {
 }
 
 .Notification p {
-  color: var(--colorSecondaryGrey);
-  font-size: 12px;
+
 }
 
 .Notification__actions {
@@ -441,19 +440,29 @@ div.card.image {
   padding: 12px;
 }
 /* Typography */
-  .Type--header {
-    font-size: 14px;
-    font-weight: 400;
-  }
-  .Type--primary {
-    font-size: 14px;
-    font-weight: 400;
-  }
-  .Type--secondary {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--colorSecondaryGrey);
-  }
+.Label {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.Type--header {
+  font-size: 14px;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.Type--primary {
+  font-size: 14px;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.Type--secondary {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--colorSecondaryGrey);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* Popover Menus */
 .PopOverWrapper {
@@ -467,15 +476,23 @@ div.card.image {
 }
 
 /* Buttons */
+.ButtonGroup {
+  display: flex;
+  padding: 4px 8px;
+}
+
 .ButtonAction {
+  box-sizing: border-box;
   color: var(--colorSecondaryGrey);
-  width: 32px;
+  min-width: 32px;
+  padding: 0px 4px;
   height: 32px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 .ButtonAction--destructive {
   color: var(--colorDestructive);
@@ -484,12 +501,16 @@ div.card.image {
   color: var(--colorLink);
 }
 .ButtonAction:hover {
-  background-color: rgba(0,0,0,.075);
+  border: 1px solid;
 }
 
 .ButtonAction .fa {
   color: inherit;
   font-size: 24px;
+}
+.ButtonAction .ButtonAction__label {
+  padding-left:4px;
+  padding-right:4px;
 }
 
 
@@ -520,13 +541,17 @@ div.card.image {
   color: var(--colorSecondaryGrey);
   border-bottom:1px solid var(--colorPaleGrey);
 }
-.ListMenu__empty {
-  margin: 4px 8px;
-  padding: 8px;
+.ListMenu__grouped {
+  flex: 1;
+  padding: 4px 0px;
   border-radius: 4px;
   border: 1px solid var(--colorPaleGrey);
   font-size: 14px;
   line-height: 20px;
+}
+.ListMenu__typegroup {
+  padding: 4px 8px;
+  line-height:20px;
 }
 .ListMenu .ListMenu__item {
   display: flex;

@@ -49,7 +49,7 @@ export default class Share extends React.PureComponent {
   }
 
   handleUnshare(e, contact) {
-    alert(`Unshare '${this.props.board.title}' from ${contact.name}`)
+    alert(`Unshare '${this.props.board.title}' Received from ${contact.name}`)
   }
 
   renderContacts() {
@@ -101,34 +101,38 @@ export default class Share extends React.PureComponent {
     const notifications = this.props.notifications.map(notification => (
       // we should create a more unique key; do we want to allow the same share multiple times?
       // i'm going to block it on the send side for now
-      <div key={`${notification.sender.name}-${notification.board.title}`} className="Notification">
-        <p>You received...</p>
-        <h4>{ notification.board.title }</h4>
-        <p>From { notification.sender.name }</p>
-
-        <div className="Notification__actions">
-          <div
-            role="button"
-            className="Notification__actions__view"
-            onClick={e => this.acceptNotification(notification)}
-          >
-            <i className="fa fa-arrow-right" /> View
+      <div key={`${notification.sender.name}-${notification.board.title}`} className="ListMenu__item">
+        <div className="ListMenu__grouped">
+          <div className="ListMenu__typegroup">
+            <h4 className="Type--primary">{ notification.board.title }</h4>
+            <p className="Type--secondary">From { notification.sender.name }</p>
           </div>
-          <div
-            role="button"
-            className="Notification__actions__archive"
-            onClick={e => alert(`Archive ${notification.board.title}`)}
-          >
-            <i className="fa fa-archive" /> Archive
-          </div>
+          <div className="ButtonGroup">
+            <div
+              role="button"
+              className="ButtonAction ButtonAction--primary"
+              onClick={e => this.acceptNotification(notification)}
+            >
+              <i className="fa fa-arrow-right" />
+              <p className="ButtonAction__label">View</p>
+            </div>
+            <div
+              role="button"
+              className="ButtonAction ButtonAction--destructive"
+              onClick={e => alert(`Archive ${notification.board.title}`)}
+            >
+              <i className="fa fa-archive" />
+              <p className="ButtonAction__label">Archive</p>
+            </div>
         </div>
       </div>
+    </div>
     ))
 
     return (
       <div className="ListMenu__section">
         { notifications.length > 0 ? notifications :
-        <div className="ListMenu__empty">
+        <div className="ListMenu__grouped">
           <i className="fa fa-info-circle"/>
           <p className="Type--primary">
             Nobody has shared any documents with you.

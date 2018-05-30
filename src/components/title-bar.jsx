@@ -149,7 +149,9 @@ export default class TitleBar extends React.PureComponent {
             <div className="PopOverWrapper">
               <div className="ListMenu">
                 <div className="ListMenu__header">
-                  <p className="Type--header">Label</p>
+                  <div class="Label">
+                    <p className="Label Type--header">Label</p>
+                  </div>
                 </div>
                 <div className="Tabs">
                   <div role="button" className="Tabs__tab Tabs__tab--active">
@@ -166,11 +168,23 @@ export default class TitleBar extends React.PureComponent {
                 </div>
 
                 <div className="ListMenu__section">
-                  <div className="ListMenu__empty">
-                    <div><i className="fa fa-info-circle"></i></div>
-                    <p className="Type--primary">Sorry, nothing to see here.</p>
-                    <p className="Type--secondary">Try making more friends</p>
+                  <div className="ListMenu__item">
+                    <div className="ListMenu__grouped">
+                      <div className="ListMenu__typegroup">
+                        <div><i className="fa fa-info-circle"></i></div>
+                        <p className="Type--primary">Sorry, nothing to see here.</p>
+                        <p className="Type--secondary">Try making more friends</p>
+                      </div>
+                      <div className="ButtonGroup">
+                        <div role="button" className="ButtonAction">
+                          <i className="fa fa-arrow-left"/>
+                          <p className="ButtonAction__label">View</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                </div>
+                <div className="ListMenu__section">
                   <div className="ListMenu__item">
                     <div className="ListMenu__thumbnail">
                       <div className="Avatar">
@@ -178,14 +192,13 @@ export default class TitleBar extends React.PureComponent {
                       </div>
                     </div>
                     <div className="Label">
-                      <p className="Type--primary">Label</p>
+                      <p className="Type--primary">A thing that goes on for far to long and is too long for the container</p>
                       <p className="Type--secondary">Secondary Label</p>
                     </div>
                     <div className="Actions">
                       <div className="ButtonAction"><i className="fa fa-share-alt"/></div>
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
