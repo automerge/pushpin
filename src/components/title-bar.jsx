@@ -62,8 +62,8 @@ export default class TitleBar extends React.PureComponent {
             <div className="PopOverWrapper">
               <div className="ListMenu">
                 <div className="ListMenu__header">
-                  <div class="Label">
-                    <p className="Label Type--header">Label</p>
+                  <div className="Label">
+                    <p className="Type--header">Label</p>
                   </div>
                 </div>
                 <div className="Tabs">

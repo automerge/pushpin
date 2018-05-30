@@ -99,33 +99,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.Settings {
-  box-sizing: border-box;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
-  overflow: hidden;
-  width: 296px;
-  padding: 4px 0px;
-}
-
-.Settings__title {
-  text-align: center;
-  font-size: 14px;
-  line-height: 28px;
-  color: var(--colorBlueBlack);
-}
-
-.Settings h6 {
-  font-size: 12px;
-  line-height: 16px;
-  margin-bottom: 8px;
-  color: var(--colorBlueBlack);
-}
-.Settings .Settings__section {
-  padding: 4px 8px;
-}
-.Settings input {
+input {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
@@ -138,19 +112,6 @@ body {
   background: #F3F3F3;
   border: 0px;
   outline: none;
-  margin-bottom:4px;
-}
-.Settings .Settings__avatarGroup {
-  margin-bottom: 8px;
-}
-.Settings .Avatar, .Settings__setAvatar {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.Settings__setAvatar {
-  margin-left: 8px;
-  color: #1e73e7;
 }
 
 .Notification {
@@ -456,6 +417,9 @@ div.card.image {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.Type--action {
+  color: var(--colorLink);
+}
 .Type--primary {
   font-size: 14px;
   font-weight: 400;
@@ -524,6 +488,7 @@ div.card.image {
 
 .ListMenu {
   color: var(--colorBlueBlack);
+  padding-bottom: 4px;
 }
 
 .ListMenu__section {
@@ -547,6 +512,12 @@ div.card.image {
   color: var(--colorSecondaryGrey);
   border-bottom:1px solid var(--colorPaleGrey);
 }
+.ListMenu__label {
+  padding: 4px 8px;
+  font-size: 14px;
+  color: var(--colorSecondaryGrey);
+  line-height: 16px;
+}
 .ListMenu__grouped {
   flex: 1;
   padding: 4px 0px;
@@ -557,7 +528,6 @@ div.card.image {
 }
 .ListMenu__typegroup {
   padding: 4px 8px;
-  line-height:20px;
 }
 .ListMenu .ListMenu__item {
   display: flex;
@@ -585,6 +555,7 @@ div.card.image {
 .ListMenu .Actions > * {
   margin-left: 8px;
 }
+
 /* Tabs */
 .Tabs {
   display: flex;
