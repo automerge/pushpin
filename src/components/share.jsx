@@ -17,7 +17,8 @@ export default class Share extends React.PureComponent {
         sender: PropTypes.object.isRequired,
         board: PropTypes.object.isRequired
       }))
-    }).isRequired
+    }).isRequired,
+    openBoard: PropTypes.func.isRequired
   }
 
   constructor() {
@@ -173,7 +174,6 @@ export default class Share extends React.PureComponent {
   }
 
   acceptNotification(notification) {
-    alert('jaccept')
     this.props.openBoard(notification.board.docId)
   }
 
