@@ -21,36 +21,34 @@ export default class Contact extends React.PureComponent {
     const actions = []
     if (this.props.actions.includes('share')) {
       actions.push((
-        <i
-          role="button"
-          key="share"
-          className="fa fa-share-alt"
-          onClick={this.props.onShare}
-        />
+        <div role="button" key="share" onClick={this.props.onShare} className="ButtonAction ButtonAction--primary">
+          <i className="fa fa-share-alt"/>
+        </div>
       ))
     }
 
     if (this.props.actions.includes('unshare')) {
       actions.push((
-        <i
-          role="button"
-          key="unshare"
-          className="fa fa-ban"
-          onClick={this.props.onUnshare}
-        />
+        <div role="button" key="unshare" onClick={this.props.onUnshare} className="ButtonAction ButtonAction--destructive">
+          <i className="fa fa-ban"/>
+        </div>
       ))
     }
 
     return (
-      <div className="Contact">
-        <div className="Avatar"><img alt="avatar" src={this.props.avatar} /></div>
-        <div className="Contact__info">
-          <div className="Contact__info__name">
-            { this.props.name }
+      <div className="ListMenu__item">
+        <div className="ListMenu__thumbnail">
+          <div className="Avatar">
+            <img alt="avatar" src={this.props.avatar} />
           </div>
         </div>
+        <div className="Label">
+          <p className="Type--primary">
+            { this.props.name }
+          </p>
+        </div>
 
-        <div className="Contact__actions"> { actions } </div>
+        <div className="Actions"> { actions } </div>
       </div>
     )
   }

@@ -49,7 +49,7 @@ export default class Share extends React.PureComponent {
   }
 
   handleUnshare(e, contact) {
-    alert(`Unshare '${this.props.board.title}' from ${contact.name}`)
+    alert(`Unshare '${this.props.board.title}' Received from ${contact.name}`)
   }
 
   renderContacts() {
@@ -81,17 +81,13 @@ export default class Share extends React.PureComponent {
 
     return (
       <div>
-        <h6>On Board</h6>
-        <div className="Share__section">
-          <div className="Share__authors">
+        <div className="ListMenu__segment">On Board</div>
+        <div className="ListMenu__section">
             { authors }
-          </div>
         </div>
-        { (contacts.length > 0) && <h6>All</h6> }
-        <div className="Share__section">
-          <div className="Share__contacts">
-            { contacts }
-          </div>
+        { (contacts.length > 0) && <div className="ListMenu__segment">All</div> }
+        <div className="ListMenu__section">
+          { contacts }
         </div>
       </div>
     )
@@ -105,45 +101,59 @@ export default class Share extends React.PureComponent {
     const notifications = this.props.notifications.map(notification => (
       // we should create a more unique key; do we want to allow the same share multiple times?
       // i'm going to block it on the send side for now
-      <div key={`${notification.sender.name}-${notification.board.title}`} className="Notification">
-        <p>You received...</p>
-        <h4>{ notification.board.title }</h4>
-        <p>From { notification.sender.name }</p>
-
-        <div className="Notification__actions">
-          <div
-            role="button"
-            className="Notification__actions__view"
-            onClick={e => this.acceptNotification(notification)}
-          >
-            <i className="fa fa-arrow-right" /> View
+      <div key={`${notification.sender.name}-${notification.board.title}`} className="ListMenu__item">
+        <div className="ListMenu__grouped">
+          <div className="ListMenu__typegroup">
+            <h4 className="Type--primary">{ notification.board.title }</h4>
+            <p className="Type--secondary">From { notification.sender.name }</p>
           </div>
-          <div
-            role="button"
-            className="Notification__actions__archive"
-            onClick={e => alert(`Archive ${notification.board.title}`)}
-          >
-            <i className="fa fa-archive" /> Archive
-          </div>
+          <div className="ButtonGroup">
+            <div
+              role="button"
+              className="ButtonAction ButtonAction--primary"
+              onClick={e => this.acceptNotification(notification)}
+            >
+              <i className="fa fa-arrow-right" />
+              <p className="ButtonAction__label">View</p>
+            </div>
+            <div
+              role="button"
+              className="ButtonAction ButtonAction--destructive"
+              onClick={e => alert(`Archive ${notification.board.title}`)}
+            >
+              <i className="fa fa-archive" />
+              <p className="ButtonAction__label">Archive</p>
+            </div>
         </div>
       </div>
+    </div>
     ))
 
     return (
-      <div className="Share__notifications">
+      <div className="ListMenu__section">
         { notifications.length > 0 ? notifications :
-        <div className="Share__notifications--empty">
-          Nobody has shared any documents with you.
-          Documents are like love. You have got to give
-          a little to get a little.
-        </div> }
+          <div className="ListMenu__item">
+            <div className="ListMenu__grouped">
+              <div className="ListMenu__typegroup">
+                <i className="fa fa-info-circle"/>
+                <p className="Type--primary">
+                  Nothing here!.
+                </p>
+                <p className="Type--secondary">
+                  Documents are like love. You have got to give
+                  a little to get a little.
+                </p>
+              </div>
+            </div>
+          </div>
+         }
       </div>
     )
   }
 
   tabClasses(name) {
-    if (this.state.tab === name) { return 'Share__tabs__tab Share__tabs__tab--active' }
-    return 'Share__tabs__tab'
+    if (this.state.tab === name) { return 'Tabs__tab Tabs__tab--active' }
+    return 'Tabs__tab'
   }
 
   render() {
@@ -154,25 +164,26 @@ export default class Share extends React.PureComponent {
     if (this.state.tab === 'contacts') { body = this.renderContacts() } else if (this.state.tab === 'notifications') { body = this.renderNotifications() }
 
     return (
-      <div className="Share">
-        <div className="Share__tabs">
-          <div
-            role="button"
-            className={this.tabClasses('contacts')}
-            onClick={() => this.setState({ tab: 'contacts' })}
-          >
-            <i className="fa fa-group" /> Contacts
+      <div className="PopOverWrapper">
+        <div className="ListMenu">
+          <div className="Tabs">
+            <div
+              role="button"
+              className={this.tabClasses('contacts')}
+              onClick={() => this.setState({ tab: 'contacts' })}
+            >
+              <i className="fa fa-group" /> Contacts
+            </div>
+            <div
+              role="button"
+              className={this.tabClasses('notifications')}
+              onClick={() => this.setState({ tab: 'notifications' })}
+            >
+              Notifications
+            </div>
           </div>
-          <div
-            role="button"
-            className={this.tabClasses('notifications')}
-            onClick={() => this.setState({ tab: 'notifications' })}
-          >
-            Notifications
-          </div>
-        </div>
-
         { body }
+      </div>
       </div>
     )
   }

@@ -50,22 +50,28 @@ export default class Settings extends React.PureComponent {
 
   render() {
     return (
-      <div className="Settings">
-        <div className="Settings__section">
-          <p className="Settings__title">Your Profile</p>
-        </div>
-        <div className="Settings__section">
-          <h6>Avatar</h6>
-          <div className="Settings__avatarGroup">
-            <div className="Avatar">
-              <img src={this.props.avatar} />
-            </div>
-            <a className="Settings__setAvatar" onClick={this.chooseAvatar}>Choose from file...</a>
+      <div className="PopOverWrapper">
+        <div className="ListMenu">
+          <div className="ListMenu__header">
+            <p className="Type--header">Your Profile</p>
           </div>
-        </div>
-        <div className="Settings__section">
-          <h6>Display Name</h6>
-          <input type="text" onChange={this.setName} defaultValue={this.props.name} />
+          <div className="ListMenu__section">
+            <div className="ListMenu__label">Display Name</div>
+            <div className="ListMenu__item">
+              <input type="text" onChange={this.setName} defaultValue={this.props.name} />
+            </div>
+            <div className="ListMenu__label">Avatar</div>
+            <div className="ListMenu__item">
+              <div className="ListMenu__thumbnail">
+                <div className="Avatar">
+                  <img src={this.props.avatar} />
+                </div>
+              </div>
+              <div className="Label">
+                <a className="Type--action" onClick={this.chooseAvatar}>Choose from file...</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
