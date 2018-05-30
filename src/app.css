@@ -344,16 +344,6 @@ div.board {
   z-index: var(--zIndexCard);
 }
 
-.card .card__scrollarea {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.card.text .card__scrollarea {
-  overflow: auto;
-}
-
 .card::-webkit-scrollbar
 {
   width: 6px;
@@ -625,6 +615,7 @@ div.card.image {
   box-sizing: border-box;
   background: white;
   border: solid 1px var(--colorPaleGrey);
+  overflow: auto;
 }
 
 .CodeMirrorEditor__editor {

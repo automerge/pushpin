@@ -64,12 +64,10 @@ export default class Card extends React.PureComponent {
         style={style}
         onContextMenu={this.stopPropagation}
       >
-        <div className="card__scrollarea">
-          <Content
-            card={this.props.card}
-            uniquelySelected={this.props.uniquelySelected}
-          />
-        </div>
+        <Content
+          card={this.props.card}
+          uniquelySelected={this.props.uniquelySelected}
+        />
         { contentType.resizable !== false && <span className="cardResizeHandle" /> }
       </div>
     )
