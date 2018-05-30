@@ -3,9 +3,8 @@ import Debug from 'debug'
 
 import Loop from '../loop'
 import * as Model from './model'
-
 import BoardComponent from '../components/board'
-import { WORKSPACE_ID_PATH } from '../constants'
+import { WORKSPACE_ID_PATH, USER } from '../constants'
 
 const log = Debug('pushpin:workspace')
 
@@ -25,7 +24,7 @@ export function create(state) {
   const identity = state.hm.create()
   const selfId = state.hm.getId(identity)
   const nextIdentity = state.hm.change(identity, (i) => {
-    i.name = `The Mysterious ${Model.USER}`
+    i.name = `The Mysterious ${USER}`
     i.docId = selfId
   })
 
