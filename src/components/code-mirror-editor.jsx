@@ -39,7 +39,6 @@ export default class CodeMirrorEditor extends React.PureComponent {
     onChange: PropTypes.func.isRequired,
     uniquelySelected: PropTypes.bool.isRequired,
     cardId: PropTypes.string.isRequired,
-    cardHeight: PropTypes.number.isRequired,
   }
 
   static initializeDocument(onChange, { text }) {
