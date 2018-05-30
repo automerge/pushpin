@@ -59,6 +59,7 @@ table {
   --colorPaleGrey: #D5DFE5;
   --colorInputGrey: #f3f3f3;
   --colorLink: #0645ad;
+  --colorDestructive: #F87060;
 }
 
 /* Global */
@@ -205,52 +206,6 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-}
-
-.Contact {
-  padding: 4px 8px;
-  display: flex;
-  align-items: center;
-}
-
-.Contact .fa {
-  visibility: hidden;
-  padding: 4px;
-}
-
-.Contact:hover .fa {
-  visibility: visible;
-}
-
-.Contact:hover {
-  background: #f3f3f3;
-}
-
-.Contact .fa.fa-ban {
-  color: #f87060;
-}
-
-.Contact .fa.fa-share-alt {
-  color: #1e73e7;
-}
-
-.Contact__info {
-  margin-left: 8px;
-}
-
-.Contact__info__lastSeen {
-  color: #666;
-  font-style: italic;
-}
-
-.Contact__actions {
-  margin-left: auto;
-}
-
-.Contact__actions i.fa {
-  font-size: 24px;
-  color: #333;
-  cursor: pointer;
 }
 
 .ContextMenu {
@@ -556,6 +511,9 @@ div.card.image {
   cursor: pointer;
 }
 .ButtonAction--destructive {
+  color: var(--colorDestructive);
+}
+.ButtonAction--primary {
   color: var(--colorLink);
 }
 .ButtonAction:hover {
@@ -615,7 +573,7 @@ div.card.image {
 .ListMenu .ListMenu__item:hover{
 }
 
-.ListMenu .Thumbnail {
+.ListMenu__thumbnail {
   flex:none;
   margin-right: 8px;
 }
