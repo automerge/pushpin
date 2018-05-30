@@ -137,7 +137,9 @@ export default class Share extends React.PureComponent {
               <div className="ListMenu__typegroup">
                 <i className="fa fa-info-circle"/>
                 <p className="Type--primary">
-                  Nobody has shared any documents with you.
+                  Nothing here!.
+                </p>
+                <p className="Type--secondary">
                   Documents are like love. You have got to give
                   a little to get a little.
                 </p>
