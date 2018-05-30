@@ -18,7 +18,7 @@ export default class TitleBar extends React.PureComponent {
     doc: PropTypes.shape({
       selfId: PropTypes.string,
       boardId: PropTypes.string,
-      offeredIds: PropTypes.arrayOf(PropTypes.string),
+      offeredIds: PropTypes.arrayOf(PropTypes.object),
       contactIds: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
     onChange: PropTypes.func.isRequired
