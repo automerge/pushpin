@@ -335,12 +335,21 @@ div.board {
   user-select: none;
 }
 
-div.card {
+.card {
   border-top: 0;
-  overflow: auto; 
   max-height: 100%;
   max-width: 100%;
   min-width: 20px;
+}
+
+.card .card__scrollarea {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.card.text .card__scrollarea {
+  overflow: auto;
 }
 
 .card::-webkit-scrollbar
@@ -363,7 +372,6 @@ div.card {
 
 div.card.text {
   /* use an inset box-shadow to avoid the mitering of corners with normal borders */
-  box-shadow: inset 0 4px 0 0 var(--colorBlueBlack);
   min-width: 48px;
 }
 
@@ -400,6 +408,8 @@ div.card span.cardResizeHandle {
 .card {
   box-sizing: border-box;
   display: flex;
+  background: white;
+  border: solid 1px var(--colorPaleGrey);
 }
 
 div.card img.image {
@@ -610,9 +620,8 @@ div.card.image {
   cursor: text;
   text-align: left;
   color: var(--colorBlack);
-  background: white;
-  border: solid 1px var(--colorPaleGrey);
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
 }
 

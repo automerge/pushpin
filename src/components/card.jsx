@@ -46,7 +46,7 @@ export default class Card extends React.PureComponent {
 
     const style = {
       width: Number.isInteger(dragState.resizeWidth) ? dragState.resizeWidth : card.width,
-      minHeight: Number.isInteger(dragState.resizeHeight) ? dragState.resizeHeight : card.height,
+      height: Number.isInteger(dragState.resizeHeight) ? dragState.resizeHeight : card.height,
       position: 'absolute',
       left: Number.isInteger(dragState.moveX) ? dragState.moveX : card.x,
       top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
@@ -64,10 +64,12 @@ export default class Card extends React.PureComponent {
         style={style}
         onContextMenu={this.stopPropagation}
       >
-        <Content
-          card={this.props.card}
-          uniquelySelected={this.props.uniquelySelected}
-        />
+        <div className="card__scrollarea">
+          <Content
+            card={this.props.card}
+            uniquelySelected={this.props.uniquelySelected}
+          />
+        </div>
         { contentType.resizable !== false && <span className="cardResizeHandle" /> }
       </div>
     )
