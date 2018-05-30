@@ -123,7 +123,7 @@ export default class Board extends React.PureComponent {
       b.color = BOARD_COLORS.SKY
       if (selfId) {
         b.authorIds = [selfId]
-      } // XXX choxi what should we do here for the right click menu?
+      }
       b.cards = {}
     })
   }
