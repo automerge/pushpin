@@ -506,6 +506,10 @@ export default class Board extends React.PureComponent {
       let preClampWidth = tracking.resizeWidth + deltaX
       let preClampHeight = tracking.resizeHeight + deltaY
 
+      if ((preClampWidth + card.x) > BOARD_WIDTH || (preClampHeight + card.y) > BOARD_HEIGHT) {
+        return
+      }
+
       // Maintain aspect ratio on image cards.
       if (card.type === 'image') {
         const ratio = tracking.resizeWidth / tracking.resizeHeight
@@ -525,7 +529,11 @@ export default class Board extends React.PureComponent {
       let newHeight = preClampHeight + tracking.slackHeight
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
+      newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
+      newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
       tracking.resizeWidth = newWidth
+      newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
+      newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
       tracking.resizeHeight = newHeight
 
       // If the numbers changed, we must have introduced some slack.
