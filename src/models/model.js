@@ -67,12 +67,6 @@ function documentReady(state, { docId, doc }) {
     return state
   }
 
-  if (state.workspace.offeredIds.map(o => o.offeredId).includes(docId)) {
-    const offeredDocs = state.offeredDocs || {}
-    offeredDocs[docId] = doc
-    state = { ...state, offeredDocs }
-  }
-
   const contactIds = state.workspace && state.workspace.contactIds ?
     state.workspace.contactIds : []
   if (contactIds.includes(docId)) {
