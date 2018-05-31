@@ -17,8 +17,7 @@ EventEmitter.defaultMaxListeners = 100
 // ## Initial state.
 export const empty = {
   workspace: null,
-  contacts: {},
-  hm: null
+  contacts: {}
 }
 
 // Starts IO subsystems and populates associated state.
@@ -46,7 +45,7 @@ export function init(state) {
     }
   })
 
-  return { ...state, hm, requestedWorkspace }
+  return { ...state, requestedWorkspace }
 }
 
 function documentReady(state, { docId, doc }) {
@@ -104,7 +103,7 @@ function documentUpdated(state, { docId, doc }) {
 
 /* The hypermerge interface is awesome! *ahem* */
 function openDocument(state, { docId }) {
-  state.hm.open(docId)
+  window.hm.open(docId)
     .then(doc => {
       Loop.dispatch(documentReady, { doc, docId })
     })
@@ -113,31 +112,31 @@ function openDocument(state, { docId }) {
 }
 
 function createWorkspace(state) {
-  let workspace = state.hm.create()
-  const docId = state.hm.getId(workspace)
+  let workspace = window.hm.create()
+  const docId = window.hm.getId(workspace)
 
   Loop.dispatch(saveWorkspaceId, { docId })
 
-  workspace = state.hm.change(workspace, (ws) => {
+  workspace = window.hm.change(workspace, (ws) => {
     ws.selfId = ''
     ws.offeredIds = []
     ws.contactIds = []
   })
 
-  const identity = state.hm.create()
-  const selfId = state.hm.getId(identity)
-  state.hm.change(identity, (i) => {
+  const identity = window.hm.create()
+  const selfId = window.hm.getId(identity)
+  window.hm.change(identity, (i) => {
     i.name = `The Mysterious ${USER}`
     i.docId = selfId
   })
 
-  const doc = state.hm.create()
+  const doc = window.hm.create()
   const onChange = function onChange(cb) {
-    state.hm.change(doc, cb)
+    window.hm.change(doc, cb)
   }
 
-  const boardId = state.hm.getId(doc)
-  workspace = state.hm.change(workspace, (ws) => {
+  const boardId = window.hm.getId(doc)
+  workspace = window.hm.change(workspace, (ws) => {
     ws.boardId = boardId
     ws.selfId = selfId
   })
@@ -165,7 +164,7 @@ function onIdentityUpdated(state, { contactId }) {
   log('identityUpdated.iterate', offeredIds)
   offeredIds.forEach((offeredId) => {
     Loop.dispatch(openDocument, { docId: offeredId })
-    workspace = state.hm.change(workspace, (ws) => {
+    workspace = window.hm.change(workspace, (ws) => {
       const offeredIdsSet = new Set(ws.offeredIds)
       if (!offeredIdsSet.has(offeredId)) {
         ws.offeredIds.push({ offeredId, offererId: contactId })
