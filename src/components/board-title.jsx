@@ -14,7 +14,9 @@ export default class BoardTitle extends React.Component {
 
   onChangeTitle({ title }) {
     log('onChangeTitle')
-    this.props.onChange(b => b.title = title)
+    this.props.onChange((b) => {
+      b.title = title
+    })
   }
 
   render() {
