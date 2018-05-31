@@ -39,7 +39,7 @@ export function create(state) {
     ws.selfId = selfId
   })
 
-  BoardComponent.initializeDocument(onChange, { selfId })
+  BoardComponent.initializeDocument(onChange)
 
   return { ...state, workspace }
 }

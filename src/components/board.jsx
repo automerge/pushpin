@@ -117,18 +117,12 @@ export default class Board extends React.PureComponent {
     this.state = { cards: {}, selected: [] }
   }
 
-  static initializeDocument(onChange, { selfId }) {
-    // We may need to revisit this if we go back to nested boards.
-    if (!selfId) {
-      throw new Error('Must have selfId to initialize Board doc')
-    }
+  static initializeDocument(onChange) {
     onChange((b) => {
       b.title = 'No Title'
       b.color = BOARD_COLORS.SKY
-      if (selfId) {
-        b.authorIds = [selfId]
-      }
       b.cards = {}
+      b.authorIds = []
     })
   }
 
