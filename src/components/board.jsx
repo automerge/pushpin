@@ -150,6 +150,10 @@ export default class Board extends React.PureComponent {
     document.removeEventListener('keydown', this.onKeyDown)
   }
 
+  componentWillReceiveProps() {
+    log('componentWillReceiveProps')
+  }
+
   onKeyDown(e) {
     if (e.key === 'Backspace') {
       // backspace on the board can't erase a single text card
