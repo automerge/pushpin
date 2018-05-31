@@ -361,7 +361,6 @@ div.board {
   max-width: 100%;
   min-width: 20px;
   z-index: var(--zIndexCard);
-  overflow: auto;
 }
 
 .card::-webkit-scrollbar
