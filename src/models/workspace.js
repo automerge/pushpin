@@ -69,24 +69,6 @@ export function updateSeenBoardIds(state, { docId }) {
   return { ...state, workspace }
 }
 
-export function updateSelfId(state, { selfId }) {
-  const nextWorkspace = state.hm.change(state.workspace, (w) => {
-    w.selfId = selfId
-  })
-
-  return { ...state, workspace: nextWorkspace }
-}
-
-export function updateBoardId(state, { boardId }) {
-  const nextWorkspace = state.hm.change(state.workspace, (w) => {
-    w.boardId = boardId
-  })
-
-  // should we be responsbile for opening the new board here? cc//choxi
-
-  return { ...state, workspace: nextWorkspace }
-}
-
 /**
  * we listen to Identity documents to see if anyone has initiated a share with us
  */
