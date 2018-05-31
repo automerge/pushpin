@@ -16,8 +16,7 @@ EventEmitter.defaultMaxListeners = 100
 
 // ## Initial state.
 export const empty = {
-  workspace: null,
-  contacts: {}
+  workspace: null
 }
 
 // Starts IO subsystems and populates associated state.
@@ -58,33 +57,12 @@ function documentReady(state, { docId, doc }) {
     return { ...state, workspace: doc }
   }
 
-  if (!state.workspace) {
-    return state
-  }
-
-  const contactIds = state.workspace && state.workspace.contactIds ?
-    state.workspace.contactIds : []
-  if (contactIds.includes(docId)) {
-    return { ...state, contacts: { ...state.contacts, [docId]: doc } }
-  }
-
   return state
 }
 
 function documentUpdated(state, { docId, doc }) {
   if (docId === state.requestedWorkspace) {
     return { ...state, workspace: doc }
-  }
-
-  if (state.workspace && (docId === state.workspace.boardId)) {
-    return state
-  }
-
-  const contactIds = state.workspace && state.workspace.contactIds ?
-    state.workspace.contactIds : []
-  if (contactIds.includes(docId)) {
-    Loop.dispatch(onIdentityUpdated, { contactId: docId })
-    return { ...state, contacts: { ...state.contacts, [docId]: doc } }
   }
 
   return state
@@ -132,35 +110,6 @@ function createWorkspace(state) {
 
   BoardComponent.initializeDocument(onChange)
 
-  return { ...state, workspace }
-}
-
-/**
- * we listen to Identity documents to see if anyone has initiated a share with us
- */
-function onIdentityUpdated(state, { contactId }) {
-  log('identityUpdated.start', contactId)
-  if (!(state.contacts && state.contacts[contactId] &&
-        state.contacts[contactId].offeredIds)) {
-    log('identityUpdated.short', state.contacts)
-    return state
-  }
-
-  // we'll iterate changes for each new offer onto the workspace
-  let { workspace } = state
-  const offeredIds = state.contacts[contactId].offeredIds[state.workspace.selfId] || []
-
-  log('identityUpdated.iterate', offeredIds)
-  offeredIds.forEach((offeredId) => {
-    Loop.dispatch(openDocument, { docId: offeredId })
-    workspace = window.hm.change(workspace, (ws) => {
-      const offeredIdsSet = new Set(ws.offeredIds)
-      if (!offeredIdsSet.has(offeredId)) {
-        ws.offeredIds.push({ offeredId, offererId: contactId })
-        Loop.dispatch(openDocument, { docId: offeredId })
-      }
-    })
-  })
   return { ...state, workspace }
 }
 
