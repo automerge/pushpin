@@ -544,6 +544,7 @@ export default class Board extends React.PureComponent {
       this.props.onChange(b => {
         // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
         // this prevents visual changes like scrollbar from triggering on drag
+        /* eslint react/no-find-dom-node: "off" */
         b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth + 1
         b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
       })
