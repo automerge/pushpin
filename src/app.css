@@ -488,6 +488,23 @@ div.card.image {
 }
 
 /* Buttons */
+
+button {
+  box-sizing: border-box;
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  height:32px;
+  background-color: white;
+  color: var(--colorLink);
+  border:1px solid var(--colorInputGrey);
+  color: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+button:focus {
+  outline: none;
+  background-color: var(--colorInputGrey);
+}
 .ButtonGroup {
   display: flex;
   padding: 4px 8px;
