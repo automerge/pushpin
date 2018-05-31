@@ -92,10 +92,10 @@ export function documentReady(state, { docId, doc }) {
 export function documentUpdated(state, { docId, doc }) {
   if (docId === state.requestedWorkspace) {
     return { ...state, workspace: doc }
-  } else if (state.workspace) {
-    if (docId === state.workspace.boardId) {
-      return { ...state, board: doc }
-    }
+  }
+
+  if (state.workspace && (docId === state.workspace.boardId)) {
+    return { ...state, board: doc }
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
