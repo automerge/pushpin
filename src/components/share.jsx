@@ -1,92 +1,192 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Contact from './contact'
 import Content from './content'
 import ContentTypes from '../content-types'
-import Loop from '../loop'
-import * as Model from '../models/model'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
-    authors: PropTypes.arrayOf(PropTypes.shape({
-      docId: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      avatar: PropTypes.string.isOptional
-    })),
-    board: PropTypes.shape({
-      docId: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired
-    }),
-    contacts: PropTypes.objectOf(PropTypes.shape({
-      docId: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      avatar: PropTypes.string.isOptional
-    })),
-    notifications: PropTypes.arrayOf(PropTypes.shape({
-      type: PropTypes.string.isRequired,
-      sender: PropTypes.object.isRequired,
-      board: PropTypes.object.isRequired
-    }))
-  }
-
-  static defaultProps = {
-    authors: [],
-    contacts: {},
-    notifications: []
+    doc: PropTypes.shape({
+      selfId: PropTypes.string,
+      boardId: PropTypes.string,
+      authorIds: PropTypes.arrayOf(PropTypes.string),
+      contactIds: PropTypes.arrayOf(PropTypes.string),
+      notifications: PropTypes.arrayOf(PropTypes.shape({
+        type: PropTypes.string.isRequired,
+        sender: PropTypes.object.isRequired,
+        board: PropTypes.object.isRequired
+      }))
+    }).isRequired,
+    openBoard: PropTypes.func.isRequired
   }
 
   constructor() {
     super()
 
-    this.state = { tab: 'notifications' }
+    this.state = {
+      requestedContactDocs: {},
+      contactDocs: {},
+      consolidatedOffers: new Set(),
+      requestedBoardDocs: {},
+      boardDocs: {},
+      tab: 'notifications'
+    }
+  }
+
+  getHypermergeDoc(docId, cb) {
+    window.hm.open(docId)
+      .then(doc => {
+        // XXX fixme: lol
+        window.hm.on('document:updated', (id, doc) => {
+          if (id !== docId) {
+            return
+          }
+
+          // unregister listener
+          cb(null, doc)
+        })
+        cb(null, doc)
+      }, err => {
+        cb(err)
+      })
+  }
+
+  updateIdentityReferences(workspaceDoc, boardDoc) {
+    const { authorIds = [] } = boardDoc
+    const { selfId, contactIds = [] } = workspaceDoc
+
+
+    // add any never-before seen authors to our contacts
+    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
+    if (newContactIds.length > 0) {
+      window.hm.change(workspaceDoc, (workspace) => {
+        workspace.contactIds.push(...newContactIds)
+      })
+    }
+
+    // add ourselves to the authors if we haven't yet
+    // note that we guard against an empty authorIds
+    if (selfId && boardDoc.authorIds && !authorIds.includes(selfId)) {
+      // XXX JANK -- get rid of all these window.hm calls
+      window.hm.change(boardDoc, (board) => {
+        board.authorIds.push(selfId)
+      })
+    }
+  }
+
+  openBoardDocument() {
+    if (this.props.doc.boardId && this.props.doc.boardId !== this.state.boardId) {
+      this.getHypermergeDoc(this.props.doc.boardId, (err, doc) => {
+        this.updateIdentityReferences(this.props.doc, doc)
+        this.setState({ boardId: this.props.doc.boardId, boardDoc: doc })
+      })
+    }
+  }
+
+  onContactUpdated(contactId, contact) {
+    const { selfId } = this.props.doc
+    const { consolidatedOffers } = this.state
+
+    // record offers of boards for this account from this contact in our local state
+    if (contact.offeredIds && contact.offeredIds[selfId]) {
+      const offeredIds = contact.offeredIds[selfId]
+      offeredIds.forEach((offeredId) => {
+        // consolidatedOffers is a Set
+        consolidatedOffers.add({ offeredId, offererDoc: contact })
+
+        const { requestedBoardDocs } = this.state
+        // trigger a board load for any new boards we haven't seen yet
+        if (!requestedBoardDocs[offeredId]) {
+          requestedBoardDocs[offeredId] = true
+          this.getHypermergeDoc(this.props.doc.boardId, (err, doc) => {
+            this.setState({ boardDocs: { ...this.state.boardDocs, [offeredId]: doc } })
+          })
+        }
+      })
+    }
+
+    // updates will result in an updated contact document map
+    this.setState({ ...this.state,
+      consolidatedOffers,
+      contactDocs: { ...this.state.contactDocs, [contactId]: contact } })
+  }
+
+  openAllContacts() {
+    const { contactIds } = this.props.doc
+    const { requestedContactDocs } = this.state
+    if (contactIds) {
+      contactIds.forEach((contactId) => {
+        if (!requestedContactDocs[contactId]) {
+          requestedContactDocs[contactId] = true
+
+          this.getHypermergeDoc(contactId, (err, doc) => {
+            this.onContactUpdated(contactId, doc)
+          })
+        }
+      })
+      // the dance with requestedContactDocs prevents requesting the same one multiple times
+      this.setState({ ...this.state, requestedContactDocs })
+    }
+  }
+
+  openSelfDocument() {
+    if (this.props.doc.selfId && this.props.doc.selfId !== this.state.selfId) {
+      this.getHypermergeDoc(this.props.doc.selfId, (err, doc) => {
+        this.setState({ selfId: this.props.doc.selfId, selfDoc: doc })
+      })
+    }
+  }
+
+  // XXX will this work right as the document changes?
+  componentDidUpdate() {
+    this.openBoardDocument()
+    this.openAllContacts()
+    this.openSelfDocument()
   }
 
   // this probably doesn't work here...
-  updateSelfOfferDocumentToIdentity(state, { identityId, sharedDocId }) {
-    const self = state.hm.change(state.self, (s) => {
+  offerDocumentToIdentity(e, contactId) {
+    if (!this.state.selfDoc) {
+      throw new Error('unable to write an offer without a self identity to hold it')
+    }
+    window.hm.change(this.state.selfDoc, (s) => {
       if (!s.offeredIds) {
         s.offeredIds = {}
       }
 
-      if (!s.offeredIds[identityId]) {
-        s.offeredIds[identityId] = []
+      if (!s.offeredIds[contactId]) {
+        s.offeredIds[contactId] = []
       }
 
-      s.offeredIds[identityId].push(sharedDocId)
+      if (!s.offeredIds[contactId].includes(this.props.doc.boardId)) {
+        s.offeredIds[contactId].push(this.props.doc.boardId)
+      }
     })
-    return { ...state, self }
-  }
-
-  handleShare(e, contact) {
-    // i deleted board.docId and broke the updateSelfOfferDocumentToIdentity,
-    // but at least I pasted the code above ^^^^
-    Loop.dispatch(
-      this.updateSelfOfferDocumentToIdentity,
-      { identityId: contact.docId, sharedDocId: this.props.board.docId }
-    )
-  }
-
-  handleUnshare(e, contact) {
-    alert(`Unshare '${this.props.board.title}' Received from ${contact.name}`)
   }
 
   renderContacts() {
-    const authors = this.props.doc.authorIds.map(id => (
+    const authorIds = this.state.boardDoc && this.state.boardDoc.authorIds || []
+
+    const authors = authorIds.map(id => (
       <Content
         key={id}
-        card={{ type: 'contact', docId: id }}
-        actions={['unshare']}
-        onUnshare={e => this.handleUnshare(e, author)}
+        type="contact"
+        docId={id}
       />
     ))
 
-    const contacts = this.props.contactIds.map(id => (
+    const contactIds = this.props.doc.contactIds || []
+
+    // this .filter is probably very slow if you have a lot of authors
+    const filteredContactIds = contactIds.filter(contactId => (!authorIds.includes(contactId)))
+
+    const contacts = filteredContactIds.map(id => (
       <Content
         key={id}
-        card={{ type: 'contact', docId: id }}
+        type="contact"
+        docId={id}
         actions={['share']}
-        onShare={e => this.handleShare(e, contact)}
+        onShare={e => this.offerDocumentToIdentity(e, id)}
       />
     ))
 
@@ -105,12 +205,21 @@ export default class Share extends React.PureComponent {
   }
 
   acceptNotification(notification) {
-    // i deleted board.docId
-    Loop.dispatch(Model.openAndRequestBoard, { docId: notification.board.docId })
+    // passing boardId like this is sorta suspect
+    this.props.openBoard(notification.boardId)
   }
 
   renderNotifications() {
-    const notifications = this.props.notifications.map(notification => (
+    const notifications = []
+    this.state.consolidatedOffers.forEach(offer => {
+      const contactDoc = offer.offererDoc
+      const boardDoc = this.state.boardDocs[offer.offeredId]
+      if (boardDoc) {
+        notifications.push({ type: 'Invitation', sender: contactDoc, boardId: offer.offeredId, board: boardDoc })
+      }
+    })
+
+    const notificationsJSX = notifications.map(notification => (
       // we should create a more unique key; do we want to allow the same share multiple times?
       // i'm going to block it on the send side for now
       <div key={`${notification.sender.name}-${notification.board.title}`} className="ListMenu__item">
@@ -143,7 +252,7 @@ export default class Share extends React.PureComponent {
 
     return (
       <div className="ListMenu__section">
-        { notifications.length > 0 ? notifications :
+        { notificationsJSX.length > 0 ? notificationsJSX :
         <div className="ListMenu__item">
           <div className="ListMenu__grouped">
             <div className="ListMenu__typegroup">
@@ -158,8 +267,8 @@ export default class Share extends React.PureComponent {
             </div>
           </div>
         </div>
-       }
-    </div>
+        }
+      </div>
     )
   }
 

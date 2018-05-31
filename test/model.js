@@ -7,8 +7,7 @@ describe('Model', () => {
   describe('should be empty to begin with', () => {
     it('should have a set of starting fields', () => {
       expect(originalState).to.have.all.keys(
-        'board', 'workspace', 'self', 'contacts',
-        'hm', 'docs', 'formDocId', 'selected'
+        'board', 'workspace', 'contacts', 'hm'
       )
     })
   })

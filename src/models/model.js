@@ -4,7 +4,6 @@ import { EventEmitter } from 'events'
 import Loop from '../loop'
 import Hypermerge from '../hypermerge'
 import * as Workspace from './workspace'
-// import * as Board from './board'
 import { HYPERMERGE_PATH } from '../constants'
 
 const log = Debug('pushpin:model')
@@ -14,16 +13,12 @@ const log = Debug('pushpin:model')
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 100
 
-// ## Initial state. Evolved by actions below.
+// ## Initial state.
 export const empty = {
-  formDocId: '',
-  selected: [],
   workspace: null,
   board: null,
-  self: null,
   contacts: {},
-  hm: null,
-  docs: {}
+  hm: null
 }
 
 // Starts IO subsystems and populates associated state.
@@ -74,48 +69,15 @@ export function documentReady(state, { docId, doc }) {
     return state
   }
 
-  if (state.workspace.selfId === docId) {
-    return { ...state, self: doc }
-  }
-
   if (state.workspace.offeredIds.map(o => o.offeredId).includes(docId)) {
     const offeredDocs = state.offeredDocs || {}
     offeredDocs[docId] = doc
     state = { ...state, offeredDocs }
   }
 
-  if (state.board && state.board.cards) {
-    const cardDocIds = Object.values(state.board.cards).map(c => c.docId)
-    let newDocs = state.docs
-
-    if (cardDocIds.includes(docId)) {
-      newDocs = { ...newDocs, [docId]: doc }
-      state = { ...state, docs: newDocs }
-    }
-  }
-
   if (state.workspace.boardId === docId) {
-    // Case where we've created or opened the requested doc.
-    // It may be an unitialized board in which case we need to populate it.
-    // these two properties are not part of the workspace document because they
-    // represent transient application state, not something we save.
-    state = { ...state,
-      formDocId: docId,
-      board: doc
-    }
-
-    // state = Board.addSelfToAuthors(state)
-    if (state.board.authorIds) {
-      state = Workspace.updateContactIds(
-        state,
-        { candidateContactIds: state.board.authorIds }
-      )
-    }
+    state = { ...state, board: doc }
     state = Workspace.updateSeenBoardIds(state, { docId })
-
-    Object.values(state.board.cards || []).forEach(c => {
-      Loop.dispatch(openDocument, { docId: c.docId })
-    })
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
@@ -131,19 +93,9 @@ export function documentUpdated(state, { docId, doc }) {
   if (docId === state.requestedWorkspace) {
     return { ...state, workspace: doc }
   } else if (state.workspace) {
-    if (docId === state.workspace.selfId) {
-      return { ...state, self: doc }
-    } else if (docId === state.workspace.boardId) {
-      Loop.dispatch(Workspace.updateContactIds, { candidateContactIds: doc.authorIds })
+    if (docId === state.workspace.boardId) {
       return { ...state, board: doc }
     }
-  }
-
-  const cardDocIds = state.board && state.board.cards ?
-    Object.values(state.board.cards).map(c => c.docId) : []
-  if (cardDocIds.includes(docId)) {
-    const newDocs = { ...state.docs, [docId]: doc }
-    return { ...state, docs: newDocs }
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
@@ -162,24 +114,6 @@ export function documentUpdated(state, { docId, doc }) {
 
   // what's all this, then? how did we get here?
   log('somehow we loaded a document we know nothing about', docId, doc)
-  return state
-}
-
-export function formChanged(state, { docId }) {
-  return { ...state, formDocId: docId }
-}
-
-export function formSubmitted(state) {
-  Loop.dispatch(openDocument, { docId: state.formDocId })
-  Loop.dispatch(Workspace.updateBoardId, { boardId: state.formDocId })
-
-  return state
-}
-
-export function openAndRequestBoard(state, { docId }) {
-  Loop.dispatch(openDocument, { docId })
-  Loop.dispatch(Workspace.updateBoardId, { boardId: docId })
-
   return state
 }
 

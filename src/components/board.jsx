@@ -23,7 +23,18 @@ const log = Debug('pushpin:board')
 const BOARD_MENU_ID = 'BoardMenu'
 
 const BOARD_COLORS = {
-  SNOW: '#f9f9f9',
+
+  DEFAULT: '#D5DFE5',
+  SNOW: '#EBEDF4',
+  CANVAS: '#D8D1C0',
+  RUST: '#D96767',
+  ENGINEER: '#FFE283',
+  KEYLIME: '#A1E991',
+  PINE: '#63D2A5',
+  SOFT: '#64BCDF',
+  KAWAII: '#ED77AA',
+  ROYAL: '#A485E2',
+  BIGBLUE: '#3A66A3',
   BEIGE: '#f3f1ec',
   SKY: '#dcf3f6',
   VIOLET: '#e5dcf6',
@@ -36,8 +47,6 @@ const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
 const GRID_SIZE = 24
 
-const CARD_DEFAULT_WIDTH = 337
-const CARD_DEFAULT_HEIGHT = 97
 const CARD_MIN_WIDTH = 97
 const CARD_MIN_HEIGHT = 49
 
@@ -119,18 +128,18 @@ export default class Board extends React.PureComponent {
     this.state = { cards: {}, selected: [] }
   }
 
-  static initializeDocument(onChange, { selfId }) {
+  static initializeDocument(onChange) {
+    log('initializeDocument')
     onChange((b) => {
       b.title = 'No Title'
       b.color = BOARD_COLORS.SKY
-      if (selfId) {
-        b.authorIds = [selfId]
-      } // XXX choxi what should we do here for the right click menu?
       b.cards = {}
+      b.authorIds = []
     })
   }
 
   populateDemoBoard() {
+    log('populateDemoBoard')
     this.changeTitle('Example Board')
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
@@ -150,6 +159,10 @@ export default class Board extends React.PureComponent {
   componentWillUnmount() {
     log('componentWillUnmount')
     document.removeEventListener('keydown', this.onKeyDown)
+  }
+
+  componentWillReceiveProps() {
+    log('componentWillReceiveProps')
   }
 
   onKeyDown(e) {
@@ -506,8 +519,8 @@ export default class Board extends React.PureComponent {
 
     if (tracking.resizing) {
       // First guess at change in dimensions given mouse movements.
-      let preClampWidth = tracking.resizeWidth + deltaX
-      let preClampHeight = tracking.resizeHeight + deltaY
+      const preClampWidth = tracking.resizeWidth + deltaX
+      const preClampHeight = tracking.resizeHeight + deltaY
 
       if ((preClampWidth + card.x) > BOARD_WIDTH || (preClampHeight + card.y) > BOARD_HEIGHT) {
         return
@@ -546,6 +559,7 @@ export default class Board extends React.PureComponent {
       this.props.onChange(b => {
         // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
         // this prevents visual changes like scrollbar from triggering on drag
+        /* eslint react/no-find-dom-node: "off" */
         b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth + 1
         b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
       })
@@ -686,7 +700,7 @@ export default class Board extends React.PureComponent {
         >
           <div>
             <Card
-              ref={node => this.cardRefs[id] = node}
+              ref={node => { this.cardRefs[id] = node }}
               card={card}
               dragState={this.state.cards[id] || {}}
               selected={selected}

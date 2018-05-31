@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import Loop from '../loop'
 import ContentTypes from '../content-types'
 
 // we should make the avatar image a proper ImageCard
@@ -14,7 +13,16 @@ const { dialog } = remote
 const log = Debug('pushpin:settings')
 
 export default class Settings extends React.PureComponent {
+  static propTypes = {
+    doc: PropTypes.shape({
+      avatarDocId: PropTypes.string,
+      name: PropTypes.string
+    }).isRequired,
+    onChange: PropTypes.func.isRequired,
+  }
+
   constructor() {
+    log('constructor')
     super()
     this.chooseAvatar = this.chooseAvatar.bind(this)
     this.setName = this.setName.bind(this)
@@ -32,20 +40,25 @@ export default class Settings extends React.PureComponent {
       }
       const path = paths[0]
       const docId = Content.initializeContentDoc('image', { path })
-      this.props.onChange(d => d.avatarDocId = docId)
+      this.props.onChange((d) => {
+        d.avatarDocId = docId
+      })
     })
   }
 
   setName(e) {
-    this.props.onChange(d => d.name = e.target.value)
+    this.props.onChange((d) => {
+      d.name = e.target.value
+    })
   }
 
   render() {
+    log('render')
     let avatar
     if (this.props.doc.avatarDocId) {
-      avatar = <Content card={{ type: 'image', docId: this.props.doc.avatarDocId }} />
+      avatar = <Content type="image" docId={this.props.doc.avatarDocId} />
     } else {
-      avatar = <img src="../img/default-avatar.png" />
+      avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
 
     return (
@@ -63,11 +76,11 @@ export default class Settings extends React.PureComponent {
             <div className="ListMenu__item">
               <div className="ListMenu__thumbnail">
                 <div className="Avatar">
-                  <img src={this.props.avatar} />
+                  { avatar }
                 </div>
               </div>
               <div className="Label">
-                <a className="Type--action" onClick={this.chooseAvatar}>Choose from file...</a>
+                <button className="Type--action" onClick={this.chooseAvatar}>Choose from file...</button>
               </div>
             </div>
           </div>

@@ -2,9 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import Loop from '../loop'
-import * as Model from '../models/model'
-
 const log = Debug('pushpin:hash-form')
 
 export default class HashForm extends React.PureComponent {
@@ -23,6 +20,7 @@ export default class HashForm extends React.PureComponent {
 
     this.state = { value: this.props.formDocId }
     this.onSubmit = this.onSubmit.bind(this)
+    this.setInput = this.setInput.bind(this)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -33,6 +31,10 @@ export default class HashForm extends React.PureComponent {
     log('onSubmit')
     e.preventDefault()
     this.props.onChanged(this.input.value)
+  }
+
+  setInput(elem) {
+    this.input = elem
   }
 
   render() {
@@ -47,7 +49,7 @@ export default class HashForm extends React.PureComponent {
             className="loaded"
             value={this.state.value}
             onChange={e => this.setState({ value: e.target.value })}
-            ref={node => this.input = node}
+            ref={this.setInput}
           />
         </form>
       </div>

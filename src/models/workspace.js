@@ -3,9 +3,8 @@ import Debug from 'debug'
 
 import Loop from '../loop'
 import * as Model from './model'
-
 import BoardComponent from '../components/board'
-import { WORKSPACE_ID_PATH } from '../constants'
+import { WORKSPACE_ID_PATH, USER } from '../constants'
 
 const log = Debug('pushpin:workspace')
 
@@ -24,8 +23,8 @@ export function create(state) {
 
   const identity = state.hm.create()
   const selfId = state.hm.getId(identity)
-  const nextIdentity = state.hm.change(identity, (i) => {
-    i.name = `The Mysterious ${Model.USER}`
+  state.hm.change(identity, (i) => {
+    i.name = `The Mysterious ${USER}`
     i.docId = selfId
   })
 
@@ -40,7 +39,7 @@ export function create(state) {
     ws.selfId = selfId
   })
 
-  BoardComponent.initializeDocument(onChange, { selfId })
+  BoardComponent.initializeDocument(onChange)
 
   return { ...state, workspace }
 }
@@ -68,46 +67,6 @@ export function updateSeenBoardIds(state, { docId }) {
   })
 
   return { ...state, workspace }
-}
-
-export function updateContactIds(state, { candidateContactIds }) {
-  const { selfId, contactIds } = state.workspace
-
-  // #accidentallyQuadratic?
-  const oldContactsSet = new Set(contactIds)
-  const addedContacts = candidateContactIds.filter(contactId =>
-    (!oldContactsSet.has(contactId) && contactId !== selfId))
-
-  if (addedContacts.length > 0) {
-    const workspace = state.hm.change(state.workspace, (w) => {
-      // this is probably not very conflict avoidey: talk to Martin?
-      w.contactIds.push(...addedContacts)
-    })
-
-    addedContacts.forEach((contactId) => Loop.dispatch(Model.openDocument, { docId: contactId }))
-    return { ...state, workspace }
-  }
-
-  // nothing added, nothing to do
-  return state
-}
-
-export function updateSelfId(state, { selfId }) {
-  const nextWorkspace = state.hm.change(state.workspace, (w) => {
-    w.selfId = selfId
-  })
-
-  return { ...state, workspace: nextWorkspace }
-}
-
-export function updateBoardId(state, { boardId }) {
-  const nextWorkspace = state.hm.change(state.workspace, (w) => {
-    w.boardId = boardId
-  })
-
-  // should we be responsbile for opening the new board here? cc//choxi
-
-  return { ...state, workspace: nextWorkspace }
 }
 
 /**

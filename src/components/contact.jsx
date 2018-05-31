@@ -2,22 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
+import Content from './content'
 
 export default class Contact extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
-      avatar: PropTypes.object,
+      avatarDocId: PropTypes.string,
       name: PropTypes.string,
     }).isRequired,
-    name: PropTypes.string.isRequired,
-    avatar: PropTypes.string,
     actions: PropTypes.arrayOf(PropTypes.string),
     onShare: PropTypes.func,
     onUnshare: PropTypes.func
   }
 
   static defaultProps = {
-    avatar: '../img/default-avatar.png',
     actions: [],
     onShare: () => {},
     onUnshare: () => {}
@@ -41,11 +39,18 @@ export default class Contact extends React.PureComponent {
       ))
     }
 
+    let avatar
+    if (this.props.doc.avatarDocId) {
+      avatar = <Content type="image" docId={this.props.doc.avatarDocId} />
+    } else {
+      avatar = <img alt="avatar" src="../img/default-avatar.png" />
+    }
+
     return (
       <div className="ListMenu__item">
         <div className="ListMenu__thumbnail">
           <div className="Avatar">
-            <img alt="avatar" src={this.props.doc.avatar} />
+            { avatar }
           </div>
         </div>
         <div className="Label">
