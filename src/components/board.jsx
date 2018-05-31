@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
@@ -114,6 +115,7 @@ export default class Board extends React.PureComponent {
     this.changeBackgroundColor = this.changeBackgroundColor.bind(this)
 
     this.tracking = {}
+    this.cardRefs = {}
     this.state = { cards: {}, selected: [] }
   }
 
@@ -274,6 +276,8 @@ export default class Board extends React.PureComponent {
   }
 
   addContent(e, contentType) {
+    e.stopPropagation()
+
     const x = e.pageX
     const y = e.pageY
 
@@ -292,7 +296,8 @@ export default class Board extends React.PureComponent {
         throw new Error('Expected exactly one path?')
       }
       const path = paths[0]
-      this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+      this.selectOnly(cardId)
     })
   }
 
@@ -328,8 +333,8 @@ export default class Board extends React.PureComponent {
         docId,
         x: snapX,
         y: snapY,
-        width: this.snapMeasureToGrid(width || CARD_DEFAULT_WIDTH),
-        height: this.snapMeasureToGrid(height || CARD_DEFAULT_HEIGHT),
+        width: width ? this.snapMeasureToGrid(width) : null,
+        height: height ? this.snapMeasureToGrid(height) : null,
         slackWidth: 0,
         slackHeight: 0,
         resizing: false,
@@ -400,7 +405,7 @@ export default class Board extends React.PureComponent {
     // document change if in fact the card won't resize mod snapping.
     const snapWidth = this.snapMeasureToGrid(width)
     const snapHeight = this.snapMeasureToGrid(height)
-    if (snapWidth === doc.cards[id].width && doc.cards[id].height) {
+    if (snapWidth === doc.cards[id].width && snapHeight === doc.cards[id].height) {
       return
     }
     onChange((b) => {
@@ -474,8 +479,6 @@ export default class Board extends React.PureComponent {
       return
     }
 
-    tracking.totalDrag = tracking.totalDrag + Math.abs(deltaX) + Math.abs(deltaY)
-
     if (tracking.moving) {
       // First guess at change in location given mouse movements.
       const preClampX = tracking.moveX + deltaX
@@ -506,11 +509,8 @@ export default class Board extends React.PureComponent {
       let preClampWidth = tracking.resizeWidth + deltaX
       let preClampHeight = tracking.resizeHeight + deltaY
 
-      // Maintain aspect ratio on image cards.
-      if (card.type === 'image') {
-        const ratio = tracking.resizeWidth / tracking.resizeHeight
-        preClampHeight = preClampWidth / ratio
-        preClampWidth = preClampHeight * ratio
+      if ((preClampWidth + card.x) > BOARD_WIDTH || (preClampHeight + card.y) > BOARD_HEIGHT) {
+        return
       }
 
       // Add slack to the values used to calculate bound position. This will
@@ -541,6 +541,18 @@ export default class Board extends React.PureComponent {
 
     const tracking = this.tracking[card.id]
 
+    // If the card has no fixed dimensions yet, get its current rendered dimensions
+    if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
+      this.props.onChange(b => {
+        // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
+        // this prevents visual changes like scrollbar from triggering on drag
+        b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth + 1
+        b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
+      })
+
+      card = this.props.doc.cards[card.id]
+    }
+
     // If we haven't started tracking this drag, initialize tracking
     if (!(tracking && (tracking.moving || tracking.resizing))) {
       const resizing = e.target.className === 'cardResizeHandle'
@@ -555,7 +567,6 @@ export default class Board extends React.PureComponent {
             moveY: c.y,
             slackX: 0,
             slackY: 0,
-            totalDrag: 0,
             moving: true
           }
         })
@@ -635,7 +646,6 @@ export default class Board extends React.PureComponent {
         t.slackX = null
         t.slackY = null
         t.moving = false
-        t.totalDrag = null
 
         this.cardMoved(this.props.onChange, this.props.doc, { id: card.id, x, y })
         this.setDragState(card, t)
@@ -651,7 +661,6 @@ export default class Board extends React.PureComponent {
       tracking.slackWidth = null
       tracking.slackHeight = null
       tracking.resizing = false
-      tracking.totalDrag = null
 
       this.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
       this.setDragState(card, tracking)
@@ -677,6 +686,7 @@ export default class Board extends React.PureComponent {
         >
           <div>
             <Card
+              ref={node => this.cardRefs[id] = node}
               card={card}
               dragState={this.state.cards[id] || {}}
               selected={selected}

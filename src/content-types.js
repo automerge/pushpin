@@ -4,11 +4,11 @@ const log = Debug('pushpin:content-types')
 
 const registry = []
 
-function register({ component, type, name, icon, unlisted }) {
+function register({ component, type, name, icon, unlisted, resizable }) {
   if (!component || !type || !name || !icon) {
     throw new Error('Missing something in register')
   }
-  log('register', component.name, type, name, icon, unlisted)
+  log('register', component.name, type, name, icon, unlisted, resizable)
 
   registry.push({
     component,
@@ -16,6 +16,7 @@ function register({ component, type, name, icon, unlisted }) {
     name,
     icon,
     unlisted,
+    resizable
   })
 }
 
