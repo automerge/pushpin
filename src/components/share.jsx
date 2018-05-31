@@ -195,7 +195,7 @@ export default class Share extends React.PureComponent {
     consolidatedOffers.forEach(offer => {
       const contactDoc = offer.offererDoc
 
-      const board = { title: "hello, this isn't implemented yet" }
+      const board = { title: offer.offeredId, docId: offer.offeredId }
       notifications.push({ type: 'Invitation', sender: contactDoc, board })
     })
 
