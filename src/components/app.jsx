@@ -32,8 +32,8 @@ export default class App extends React.PureComponent {
 
     return (
       <div>
-        <Content card={{ type: 'title-bar', docId: this.props.docId }} />
-        <Content card={{ type: 'board', docId: this.props.doc.boardId }} />
+        <Content type="title-bar" docId={this.props.docId} />
+        <Content type="board" docId={this.props.doc.boardId} />
       </div>
     )
   }

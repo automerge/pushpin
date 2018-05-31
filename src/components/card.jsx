@@ -18,8 +18,9 @@ export default class Card extends React.PureComponent {
       resizeHeight: PropTypes.number,
     }).isRequired,
     card: PropTypes.shape({
-      type: PropTypes.string,
       id: PropTypes.string,
+      type: PropTypes.string,
+      docId: PropTypes.string,
       x: PropTypes.number,
       y: PropTypes.number,
       height: PropTypes.number,
@@ -59,7 +60,8 @@ export default class Card extends React.PureComponent {
         onContextMenu={this.stopPropagation}
       >
         <Content
-          card={this.props.card}
+          type={this.props.card.type}
+          docId={this.props.card.docId}
           uniquelySelected={this.props.uniquelySelected}
         />
         <span className="cardResizeHandle" />

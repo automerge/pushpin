@@ -5,14 +5,12 @@ import Debug from 'debug'
 import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:content')
-const FILTERED_PROPS = ['card']
+const FILTERED_PROPS = ['type', 'docId']
 
 export default class Content extends React.PureComponent {
   static propTypes = {
-    card: PropTypes.shape({
-      type: PropTypes.string,
-      docId: PropTypes.string,
-    }).isRequired
+    type: PropTypes.string.isRequired,
+    docId: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -50,7 +48,7 @@ export default class Content extends React.PureComponent {
     // We can read the old version of th doc from this.state.doc because
     // setState is not immediate and so this.state may not yet reflect the
     // latest version of the doc.
-    const doc = window.hm.change(window.hm.find(this.props.card.docId), changeBlock)
+    const doc = window.hm.change(window.hm.find(this.props.docId), changeBlock)
     this.setState({ ...this.state, doc })
     return doc
   }
@@ -76,7 +74,7 @@ export default class Content extends React.PureComponent {
   componentDidMount() {
     this.mounted = true
 
-    this.getHypermergeDoc(this.props.card.docId, (error, doc) => {
+    this.getHypermergeDoc(this.props.docId, (error, doc) => {
       if (error) {
         log(error)
       }
@@ -93,8 +91,8 @@ export default class Content extends React.PureComponent {
   componentWillUpdate(nextProps, nextState) {
     log('componentWillUpdate')
 
-    if (nextProps.card.docId !== this.props.card.docId) {
-      this.getHypermergeDoc(nextProps.card.docId, (error, doc) => {
+    if (nextProps.docId !== this.props.docId) {
+      this.getHypermergeDoc(nextProps.docId, (error, doc) => {
         if (error) {
           log(error)
         }
@@ -120,10 +118,10 @@ export default class Content extends React.PureComponent {
     log('render')
     const contentType = ContentTypes
       .list({ withUnlisted: true })
-      .find((ct) => ct.type === this.props.card.type)
+      .find((ct) => ct.type === this.props.type)
 
     if (!contentType) {
-      throw new Error(`Could not find component of type ${this.props.card.type}`)
+      throw new Error(`Could not find component of type ${this.props.type}`)
     }
 
     if (this.state.loading) {
@@ -134,7 +132,7 @@ export default class Content extends React.PureComponent {
 
     return (
       <contentType.component
-        docId={this.props.card.docId}
+        docId={this.props.docId}
         onChange={this.onChange}
         doc={this.state.doc}
         {...filteredProps}
