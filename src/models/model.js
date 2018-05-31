@@ -48,12 +48,6 @@ export function init(state) {
 
 function documentReady(state, { docId, doc }) {
   if (state.requestedWorkspace === docId) {
-    if (doc.contactIds) {
-      doc.contactIds.forEach((id) => {
-        Loop.dispatch(openDocument, { docId: id })
-      })
-    }
-
     return { ...state, workspace: doc }
   }
 
