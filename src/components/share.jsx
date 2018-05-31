@@ -130,10 +130,6 @@ export default class Share extends React.PureComponent {
     })
   }
 
-  handleUnshare(e, contact) {
-    alert(`Unshare '${this.state.boardDoc.title}' from ${contact.name}`)
-  }
-
   renderContacts() {
     const authorIds = this.state.boardDoc && this.state.boardDoc.authorIds || []
 
