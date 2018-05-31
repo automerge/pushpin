@@ -112,8 +112,6 @@ export function documentUpdated(state, { docId, doc }) {
     return { ...state, boards: { ...state.boards, [docId]: doc } }
   }
 
-  // what's all this, then? how did we get here?
-  log('somehow we loaded a document we know nothing about', docId, doc)
   return state
 }
 
