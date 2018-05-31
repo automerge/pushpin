@@ -23,7 +23,7 @@ export function create(state) {
 
   const identity = state.hm.create()
   const selfId = state.hm.getId(identity)
-  const nextIdentity = state.hm.change(identity, (i) => {
+  state.hm.change(identity, (i) => {
     i.name = `The Mysterious ${USER}`
     i.docId = selfId
   })
