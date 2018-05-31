@@ -532,7 +532,9 @@ div.card.image {
   color: var(--colorBlueBlack);
   padding-bottom: 4px;
 }
-
+.ListMenu input {
+  width: 100%;
+}
 .ListMenu__section {
   padding: 4px 0px;
 }
