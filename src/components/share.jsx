@@ -23,7 +23,14 @@ export default class Share extends React.PureComponent {
   constructor() {
     super()
 
-    this.state = { requestedContactDocs: {}, contactDocs: {}, tab: 'notifications' }
+    this.state = {
+      requestedContactDocs: {},
+      contactDocs: {},
+      consolidatedOffers: new Set(),
+      requestedBoardDocs: {},
+      boardDocs: {},
+      tab: 'notifications'
+    }
   }
 
   getHypermergeDoc(docId, cb) {
@@ -76,6 +83,34 @@ export default class Share extends React.PureComponent {
     }
   }
 
+  onContactUpdated(contactId, contact) {
+    const { selfId } = this.props.doc
+    const { consolidatedOffers } = this.state
+
+    // record offers of boards for this account from this contact in our local state
+    if (contact.offeredIds && contact.offeredIds[selfId]) {
+      const offeredIds = contact.offeredIds[selfId]
+      offeredIds.forEach((offeredId) => {
+        // consolidatedOffers is a Set
+        consolidatedOffers.add({ offeredId, offererDoc: contact })
+
+        const { requestedBoardDocs } = this.state
+        // trigger a board load for any new boards we haven't seen yet
+        if (!requestedBoardDocs[offeredId]) {
+          requestedBoardDocs[offeredId] = true
+          this.getHypermergeDoc(this.props.doc.boardId, (err, doc) => {
+            this.setState({ boardDocs: { ...this.state.boardDocs, [offeredId]: doc } })
+          })
+        }
+      })
+    }
+
+    // updates will result in an updated contact document map
+    this.setState({ ...this.state,
+      consolidatedOffers,
+      contactDocs: { ...this.state.contactDocs, [contactId]: contact } })
+  }
+
   openAllContacts() {
     const { contactIds } = this.props.doc
     const { requestedContactDocs } = this.state
@@ -84,10 +119,9 @@ export default class Share extends React.PureComponent {
         if (!requestedContactDocs[contactId]) {
           requestedContactDocs[contactId] = true
 
-          this.getHypermergeDoc(contactId, (err, doc) =>
-            // updates will result in an updated contact document
-            this.setState({ ...this.state,
-              contactDocs: { ...this.state.contactDocs, [contactId]: doc } }))
+          this.getHypermergeDoc(contactId, (err, doc) => {
+            this.onContactUpdated(contactId, doc)
+          })
         }
       })
       // the dance with requestedContactDocs prevents requesting the same one multiple times
@@ -171,29 +205,18 @@ export default class Share extends React.PureComponent {
   }
 
   acceptNotification(notification) {
-    this.props.openBoard(notification.board.docId)
+    // passing boardId like this is sorta suspect
+    this.props.openBoard(notification.boardId)
   }
 
   renderNotifications() {
-    const consolidatedOffers = []
-
-    Object.entries(this.state.contactDocs).forEach(([contactId, contact]) => {
-      if (contact.offeredIds && contact.offeredIds[this.props.doc.selfId]) {
-        const offeredIds = contact.offeredIds[this.props.doc.selfId]
-        offeredIds.forEach((offeredId) => {
-          consolidatedOffers.push({ offeredId, offererDoc: contact })
-        })
-      }
-    })
-
-    // consider filtering out known boards
-
     const notifications = []
-    consolidatedOffers.forEach(offer => {
+    this.state.consolidatedOffers.forEach(offer => {
       const contactDoc = offer.offererDoc
-
-      const board = { title: offer.offeredId, docId: offer.offeredId }
-      notifications.push({ type: 'Invitation', sender: contactDoc, board })
+      const boardDoc = this.state.boardDocs[offer.offeredId]
+      if (boardDoc) {
+        notifications.push({ type: 'Invitation', sender: contactDoc, boardId: offer.offeredId, board: boardDoc })
+      }
     })
 
     const notificationsJSX = notifications.map(notification => (
