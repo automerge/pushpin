@@ -76,7 +76,7 @@ export default class Settings extends React.PureComponent {
             <div className="ListMenu__item">
               <div className="ListMenu__thumbnail">
                 <div className="Avatar">
-                  <img src={this.props.avatar} />
+                  { avatar }
                 </div>
               </div>
               <div className="Label">
