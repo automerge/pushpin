@@ -6,16 +6,6 @@ import { ipcRenderer } from 'electron'
 import ContentTypes from '../content-types'
 import Content from './content'
 
-// We load these modules here so that the content registry will have them
-// and we supppress the eslint warning just for this file here.
-/* eslint no-unused-vars: ["error", { "varsIgnorePattern": "[A-Z]\w+" }] */
-import Board from './board'
-import ImageCard from './image-card'
-import CodeMirrorEditor from './code-mirror-editor'
-import TitleBar from './title-bar'
-import BoardTitle from './board-title'
-import Toggle from './toggle'
-
 const log = Debug('pushpin:app')
 
 export default class App extends React.PureComponent {

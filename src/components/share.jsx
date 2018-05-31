@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Contact from './contact'
 import Content from './content'
 import ContentTypes from '../content-types'
 

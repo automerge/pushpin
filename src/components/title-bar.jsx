@@ -4,8 +4,6 @@ import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import HashForm from './hash-form'
-import Share from './share'
-import Settings from './settings'
 import Content from './content'
 import ContentTypes from '../content-types'
 
