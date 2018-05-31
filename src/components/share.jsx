@@ -113,7 +113,7 @@ export default class Share extends React.PureComponent {
   // this probably doesn't work here...
   offerDocumentToIdentity(e, contactId) {
     if (!this.state.selfDoc) {
-      throw new Error('How did you manage to share something before having a self?')
+      throw new Error('unable to write an offer without a self identity to hold it')
     }
     window.hm.change(this.state.selfDoc, (s) => {
       if (!s.offeredIds) {
