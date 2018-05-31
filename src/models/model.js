@@ -84,16 +84,6 @@ export function documentReady(state, { docId, doc }) {
     state = { ...state, offeredDocs }
   }
 
-  if (state.board && state.board.cards) {
-    const cardDocIds = Object.values(state.board.cards).map(c => c.docId)
-    let newDocs = state.docs
-
-    if (cardDocIds.includes(docId)) {
-      newDocs = { ...newDocs, [docId]: doc }
-      state = { ...state, docs: newDocs }
-    }
-  }
-
   if (state.workspace.boardId === docId) {
     // Case where we've created or opened the requested doc.
     // It may be an unitialized board in which case we need to populate it.
@@ -105,10 +95,6 @@ export function documentReady(state, { docId, doc }) {
     }
 
     state = Workspace.updateSeenBoardIds(state, { docId })
-
-    Object.values(state.board.cards || []).forEach(c => {
-      Loop.dispatch(openDocument, { docId: c.docId })
-    })
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
@@ -129,13 +115,6 @@ export function documentUpdated(state, { docId, doc }) {
     } else if (docId === state.workspace.boardId) {
       return { ...state, board: doc }
     }
-  }
-
-  const cardDocIds = state.board && state.board.cards ?
-    Object.values(state.board.cards).map(c => c.docId) : []
-  if (cardDocIds.includes(docId)) {
-    const newDocs = { ...state.docs, [docId]: doc }
-    return { ...state, docs: newDocs }
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
