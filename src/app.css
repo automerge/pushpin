@@ -365,6 +365,7 @@ div.board {
 div.card.text {
   /* use an inset box-shadow to avoid the mitering of corners with normal borders */
   min-width: 48px;
+  max-width: 481px;
 }
 
 div.card.text.selected {
@@ -616,7 +617,6 @@ div.card.image {
   background: white;
   border: solid 1px var(--colorPaleGrey);
   overflow: auto;
-  max-width: 400px;
 }
 
 .CodeMirrorEditor__editor {
