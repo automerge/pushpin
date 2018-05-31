@@ -16,7 +16,6 @@ EventEmitter.defaultMaxListeners = 100
 // ## Initial state.
 export const empty = {
   workspace: null,
-  board: null,
   contacts: {},
   hm: null
 }
@@ -76,7 +75,6 @@ export function documentReady(state, { docId, doc }) {
   }
 
   if (state.workspace.boardId === docId) {
-    state = { ...state, board: doc }
     state = Workspace.updateSeenBoardIds(state, { docId })
   }
 
@@ -95,7 +93,7 @@ export function documentUpdated(state, { docId, doc }) {
   }
 
   if (state.workspace && (docId === state.workspace.boardId)) {
-    return { ...state, board: doc }
+    return state
   }
 
   const contactIds = state.workspace && state.workspace.contactIds ?
