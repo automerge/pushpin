@@ -1,12 +1,9 @@
-import Debug from 'debug'
 import { EventEmitter } from 'events'
 
 import Loop from '../loop'
 import Hypermerge from '../hypermerge'
 import * as Workspace from './workspace'
 import { HYPERMERGE_PATH } from '../constants'
-
-const log = Debug('pushpin:model')
 
 // It's normal for a document with a lot of participants to have a lot of
 // connections, so increase the limit to avoid spurious warnings about
