@@ -18,7 +18,6 @@ EventEmitter.defaultMaxListeners = 100
 export const empty = {
   workspace: null,
   board: null,
-  self: null,
   contacts: {},
   hm: null
 }
@@ -71,10 +70,6 @@ export function documentReady(state, { docId, doc }) {
     return state
   }
 
-  if (state.workspace.selfId === docId) {
-    return { ...state, self: doc }
-  }
-
   if (state.workspace.offeredIds.map(o => o.offeredId).includes(docId)) {
     const offeredDocs = state.offeredDocs || {}
     offeredDocs[docId] = doc
@@ -99,9 +94,7 @@ export function documentUpdated(state, { docId, doc }) {
   if (docId === state.requestedWorkspace) {
     return { ...state, workspace: doc }
   } else if (state.workspace) {
-    if (docId === state.workspace.selfId) {
-      return { ...state, self: doc }
-    } else if (docId === state.workspace.boardId) {
+    if (docId === state.workspace.boardId) {
       return { ...state, board: doc }
     }
   }
