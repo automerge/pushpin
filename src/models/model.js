@@ -157,24 +157,6 @@ export function documentUpdated(state, { docId, doc }) {
   return state
 }
 
-export function formChanged(state, { docId }) {
-  return { ...state, formDocId: docId }
-}
-
-export function formSubmitted(state) {
-  Loop.dispatch(openDocument, { docId: state.formDocId })
-  Loop.dispatch(Workspace.updateBoardId, { boardId: state.formDocId })
-
-  return state
-}
-
-export function openAndRequestBoard(state, { docId }) {
-  Loop.dispatch(openDocument, { docId })
-  Loop.dispatch(Workspace.updateBoardId, { boardId: docId })
-
-  return state
-}
-
 /* The hypermerge interface is awesome! *ahem* */
 export function openDocument(state, { docId }) {
   state.hm.open(docId)
