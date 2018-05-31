@@ -41,7 +41,7 @@ class DocHandle {
   }
 
   change(cb) {
-    this.doc = this.hm.change(this, cb)
+    this.doc = this.hm.change(this.doc, cb)
   }
 
   onChange(cb) {
