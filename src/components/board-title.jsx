@@ -7,7 +7,7 @@ import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:board-title')
 
-export default class BoardTitle extends React.Component {
+export default class BoardTitle extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
       title: PropTypes.string,
