@@ -22,19 +22,18 @@ export const empty = {
 
 // Starts IO subsystems and populates associated state.
 export function init(state) {
-  const hm = new Hypermerge({ storage: HYPERMERGE_PATH, port: 0 })
-  window.hm = hm
+  window.hm = new Hypermerge({ storage: HYPERMERGE_PATH, port: 0 })
 
   const requestedWorkspace = getBootstrapWorkspaceId() || ''
 
-  hm.once('ready', () => {
-    hm.joinSwarm()
+  window.hm.once('ready', () => {
+    window.hm.joinSwarm()
 
-    hm.on('document:ready', (docId, doc) => {
+    window.hm.on('document:ready', (docId, doc) => {
       Loop.dispatch(documentReady, { docId, doc })
     })
 
-    hm.on('document:updated', (docId, doc) => {
+    window.hm.on('document:updated', (docId, doc) => {
       Loop.dispatch(documentUpdated, { docId, doc })
     })
 
