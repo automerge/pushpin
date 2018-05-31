@@ -111,6 +111,7 @@ export default class Board extends React.PureComponent {
     log('constructor')
 
     this.onClick = this.onClick.bind(this)
+    this.onCardClicked = this.onCardClicked.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
@@ -175,10 +176,13 @@ export default class Board extends React.PureComponent {
   }
 
   onClick(e) {
-    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
-      log('onClick')
-      this.setState({ ...this.state, selected: [] })
-    }
+    log('onClick')
+    this.setState({ selected: [] })
+  }
+
+  onCardClicked(e, card) {
+    this.setState({ selected: [card.id] })
+    e.stopPropagation()
   }
 
   onDoubleClick(e) {
@@ -701,6 +705,7 @@ export default class Board extends React.PureComponent {
               dragState={this.state.cards[id] || {}}
               selected={selected}
               uniquelySelected={uniquelySelected}
+              onCardClicked={this.onCardClicked}
             />
           </div>
         </DraggableCore>
