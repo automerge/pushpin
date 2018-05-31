@@ -26,7 +26,7 @@ localStorage.removeItem('debug')
 
 const view = (state) => {
   if (window.hm && state.workspace) {
-    return <Content state={state} card={{ type: 'app', docId: window.hm.getId(state.workspace) }} />
+    return <Content state={state} type="app" docId={window.hm.getId(state.workspace)} />
   }
   return <p>Loading...</p>
 }

@@ -136,7 +136,8 @@ export default class Share extends React.PureComponent {
     const authors = authorIds.map(id => (
       <Content
         key={id}
-        card={{ type: 'contact', docId: id }}
+        type="contact"
+        docId={id}
       />
     ))
 
@@ -148,7 +149,8 @@ export default class Share extends React.PureComponent {
     const contacts = filteredContactIds.map(id => (
       <Content
         key={id}
-        card={{ type: 'contact', docId: id }}
+        type="contact"
+        docId={id}
         actions={['share']}
         onShare={e => this.offerDocumentToIdentity(e, id)}
       />

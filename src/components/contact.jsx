@@ -41,7 +41,7 @@ export default class Contact extends React.PureComponent {
 
     let avatar
     if (this.props.doc.avatarDocId) {
-      avatar = <Content card={{ type: 'image', docId: this.props.doc.avatarDocId }} />
+      avatar = <Content type="image" docId={this.props.doc.avatarDocId} />
     } else {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
