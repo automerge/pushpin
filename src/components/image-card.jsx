@@ -90,8 +90,9 @@ export default class ImageCard extends React.PureComponent {
   render() {
     log('render')
     if (!this.state.imageContentReady) {
-      return <p>Fetching {this.props.doc.path}</p>
-      // we should put useful stand-in content here, like alt-text or a caption
+      // we used to show some kind of stand-in value but we don't have a design
+      // for one that works everywhere the image works, so for now: nothing.
+      return null
     }
     return <img className="image" alt="" src={this.state.imagePath} />
   }
