@@ -14,9 +14,8 @@ const log = Debug('pushpin:model')
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 100
 
-// ## Initial state. Evolved by actions below.
+// ## Initial state.
 export const empty = {
-  formDocId: '',
   selected: [],
   workspace: null,
   board: null,
@@ -88,10 +87,7 @@ export function documentReady(state, { docId, doc }) {
     // It may be an unitialized board in which case we need to populate it.
     // these two properties are not part of the workspace document because they
     // represent transient application state, not something we save.
-    state = { ...state,
-      formDocId: docId,
-      board: doc
-    }
+    state = { ...state, board: doc}
 
     state = Workspace.updateSeenBoardIds(state, { docId })
   }
