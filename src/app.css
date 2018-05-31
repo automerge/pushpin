@@ -144,7 +144,7 @@ input {
 .ContextMenu {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  width: 232px;
+  width: 200px;
   z-index: 10;
 }
 
@@ -209,7 +209,7 @@ input {
   border: 0 solid rgba(0,0,0,0.25);
   border-radius: 2px;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(6, 24px);
   grid-gap: 8px;
 }
 
