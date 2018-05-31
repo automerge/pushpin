@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
@@ -14,6 +13,7 @@ const log = Debug('pushpin:settings')
 
 export default class Settings extends React.PureComponent {
   constructor() {
+    log('constructor')
     super()
     this.chooseAvatar = this.chooseAvatar.bind(this)
     this.setName = this.setName.bind(this)
@@ -40,6 +40,7 @@ export default class Settings extends React.PureComponent {
   }
 
   render() {
+    log('render')
     let avatar
     if (this.props.doc.avatarDocId) {
       avatar = <Content card={{ type: 'image', docId: this.props.doc.avatarDocId }} />
