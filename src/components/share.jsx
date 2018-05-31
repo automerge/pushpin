@@ -232,7 +232,7 @@ export default class Share extends React.PureComponent {
 
     return (
       <div className="ListMenu__section">
-        { notifications.length > 0 ? notifications :
+        { notificationsJSX.length > 0 ? notificationsJSX :
         <div className="ListMenu__item">
           <div className="ListMenu__grouped">
             <div className="ListMenu__typegroup">
@@ -247,8 +247,8 @@ export default class Share extends React.PureComponent {
             </div>
           </div>
         </div>
-       }
-    </div>
+        }
+      </div>
     )
   }
 
