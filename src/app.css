@@ -57,7 +57,7 @@ table {
   --colorBlack: var(--colorBlack);
   --colorSecondaryGrey: #637389;
   --colorPaleGrey: #D5DFE5;
-  --colorInputGrey: #f3f3f3;
+  --colorInputGrey: #E9EDF0;
   --colorLink: #0645ad;
   --colorDestructive: #F87060;
   --zIndexCard: 1;
@@ -109,7 +109,7 @@ input {
   box-sizing: border-box;
   height: 32px;
   border-radius: 4px;
-  background: #F3F3F3;
+  background: var(--colorInputGrey);
   border: 0px;
   outline: none;
 }
@@ -150,7 +150,7 @@ input {
 
 .ContextMenu__divider {
   height: 1px;
-  border-top: 1px solid #f3f3f3;
+  border-top: 1px solid var(--colorInputGrey);
 }
 
 .ContextMenu__section {
@@ -261,15 +261,13 @@ input {
   height:40px;
 }
 
-.TitleBar .dropdown:last-child {
-}
 .TitleBar .dropdown__trigger {
   width:32px;
   height:32px;
   border-radius: 16px;
 }
 .TitleBar .dropdown.dropdown--active .dropdown__trigger {
-  background-color: var(--colorPaleGrey);
+  background-color: var(--colorInputGrey);
 }
 .TitleBar .dropdown__trigger .fa {
   color: var(--colorBlueBlack);
@@ -289,6 +287,7 @@ input {
 }
 
 .TitleBar__titleText {
+  max-width: 244px;
   padding: 0px 4px;
   white-space: nowrap;
   overflow:hidden;
@@ -296,15 +295,19 @@ input {
 }
 
 input.TitleBar__titleText{
-  font-size: 13px;
+  width: 244px;
+  font-size: 14px;
   color: black;
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  background: #F3F3F3;
+  background: var(--colorInputGrey);
   border:0px;
   outline: none;
   border-radius: 4px;
-  height: 28px;
-  line-height:28px;
+  height: 24px;
+  line-height:24px;
+}
+input.TitleBar__titleText::selection {
+  background: rgba(0,0,0,.05);
 }
 
 .TitleBar__dropDown {
@@ -331,7 +334,7 @@ input.TitleBar__titleText{
 }
 .HashForm input:focus {
   outline: none;
-  background: #F3F3F3;
+  background: var(--colorInputGrey);
 }
 
 .HashForm input.loading {
