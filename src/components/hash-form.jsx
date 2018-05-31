@@ -2,9 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import Loop from '../loop'
-import * as Model from '../models/model'
-
 const log = Debug('pushpin:hash-form')
 
 export default class HashForm extends React.PureComponent {
