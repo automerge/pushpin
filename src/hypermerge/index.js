@@ -32,24 +32,32 @@ const METADATA = {
 /**
    * Experimental second open
    */
-class DocHandle extends EventEmitter {
-  constructor(hm, docId) {
-    super()
+class DocHandle {
+  constructor(hm, docId, doc) {
     this.hm = hm
-    this.docId = docId
-    this.doc = null;
-
-    this.onUpdated = this.onUpdated.bind(this)
-    this.hm.on('document:updated', (docId, doc) => {
-      if (docId !== this.docId) {
-        return // blech
-      }
-      this.emit('updated', doc)
-    })
+    this.id = docId
+    this.doc = doc
+    this._cb = () => {}
   }
 
   change(cb) {
     this.doc = this.hm.change(this, cb)
+  }
+
+  onChange(cb) {
+    this._cb = cb
+    if (this.doc) cb(this.doc)
+    return this
+  }
+
+  _update(doc) {
+    this.doc = doc
+    this._cb(doc)
+  }
+
+  _ready(doc) {
+    this.doc = doc
+    this._cb(doc)
   }
 }
 
@@ -73,6 +81,7 @@ class Hypermerge extends EventEmitter {
     this.isReady = false
     this.feeds = {}
     this.docs = {}
+    this.handles = {} // docId -> [DocHandle]
     this.readyIndex = {} // docId -> Boolean
     this.groupIndex = {} // groupId -> [actorId]
     this.docIndex = {} // docId -> [actorId]
@@ -190,23 +199,20 @@ class Hypermerge extends EventEmitter {
     })
   }
 
-  // this is not a good name
   openHandle(docId) {
     this._ensureReady()
-    log('open2', docId)
+
+    log('openHandle', docId)
+
     this._trackedFeed(docId)
 
-    if (this.readyIndex[docId]) {
-      return Promise.resolve(new DocHandle(this, docId, this.docs[docId]))
-    }
+    const doc = this.readyIndex[docId] ? this.docs[docId] : null
 
-    return new Promise((res, rej) => {
-      this.on('document:ready', (updatedId, doc) => {
-        if (docId === updatedId) {
-          res(new DocHandle(this, docId, doc))
-        }
-      })
-    })
+    const handle = new DocHandle(this, docId, doc)
+
+    this._handles(docId).push(handle)
+
+    return handle
   }
 
   /**
@@ -343,6 +349,11 @@ class Hypermerge extends EventEmitter {
     this._trackedFeed(actorId).peers.forEach(peer => {
       this._messagePeer(peer, msg)
     })
+  }
+
+  _handles(docId) {
+    if (!this.handles[docId]) this.handles[docId] = []
+    return this.handles[docId]
   }
 
   _create(metadata, parentMetadata = {}) {
@@ -520,6 +531,9 @@ class Hypermerge extends EventEmitter {
                */
               const doc = this.find(docId)
               this.emit('document:ready', docId, doc)
+              this._handles(docId).forEach(handle => {
+                handle._ready(doc)
+              })
             })
         })
     }
@@ -757,6 +771,9 @@ class Hypermerge extends EventEmitter {
        * @param {Document} doc - Automerge document
        */
       this.emit('document:updated', docId, doc)
+      this._handles(docId).forEach(handle => {
+        handle._update(doc)
+      })
     }
   }
 

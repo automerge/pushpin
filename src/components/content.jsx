@@ -19,9 +19,11 @@ export default class Content extends React.PureComponent {
 
     this.onChange = this.onChange.bind(this)
 
+    this.handle = window.hm.openHandle(this.props.docId)
+
     // State directly affects the rendered view.
     this.state = {
-      loading: true
+      doc: this.handle.doc
     }
   }
 
@@ -50,49 +52,17 @@ export default class Content extends React.PureComponent {
     // setState is not immediate and so this.state may not yet reflect the
     // latest version of the doc.
     const doc = window.hm.change(window.hm.find(this.props.docId), changeBlock)
-    this.setState({ ...this.state, doc })
+    this.setState({ doc })
     return doc
-  }
-
-  getHypermergeDoc(docId, cb) {
-    window.hm.openHandle(docId)
-      .then(handle => {
-        handle.on('updated', (handle) => cb(null, handle.doc()))
-        cb(null, handle.doc)
-      }, err => {
-        cb(err)
-      })
   }
 
   componentDidMount() {
     this.mounted = true
 
-    this.getHypermergeDoc(this.props.docId, (error, doc) => {
-      if (error) {
-        log(error)
-      }
-
-      // This card may have been deleted by the time fetchHypermergeDoc returns,
-      // so check here to see if the component is still mounted
-      if (!this.mounted) {
-        return
-      }
-      this.setState({ loading: false, doc })
+    this.handle.onChange(doc => {
+      if (!this.mounted) return
+      this.setState({doc})
     })
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    log('componentWillUpdate')
-
-    if (nextProps.docId !== this.props.docId) {
-      this.getHypermergeDoc(nextProps.docId, (error, doc) => {
-        if (error) {
-          log(error)
-        }
-
-        this.setState({ loading: false, doc })
-      })
-    }
   }
 
   componentWillUnmount() {
@@ -119,7 +89,7 @@ export default class Content extends React.PureComponent {
       return missingType(this.props.type)
     }
 
-    if (this.state.loading) {
+    if (!this.state.doc) {
       return null
     }
 
