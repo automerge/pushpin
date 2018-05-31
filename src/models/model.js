@@ -82,12 +82,7 @@ export function documentReady(state, { docId, doc }) {
   }
 
   if (state.workspace.boardId === docId) {
-    // Case where we've created or opened the requested doc.
-    // It may be an unitialized board in which case we need to populate it.
-    // these two properties are not part of the workspace document because they
-    // represent transient application state, not something we save.
     state = { ...state, board: doc}
-
     state = Workspace.updateSeenBoardIds(state, { docId })
   }
 
