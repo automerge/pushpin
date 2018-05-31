@@ -36,8 +36,6 @@ const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
 const GRID_SIZE = 24
 
-const CARD_DEFAULT_WIDTH = 337
-const CARD_DEFAULT_HEIGHT = 97
 const CARD_MIN_WIDTH = 97
 const CARD_MIN_HEIGHT = 49
 
@@ -504,8 +502,8 @@ export default class Board extends React.PureComponent {
 
     if (tracking.resizing) {
       // First guess at change in dimensions given mouse movements.
-      let preClampWidth = tracking.resizeWidth + deltaX
-      let preClampHeight = tracking.resizeHeight + deltaY
+      const preClampWidth = tracking.resizeWidth + deltaX
+      const preClampHeight = tracking.resizeHeight + deltaY
 
       if ((preClampWidth + card.x) > BOARD_WIDTH || (preClampHeight + card.y) > BOARD_HEIGHT) {
         return
@@ -684,7 +682,7 @@ export default class Board extends React.PureComponent {
         >
           <div>
             <Card
-              ref={node => this.cardRefs[id] = node}
+              ref={node => { this.cardRefs[id] = node }}
               card={card}
               dragState={this.state.cards[id] || {}}
               selected={selected}
