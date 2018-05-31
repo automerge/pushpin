@@ -118,6 +118,7 @@ export default class Board extends React.PureComponent {
   }
 
   static initializeDocument(onChange) {
+    log('initializeDocument')
     onChange((b) => {
       b.title = 'No Title'
       b.color = BOARD_COLORS.SKY
@@ -127,6 +128,7 @@ export default class Board extends React.PureComponent {
   }
 
   populateDemoBoard() {
+    log('populateDemoBoard')
     this.changeTitle('Example Board')
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
