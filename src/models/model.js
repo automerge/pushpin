@@ -16,7 +16,6 @@ EventEmitter.defaultMaxListeners = 100
 
 // ## Initial state.
 export const empty = {
-  selected: [],
   workspace: null,
   board: null,
   self: null,
