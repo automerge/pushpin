@@ -47,9 +47,11 @@ export default class Contact extends React.PureComponent {
     }
 
     return (
-      <div className="Contact">
-        <div className="Avatar">
-          { avatar }
+      <div className="ListMenu__item">
+        <div className="ListMenu__thumbnail">
+          <div className="Avatar">
+            { avatar }
+          </div>
         </div>
         <div className="Label">
           <p className="Type--primary">
