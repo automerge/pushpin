@@ -74,10 +74,6 @@ function documentReady(state, { docId, doc }) {
     state = { ...state, offeredDocs }
   }
 
-  if (state.workspace.boardId === docId) {
-    state = updateSeenBoardIds(state, { docId })
-  }
-
   const contactIds = state.workspace && state.workspace.contactIds ?
     state.workspace.contactIds : []
   if (contactIds.includes(docId)) {
@@ -103,13 +99,6 @@ function documentUpdated(state, { docId, doc }) {
     return { ...state, contacts: { ...state.contacts, [docId]: doc } }
   }
 
-  // this won't work with invitations, since presumably they are not yet in your seenBoardIds
-  const seenBoardIds = state.workspace && state.workspace.seenBoardIds ?
-    state.workspace.seenBoardIds : []
-  if (seenBoardIds.includes(docId)) {
-    return { ...state, boards: { ...state.boards, [docId]: doc } }
-  }
-
   return state
 }
 
@@ -131,7 +120,6 @@ function createWorkspace(state) {
 
   workspace = state.hm.change(workspace, (ws) => {
     ws.selfId = ''
-    ws.seenBoardIds = []
     ws.offeredIds = []
     ws.contactIds = []
   })
@@ -155,31 +143,6 @@ function createWorkspace(state) {
   })
 
   BoardComponent.initializeDocument(onChange)
-
-  return { ...state, workspace }
-}
-
-function updateSeenBoardIds(state, { docId }) {
-  if (!state.workspace) {
-    log('updateSeenBoardIdsIfNeeded called with no workspace!')
-    // maybe this should be a more violent error
-    return state
-  }
-
-  const workspace = state.hm.change(state.workspace, (workspace) => {
-    let library = state.workspace.seenBoardIds || []
-    const seenDocIndex = library.findIndex(d => d === docId)
-
-    if (Number.isInteger(seenDocIndex)) {
-      library = [docId,
-        ...library.slice(0, seenDocIndex),
-        ...library.slice(seenDocIndex + 1)]
-    } else {
-      library = [docId, ...library]
-    }
-
-    workspace.seenBoardIds = library
-  })
 
   return { ...state, workspace }
 }
