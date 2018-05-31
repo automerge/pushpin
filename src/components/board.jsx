@@ -80,14 +80,6 @@ We've made some initial cards for you to play with. Have fun!`
 const KAY_PATH = './img/kay.jpg'
 const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
-const withinCard = (card, x, y) => (x >= card.x) &&
-         (x <= card.x + card.width) &&
-         (y >= card.y) &&
-         (y <= card.y + card.height)
-
-const withinAnyCard = (cards, x, y) =>
-  Object.values(cards).some((card) => withinCard(card, x, y))
-
 const draggableCards = (cards, selected, card) => {
   if (selected.length > 0 && selected.find(id => id === card.id)) {
     return selected.map(id => cards[id])
@@ -180,14 +172,14 @@ export default class Board extends React.PureComponent {
   }
 
   onClick(e) {
-    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
+    if (e.target.className === 'react-contextmenu-wrapper') {
       log('onClick')
       this.setState({ ...this.state, selected: [] })
     }
   }
 
   onDoubleClick(e) {
-    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
+    if (e.target.className === 'react-contextmenu-wrapper') {
       log('onDoubleClick')
       const cardId = this.createCard({ x: e.pageX, y: e.pageY, type: 'text' })
       this.selectOnly(cardId)
@@ -620,15 +612,15 @@ export default class Board extends React.PureComponent {
 
     if (selected.includes(cardId)) {
       // remove from the current state if we have it
-      this.setState({ ...this.state,
-        selected: selected.filter((filterId) => filterId !== cardId) })
+      this.setState({ selected: selected.filter((filterId) => filterId !== cardId) })
     } else {
       // add to the current state if we don't
-      this.setState({ ...this.state, selected: [...selected, cardId] })
+      this.setState({ selected: [...selected, cardId] })
     }
   }
+
   selectOnly(cardId) {
-    this.setState({ ...this.state, selected: [cardId] })
+    this.setState({ selected: [cardId] })
   }
 
   onStop(card, e, d) {
