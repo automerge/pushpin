@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import Loop from '../loop'
 import ContentTypes from '../content-types'
 
 // we should make the avatar image a proper ImageCard
