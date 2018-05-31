@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
 
@@ -7,6 +8,13 @@ import ContentTypes from '../content-types'
 const log = Debug('pushpin:board-title')
 
 export default class BoardTitle extends React.Component {
+  static propTypes = {
+    doc: PropTypes.shape({
+      title: PropTypes.string,
+    }).isRequired,
+    onChange: PropTypes.func.isRequired,
+  }
+
   constructor() {
     super()
     this.onChangeTitle = this.onChangeTitle.bind(this)

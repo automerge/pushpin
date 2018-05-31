@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
@@ -12,6 +13,14 @@ const { dialog } = remote
 const log = Debug('pushpin:settings')
 
 export default class Settings extends React.PureComponent {
+  static propTypes = {
+    doc: PropTypes.shape({
+      avatarDocId: PropTypes.string,
+      name: PropTypes.string
+    }).isRequired,
+    onChange: PropTypes.func.isRequired,
+  }
+
   constructor() {
     log('constructor')
     super()
