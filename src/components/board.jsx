@@ -23,7 +23,18 @@ const log = Debug('pushpin:board')
 const BOARD_MENU_ID = 'BoardMenu'
 
 const BOARD_COLORS = {
-  SNOW: '#f9f9f9',
+
+  DEFAULT: '#D5DFE5',
+  SNOW: '#EBEDF4',
+  CANVAS: '#D8D1C0',
+  RUST: '#D96767',
+  ENGINEER: '#FFE283',
+  KEYLIME: '#A1E991',
+  PINE: '#63D2A5',
+  SOFT: '#64BCDF',
+  KAWAII: '#ED77AA',
+  ROYAL: '#A485E2',
+  BIGBLUE: '#3A66A3',
   BEIGE: '#f3f1ec',
   SKY: '#dcf3f6',
   VIOLET: '#e5dcf6',

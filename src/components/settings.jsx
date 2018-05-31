@@ -80,7 +80,7 @@ export default class Settings extends React.PureComponent {
                 </div>
               </div>
               <div className="Label">
-                <a className="Type--action" onClick={this.chooseAvatar}>Choose from file...</a>
+                <button className="Type--action" onClick={this.chooseAvatar}>Choose from file...</button>
               </div>
             </div>
           </div>
