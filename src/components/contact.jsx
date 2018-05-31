@@ -10,7 +10,7 @@ export default class Contact extends React.PureComponent {
       avatarDocId: PropTypes.string,
       name: PropTypes.string,
     }).isRequired,
-    actions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    actions: PropTypes.arrayOf(PropTypes.string),
     onShare: PropTypes.func,
     onUnshare: PropTypes.func
   }
