@@ -50,7 +50,7 @@ export default class Share extends React.PureComponent {
 
 
     // add any never-before seen authors to our contacts
-    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !selfId === a)
+    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
     if (newContactIds.length > 0) {
       window.hm.change(workspaceDoc, (workspace) => {
         workspace.contactIds.push(...newContactIds)
