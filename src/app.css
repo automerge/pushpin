@@ -108,7 +108,6 @@ input {
   padding: 0 8px;
   box-sizing: border-box;
   height: 32px;
-  width: 100%;
   border-radius: 4px;
   background: #F3F3F3;
   border: 0px;
@@ -222,17 +221,37 @@ input {
 }
 
 .TitleBar {
+  display: flex;
+  box-sizing: border-box;
   position: fixed;
   top: 0px;
   height: 40px;
+  padding: 0px 8px;
   width: 100%;
-  display: flex;
   align-items: center;
+  align-content: space-between;
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
 }
 
+.TitleBar .TitleBar__dropdowns, .TitleBar .TitleBar__left {
+  align-items: center;
+  display: flex;
+  height: 40px;
+}
+
+.TitleBar .TitleBar__left {
+  position: absolute;
+  left:8px;
+  top:0;
+
+}
+.TitleBar .TitleBar__dropdowns {
+  position: absolute;
+  top:0;
+  right: 8px;
+}
 
 .TitleBar .dropdown {
   display: flex;
@@ -243,7 +262,6 @@ input {
 }
 
 .TitleBar .dropdown:last-child {
-  margin-right: 8px;
 }
 .TitleBar .dropdown__trigger {
   width:32px;
@@ -267,7 +285,6 @@ input {
 }
 
 .TitleBar__logo {
-  margin-left: 12px;
   margin-right: 8px;
 }
 
@@ -296,19 +313,15 @@ input.TitleBar__titleText{
 
 .HashForm {
   margin: 0 auto;
+  padding: 4px 8px;
 }
 
 .HashForm input {
-  color: #444;
   padding: 0;
-  margin-top: 8px;
-  margin-right: 8px;
-  margin-bottom: 8px;
   margin-left: auto;
-  margin-right: 16px;
   box-sizing: border-box;
   width: 66ch;
-  height: 28px;
+  height: 24px;
   font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
   color: var(--colorSecondaryGrey);
   text-align: center;
@@ -327,6 +340,8 @@ input.TitleBar__titleText{
 
 
 div.board {
+  position:relative;
+  top:40px;
   background-image: url(grid.svg);
   background-blend-mode: color-burn;
   -webkit-touch-callout: none;

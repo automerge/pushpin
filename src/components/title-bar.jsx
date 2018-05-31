@@ -38,46 +38,45 @@ export default class TitleBar extends React.PureComponent {
 
     return (
       <div className="TitleBar">
-        <img
-          className="TitleBar__logo"
-          alt="pushpin logo"
-          src="pushpinIcon_Standalone.svg"
-          width="28"
-          height="28"
-        />
-
-        <Content type="board-title" docId={this.props.doc.boardId} />
-
+        <div className="TitleBar__left">
+          <img
+            className="TitleBar__logo"
+            alt="pushpin logo"
+            src="pushpinIcon_Standalone.svg"
+            width="28"
+            height="28"
+          />
+          <Content type="board-title" docId={this.props.doc.boardId} />
+        </div>
         <HashForm
           formDocId={this.props.doc.boardId}
           onChanged={this.openBoard}
         />
-
-        <Dropdown>
-          <DropdownTrigger>
-            <div className="TitleBar__dropDown">
-              <i className="fa fa-group" />
-            </div>
-          </DropdownTrigger>
-          <DropdownContent>
-            <Content
-              type="share"
-              docId={this.props.docId}
-              openBoard={this.openBoard}
-            />
-          </DropdownContent>
-        </Dropdown>
-
-        <Dropdown>
-          <DropdownTrigger>
-            <div className="TitleBar__dropDown">
-              <i className="fa fa-gear" />
-            </div>
-          </DropdownTrigger>
-          <DropdownContent>
-            <Content type="settings" docId={this.props.doc.selfId} />
-          </DropdownContent>
-        </Dropdown>
+        <div className="TitleBar__dropdowns">
+          <Dropdown>
+            <DropdownTrigger>
+              <div className="TitleBar__dropDown">
+                <i className="fa fa-group" />
+              </div>
+            </DropdownTrigger>
+            <DropdownContent>
+              <Content
+                type="share" docId={this.props.docId}
+                openBoard={this.openBoard}
+              />
+            </DropdownContent>
+          </Dropdown>
+          <Dropdown>
+            <DropdownTrigger>
+              <div className="TitleBar__dropDown">
+                <i className="fa fa-gear" />
+              </div>
+            </DropdownTrigger>
+            <DropdownContent>
+              <Content type="settings" docId={this.props.doc.selfId} />
+            </DropdownContent>
+          </Dropdown>
+        </div>
       </div>
     )
   }
