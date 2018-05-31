@@ -31,12 +31,16 @@ export default class Settings extends React.PureComponent {
       }
       const path = paths[0]
       const docId = Content.initializeContentDoc('image', { path })
-      this.props.onChange(d => d.avatarDocId = docId)
+      this.props.onChange((d) => {
+        d.avatarDocId = docId
+      })
     })
   }
 
   setName(e) {
-    this.props.onChange(d => d.name = e.target.value)
+    this.props.onChange((d) => {
+      d.name = e.target.value
+    })
   }
 
   render() {
