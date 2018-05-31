@@ -26,21 +26,22 @@ const BOARD_COLORS = {
 
   DEFAULT: '#D5DFE5',
   SNOW: '#EBEDF4',
-  CANVAS: '#D8D1C0',
-  RUST: '#D96767',
-  ENGINEER: '#FFE283',
-  KEYLIME: '#A1E991',
-  PINE: '#63D2A5',
-  SOFT: '#64BCDF',
-  KAWAII: '#ED77AA',
-  ROYAL: '#A485E2',
-  BIGBLUE: '#3A66A3',
   BEIGE: '#f3f1ec',
+  CANVAS: '#D8D1C0',
   SKY: '#dcf3f6',
   VIOLET: '#e5dcf6',
   PINK: '#ffe1e7',
   HERB: '#daefd2',
   PEACH: '#ffd2cc',
+  RUST: '#D96767',
+  ENGINEER: '#FFE283',
+  KEYLIME: '#A1E991',
+  PINE: '#63D2A5',
+  SOFT: '#64BCDF',
+  BIGBLUE: '#3A66A3',
+  ROYAL: '#A485E2',
+  KAWAII: '#ED77AA',
+  BLACK: '#2b2b2b'
 }
 
 const BOARD_WIDTH = 3600
