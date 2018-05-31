@@ -53,7 +53,6 @@ function documentReady(state, { docId, doc }) {
   if (state.requestedWorkspace === docId) {
     // TODO: this should be a thing that is listening on the workspace document
     // xxx: move this somewhere else?
-    Loop.dispatch(openDocument, { docId: doc.boardId })
     Loop.dispatch(openDocument, { docId: doc.selfId })
 
     if (doc.contactIds) {
