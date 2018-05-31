@@ -136,6 +136,11 @@ export default class CodeMirrorEditor extends React.PureComponent {
       return
     }
 
+    // the text has not loaded yet
+    if (!text) {
+      return
+    }
+
     // Short circuit if we don't need to apply any changes to the editor. This
     // happens when we get a text update based on our own local edits.
     const oldStr = this.codeMirror.getValue()

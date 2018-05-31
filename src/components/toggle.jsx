@@ -38,5 +38,6 @@ ContentTypes.register({
   component: Toggle,
   type: 'toggle',
   name: 'Toggle',
-  icon: 'toggle-off'
+  icon: 'toggle-off',
+  resizable: false
 })
