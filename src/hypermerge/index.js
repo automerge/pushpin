@@ -33,33 +33,23 @@ const METADATA = {
    * Experimental second open
    */
 class DocHandle extends EventEmitter {
-  constructor(hm, docId, doc) {
+  constructor(hm, docId) {
     super()
     this.hm = hm
     this.docId = docId
-    this.doc = doc
+    this.doc = null;
 
     this.onUpdated = this.onUpdated.bind(this)
-    this.hm.on('document:updated', this.onUpdated)
-  }
-
-  docId() {
-    return this.docId
-  }
-
-  doc() {
-    return this.doc
+    this.hm.on('document:updated', (docId, doc) => {
+      if (docId !== this.docId) {
+        return // blech
+      }
+      this.emit('updated', doc)
+    })
   }
 
   change(cb) {
     this.doc = this.hm.change(this, cb)
-  }
-
-  onUpdated(docId, doc) {
-    if (docId !== this.docId) {
-      return // blech
-    }
-    this.emit('document:updated', doc)
   }
 }
 
