@@ -328,6 +328,7 @@ input.TitleBar__titleText{
 
 div.board {
   background-image: url(grid.svg);
+  background-blend-mode: color-burn;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -342,6 +343,7 @@ div.board {
   max-width: 100%;
   min-width: 20px;
   z-index: var(--zIndexCard);
+  overflow: auto;
 }
 
 .card::-webkit-scrollbar
