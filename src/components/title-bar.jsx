@@ -61,7 +61,8 @@ export default class TitleBar extends React.PureComponent {
             </DropdownTrigger>
             <DropdownContent>
               <Content
-                type="share" docId={this.props.docId}
+                type="share"
+                docId={this.props.docId}
                 openBoard={this.openBoard}
               />
             </DropdownContent>
