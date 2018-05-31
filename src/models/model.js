@@ -22,8 +22,7 @@ export const empty = {
   board: null,
   self: null,
   contacts: {},
-  hm: null,
-  docs: {}
+  hm: null
 }
 
 // Starts IO subsystems and populates associated state.
