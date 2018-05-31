@@ -383,7 +383,7 @@ class Hypermerge extends EventEmitter {
     }
 
     log('feed.init', actorId)
-    return this._trackFeed(actorId, this._feed(actorId))
+    return this._trackFeed(this._feed(actorId))
   }
 
   _replicate(opts) {
@@ -427,7 +427,8 @@ class Hypermerge extends EventEmitter {
   // Track the given `feed`, which must correspond to the given `actorId`,
   // setting up listeners for when peers are added/removed, data is
   // downloaded, etc.
-  _trackFeed(actorId, feed) {
+  _trackFeed(feed) {
+    const actorId = feed.key.toString('hex')
     log('_trackFeed', actorId)
 
     this.feeds[actorId] = feed
