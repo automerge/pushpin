@@ -54,9 +54,10 @@ export default class CodeMirrorEditor extends React.PureComponent {
   constructor(props) {
     log('constructor')
     super(props)
-    this.onBackspace = this.onBackspace.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
     this.onCodeMirrorChange = this.onCodeMirrorChange.bind(this)
     this.setEditorRef = this.setEditorRef.bind(this)
+
     this.editorRef = null
     this.mounted = false
   }
@@ -68,7 +69,6 @@ export default class CodeMirrorEditor extends React.PureComponent {
     // The props after `autofocus` are needed to get an editor that resizes
     // according to the size of the text, without scrollbars or wrapping.
     this.codeMirror = CodeMirror(this.editorRef, {
-      extraKeys: { Backspace: this.onBackspace },
       autofocus: this.props.uniquelySelected,
       lineNumbers: false,
       lineWrapping: true,
@@ -95,18 +95,6 @@ export default class CodeMirrorEditor extends React.PureComponent {
       this.ensureContents(props.doc)
       this.ensureFocus(props.uniquelySelected)
     }
-  }
-
-  // This is fired whenever we hit backspace while editing. If the editor is
-  // empty, take this as a command to delete the card. Otherwise pass through
-  // to the default editor behaviour.
-  onBackspace(codeMirror) {
-    log('onBackspace')
-    if (codeMirror.getValue() === '') {
-      // We want to avoid both Loop and using this.props.cardId (which we no longer have).
-      // Loop.dispatch(Board.cardDeleted, { id: this.props.cardId })
-    }
-    return CodeMirror.Pass
   }
 
   // Observe changes to the editor and make corresponding updates to the
@@ -208,11 +196,18 @@ export default class CodeMirrorEditor extends React.PureComponent {
     this.editorRef = e
   }
 
+  onKeyDown(e) {
+    if (e.key === 'Backspace' && this.props.doc.text.length === 0) {
+      return
+    }
+    e.stopPropagation()
+  }
+
   render() {
     log('render')
 
     return (
-      <div className="CodeMirrorEditor">
+      <div className="CodeMirrorEditor" onKeyDown={this.onKeyDown}>
         <div
           id={`editor-${this.props.docId}`}
           className="CodeMirrorEditor__editor"

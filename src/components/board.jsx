@@ -167,14 +167,9 @@ export default class Board extends React.PureComponent {
   }
 
   onKeyDown(e) {
+    // this event can be consumed by a card if it wants to keep control of backspace
+    // for example, see code-mirror-editor.jsx onKeyDown
     if (e.key === 'Backspace') {
-      // backspace on the board can't erase a single text card
-      if (this.state.selected.length === 1) {
-        const card = this.props.doc.cards[this.state.selected[0]]
-        if (card && card.type === 'text') {
-          return
-        }
-      }
       this.deleteCard(this.state.selected)
     }
   }
