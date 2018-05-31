@@ -11,8 +11,6 @@ export default class Content extends React.PureComponent {
   static propTypes = {
     card: PropTypes.shape({
       type: PropTypes.string,
-      id: PropTypes.string,
-      height: PropTypes.number,
       docId: PropTypes.string,
     }).isRequired
   }
@@ -136,7 +134,6 @@ export default class Content extends React.PureComponent {
 
     return (
       <contentType.component
-        cardId={this.props.card.id}
         docId={this.props.card.docId}
         onChange={this.onChange}
         doc={this.state.doc}

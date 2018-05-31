@@ -36,9 +36,9 @@ export default class CodeMirrorEditor extends React.PureComponent {
     doc: PropTypes.shape({
       text: PropTypes.object,
     }).isRequired,
+    docId: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     uniquelySelected: PropTypes.bool.isRequired,
-    cardId: PropTypes.string.isRequired,
   }
 
   static initializeDocument(onChange, { text }) {
@@ -103,6 +103,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
   onBackspace(codeMirror) {
     log('onBackspace')
     if (codeMirror.getValue() === '') {
+      // We want to avoid both Loop and using this.props.cardId (which we no longer have).
       // Loop.dispatch(Board.cardDeleted, { id: this.props.cardId })
     }
     return CodeMirror.Pass
@@ -208,7 +209,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
     return (
       <div className="CodeMirrorEditor">
         <div
-          id={`editor-${this.props.cardId}`}
+          id={`editor-${this.props.docId}`}
           className="CodeMirrorEditor__editor"
           ref={this.setEditorRef}
         />

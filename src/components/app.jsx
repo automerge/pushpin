@@ -10,17 +10,11 @@ const log = Debug('pushpin:app')
 
 export default class App extends React.PureComponent {
   static propTypes = {
-    state: PropTypes.shape({
-      formDocId: PropTypes.string,
-      selected: PropTypes.arrayOf(PropTypes.string),
-      workspace: PropTypes.object,
-      self: PropTypes.object,
-      board: PropTypes.object,
-    }).isRequired,
     doc: PropTypes.shape({
       boardId: PropTypes.string.isRequired,
       selfId: PropTypes.string.isRequired
     }).isRequired,
+    docId: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
   }
 
@@ -36,28 +30,10 @@ export default class App extends React.PureComponent {
   render() {
     log('render')
 
-    const contentProps = {
-      uniquelySelected: false,
-      card: {
-        type: 'board',
-        id: '1',
-        height: 800,
-        docId: this.props.doc.boardId,
-      }
-    }
-
     return (
-      // XXX we probably don't want to pass in all these props here
       <div>
-        <Content
-          card={{ type: 'title-bar', docId: window.hm.getId(this.props.doc) }}
-          state={this.props.state}
-          board={this.props.state.board}
-          formDocId={this.props.state.formDocId}
-          requestedDocId={this.props.state.workspace.boardId}
-          self={this.props.state.self}
-        />
-        <Content {...contentProps} />
+        <Content card={{ type: 'title-bar', docId: this.props.docId }} />
+        <Content card={{ type: 'board', docId: this.props.doc.boardId }} />
       </div>
     )
   }
