@@ -76,7 +76,7 @@ export function documentReady(state, { docId, doc }) {
   }
 
   if (state.workspace.boardId === docId) {
-    state = { ...state, board: doc}
+    state = { ...state, board: doc }
     state = Workspace.updateSeenBoardIds(state, { docId })
   }
 
