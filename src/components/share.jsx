@@ -26,7 +26,7 @@ export default class Share extends React.PureComponent {
     this.state = {
       requestedContactDocs: {},
       contactDocs: {},
-      consolidatedOffers: new Set(),
+      consolidatedOffers: [],
       requestedBoardDocs: {},
       boardDocs: {},
       tab: 'notifications'
@@ -91,14 +91,17 @@ export default class Share extends React.PureComponent {
     if (contact.offeredIds && contact.offeredIds[selfId]) {
       const offeredIds = contact.offeredIds[selfId]
       offeredIds.forEach((offeredId) => {
-        // consolidatedOffers is a Set
-        consolidatedOffers.add({ offeredId, offererDoc: contact })
+        // add this to the offers if we haven't already got it
+        if (!consolidatedOffers.some((offer) =>
+          (offer.offeredId === offeredId && offer.offererDoc === contact))) {
+          consolidatedOffers.push({ offeredId, offererDoc: contact })
+        }
 
         const { requestedBoardDocs } = this.state
         // trigger a board load for any new boards we haven't seen yet
         if (!requestedBoardDocs[offeredId]) {
           requestedBoardDocs[offeredId] = true
-          this.getHypermergeDoc(this.props.doc.boardId, (err, doc) => {
+          this.getHypermergeDoc(offeredId, (err, doc) => {
             this.setState({ boardDocs: { ...this.state.boardDocs, [offeredId]: doc } })
           })
         }
@@ -222,7 +225,7 @@ export default class Share extends React.PureComponent {
     const notificationsJSX = notifications.map(notification => (
       // we should create a more unique key; do we want to allow the same share multiple times?
       // i'm going to block it on the send side for now
-      <div key={`${notification.sender.name}-${notification.board.title}`} className="ListMenu__item">
+      <div key={`${notification.sender.docId}-${notification.boardId}`} className="ListMenu__item">
         <div className="ListMenu__grouped">
           <div className="ListMenu__typegroup">
             <h4 className="Type--primary">{ notification.board.title }</h4>
