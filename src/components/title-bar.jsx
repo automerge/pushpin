@@ -43,15 +43,15 @@ export default class TitleBar extends React.PureComponent {
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <div className="TitleBar__menuItem">
+          <button className="TitleBar__menuItem">
             <i className="fa fa-map"/>
-          </div>
-          <div className="TitleBar__menuItem">
+          </button>
+          <button className="TitleBar__menuItem">
             <i className="fa fa-angle-left"/>
-          </div>
-          <div className="TitleBar__menuItem">
+          </button>
+          <button className="TitleBar__menuItem">
             <i className="fa fa-angle-right"/>
-          </div>
+          </button>
         </div>
         <div className="TitleBar__center">
           <Content url={createDocumentLink('board-title', docId)} />
