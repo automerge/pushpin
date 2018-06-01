@@ -44,9 +44,7 @@ export default class TitleBar extends React.PureComponent {
       <div className="TitleBar">
         <div className="TitleBar__left">
           <div className="TitleBar__menuItem">
-            <button className="TitleBar__button">
-              <i className="fa fa-map"/>
-            </button>
+            <i className="fa fa-map"/>
           </div>
           <div className="TitleBar__menuItem">
             <i className="fa fa-angle-left"/>
@@ -66,9 +64,7 @@ export default class TitleBar extends React.PureComponent {
         <div className="TitleBar__right">
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <button className="TitleBar__button">
-                <i className="fa fa-group" />
-              </button>
+              <i className="fa fa-group" />
             </DropdownTrigger>
             <DropdownContent>
               <Content
@@ -79,9 +75,7 @@ export default class TitleBar extends React.PureComponent {
           </Dropdown>
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <button className="TitleBar__button">
-                <i className="fa fa-gear" />
-              </button>
+              <i className="fa fa-gear" />
             </DropdownTrigger>
             <DropdownContent>
               <Content
