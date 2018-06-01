@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Corner</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Corner" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" fill="#F3F3F3" x="6" y="6" width="10" height="10"></rect>
+        <path d="M13,9 L15,9 L15,15 L9,15 L9,13 L13,13 L13,9 Z" id="Combined-Shape" fill="#637389"></path>
+    </g>
+</svg>

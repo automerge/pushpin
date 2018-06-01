@@ -363,24 +363,6 @@ div.board {
   z-index: var(--zIndexCard);
 }
 
-.card::-webkit-scrollbar
-{
-  width: 6px;
-  height: 6px;
-}
-
-.card::-webkit-scrollbar-track
-{
-	background-color: var(--colorPaleGrey);
-}
-
-.card::-webkit-scrollbar-thumb
-{
-  width: 8px;
-  height: 8px;
-	background-color: #000000;
-}
-
 div.card.text {
   /* use an inset box-shadow to avoid the mitering of corners with normal borders */
   min-width: 48px;
@@ -399,14 +381,12 @@ div.card.selected {
 
 div.card span.cardResizeHandle {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  bottom: 0;
-  right: 0;
-  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2IDYiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiNmZmZmZmYwMCIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2cHgiIGhlaWdodD0iNnB4Ij48ZyBvcGFjaXR5PSIwLjMwMiI+PHBhdGggZD0iTSA2IDYgTCAwIDYgTCAwIDQuMiBMIDQgNC4yIEwgNC4yIDQuMiBMIDQuMiAwIEwgNiAwIEwgNiA2IEwgNiA2IFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9zdmc+');
+  width: 16px;
+  height: 16px;
+  bottom: 1px;
+  right: 1px;
+  background: url('corner.svg');
   background-position: bottom right;
-  padding-right: 3px;
-  padding-bottom: 3px;
   background-repeat: no-repeat;
   background-origin: content-box;
   cursor: se-resize;
@@ -420,6 +400,10 @@ div.card span.cardResizeHandle {
 .card {
   box-sizing: border-box;
   display: flex;
+}
+
+.card:focus, .card:active {
+  outline: none;
 }
 
 div.card img.image {
@@ -658,7 +642,35 @@ button:focus {
   border: solid 1px var(--colorPaleGrey);
   overflow: auto;
 }
+.CodeMirrorEditor:focus, .CodeMirrorEditor:active {
+  outline: none;
+}
+.CodeMirrorEditor::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
 
+.CodeMirrorEditor::-webkit-scrollbar-track {
+	background-color: transparent;
+  margin-bottom: 10px;
+
+}
+
+.CodeMirrorEditor::-webkit-scrollbar-thumb {
+	background-color: transparent;
+}
+
+.CodeMirrorEditor:hover::-webkit-scrollbar-track {
+  background-color: #f3f3f3;
+}
+
+.CodeMirrorEditor:hover::-webkit-scrollbar-thumb {
+  background-color: var(--colorPaleGrey);
+}
+
+.CodeMirrorEditor::-webkit-scrollbar-thumb:hover {
+  background-color: #CBD5DB;
+}
 .CodeMirrorEditor__editor {
   box-sizing: border-box;
   width: 100%;
