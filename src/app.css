@@ -241,9 +241,23 @@ input {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
+  color: var(--colorSecondaryGrey);
+
+}
+.TitleBar .fa {
+  font-size: 24px;
+  line-height: 30px; /* this is a slight hack */
+  width:32px;
+  text-align: center;
 }
 
-.TitleBar .TitleBar__dropdowns, .TitleBar .TitleBar__left {
+.TitleBar__center {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.TitleBar .TitleBar__right, .TitleBar .TitleBar__left {
   align-items: center;
   display: flex;
   height: 40px;
@@ -255,20 +269,39 @@ input {
   top:0;
 
 }
-.TitleBar .TitleBar__dropdowns {
+.TitleBar .TitleBar__right {
   position: absolute;
   top:0;
   right: 8px;
 }
 
-.TitleBar .dropdown {
+.TitleBar .TitleBar__menuItem {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   width:40px;
   height:40px;
 }
-
+.TitleBar .TitleBar__button {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  padding:0;
+  border: none;
+  background: none;
+  margin: none;
+}
+.TitleBar .TitleBar__button:active,
+.TitleBar .TitleBar__button:focus {
+  outline: none;
+}
+.TitleBar .TitleBar__button:active {
+  background-color: var(--colorPaleGrey);
+}
+.TitleBar .TitleBar__menuItem:hover {
+  color: var(--colorBlueBlack);
+}
 .TitleBar .dropdown__trigger {
   width:32px;
   height:32px;
@@ -276,13 +309,6 @@ input {
 }
 .TitleBar .dropdown.dropdown--active .dropdown__trigger {
   background-color: var(--colorInputGrey);
-}
-.TitleBar .dropdown__trigger .fa {
-  color: var(--colorBlueBlack);
-  font-size: 24px;
-  line-height: 30px; /* this is a slight hack */
-  width:32px;
-  text-align: center;
 }
 
 .TitleBar .dropdown__content {
@@ -314,6 +340,7 @@ input.TitleBar__titleText{
   height: 24px;
   line-height:24px;
 }
+
 input.TitleBar__titleText::selection {
   background: rgba(0,0,0,.05);
 }
@@ -321,12 +348,9 @@ input.TitleBar__titleText::selection {
 .TitleBar__dropDown {
 
 }
-
 .HashForm {
-  margin: 0 auto;
   padding: 4px 8px;
 }
-
 .HashForm input {
   padding: 0;
   margin-left: auto;
@@ -340,6 +364,7 @@ input.TitleBar__titleText::selection {
   border-radius: 4px;
   border: 0px;
 }
+
 .HashForm input:focus {
   outline: none;
   background: var(--colorInputGrey);
@@ -479,7 +504,7 @@ div.card.image {
 
 /* Buttons */
 
-button {
+.ListMenu button {
   box-sizing: border-box;
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
@@ -491,7 +516,7 @@ button {
   border-radius: 4px;
   padding: 4px 8px;
 }
-button:focus {
+.ListMenu button:focus {
   outline: none;
   background-color: var(--colorInputGrey);
 }
