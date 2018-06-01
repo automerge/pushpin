@@ -80,14 +80,6 @@ We've made some initial cards for you to play with. Have fun!`
 const KAY_PATH = './img/kay.jpg'
 const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
-const withinCard = (card, x, y) => (x >= card.x) &&
-         (x <= card.x + card.width) &&
-         (y >= card.y) &&
-         (y <= card.y + card.height)
-
-const withinAnyCard = (cards, x, y) =>
-  Object.values(cards).some((card) => withinCard(card, x, y))
-
 const draggableCards = (cards, selected, card) => {
   if (selected.length > 0 && selected.find(id => id === card.id)) {
     return selected.map(id => cards[id])
@@ -113,6 +105,7 @@ export default class Board extends React.PureComponent {
     this.onClick = this.onClick.bind(this)
     this.onCardClicked = this.onCardClicked.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
+    this.onCardDoubleClicked = this.onCardDoubleClicked.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
     this.onDrag = this.onDrag.bind(this)
@@ -188,15 +181,19 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
   }
 
+  onCardDoubleClicked(e, card) {
+    // we might want to do more here later, so let's keep the infrastructure
+    // symmetrical with onCardClicked.
+    e.stopPropagation()
+  }
+
   onDoubleClick(e) {
-    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
-      log('onDoubleClick')
-      const cardId = this.createCard({
-        x: e.pageX - e.target.getBoundingClientRect().left,
-        y: e.pageY - e.target.getBoundingClientRect().top,
-        type: 'text' })
-      this.selectOnly(cardId)
-    }
+    log('onDoubleClick')
+    const cardId = this.createCard({
+      x: e.pageX - e.target.getBoundingClientRect().left,
+      y: e.pageY - e.target.getBoundingClientRect().top,
+      type: 'text' })
+    this.selectOnly(cardId)
   }
 
   onDragOver(e) {
@@ -625,15 +622,14 @@ export default class Board extends React.PureComponent {
 
     if (selected.includes(cardId)) {
       // remove from the current state if we have it
-      this.setState({ ...this.state,
-        selected: selected.filter((filterId) => filterId !== cardId) })
+      this.setState({ selected: selected.filter((filterId) => filterId !== cardId) })
     } else {
       // add to the current state if we don't
-      this.setState({ ...this.state, selected: [...selected, cardId] })
+      this.setState({ selected: [...selected, cardId] })
     }
   }
   selectOnly(cardId) {
-    this.setState({ ...this.state, selected: [cardId] })
+    this.setState({ selected: [cardId] })
   }
 
   onStop(card, e, d) {
@@ -705,6 +701,7 @@ export default class Board extends React.PureComponent {
               selected={selected}
               uniquelySelected={uniquelySelected}
               onCardClicked={this.onCardClicked}
+              onCardDoubleClicked={this.onCardDoubleClicked}
             />
           </div>
         </DraggableCore>
