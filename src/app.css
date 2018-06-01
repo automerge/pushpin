@@ -236,7 +236,7 @@ input {
   color: var(--colorSecondaryGrey);
 
 }
-.TitleBar .fa {
+.TitleBar__menuItem .fa {
   font-size: 24px;
   line-height: 30px; /* this is a slight hack */
   width:32px;
