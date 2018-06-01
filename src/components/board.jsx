@@ -179,7 +179,12 @@ export default class Board extends React.PureComponent {
   }
 
   onCardClicked(e, card) {
-    this.setState({ selected: [card.id] })
+    if (e.ctrlKey || e.shiftKey) {
+      this.selectToggle(card.id)
+    } else {
+      // otherwise we don't have shift/ctrl, so just set selection to this
+      this.selectOnly(card.id)
+    }
     e.stopPropagation()
   }
 
@@ -639,13 +644,6 @@ export default class Board extends React.PureComponent {
 
     // If tracking is not initialized, treat this as a click
     if (!(tracking && (tracking.moving || tracking.resizing))) {
-      if (e.ctrlKey || e.shiftKey) {
-        this.selectToggle(id)
-      } else {
-        // otherwise we don't have shift/ctrl, so just set selection to this
-        this.selectOnly(id)
-      }
-
       return
     }
 
