@@ -46,7 +46,9 @@ class DocHandle {
 
   onChange(cb) {
     this._cb = cb
-    if (this.doc) cb(this.doc)
+    if (this.doc) {
+      cb(this.doc)
+    }
     return this
   }
 
@@ -352,7 +354,9 @@ class Hypermerge extends EventEmitter {
   }
 
   _handles(docId) {
-    if (!this.handles[docId]) this.handles[docId] = []
+    if (!this.handles[docId]) {
+      this.handles[docId] = []
+    }
     return this.handles[docId]
   }
 
