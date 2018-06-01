@@ -12,6 +12,7 @@ export default class Card extends React.PureComponent {
   static propTypes = {
     selected: PropTypes.bool.isRequired,
     uniquelySelected: PropTypes.bool.isRequired,
+    onCardClicked: PropTypes.func.isRequired,
     dragState: PropTypes.shape({
       moveX: PropTypes.number,
       moveY: PropTypes.number,
@@ -33,7 +34,12 @@ export default class Card extends React.PureComponent {
     super(props)
     log('constructor')
 
+    this.onClick = this.onClick.bind(this)
     this.stopPropagation = this.stopPropagation.bind(this)
+  }
+
+  onClick(e) {
+    this.props.onCardClicked(e, this.props.card)
   }
 
   stopPropagation(e) {
@@ -60,9 +66,11 @@ export default class Card extends React.PureComponent {
 
     return (
       <div
+        tabIndex="-1"
         id={`card-${card.id}`}
         className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
         style={style}
+        onClick={this.onClick}
         onContextMenu={this.stopPropagation}
       >
         <Content

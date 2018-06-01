@@ -111,6 +111,7 @@ export default class Board extends React.PureComponent {
     log('constructor')
 
     this.onClick = this.onClick.bind(this)
+    this.onCardClicked = this.onCardClicked.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
@@ -154,12 +155,10 @@ export default class Board extends React.PureComponent {
     if (this.props.doc.cards && Object.keys(this.props.doc.cards).length === 0) {
       this.populateDemoBoard()
     }
-    document.addEventListener('keydown', this.onKeyDown)
   }
 
   componentWillUnmount() {
     log('componentWillUnmount')
-    document.removeEventListener('keydown', this.onKeyDown)
   }
 
   componentWillReceiveProps() {
@@ -167,23 +166,21 @@ export default class Board extends React.PureComponent {
   }
 
   onKeyDown(e) {
+    // this event can be consumed by a card if it wants to keep control of backspace
+    // for example, see code-mirror-editor.jsx onKeyDown
     if (e.key === 'Backspace') {
-      // backspace on the board can't erase a single text card
-      if (this.state.selected.length === 1) {
-        const card = this.props.doc.cards[this.state.selected[0]]
-        if (card && card.type === 'text') {
-          return
-        }
-      }
       this.deleteCard(this.state.selected)
     }
   }
 
   onClick(e) {
-    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
-      log('onClick')
-      this.setState({ ...this.state, selected: [] })
-    }
+    log('onClick')
+    this.setState({ selected: [] })
+  }
+
+  onCardClicked(e, card) {
+    this.setState({ selected: [card.id] })
+    e.stopPropagation()
   }
 
   onDoubleClick(e) {
@@ -706,6 +703,7 @@ export default class Board extends React.PureComponent {
               dragState={this.state.cards[id] || {}}
               selected={selected}
               uniquelySelected={uniquelySelected}
+              onCardClicked={this.onCardClicked}
             />
           </div>
         </DraggableCore>
@@ -753,6 +751,7 @@ export default class Board extends React.PureComponent {
           width: BOARD_WIDTH,
           height: BOARD_HEIGHT
         }}
+        onKeyDown={this.onKeyDown}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onDragOver={this.onDragOver}
