@@ -106,6 +106,7 @@ export default class Board extends React.PureComponent {
     this.onCardClicked = this.onCardClicked.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onCardDoubleClicked = this.onCardDoubleClicked.bind(this)
+    this.onShowContextMenu = this.onShowContextMenu.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
     this.onDrag = this.onDrag.bind(this)
@@ -221,14 +222,17 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
     const { pageX, pageY } = e
 
+    const localX = pageX - e.target.getBoundingClientRect().left
+    const localY = pageY - e.target.getBoundingClientRect().top
+
     /* Adapted from:
       https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
     const { length } = e.dataTransfer.files
     for (let i = 0; i < length; i += 1) {
       const entry = e.dataTransfer.files[i]
       const reader = new FileReader()
-      const x = pageX + (i * (GRID_SIZE * 2))
-      const y = pageY + (i * (GRID_SIZE * 2))
+      const x = localX + (i * (GRID_SIZE * 2))
+      const y = localY + (i * (GRID_SIZE * 2))
       if (entry.type.match('image/')) {
         reader.onload = () => {
           this.createImageCardFromReader(x, y, reader)
@@ -237,8 +241,8 @@ export default class Board extends React.PureComponent {
       } else if (entry.type.match('text/')) {
         reader.onload = () => {
           this.createCard({
-            x: pageX + (i * (GRID_SIZE * 2)),
-            y: pageY + (i * (GRID_SIZE * 2)),
+            x: localX + (i * (GRID_SIZE * 2)),
+            y: localY + (i * (GRID_SIZE * 2)),
             type: 'text',
             typeAttrs: { text: reader.readAsText(entry) }
           })
@@ -294,8 +298,8 @@ export default class Board extends React.PureComponent {
   addContent(e, contentType) {
     e.stopPropagation()
 
-    const x = e.pageX
-    const y = e.pageY
+    const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
+    const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
 
     if (contentType.type !== 'image') {
       const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
@@ -676,6 +680,10 @@ export default class Board extends React.PureComponent {
     }
   }
 
+  onShowContextMenu(e) {
+    this.setState({ contextMenuPosition: e.detail.position })
+  }
+
   render() {
     log('render')
 
@@ -719,7 +727,7 @@ export default class Board extends React.PureComponent {
     ))
 
     const contextMenu = (
-      <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
+      <ContextMenu id={BOARD_MENU_ID} onShow={this.onShowContextMenu} className="ContextMenu">
 
         <div className="ContextMenu__section">
           { createMenuItems }
