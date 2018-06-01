@@ -155,12 +155,10 @@ export default class Board extends React.PureComponent {
     if (this.props.doc.cards && Object.keys(this.props.doc.cards).length === 0) {
       this.populateDemoBoard()
     }
-    document.addEventListener('keydown', this.onKeyDown)
   }
 
   componentWillUnmount() {
     log('componentWillUnmount')
-    document.removeEventListener('keydown', this.onKeyDown)
   }
 
   componentWillReceiveProps() {
@@ -753,6 +751,7 @@ export default class Board extends React.PureComponent {
           width: BOARD_WIDTH,
           height: BOARD_HEIGHT
         }}
+        onKeyDown={this.onKeyDown}
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onDragOver={this.onDragOver}

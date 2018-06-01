@@ -66,6 +66,7 @@ export default class Card extends React.PureComponent {
 
     return (
       <div
+        tabIndex="-1"
         id={`card-${card.id}`}
         className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
         style={style}
