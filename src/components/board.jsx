@@ -189,7 +189,10 @@ export default class Board extends React.PureComponent {
   onDoubleClick(e) {
     if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
       log('onDoubleClick')
-      const cardId = this.createCard({ x: e.pageX, y: e.pageY, type: 'text' })
+      const cardId = this.createCard({
+        x: e.pageX - e.target.getBoundingClientRect().left,
+        y: e.pageY - e.target.getBoundingClientRect().top,
+        type: 'text' })
       this.selectOnly(cardId)
     }
   }
