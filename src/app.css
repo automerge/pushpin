@@ -651,13 +651,13 @@ button:focus {
 }
 
 .CodeMirrorEditor::-webkit-scrollbar-track {
-	background-color: transparent;
+  background-color: transparent;
   margin-bottom: 10px;
 
 }
 
 .CodeMirrorEditor::-webkit-scrollbar-thumb {
-	background-color: transparent;
+  background-color: transparent;
 }
 
 .CodeMirrorEditor:hover::-webkit-scrollbar-track {
