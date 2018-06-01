@@ -39,25 +39,31 @@ export default class TitleBar extends React.PureComponent {
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <img
-            className="TitleBar__logo"
-            alt="pushpin logo"
-            src="pushpinIcon_Standalone.svg"
-            width="28"
-            height="28"
-          />
-          <Content type="board-title" docId={this.props.doc.boardId} />
+          <div className="TitleBar__menuItem">
+            <button className="TitleBar__button">
+              <i className="fa fa-map"/>
+            </button>
+          </div>
+          <div className="TitleBar__menuItem">
+            <i className="fa fa-angle-left"/>
+          </div>
+          <div className="TitleBar__menuItem">
+            <i className="fa fa-angle-right"/>
+          </div>
         </div>
-        <HashForm
-          formDocId={this.props.doc.boardId}
-          onChanged={this.openBoard}
-        />
-        <div className="TitleBar__dropdowns">
-          <Dropdown>
+        <div className="TitleBar__center">
+          <HashForm
+            formDocId={this.props.doc.boardId}
+            onChanged={this.openBoard}
+          />
+        </div>
+
+        <div className="TitleBar__right">
+          <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <div className="TitleBar__dropDown">
+              <button className="TitleBar__button">
                 <i className="fa fa-group" />
-              </div>
+              </button>
             </DropdownTrigger>
             <DropdownContent>
               <Content
@@ -67,11 +73,11 @@ export default class TitleBar extends React.PureComponent {
               />
             </DropdownContent>
           </Dropdown>
-          <Dropdown>
+          <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <div className="TitleBar__dropDown">
+              <button className="TitleBar__button">
                 <i className="fa fa-gear" />
-              </div>
+              </button>
             </DropdownTrigger>
             <DropdownContent>
               <Content type="settings" docId={this.props.doc.selfId} />
