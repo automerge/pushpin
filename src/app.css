@@ -234,12 +234,9 @@ input {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
   color: var(--colorSecondaryGrey);
-
 }
 .TitleBar__menuItem .fa {
   font-size: 24px;
-  line-height: 30px; /* this is a slight hack */
-  width:32px;
   text-align: center;
 }
 
@@ -268,44 +265,45 @@ input {
 }
 
 .TitleBar .TitleBar__menuItem {
+  color: var(--colorSecondaryGrey);
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   width:40px;
   height:40px;
-}
-.TitleBar .TitleBar__button {
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
   padding:0;
-  border: none;
   background: none;
   margin: none;
-}
-.TitleBar .TitleBar__button:active,
-.TitleBar .TitleBar__button:focus {
+  border: none;
   outline: none;
 }
-.TitleBar .TitleBar__button:active {
-  background-color: var(--colorPaleGrey);
+
+.TitleBar .TitleBar__menuItem:active,
+.TitleBar .TitleBar__menuItem:focus {
+  outline: none;
+}
+.TitleBar .TitleBar__menuItem:active {
+
 }
 .TitleBar .TitleBar__menuItem:hover {
   color: var(--colorBlueBlack);
 }
 .TitleBar .dropdown__trigger {
-  width:32px;
-  height:32px;
-  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
 }
-.TitleBar .dropdown.dropdown--active .dropdown__trigger {
+.TitleBar .dropdown.dropdown--active {
   background-color: var(--colorInputGrey);
 }
 
+
 .TitleBar .dropdown__content {
-  top: 52px;
-  right: 12px;
+  top: 48px;
+  right: 0px;
 }
 
 .TitleBar__logo {
