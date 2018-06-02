@@ -24,61 +24,38 @@ export default class Share extends React.PureComponent {
     super()
 
     this.state = {
-      requestedContactDocs: {},
-      contactDocs: {},
       consolidatedOffers: [],
-      requestedBoardDocs: {},
-      boardDocs: {},
       tab: 'notifications'
     }
   }
 
-  getHypermergeDoc(docId, cb) {
-    window.hm.open(docId)
-      .then(doc => {
-        // XXX fixme: lol
-        window.hm.on('document:updated', (id, doc) => {
-          if (id !== docId) {
-            return
-          }
-
-          // unregister listener
-          cb(null, doc)
-        })
-        cb(null, doc)
-      }, err => {
-        cb(err)
-      })
-  }
-
-  updateIdentityReferences(workspaceDoc, boardDoc) {
-    const { authorIds = [] } = boardDoc
-    const { selfId, contactIds = [] } = workspaceDoc
-
+  updateIdentityReferences(workspaceHandle, boardHandle) {
+    const { authorIds = [] } = boardHandle.doc || {}
+    const { selfId, contactIds = [] } = workspaceHandle.doc || {}
 
     // add any never-before seen authors to our contacts
     const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
     if (newContactIds.length > 0) {
-      window.hm.change(workspaceDoc, (workspace) => {
+      workspaceHandle.change((workspace) => {
         workspace.contactIds.push(...newContactIds)
       })
     }
 
     // add ourselves to the authors if we haven't yet
-    // note that we guard against an empty authorIds
-    if (selfId && boardDoc.authorIds && !authorIds.includes(selfId)) {
-      // XXX JANK -- get rid of all these window.hm calls
-      window.hm.change(boardDoc, (board) => {
+    if (selfId && !authorIds.includes(selfId)) {
+      boardHandle.change((board) => {
         board.authorIds.push(selfId)
       })
     }
   }
 
-  openBoardDocument() {
+  watchBoard() {
     if (this.props.doc.boardId && this.props.doc.boardId !== this.state.boardId) {
-      this.getHypermergeDoc(this.props.doc.boardId, (err, doc) => {
-        this.updateIdentityReferences(this.props.doc, doc)
-        this.setState({ boardId: this.props.doc.boardId, boardDoc: doc })
+      const workspaceHandle = window.hm.openHandle(this.props.docId)
+      const boardHandle = window.hm.openHandle(this.props.doc.boardId)
+      boardHandle.onChange( (doc) => {
+        this.updateIdentityReferences(workspaceHandle, boardHandle)
+        this.setState({ boardId: this.props.doc.boardId })
       })
     }
   }
@@ -88,71 +65,50 @@ export default class Share extends React.PureComponent {
     const { consolidatedOffers } = this.state
 
     // record offers of boards for this account from this contact in our local state
-    if (contact.offeredIds && contact.offeredIds[selfId]) {
-      const offeredIds = contact.offeredIds[selfId]
-      offeredIds.forEach((offeredId) => {
-        // add this to the offers if we haven't already got it
-        if (!consolidatedOffers.some((offer) =>
-          (offer.offeredId === offeredId && offer.offererDoc === contact))) {
-          consolidatedOffers.push({ offeredId, offererDoc: contact })
-        }
-
-        const { requestedBoardDocs } = this.state
-        // trigger a board load for any new boards we haven't seen yet
-        if (!requestedBoardDocs[offeredId]) {
-          requestedBoardDocs[offeredId] = true
-          this.getHypermergeDoc(offeredId, (err, doc) => {
-            this.setState({ boardDocs: { ...this.state.boardDocs, [offeredId]: doc } })
-          })
-        }
-      })
-    }
-
-    // updates will result in an updated contact document map
-    this.setState({ ...this.state,
-      consolidatedOffers,
-      contactDocs: { ...this.state.contactDocs, [contactId]: contact } })
+    if (!contact.offeredIds) {
+      return
+    } 
+    
+    const offererId = contactId
+    const offersForUs = contact.offeredIds[selfId] || []
+    offersForUs.forEach((offeredId) => {
+      // add this to the offers if we haven't already got it
+      if (!consolidatedOffers.some((offer) =>
+        (offer.offeredId === offeredId && offer.offererId === offererId))) {
+        consolidatedOffers.push({ offeredId, offererId })
+      }
+    })
+    
+    this.setState({ consolidatedOffers })
   }
 
-  openAllContacts() {
-    const { contactIds } = this.props.doc
-    const { requestedContactDocs } = this.state
-    if (contactIds) {
-      contactIds.forEach((contactId) => {
-        if (!requestedContactDocs[contactId]) {
-          requestedContactDocs[contactId] = true
-
-          this.getHypermergeDoc(contactId, (err, doc) => {
-            this.onContactUpdated(contactId, doc)
-          })
-        }
-      })
-      // the dance with requestedContactDocs prevents requesting the same one multiple times
-      this.setState({ ...this.state, requestedContactDocs })
-    }
-  }
-
-  openSelfDocument() {
-    if (this.props.doc.selfId && this.props.doc.selfId !== this.state.selfId) {
-      this.getHypermergeDoc(this.props.doc.selfId, (err, doc) => {
-        this.setState({ selfId: this.props.doc.selfId, selfDoc: doc })
-      })
-    }
+  watchContacts() {
+    const { contactIds = [] } = this.props.doc
+    const { watchedContacts = {} } = this.state
+    
+    contactIds.forEach((contactId) => {
+      if (!watchedContacts[contactId]) {
+        watchedContacts[contactId] = window.hm.openHandle(contactId).onChange( (doc) => {
+          this.onContactUpdated(contactId, doc)
+        })
+      }
+    })
   }
 
   // XXX will this work right as the document changes?
   componentDidUpdate() {
-    this.openBoardDocument()
-    this.openAllContacts()
-    this.openSelfDocument()
+    this.watchBoard()
+    this.watchContacts()
   }
 
-  // this probably doesn't work here...
   offerDocumentToIdentity(e, contactId) {
-    if (!this.state.selfDoc) {
-      throw new Error('unable to write an offer without a self identity to hold it')
+    if (!this.props.doc.selfId) {
+      return
     }
-    window.hm.change(this.state.selfDoc, (s) => {
+
+    const selfHandle = window.hm.openHandle(this.props.doc.selfId)
+
+    selfHandle.change((s) => {
       if (!s.offeredIds) {
         s.offeredIds = {}
       }
@@ -168,7 +124,13 @@ export default class Share extends React.PureComponent {
   }
 
   renderContacts() {
-    const authorIds = this.state.boardDoc && this.state.boardDoc.authorIds || []
+    const { boardId, contactIds = [] } = this.props.doc
+    if (!boardId) {
+      return
+    }
+
+    const boardHandle = window.hm.openHandle(boardId)
+    const { authorIds = [] } = boardHandle.doc || {}
 
     const authors = authorIds.map(id => (
       <Content
@@ -178,12 +140,9 @@ export default class Share extends React.PureComponent {
       />
     ))
 
-    const contactIds = this.props.doc.contactIds || []
-
     // this .filter is probably very slow if you have a lot of authors
-    const filteredContactIds = contactIds.filter(contactId => (!authorIds.includes(contactId)))
-
-    const contacts = filteredContactIds.map(id => (
+    const nonAuthorContactIds = contactIds.filter(contactId => (!authorIds.includes(contactId)))
+    const contacts = nonAuthorContactIds.map(id => (
       <Content
         key={id}
         type="contact"
@@ -215,10 +174,10 @@ export default class Share extends React.PureComponent {
   renderNotifications() {
     const notifications = []
     this.state.consolidatedOffers.forEach(offer => {
-      const contactDoc = offer.offererDoc
-      const boardDoc = this.state.boardDocs[offer.offeredId]
-      if (boardDoc) {
-        notifications.push({ type: 'Invitation', sender: contactDoc, boardId: offer.offeredId, board: boardDoc })
+      const sender = window.hm.openHandle(offer.offererId).doc
+      const board = window.hm.openHandle(offer.offeredId).doc
+      if (sender && board) {
+        notifications.push({ type: 'Invitation', sender, board })
       }
     })
 
@@ -285,7 +244,11 @@ export default class Share extends React.PureComponent {
 
     // XXX if notifications is empty, let's default to contacts.
     // NB: i have not implemented this, i'm just leaving a note to myself
-    if (this.state.tab === 'contacts') { body = this.renderContacts() } else if (this.state.tab === 'notifications') { body = this.renderNotifications() }
+    if (this.state.tab === 'contacts') { 
+      body = this.renderContacts()
+    } else if (this.state.tab === 'notifications') {
+      body = this.renderNotifications()
+    }
 
     return (
       <div className="PopOverWrapper">
