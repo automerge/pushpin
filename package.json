@@ -91,7 +91,7 @@
     "chai": "^4.1.2",
     "electron-forge": "^5.2.1",
     "electron-mocha": "^6.0.2",
-    "electron-prebuilt-compile": "1.8.4",
+    "electron-prebuilt-compile": "2.0.2",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-15": "^1.0.5",
     "eslint": "^4.19.1",
