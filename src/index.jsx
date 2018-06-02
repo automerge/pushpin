@@ -1,14 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { EventEmitter } from 'events'
+import Fs from 'fs'
 
-import Loop from './loop'
+import { HYPERMERGE_PATH, WORKSPACE_ID_PATH } from './constants'
+import Hypermerge from './hypermerge'
 import Content from './components/content'
-import * as Model from './models/model'
 
 // We load these modules here so that the content registry will have them
 // and we supppress the eslint warning just for this file here.
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "[A-Z]\w+" }] */
-import App from './components/app'
+import Workspace from './components/workspace'
 import Board from './components/board'
 import ImageCard from './components/image-card'
 import CodeMirrorEditor from './components/code-mirror-editor'
@@ -24,22 +26,49 @@ import Settings from './components/settings'
 // doesn't confuse future instances.
 localStorage.removeItem('debug')
 
-const view = (state) => {
-  if (window.hm && state.workspace) {
-    return <Content type="app" docId={window.hm.getId(state.workspace)} />
+// It's normal for a document with a lot of participants to have a lot of
+// connections, so increase the limit to avoid spurious warnings about
+// emitter leaks.
+EventEmitter.defaultMaxListeners = 100
+
+function initHypermerge(cb) {
+  window.hm = new Hypermerge({ storage: HYPERMERGE_PATH, port: 0 })
+  window.hm.once('ready', () => {
+    window.hm.joinSwarm()
+    cb()
+  })
+}
+
+function loadWorkspaceId() {
+  if (Fs.existsSync(WORKSPACE_ID_PATH)) {
+    const json = JSON.parse(Fs.readFileSync(WORKSPACE_ID_PATH))
+    if (json.workspaceDocId) {
+      return json.workspaceDocId
+    }
   }
-  return <p>Loading...</p>
+  return ''
 }
 
-const element = document.getElementById('app')
-
-const render = (vdom) => {
-  ReactDOM.render(vdom, element)
+function saveWorkspaceId(docId) {
+  const workspaceIdFile = { workspaceDocId: docId }
+  Fs.writeFileSync(WORKSPACE_ID_PATH, JSON.stringify(workspaceIdFile))
 }
 
-const init = () => {
-  Loop.init(Model.empty, view, render)
-  Loop.dispatch(Model.init)
+function initWorkspace() {
+  let workspaceId
+  const existingWorkspaceId = loadWorkspaceId()
+  if (existingWorkspaceId !== '') {
+    workspaceId = existingWorkspaceId
+  } else {
+    const newWorkspaceId = Content.initializeContentDoc('workspace')
+    saveWorkspaceId(newWorkspaceId)
+    workspaceId = newWorkspaceId
+  }
+  const workspace = <Content type="workspace" docId={workspaceId} />
+  const element = document.getElementById('workspace')
+  ReactDOM.render(workspace, element)
 }
 
-init()
+initHypermerge(() => {
+  initWorkspace()
+})
