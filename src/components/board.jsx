@@ -173,6 +173,13 @@ export default class Board extends React.PureComponent {
   }
 
   onCardClicked(e, card) {
+    if (this.finishedDrag) {
+      // this is the end of a resize / move event, don't change selection
+      this.finishedDrag = false
+      e.stopPropagation()
+      return
+    }
+
     if (e.ctrlKey || e.shiftKey) {
       this.selectToggle(card.id)
     } else {
@@ -556,9 +563,6 @@ export default class Board extends React.PureComponent {
 
   onDrag(card, e, d) {
     log('onDrag')
-    e.preventDefault()
-    e.stopPropagation()
-
     const tracking = this.tracking[card.id]
 
     // If the card has no fixed dimensions yet, get its current rendered dimensions
@@ -678,6 +682,8 @@ export default class Board extends React.PureComponent {
       this.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
       this.setDragState(card, tracking)
     }
+
+    this.finishedDrag = true
   }
 
   onShowContextMenu(e) {
