@@ -191,8 +191,8 @@ export default class Board extends React.PureComponent {
   onDoubleClick(e) {
     log('onDoubleClick')
     const cardId = this.createCard({
-      x: e.pageX - e.target.getBoundingClientRect().left,
-      y: e.pageY - e.target.getBoundingClientRect().top,
+      x: e.pageX - this.boardRef.offsetLeft,
+      y: e.pageY - this.boardRef.offsetTop,
       type: 'text' })
     this.selectOnly(cardId)
   }
@@ -222,8 +222,8 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
     const { pageX, pageY } = e
 
-    const localX = pageX - e.target.getBoundingClientRect().left
-    const localY = pageY - e.target.getBoundingClientRect().top
+    const localX = pageX - this.boardRef.offsetLeft
+    const localY = pageY - this.boardRef.offsetTop
 
     /* Adapted from:
       https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
