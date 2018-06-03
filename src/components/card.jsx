@@ -13,6 +13,7 @@ export default class Card extends React.PureComponent {
     selected: PropTypes.bool.isRequired,
     uniquelySelected: PropTypes.bool.isRequired,
     onCardClicked: PropTypes.func.isRequired,
+    onCardDoubleClicked: PropTypes.func.isRequired,
     dragState: PropTypes.shape({
       moveX: PropTypes.number,
       moveY: PropTypes.number,
@@ -35,11 +36,17 @@ export default class Card extends React.PureComponent {
     log('constructor')
 
     this.onClick = this.onClick.bind(this)
+    this.onDoubleClick = this.onDoubleClick.bind(this)
     this.stopPropagation = this.stopPropagation.bind(this)
   }
 
+  // We also delegate these actions to the board, because
+  // the board is responsible for managing selection state.
   onClick(e) {
     this.props.onCardClicked(e, this.props.card)
+  }
+  onDoubleClick(e) {
+    this.props.onCardDoubleClicked(e, this.props.card)
   }
 
   stopPropagation(e) {
@@ -71,6 +78,7 @@ export default class Card extends React.PureComponent {
         className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
         style={style}
         onClick={this.onClick}
+        onDoubleClick={this.onDoubleClick}
         onContextMenu={this.stopPropagation}
       >
         <Content

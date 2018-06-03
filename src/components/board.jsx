@@ -80,14 +80,6 @@ We've made some initial cards for you to play with. Have fun!`
 const KAY_PATH = './img/kay.jpg'
 const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
 
-const withinCard = (card, x, y) => (x >= card.x) &&
-         (x <= card.x + card.width) &&
-         (y >= card.y) &&
-         (y <= card.y + card.height)
-
-const withinAnyCard = (cards, x, y) =>
-  Object.values(cards).some((card) => withinCard(card, x, y))
-
 const draggableCards = (cards, selected, card) => {
   if (selected.length > 0 && selected.find(id => id === card.id)) {
     return selected.map(id => cards[id])
@@ -113,6 +105,8 @@ export default class Board extends React.PureComponent {
     this.onClick = this.onClick.bind(this)
     this.onCardClicked = this.onCardClicked.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
+    this.onCardDoubleClicked = this.onCardDoubleClicked.bind(this)
+    this.onShowContextMenu = this.onShowContextMenu.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
     this.onDrag = this.onDrag.bind(this)
@@ -179,19 +173,35 @@ export default class Board extends React.PureComponent {
   }
 
   onCardClicked(e, card) {
-    this.setState({ selected: [card.id] })
+    if (this.finishedDrag) {
+      // this is the end of a resize / move event, don't change selection
+      this.finishedDrag = false
+      e.stopPropagation()
+      return
+    }
+
+    if (e.ctrlKey || e.shiftKey) {
+      this.selectToggle(card.id)
+    } else {
+      // otherwise we don't have shift/ctrl, so just set selection to this
+      this.selectOnly(card.id)
+    }
+    e.stopPropagation()
+  }
+
+  onCardDoubleClicked(e, card) {
+    // we might want to do more here later, so let's keep the infrastructure
+    // symmetrical with onCardClicked.
     e.stopPropagation()
   }
 
   onDoubleClick(e) {
-    if (!withinAnyCard(this.props.doc.cards, e.pageX, e.pageY)) {
-      log('onDoubleClick')
-      const cardId = this.createCard({
-        x: e.pageX - e.target.getBoundingClientRect().left,
-        y: e.pageY - e.target.getBoundingClientRect().top,
-        type: 'text' })
-      this.selectOnly(cardId)
-    }
+    log('onDoubleClick')
+    const cardId = this.createCard({
+      x: e.pageX - this.boardRef.offsetLeft,
+      y: e.pageY - this.boardRef.offsetTop,
+      type: 'text' })
+    this.selectOnly(cardId)
   }
 
   onDragOver(e) {
@@ -219,14 +229,17 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
     const { pageX, pageY } = e
 
+    const localX = pageX - this.boardRef.offsetLeft
+    const localY = pageY - this.boardRef.offsetTop
+
     /* Adapted from:
       https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
     const { length } = e.dataTransfer.files
     for (let i = 0; i < length; i += 1) {
       const entry = e.dataTransfer.files[i]
       const reader = new FileReader()
-      const x = pageX + (i * (GRID_SIZE * 2))
-      const y = pageY + (i * (GRID_SIZE * 2))
+      const x = localX + (i * (GRID_SIZE * 2))
+      const y = localY + (i * (GRID_SIZE * 2))
       if (entry.type.match('image/')) {
         reader.onload = () => {
           this.createImageCardFromReader(x, y, reader)
@@ -235,8 +248,8 @@ export default class Board extends React.PureComponent {
       } else if (entry.type.match('text/')) {
         reader.onload = () => {
           this.createCard({
-            x: pageX + (i * (GRID_SIZE * 2)),
-            y: pageY + (i * (GRID_SIZE * 2)),
+            x: localX + (i * (GRID_SIZE * 2)),
+            y: localY + (i * (GRID_SIZE * 2)),
             type: 'text',
             typeAttrs: { text: reader.readAsText(entry) }
           })
@@ -292,8 +305,8 @@ export default class Board extends React.PureComponent {
   addContent(e, contentType) {
     e.stopPropagation()
 
-    const x = e.pageX
-    const y = e.pageY
+    const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
+    const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
 
     if (contentType.type !== 'image') {
       const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
@@ -550,9 +563,6 @@ export default class Board extends React.PureComponent {
 
   onDrag(card, e, d) {
     log('onDrag')
-    e.preventDefault()
-    e.stopPropagation()
-
     const tracking = this.tracking[card.id]
 
     // If the card has no fixed dimensions yet, get its current rendered dimensions
@@ -620,15 +630,14 @@ export default class Board extends React.PureComponent {
 
     if (selected.includes(cardId)) {
       // remove from the current state if we have it
-      this.setState({ ...this.state,
-        selected: selected.filter((filterId) => filterId !== cardId) })
+      this.setState({ selected: selected.filter((filterId) => filterId !== cardId) })
     } else {
       // add to the current state if we don't
-      this.setState({ ...this.state, selected: [...selected, cardId] })
+      this.setState({ selected: [...selected, cardId] })
     }
   }
   selectOnly(cardId) {
-    this.setState({ ...this.state, selected: [cardId] })
+    this.setState({ selected: [cardId] })
   }
 
   onStop(card, e, d) {
@@ -639,13 +648,6 @@ export default class Board extends React.PureComponent {
 
     // If tracking is not initialized, treat this as a click
     if (!(tracking && (tracking.moving || tracking.resizing))) {
-      if (e.ctrlKey || e.shiftKey) {
-        this.selectToggle(id)
-      } else {
-        // otherwise we don't have shift/ctrl, so just set selection to this
-        this.selectOnly(id)
-      }
-
       return
     }
 
@@ -680,6 +682,12 @@ export default class Board extends React.PureComponent {
       this.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
       this.setDragState(card, tracking)
     }
+
+    this.finishedDrag = true
+  }
+
+  onShowContextMenu(e) {
+    this.setState({ contextMenuPosition: e.detail.position })
   }
 
   render() {
@@ -707,6 +715,7 @@ export default class Board extends React.PureComponent {
               selected={selected}
               uniquelySelected={uniquelySelected}
               onCardClicked={this.onCardClicked}
+              onCardDoubleClicked={this.onCardDoubleClicked}
             />
           </div>
         </DraggableCore>
@@ -724,7 +733,7 @@ export default class Board extends React.PureComponent {
     ))
 
     const contextMenu = (
-      <ContextMenu id={BOARD_MENU_ID} className="ContextMenu">
+      <ContextMenu id={BOARD_MENU_ID} onShow={this.onShowContextMenu} className="ContextMenu">
 
         <div className="ContextMenu__section">
           { createMenuItems }
