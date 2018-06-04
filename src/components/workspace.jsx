@@ -15,7 +15,6 @@ export default class Workspace extends React.PureComponent {
     doc: PropTypes.shape({
       selfId: PropTypes.string,
       boardId: PropTypes.string,
-      offeredIds: PropTypes.arrayOf(PropTypes.string),
       contactIds: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
     onChange: PropTypes.func.isRequired
@@ -34,7 +33,6 @@ export default class Workspace extends React.PureComponent {
     onChange((ws) => {
       ws.selfId = selfId
       ws.boardId = boardId
-      ws.offeredIds = []
       ws.contactIds = []
     })
   }
