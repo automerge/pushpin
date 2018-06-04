@@ -68,9 +68,9 @@ export default class Content extends React.PureComponent {
     // We can read the old version of th doc from this.state.doc because
     // setState is not immediate and so this.state may not yet reflect the
     // latest version of the doc.
-    const doc = this.handle.change(changeBlock)
-    this.setState({ doc })
-    return doc
+    this.handle.change(changeBlock)
+    this.setState({ doc: this.handle.doc })
+    return this.handle.doc
   }
 
   componentDidMount() {
