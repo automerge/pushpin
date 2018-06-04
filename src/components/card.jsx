@@ -81,9 +81,7 @@ export default class Card extends React.PureComponent {
         onDoubleClick={this.onDoubleClick}
         onContextMenu={this.stopPropagation}
       >
-        <Content
-          type={this.props.card.type}
-          docId={this.props.card.docId}
+        <Content url={`pushpin://${this.props.card.type}/${this.props.card.docId}`}
           uniquelySelected={this.props.uniquelySelected}
         />
         { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }

@@ -56,7 +56,7 @@ export default class Settings extends React.PureComponent {
     log('render')
     let avatar
     if (this.props.doc.avatarDocId) {
-      avatar = <Content type="image" docId={this.props.doc.avatarDocId} />
+      avatar = <Content url={`pushpin://image/${this.props.doc.avatarDocId}`} />
     } else {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }

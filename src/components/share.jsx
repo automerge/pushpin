@@ -52,7 +52,10 @@ export default class Share extends React.PureComponent {
   watchBoard() {
     if (this.props.doc.boardId && this.props.doc.boardId !== this.state.boardId) {
       const workspaceHandle = window.hm.openHandle(this.props.docId)
-      const boardHandle = window.hm.openHandle(this.props.doc.boardId)
+      const boardUrl = new URL(this.props.doc.boardId)
+      const boardId = boardUrl.pathname.slice(1)
+      // XXX: this is a problem -- too many parsings and this should work for non-board docs
+      const boardHandle = window.hm.openHandle(boardId)
       boardHandle.onChange( (doc) => {
         this.updateIdentityReferences(workspaceHandle, boardHandle)
         this.setState({ boardId: this.props.doc.boardId })
@@ -129,14 +132,22 @@ export default class Share extends React.PureComponent {
       return
     }
 
-    const boardHandle = window.hm.openHandle(boardId)
+    // hmmmmmmmmm. i don't love this. where should this happen instead?
+    const boardUrl = new URL(boardId)
+    const type = boardUrl.hostname
+    if (type != 'board') {
+      // right now only boards have authorIds (though maybe we can check that instead?)
+      return null
+    }
+    const docId = boardUrl.pathname.slice(1)
+
+    const boardHandle = window.hm.openHandle(docId)
     const { authorIds = [] } = boardHandle.doc || {}
 
     const authors = authorIds.map(id => (
       <Content
         key={id}
-        type="contact"
-        docId={id}
+        url={`pushpin://contact/${id}`}
       />
     ))
 
@@ -145,8 +156,7 @@ export default class Share extends React.PureComponent {
     const contacts = nonAuthorContactIds.map(id => (
       <Content
         key={id}
-        type="contact"
-        docId={id}
+        url={`pushpin://contact/${id}`}
         actions={['share']}
         onShare={e => this.offerDocumentToIdentity(e, id)}
       />
@@ -168,6 +178,7 @@ export default class Share extends React.PureComponent {
 
   acceptNotification(notification) {
     // passing boardId like this is sorta suspect
+    // XXX: openBoard should be openDoc and carry a URL
     this.props.openBoard(notification.boardId)
   }
 

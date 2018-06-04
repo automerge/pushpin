@@ -64,7 +64,7 @@ function initWorkspace() {
     saveWorkspaceId(newWorkspaceId)
     workspaceId = newWorkspaceId
   }
-  const workspace = <Content type="workspace" docId={workspaceId} />
+  const workspace = <Content url={`pushpin://workspace/${workspaceId}`} />
   const element = document.getElementById('workspace')
   ReactDOM.render(workspace, element)
 }

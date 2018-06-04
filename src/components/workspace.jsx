@@ -32,7 +32,7 @@ export default class Workspace extends React.PureComponent {
 
     onChange((ws) => {
       ws.selfId = selfId
-      ws.boardId = boardId
+      ws.boardId = 'pushpin://board/' + boardId
       ws.contactIds = []
     })
   }
@@ -53,8 +53,8 @@ export default class Workspace extends React.PureComponent {
     log('render')
     return (
       <div>
-        <Content type="title-bar" docId={this.props.docId} />
-        <Content type="board" docId={this.props.doc.boardId} />
+        <Content url={`pushpin://title-bar/${this.props.docId}`} />
+        <Content url={this.props.doc.boardId} />
       </div>
     )
   }

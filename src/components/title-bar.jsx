@@ -45,7 +45,6 @@ export default class TitleBar extends React.PureComponent {
             width="28"
             height="28"
           />
-          <Content type="board-title" docId={this.props.doc.boardId} />
         </div>
         <HashForm
           formDocId={this.props.doc.boardId}
@@ -60,8 +59,7 @@ export default class TitleBar extends React.PureComponent {
             </DropdownTrigger>
             <DropdownContent>
               <Content
-                type="share"
-                docId={this.props.docId}
+                url={`pushpin://share/${this.props.docId}`}
                 openBoard={this.openBoard}
               />
             </DropdownContent>
@@ -73,7 +71,9 @@ export default class TitleBar extends React.PureComponent {
               </div>
             </DropdownTrigger>
             <DropdownContent>
-              <Content type="settings" docId={this.props.doc.selfId} />
+              <Content
+                url={`pushpin://settings/${this.props.doc.selfId}`}
+              />
             </DropdownContent>
           </Dropdown>
         </div>

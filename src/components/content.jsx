@@ -9,8 +9,7 @@ const FILTERED_PROPS = ['type', 'docId']
 
 export default class Content extends React.PureComponent {
   static propTypes = {
-    type: PropTypes.string.isRequired,
-    docId: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -19,7 +18,9 @@ export default class Content extends React.PureComponent {
 
     this.onChange = this.onChange.bind(this)
 
-    this.handle = window.hm.openHandle(this.props.docId)
+    const [type, docId] = this.parseProps()
+
+    this.handle = window.hm.openHandle(docId)
 
     // State directly affects the rendered view.
     this.state = {
@@ -47,11 +48,25 @@ export default class Content extends React.PureComponent {
     return docId
   }
 
+  parseProps() {
+    let type, docId
+    if (!this.props.url) {
+      throw "Content created without a URL"
+    }
+
+    const url = new URL(this.props.url)
+    // protocol includes a trailing : for lame historical reasons
+    if (url.protocol.slice(0, -1) !== 'pushpin') {
+      throw new Error("Invalid url scheme (expected pushpin://)")
+    }
+
+    return [url.host, url.pathname.slice(1)]
+  }
   onChange(changeBlock) {
     // We can read the old version of th doc from this.state.doc because
     // setState is not immediate and so this.state may not yet reflect the
     // latest version of the doc.
-    const doc = window.hm.change(window.hm.find(this.props.docId), changeBlock)
+    const doc = this.handle.change(changeBlock)
     this.setState({ doc })
     return doc
   }
@@ -83,9 +98,12 @@ export default class Content extends React.PureComponent {
 
   render() {
     log('render')
+
+    const [type, docId] = this.parseProps()
+
     const contentType = ContentTypes
       .list({ withUnlisted: true })
-      .find(ct => ct.type === this.props.type)
+      .find((ct) => ct.type === type)
 
     if (!contentType) {
       return missingType(this.props.type)
@@ -99,7 +117,7 @@ export default class Content extends React.PureComponent {
 
     return (
       <contentType.component
-        docId={this.props.docId}
+        docId={docId}
         onChange={this.onChange}
         doc={this.state.doc}
         {...filteredProps}
