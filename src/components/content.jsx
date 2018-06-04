@@ -69,8 +69,6 @@ export default class Content extends React.PureComponent {
     // setState is not immediate and so this.state may not yet reflect the
     // latest version of the doc.
     this.handle.change(changeBlock)
-    this.setState({ doc: this.handle.doc })
-    return this.handle.doc
   }
 
   componentDidMount() {
