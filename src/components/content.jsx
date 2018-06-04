@@ -53,6 +53,9 @@ export default class Content extends React.PureComponent {
       throw new Error('Content created without a URL')
     }
 
+    // example URL
+    // pushpin://board/asflasfdljkasdflkjasdf
+
     const url = new URL(this.props.url)
     // protocol includes a trailing : for lame historical reasons
     if (url.protocol.slice(0, -1) !== 'pushpin') {
