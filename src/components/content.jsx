@@ -49,15 +49,14 @@ export default class Content extends React.PureComponent {
   }
 
   parseProps() {
-    let type, docId
     if (!this.props.url) {
-      throw "Content created without a URL"
+      throw new Error('Content created without a URL')
     }
 
     const url = new URL(this.props.url)
     // protocol includes a trailing : for lame historical reasons
     if (url.protocol.slice(0, -1) !== 'pushpin') {
-      throw new Error("Invalid url scheme (expected pushpin://)")
+      throw new Error('Invalid url scheme (expected pushpin://)')
     }
 
     return [url.host, url.pathname.slice(1)]
