@@ -30,7 +30,7 @@ export default class Toggle extends React.PureComponent {
   }
 
   render() {
-    return <ReactToggle checked={this.props.doc.toggled || false} onChange={this.toggle} />
+    return <ReactToggle checked={this.props.doc.toggled} onChange={this.toggle} />
   }
 }
 
