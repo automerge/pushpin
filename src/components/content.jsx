@@ -30,6 +30,7 @@ export default class Content extends React.PureComponent {
     const contentType = ContentTypes
       .list({ withUnlisted: true })
       .find(contentType => contentType.type === type)
+
     const documentInitializationFunction = contentType.component.initializeDocument
 
     let doc = hm.create()
@@ -108,9 +109,11 @@ export default class Content extends React.PureComponent {
 
   filterProps(props) {
     const filtered = {}
-    Object.keys(props).filter(key => !FILTERED_PROPS.includes(key)).forEach(key => {
-      filtered[key] = props[key]
-    })
+    Object.keys(props)
+      .filter(key => !FILTERED_PROPS.includes(key))
+      .forEach(key => {
+        filtered[key] = props[key]
+      })
     return filtered
   }
 
@@ -118,10 +121,10 @@ export default class Content extends React.PureComponent {
     log('render')
     const contentType = ContentTypes
       .list({ withUnlisted: true })
-      .find((ct) => ct.type === this.props.type)
+      .find(ct => ct.type === this.props.type)
 
     if (!contentType) {
-      throw new Error(`Could not find component of type ${this.props.type}`)
+      return missingType(this.props.type)
     }
 
     if (this.state.loading) {
@@ -140,3 +143,10 @@ export default class Content extends React.PureComponent {
     )
   }
 }
+
+const missingType = type => (
+  <div>
+    <i className="fa fa-exclamation-triangle" />
+    Component of type &quot;{type}&quot; not found.
+  </div>
+)
