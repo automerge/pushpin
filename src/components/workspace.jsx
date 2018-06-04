@@ -14,7 +14,7 @@ export default class Workspace extends React.PureComponent {
     docId: PropTypes.string.isRequired,
     doc: PropTypes.shape({
       selfId: PropTypes.string,
-      boardId: PropTypes.string,
+      currentDocUrl: PropTypes.string,
       contactIds: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
     onChange: PropTypes.func.isRequired
@@ -32,7 +32,7 @@ export default class Workspace extends React.PureComponent {
 
     onChange((ws) => {
       ws.selfId = selfId
-      ws.boardId = 'pushpin://board/' + boardId
+      ws.currentDocUrl = 'pushpin://board/' + boardId
       ws.contactIds = []
     })
   }
@@ -44,7 +44,7 @@ export default class Workspace extends React.PureComponent {
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
       this.props.onChange((ws) => {
-        ws.boardId = docId
+        ws.currentDocUrl = 'pushpin://board/' + docId
       })
     })
   }
@@ -54,7 +54,7 @@ export default class Workspace extends React.PureComponent {
     return (
       <div>
         <Content url={`pushpin://title-bar/${this.props.docId}`} />
-        <Content url={this.props.doc.boardId} />
+        <Content url={this.props.doc.currentDocUrl} />
       </div>
     )
   }

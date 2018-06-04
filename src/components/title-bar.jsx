@@ -7,7 +7,6 @@ import HashForm from './hash-form'
 import Content from './content'
 import ContentTypes from '../content-types'
 
-
 const log = Debug('pushpin:title-bar')
 
 export default class TitleBar extends React.PureComponent {
@@ -15,7 +14,7 @@ export default class TitleBar extends React.PureComponent {
     docId: PropTypes.string.isRequired,
     doc: PropTypes.shape({
       selfId: PropTypes.string,
-      boardId: PropTypes.string,
+      currentDocUrl: PropTypes.string,
       contactIds: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
     onChange: PropTypes.func.isRequired
@@ -23,12 +22,12 @@ export default class TitleBar extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.openBoard = this.openBoard.bind(this)
+    this.openDocument = this.openDocument.bind(this)
   }
 
-  openBoard(id) {
+  openDocument(id) {
     this.props.onChange(d => {
-      d.boardId = id
+      d.currentDocUrl = id
     })
   }
 
@@ -47,8 +46,8 @@ export default class TitleBar extends React.PureComponent {
           />
         </div>
         <HashForm
-          formDocId={this.props.doc.boardId}
-          onChanged={this.openBoard}
+          formDocId={this.props.doc.currentDocUrl}
+          onChanged={this.openDocument}
         />
         <div className="TitleBar__dropdowns">
           <Dropdown>
@@ -60,7 +59,7 @@ export default class TitleBar extends React.PureComponent {
             <DropdownContent>
               <Content
                 url={`pushpin://share/${this.props.docId}`}
-                openBoard={this.openBoard}
+                openDocument={this.openDocument}
               />
             </DropdownContent>
           </Dropdown>

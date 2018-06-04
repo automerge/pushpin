@@ -8,7 +8,7 @@ export default class Share extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
       selfId: PropTypes.string,
-      boardId: PropTypes.string,
+      currentDocUrl: PropTypes.string,
       authorIds: PropTypes.arrayOf(PropTypes.string),
       contactIds: PropTypes.arrayOf(PropTypes.string),
       notifications: PropTypes.arrayOf(PropTypes.shape({
@@ -17,7 +17,7 @@ export default class Share extends React.PureComponent {
         board: PropTypes.object.isRequired
       }))
     }).isRequired,
-    openBoard: PropTypes.func.isRequired
+    openDocument: PropTypes.func.isRequired
   }
 
   constructor() {
@@ -50,15 +50,15 @@ export default class Share extends React.PureComponent {
   }
 
   watchBoard() {
-    if (this.props.doc.boardId && this.props.doc.boardId !== this.state.boardId) {
+    if (this.props.doc.currentDocUrl && this.props.doc.currentDocUrl !== this.state.currentDocUrl) {
       const workspaceHandle = window.hm.openHandle(this.props.docId)
-      const boardUrl = new URL(this.props.doc.boardId)
+      const boardUrl = new URL(this.props.doc.currentDocUrl)
       const boardId = boardUrl.pathname.slice(1)
       // XXX: this is a problem -- too many parsings and this should work for non-board docs
       const boardHandle = window.hm.openHandle(boardId)
       boardHandle.onChange( (doc) => {
         this.updateIdentityReferences(workspaceHandle, boardHandle)
-        this.setState({ boardId: this.props.doc.boardId })
+        this.setState({ currentDocUrl: this.props.doc.currentDocUrl })
       })
     }
   }
@@ -120,20 +120,20 @@ export default class Share extends React.PureComponent {
         s.offeredIds[contactId] = []
       }
 
-      if (!s.offeredIds[contactId].includes(this.props.doc.boardId)) {
-        s.offeredIds[contactId].push(this.props.doc.boardId)
+      if (!s.offeredIds[contactId].includes(this.props.doc.documentUrl)) {
+        s.offeredIds[contactId].push(this.props.doc.documentUrl)
       }
     })
   }
 
   renderContacts() {
-    const { boardId, contactIds = [] } = this.props.doc
-    if (!boardId) {
+    const { currentDocUrl, contactIds = [] } = this.props.doc
+    if (!currentDocUrl) {
       return
     }
 
     // hmmmmmmmmm. i don't love this. where should this happen instead?
-    const boardUrl = new URL(boardId)
+    const boardUrl = new URL(currentDocUrl)
     const type = boardUrl.hostname
     if (type != 'board') {
       // right now only boards have authorIds (though maybe we can check that instead?)
@@ -177,9 +177,7 @@ export default class Share extends React.PureComponent {
   }
 
   acceptNotification(notification) {
-    // passing boardId like this is sorta suspect
-    // XXX: openBoard should be openDoc and carry a URL
-    this.props.openBoard(notification.boardId)
+    this.props.openDocument(notification.documentUrl)
   }
 
   renderNotifications() {
@@ -195,7 +193,7 @@ export default class Share extends React.PureComponent {
     const notificationsJSX = notifications.map(notification => (
       // we should create a more unique key; do we want to allow the same share multiple times?
       // i'm going to block it on the send side for now
-      <div key={`${notification.sender.docId}-${notification.boardId}`} className="ListMenu__item">
+      <div key={`${notification.sender.docId}-${notification.documentUrl}`} className="ListMenu__item">
         <div className="ListMenu__grouped">
           <div className="ListMenu__typegroup">
             <h4 className="Type--primary">{ notification.board.title }</h4>
