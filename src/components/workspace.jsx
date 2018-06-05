@@ -30,12 +30,13 @@ export default class Workspace extends React.PureComponent {
     })
 
     const boardId = Content.initializeContentDoc('board', { selfId })
+    const docUrl = createDocumentLink('board', boardId)
 
     onChange((ws) => {
       ws.selfId = selfId
-      ws.currentDocUrl = createDocumentLink('board', boardId)
+      ws.currentDocUrl = docUrl
       ws.contactIds = []
-      ws.viewedDocIds = [boardId]
+      ws.viewedDocUrls = [docUrl]
     })
   }
 
@@ -67,12 +68,9 @@ export default class Workspace extends React.PureComponent {
     this.props.onChange((ws) => {
       ws.currentDocUrl = docUrl
 
-      ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
-      ws.viewedDocUrls.push(docUrl)
-
       if (saveHistory) {
         ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
-        ws.viewedDocUrls.unshift(docId)
+        ws.viewedDocUrls.unshift(docUrl)
       }
     })
   }
@@ -81,7 +79,7 @@ export default class Workspace extends React.PureComponent {
     log('render')
     return (
       <div className="Workspace">
-        <Content url={createDocumentLink('title-bar', this.props.docId)} />
+        <Content openDoc={this.openDoc} url={createDocumentLink('title-bar', this.props.docId)} />
         <div className="Workspace__container">
           <Content url={this.props.doc.currentDocUrl} />
         </div>

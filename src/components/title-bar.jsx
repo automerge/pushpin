@@ -31,17 +31,17 @@ export default class TitleBar extends React.PureComponent {
   }
 
   backIndex() {
-    return this.props.doc.viewedDocIds.findIndex(docId => docId === this.props.doc.boardId)
+    return this.props.doc.viewedDocUrls.findIndex(url => url === this.props.doc.currentDocUrl)
   }
 
   back() {
     const index = this.backIndex()
-    this.props.openDoc(this.props.doc.viewedDocIds[index + 1], { saveHistory: false })
+    this.props.openDoc(this.props.doc.viewedDocUrls[index + 1], { saveHistory: false })
   }
 
   forward() {
     const index = this.backIndex()
-    this.props.openDoc(this.props.doc.viewedDocIds[index - 1], { saveHistory: false })
+    this.props.openDoc(this.props.doc.viewedDocUrls[index - 1], { saveHistory: false })
   }
 
   render() {
@@ -52,14 +52,17 @@ export default class TitleBar extends React.PureComponent {
 
     const { docId } = parseDocumentLink(this.props.doc.currentDocUrl)
 
-    const viewedDocs = this.props.doc.viewedDocUrls.map(url => (
-      <div key={url} className="ListMenu__item">
-        <Content onClick={this.props.openDoc} type="doc-link" docUrl={url} />
+    const viewedDocs = this.props.doc.viewedDocUrls.map(url => {
+      const id = parseDocumentLink(url).docId
+      const docLinkUrl = createDocumentLink('doc-link', id)
+
+      return <div key={url} className="ListMenu__item">
+        <Content onClick={this.props.openDoc} url={docLinkUrl} />
       </div>
-    ))
+    })
 
     const index = this.backIndex()
-    const disableBack = index === (this.props.doc.viewedDocIds.length - 1)
+    const disableBack = index === (this.props.doc.viewedDocUrls.length - 1)
     const disableForward = index === 0
 
     return (
@@ -103,7 +106,7 @@ export default class TitleBar extends React.PureComponent {
             <DropdownContent>
               <Content
                 url={createDocumentLink('share', this.props.docId)}
-                openDocument={this.openDoc}
+                openDocument={this.props.openDoc}
               />
             </DropdownContent>
           </Dropdown>
