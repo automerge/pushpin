@@ -54,18 +54,26 @@ export default class Workspace extends React.PureComponent {
     })
   }
 
-  openDoc(docUrl) {
+  openDoc(docUrl, options = {}) {
+    const { saveHistory = true } = { options }
+
     try {
       parseDocumentLink(docUrl)
     } catch (e) {
       // if we can't parse the document, don't navigate
       return
     }
+
     this.props.onChange((ws) => {
       ws.currentDocUrl = docUrl
 
-      ws.viewedDocIds = ws.viewedDocIds.filter(url => url !== docUrl)
-      ws.viewedDocIds.push(docUrl)
+      ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
+      ws.viewedDocUrls.push(docUrl)
+
+      if (saveHistory) {
+        ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
+        ws.viewedDocUrls.push(docUrl)
+      }
     })
   }
 

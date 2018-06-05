@@ -249,6 +249,10 @@ input {
   text-align: center;
 }
 
+button[disabled].TitleBar__menuItem .fa {
+  color: #CCC;
+}
+
 .TitleBar__center {
   display: flex;
   align-items: center;
