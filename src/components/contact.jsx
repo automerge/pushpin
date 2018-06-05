@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
 import Content from './content'
-import { shareLinkForDocument } from '../share-link';
+import { shareLinkForDocument } from '../share-link'
 
 export default class Contact extends React.PureComponent {
   static propTypes = {

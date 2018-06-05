@@ -70,17 +70,17 @@ export default class Share extends React.PureComponent {
     const { consolidatedOffers } = this.state
 
     // record offers of boards for this account from this contact in our local state
-    if (!contact.offeredIds) {
+    if (!contact.offeredUrls) {
       return
     }
 
     const offererId = contactId
-    const offersForUs = contact.offeredIds[selfId] || []
-    offersForUs.forEach((offeredId) => {
+    const offersForUs = contact.offeredUrls[selfId] || []
+    offersForUs.forEach((documentUrl) => {
       // add this to the offers if we haven't already got it
       if (!consolidatedOffers.some((offer) =>
-        (offer.offeredId === offeredId && offer.offererId === offererId))) {
-        consolidatedOffers.push({ offeredId, offererId })
+        (offer.documentUrl === documentUrl && offer.offererId === offererId))) {
+        consolidatedOffers.push({ documentUrl, offererId })
       }
     })
 
@@ -114,16 +114,16 @@ export default class Share extends React.PureComponent {
     const selfHandle = window.hm.openHandle(this.props.doc.selfId)
 
     selfHandle.change((s) => {
-      if (!s.offeredIds) {
-        s.offeredIds = {}
+      if (!s.offeredUrls) {
+        s.offeredUrls = {}
       }
 
-      if (!s.offeredIds[contactId]) {
-        s.offeredIds[contactId] = []
+      if (!s.offeredUrls[contactId]) {
+        s.offeredUrls[contactId] = []
       }
 
-      if (!s.offeredIds[contactId].includes(this.props.doc.currentDocUrl)) {
-        s.offeredIds[contactId].push(this.props.doc.currentDocUrl)
+      if (!s.offeredUrls[contactId].includes(this.props.doc.currentDocUrl)) {
+        s.offeredUrls[contactId].push(this.props.doc.currentDocUrl)
       }
     })
   }
@@ -183,9 +183,10 @@ export default class Share extends React.PureComponent {
     const notifications = []
     this.state.consolidatedOffers.forEach(offer => {
       const sender = window.hm.openHandle(offer.offererId).get()
-      const board = window.hm.openHandle(offer.offeredId).get()
-      if (sender && board) {
-        notifications.push({ type: 'Invitation', sender, board })
+      const { docId } = parseDocumentLink(offer.documentUrl)
+      const docHandle = window.hm.openHandle(docId).get()
+      if (sender && docHandle) {
+        notifications.push({ type: 'Invitation', sender, docHandle })
       }
     })
 
@@ -195,7 +196,7 @@ export default class Share extends React.PureComponent {
       <div key={`${notification.sender.docId}-${notification.documentUrl}`} className="ListMenu__item">
         <div className="ListMenu__grouped">
           <div className="ListMenu__typegroup">
-            <h4 className="Type--primary">{ notification.board.title }</h4>
+            <h4 className="Type--primary">{ notification.docHandle.title || 'Untitled' }</h4>
             <p className="Type--secondary">From { notification.sender.name }</p>
           </div>
           <div className="ButtonGroup">
