@@ -63,15 +63,23 @@ const WELCOME_TEXT =
 This is our demo board!`
 
 const USAGE_TEXT =
-`### Usage
+`A Guided Tour of Pushpin!
 
-* Double-click to create a new text card.
-* Right-click to create a new text or image card.
-* Click on a card to edit its text.
-* Click and drag anywhere on a card to move it around.
-* Click and drag on the bottom right corner of a card to resize it.
-* Drop or paste content onto the board to create corresponding cards.
-* Use arrow keys to scroll around the board.`
+Double click to create a card. Type something.
+Paste some text from your clipboard into a note, or paste it as a new note.
+Drag in some text, or an image, or several images at once.
+Copy an image in Chrome and paste it. (Dragging images in won't work.)
+Open a second copy of the app with a different profile. 
+($ export NAME="Someone")
+Connect your apps: copy the URL above and paste it into the other app.
+Make a change on each side and watch it go.
+Click the gear to open your user profile.
+Set your name and avatar to something.
+See how in the contacts list are two authors "on board" with names and avatars.
+Make a new doc. Notice your other client isn't on the board yet and invite them.
+In the other client, check your notifications. Accept the invite.
+See how both clients see each other in the authors list.
+`
 
 const EXAMPLE_TEXT =
 `### Example data
