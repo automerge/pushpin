@@ -46,6 +46,9 @@ export default class Share extends React.PureComponent {
     // add ourselves to the authors if we haven't yet
     if (selfId && !authorIds.includes(selfId)) {
       boardHandle.change((board) => {
+        if (!board.authorIds) {
+          board.authorIds = []
+        }
         board.authorIds.push(selfId)
       })
     }
