@@ -33,32 +33,34 @@ const METADATA = {
    * Experimental second open
    */
 class DocHandle {
-  constructor(hm, docId, doc) {
+  constructor(hm, docId) {
     this.hm = hm
     this.id = docId
-    this.doc = doc
     this._cb = () => {}
   }
 
+  /* make a change to a document through the handle */
   change(cb) {
-    this.doc = this.hm.change(this.doc, cb)
+    const doc = this.hm.find(this.id)
+    this.hm.change(doc, cb)
+    return this.hm.find(this.id)
   }
 
+  /* register the function you'd like called when the document is updated */
   onChange(cb) {
     this._cb = cb
-    if (this.doc) {
-      cb(this.doc)
+    if (this.hm.readyIndex[this.id]) {
+      const doc = this.hm.find(this.id)
+      cb(doc)
     }
     return this
   }
 
   _update(doc) {
-    this.doc = doc
     this._cb(doc)
   }
 
   _ready(doc) {
-    this.doc = doc
     this._cb(doc)
   }
 }
@@ -263,6 +265,9 @@ class Hypermerge extends EventEmitter {
     this._appendAll(actorId, changes)
     this._set(docId, doc)
     this.emit('document:updated', docId, doc)
+    this._handles(docId).forEach(handle => {
+      handle._update(doc)
+    })
 
     return doc
   }
