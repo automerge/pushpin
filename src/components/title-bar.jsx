@@ -6,7 +6,7 @@ import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdow
 import HashForm from './hash-form'
 import Content from './content'
 import ContentTypes from '../content-types'
-import { shareLinkForDocument } from '../share-link'
+import { shareLinkForDocument, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:title-bar')
 
@@ -34,6 +34,11 @@ export default class TitleBar extends React.PureComponent {
 
   render() {
     log('render')
+    if (!this.props.doc.currentDocUrl) {
+      return null
+    }
+
+    const { docId } = parseDocumentLink(this.props.doc.currentDocUrl)
 
     return (
       <div className="TitleBar">
@@ -45,6 +50,7 @@ export default class TitleBar extends React.PureComponent {
             width="28"
             height="28"
           />
+          <Content url={shareLinkForDocument('board-title', docId)} />
         </div>
         <HashForm
           formDocId={this.props.doc.currentDocUrl}

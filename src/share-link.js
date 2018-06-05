@@ -5,8 +5,18 @@ import { crc16 } from 'js-crc'
  * lifted and adapted from pixelpusher
  */
 
-export const shareLinkForDocument = (type, id) =>
-  withCrc(`pushpin://${type}/${encode(id)}`)
+export const shareLinkForDocument = (type, id) => {
+  if (!type) {
+    throw new Error('no type when creating URL')
+  }
+  if (id.match('pushpin')) {
+    throw new Error('so-called ID contains "pushpin". you appear to have passed a URL as an ID')
+  }
+  if (!id || id.length !== 64) {
+    throw new Error('expected a 64 character base16 key as input')
+  }
+  return withCrc(`pushpin://${type}/${encode(id)}`)
+}
 
 export const parseDocumentLink = link => {
   if (!link) {

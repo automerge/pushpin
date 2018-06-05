@@ -9,28 +9,31 @@ const log = Debug('pushpin:board-title')
 
 export default class BoardTitle extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.shape({
-      title: PropTypes.string,
-    }).isRequired,
-    onChange: PropTypes.func.isRequired,
+    docId: PropTypes.string.isRequired,
   }
 
   constructor() {
     super()
-    this.onChangeTitle = this.onChangeTitle.bind(this)
+    this.setTitle = this.setTitle.bind(this)
   }
 
-  onChangeTitle({ title }) {
+  setTitle({ title }) {
     log('onChangeTitle')
-    this.props.onChange((b) => {
+    this.handle.change((b) => {
       b.title = title
     })
   }
 
+  componentWillMount() {
+    log('componentWillMount')
+    this.handle = window.hm.openHandle(this.props.docId)
+    this.handle.onChange(doc => this.setState({ doc }))
+  }
+
   render() {
     return (<RIEInput
-      value={this.props.doc.title || ''}
-      change={this.onChangeTitle}
+      value={this.state.doc.title || ''}
+      change={this.setTitle}
       propName="title"
       className="TitleBar__titleText"
       classLoading="TitleBar__titleText--loading"
