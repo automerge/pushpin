@@ -5,6 +5,7 @@ import Debug from 'debug'
 
 import Content from './content'
 import ContentTypes from '../content-types'
+import { parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:card')
 
@@ -22,8 +23,7 @@ export default class Card extends React.PureComponent {
     }).isRequired,
     card: PropTypes.shape({
       id: PropTypes.string,
-      type: PropTypes.string,
-      docId: PropTypes.string,
+      url: PropTypes.string,
       x: PropTypes.number,
       y: PropTypes.number,
       height: PropTypes.number,
@@ -66,7 +66,7 @@ export default class Card extends React.PureComponent {
       top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
     }
 
-    const { type } = card
+    const { type } = parseDocumentLink(card.url)
     const contentType = ContentTypes
       .list({ withUnlisted: true })
       .find(contentType => contentType.type === type)
@@ -81,7 +81,8 @@ export default class Card extends React.PureComponent {
         onDoubleClick={this.onDoubleClick}
         onContextMenu={this.stopPropagation}
       >
-        <Content url={`pushpin://${this.props.card.type}/${this.props.card.docId}`}
+        <Content
+          url={this.props.card.url}
           uniquelySelected={this.props.uniquelySelected}
         />
         { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }

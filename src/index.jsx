@@ -20,6 +20,7 @@ import Toggle from './components/toggle'
 import Contact from './components/contact'
 import Share from './components/share'
 import Settings from './components/settings'
+import { shareLinkForDocument } from './share-link'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
@@ -64,7 +65,7 @@ function initWorkspace() {
     saveWorkspaceId(newWorkspaceId)
     workspaceId = newWorkspaceId
   }
-  const workspace = <Content url={`pushpin://workspace/${workspaceId}`} />
+  const workspace = <Content url={shareLinkForDocument('workspace', workspaceId)} />
   const element = document.getElementById('workspace')
   ReactDOM.render(workspace, element)
 }

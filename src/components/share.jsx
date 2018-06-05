@@ -3,9 +3,11 @@ import PropTypes from 'prop-types'
 
 import Content from './content'
 import ContentTypes from '../content-types'
+import { shareLinkForDocument, parseDocumentLink } from '../share-link'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
+    docId: PropTypes.string.isRequired,
     doc: PropTypes.shape({
       selfId: PropTypes.string,
       currentDocUrl: PropTypes.string,
@@ -56,7 +58,7 @@ export default class Share extends React.PureComponent {
       const boardId = boardUrl.pathname.slice(1)
       // XXX: this is a problem -- too many parsings and this should work for non-board docs
       const boardHandle = window.hm.openHandle(boardId)
-      boardHandle.onChange( (doc) => {
+      boardHandle.onChange((doc) => {
         this.updateIdentityReferences(workspaceHandle, boardHandle)
         this.setState({ currentDocUrl: this.props.doc.currentDocUrl })
       })
@@ -70,8 +72,8 @@ export default class Share extends React.PureComponent {
     // record offers of boards for this account from this contact in our local state
     if (!contact.offeredIds) {
       return
-    } 
-    
+    }
+
     const offererId = contactId
     const offersForUs = contact.offeredIds[selfId] || []
     offersForUs.forEach((offeredId) => {
@@ -81,17 +83,17 @@ export default class Share extends React.PureComponent {
         consolidatedOffers.push({ offeredId, offererId })
       }
     })
-    
+
     this.setState({ consolidatedOffers })
   }
 
   watchContacts() {
     const { contactIds = [] } = this.props.doc
     const { watchedContacts = {} } = this.state
-    
+
     contactIds.forEach((contactId) => {
       if (!watchedContacts[contactId]) {
-        watchedContacts[contactId] = window.hm.openHandle(contactId).onChange( (doc) => {
+        watchedContacts[contactId] = window.hm.openHandle(contactId).onChange((doc) => {
           this.onContactUpdated(contactId, doc)
         })
       }
@@ -120,8 +122,8 @@ export default class Share extends React.PureComponent {
         s.offeredIds[contactId] = []
       }
 
-      if (!s.offeredIds[contactId].includes(this.props.doc.documentUrl)) {
-        s.offeredIds[contactId].push(this.props.doc.documentUrl)
+      if (!s.offeredIds[contactId].includes(this.props.doc.currentDocUrl)) {
+        s.offeredIds[contactId].push(this.props.doc.currentDocUrl)
       }
     })
   }
@@ -129,17 +131,14 @@ export default class Share extends React.PureComponent {
   renderContacts() {
     const { currentDocUrl, contactIds = [] } = this.props.doc
     if (!currentDocUrl) {
-      return
+      return null
     }
 
-    // hmmmmmmmmm. i don't love this. where should this happen instead?
-    const boardUrl = new URL(currentDocUrl)
-    const type = boardUrl.hostname
-    if (type != 'board') {
+    const { type, docId } = parseDocumentLink(this.props.doc.currentDocUrl)
+    if (type !== 'board') {
       // right now only boards have authorIds (though maybe we can check that instead?)
       return null
     }
-    const docId = boardUrl.pathname.slice(1)
 
     const boardHandle = window.hm.openHandle(docId)
     const { authorIds = [] } = boardHandle.doc || {}
@@ -147,7 +146,7 @@ export default class Share extends React.PureComponent {
     const authors = authorIds.map(id => (
       <Content
         key={id}
-        url={`pushpin://contact/${id}`}
+        url={shareLinkForDocument('contact', id)}
       />
     ))
 
@@ -156,7 +155,7 @@ export default class Share extends React.PureComponent {
     const contacts = nonAuthorContactIds.map(id => (
       <Content
         key={id}
-        url={`pushpin://contact/${id}`}
+        url={shareLinkForDocument('contact', id)}
         actions={['share']}
         onShare={e => this.offerDocumentToIdentity(e, id)}
       />
@@ -253,7 +252,7 @@ export default class Share extends React.PureComponent {
 
     // XXX if notifications is empty, let's default to contacts.
     // NB: i have not implemented this, i'm just leaving a note to myself
-    if (this.state.tab === 'contacts') { 
+    if (this.state.tab === 'contacts') {
       body = this.renderContacts()
     } else if (this.state.tab === 'notifications') {
       body = this.renderNotifications()

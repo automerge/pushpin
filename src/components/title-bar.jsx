@@ -6,6 +6,7 @@ import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdow
 import HashForm from './hash-form'
 import Content from './content'
 import ContentTypes from '../content-types'
+import { shareLinkForDocument } from '../share-link'
 
 const log = Debug('pushpin:title-bar')
 
@@ -58,7 +59,7 @@ export default class TitleBar extends React.PureComponent {
             </DropdownTrigger>
             <DropdownContent>
               <Content
-                url={`pushpin://share/${this.props.docId}`}
+                url={shareLinkForDocument('share', this.props.docId)}
                 openDocument={this.openDocument}
               />
             </DropdownContent>
@@ -71,7 +72,7 @@ export default class TitleBar extends React.PureComponent {
             </DropdownTrigger>
             <DropdownContent>
               <Content
-                url={`pushpin://settings/${this.props.doc.selfId}`}
+                url={shareLinkForDocument('settings', this.props.doc.selfId)}
               />
             </DropdownContent>
           </Dropdown>

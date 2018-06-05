@@ -6,6 +6,7 @@ import { ipcRenderer } from 'electron'
 import { USER } from '../constants'
 import ContentTypes from '../content-types'
 import Content from './content'
+import { shareLinkForDocument } from '../share-link'
 
 const log = Debug('pushpin:workspace')
 
@@ -13,9 +14,9 @@ export default class Workspace extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
     doc: PropTypes.shape({
-      selfId: PropTypes.string,
-      currentDocUrl: PropTypes.string,
-      contactIds: PropTypes.arrayOf(PropTypes.string)
+      selfId: PropTypes.string.isRequired,
+      currentDocUrl: PropTypes.string.isRequired,
+      contactIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     onChange: PropTypes.func.isRequired
   }
@@ -32,7 +33,7 @@ export default class Workspace extends React.PureComponent {
 
     onChange((ws) => {
       ws.selfId = selfId
-      ws.currentDocUrl = 'pushpin://board/' + boardId
+      ws.currentDocUrl = shareLinkForDocument('board', boardId)
       ws.contactIds = []
     })
   }
@@ -44,7 +45,7 @@ export default class Workspace extends React.PureComponent {
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
       this.props.onChange((ws) => {
-        ws.currentDocUrl = 'pushpin://board/' + docId
+        ws.currentDocUrl = shareLinkForDocument('board', docId)
       })
     })
   }
@@ -53,7 +54,7 @@ export default class Workspace extends React.PureComponent {
     log('render')
     return (
       <div>
-        <Content url={`pushpin://title-bar/${this.props.docId}`} />
+        <Content url={shareLinkForDocument('title-bar', this.props.docId)} />
         <Content url={this.props.doc.currentDocUrl} />
       </div>
     )

@@ -4,6 +4,7 @@ import { remote } from 'electron'
 import Debug from 'debug'
 
 import ContentTypes from '../content-types'
+import { shareLinkForDocument } from '../share-link'
 
 // we should make the avatar image a proper ImageCard
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
@@ -56,7 +57,7 @@ export default class Settings extends React.PureComponent {
     log('render')
     let avatar
     if (this.props.doc.avatarDocId) {
-      avatar = <Content url={`pushpin://image/${this.props.doc.avatarDocId}`} />
+      avatar = <Content url={shareLinkForDocument('image', this.props.doc.avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }

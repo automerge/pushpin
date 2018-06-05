@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import ContentTypes from '../content-types'
+import { parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:content')
 const FILTERED_PROPS = ['type', 'docId']
@@ -18,7 +19,7 @@ export default class Content extends React.PureComponent {
 
     this.onChange = this.onChange.bind(this)
 
-    const [type, docId] = this.parseProps()
+    const { docId } = parseDocumentLink(this.props.url)
 
     this.handle = window.hm.openHandle(docId)
 
@@ -48,22 +49,6 @@ export default class Content extends React.PureComponent {
     return docId
   }
 
-  parseProps() {
-    if (!this.props.url) {
-      throw new Error('Content created without a URL')
-    }
-
-    // example URL
-    // pushpin://board/asflasfdljkasdflkjasdf
-
-    const url = new URL(this.props.url)
-    // protocol includes a trailing : for lame historical reasons
-    if (url.protocol.slice(0, -1) !== 'pushpin') {
-      throw new Error('Invalid url scheme (expected pushpin://)')
-    }
-
-    return [url.host, url.pathname.slice(1)]
-  }
   onChange(changeBlock) {
     // We can read the old version of th doc from this.state.doc because
     // setState is not immediate and so this.state may not yet reflect the
@@ -100,7 +85,11 @@ export default class Content extends React.PureComponent {
   render() {
     log('render')
 
-    const [type, docId] = this.parseProps()
+    if (!this.props.url) {
+      return null
+    }
+
+    const { type, docId } = parseDocumentLink(this.props.url)
 
     const contentType = ContentTypes
       .list({ withUnlisted: true })
