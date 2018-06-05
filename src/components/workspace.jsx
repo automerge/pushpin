@@ -9,7 +9,6 @@ import Content from './content'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:workspace')
-const DOC_HISTORY_LIMIT = 5
 
 export default class Workspace extends React.PureComponent {
   static propTypes = {
@@ -36,7 +35,7 @@ export default class Workspace extends React.PureComponent {
       ws.selfId = selfId
       ws.currentDocUrl = createDocumentLink('board', boardId)
       ws.contactIds = []
-      ws.docHistory = [boardId]
+      ws.viewedDocIds = [boardId]
     })
   }
 
@@ -65,12 +64,8 @@ export default class Workspace extends React.PureComponent {
     this.props.onChange((ws) => {
       ws.currentDocUrl = docUrl
 
-      ws.docHistory = ws.docHistory.filter(url => url !== docUrl)
-      ws.docHistory.push(docUrl)
-
-      if (ws.docHistory.length > DOC_HISTORY_LIMIT) {
-        ws.docHistory.shift()
-      }
+      ws.viewedDocIds = ws.viewedDocIds.filter(url => url !== docUrl)
+      ws.viewedDocIds.push(docUrl)
     })
   }
 

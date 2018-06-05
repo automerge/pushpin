@@ -43,6 +43,7 @@ export default class TitleBar extends React.PureComponent {
             <i className="fa fa-angle-right"/>
           </button>
         </div>
+
         <div className="TitleBar__center">
           <Content url={createDocumentLink('board-title', docId)} />
           <HashForm
