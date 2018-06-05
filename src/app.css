@@ -243,6 +243,7 @@ input {
   z-index: 3;
   color: var(--colorSecondaryGrey);
 }
+
 .TitleBar__menuItem .fa {
   font-size: 24px;
   text-align: center;
@@ -291,12 +292,15 @@ input {
 .TitleBar .TitleBar__menuItem:focus {
   outline: none;
 }
+
 .TitleBar .TitleBar__menuItem:active {
 
 }
+
 .TitleBar .TitleBar__menuItem:hover {
   color: var(--colorBlueBlack);
 }
+
 .TitleBar .dropdown__trigger {
   display: flex;
   align-items: center;
@@ -304,6 +308,7 @@ input {
   width: 40px;
   height: 40px;
 }
+
 .TitleBar .dropdown.dropdown--active {
   background-color: var(--colorInputGrey);
 }
@@ -312,6 +317,11 @@ input {
 .TitleBar .dropdown__content {
   top: 48px;
   right: 0px;
+}
+
+.TitleBar .TitleBar__left .dropdown__content {
+  right: inherit;
+  left: 0px;
 }
 
 .TitleBar__logo {
@@ -346,9 +356,31 @@ input.TitleBar__titleText::selection {
 .TitleBar__dropDown {
 
 }
+
+.ViewedDocs {
+  background: white;
+}
+
+.DocLink {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.DocLink__title {
+  margin-left: 10px;
+}
+
+.DocLink .fa {
+  padding: 8px;
+  font-size: 24px;
+  border-radius: 50%;
+}
+
 .HashForm {
   padding: 4px 8px;
 }
+
 .HashForm input {
   padding: 0;
   margin-left: auto;

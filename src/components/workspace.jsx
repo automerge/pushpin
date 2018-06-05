@@ -88,5 +88,5 @@ ContentTypes.register({
   name: 'Workspace',
   icon: 'briefcase',
   resizable: false,
-  unlisted: true,
+  unlisted: true
 })

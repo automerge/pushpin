@@ -7,6 +7,7 @@ import HashForm from './hash-form'
 import Content from './content'
 import ContentTypes from '../content-types'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
+import DocLink from './doc-link'
 
 const log = Debug('pushpin:title-bar')
 
@@ -30,12 +31,29 @@ export default class TitleBar extends React.PureComponent {
 
     const { docId } = parseDocumentLink(this.props.doc.currentDocUrl)
 
+    const viewedDocs = this.props.doc.viewedDocUrls.map(url => (
+      <div key={url} className="ListMenu__item">
+        <Content onClick={this.props.openDoc} type="doc-link" docUrl={url} />
+      </div>
+    ))
+
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <button className="TitleBar__menuItem">
-            <i className="fa fa-map"/>
-          </button>
+          <Dropdown className="TitleBar__menuItem">
+            <DropdownTrigger>
+              <i className="fa fa-map"/>
+            </DropdownTrigger>
+            <DropdownContent>
+              <div className="PopOverWrapper">
+                <div className="ListMenu">
+                  <div className="ListMenuSection">
+                    { viewedDocs }
+                  </div>
+                </div>
+              </div>
+            </DropdownContent>
+          </Dropdown>
           <button className="TitleBar__menuItem">
             <i className="fa fa-angle-left"/>
           </button>
