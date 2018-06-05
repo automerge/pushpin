@@ -23,6 +23,27 @@ export default class TitleBar extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
+  constructor() {
+    super()
+
+    this.back = this.back.bind(this)
+    this.forward = this.forward.bind(this)
+  }
+
+  backIndex() {
+    return this.props.doc.viewedDocIds.findIndex(docId => docId === this.props.doc.boardId)
+  }
+
+  back() {
+    const index = this.backIndex()
+    this.props.openDoc(this.props.doc.viewedDocIds[index - 1], { saveHistory: false })
+  }
+
+  forward() {
+    const index = this.backIndex()
+    this.props.openDoc(this.props.doc.viewedDocIds[index + 1], { saveHistory: false })
+  }
+
   render() {
     log('render')
     if (!this.props.doc.currentDocUrl) {
@@ -36,6 +57,10 @@ export default class TitleBar extends React.PureComponent {
         <Content onClick={this.props.openDoc} type="doc-link" docUrl={url} />
       </div>
     ))
+
+    const index = this.backIndex()
+    const disableBack = index === 0
+    const disableForward = index === (this.props.doc.viewedDocIds.length - 1)
 
     return (
       <div className="TitleBar">
@@ -54,11 +79,11 @@ export default class TitleBar extends React.PureComponent {
               </div>
             </DropdownContent>
           </Dropdown>
-          <button className="TitleBar__menuItem">
-            <i className="fa fa-angle-left"/>
+          <button disabled={disableBack} onClick={this.back} className="TitleBar__menuItem">
+            <i className="fa fa-angle-left" />
           </button>
-          <button className="TitleBar__menuItem">
-            <i className="fa fa-angle-right"/>
+          <button disabled={disableForward} onClick={this.forward} className="TitleBar__menuItem">
+            <i className="fa fa-angle-right" />
           </button>
         </div>
 
