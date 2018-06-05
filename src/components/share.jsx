@@ -31,8 +31,8 @@ export default class Share extends React.PureComponent {
     }
   }
 
-  updateIdentityReferences(workspaceHandle, boardHandle) {
-    const { authorIds = [] } = boardHandle.get() || {}
+  updateIdentityReferences(workspaceHandle, documentHandle) {
+    const { authorIds = [] } = documentHandle.get() || {}
     const { selfId, contactIds = [] } = workspaceHandle.get() || {}
 
     // add any never-before seen authors to our contacts
@@ -45,11 +45,11 @@ export default class Share extends React.PureComponent {
 
     // add ourselves to the authors if we haven't yet
     if (selfId && !authorIds.includes(selfId)) {
-      boardHandle.change((board) => {
-        if (!board.authorIds) {
-          board.authorIds = []
+      documentHandle.change((document) => {
+        if (!document.authorIds) {
+          document.authorIds = []
         }
-        board.authorIds.push(selfId)
+        document.authorIds.push(selfId)
       })
     }
   }
