@@ -108,7 +108,7 @@ export default class Content extends React.PureComponent {
       .find((ct) => ct.type === type)
 
     if (!contentType) {
-      return missingType(this.props.type)
+      return missingType(type)
     }
 
     if (!this.state.doc) {
