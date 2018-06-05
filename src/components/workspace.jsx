@@ -42,6 +42,12 @@ export default class Workspace extends React.PureComponent {
     log('constructor')
     super()
 
+    ipcRenderer.on('loadDocumentUrl', (url) => {
+      this.props.onChange((ws) => {
+        ws.currentDocUrl = url
+      })
+    })
+
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
       this.props.onChange((ws) => {
