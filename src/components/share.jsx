@@ -182,11 +182,14 @@ export default class Share extends React.PureComponent {
   renderNotifications() {
     const notifications = []
     this.state.consolidatedOffers.forEach(offer => {
-      const sender = window.hm.openHandle(offer.offererId).get()
-      const { docId } = parseDocumentLink(offer.documentUrl)
+      const { offererId, documentUrl } = offer
+      const { docId } = parseDocumentLink(documentUrl)
+
+      const sender = window.hm.openHandle(offererId).get()
       const docHandle = window.hm.openHandle(docId).get()
+
       if (sender && docHandle) {
-        notifications.push({ type: 'Invitation', sender, docHandle })
+        notifications.push({ type: 'Invitation', sender, documentUrl, docHandle })
       }
     })
 
