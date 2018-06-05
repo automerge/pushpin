@@ -4,6 +4,7 @@ import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 import Automerge from 'automerge'
+
 import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:code-mirror-editor')
@@ -33,16 +34,12 @@ const log = Debug('pushpin:code-mirror-editor')
 // seems to give the right caching behaviour, so for now we'll extend from it.
 export default class CodeMirrorEditor extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.shape({
-      text: PropTypes.object,
-    }).isRequired,
     docId: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
     uniquelySelected: PropTypes.bool.isRequired,
   }
 
-  static initializeDocument(onChange, { text }) {
-    onChange(d => {
+  static initializeDocument(change, { text }) {
+    change(d => {
       d.text = new Automerge.Text()
       if (text) {
         d.text.insertAt(0, ...text.split(''))
@@ -50,22 +47,26 @@ export default class CodeMirrorEditor extends React.PureComponent {
     })
   }
 
-
   constructor(props) {
     log('constructor')
     super(props)
-    this.onKeyDown = this.onKeyDown.bind(this)
-    this.onCodeMirrorChange = this.onCodeMirrorChange.bind(this)
-    this.setEditorRef = this.setEditorRef.bind(this)
 
     this.editorRef = null
-    this.mounted = false
+    this.handle = null
+
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.onCodeMirrorChange = this.onCodeMirrorChange.bind(this)
+    this.onDocChange = this.onDocChange.bind(this)
+    this.setEditorRef = this.setEditorRef.bind(this)
+
+    this.state = { text: null }
   }
 
   // When the components mounts, and we therefore have refs to the DOM,
   // set up the editor.
   componentDidMount() {
     log('componentDidMount')
+
     // The props after `autofocus` are needed to get an editor that resizes
     // according to the size of the text, without scrollbars or wrapping.
     this.codeMirror = CodeMirror(this.editorRef, {
@@ -75,25 +76,26 @@ export default class CodeMirrorEditor extends React.PureComponent {
       scrollbarStyle: 'null',
       viewportMargin: Infinity,
     })
-    if (this.props.doc.text) {
-      this.codeMirror.setValue(this.props.doc.text.join(''))
-    }
     this.codeMirror.on('change', this.onCodeMirrorChange)
-    this.mounted = true
+
+    this.handle = window.hm.openHandle(this.props.docId)
+    this.handle.onChange(this.onDocChange)
   }
 
-  componentWillUnmount() {
-    this.mounted = false
-  }
-
-  // This is where we transform declarative updates from React into imperative
-  // commands in the editor.
+  // Transform declarative React selection prop into imperative focus changes
+  // in the editor.
   componentWillReceiveProps(props) {
-    // It's possible to receive props before mounting - in that case just
-    // accept without action and the editor will start with the right contents.
-    if (this.mounted) {
-      this.ensureContents(props.doc)
-      this.ensureFocus(props.uniquelySelected)
+    if (!this.codeMirror) {
+      return
+    }
+    this.ensureFocus(props.uniquelySelected)
+  }
+
+  // Ensure the CodeMirror editor is focused if we expect it to be.
+  ensureFocus(uniquelySelected) {
+    if (uniquelySelected && !this.codeMirror.hasFocus()) {
+      log('ensureFocus.forceFocus')
+      this.codeMirror.focus()
     }
   }
 
@@ -105,29 +107,40 @@ export default class CodeMirrorEditor extends React.PureComponent {
     if (change.origin === 'automerge') {
       return
     }
-
     log('onCodeMirrorChange')
+
     // Convert from CodeMirror coordinate space to Automerge text/array API.
     const at = codeMirror.indexFromPos(change.from)
     const removedLength = change.removed.join('\n').length
     const addedText = change.text.join('\n')
-    this.cardTextChanged({ at, removedLength, addedText })
+
+    this.handle.change((doc) => {
+      if (removedLength > 0) {
+        doc.text.splice(at, removedLength)
+      }
+
+      if (addedText.length > 0) {
+        doc.text.insertAt(at, ...addedText.split(''))
+      }
+    })
   }
 
-  // When we get a new text prop, ensure that the editor contents reflect that.
-  ensureContents(doc) {
+  // Transform updates from the Automerge text into imperative text changes
+  // in the editor.
+  onDocChange(doc) {
     const { text } = doc
 
     // Short circuit if the text didn't change. This happens when a prop
     // besides text changed.
-    if (this.props.doc === doc) {
+    if (this.state.text === text) {
       return
     }
-
-    // the text has not loaded yet
+    // Short circuit if the text has not loaded yet.
     if (!text) {
       return
     }
+
+    this.setState({ text })
 
     // Short circuit if we don't need to apply any changes to the editor. This
     // happens when we get a text update based on our own local edits.
@@ -171,33 +184,12 @@ export default class CodeMirrorEditor extends React.PureComponent {
     }
   }
 
-  // Ensure the CodeMirror editor is focused if we expect it to be.
-  ensureFocus(uniquelySelected) {
-    if (uniquelySelected && !this.codeMirror.hasFocus()) {
-      log('forceFocus')
-      this.codeMirror.focus()
-    }
-  }
-
-  // Update the Hypermerge document and rerender the component.
-  cardTextChanged({ id, at, removedLength, addedText }) {
-    this.props.onChange((d) => {
-      if (removedLength > 0) {
-        d.text.splice(at, removedLength)
-      }
-
-      if (addedText.length > 0) {
-        d.text.insertAt(at, ...addedText.split(''))
-      }
-    })
-  }
-
   setEditorRef(e) {
     this.editorRef = e
   }
 
   onKeyDown(e) {
-    if (e.key === 'Backspace' && this.props.doc.text.length === 0) {
+    if (e.key === 'Backspace' && this.state.text.length === 0) {
       return
     }
     e.stopPropagation()

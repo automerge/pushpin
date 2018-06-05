@@ -1,36 +1,47 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactToggle from 'react-toggle'
+import Debug from 'debug'
 
 import ContentTypes from '../content-types'
 
+const log = Debug('pushpin:toggle')
+
 export default class Toggle extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.shape({
-      toggled: PropTypes.boolean,
-    }).isRequired,
-    onChange: PropTypes.func.isRequired
+    docId: PropTypes.string.isRequired
   }
 
-  static initializeDocument(onChange) {
-    onChange((doc) => {
+  static initializeDocument(change) {
+    change((doc) => {
       doc.toggled = false
     })
   }
 
   constructor() {
+    log('constructor')
     super()
-    this.toggle = this.toggle.bind(this)
+    this.handle = null
+    this.flipToggle = this.flipToggle.bind(this)
   }
 
-  toggle() {
-    this.props.onChange((doc) => {
+  componentWillMount() {
+    log('componentWillMount')
+    this.handle = window.hm.openHandle(this.props.docId)
+    this.handle.onChange((doc) => {
+      this.setState({ toggled: doc.toggled })
+    })
+  }
+
+  flipToggle() {
+    this.handle.change((doc) => {
       doc.toggled = !doc.toggled
     })
   }
 
   render() {
-    return <ReactToggle checked={this.props.doc.toggled} onChange={this.toggle} />
+    log('render')
+    return <ReactToggle checked={this.state.toggled} onChange={this.flipToggle} />
   }
 }
 
