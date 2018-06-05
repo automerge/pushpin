@@ -20,7 +20,6 @@ export default class Content extends React.PureComponent {
     this.onChange = this.onChange.bind(this)
 
     const { docId } = parseDocumentLink(this.props.url)
-
     this.handle = window.hm.openHandle(docId)
 
     // State directly affects the rendered view.
@@ -66,6 +65,19 @@ export default class Content extends React.PureComponent {
       }
       this.setState({ doc })
     })
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.url !== this.props.url) {
+      const { docId } = parseDocumentLink(this.props.url)
+      this.handle = window.hm.openHandle(docId)
+      this.handle.onChange(doc => {
+        if (!this.mounted) {
+          return
+        }
+        this.setState({ doc })
+      })
+    }
   }
 
   componentWillUnmount() {
