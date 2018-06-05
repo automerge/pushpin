@@ -18,18 +18,8 @@ export default class TitleBar extends React.PureComponent {
       currentDocUrl: PropTypes.string,
       contactIds: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
-    onChange: PropTypes.func.isRequired
-  }
-
-  constructor(props) {
-    super(props)
-    this.openDocument = this.openDocument.bind(this)
-  }
-
-  openDocument(id) {
-    this.props.onChange(d => {
-      d.currentDocUrl = id
-    })
+    onChange: PropTypes.func.isRequired,
+    openDoc: PropTypes.func.isRequired
   }
 
   render() {
@@ -57,7 +47,7 @@ export default class TitleBar extends React.PureComponent {
           <Content url={createDocumentLink('board-title', docId)} />
           <HashForm
             formDocId={this.props.doc.currentDocUrl}
-            onChanged={this.openDocument}
+            onChanged={this.props.openDoc}
           />
         </div>
 
@@ -69,7 +59,7 @@ export default class TitleBar extends React.PureComponent {
             <DropdownContent>
               <Content
                 url={createDocumentLink('share', this.props.docId)}
-                openDocument={this.openDocument}
+                openDocument={this.openDoc}
               />
             </DropdownContent>
           </Dropdown>

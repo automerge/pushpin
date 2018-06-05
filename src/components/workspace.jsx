@@ -6,9 +6,10 @@ import { ipcRenderer } from 'electron'
 import { USER } from '../constants'
 import ContentTypes from '../content-types'
 import Content from './content'
-import { createDocumentLink } from '../share-link'
+import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:workspace')
+const DOC_HISTORY_LIMIT = 5
 
 export default class Workspace extends React.PureComponent {
   static propTypes = {
@@ -35,24 +36,41 @@ export default class Workspace extends React.PureComponent {
       ws.selfId = selfId
       ws.currentDocUrl = createDocumentLink('board', boardId)
       ws.contactIds = []
+      ws.docHistory = [boardId]
     })
   }
 
   constructor() {
     log('constructor')
     super()
+    this.openDoc = this.openDoc.bind(this)
 
     ipcRenderer.on('loadDocumentUrl', (url) => {
-      this.props.onChange((ws) => {
-        ws.currentDocUrl = url
-      })
+      this.openDoc(url)
     })
 
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
-      this.props.onChange((ws) => {
-        ws.currentDocUrl = createDocumentLink('board', docId)
-      })
+      this.openDoc(createDocumentLink('board', docId))
+    })
+  }
+
+  openDoc(docUrl) {
+    try {
+      parseDocumentLink(docUrl)
+    } catch (e) {
+      // if we can't parse the document, don't navigate
+      return
+    }
+    this.props.onChange((ws) => {
+      ws.currentDocUrl = docUrl
+
+      ws.docHistory = ws.docHistory.filter(url => url !== docUrl)
+      ws.docHistory.push(docUrl)
+
+      if (ws.docHistory.length > DOC_HISTORY_LIMIT) {
+        ws.docHistory.shift()
+      }
     })
   }
 
