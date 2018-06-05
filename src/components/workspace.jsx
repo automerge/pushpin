@@ -72,7 +72,7 @@ export default class Workspace extends React.PureComponent {
 
       if (saveHistory) {
         ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
-        ws.viewedDocUrls.push(docUrl)
+        ws.viewedDocUrls.unshift(docId)
       }
     })
   }

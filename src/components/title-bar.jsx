@@ -36,12 +36,12 @@ export default class TitleBar extends React.PureComponent {
 
   back() {
     const index = this.backIndex()
-    this.props.openDoc(this.props.doc.viewedDocIds[index - 1], { saveHistory: false })
+    this.props.openDoc(this.props.doc.viewedDocIds[index + 1], { saveHistory: false })
   }
 
   forward() {
     const index = this.backIndex()
-    this.props.openDoc(this.props.doc.viewedDocIds[index + 1], { saveHistory: false })
+    this.props.openDoc(this.props.doc.viewedDocIds[index - 1], { saveHistory: false })
   }
 
   render() {
@@ -59,8 +59,8 @@ export default class TitleBar extends React.PureComponent {
     ))
 
     const index = this.backIndex()
-    const disableBack = index === 0
-    const disableForward = index === (this.props.doc.viewedDocIds.length - 1)
+    const disableBack = index === (this.props.doc.viewedDocIds.length - 1)
+    const disableForward = index === 0
 
     return (
       <div className="TitleBar">
