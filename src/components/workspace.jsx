@@ -6,7 +6,7 @@ import { ipcRenderer } from 'electron'
 import { USER } from '../constants'
 import ContentTypes from '../content-types'
 import Content from './content'
-import { shareLinkForDocument } from '../share-link'
+import { createDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:workspace')
 
@@ -33,7 +33,7 @@ export default class Workspace extends React.PureComponent {
 
     onChange((ws) => {
       ws.selfId = selfId
-      ws.currentDocUrl = shareLinkForDocument('board', boardId)
+      ws.currentDocUrl = createDocumentLink('board', boardId)
       ws.contactIds = []
     })
   }
@@ -45,7 +45,7 @@ export default class Workspace extends React.PureComponent {
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
       this.props.onChange((ws) => {
-        ws.currentDocUrl = shareLinkForDocument('board', docId)
+        ws.currentDocUrl = createDocumentLink('board', docId)
       })
     })
   }
@@ -54,7 +54,7 @@ export default class Workspace extends React.PureComponent {
     log('render')
     return (
       <div>
-        <Content url={shareLinkForDocument('title-bar', this.props.docId)} />
+        <Content url={createDocumentLink('title-bar', this.props.docId)} />
         <Content url={this.props.doc.currentDocUrl} />
       </div>
     )

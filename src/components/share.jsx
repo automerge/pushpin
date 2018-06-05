@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Content from './content'
 import ContentTypes from '../content-types'
-import { shareLinkForDocument, parseDocumentLink } from '../share-link'
+import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
@@ -149,7 +149,7 @@ export default class Share extends React.PureComponent {
     const authors = authorIds.map(id => (
       <Content
         key={id}
-        url={shareLinkForDocument('contact', id)}
+        url={createDocumentLink('contact', id)}
       />
     ))
 
@@ -158,7 +158,7 @@ export default class Share extends React.PureComponent {
     const contacts = nonAuthorContactIds.map(id => (
       <Content
         key={id}
-        url={shareLinkForDocument('contact', id)}
+        url={createDocumentLink('contact', id)}
         actions={['share']}
         onShare={e => this.offerDocumentToIdentity(e, id)}
       />

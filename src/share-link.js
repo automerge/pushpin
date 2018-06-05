@@ -5,7 +5,7 @@ import { crc16 } from 'js-crc'
  * lifted and adapted from pixelpusher
  */
 
-export const shareLinkForDocument = (type, id) => {
+export const createDocumentLink = (type, id) => {
   if (!type) {
     throw new Error('no type when creating URL')
   }

@@ -15,7 +15,7 @@ import ColorPicker from './color-picker'
 import Content from './content'
 import ContentTypes from '../content-types'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
-import { shareLinkForDocument } from '../share-link'
+import { createDocumentLink } from '../share-link'
 
 const { dialog } = remote
 
@@ -365,7 +365,7 @@ export default class Board extends React.PureComponent {
       const snapY = this.snapCoordinateToGrid(y)
       const newCard = {
         id,
-        url: shareLinkForDocument(type, docId),
+        url: createDocumentLink(type, docId),
         x: snapX,
         y: snapY,
         width: width ? this.snapMeasureToGrid(width) : null,
