@@ -114,6 +114,14 @@ input {
   outline: none;
 }
 
+#workspace, .Workspace, .Workspace__container {
+  height: 100%;
+}
+
+.Workspace__container {
+  margin-top: 40px;
+}
+
 .Notification {
   margin: 8px;
   border: 1px solid #e9edf0;
@@ -344,7 +352,6 @@ input.TitleBar__titleText::selection {
 
 div.board {
   position:relative;
-  top:40px;
   background-image: url(grid.svg);
   background-blend-mode: color-burn;
   -webkit-touch-callout: none;
