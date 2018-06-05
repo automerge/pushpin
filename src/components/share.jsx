@@ -52,14 +52,14 @@ export default class Share extends React.PureComponent {
   }
 
   watchBoard() {
+    // we need to create a new current document handle each time the document changes
+    // NB: this is probably leaking listeners right now
     if (this.props.doc.currentDocUrl && this.props.doc.currentDocUrl !== this.state.currentDocUrl) {
       const workspaceHandle = window.hm.openHandle(this.props.docId)
-      const boardUrl = new URL(this.props.doc.currentDocUrl)
-      const boardId = boardUrl.pathname.slice(1)
-      // XXX: this is a problem -- too many parsings and this should work for non-board docs
-      const boardHandle = window.hm.openHandle(boardId)
-      boardHandle.onChange((doc) => {
-        this.updateIdentityReferences(workspaceHandle, boardHandle)
+      const { docId: currentDocId } = parseDocumentLink(this.props.doc.currentDocUrl)
+      const currentDocHandle = window.hm.openHandle(currentDocId)
+      currentDocHandle.onChange((doc) => {
+        this.updateIdentityReferences(workspaceHandle, currentDocHandle)
         this.setState({ currentDocUrl: this.props.doc.currentDocUrl })
       })
     }
