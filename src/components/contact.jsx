@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
 import Content from './content'
+import { shareLinkForDocument } from '../share-link';
 
 export default class Contact extends React.PureComponent {
   static propTypes = {
@@ -41,7 +42,7 @@ export default class Contact extends React.PureComponent {
 
     let avatar
     if (this.props.doc.avatarDocId) {
-      avatar = <Content type="image" docId={this.props.doc.avatarDocId} />
+      avatar = <Content url={shareLinkForDocument('image', this.props.doc.avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }

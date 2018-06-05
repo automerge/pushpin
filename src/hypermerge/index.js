@@ -39,6 +39,13 @@ class DocHandle {
     this._cb = () => {}
   }
 
+  get() {
+    if (this.hm.readyIndex[this.id]) {
+      return this.hm.find(this.id)
+    }
+    return null
+  }
+
   /* make a change to a document through the handle */
   change(cb) {
     const doc = this.hm.find(this.id)

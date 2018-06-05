@@ -32,8 +32,8 @@ export default class Share extends React.PureComponent {
   }
 
   updateIdentityReferences(workspaceHandle, boardHandle) {
-    const { authorIds = [] } = boardHandle.doc || {}
-    const { selfId, contactIds = [] } = workspaceHandle.doc || {}
+    const { authorIds = [] } = boardHandle.get() || {}
+    const { selfId, contactIds = [] } = workspaceHandle.get() || {}
 
     // add any never-before seen authors to our contacts
     const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
@@ -141,7 +141,7 @@ export default class Share extends React.PureComponent {
     }
 
     const boardHandle = window.hm.openHandle(docId)
-    const { authorIds = [] } = boardHandle.doc || {}
+    const { authorIds = [] } = boardHandle.get() || {}
 
     const authors = authorIds.map(id => (
       <Content
@@ -182,8 +182,8 @@ export default class Share extends React.PureComponent {
   renderNotifications() {
     const notifications = []
     this.state.consolidatedOffers.forEach(offer => {
-      const sender = window.hm.openHandle(offer.offererId).doc
-      const board = window.hm.openHandle(offer.offeredId).doc
+      const sender = window.hm.openHandle(offer.offererId).get()
+      const board = window.hm.openHandle(offer.offeredId).get()
       if (sender && board) {
         notifications.push({ type: 'Invitation', sender, board })
       }

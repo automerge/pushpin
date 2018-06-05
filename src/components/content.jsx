@@ -25,7 +25,7 @@ export default class Content extends React.PureComponent {
 
     // State directly affects the rendered view.
     this.state = {
-      doc: this.handle.doc
+      doc: this.handle.get()
     }
   }
 
