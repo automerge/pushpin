@@ -6,6 +6,12 @@ import { createDocumentLink } from '../share-link'
 
 export default class DocLink extends React.PureComponent {
   static propTypes = {
+    docId: PropTypes.string.isRequired,
+    doc: PropTypes.shape({
+      title: PropTypes.string,
+      backgroundColor: PropTypes.string,
+    }).isRequired,
+    linkedDocumentType: PropTypes.string.isRequired,
     onClick: PropTypes.func
   }
 
@@ -20,7 +26,7 @@ export default class DocLink extends React.PureComponent {
   }
 
   handleClick(e) {
-    this.props.onClick(createDocumentLink('board', this.props.docId), e)
+    this.props.onClick(createDocumentLink(this.props.linkedDocumentType, this.props.docId), e)
   }
 
   render() {

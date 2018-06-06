@@ -56,7 +56,7 @@ export default class Workspace extends React.PureComponent {
   }
 
   openDoc(docUrl, options = {}) {
-    const { saveHistory = true } = { options }
+    const { saveHistory = true } = options
 
     try {
       parseDocumentLink(docUrl)
