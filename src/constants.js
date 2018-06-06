@@ -5,6 +5,11 @@ export const IMAGE_DIALOG_OPTIONS = {
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
 }
 
+export const PDF_DIALOG_OPTIONS = {
+  properties: ['openFile'],
+  filters: [{ name: 'PDF files', extensions: ['pdf'] }]
+}
+
 export const USER = process.env.NAME || 'userA'
 
 export const USER_PATH = Path.join('.', 'data', USER)
