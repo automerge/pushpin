@@ -28,8 +28,8 @@ const createWindow = async () => {
   }
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    event.preventDefault()
     if (isSafeishURL(url)) {
+      event.preventDefault()
       shell.openExternal(url)
     }
   })
