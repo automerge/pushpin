@@ -124,7 +124,7 @@ const css = {
 
   },
   content: {
-    marginLeft: 56,
+    marginLeft: 12,
   },
   input: {
     flexShrink: "0",
