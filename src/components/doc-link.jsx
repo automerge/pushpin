@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
+import { createDocumentLink } from '../share-link'
 
 export default class DocLink extends React.PureComponent {
   static propTypes = {
@@ -19,13 +20,13 @@ export default class DocLink extends React.PureComponent {
   }
 
   handleClick(e) {
-    this.props.onClick(this.props.docId, e)
+    this.props.onClick(createDocumentLink('board', this.props.docId), e)
   }
 
   render() {
     return (
       <div className="DocLink" onClick={this.handleClick}>
-        <i className="fa fa-files-o" style={{background: this.props.doc.backgroundColor}} />
+        <i className="fa fa-files-o" style={{ background: this.props.doc.backgroundColor }} />
         <div className="DocLink__title">{ this.props.doc.title }</div>
       </div>
     )
