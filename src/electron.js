@@ -14,6 +14,12 @@ const createWindow = async () => {
     height: 1000,
   })
 
+  protocol.registerHttpProtocol('pushpin', (req, cb) => {
+    // we don't want to use loadURL because we don't want to reset the whole app state
+    // so we use the workspace manipulation function here
+    mainWindow.webContents.send('loadDocumentUrl', req.url)
+  })
+
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
 

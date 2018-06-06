@@ -6,7 +6,7 @@ import { ipcRenderer } from 'electron'
 import { USER } from '../constants'
 import ContentTypes from '../content-types'
 import Content from './content'
-import { createDocumentLink } from '../share-link'
+import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:workspace')
 
@@ -30,23 +30,48 @@ export default class Workspace extends React.PureComponent {
     })
 
     const boardId = Content.initializeContentDoc('board', { selfId })
+    const docUrl = createDocumentLink('board', boardId)
 
     onChange((ws) => {
       ws.selfId = selfId
-      ws.currentDocUrl = createDocumentLink('board', boardId)
+      ws.currentDocUrl = docUrl
       ws.contactIds = []
+      ws.viewedDocUrls = [docUrl]
     })
   }
 
   constructor() {
     log('constructor')
     super()
+    this.openDoc = this.openDoc.bind(this)
+
+    ipcRenderer.on('loadDocumentUrl', (url) => {
+      this.openDoc(url)
+    })
 
     ipcRenderer.on('newDocument', () => {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
-      this.props.onChange((ws) => {
-        ws.currentDocUrl = createDocumentLink('board', docId)
-      })
+      this.openDoc(createDocumentLink('board', docId))
+    })
+  }
+
+  openDoc(docUrl, options = {}) {
+    const { saveHistory = true } = options
+
+    try {
+      parseDocumentLink(docUrl)
+    } catch (e) {
+      // if we can't parse the document, don't navigate
+      return
+    }
+
+    this.props.onChange((ws) => {
+      ws.currentDocUrl = docUrl
+
+      if (saveHistory) {
+        ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
+        ws.viewedDocUrls.unshift(docUrl)
+      }
     })
   }
 
@@ -54,7 +79,7 @@ export default class Workspace extends React.PureComponent {
     log('render')
     return (
       <div className="Workspace">
-        <Content url={createDocumentLink('title-bar', this.props.docId)} />
+        <Content openDoc={this.openDoc} url={createDocumentLink('title-bar', this.props.docId)} />
         <div className="Workspace__container">
           <Content url={this.props.doc.currentDocUrl} />
         </div>
@@ -69,5 +94,5 @@ ContentTypes.register({
   name: 'Workspace',
   icon: 'briefcase',
   resizable: false,
-  unlisted: true,
+  unlisted: true
 })
