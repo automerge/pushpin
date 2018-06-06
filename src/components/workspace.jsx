@@ -53,6 +53,9 @@ export default class Workspace extends React.PureComponent {
       const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
       this.openDoc(createDocumentLink('board', docId))
     })
+
+    // Be mad (:
+    window.selfId = props.doc.selfId
   }
 
   openDoc(docUrl, options = {}) {
