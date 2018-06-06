@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import { Relaxer } from '../Relaxer'
 import { remote } from 'electron'
 import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
@@ -128,6 +129,10 @@ export default class Board extends React.PureComponent {
     this.addContent = this.addContent.bind(this)
     this.changeBackgroundColor = this.changeBackgroundColor.bind(this)
 
+    this.relax = this.relax.bind(this)
+
+    setInterval(this.relax,100)
+
     this.tracking = {}
     this.cardRefs = {}
     this.state = { cards: {}, selected: [] }
@@ -139,6 +144,51 @@ export default class Board extends React.PureComponent {
     board.color = BOARD_COLORS.SKY
     board.cards = {}
     board.authorIds = []
+  }
+
+  relax() {
+    let cardMap = JSON.parse(JSON.stringify(this.props.doc.cards || {}))
+    let cards = Object.values(cardMap)
+    let stillCards = cards.filter( c => !(this.tracking[c.id] && (this.tracking[c.id].moving || this.tracking[c.id].resizing)))
+    let props = ["x","y"]//,"height","width"]
+    if (stillCards.length != cards.length) return;
+    let relaxer = new Relaxer(stillCards,props)
+
+    cards.sort((a,b) => a.y - b.y)
+    let lasty = 0
+    for (let card of cards) {
+       let top = lasty + 30
+//       relaxer.eq(() => card.x , () => 50)
+       relaxer.eq(() => card.y , () => top)
+       lasty = card.y + card.height;
+    }
+
+    relaxer.iterateForUpToMillis(1)
+
+    let ids = []
+    for (let card of cards) {
+      let RealCard = this.props.doc.cards[card.id]
+      for (let p of props) {
+        if (RealCard[p] != card[p]) {
+          ids.push(card.id)
+          break;
+        }
+      }
+    }
+    if (ids.length > 0) {
+/*
+      for (let i of ids) {
+        this.props.docs.cards[i].x = cardsMap[i].x
+        this.props.docs.cards[i].y = cardsMap[i].y
+      }
+*/
+      this.props.onChange((b) => {
+        for (let i of ids) {
+          b.cards[i].x = cardMap[i].x
+          b.cards[i].y = cardMap[i].y
+        }
+      })
+    }
   }
 
   populateDemoBoard() {
