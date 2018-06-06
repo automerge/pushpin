@@ -17,9 +17,9 @@ export default class TitleBar extends React.PureComponent {
     doc: PropTypes.shape({
       selfId: PropTypes.string,
       currentDocUrl: PropTypes.string,
-      contactIds: PropTypes.arrayOf(PropTypes.string)
+      contactIds: PropTypes.arrayOf(PropTypes.string),
+      viewedDocUrls: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
-    onChange: PropTypes.func.isRequired,
     openDoc: PropTypes.func.isRequired
   }
 
@@ -56,9 +56,11 @@ export default class TitleBar extends React.PureComponent {
       const id = parseDocumentLink(url).docId
       const docLinkUrl = createDocumentLink('doc-link', id)
 
-      return <div key={url} className="ListMenu__item">
-        <Content onClick={this.props.openDoc} url={docLinkUrl} />
-      </div>
+      return (
+        <div key={url} className="ListMenu__item">
+          <Content onClick={this.props.openDoc} url={docLinkUrl} />
+        </div>
+      )
     })
 
     const index = this.backIndex()
@@ -70,7 +72,7 @@ export default class TitleBar extends React.PureComponent {
         <div className="TitleBar__left">
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <i className="fa fa-map"/>
+              <i className="fa fa-map" />
             </DropdownTrigger>
             <DropdownContent>
               <div className="PopOverWrapper">
