@@ -69,11 +69,11 @@ export default class Chat extends React.PureComponent {
 
   renderGroupedMessages(groupOfMessages, idx) {
     return (
-      <div className="groupOfMessages" key={idx }>
-        <div style={css.avatar}>
+      <div className="messageGroup" style={css.messageGroup} key={idx}>
           <Content url={createDocumentLink('mini-avatar', groupOfMessages[0].authorId)} />
-          { groupOfMessages.map(this.renderMessage) }
-        </div>
+          <div style={css.groupedMessages}>
+            { groupOfMessages.map(this.renderMessage) }
+          </div>
       </div>
     )
   }
@@ -140,9 +140,14 @@ class MiniAvatar extends React.PureComponent {
     }
 
     return (
+      <div style={css.user}>
         <div className="Avatar" style={css.avatar} title={this.props.doc.name}>
             { avatar }
         </div>
+        <div className="username" style={css.username}>
+          {this.props.doc.name}
+        </div>
+      </div>
     )
   }
 }
@@ -163,6 +168,14 @@ const css = {
     marginBottom: 49,
     flexGrow: 1,
   },
+  messageGroup: {
+    marginBottom: -12
+  },
+  groupedMessages: {
+    position: 'relative',
+    top: -20,
+    paddingLeft: 40 + 8
+  },
   messages: {
     display: 'flex',
     flexDirection: 'column',
@@ -170,19 +183,28 @@ const css = {
     flexGrow: '1',
   },
   message: {
+    display: 'flex',
     lineHeight: '20px',
+    padding: '2px 0'
+  },
+  user: {
+    display: 'flex'
+  },
+  username: {
+    paddingLeft: 8,
+    fontSize: 12,
+    color: 'var(--colorSecondaryGrey)'
   },
   avatar: {
-    float: 'left',
+
   },
   time: {
-    float: 'right',
+    flex: 'none',
+    marginLeft: 'auto',
     fontSize: 12,
-    textAlign: 'right',
     color: 'var(--colorSecondaryGrey)'
   },
   content: {
-    float: 'left'
   },
   inputWrapper: {
     boxSizing: 'border-box',
