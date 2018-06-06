@@ -69,7 +69,7 @@ export default class Chat extends React.PureComponent {
 
   renderGroupedMessages(groupOfMessages, idx) {
     return (
-      <div className="groupOfMessages" key={idx}>
+      <div className="groupOfMessages" key={idx }>
         <div style={css.avatar}>
           <Content url={createDocumentLink('mini-avatar', groupOfMessages[0].authorId)} />
           { groupOfMessages.map(this.renderMessage) }
