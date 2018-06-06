@@ -40,9 +40,9 @@ export default class Workspace extends React.PureComponent {
     workspace.viewedDocUrls = [docUrl]
   }
 
-  constructor() {
+  constructor(props) {
+    super(props)
     log('constructor')
-    super()
     this.openDoc = this.openDoc.bind(this)
 
     ipcRenderer.on('loadDocumentUrl', (event, url) => {

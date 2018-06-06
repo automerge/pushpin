@@ -13,8 +13,8 @@ export default class Toggle extends React.PureComponent {
     toggleDoc.toggled = false
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.handle = null
     this.flipToggle = this.flipToggle.bind(this)
   }

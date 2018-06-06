@@ -22,8 +22,8 @@ export default class Share extends React.PureComponent {
     openDocument: PropTypes.func.isRequired
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
     this.state = {
       consolidatedOffers: [],
