@@ -20,6 +20,7 @@ export default class BlackJack extends React.PureComponent {
 
   static initializeDocument(blackJack) {
     blackJack.cards = BlackJack.freshDeck()
+    blackJack.discards = []
     blackJack.hands = {}
   }
 
@@ -29,6 +30,7 @@ export default class BlackJack extends React.PureComponent {
     this.shuffle = this.shuffle.bind(this)
     this.deal = this.deal.bind(this)
     this.draw = this.draw.bind(this)
+    this.discard = this.discard.bind(this)
   }
 
 
@@ -53,6 +55,7 @@ export default class BlackJack extends React.PureComponent {
   deal() {
     this.handle.change((game) => {
       game.hands = {}
+      game.discards = []
       game.cards = BlackJack.freshDeck()
     })
   }
@@ -65,6 +68,17 @@ export default class BlackJack extends React.PureComponent {
         game.hands[window.selfId].push(card)
       } else {
         game.hands[window.selfId] = [card]
+      }
+    })
+  }
+
+  discard() {
+    this.handle.change((game) => {
+      const card = game.hands[window.selfId].shift()
+      if (game.discards) {
+        game.discards.push(card)
+      } else {
+        game.discards = [card]
       }
     })
   }
@@ -83,9 +97,13 @@ export default class BlackJack extends React.PureComponent {
 
     return (
       <div><h2>Deck</h2>
-        [A deck of {
+        <p>[A deck of {
           this.state.cards.length
         } cards sits here]
+        </p>
+        <p>[Beside it, with {this.state.discards.slice(-1)[0]} atop, is a
+            discard pile of {this.state.discards.length} cards.]
+        </p>
         <h2>Hands</h2>
         {
           Object.entries(this.state.hands).map(([user, hand]) => {
@@ -109,6 +127,7 @@ export default class BlackJack extends React.PureComponent {
           <button onClick={this.deal}>deal</button>
           <button onClick={this.shuffle}>shuffle</button>
           <button onClick={this.draw}>draw</button>
+          <button onClick={this.discard}>discard</button>
         </div>
       </div>
     )
