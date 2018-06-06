@@ -197,8 +197,7 @@ export default class Board extends React.PureComponent {
   }
 
   onCardDoubleClicked(e, card) {
-    // we might want to do more here later, so let's keep the infrastructure
-    // symmetrical with onCardClicked.
+    window.location = card.url
     e.stopPropagation()
   }
 
