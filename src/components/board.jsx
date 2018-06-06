@@ -644,6 +644,7 @@ export default class Board extends React.PureComponent {
       this.setState({ selected: [...selected, cardId] })
     }
   }
+
   selectOnly(cardId) {
     this.setState({ selected: [cardId] })
   }
