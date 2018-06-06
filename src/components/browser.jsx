@@ -172,7 +172,7 @@ const Button = ({ icon, ...props }) => (
 ContentTypes.register({
   component: Browser,
   type: 'browser',
-  name: 'Website',
+  name: 'Browser',
   icon: 'globe',
   resizable: true,
 })
