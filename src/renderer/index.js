@@ -28,6 +28,7 @@ import './components/contact/contact-in-thread'
 // other single-context components
 import './components/text-content'
 import './components/image-content'
+import './components/pdf-card'
 import './components/thread-content'
 import './components/url-content'
 
