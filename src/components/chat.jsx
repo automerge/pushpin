@@ -48,6 +48,7 @@ export default class Chat extends React.PureComponent {
             value={this.state.message}
             onKeyDown={this.onKeyDown}
             onInput={this.onInput}
+            placeholder={'Enter your message...'}
           />
         </div>
       </div>
@@ -62,7 +63,7 @@ export default class Chat extends React.PureComponent {
         { prev.authorId === authorId
           ? null
           : <div style={css.avatar}>
-              <Content url={createDocumentLink('contact', authorId)} />
+              <Content url={createDocumentLink('mini-avatar', authorId)} />
             </div>
         }
         <div style={css.content}>{content}</div>
@@ -99,12 +100,29 @@ export default class Chat extends React.PureComponent {
   }
 }
 
-ContentTypes.register({
-  component: Chat,
-  type: 'chat',
-  name: 'Chat',
-  icon: 'group',
-})
+class MiniAvatar extends React.PureComponent {
+  static propTypes = {
+    doc: PropTypes.shape({
+      avatarDocId: PropTypes.string,
+      name: PropTypes.string,
+    }).isRequired
+  }
+
+  render() {
+    let avatar
+    if (this.props.doc.avatarDocId) {
+      avatar = <Content url={createDocumentLink('image', this.props.doc.avatarDocId)} />
+    } else {
+      avatar = <img alt="avatar" src="../img/default-avatar.png" />
+    }
+
+    return (
+        <div style={css.avatar} title={this.props.doc.name}>
+            { avatar }
+        </div>
+    )
+  }
+}
 
 const css = {
   chatWrapper: {
@@ -138,6 +156,8 @@ const css = {
 
   },
   inputWrapper: {
+    boxSizing: 'border-box',
+    width: '100%',
     borderTop: '1px solid var(--colorInputGrey)',
     position: 'absolute',
     bottom: 0,
@@ -148,3 +168,18 @@ const css = {
     width: '100%'
   },
 }
+
+ContentTypes.register({
+  component: MiniAvatar,
+  type: 'mini-avatar',
+  name: 'Mini Avatar',
+  icon: 'user',
+  unlisted: true,
+})
+
+ContentTypes.register({
+  component: Chat,
+  type: 'chat',
+  name: 'Chat',
+  icon: 'group',
+})
