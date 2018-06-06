@@ -49,11 +49,10 @@ export default class TitleBar extends React.PureComponent {
       return null
     }
 
-    const { docId, type } = parseDocumentLink(this.props.doc.currentDocUrl)
-
-    const viewedDocs = this.props.doc.viewedDocUrls.map(url => {
-      const id = parseDocumentLink(url).docId
-      const docLinkUrl = createDocumentLink('doc-link', id)
+    const boardDocUrls = this.props.doc.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
+    const boardDocLinks = boardDocUrls.map(url => {
+      const { docId, type } = parseDocumentLink(url)
+      const docLinkUrl = createDocumentLink('doc-link', docId)
 
       return (
         <div key={url} className="ListMenu__item">
@@ -62,6 +61,7 @@ export default class TitleBar extends React.PureComponent {
       )
     })
 
+    const { docId, type } = parseDocumentLink(this.props.doc.currentDocUrl)
     const index = this.backIndex()
     const disableBack = index === (this.props.doc.viewedDocUrls.length - 1)
     const disableForward = index === 0
@@ -77,7 +77,7 @@ export default class TitleBar extends React.PureComponent {
               <div className="PopOverWrapper">
                 <div className="ListMenu">
                   <div className="ListMenuSection">
-                    { viewedDocs }
+                    { boardDocLinks }
                   </div>
                 </div>
               </div>
