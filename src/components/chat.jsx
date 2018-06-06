@@ -169,7 +169,7 @@ const css = {
     flexGrow: 1,
   },
   messageGroup: {
-    marginBottom: -12
+    marginBottom: -24
   },
   groupedMessages: {
     position: 'relative',
