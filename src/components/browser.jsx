@@ -14,14 +14,17 @@ export default class Browser extends React.PureComponent {
 
   handle = null
   state = {
-    src: null,
+    src: '',
+    input: '',
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.handle = window.hm.openHandle(this.props.docId)
     this.handle.onChange(doc => {
-      this.setState({ src: doc.src })
+      this.setState({ src: doc.src, input: doc.src })
     })
+
+    this.web.addEventListener('load-commit', this.navigated)
   }
 
 
@@ -38,24 +41,56 @@ export default class Browser extends React.PureComponent {
           border: '1px solid #ddd',
           display: 'grid',
           gridTemplateRows: 'auto 1fr',
+          minWidth: 200,
+          minHeight: 200,
         }}
         onSubmit={this.go}
       >
-        <input
-          value={this.state.src}
-          onInput={this.setUrl}
+        <div
           style={{
-            margin: 5,
+            padding: 5,
+            borderBottom: '1px solid #eee',
+            display: 'flex',
           }}
-        />
+        >
+          <Button icon="arrow-left" onClick={this.back} />
+          <Button icon="arrow-right" onClick={this.forward} />
+          <Button icon="refresh" onClick={this.reload} />
+          <input
+            value={this.state.input}
+            onInput={this.setUrl}
+            onKeyDown={this.stop}
+            style={{
+              flexGrow: 1,
+            }}
+          />
+        </div>
         <webview
+          ref={web => { this.web = web }}
           src={http(this.state.src)}
-          style={{
-            borderTop: '1px solid #eee'
-          }}
         />
       </form>
     )
+  }
+
+  reload = e => {
+    this.web.reload()
+  }
+
+  back = e => {
+    this.web.goBack()
+  }
+
+  forward = e => {
+    this.web.goForward()
+  }
+
+  navigated = e => {
+    this.setState({ src: e.url })
+
+    this.handle.change(doc => {
+      doc.src = e.url
+    })
   }
 
   go = e => {
@@ -63,7 +98,7 @@ export default class Browser extends React.PureComponent {
     e.stopPropagation()
 
     this.handle.change(doc => {
-      doc.src = this.state.src
+      doc.src = this.state.input
     })
   }
 
@@ -71,15 +106,36 @@ export default class Browser extends React.PureComponent {
     e.stopPropagation()
 
     this.setState({
-      src: e.target.value
+      input: e.target.value
     })
+  }
+
+  stop = e => {
+    e.stopPropagation()
   }
 }
 
 const http = url => (
-  url.startsWith('http://')
+  url.startsWith('http')
     ? url
     : `http://${url}`
+)
+
+const Button = ({ icon, ...props }) => (
+  <button
+    style={{
+      marginRight: 3,
+      WebkitAppearance: 'none',
+      outline: 0,
+      backgroundColor: 'transparent',
+      border: '1px solid #eee',
+      borderRadius: 3,
+      cursor: 'pointer',
+    }}
+    {...props}
+  >
+    <i className={`fa fa-${icon}`} />
+  </button>
 )
 
 ContentTypes.register({
@@ -89,3 +145,4 @@ ContentTypes.register({
   icon: 'globe',
   resizable: true,
 })
+
