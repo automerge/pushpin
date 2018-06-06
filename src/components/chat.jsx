@@ -117,7 +117,7 @@ class MiniAvatar extends React.PureComponent {
     }
 
     return (
-        <div style={css.avatar} title={this.props.doc.name}>
+        <div className="Avatar" style={css.avatar} title={this.props.doc.name}>
             { avatar }
         </div>
     )
@@ -147,10 +147,10 @@ const css = {
     flexGrow: '1',
   },
   message: {
-
+    lineHeight: '20px'
   },
   avatar: {
-
+    float: 'left',
   },
   content: {
 
