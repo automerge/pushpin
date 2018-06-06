@@ -113,8 +113,7 @@ export default class PDFCard extends React.PureComponent {
       const canvas = document.createElement('canvas')
       canvas.width = viewport.width
       canvas.height = viewport.height
-      canvas.style.width = `${viewport.width / resolution}px`
-      canvas.style.height = `${viewport.height / resolution}px`
+      canvas.style.width = '100%'
       page.render({ canvasContext: canvas.getContext('2d'), viewport })
 
       if (this.pdfViewport.current.firstChild) {
