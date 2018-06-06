@@ -36,16 +36,20 @@ export default class Chat extends React.PureComponent {
 
   render() {
     return (
-      <div style={css.wrapper}>
-        <div style={css.messages} onScroll={this.onScroll}>
-          {(this.state.messages || []).map(this.renderMessage)}
+      <div style={css.chatWrapper}>
+        <div style={css.messageWrapper}>
+          <div style={css.messages} onScroll={this.onScroll}>
+            {(this.state.messages || []).map(this.renderMessage)}
+          </div>
         </div>
-        <input 
-          style={css.input}
-          value={this.state.message}
-          onKeyDown={this.onKeyDown}
-          onInput={this.onInput}
-        />
+        <div style={css.inputWrapper}>
+          <input
+            style={css.input}
+            value={this.state.message}
+            onKeyDown={this.onKeyDown}
+            onInput={this.onInput}
+          />
+        </div>
       </div>
     )
   }
@@ -57,7 +61,7 @@ export default class Chat extends React.PureComponent {
       <div style={css.message} key={idx}>
         { prev.authorId === authorId
           ? null
-          : <div className="ListMenu" style={css.avatar}>
+          : <div style={css.avatar}>
               <Content url={createDocumentLink('contact', authorId)} />
             </div>
         }
@@ -78,7 +82,7 @@ export default class Chat extends React.PureComponent {
 
   onKeyDown(e) {
     e.stopPropagation()
-    
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       this.handle.change((chatDoc) => {
@@ -103,30 +107,44 @@ ContentTypes.register({
 })
 
 const css = {
-  wrapper: {
+  chatWrapper: {
     display: 'flex',
-    flexDirection: 'column',
     backgroundColor: 'white',
+    width: '100%',
+    overflow: 'auto'
+  },
+  messageWrapper: {
+    padding: 12,
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    overflowY: 'scroll',
+    marginBottom: 49,
     flexGrow: 1,
-    minWidth: 288,
-    minHeight: 480,
   },
   messages: {
-    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
     flexGrow: '1',
-    padding: '5px 5px 0 5px',
   },
   message: {
-    
+
   },
   avatar: {
 
   },
   content: {
-    marginLeft: 12,
+
+  },
+  inputWrapper: {
+    borderTop: '1px solid var(--colorInputGrey)',
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'white',
+    padding: 8,
   },
   input: {
-    flexShrink: "0",
-    margin: 4,
+    width: '100%'
   },
 }
