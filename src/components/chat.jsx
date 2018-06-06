@@ -35,12 +35,26 @@ export default class Chat extends React.PureComponent {
   }
 
   render() {
+    const messages = (this.state.messages || [])
+    const twoHoursAgo = new Date().getTime() - (2 * 60 * 60 * 1000)
+    const recentMessages = messages.filter((m) => m.time > twoHoursAgo)
+    const groupedMessages = []
+    let currentGroup = []
+    groupedMessages.push(currentGroup)
+    recentMessages.forEach((message) => {
+      if (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId) {
+        currentGroup = []
+        groupedMessages.push(currentGroup)
+      }
+      currentGroup.push(message)
+    })
+    console.log(recentMessages, groupedMessages)
     return (
       <div style={css.wrapper}>
         <div style={css.messages} onScroll={this.onScroll}>
-          {(this.state.messages || []).map(this.renderMessage)}
+          {recentMessages.map(this.renderMessage)}
         </div>
-        <input 
+        <input
           style={css.input}
           value={this.state.message}
           onKeyDown={this.onKeyDown}
@@ -50,8 +64,10 @@ export default class Chat extends React.PureComponent {
     )
   }
 
-  renderMessage({ authorId, content }, idx, msgs) {
+  renderMessage({ authorId, content, time }, idx, msgs) {
     const prev = msgs[idx - 1] || {}
+    const date = new Date()
+    date.setTime(time)
 
     return (
       <div style={css.message} key={idx}>
@@ -61,6 +77,7 @@ export default class Chat extends React.PureComponent {
               <Content url={createDocumentLink('contact', authorId)} />
             </div>
         }
+        <div style={css.time}>{date.getHours()}:{date.getMinutes()}</div>
         <div style={css.content}>{content}</div>
       </div>
     )
@@ -84,7 +101,8 @@ export default class Chat extends React.PureComponent {
       this.handle.change((chatDoc) => {
         chatDoc.messages.push({
           authorId: window.selfId,
-          content: this.state.message
+          content: this.state.message,
+          time: new Date().getTime()
         })
       })
 
@@ -121,6 +139,9 @@ const css = {
   },
   avatar: {
 
+  },
+  time: {
+    marginLeft: 12,
   },
   content: {
     marginLeft: 12,
