@@ -12,8 +12,8 @@ export default class BoardTitle extends React.PureComponent {
     docId: PropTypes.string.isRequired,
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.setTitle = this.setTitle.bind(this)
   }
 

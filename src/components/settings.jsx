@@ -22,9 +22,9 @@ export default class Settings extends React.PureComponent {
     onChange: PropTypes.func.isRequired,
   }
 
-  constructor() {
+  constructor(props) {
+    super(props)
     log('constructor')
-    super()
     this.chooseAvatar = this.chooseAvatar.bind(this)
     this.setName = this.setName.bind(this)
   }

@@ -14,8 +14,7 @@ export default class DocLink extends React.PureComponent {
     linkedDocumentType: PropTypes.string.isRequired
   }
 
-  constructor() {
-    super()
+  constructor(props) {
     this.handleClick = this.handleClick.bind(this)
   }
 

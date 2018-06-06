@@ -46,8 +46,8 @@ export default class CodeMirrorEditor extends React.PureComponent {
   }
 
   constructor(props) {
-    log('constructor')
     super(props)
+    log('constructor')
 
     this.editorRef = null
     this.handle = null

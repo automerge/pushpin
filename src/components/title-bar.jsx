@@ -22,8 +22,8 @@ export default class TitleBar extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
     this.back = this.back.bind(this)
     this.forward = this.forward.bind(this)
