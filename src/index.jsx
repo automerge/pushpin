@@ -20,6 +20,8 @@ import Toggle from './components/toggle'
 import Contact from './components/contact'
 import Share from './components/share'
 import Settings from './components/settings'
+import DocLink from './components/doc-link'
+
 import { createDocumentLink } from './share-link'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
