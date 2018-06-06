@@ -114,6 +114,11 @@ input {
   outline: none;
 }
 
+.Whiteboard {
+  border: 5px solid #CCC;
+  background: white;
+}
+
 #workspace, .Workspace, .Workspace__container {
   height: 100%;
 }
