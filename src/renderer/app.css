@@ -1364,3 +1364,9 @@ div.card.image {
 .Footer {
   margin: 40px 0 60px;
 }
+
+.pdf-card {
+  width: 100%;
+  overflow: hidden;
+  background: white;
+}

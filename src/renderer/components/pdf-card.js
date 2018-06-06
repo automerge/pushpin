@@ -126,7 +126,7 @@ export default class PDFCard extends React.PureComponent {
 
   render() {
     if (this.state.pdfContentReady) {
-      return <div ref={this.pdfViewport} style={{ width: '100%', overflow: 'hidden', background: 'white' }}/>
+      return <div ref={this.pdfViewport} className="pdf-card"/>
     } else {
       return null
     }
