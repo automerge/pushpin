@@ -77,10 +77,11 @@ export default class Workspace extends React.PureComponent {
 
   render() {
     log('render')
+    const { type } = parseDocumentLink(this.props.doc.currentDocUrl)
     return (
       <div className="Workspace">
         <Content openDoc={this.openDoc} url={createDocumentLink('title-bar', this.props.docId)} />
-        <div className="Workspace__container">
+        <div className={"Workspace__container Workspace__container--" + type }>
           <Content url={this.props.doc.currentDocUrl} />
         </div>
       </div>
