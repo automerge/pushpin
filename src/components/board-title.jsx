@@ -24,10 +24,20 @@ export default class BoardTitle extends React.PureComponent {
     })
   }
 
-  componentWillMount() {
-    log('componentWillMount')
+  refreshHandle(docId) {
     this.handle = window.hm.openHandle(this.props.docId)
     this.handle.onChange(doc => this.setState({ doc }))
+  }
+
+  componentWillMount() {
+    log('componentWillMount')
+    this.refreshHandle(this.props.docId)
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
   }
 
   render() {
