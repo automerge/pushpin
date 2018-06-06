@@ -48,13 +48,11 @@ export default class Chat extends React.PureComponent {
       }
       currentGroup.push(message)
     })
-    console.log(recentMessages, groupedMessages)
     return (
-<<<<<<< HEAD
       <div style={css.chatWrapper}>
         <div style={css.messageWrapper}>
           <div style={css.messages} onScroll={this.onScroll}>
-            {(this.state.messages || []).map(this.renderMessage)}
+            {groupedMessages.map(this.renderGroupedMessages)}
           </div>
         </div>
         <div style={css.inputWrapper}>
@@ -66,37 +64,29 @@ export default class Chat extends React.PureComponent {
             placeholder={'Enter your message...'}
           />
         </div>
-=======
-      <div style={css.wrapper}>
-        <div style={css.messages} onScroll={this.onScroll}>
-          {recentMessages.map(this.renderMessage)}
-        </div>
-        <input
-          style={css.input}
-          value={this.state.message}
-          onKeyDown={this.onKeyDown}
-          onInput={this.onInput}
-        />
->>>>>>> origin/chat-revived-time
       </div>
     )
   }
+  renderGroupedMessages(groupOfMessages) {
+    debugger
+    return (
+      <div className="groupOfMessages">
+        <div style={css.avatar}>
+          <Content url={createDocumentLink('mini-avatar', groupOfMessages[0].authorId)} />
+          { groupOfMessages.map(this.renderMessage) }
+        </div>
 
-  renderMessage({ authorId, content, time }, idx, msgs) {
-    const prev = msgs[idx - 1] || {}
+      </div>
+    )
+  }
+  renderMessage({ authorId, content, time }) {
     const date = new Date()
     date.setTime(time)
 
     return (
-      <div style={css.message} key={idx}>
-        { prev.authorId === authorId
-          ? null
-          : <div style={css.avatar}>
-              <Content url={createDocumentLink('mini-avatar', authorId)} />
-            </div>
-        }
-        <div style={css.time}>{date.getHours()}:{date.getMinutes()}</div>
+      <div style={css.message}>
         <div style={css.content}>{content}</div>
+        <div style={css.time}>{date.getHours()}:{date.getMinutes()}</div>
       </div>
     )
   }
@@ -130,7 +120,10 @@ export default class Chat extends React.PureComponent {
     }
   }
 }
-
+// { prev.authorId === authorId
+//   ? null
+//   :
+// }
 class MiniAvatar extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
@@ -178,16 +171,19 @@ const css = {
     flexGrow: '1',
   },
   message: {
-    lineHeight: '20px'
+    lineHeight: '20px',
   },
   avatar: {
     float: 'left',
   },
   time: {
-    marginLeft: 12,
+    float: 'right',
+    fontSize: 12,
+    textAlign: 'right',
+    color: 'var(--colorSecondaryGrey)'
   },
   content: {
-
+    float: 'left'
   },
   inputWrapper: {
     boxSizing: 'border-box',
