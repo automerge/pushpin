@@ -158,7 +158,7 @@ export default class Board extends React.PureComponent {
     let lasty = 0
     for (let card of cards) {
        let top = lasty + 30
-//       relaxer.eq(() => card.x , () => 50)
+       relaxer.eq(() => card.x , () => 50)
        relaxer.eq(() => card.y , () => top)
        lasty = card.y + card.height;
     }
@@ -176,12 +176,6 @@ export default class Board extends React.PureComponent {
       }
     }
     if (ids.length > 0) {
-/*
-      for (let i of ids) {
-        this.props.docs.cards[i].x = cardsMap[i].x
-        this.props.docs.cards[i].y = cardsMap[i].y
-      }
-*/
       this.props.onChange((b) => {
         for (let i of ids) {
           b.cards[i].x = cardMap[i].x
