@@ -39,10 +39,9 @@ export default class Chat extends React.PureComponent {
     const twoHoursAgo = new Date().getTime() - (2 * 60 * 60 * 1000)
     const recentMessages = messages.filter((m) => m.time > twoHoursAgo)
     const groupedMessages = []
-    let currentGroup = []
-    groupedMessages.push(currentGroup)
+    let currentGroup = null
     recentMessages.forEach((message) => {
-      if (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId) {
+      if (!currentGroup || (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)) {
         currentGroup = []
         groupedMessages.push(currentGroup)
       }
@@ -52,7 +51,7 @@ export default class Chat extends React.PureComponent {
       <div style={css.chatWrapper}>
         <div style={css.messageWrapper}>
           <div style={css.messages} onScroll={this.onScroll}>
-            {groupedMessages.map(this.renderGroupedMessages)}
+            {groupedMessages.map(this.renderGroupedMessages, this)}
           </div>
         </div>
         <div style={css.inputWrapper}>
@@ -67,10 +66,10 @@ export default class Chat extends React.PureComponent {
       </div>
     )
   }
-  renderGroupedMessages(groupOfMessages) {
-    debugger
+
+  renderGroupedMessages(groupOfMessages, idx) {
     return (
-      <div className="groupOfMessages">
+      <div className="groupOfMessages" key={idx}>
         <div style={css.avatar}>
           <Content url={createDocumentLink('mini-avatar', groupOfMessages[0].authorId)} />
           { groupOfMessages.map(this.renderMessage) }
@@ -79,12 +78,13 @@ export default class Chat extends React.PureComponent {
       </div>
     )
   }
-  renderMessage({ authorId, content, time }) {
+
+  renderMessage({ authorId, content, time }, idx) {
     const date = new Date()
     date.setTime(time)
 
     return (
-      <div style={css.message}>
+      <div style={css.message} key={idx}>
         <div style={css.content}>{content}</div>
         <div style={css.time}>{date.getHours()}:{date.getMinutes()}</div>
       </div>
