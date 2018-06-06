@@ -34,16 +34,13 @@ export default class Content extends React.PureComponent {
       .list({ withUnlisted: true })
       .find(contentType => contentType.type === type)
 
-    const documentInitializationFunction = contentType.component.initializeDocument
+    const initializeDocumentWithAttrs = (doc) => {
+      contentType.component.initializeDocument(doc, typeAttrs)
+    }
 
     let doc = hm.create()
     const docId = hm.getId(doc)
-
-    const onChange = (cb) => {
-      doc = hm.change(doc, cb)
-    }
-
-    documentInitializationFunction(onChange, typeAttrs)
+    doc = hm.change(doc, initializeDocumentWithAttrs)
 
     return docId
   }

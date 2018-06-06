@@ -38,13 +38,11 @@ export default class CodeMirrorEditor extends React.PureComponent {
     uniquelySelected: PropTypes.bool.isRequired,
   }
 
-  static initializeDocument(change, { text }) {
-    change(d => {
-      d.text = new Automerge.Text()
-      if (text) {
-        d.text.insertAt(0, ...text.split(''))
-      }
-    })
+  static initializeDocument(editor, { text }) {
+    editor.text = new Automerge.Text()
+    if (text) {
+      editor.text.insertAt(0, ...text.split(''))
+    }
   }
 
   constructor(props) {

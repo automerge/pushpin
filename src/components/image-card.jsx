@@ -25,10 +25,8 @@ export default class ImageCard extends React.PureComponent {
     this.state = { imageContentReady: false }
   }
 
-  static initializeDocument(onChange, { path, buffer }) {
-    onChange((d) => {
-      d.path = path
-    })
+  static initializeDocument(image, { path }) {
+    image.path = path
   }
 
   componentDidMount() {
