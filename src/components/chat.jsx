@@ -45,7 +45,6 @@ export default class Chat extends React.PureComponent {
           value={this.state.message}
           onKeyDown={this.onKeyDown}
           onInput={this.onInput}
-          placeholder="Say something..."
         />
       </div>
     )
