@@ -10,42 +10,47 @@ export default class Browser extends React.PureComponent {
 
   static initializeDocument(doc) {
     doc.src = 'https://google.com'
+    doc.title = 'Empty'
+    doc.backs = []
+    doc.forwards = []
   }
 
   handle = null
   state = {
-    src: '',
     input: '',
+    title: 'Empty',
+    src: '',
+    backs: [],
+    forwards: [],
   }
 
   componentDidMount() {
     this.handle = window.hm.openHandle(this.props.docId)
     this.handle.onChange(doc => {
-      this.setState({ src: doc.src, input: doc.src })
+      this.setState(doc)
+      this.setState({ input: doc.src })
     })
 
     this.web.addEventListener('load-commit', this.navigated)
+    this.web.addEventListener('page-title-updated', this.setTitle)
   }
 
-
   render() {
+    const { state } = this
+
     return (
-      <form
+      <div
         style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
           backgroundColor: 'white',
           border: '1px solid #ddd',
           display: 'grid',
-          gridTemplateRows: 'auto 1fr',
+          gridTemplateRows: 'auto auto 1fr',
           minWidth: 200,
           minHeight: 200,
+          flexGrow: 1,
         }}
-        onSubmit={this.go}
       >
+        <div style={{ textAlign: 'center', padding: 2 }}>{state.title}</div>
         <div
           style={{
             padding: 5,
@@ -53,13 +58,13 @@ export default class Browser extends React.PureComponent {
             display: 'flex',
           }}
         >
-          <Button icon="arrow-left" onClick={this.back} />
-          <Button icon="arrow-right" onClick={this.forward} />
+          <Button icon="arrow-left" onClick={this.back} disabled={!state.backs.length} />
+          <Button icon="arrow-right" onClick={this.forward} disabled={!state.forwards.length} />
           <Button icon="refresh" onClick={this.reload} />
           <input
-            value={this.state.input}
+            value={state.input}
             onInput={this.setUrl}
-            onKeyDown={this.stop}
+            onKeyDown={this.keyDown}
             style={{
               flexGrow: 1,
             }}
@@ -67,9 +72,11 @@ export default class Browser extends React.PureComponent {
         </div>
         <webview
           ref={web => { this.web = web }}
-          src={http(this.state.src)}
+          src={http(state.src)}
+          autosize="autosize"
+          useragent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36"
         />
-      </form>
+      </div>
     )
   }
 
@@ -78,27 +85,46 @@ export default class Browser extends React.PureComponent {
   }
 
   back = e => {
-    this.web.goBack()
-  }
-
-  forward = e => {
-    this.web.goForward()
-  }
-
-  navigated = e => {
-    this.setState({ src: e.url })
-
     this.handle.change(doc => {
-      doc.src = e.url
+      if (doc.backs.length) {
+        doc.forwards.push(doc.src)
+        doc.src = doc.backs.pop()
+      }
     })
   }
 
-  go = e => {
-    e.preventDefault()
-    e.stopPropagation()
+  forward = e => {
+    this.handle.change(doc => {
+      if (doc.forwards.length) {
+        doc.backs.push(doc.src)
+        doc.src = doc.forwards.pop()
+      }
+    })
+  }
+
+  navigated = e => {
+    if (!e.isMainFrame) { return }
 
     this.handle.change(doc => {
+      if (doc.src !== e.url) {
+        doc.backs.push(doc.src)
+        doc.forwards = []
+        doc.src = e.url
+      }
+    })
+  }
+
+  go = () => {
+    this.handle.change(doc => {
+      doc.backs.push(doc.src)
+      doc.forwards = []
       doc.src = this.state.input
+    })
+  }
+
+  setTitle = e => {
+    this.handle.change(doc => {
+      doc.title = e.title
     })
   }
 
@@ -110,8 +136,13 @@ export default class Browser extends React.PureComponent {
     })
   }
 
-  stop = e => {
+  keyDown = e => {
     e.stopPropagation()
+
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      this.go()
+    }
   }
 }
 
@@ -145,4 +176,3 @@ ContentTypes.register({
   icon: 'globe',
   resizable: true,
 })
-

@@ -78,14 +78,13 @@ export default class Card extends React.PureComponent {
         className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
         style={style}
         onClick={this.onClick}
-        onDoubleClick={this.onDoubleClick}
         onContextMenu={this.stopPropagation}
       >
         <Content
           url={this.props.card.url}
           uniquelySelected={this.props.uniquelySelected}
         />
-        { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }
+        {contentType && contentType.resizable !== false && <span className="cardResizeHandle" />}
       </div>
     )
   }
