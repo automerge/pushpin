@@ -38,7 +38,7 @@ export default class Chat extends React.PureComponent {
     return (
       <div style={css.wrapper}>
         <div style={css.messages} onScroll={this.onScroll}>
-          {this.state.messages.map(this.renderMessage)}
+          {(this.state.messages || []).map(this.renderMessage)}
         </div>
         <input 
           style={css.input}
