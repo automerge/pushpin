@@ -27,6 +27,9 @@ export default class TitleBar extends React.PureComponent {
 
     this.back = this.back.bind(this)
     this.forward = this.forward.bind(this)
+    this.hideBoardHistory = this.hideBoardHistory.bind(this)
+
+    this.boardHistory = React.createRef()
   }
 
   backIndex() {
@@ -43,6 +46,10 @@ export default class TitleBar extends React.PureComponent {
     this.props.openDoc(this.props.doc.viewedDocUrls[index - 1], { saveHistory: false })
   }
 
+  hideBoardHistory() {
+    this.boardHistory.current.hide()
+  }
+
   render() {
     log('render')
     if (!this.props.doc.currentDocUrl) {
@@ -56,7 +63,7 @@ export default class TitleBar extends React.PureComponent {
 
       return (
         <div key={url} className="ListMenu__item">
-          <Content onClick={this.props.openDoc} url={docLinkUrl} linkedDocumentType={type} />
+          <Content url={docLinkUrl} linkedDocumentType={type} />
         </div>
       )
     })
@@ -69,11 +76,11 @@ export default class TitleBar extends React.PureComponent {
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <Dropdown className="TitleBar__menuItem">
+          <Dropdown ref={this.boardHistory} className="TitleBar__menuItem">
             <DropdownTrigger>
               <i className="fa fa-map" />
             </DropdownTrigger>
-            <DropdownContent>
+            <DropdownContent onClick={this.hideBoardHistory}>
               <div className="PopOverWrapper">
                 <div className="ListMenu">
                   <div className="ListMenuSection">
