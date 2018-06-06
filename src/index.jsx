@@ -20,6 +20,7 @@ import Toggle from './components/toggle'
 import Contact from './components/contact'
 import Share from './components/share'
 import Settings from './components/settings'
+import BlackJack from './components/blackjack'
 import DocLink from './components/doc-link'
 
 import { createDocumentLink } from './share-link'
