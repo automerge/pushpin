@@ -133,14 +133,12 @@ export default class Board extends React.PureComponent {
     this.state = { cards: {}, selected: [] }
   }
 
-  static initializeDocument(onChange) {
+  static initializeDocument(board) {
     log('initializeDocument')
-    onChange((b) => {
-      b.title = 'No Title'
-      b.color = BOARD_COLORS.SKY
-      b.cards = {}
-      b.authorIds = []
-    })
+    board.title = 'No Title'
+    board.color = BOARD_COLORS.SKY
+    board.cards = {}
+    board.authorIds = []
   }
 
   populateDemoBoard() {

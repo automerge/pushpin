@@ -21,21 +21,21 @@ export default class Workspace extends React.PureComponent {
     onChange: PropTypes.func.isRequired
   }
 
-  static initializeDocument(onChange) {
+  static initializeDocument(workspace) {
+    // When creating a workspace we also need to create an identity and board,
+    // do that first so that we have IDs.
     const identity = window.hm.create()
     const selfId = window.hm.getId(identity)
     window.hm.change(identity, (i) => {
       i.name = `The Mysterious ${USER}`
       i.docId = selfId
     })
-
     const boardId = Content.initializeContentDoc('board', { selfId })
 
-    onChange((ws) => {
-      ws.selfId = selfId
-      ws.currentDocUrl = createDocumentLink('board', boardId)
-      ws.contactIds = []
-    })
+    // Then make changes to workspace doc.
+    workspace.selfId = selfId
+    workspace.currentDocUrl = createDocumentLink('board', boardId)
+    workspace.contactIds = []
   }
 
   constructor() {
