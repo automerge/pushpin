@@ -11,22 +11,16 @@ export default class DocLink extends React.PureComponent {
       title: PropTypes.string,
       backgroundColor: PropTypes.string,
     }).isRequired,
-    linkedDocumentType: PropTypes.string.isRequired,
-    onClick: PropTypes.func
-  }
-
-  static defaultProps = {
-    onClick: () => {}
+    linkedDocumentType: PropTypes.string.isRequired
   }
 
   constructor() {
     super()
-
     this.handleClick = this.handleClick.bind(this)
   }
 
   handleClick(e) {
-    this.props.onClick(createDocumentLink(this.props.linkedDocumentType, this.props.docId), e)
+    window.location = createDocumentLink(this.props.linkedDocumentType, this.props.docId)
   }
 
   render() {

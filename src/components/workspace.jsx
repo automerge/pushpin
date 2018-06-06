@@ -45,7 +45,7 @@ export default class Workspace extends React.PureComponent {
     super()
     this.openDoc = this.openDoc.bind(this)
 
-    ipcRenderer.on('loadDocumentUrl', (url) => {
+    ipcRenderer.on('loadDocumentUrl', (event, url) => {
       this.openDoc(url)
     })
 
