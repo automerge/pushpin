@@ -10,6 +10,12 @@ function register({ component, type, name, icon, unlisted, resizable }) {
   }
   log('register', component.name, type, name, icon, unlisted, resizable)
 
+  const idx = registry.findIndex(item => item.type === type)
+
+  if (idx >= 0) {
+    delete registry.splice(idx, 1)
+  }
+
   registry.push({
     component,
     type,

@@ -953,3 +953,11 @@ div.card.image {
 .CodeMirrorEditor__renderer :last-child {
   margin-bottom: 0;
 }
+
+.ReactCodeMirror {
+  position: relative;
+}
+
+.ReactCodeMirror .CodeMirror {
+  height: auto;
+}

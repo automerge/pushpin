@@ -9,25 +9,21 @@ export default class Toggle extends React.PureComponent {
     docId: PropTypes.string.isRequired
   }
 
-  static initializeDocument(toggleDoc) {
-    toggleDoc.toggled = false
+  static initializeDocument(doc) {
+    doc.toggled = false
   }
 
-  constructor(props) {
-    super(props)
-    this.handle = null
-    this.flipToggle = this.flipToggle.bind(this)
-  }
+  state = {}
 
   componentWillMount() {
     this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange((doc) => {
-      this.setState({ toggled: doc.toggled })
+    this.handle.onChange(doc => {
+      this.setState(doc)
     })
   }
 
-  flipToggle() {
-    this.handle.change((doc) => {
+  flipToggle = () => {
+    this.handle.change(doc => {
       doc.toggled = !doc.toggled
     })
   }

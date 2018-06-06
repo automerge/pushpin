@@ -22,6 +22,7 @@ import Share from './components/share'
 import Settings from './components/settings'
 import DocLink from './components/doc-link'
 import './components/browser'
+import './components/source-editor'
 
 import { createDocumentLink } from './share-link'
 
