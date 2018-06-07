@@ -101,11 +101,26 @@ export default class PDFCard extends React.PureComponent {
   }
 
   renderPDF() {
-    if (!this.state.pdfContentReady || this.pdfViewport.current.clientWidth === this.renderedWidth) {
+    const container = this.pdfViewport.current
+    if (!this.state.pdfContentReady || container.clientWidth === this.renderedWidth) {
       return
     }
 
-    this.renderedWidth = this.pdfViewport.current.clientWidth
+    // Measure the width of the card. Cards that have been resized have an explicit CSS width
+    // attribute, which determines the width. New cards have no width attribute, so their size is
+    // determined by the content. If we don't have the content yet, put a temporary spacer element
+    // in place so that the card is created with a sensible default size.
+    if (container.firstChild) {
+      this.renderedWidth = container.parentNode.clientWidth
+    } else {
+      const spacer = document.createElement('div')
+      spacer.style.width = '250px'
+      container.appendChild(spacer)
+      this.renderedWidth = container.parentNode.clientWidth
+      container.removeChild(spacer)
+      container.parentNode.style.width = this.renderedWidth + 'px'
+    }
+
     this.state.pdfDocument.getPage(1).then((page) => {
       const resolution = window.devicePixelRatio || 1
       const viewport = page.getViewport(resolution * this.renderedWidth / (page.view[2] - page.view[0]))
@@ -116,10 +131,10 @@ export default class PDFCard extends React.PureComponent {
       canvas.style.width = '100%'
       page.render({ canvasContext: canvas.getContext('2d'), viewport })
 
-      if (this.pdfViewport.current.firstChild) {
-        this.pdfViewport.current.removeChild(this.pdfViewport.current.firstChild)
+      if (container.firstChild) {
+        container.removeChild(container.firstChild)
       }
-      this.pdfViewport.current.appendChild(canvas)
+      container.appendChild(canvas)
     })
   }
 
