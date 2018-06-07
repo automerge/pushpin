@@ -14,7 +14,7 @@ import Card from './card'
 import ColorPicker from './color-picker'
 import Content from './content'
 import ContentTypes from '../content-types'
-import { IMAGE_DIALOG_OPTIONS } from '../constants'
+import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../constants'
 import { createDocumentLink } from '../share-link'
 
 const { dialog } = remote
@@ -308,19 +308,8 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  addContent(e, contentType) {
-    e.stopPropagation()
-
-    const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
-    const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
-
-    if (contentType.type !== 'image') {
-      const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
-      this.selectOnly(cardId)
-      return
-    }
-
-    dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
+  fileDialog(options, callback) {
+    dialog.showOpenDialog(options, (paths) => {
       // User aborted.
       if (!paths) {
         return
@@ -328,10 +317,35 @@ export default class Board extends React.PureComponent {
       if (paths.length !== 1) {
         throw new Error('Expected exactly one path?')
       }
-      const path = paths[0]
-      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { path } })
-      this.selectOnly(cardId)
+      callback(paths[0])
     })
+  }
+
+  addContent(e, contentType) {
+    e.stopPropagation()
+
+    const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
+    const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
+
+    switch (contentType.type) {
+      case 'image':
+        this.fileDialog(IMAGE_DIALOG_OPTIONS, (path) => {
+          const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+          this.selectOnly(cardId)
+        })
+        break
+
+      case 'pdf':
+        this.fileDialog(PDF_DIALOG_OPTIONS, (path) => {
+          const cardId = this.createCard({ x, y, type: 'pdf', typeAttrs: { path } })
+          this.selectOnly(cardId)
+        })
+        break
+
+      default:
+        const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
+        this.selectOnly(cardId)
+    }
   }
 
   // Bridge that enables up to create image cards - which currently require a
@@ -445,6 +459,9 @@ export default class Board extends React.PureComponent {
       card.width = snapWidth
       card.height = snapHeight
     })
+    document.dispatchEvent(new CustomEvent('cardResized', {detail: {
+      cardId: id, width: snapWidth, height: snapHeight
+    }}))
   }
 
   /**

@@ -84,6 +84,7 @@ export default class Card extends React.PureComponent {
         <Content
           url={this.props.card.url}
           uniquelySelected={this.props.uniquelySelected}
+          cardId={this.props.card.id}
         />
         { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }
       </div>

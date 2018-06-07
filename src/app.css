@@ -958,3 +958,9 @@ div.card.image {
 .CodeMirrorEditor__renderer :last-child {
   margin-bottom: 0;
 }
+
+.pdf-card {
+  width: 100%;
+  overflow: hidden;
+  background: white;
+}
