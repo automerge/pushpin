@@ -1,29 +1,16 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import ReactToggle from 'react-toggle'
+import Base from './base'
 
 import ContentTypes from '../content-types'
 
-export default class Toggle extends React.PureComponent {
-  static propTypes = {
-    docId: PropTypes.string.isRequired
-  }
-
+export default class Toggle extends Base {
   static initializeDocument(doc) {
     doc.toggled = false
   }
 
-  state = {}
-
-  componentWillMount() {
-    this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange(doc => {
-      this.setState(doc)
-    })
-  }
-
   flipToggle = () => {
-    this.handle.change(doc => {
+    this.change(doc => {
       doc.toggled = !doc.toggled
     })
   }
