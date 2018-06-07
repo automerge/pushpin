@@ -30,6 +30,9 @@ export default class TitleBar extends React.PureComponent {
     this.hideBoardHistory = this.hideBoardHistory.bind(this)
 
     this.boardHistory = React.createRef()
+
+    // this should never change, right?
+    window.selfId = props.doc.selfId
   }
 
   backIndex() {
