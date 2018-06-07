@@ -24,6 +24,7 @@ import BlackJack from './components/blackjack'
 import DocLink from './components/doc-link'
 import Whiteboard from './components/whiteboard'
 import Chat from './components/chat'
+import './components/browser'
 
 import { createDocumentLink } from './share-link'
 
