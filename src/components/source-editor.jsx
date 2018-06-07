@@ -2,7 +2,7 @@ import 'codemirror/mode/javascript/javascript'
 import React from 'react'
 import PropTypes from 'prop-types'
 import CodeMirror from 'react-codemirror'
-import { transform } from 'babel-core'
+import * as ts from 'typescript'
 import ContentTypes from '../content-types'
 
 export default class SourceEditor extends React.PureComponent {
@@ -105,38 +105,13 @@ export default class SourceEditor extends React.PureComponent {
     e.stopPropagation()
   }
 
-  _compileCode = source => {
-    const { code } = transform(source, babelOptions)
-    return code
-    // const generateContextTypes = (c) => `{ ${Object.keys(c).map((val) =>
-    //   `${val}: PropTypes.any.isRequired`).join(', ')} }`
-
-    // const scopeWithProps = { ...scope, PropTypes }
-
-    // if (noRender) {
-    //   return transform(`
-    //   ((${Object.keys(scopeWithProps).join(', ')}, mountNode) => {
-    //     class Comp extends React.Component {
-    //       getChildContext() {
-    //         return ${JSON.stringify(context)};
-    //       }
-    //       render() {
-    //         return (
-    //           ${code}
-    //         );
-    //       }
-    //     }
-    //     Comp.childContextTypes = ${generateContextTypes(context)};
-    //     return Comp;
-    //   });
-    // `, { presets: ['es2015', 'react', 'stage-1'] }).code
-    // }
-    // return transform(`
-    //   ((${Object.keys(scopeWithProps).join(',')}, mountNode) => {
-    //     ${code}
-    //   });
-    // `, { presets: ['es2015', 'react', 'stage-1'] }).code
-  }
+  _compileCode = source =>
+    ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: 'React'
+      }
+    })
 }
 
 ContentTypes.register({
@@ -146,20 +121,6 @@ ContentTypes.register({
   icon: 'code',
   resizable: true,
 })
-
-const babelOptions = {
-  presets: [
-    ['env', { targets: { electron: '1.6.0' } }],
-    'react'
-  ],
-  plugins: [
-    'transform-async-to-generator',
-    'transform-class-properties',
-    'transform-object-rest-spread',
-    'transform-es2015-classes',
-  ],
-  sourceMaps: 'inline'
-}
 
 const defaultSource =
   `import React from 'react'
