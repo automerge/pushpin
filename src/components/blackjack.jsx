@@ -138,6 +138,6 @@ ContentTypes.register({
   component: BlackJack,
   type: 'blackjack',
   name: 'BlackJack',
-  icon: 'card',
+  icon: 'money',
   resizable: false
 })
