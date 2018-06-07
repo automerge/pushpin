@@ -26,6 +26,7 @@ import DocLink from './components/doc-link'
 import Whiteboard from './components/whiteboard'
 import Chat from './components/chat'
 import './components/browser'
+import DrumKit from './components/drumkit.jsx'
 
 import { createDocumentLink } from './share-link'
 
