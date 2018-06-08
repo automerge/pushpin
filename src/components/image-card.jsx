@@ -25,7 +25,7 @@ export default class ImageCard extends React.PureComponent {
 
   componentDidMount() {
     this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange((doc) => this.setState({ ...doc }))
+    this.handle.onChange((doc) => this.setState({ ...doc, path: doc.path }))
 
     log('componentDidMount')
     this.workImage()
@@ -47,7 +47,7 @@ export default class ImageCard extends React.PureComponent {
       this.uploadImage()
     }
 
-    if (this.state.hyperfile) {
+    if (this.state.hyperfile && !this.state.imageContentReady) {
       this.fetchImage()
     }
   }
