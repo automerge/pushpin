@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactToggle from 'react-toggle'
 
 import ContentTypes from '../content-types'
 import Content from './content'
@@ -41,7 +40,8 @@ export default class Chat extends React.PureComponent {
     const groupedMessages = []
     let currentGroup = null
     recentMessages.forEach((message) => {
-      if (!currentGroup || (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)) {
+      if (!currentGroup
+        || (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)) {
         currentGroup = []
         groupedMessages.push(currentGroup)
       }
@@ -60,7 +60,7 @@ export default class Chat extends React.PureComponent {
             value={this.state.message}
             onKeyDown={this.onKeyDown}
             onInput={this.onInput}
-            placeholder={'Enter your message...'}
+            placeholder="Enter your message..."
           />
         </div>
       </div>
@@ -81,7 +81,7 @@ export default class Chat extends React.PureComponent {
   renderMessage({ authorId, content, time }, idx) {
     const date = new Date()
     date.setTime(time)
-    var options = {
+    const options = {
       localeMatcher: 'best fit',
       weekday: 'short',
       hour: '2-digit',
@@ -92,7 +92,7 @@ export default class Chat extends React.PureComponent {
     return (
       <div style={css.message} key={idx}>
         <div style={css.content}>{content}</div>
-        { idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options ).format(date)}</div> : null}
+        { idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div> : null}
       </div>
     )
   }
@@ -121,7 +121,7 @@ export default class Chat extends React.PureComponent {
       })
 
       this.setState({
-        message: ""
+        message: ''
       })
     }
   }
@@ -146,7 +146,7 @@ class MiniAvatar extends React.PureComponent {
     return (
       <div style={css.user}>
         <div className="Avatar" style={css.avatar} title={this.props.doc.name}>
-            { avatar }
+          { avatar }
         </div>
         <div className="username" style={css.username}>
           {this.props.doc.name}
