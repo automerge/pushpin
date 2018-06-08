@@ -34,22 +34,18 @@ export default class Card extends React.PureComponent {
   constructor(props) {
     super(props)
     log('constructor')
-
-    this.onClick = this.onClick.bind(this)
-    this.onDoubleClick = this.onDoubleClick.bind(this)
-    this.stopPropagation = this.stopPropagation.bind(this)
   }
 
   // We also delegate these actions to the board, because
   // the board is responsible for managing selection state.
-  onClick(e) {
+  onClick = (e) => {
     this.props.onCardClicked(e, this.props.card)
   }
-  onDoubleClick(e) {
+  onDoubleClick = (e) => {
     this.props.onCardDoubleClicked(e, this.props.card)
   }
 
-  stopPropagation(e) {
+  stopPropagation = (e) => {
     e.stopPropagation()
   }
 
