@@ -68,7 +68,7 @@ export default class TitleBar extends React.PureComponent {
       )
     })
 
-    const { docId, type } = parseDocumentLink(this.props.doc.currentDocUrl)
+    const { docId } = parseDocumentLink(this.props.doc.currentDocUrl)
     const index = this.backIndex()
     const disableBack = index === (this.props.doc.viewedDocUrls.length - 1)
     const disableForward = index === 0
