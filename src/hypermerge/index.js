@@ -63,6 +63,24 @@ class DocHandle {
     return this
   }
 
+  message(message) {
+    if (this.hm.readyIndex[this.id]) {
+      this.hm.message(this.id, message)
+    }
+  }
+
+  /* register the function you'd like called when you receive a message from a peer */
+  onMessage(cb) {
+    this._messageCb = cb
+    return this
+  }
+
+  _message({ peer, msg }) {
+    if (this._messageCb) {
+      this._messageCb({ peer, msg })
+    }
+  }
+
   _update(doc) {
     this._cb(doc)
   }
@@ -924,6 +942,9 @@ class Hypermerge extends EventEmitter {
         break
       default:
         this.emit('peer:message', actorId, peer, msg)
+        this._handles(actorId).forEach(handle => {
+          handle._message({ peer, msg })
+        })
     }
   }
 

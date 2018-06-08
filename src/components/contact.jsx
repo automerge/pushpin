@@ -20,8 +20,15 @@ export default class Contact extends React.PureComponent {
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillMount = () => {
+    this.refreshHandle(this.props.docId)
+  }
+
+  componentWillUnmount = () => {
+    window.hm.releaseHandle(this.handle)
+    window.clearInterval(this.timerId)
+  }
+
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -34,11 +41,16 @@ export default class Contact extends React.PureComponent {
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
+    this.handle.onMessage(this.onMessage)
   }
 
   // this should be overridden by components which care
   onChange = (doc) => {
     this.setState({ ...doc })
+  }
+
+  onMessage = ({ msg, peer }) => {
+    this.setState({ lastHeartbeat: new Date() })
   }
 
   render() {
@@ -66,10 +78,12 @@ export default class Contact extends React.PureComponent {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
 
+    const present = this.state.lastHeartbeat
+
     return (
       <div className="ListMenu__item">
         <div className="ListMenu__thumbnail">
-          <div className="Avatar">
+          <div className={`Avatar ${present ? 'Avatar--online' : ''}`}>
             { avatar }
           </div>
         </div>
