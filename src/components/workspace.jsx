@@ -68,6 +68,15 @@ export default class Workspace extends React.PureComponent {
   // this should be overridden by components which care
   onChange = (doc) => {
     this.setState({ ...doc })
+    this.refreshHeartbeat(doc)
+  }
+
+  refreshHeartbeat = (doc) => {
+    const selfHandle = window.hm.openHandle(doc.selfId)
+    this.timerId = setInterval(() => {
+      selfHandle.message('heartbeat')
+      console.log('hb sent')
+    }, 1000)
   }
 
   openDoc = (docUrl, options = {}) => {
