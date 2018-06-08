@@ -9,7 +9,7 @@ export default class Toggle extends React.PureComponent {
     docId: PropTypes.string.isRequired
   }
 
-  static initializeDocument(toggleDoc) {
+  static initializeDocument = (toggleDoc) => {
     toggleDoc.toggled = false
   }
 
