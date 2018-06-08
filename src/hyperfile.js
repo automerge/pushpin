@@ -4,10 +4,9 @@ import Fs from 'fs'
 import Path from 'path'
 import mkdirp from 'mkdirp'
 
-import { HYPERFILE_DATA_PATH, HYPERFILE_CACHE_PATH } from './constants'
+import { HYPERFILE_DATA_PATH } from './constants'
 
 mkdirp.sync(HYPERFILE_DATA_PATH)
-mkdirp.sync(HYPERFILE_CACHE_PATH)
 
 const hypercoreOptions = { valueEncoding: 'binary' }
 
@@ -111,15 +110,8 @@ export function fetch({ fileId, fileExt, key }, callback) {
         return
       }
 
-      const imagePath = Path.join(HYPERFILE_CACHE_PATH, fileId + fileExt)
-      Fs.writeFile(imagePath, data, (error) => {
-        if (error) {
-          callback(error)
-          return
-        }
-
-        callback(null, imagePath)
-      })
+      const filePath = Path.join(corePath(HYPERFILE_DATA_PATH, fileId), 'data')
+      callback(null, filePath)
     })
   })
 }
