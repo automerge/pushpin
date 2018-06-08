@@ -226,6 +226,20 @@ class Hypermerge extends EventEmitter {
     return handle
   }
 
+  releaseHandle(handle) {
+    log('releaseHandle', handle)
+
+    const handles = this.handles[handle.id]
+
+    if (!handles) {
+      throw new Error(`No handles found for docId: ${handle.id}.`)
+    }
+
+    this.handles[handle.id] = handles.filter(h => h !== handle)
+
+    return true
+  }
+
   /**
    * Creates an Automerge document backed by a new Hypercore.
    *
