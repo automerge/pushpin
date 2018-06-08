@@ -13,12 +13,6 @@ const log = Debug('pushpin:workspace')
 export default class Workspace extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    doc: PropTypes.shape({
-      selfId: PropTypes.string.isRequired,
-      currentDocUrl: PropTypes.string.isRequired,
-      contactIds: PropTypes.arrayOf(PropTypes.string).isRequired
-    }).isRequired,
-    onChange: PropTypes.func.isRequired
   }
 
   static initializeDocument(workspace) {
@@ -43,19 +37,36 @@ export default class Workspace extends React.PureComponent {
   constructor(props) {
     super(props)
     log('constructor')
-    this.openDoc = this.openDoc.bind(this)
 
     ipcRenderer.on('loadDocumentUrl', (event, url) => {
       this.openDoc(url)
     })
 
     ipcRenderer.on('newDocument', () => {
-      const docId = Content.initializeContentDoc('board', { selfId: this.props.doc.selfId })
+      const docId = Content.initializeContentDoc('board', { selfId: this.state.selfId })
       this.openDoc(createDocumentLink('board', docId))
     })
   }
 
-  openDoc(docUrl, options = {}) {
+  // This is the New Boilerplate
+  componentWillMount() {
+    this.refreshHandle(this.props.docId)
+  }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
+  }
+  refreshHandle = (docId) => {
+    // should release old handle
+    this.handle = window.hm.openHandle(this.props.docId)
+    this.handle.onChange(this.onChange)
+  }
+  onChange = (doc) => {
+    this.setState({ ...doc })
+  }
+
+  openDoc = (docUrl, options = {}) => {
     const { saveHistory = true } = options
 
     try {
@@ -65,7 +76,7 @@ export default class Workspace extends React.PureComponent {
       return
     }
 
-    this.props.onChange((ws) => {
+    this.handle.change((ws) => {
       ws.currentDocUrl = docUrl
 
       if (saveHistory) {
@@ -77,12 +88,12 @@ export default class Workspace extends React.PureComponent {
 
   render() {
     log('render')
-    const { type } = parseDocumentLink(this.props.doc.currentDocUrl)
+    const { type } = parseDocumentLink(this.state.currentDocUrl)
     return (
       <div className="Workspace">
         <Content openDoc={this.openDoc} url={createDocumentLink('title-bar', this.props.docId)} />
         <div className={`Workspace__container Workspace__container--${type}`}>
-          <Content url={this.props.doc.currentDocUrl} />
+          <Content url={this.state.currentDocUrl} />
         </div>
       </div>
     )
