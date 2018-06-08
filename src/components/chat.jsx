@@ -14,26 +14,31 @@ export default class Chat extends React.PureComponent {
     chatDoc.messages = []
   }
 
-  constructor(props) {
-    super(props)
+  state = { message: '', messages: null }
 
-    this.handle = null
-
-    this.onScroll = this.onScroll.bind(this)
-    this.onInput = this.onInput.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
-
-    this.state = { message: '', messages: null }
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
   }
 
-  componentWillMount() {
-    this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange((chatDoc) => {
-      this.setState({ messages: chatDoc.messages })
-    })
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.releaseHandle(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
   }
 
-  render() {
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ ...doc })
+  }
+
+  render = () => {
     const messages = (this.state.messages || [])
     const twoHoursAgo = new Date().getTime() - (2 * 60 * 60 * 1000)
     const recentMessages = messages.filter((m) => m.time > twoHoursAgo)
@@ -67,18 +72,16 @@ export default class Chat extends React.PureComponent {
     )
   }
 
-  renderGroupedMessages(groupOfMessages, idx) {
-    return (
-      <div style={css.messageGroup} key={idx}>
-        <Content url={createDocumentLink('mini-avatar', groupOfMessages[0].authorId)} />
-        <div style={css.groupedMessages}>
-          { groupOfMessages.map(this.renderMessage) }
-        </div>
+  renderGroupedMessages = (groupOfMessages, idx) => (
+    <div style={css.messageGroup} key={idx}>
+      <Content url={createDocumentLink('mini-avatar', groupOfMessages[0].authorId)} />
+      <div style={css.groupedMessages}>
+        { groupOfMessages.map(this.renderMessage) }
       </div>
-    )
-  }
+    </div>
+  )
 
-  renderMessage({ authorId, content, time }, idx) {
+  renderMessage = ({ authorId, content, time }, idx) => {
     const date = new Date()
     date.setTime(time)
     const options = {
@@ -97,17 +100,17 @@ export default class Chat extends React.PureComponent {
     )
   }
 
-  onScroll(e) {
+  onScroll= (e) => {
     e.stopPropagation()
   }
 
-  onInput(e) {
+  onInput = (e) => {
     this.setState({
       message: e.target.value
     })
   }
 
-  onKeyDown(e) {
+  onKeyDown = (e) => {
     e.stopPropagation()
 
     if (e.key === 'Enter' && !e.shiftKey) {
