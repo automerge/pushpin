@@ -69,8 +69,7 @@ export function writePath(fileId, filePath, callback) {
 
         const hyperfile = {
           key: core.key.toString('base64'),
-          fileId,
-          fileExt: Path.extname(filePath),
+          fileId
         }
 
         serve(core)
@@ -98,7 +97,7 @@ export function writeBuffer(fileId, fileBuffer, callback) {
 }
 
 // callback = (err, blob)
-export function fetch({ fileId, fileExt, key }, callback) {
+export function fetch({ fileId, key }, callback) {
   const coreKeyBuf = Buffer.from(key, 'base64')
   const core = Hypercore(corePath(HYPERFILE_DATA_PATH, fileId), coreKeyBuf, hypercoreOptions)
   core.on('error', callback)
@@ -110,8 +109,7 @@ export function fetch({ fileId, fileExt, key }, callback) {
         return
       }
 
-      const filePath = Path.join(corePath(HYPERFILE_DATA_PATH, fileId), 'data')
-      callback(null, filePath)
+      callback(null, data)
     })
   })
 }
