@@ -226,6 +226,21 @@ class Hypermerge extends EventEmitter {
     return handle
   }
 
+  releaseHandle(handle) {
+    log('releaseHandle', handle)
+
+    const handles = this._handles(handle.id)
+    const index = handles.findIndex(h => h == handle)
+
+    if (index === -1) {
+      throw new Error('Handle not found.')
+    }
+
+    handles.splice(index, 1)
+
+    return true
+  }
+
   /**
    * Creates an Automerge document backed by a new Hypercore.
    *
