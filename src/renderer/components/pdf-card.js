@@ -152,5 +152,5 @@ ContentTypes.register({
   component: PDFCard,
   type: 'pdf',
   name: 'PDF',
-  icon: 'sticky-note'
+  icon: 'book'
 })
