@@ -28,22 +28,21 @@ export default class PDFCard extends React.PureComponent {
     this.state = { pdfContentReady: false }
   }
 
-  componentWillMount = () => {
+  componentDidMount = () => {
+    this.mounted = true
     this.handle = window.hm.openHandle(this.props.docId)
     this.handle.onChange((doc) => {
       this.setState({ doc })
     })
-  }
-
-  componentDidMount = () => {
     this.workPDF()
-    this.mounted = true
     document.addEventListener('cardResized', this.cardResized)
   }
 
   componentWillUnmount = () => {
-    this.mounted = false
     document.removeEventListener('cardResized', this.cardResized)
+    window.hm.releaseHandle(this.handle)
+    this.handle = null
+    this.mounted = false
   }
 
   componentDidUpdate = () => {
@@ -58,6 +57,10 @@ export default class PDFCard extends React.PureComponent {
   }
 
   workPDF = () => {
+    if (!this.state.doc) {
+      return
+    }
+
     if (this.state.doc.path && !this.uploading) {
       this.uploading = true
       this.uploadPDF()
