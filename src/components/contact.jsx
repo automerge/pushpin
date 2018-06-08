@@ -50,15 +50,12 @@ export default class Contact extends React.PureComponent {
   }
 
   onMessage = ({ msg, peer }) => {
-    this.setState({ lastHeartbeat: new Date() })
-  }
-
-  checkForPresence = () => {
-    if (!this.state.lastHeartbeat) {
-      return false
+    if (this.timerId) {
+      clearTimeout(this.timerId)
     }
-    const heartbeatDelay = new Date() - this.state.lastHeartbeat
-    return heartbeatDelay < 5000 // ms
+    this.timerId = setTimeout(() =>
+      this.setState({ online: false }), 5000)
+    this.setState({ online: true })
   }
 
   render() {
@@ -86,12 +83,10 @@ export default class Contact extends React.PureComponent {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
 
-    const present = this.checkForPresence()
-
     return (
       <div className="ListMenu__item">
         <div className="ListMenu__thumbnail">
-          <div className={`Avatar ${present ? 'Avatar--online' : ''}`}>
+          <div className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}>
             { avatar }
           </div>
         </div>
