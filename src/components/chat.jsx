@@ -77,15 +77,24 @@ export default class Chat extends React.PureComponent {
       </div>
     )
   }
-
+  
   renderMessage({ authorId, content, time }, idx) {
     const date = new Date()
     date.setTime(time)
-
+    var options = {
+      localeMatcher: 'best fit',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      month: 'short',
+      day: 'numeric'
+    }
+    console.log(new Intl.DateTimeFormat('en-US', options ).format(date))
     return (
       <div style={css.message} key={idx}>
         <div style={css.content}>{content}</div>
-        <div style={css.time}>{date.getHours()}:{date.getMinutes()}</div>
+        <div style={css.time}>{new Intl.DateTimeFormat('en-US', options ).format(date)}</div>
+
       </div>
     )
   }
@@ -168,7 +177,8 @@ const css = {
     flexGrow: 1,
   },
   messageGroup: {
-    marginBottom: -24
+    marginBottom: -24,
+    paddingTop: 12
   },
   groupedMessages: {
     position: 'relative',
