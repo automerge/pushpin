@@ -113,7 +113,7 @@ export default class Board extends React.PureComponent {
   static initializeDocument(board) {
     log('initializeDocument')
     board.title = 'No Title'
-    board.color = BOARD_COLORS.SKY
+    board.backgroundColor = BOARD_COLORS.SKY
     board.cards = {}
     board.authorIds = []
   }
