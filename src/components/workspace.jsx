@@ -76,7 +76,6 @@ export default class Workspace extends React.PureComponent {
     const selfHandle = window.hm.openHandle(doc.selfId)
     this.timerId = setInterval(() => {
       selfHandle.message('heartbeat')
-      console.log('hb sent')
     }, 1000)
   }
 

@@ -53,6 +53,14 @@ export default class Contact extends React.PureComponent {
     this.setState({ lastHeartbeat: new Date() })
   }
 
+  checkForPresence = () => {
+    if (!this.state.lastHeartbeat) {
+      return false
+    }
+    const heartbeatDelay = new Date() - this.state.lastHeartbeat
+    return heartbeatDelay < 5000 // ms
+  }
+
   render() {
     const actions = []
     if (this.props.actions.includes('share')) {
@@ -78,7 +86,7 @@ export default class Contact extends React.PureComponent {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
 
-    const present = this.state.lastHeartbeat
+    const present = this.checkForPresence()
 
     return (
       <div className="ListMenu__item">
