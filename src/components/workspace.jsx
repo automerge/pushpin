@@ -61,7 +61,7 @@ export default class Workspace extends React.PureComponent {
     if (this.handle) {
       window.hm.release(this.handle)
     }
-    this.handle = window.hm.openHandle(this.props.docId)
+    this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
   }
 
