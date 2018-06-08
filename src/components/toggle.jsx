@@ -22,7 +22,7 @@ export default class Toggle extends React.PureComponent {
   componentWillMount() {
     this.handle = window.hm.openHandle(this.props.docId)
     this.handle.onChange((doc) => {
-      this.setState({ toggled: doc.toggled })
+      this.setState({ ...doc })
     })
   }
 
