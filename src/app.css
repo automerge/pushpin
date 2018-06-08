@@ -177,7 +177,7 @@ input {
 .Avatar--online {
   border: 2px solid rgba(113, 227, 65, 1);
   box-shadow: 0 0 4px 0 rgba(113, 227, 65, 1);
-  animation: pop .75s forwards ease-in-out, pulse 2s infinite;
+  animation: pulse 2s infinite;
 }
 
 .Avatar img {
@@ -186,7 +186,8 @@ input {
   border-radius: 50%;
 }
 
-@keyframes pop {
+/* pop .75s forwards ease-in-out, */
+/* @keyframes pop {
   0% {
     transform: scale(1.25);
   }
@@ -196,7 +197,8 @@ input {
   100% {
     transform: scale(1);
   }
-}
+} */
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(113, 227, 65, .5);
