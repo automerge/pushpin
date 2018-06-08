@@ -127,35 +127,6 @@ export default class Chat extends React.PureComponent {
   }
 }
 
-class MiniAvatar extends React.PureComponent {
-  static propTypes = {
-    doc: PropTypes.shape({
-      avatarDocId: PropTypes.string,
-      name: PropTypes.string,
-    }).isRequired
-  }
-
-  render() {
-    let avatar
-    if (this.props.doc.avatarDocId) {
-      avatar = <Content url={createDocumentLink('image', this.props.doc.avatarDocId)} />
-    } else {
-      avatar = <img alt="avatar" src="../img/default-avatar.png" />
-    }
-
-    return (
-      <div style={css.user}>
-        <div className="Avatar" style={css.avatar} title={this.props.doc.name}>
-          { avatar }
-        </div>
-        <div className="username" style={css.username}>
-          {this.props.doc.name}
-        </div>
-      </div>
-    )
-  }
-}
-
 const css = {
   chatWrapper: {
     display: 'flex',
@@ -227,14 +198,6 @@ const css = {
     width: '100%'
   },
 }
-
-ContentTypes.register({
-  component: MiniAvatar,
-  type: 'mini-avatar',
-  name: 'Mini Avatar',
-  icon: 'user',
-  unlisted: true,
-})
 
 ContentTypes.register({
   component: Chat,

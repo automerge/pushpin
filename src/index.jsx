@@ -22,6 +22,7 @@ import Share from './components/share'
 import Settings from './components/settings'
 import DocLink from './components/doc-link'
 import Chat from './components/chat'
+import MiniAvatar from './components/mini-avatar'
 
 import { createDocumentLink } from './share-link'
 
