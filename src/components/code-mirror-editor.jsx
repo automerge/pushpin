@@ -80,6 +80,13 @@ export default class CodeMirrorEditor extends React.PureComponent {
     this.handle.onChange(this.onDocChange)
   }
 
+  componentWillUnmount() {
+    log('componentDidUnmount')
+
+    window.hm.releaseHandle(this.handle)
+    this.handle = null
+  }
+
   // Transform declarative React selection prop into imperative focus changes
   // in the editor.
   componentWillReceiveProps(props) {
