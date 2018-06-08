@@ -92,8 +92,7 @@ export default class Chat extends React.PureComponent {
     return (
       <div style={css.message} key={idx}>
         <div style={css.content}>{content}</div>
-        <div style={css.time}>{new Intl.DateTimeFormat('en-US', options ).format(date)}</div>
-
+        { idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options ).format(date)}</div> : null}
       </div>
     )
   }
@@ -164,7 +163,6 @@ const css = {
     width: '100%',
     overflow: 'auto',
     height: '100%',
-    border: '1px solid var(--colorInputGrey)'
   },
   messageWrapper: {
     padding: 12,
@@ -191,6 +189,7 @@ const css = {
     flexGrow: '1',
   },
   message: {
+    color: 'black',
     display: 'flex',
     lineHeight: '20px',
     padding: '2px 0'
@@ -201,7 +200,7 @@ const css = {
   username: {
     paddingLeft: 8,
     fontSize: 12,
-    color: 'var(--colorSecondaryGrey)'
+    color: 'var(--colorBlueBlack)'
   },
   avatar: {
 
@@ -210,7 +209,8 @@ const css = {
     flex: 'none',
     marginLeft: 'auto',
     fontSize: 12,
-    color: 'var(--colorSecondaryGrey)'
+    color: 'var(--colorSecondaryGrey)',
+    marginTop: -22
   },
   content: {
   },
