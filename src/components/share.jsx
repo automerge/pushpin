@@ -163,7 +163,7 @@ export default class Share extends React.PureComponent {
         key={id}
         url={createDocumentLink('contact', id)}
         actions={['share']}
-        onShare={e => this.offerDocumentToIdentity(e, id)} // XXX test this before merging
+        onShare={e => this.offerDocumentToIdentity.bind(this)(e, id)}
       />
     ))
 
