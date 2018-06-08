@@ -59,6 +59,11 @@ export default class ImageCard extends React.PureComponent {
 
   render = () => {
     log('render')
+
+    if (this.state.hyperfile && this.state.hyperfile.key) {
+      return <p>Error: This image uses an outdated version of hyperfile, please delete and re-upload.</p>
+    }
+
     if (!this.state.hyperfileId) {
       // we used to show some kind of stand-in value but we don't have a design
       // for one that works everywhere the image works, so for now: nothing.
