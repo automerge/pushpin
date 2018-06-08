@@ -98,35 +98,12 @@ const draggableCards = (cards, selected, card) => {
 
 export default class Board extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.shape({
-      title: PropTypes.string,
-      authorIds: PropTypes.arrayOf(PropTypes.string),
-      backgroundColor: PropTypes.string,
-      cards: PropTypes.objectOf(Card.propTypes.card)
-    }).isRequired,
-    onChange: PropTypes.func.isRequired
+    docId: PropTypes.string.isRequired,
   }
 
   constructor(props) {
     super(props)
     log('constructor')
-
-    this.onClick = this.onClick.bind(this)
-    this.onCardClicked = this.onCardClicked.bind(this)
-    this.onDoubleClick = this.onDoubleClick.bind(this)
-    this.onCardDoubleClicked = this.onCardDoubleClicked.bind(this)
-    this.onShowContextMenu = this.onShowContextMenu.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDrop = this.onDrop.bind(this)
-    this.onDrag = this.onDrag.bind(this)
-    this.onStop = this.onStop.bind(this)
-    this.onPaste = this.onPaste.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
-
-    this.createCard = this.createCard.bind(this)
-    this.deleteCard = this.deleteCard.bind(this)
-    this.addContent = this.addContent.bind(this)
-    this.changeBackgroundColor = this.changeBackgroundColor.bind(this)
 
     this.tracking = {}
     this.cardRefs = {}
@@ -141,7 +118,7 @@ export default class Board extends React.PureComponent {
     board.authorIds = []
   }
 
-  populateDemoBoard() {
+  populateDemoBoard = () => {
     log('populateDemoBoard')
     this.changeTitle('Example Board')
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
@@ -151,22 +128,43 @@ export default class Board extends React.PureComponent {
     this.createCard({ type: 'image', x: 600, y: 150, typeAttrs: { path: WORKSHOP_PATH } })
   }
 
-  componentDidMount() {
-    log('componentDidMount')
-    if (this.props.doc.cards && Object.keys(this.props.doc.cards).length === 0) {
-      this.populateDemoBoard()
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
     }
   }
 
-  componentWillUnmount() {
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.releaseHandle(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    if (doc.cards && doc.cards.length === 0) { // this means no cards array at all, not an empty one
+      this.populateDemoBoard()
+    }
+    this.setState({ doc })
+  }
+  componentDidMount = () => {
+    log('componentDidMount')
+  }
+
+  componentWillUnmount = () => {
     log('componentWillUnmount')
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps = () => {
     log('componentWillReceiveProps')
   }
 
-  onKeyDown(e) {
+  onKeyDown = (e) => {
     // this event can be consumed by a card if it wants to keep control of backspace
     // for example, see code-mirror-editor.jsx onKeyDown
     if (e.key === 'Backspace') {
@@ -174,12 +172,12 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  onClick(e) {
+  onClick = (e) => {
     log('onClick')
     this.setState({ selected: [] })
   }
 
-  onCardClicked(e, card) {
+  onCardClicked = (e, card) => {
     if (this.finishedDrag) {
       // this is the end of a resize / move event, don't change selection
       this.finishedDrag = false
@@ -196,12 +194,12 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
   }
 
-  onCardDoubleClicked(e, card) {
+  onCardDoubleClicked = (e, card) => {
     window.location = card.url
     e.stopPropagation()
   }
 
-  onDoubleClick(e) {
+  onDoubleClick = (e) => {
     log('onDoubleClick')
     const cardId = this.createCard({
       x: e.pageX - this.boardRef.offsetLeft,
@@ -210,12 +208,12 @@ export default class Board extends React.PureComponent {
     this.selectOnly(cardId)
   }
 
-  onDragOver(e) {
+  onDragOver = (e) => {
     e.preventDefault()
     e.stopPropagation()
   }
 
-  getFiles(dataTransfer) {
+  getFiles = (dataTransfer) => {
     const files = []
     for (let i = 0; i < dataTransfer.files.length; i += 1) {
       const item = dataTransfer.items[i]
@@ -230,7 +228,7 @@ export default class Board extends React.PureComponent {
     return files
   }
 
-  async onDrop(e) {
+  onDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
     const { pageX, pageY } = e
@@ -274,7 +272,7 @@ export default class Board extends React.PureComponent {
   /* We can't get the mouse position on a paste event,
      so we ask the window for the current pageX/Y offsets and just stick the new card
      100px in from there. (The new React might support this through pointer events.) */
-  async onPaste(e) {
+  onPaste = (e) => {
     log('onPaste')
     e.preventDefault()
     e.stopPropagation()
@@ -308,7 +306,7 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  addContent(e, contentType) {
+  addContent = (e, contentType) => {
     e.stopPropagation()
 
     const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
@@ -339,7 +337,7 @@ export default class Board extends React.PureComponent {
   // and drop.
   // For now we write temp files, though we should do something more efficient
   // here eventually.
-  createImageCardFromReader(x, y, reader) {
+  createImageCardFromReader = (x, y, reader) => {
     Tmp.file((err, path, fd, cleanup) => {
       if (err) {
         throw err
@@ -353,11 +351,11 @@ export default class Board extends React.PureComponent {
     })
   }
 
-  createCard({ x, y, width, height, type, typeAttrs }) {
+  createCard = ({ x, y, width, height, type, typeAttrs }) => {
     const id = uuid()
     const docId = Content.initializeContentDoc(type, typeAttrs)
 
-    this.props.onChange((b) => {
+    this.handle.change((b) => {
       const snapX = this.snapCoordinateToGrid(x)
       const snapY = this.snapCoordinateToGrid(y)
       const newCard = {
@@ -378,27 +376,27 @@ export default class Board extends React.PureComponent {
     return id
   }
 
-  deleteCard(id) {
+  deleteCard = (id) => {
     // allow either an array or a single card to be passed in
     if (id.constructor !== Array) {
       id = [id]
     }
 
-    this.props.onChange((b) => {
+    this.handle.change((b) => {
       id.forEach((id) => delete b.cards[id])
     })
   }
 
-  changeTitle(title) {
+  changeTitle = (title) => {
     log('changeTitle')
-    this.props.onChange((b) => {
+    this.handle.change((b) => {
       b.title = title
     })
   }
 
-  changeBackgroundColor(color) {
+  changeBackgroundColor = (color) => {
     log('changeBackgroundColor')
-    this.props.onChange((b) => {
+    this.handle.change((b) => {
       b.backgroundColor = color.hex
     })
   }
@@ -409,7 +407,7 @@ export default class Board extends React.PureComponent {
    *
    */
 
-  cardMoved(onChange, doc, { id, x, y }) {
+  cardMoved = (changeCB, doc, { id, x, y }) => {
     // This gets called when uniquely selecting a card, so avoid a document
     // change if in fact the card hasn't moved mod snapping.
     const snapX = this.snapCoordinateToGrid(x)
@@ -417,22 +415,22 @@ export default class Board extends React.PureComponent {
     if (snapX === doc.cards[id].x && snapY === doc.cards[id].y) {
       return
     }
-    onChange((b) => {
+    changeCB((b) => {
       const card = b.cards[id]
       card.x = snapX
       card.y = snapY
     })
   }
 
-  cardResizeHeightRoundingUp(onChange, doc, { id, width, height }) {
+  cardResizeHeightRoundingUp = (changeCB, doc, { id, width, height }) => {
     const snapHeight = this.snapMeasureOutwardToGrid(Math.max(height, CARD_MIN_HEIGHT))
-    onChange((b) => {
+    changeCB((b) => {
       const card = b.cards[id]
       card.height = snapHeight
     })
   }
 
-  cardResized(onChange, doc, { id, width, height }) {
+  cardResized = (changeCB, doc, { id, width, height }) => {
     // This gets called when we click the drag corner of a card, so avoid a
     // document change if in fact the card won't resize mod snapping.
     const snapWidth = this.snapMeasureToGrid(width)
@@ -440,7 +438,7 @@ export default class Board extends React.PureComponent {
     if (snapWidth === doc.cards[id].width && snapHeight === doc.cards[id].height) {
       return
     }
-    onChange((b) => {
+    changeCB((b) => {
       const card = b.cards[id]
       card.width = snapWidth
       card.height = snapHeight
@@ -454,7 +452,7 @@ export default class Board extends React.PureComponent {
    */
 
   // Snap given num to nearest multiple of our grid size.
-  snapToGrid(num) {
+  snapToGrid = (num) => {
     const resto = num % GRID_SIZE
     if (resto <= (GRID_SIZE / 2)) {
       return num - resto
@@ -469,15 +467,10 @@ export default class Board extends React.PureComponent {
   // ever increases the measure, which are needed for some types of content
   // (like text which shouldn't get cut off by snapping).
 
-  snapCoordinateToGrid(coordinate) {
-    return this.snapToGrid(coordinate)
-  }
+  snapCoordinateToGrid = (coordinate) => this.snapToGrid(coordinate)
+  snapMeasureToGrid = (measure) => this.snapToGrid(measure) + 1
 
-  snapMeasureToGrid(measure) {
-    return this.snapToGrid(measure) + 1
-  }
-
-  snapMeasureOutwardToGrid(measure) {
+  snapMeasureOutwardToGrid = (measure) => {
     const snapped = this.snapMeasureToGrid(measure)
     if (snapped >= measure) {
       return snapped
@@ -486,7 +479,7 @@ export default class Board extends React.PureComponent {
   }
 
   // Copy view-relevant move/resize state over to React.
-  setDragState(card, tracking) {
+  setDragState = (card, tracking) => {
     const cards = { ...this.state.cards }
 
     cards[card.id] = {
@@ -499,7 +492,7 @@ export default class Board extends React.PureComponent {
     this.setState({ cards })
   }
 
-  effectDrag(card, tracking, { deltaX, deltaY }) {
+  effectDrag = (card, tracking, { deltaX, deltaY }) => {
     if (!tracking.resizing && !tracking.moving) {
       throw new Error('Did not expect drag without resize or move')
     }
@@ -566,13 +559,13 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  onDrag(card, e, d) {
+  onDrag = (card, e, d) => {
     log('onDrag')
     const tracking = this.tracking[card.id]
 
     // If the card has no fixed dimensions yet, get its current rendered dimensions
     if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
-      this.props.onChange(b => {
+      this.handle.change(b => {
         // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
         // this prevents visual changes like scrollbar from triggering on drag
         /* eslint react/no-find-dom-node: "off" */
@@ -580,7 +573,7 @@ export default class Board extends React.PureComponent {
         b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
       })
 
-      card = this.props.doc.cards[card.id]
+      card = this.state.doc.cards[card.id]
     }
 
     // If we haven't started tracking this drag, initialize tracking
@@ -589,7 +582,7 @@ export default class Board extends React.PureComponent {
       const moving = !resizing
 
       if (moving) {
-        const cards = draggableCards(this.props.doc.cards, this.state.selected, card)
+        const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
 
         cards.forEach(c => {
           this.tracking[c.id] = {
@@ -616,7 +609,7 @@ export default class Board extends React.PureComponent {
     }
 
     if (tracking.moving) {
-      const cards = draggableCards(this.props.doc.cards, this.state.selected, card)
+      const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         this.effectDrag(card, t, d)
@@ -630,7 +623,7 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  selectToggle(cardId) {
+  selectToggle = (cardId) => {
     const { selected } = this.state
 
     if (selected.includes(cardId)) {
@@ -642,11 +635,11 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  selectOnly(cardId) {
+  selectOnly = (cardId) => {
     this.setState({ selected: [cardId] })
   }
 
-  onStop(card, e, d) {
+  onStop = (card, e, d) => {
     log('onStop')
 
     const { id } = card
@@ -658,7 +651,7 @@ export default class Board extends React.PureComponent {
     }
 
     if (tracking.moving) {
-      const cards = draggableCards(this.props.doc.cards, this.state.selected, card)
+      const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         const x = t.moveX
@@ -670,7 +663,7 @@ export default class Board extends React.PureComponent {
         t.slackY = null
         t.moving = false
 
-        this.cardMoved(this.props.onChange, this.props.doc, { id: card.id, x, y })
+        this.cardMoved(this.handle.change, this.state.doc, { id: card.id, x, y })
         this.setDragState(card, t)
       })
     }
@@ -685,21 +678,21 @@ export default class Board extends React.PureComponent {
       tracking.slackHeight = null
       tracking.resizing = false
 
-      this.cardResized(this.props.onChange, this.props.doc, { id: card.id, width, height })
+      this.cardResized(this.handle.change, this.state.doc, { id: card.id, width, height })
       this.setDragState(card, tracking)
     }
 
     this.finishedDrag = true
   }
 
-  onShowContextMenu(e) {
+  onShowContextMenu = (e) => {
     this.setState({ contextMenuPosition: e.detail.position })
   }
 
-  render() {
+  render = () => {
     log('render')
 
-    const cards = this.props.doc.cards || {}
+    const cards = this.state.doc.cards || {}
     // rework selected functioning, this is a slow implementation
     const cardChildren = Object.entries(cards).map(([id, card]) => {
       const selected = this.state.selected.includes(id)
@@ -751,7 +744,7 @@ export default class Board extends React.PureComponent {
           <div className="ContextMenu__divider" />
           <ContextMenuItem>
             <ColorPicker
-              color={this.props.doc.backgroundColor}
+              color={this.state.doc.backgroundColor}
               colors={BOARD_COLOR_VALUES}
               onChangeComplete={this.changeBackgroundColor}
             />
@@ -765,7 +758,7 @@ export default class Board extends React.PureComponent {
         className="board"
         ref={(e) => { this.boardRef = e }}
         style={{
-          backgroundColor: this.props.doc.backgroundColor,
+          backgroundColor: this.state.doc.backgroundColor,
           width: BOARD_WIDTH,
           height: BOARD_HEIGHT
         }}

@@ -15,18 +15,28 @@ const log = Debug('pushpin:settings')
 
 export default class Settings extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.shape({
-      avatarDocId: PropTypes.string,
-      name: PropTypes.string
-    }).isRequired,
-    onChange: PropTypes.func.isRequired,
+    docId: PropTypes.string.isRequired
   }
 
-  constructor(props) {
-    super(props)
-    log('constructor')
-    this.chooseAvatar = this.chooseAvatar.bind(this)
-    this.setName = this.setName.bind(this)
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
+  }
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.releaseHandle(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ ...doc })
   }
 
   chooseAvatar() {
@@ -41,14 +51,14 @@ export default class Settings extends React.PureComponent {
       }
       const path = paths[0]
       const docId = Content.initializeContentDoc('image', { path })
-      this.props.onChange((d) => {
+      this.handle.change((d) => {
         d.avatarDocId = docId
       })
     })
   }
 
   setName(e) {
-    this.props.onChange((d) => {
+    this.handle.change((d) => {
       d.name = e.target.value
     })
   }
@@ -56,8 +66,8 @@ export default class Settings extends React.PureComponent {
   render() {
     log('render')
     let avatar
-    if (this.props.doc.avatarDocId) {
-      avatar = <Content url={createDocumentLink('image', this.props.doc.avatarDocId)} />
+    if (this.state.avatarDocId) {
+      avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
@@ -71,7 +81,7 @@ export default class Settings extends React.PureComponent {
           <div className="ListMenu__section">
             <div className="ListMenu__label">Display Name</div>
             <div className="ListMenu__item">
-              <input type="text" onChange={this.setName} defaultValue={this.props.doc.name} />
+              <input type="text" onChange={this.setName} defaultValue={this.state.name} />
             </div>
             <div className="ListMenu__label">Avatar</div>
             <div className="ListMenu__item">

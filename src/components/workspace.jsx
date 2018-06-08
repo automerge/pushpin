@@ -50,7 +50,7 @@ export default class Workspace extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.release(this.handle)
+  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -59,7 +59,7 @@ export default class Workspace extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      window.hm.release(this.handle)
+      window.hm.releaseHandle(this.handle)
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
