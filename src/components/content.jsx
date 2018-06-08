@@ -13,21 +13,6 @@ export default class Content extends React.PureComponent {
     url: PropTypes.string.isRequired,
   }
 
-  constructor(props) {
-    super(props)
-    log('constructor')
-
-    this.onChange = this.onChange.bind(this)
-
-    const { docId } = parseDocumentLink(this.props.url)
-    this.handle = window.hm.openHandle(docId)
-
-    // State directly affects the rendered view.
-    this.state = {
-      doc: this.handle.get()
-    }
-  }
-
   static initializeContentDoc(type, typeAttrs = {}) {
     const { hm } = window // still not a great idea
     const contentType = ContentTypes
@@ -45,40 +30,30 @@ export default class Content extends React.PureComponent {
     return docId
   }
 
-  onChange(changeBlock) {
-    // We can read the old version of th doc from this.state.doc because
-    // setState is not immediate and so this.state may not yet reflect the
-    // latest version of the doc.
-    const doc = this.handle.change(changeBlock)
-    this.setState({ doc })
+  // This is the New Boilerplate, adapted slightly for content
+  componentWillMount = () => {
+    const { docId } = parseDocumentLink(this.props.url)
+    this.refreshHandle(docId)
   }
-
-  componentDidMount() {
-    this.mounted = true
-
-    this.handle.onChange(doc => {
-      if (!this.mounted) {
-        return
-      }
-      this.setState({ doc })
-    })
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentWillUnmount = () => window.hm.release(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.url !== this.props.url) {
       const { docId } = parseDocumentLink(this.props.url)
-      this.handle = window.hm.openHandle(docId)
-      this.handle.onChange(doc => {
-        if (!this.mounted) {
-          return
-        }
-        this.setState({ doc })
-      })
+      this.refreshHandle(docId)
     }
   }
 
-  componentWillUnmount() {
-    this.mounted = false
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.release(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ doc })
   }
 
   filterProps(props) {
