@@ -181,7 +181,8 @@ const css = {
   },
   time: {
     flex: 'none',
-    marginLeft: 'auto',
+    position: 'absolute',
+    right: 0,
     fontSize: 12,
     color: 'var(--colorSecondaryGrey)',
     marginTop: -22
