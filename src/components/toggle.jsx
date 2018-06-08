@@ -13,12 +13,6 @@ export default class Toggle extends React.PureComponent {
     toggleDoc.toggled = false
   }
 
-  constructor(props) {
-    super(props)
-    this.handle = null
-    this.flipToggle = this.flipToggle.bind(this)
-  }
-
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)
@@ -41,7 +35,7 @@ export default class Toggle extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  flipToggle() {
+  flipToggle = () => {
     this.handle.change((doc) => {
       doc.toggled = !doc.toggled
     })
