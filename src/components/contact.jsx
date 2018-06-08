@@ -7,10 +7,7 @@ import { createDocumentLink } from '../share-link'
 
 export default class Contact extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.shape({
-      avatarDocId: PropTypes.string,
-      name: PropTypes.string,
-    }).isRequired,
+    docId: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.string),
     onShare: PropTypes.func,
     onUnshare: PropTypes.func
@@ -20,6 +17,28 @@ export default class Contact extends React.PureComponent {
     actions: [],
     onShare: () => {},
     onUnshare: () => {}
+  }
+
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.release(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
+  }
+
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.release(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ ...doc })
   }
 
   render() {
@@ -41,8 +60,8 @@ export default class Contact extends React.PureComponent {
     }
 
     let avatar
-    if (this.props.doc.avatarDocId) {
-      avatar = <Content url={createDocumentLink('image', this.props.doc.avatarDocId)} />
+    if (this.state.avatarDocId) {
+      avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
@@ -56,7 +75,7 @@ export default class Contact extends React.PureComponent {
         </div>
         <div className="Label">
           <p className="Type--primary">
-            { this.props.doc.name }
+            { this.state.name }
           </p>
         </div>
 
