@@ -157,7 +157,9 @@ const css = {
     display: 'flex',
     backgroundColor: 'white',
     width: '100%',
-    overflow: 'auto'
+    overflow: 'auto',
+    height: '100%',
+    border: '1px solid var(--colorInputGrey)'
   },
   messageWrapper: {
     padding: 12,
@@ -208,7 +210,7 @@ const css = {
   },
   inputWrapper: {
     boxSizing: 'border-box',
-    width: '100%',
+    width: 'calc(100% - 1px)',
     borderTop: '1px solid var(--colorInputGrey)',
     position: 'absolute',
     bottom: 0,
