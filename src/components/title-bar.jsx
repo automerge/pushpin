@@ -16,31 +16,21 @@ export default class TitleBar extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  constructor(props) {
-    super(props)
+  boardHistory = React.createRef()
 
-    this.back = this.back.bind(this)
-    this.forward = this.forward.bind(this)
-    this.hideBoardHistory = this.hideBoardHistory.bind(this)
+  backIndex = () => this.state.viewedDocUrls.findIndex(url => url === this.state.currentDocUrl)
 
-    this.boardHistory = React.createRef()
-  }
-
-  backIndex() {
-    return this.state.viewedDocUrls.findIndex(url => url === this.state.currentDocUrl)
-  }
-
-  back() {
+  back = () => {
     const index = this.backIndex()
     this.props.openDoc(this.state.viewedDocUrls[index + 1], { saveHistory: false })
   }
 
-  forward() {
+  forward = () => {
     const index = this.backIndex()
     this.props.openDoc(this.state.viewedDocUrls[index - 1], { saveHistory: false })
   }
 
-  hideBoardHistory() {
+  hideBoardHistory = () => {
     this.boardHistory.current.hide()
   }
 
@@ -66,7 +56,7 @@ export default class TitleBar extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  render() {
+  render = () => {
     log('render')
     if (!this.state.currentDocUrl) {
       return null
