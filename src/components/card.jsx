@@ -66,7 +66,7 @@ export default class Card extends React.PureComponent {
       top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
     }
 
-    const { type } = parseDocumentLink(card.url)
+    const { type, docId } = parseDocumentLink(card.url)
     const contentType = ContentTypes
       .list({ withUnlisted: true })
       .find(contentType => contentType.type === type)
@@ -74,7 +74,7 @@ export default class Card extends React.PureComponent {
     return (
       <div
         tabIndex="-1"
-        id={`card-${card.id}`}
+        id={docId}
         className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
         style={style}
         onClick={this.onClick}
