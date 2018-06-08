@@ -8,17 +8,6 @@ import { createDocumentLink, parseDocumentLink } from '../share-link'
 export default class Share extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    doc: PropTypes.shape({
-      selfId: PropTypes.string,
-      currentDocUrl: PropTypes.string,
-      authorIds: PropTypes.arrayOf(PropTypes.string),
-      contactIds: PropTypes.arrayOf(PropTypes.string),
-      notifications: PropTypes.arrayOf(PropTypes.shape({
-        type: PropTypes.string.isRequired,
-        sender: PropTypes.object.isRequired,
-        board: PropTypes.object.isRequired
-      }))
-    }).isRequired,
     openDocument: PropTypes.func.isRequired
   }
 
@@ -57,19 +46,19 @@ export default class Share extends React.PureComponent {
   watchBoard() {
     // we need to create a new current document handle each time the document changes
     // NB: this is probably leaking listeners right now
-    if (this.props.doc.currentDocUrl && this.props.doc.currentDocUrl !== this.state.currentDocUrl) {
+    if (this.state.doc.currentDocUrl && this.state.doc.currentDocUrl !== this.state.currentDocUrl) {
       const workspaceHandle = window.hm.openHandle(this.props.docId)
-      const { docId: currentDocId } = parseDocumentLink(this.props.doc.currentDocUrl)
+      const { docId: currentDocId } = parseDocumentLink(this.state.doc.currentDocUrl)
       const currentDocHandle = window.hm.openHandle(currentDocId)
       currentDocHandle.onChange((doc) => {
         this.updateIdentityReferences(workspaceHandle, currentDocHandle)
-        this.setState({ currentDocUrl: this.props.doc.currentDocUrl })
+        this.setState({ currentDocUrl: this.state.doc.currentDocUrl })
       })
     }
   }
 
   onContactUpdated(contactId, contact) {
-    const { selfId } = this.props.doc
+    const { selfId } = this.state.doc
     const { consolidatedOffers } = this.state
 
     // record offers of boards for this account from this contact in our local state
@@ -91,7 +80,7 @@ export default class Share extends React.PureComponent {
   }
 
   watchContacts() {
-    const { contactIds = [] } = this.props.doc
+    const { contactIds = [] } = this.state.doc
     const { watchedContacts = {} } = this.state
 
     contactIds.forEach((contactId) => {
@@ -110,11 +99,11 @@ export default class Share extends React.PureComponent {
   }
 
   offerDocumentToIdentity(e, contactId) {
-    if (!this.props.doc.selfId) {
+    if (!this.state.doc.selfId) {
       return
     }
 
-    const selfHandle = window.hm.openHandle(this.props.doc.selfId)
+    const selfHandle = window.hm.openHandle(this.state.doc.selfId)
 
     selfHandle.change((s) => {
       if (!s.offeredUrls) {
@@ -125,19 +114,19 @@ export default class Share extends React.PureComponent {
         s.offeredUrls[contactId] = []
       }
 
-      if (!s.offeredUrls[contactId].includes(this.props.doc.currentDocUrl)) {
-        s.offeredUrls[contactId].push(this.props.doc.currentDocUrl)
+      if (!s.offeredUrls[contactId].includes(this.state.doc.currentDocUrl)) {
+        s.offeredUrls[contactId].push(this.state.doc.currentDocUrl)
       }
     })
   }
 
   renderContacts() {
-    const { currentDocUrl, contactIds = [] } = this.props.doc
+    const { currentDocUrl, contactIds = [] } = this.state.doc
     if (!currentDocUrl) {
       return null
     }
 
-    const { type, docId } = parseDocumentLink(this.props.doc.currentDocUrl)
+    const { type, docId } = parseDocumentLink(this.state.doc.currentDocUrl)
     if (type !== 'board') {
       // right now only boards have authorIds (though maybe we can check that instead?)
       return null

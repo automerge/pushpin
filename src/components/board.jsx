@@ -407,38 +407,39 @@ export default class Board extends React.PureComponent {
    *
    */
 
-  cardMoved = (changeCB, doc, { id, x, y }) => {
+  cardMoved = ({ id, x, y }) => {
     // This gets called when uniquely selecting a card, so avoid a document
     // change if in fact the card hasn't moved mod snapping.
     const snapX = this.snapCoordinateToGrid(x)
     const snapY = this.snapCoordinateToGrid(y)
-    if (snapX === doc.cards[id].x && snapY === doc.cards[id].y) {
+    if (snapX === this.state.doc.cards[id].x && snapY === this.state.doc.cards[id].y) {
       return
     }
-    changeCB((b) => {
+    this.handle.change((b) => {
       const card = b.cards[id]
       card.x = snapX
       card.y = snapY
     })
   }
 
-  cardResizeHeightRoundingUp = (changeCB, doc, { id, width, height }) => {
+  cardResizeHeightRoundingUp = ({ id, width, height }) => {
     const snapHeight = this.snapMeasureOutwardToGrid(Math.max(height, CARD_MIN_HEIGHT))
-    changeCB((b) => {
+    this.handle.change((b) => {
       const card = b.cards[id]
       card.height = snapHeight
     })
   }
 
-  cardResized = (changeCB, doc, { id, width, height }) => {
+  cardResized = ({ id, width, height }) => {
     // This gets called when we click the drag corner of a card, so avoid a
     // document change if in fact the card won't resize mod snapping.
     const snapWidth = this.snapMeasureToGrid(width)
     const snapHeight = this.snapMeasureToGrid(height)
-    if (snapWidth === doc.cards[id].width && snapHeight === doc.cards[id].height) {
+    if (snapWidth === this.state.doc.cards[id].width &&
+        snapHeight === this.state.doc.cards[id].height) {
       return
     }
-    changeCB((b) => {
+    this.handle.change((b) => {
       const card = b.cards[id]
       card.width = snapWidth
       card.height = snapHeight
@@ -663,7 +664,7 @@ export default class Board extends React.PureComponent {
         t.slackY = null
         t.moving = false
 
-        this.cardMoved(this.handle.change, this.state.doc, { id: card.id, x, y })
+        this.cardMoved({ id: card.id, x, y })
         this.setDragState(card, t)
       })
     }
@@ -678,7 +679,7 @@ export default class Board extends React.PureComponent {
       tracking.slackHeight = null
       tracking.resizing = false
 
-      this.cardResized(this.handle.change, this.state.doc, { id: card.id, width, height })
+      this.cardResized({ id: card.id, width, height })
       this.setDragState(card, tracking)
     }
 
@@ -703,8 +704,8 @@ export default class Board extends React.PureComponent {
           allowAnyClick={false}
           disabled={false}
           enableUserSelectHack={false}
-          onDrag={(e, d) => this.onDrag(card, e, d)}
-          onStop={(e, d) => this.onStop(card, e, d)}
+          onDrag={(e, d) => this.onDrag.bind(this)(card, e, d)}
+          onStop={(e, d) => this.onStop.bind(this)(card, e, d)}
         >
           <div>
             <Card
