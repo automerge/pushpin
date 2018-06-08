@@ -10,13 +10,7 @@ const log = Debug('pushpin:image-card')
 
 export default class ImageCard extends React.PureComponent {
   static propTypes = {
-    doc: PropTypes.shape({
-      path: PropTypes.string,
-      hyperfile: PropTypes.shape({
-        key: PropTypes.string
-      })
-    }).isRequired,
-    onChange: PropTypes.func.isRequired
+    docId: PropTypes.string.isRequired
   }
 
   constructor(props) {
@@ -30,6 +24,9 @@ export default class ImageCard extends React.PureComponent {
   }
 
   componentDidMount() {
+    this.handle = window.hm.openHandle(this.props.docId)
+    this.handle.onChange((doc) => this.setState({ ...doc }))
+
     log('componentDidMount')
     this.workImage()
     this.mounted = true
@@ -46,23 +43,23 @@ export default class ImageCard extends React.PureComponent {
   }
 
   workImage() {
-    if (this.props.doc.path) {
+    if (this.state.path) {
       this.uploadImage()
     }
 
-    if (this.props.doc.hyperfile) {
+    if (this.state.hyperfile) {
       this.fetchImage()
     }
   }
 
   uploadImage() {
     const fileId = uuid()
-    Hyperfile.writePath(fileId, this.props.doc.path, (err, hyperfile) => {
+    Hyperfile.writePath(fileId, this.state.path, (err, hyperfile) => {
       if (err) {
         log(err)
       }
 
-      this.props.onChange(d => {
+      this.handle.change(d => {
         delete d.path
         d.hyperfile = hyperfile
       })
@@ -70,7 +67,7 @@ export default class ImageCard extends React.PureComponent {
   }
 
   fetchImage() {
-    Hyperfile.fetch(this.props.doc.hyperfile, (error, imagePath) => {
+    Hyperfile.fetch(this.state.hyperfile, (error, imagePath) => {
       if (error) {
         log(error)
       }
