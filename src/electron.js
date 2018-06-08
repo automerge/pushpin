@@ -22,8 +22,15 @@ const createWindow = async () => {
   })
 
   protocol.registerBufferProtocol('hyperfile', (request, callback) => {
-    const [fileId, key] = request.url.split('//')[1].split('/')
-    Hyperfile.fetch({ fileId, key }, (err, data) => callback({ data }))
+    const hyperfileId = request.url.split('//')[1]
+    Hyperfile.fetch(hyperfileId, (err, data) => {
+      if (err) {
+        console.log(err)
+        return
+      }
+
+      callback({ data })
+    })
   }, (error) => {
     if (error) console.error('Failed to register protocol')
   })

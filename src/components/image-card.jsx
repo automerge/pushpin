@@ -45,28 +45,27 @@ export default class ImageCard extends React.PureComponent {
   }
 
   uploadImage = () => {
-    const fileId = uuid()
-    Hyperfile.writePath(fileId, this.state.path, (err, hyperfile) => {
+    Hyperfile.write(this.state.path, (err, hyperfileId) => {
       if (err) {
         log(err)
       }
 
       this.handle.change(d => {
         delete d.path
-        d.hyperfile = hyperfile
+        d.hyperfileId = hyperfileId
       })
     })
   }
 
   render = () => {
     log('render')
-    if (!this.state.hyperfile) {
+    if (!this.state.hyperfileId) {
       // we used to show some kind of stand-in value but we don't have a design
       // for one that works everywhere the image works, so for now: nothing.
       return null
     }
 
-    const fileUri =  `hyperfile://${this.state.hyperfile.fileId}/${this.state.hyperfile.key}`
+    const fileUri = `hyperfile://${this.state.hyperfileId}`
     return <img className="image" alt="" src={fileUri} />
   }
 }

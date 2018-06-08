@@ -27,6 +27,14 @@ class Multicore extends EventEmitter {
     })
   }
 
+  ready(cb) {
+    if(this.isReady) {
+      cb()
+    } else {
+      this.on('ready', cb)
+    }
+  }
+
   createFeed(key, opts = {}) {
     this._ensureReady()
     log('createFeed', key && key.toString('hex'))
