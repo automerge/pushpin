@@ -15,7 +15,7 @@ export default class Workspace extends React.PureComponent {
     docId: PropTypes.string.isRequired,
   }
 
-  static initializeDocument(workspace) {
+  static initializeDocument = (workspace) => {
     // When creating a workspace we also need to create an identity and board,
     // do that first so that we have IDs.
     const identity = window.hm.create()
@@ -49,10 +49,8 @@ export default class Workspace extends React.PureComponent {
   }
 
   // This is the New Boilerplate
-  componentWillMount() {
-    this.refreshHandle(this.props.docId)
-  }
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
     }
@@ -86,7 +84,7 @@ export default class Workspace extends React.PureComponent {
     })
   }
 
-  render() {
+  render = () => {
     log('render')
     const { type } = parseDocumentLink(this.state.currentDocUrl)
     return (
