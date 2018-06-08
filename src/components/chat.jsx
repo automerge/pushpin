@@ -119,10 +119,7 @@ export default class Chat extends React.PureComponent {
     }
   }
 }
-// { prev.authorId === authorId
-//   ? null
-//   :
-// }
+
 class MiniAvatar extends React.PureComponent {
   static propTypes = {
     doc: PropTypes.shape({
