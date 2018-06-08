@@ -12,6 +12,7 @@ export default class ImageCard extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
+
   static initializeDocument = (image, { path }) => {
     image.path = path
   }
@@ -41,10 +42,6 @@ export default class ImageCard extends React.PureComponent {
     if (this.state.path) {
       this.uploadImage()
     }
-
-    if (this.state.hyperfile && !this.state.imageContentReady) {
-      this.fetchImage()
-    }
   }
 
   uploadImage = () => {
@@ -61,30 +58,16 @@ export default class ImageCard extends React.PureComponent {
     })
   }
 
-  fetchImage = () => {
-    Hyperfile.fetch(this.state.hyperfile, (error, imagePath) => {
-      if (error) {
-        log(error)
-      }
-
-      // This card may have been deleted by the time fetchImage returns,
-      // so check here to see if the component is still mounted
-      if (!this.mounted) {
-        return
-      }
-
-      this.setState({ imageContentReady: true, imagePath: `../${imagePath}` })
-    })
-  }
-
   render = () => {
     log('render')
-    if (!this.state.imageContentReady) {
+    if (!this.state.hyperfile) {
       // we used to show some kind of stand-in value but we don't have a design
       // for one that works everywhere the image works, so for now: nothing.
       return null
     }
-    return <img className="image" alt="" src={this.state.imagePath} />
+
+    const fileUri =  `hyperfile://${this.state.hyperfile.fileId}/${this.state.hyperfile.key}`
+    return <img className="image" alt="" src={fileUri} />
   }
 }
 
