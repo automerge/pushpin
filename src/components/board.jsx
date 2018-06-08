@@ -147,7 +147,7 @@ export default class Board extends React.PureComponent {
 
   // this should be overridden by components which care
   onChange = (doc) => {
-    if (doc.cards && doc.cards.length === 0) { // this means no cards array at all, not an empty one
+    if (doc.cards && doc.cards.length === 0) {
       this.populateDemoBoard()
     }
     this.setState({ doc })
