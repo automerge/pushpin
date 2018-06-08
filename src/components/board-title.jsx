@@ -12,37 +12,38 @@ export default class BoardTitle extends React.PureComponent {
     docId: PropTypes.string.isRequired,
   }
 
-  constructor(props) {
-    super(props)
-    this.setTitle = this.setTitle.bind(this)
-  }
-
-  setTitle({ title }) {
+  setTitle = ({ title }) => {
     log('onChangeTitle')
     this.handle.change((b) => {
       b.title = title
     })
   }
 
-  refreshHandle(docId) {
-    this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange(doc => this.setState({ doc }))
-  }
-
-  componentWillMount() {
-    log('componentWillMount')
-    this.refreshHandle(this.props.docId)
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
     }
   }
 
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.releaseHandle(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ ...doc })
+  }
+
   render() {
     return (<RIEInput
-      value={this.state.doc.title || ''}
+      value={this.state.title || ''}
       change={this.setTitle}
       propName="title"
       className="TitleBar__titleText"
