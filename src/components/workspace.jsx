@@ -69,6 +69,15 @@ export default class Workspace extends React.PureComponent {
   onChange = (doc) => {
     window.selfId = doc.selfId // Be mad (:
     this.setState({ ...doc })
+    this.refreshHeartbeat(doc)
+  }
+
+  refreshHeartbeat = (doc) => {
+    const selfHandle = window.hm.openHandle(doc.selfId)
+    this.timerId = setInterval(() => {
+      selfHandle.message('heartbeat')
+      console.log('hb sent')
+    }, 1000)
   }
 
   openDoc = (docUrl, options = {}) => {

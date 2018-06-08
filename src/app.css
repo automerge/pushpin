@@ -171,6 +171,10 @@ input {
   padding:2px;
 }
 
+.Avatar--online {
+  border: 10px solid green;
+}
+
 .Avatar img {
   width: 36px;
   height: 36px;
