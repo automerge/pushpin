@@ -177,7 +177,7 @@ input {
 .Avatar--online {
   border: 2px solid rgba(113, 227, 65, 1);
   box-shadow: 0 0 4px 0 rgba(113, 227, 65, 1);
-  animation: pulse 2s infinite;
+  animation: pulse 2s;
 }
 
 .Avatar img {
@@ -191,7 +191,7 @@ input {
     box-shadow: 0 0 0 0 rgba(113, 227, 65, .5);
   }
   70% {
-      box-shadow: 0 0 0 10px rgba(113, 227, 65, 0);
+      box-shadow: 0 0 0 8px rgba(113, 227, 65, 0);
   }
   100% {
       box-shadow: 0 0 0 0 rgba(113, 227, 65, 0);
