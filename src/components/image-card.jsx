@@ -12,18 +12,13 @@ export default class ImageCard extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
-
-  constructor(props) {
-    super(props)
-    log('constructor')
-    this.state = { imageContentReady: false }
-  }
-
-  static initializeDocument(image, { path }) {
+  static initializeDocument = (image, { path }) => {
     image.path = path
   }
 
-  componentDidMount() {
+  state = { imageContentReady: false }
+
+  componentDidMount = () => {
     this.handle = window.hm.openHandle(this.props.docId)
     this.handle.onChange((doc) => this.setState({ ...doc, path: doc.path }))
 
@@ -32,17 +27,17 @@ export default class ImageCard extends React.PureComponent {
     this.mounted = true
   }
 
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     log('componentWillUnmount')
     this.mounted = false
   }
 
-  componentDidUpdate() {
+  componentDidUpdate = () => {
     log('componentDidUpdate')
     this.workImage()
   }
 
-  workImage() {
+  workImage = () => {
     if (this.state.path) {
       this.uploadImage()
     }
@@ -52,7 +47,7 @@ export default class ImageCard extends React.PureComponent {
     }
   }
 
-  uploadImage() {
+  uploadImage = () => {
     const fileId = uuid()
     Hyperfile.writePath(fileId, this.state.path, (err, hyperfile) => {
       if (err) {
@@ -66,7 +61,7 @@ export default class ImageCard extends React.PureComponent {
     })
   }
 
-  fetchImage() {
+  fetchImage = () => {
     Hyperfile.fetch(this.state.hyperfile, (error, imagePath) => {
       if (error) {
         log(error)
@@ -82,7 +77,7 @@ export default class ImageCard extends React.PureComponent {
     })
   }
 
-  render() {
+  render = () => {
     log('render')
     if (!this.state.imageContentReady) {
       // we used to show some kind of stand-in value but we don't have a design

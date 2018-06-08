@@ -7,52 +7,37 @@ const log = Debug('pushpin:hash-form')
 export default class HashForm extends React.PureComponent {
   static propTypes = {
     formDocId: PropTypes.string.isRequired,
-    onChanged: PropTypes.func
+    onChanged: PropTypes.func.isRequired
   }
 
-  static defaultProps = {
-    onChanged: () => {}
-  }
+  state = { value: this.props.formDocId }
 
-  constructor(props) {
-    super(props)
-    log('constructor')
-
-    this.state = { value: this.props.formDocId }
-    this.onSubmit = this.onSubmit.bind(this)
-    this.setInput = this.setInput.bind(this)
-  }
-
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps = (nextProps) => {
     this.setState({ value: nextProps.formDocId })
   }
 
-  onSubmit(e) {
+  onSubmit = (e) => {
     log('onSubmit')
     e.preventDefault()
     this.props.onChanged(this.input.value)
   }
 
-  setInput(elem) {
+  setInput = (elem) => {
     this.input = elem
   }
 
-  render() {
-    log('render')
-
-    // Should go back to checking activeDocId === requestedDocId for className
-    return (
-      <div className="HashForm">
-        <form onSubmit={this.onSubmit}>
-          <input
-            type="text"
-            className="loaded"
-            value={this.state.value}
-            onChange={e => this.setState({ value: e.target.value })}
-            ref={this.setInput}
-          />
-        </form>
-      </div>
-    )
-  }
+  // Should go back to checking activeDocId === requestedDocId for className
+  render = () => (
+    <div className="HashForm">
+      <form onSubmit={this.onSubmit}>
+        <input
+          type="text"
+          className="loaded"
+          value={this.state.value}
+          onChange={e => this.setState({ value: e.target.value })}
+          ref={this.setInput}
+        />
+      </form>
+    </div>
+  )
 }

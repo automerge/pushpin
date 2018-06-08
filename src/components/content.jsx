@@ -13,7 +13,7 @@ export default class Content extends React.PureComponent {
     url: PropTypes.string.isRequired,
   }
 
-  static initializeContentDoc(type, typeAttrs = {}) {
+  static initializeContentDoc = (type, typeAttrs = {}) => {
     const { hm } = window // still not a great idea
     const contentType = ContentTypes
       .list({ withUnlisted: true })
@@ -57,7 +57,7 @@ export default class Content extends React.PureComponent {
     this.setState({ doc })
   }
 
-  filterProps(props) {
+  filterProps = (props) => {
     const filtered = {}
     Object.keys(props)
       .filter(key => !FILTERED_PROPS.includes(key))
@@ -67,7 +67,7 @@ export default class Content extends React.PureComponent {
     return filtered
   }
 
-  render() {
+  render = () => {
     log('render')
 
     if (!this.props.url) {

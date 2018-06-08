@@ -63,7 +63,7 @@ export default class Settings extends React.PureComponent {
     })
   }
 
-  render() {
+  render = () => {
     log('render')
     let avatar
     if (this.state.avatarDocId) {

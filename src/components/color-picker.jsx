@@ -17,12 +17,7 @@ class ColorPicker extends React.PureComponent {
     onChange: PropTypes.func
   }
 
-  constructor(props) {
-    super(props)
-    this.handleChange = this.handleChange.bind(this)
-  }
-
-  handleChange(hexcode, e) {
+  handleChange = (hexcode, e) => {
     this.props.onChange({
       hex: hexcode,
       source: 'hex',

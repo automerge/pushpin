@@ -11,16 +11,12 @@ export default class Share extends React.PureComponent {
     openDocument: PropTypes.func.isRequired
   }
 
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      consolidatedOffers: [],
-      tab: 'notifications'
-    }
+  state = {
+    consolidatedOffers: [],
+    tab: 'notifications'
   }
 
-  updateIdentityReferences(workspaceHandle, documentHandle) {
+  updateIdentityReferences = (workspaceHandle, documentHandle) => {
     const { authorIds = [] } = documentHandle.get() || {}
     const { selfId, contactIds = [] } = workspaceHandle.get() || {}
 
@@ -43,7 +39,7 @@ export default class Share extends React.PureComponent {
     }
   }
 
-  watchBoard() {
+  watchBoard = () => {
     // we need to create a new current document handle each time the document changes
     // NB: this is probably leaking listeners right now
     if (this.state.doc.currentDocUrl && this.state.doc.currentDocUrl !== this.state.currentDocUrl) {
@@ -57,7 +53,7 @@ export default class Share extends React.PureComponent {
     }
   }
 
-  onContactUpdated(contactId, contact) {
+  onContactUpdated = (contactId, contact) => {
     const { selfId } = this.state.doc
     const { consolidatedOffers } = this.state
 
@@ -79,7 +75,7 @@ export default class Share extends React.PureComponent {
     this.setState({ consolidatedOffers })
   }
 
-  watchContacts() {
+  watchContacts = () => {
     const { contactIds = [] } = this.state.doc
     const { watchedContacts = {} } = this.state
 
@@ -116,7 +112,7 @@ export default class Share extends React.PureComponent {
     this.setState({ doc })
   }
 
-  offerDocumentToIdentity(e, contactId) {
+  offerDocumentToIdentity = (e, contactId) => {
     if (!this.state.doc.selfId) {
       return
     }
@@ -138,7 +134,7 @@ export default class Share extends React.PureComponent {
     })
   }
 
-  renderContacts() {
+  renderContacts = () => {
     const { currentDocUrl, contactIds = [] } = this.state.doc || {}
     if (!currentDocUrl) {
       return null
@@ -167,7 +163,7 @@ export default class Share extends React.PureComponent {
         key={id}
         url={createDocumentLink('contact', id)}
         actions={['share']}
-        onShare={e => this.offerDocumentToIdentity(e, id)}
+        onShare={e => this.offerDocumentToIdentity(e, id)} // XXX test this before merging
       />
     ))
 
@@ -185,11 +181,11 @@ export default class Share extends React.PureComponent {
     )
   }
 
-  acceptNotification(notification) {
+  acceptNotification = (notification) => {
     this.props.openDocument(notification.documentUrl)
   }
 
-  renderNotifications() {
+  renderNotifications = () => {
     const notifications = []
     this.state.consolidatedOffers.forEach(offer => {
       const { offererId, documentUrl } = offer
@@ -256,12 +252,12 @@ export default class Share extends React.PureComponent {
     )
   }
 
-  tabClasses(name) {
+  tabClasses = (name) => {
     if (this.state.tab === name) { return 'Tabs__tab Tabs__tab--active' }
     return 'Tabs__tab'
   }
 
-  render() {
+  render = () => {
     let body
 
     // XXX if notifications is empty, let's default to contacts.
