@@ -77,7 +77,7 @@ export default class Chat extends React.PureComponent {
       </div>
     )
   }
-  
+
   renderMessage({ authorId, content, time }, idx) {
     const date = new Date()
     date.setTime(time)
@@ -89,7 +89,6 @@ export default class Chat extends React.PureComponent {
       month: 'short',
       day: 'numeric'
     }
-    console.log(new Intl.DateTimeFormat('en-US', options ).format(date))
     return (
       <div style={css.message} key={idx}>
         <div style={css.content}>{content}</div>
