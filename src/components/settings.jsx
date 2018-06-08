@@ -39,7 +39,7 @@ export default class Settings extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  chooseAvatar() {
+  chooseAvatar = () => {
     // TODO: Images only update on refresh sometimes
     dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
       // User aborted.
@@ -57,7 +57,7 @@ export default class Settings extends React.PureComponent {
     })
   }
 
-  setName(e) {
+  setName = (e) => {
     this.handle.change((d) => {
       d.name = e.target.value
     })

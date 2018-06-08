@@ -92,10 +92,28 @@ export default class Share extends React.PureComponent {
     })
   }
 
-  // XXX will this work right as the document changes?
-  componentDidUpdate() {
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
     this.watchBoard()
     this.watchContacts()
+  }
+
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.releaseHandle(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ doc })
   }
 
   offerDocumentToIdentity(e, contactId) {
@@ -121,7 +139,7 @@ export default class Share extends React.PureComponent {
   }
 
   renderContacts() {
-    const { currentDocUrl, contactIds = [] } = this.state.doc
+    const { currentDocUrl, contactIds = [] } = this.state.doc || {}
     if (!currentDocUrl) {
       return null
     }
