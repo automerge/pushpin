@@ -13,12 +13,6 @@ const log = Debug('pushpin:title-bar')
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    doc: PropTypes.shape({
-      selfId: PropTypes.string,
-      currentDocUrl: PropTypes.string,
-      contactIds: PropTypes.arrayOf(PropTypes.string),
-      viewedDocUrls: PropTypes.arrayOf(PropTypes.string)
-    }).isRequired,
     openDoc: PropTypes.func.isRequired
   }
 
@@ -33,30 +27,52 @@ export default class TitleBar extends React.PureComponent {
   }
 
   backIndex() {
-    return this.props.doc.viewedDocUrls.findIndex(url => url === this.props.doc.currentDocUrl)
+    return this.state.viewedDocUrls.findIndex(url => url === this.state.currentDocUrl)
   }
 
   back() {
     const index = this.backIndex()
-    this.props.openDoc(this.props.doc.viewedDocUrls[index + 1], { saveHistory: false })
+    this.props.openDoc(this.state.viewedDocUrls[index + 1], { saveHistory: false })
   }
 
   forward() {
     const index = this.backIndex()
-    this.props.openDoc(this.props.doc.viewedDocUrls[index - 1], { saveHistory: false })
+    this.props.openDoc(this.state.viewedDocUrls[index - 1], { saveHistory: false })
   }
 
   hideBoardHistory() {
     this.boardHistory.current.hide()
   }
 
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.release(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
+  }
+
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.release(this.handle)
+    }
+    this.handle = window.hm.openHandle(this.props.docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ ...doc })
+  }
+
   render() {
     log('render')
-    if (!this.props.doc.currentDocUrl) {
+    if (!this.state.currentDocUrl) {
       return null
     }
 
-    const boardDocUrls = this.props.doc.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
+    const boardDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
     const boardDocLinks = boardDocUrls.map(url => {
       const { docId, type } = parseDocumentLink(url)
       const docLinkUrl = createDocumentLink('doc-link', docId)
@@ -68,9 +84,9 @@ export default class TitleBar extends React.PureComponent {
       )
     })
 
-    const { docId } = parseDocumentLink(this.props.doc.currentDocUrl)
+    const { docId } = parseDocumentLink(this.state.currentDocUrl)
     const index = this.backIndex()
-    const disableBack = index === (this.props.doc.viewedDocUrls.length - 1)
+    const disableBack = index === (this.state.viewedDocUrls.length - 1)
     const disableForward = index === 0
 
     return (
@@ -101,7 +117,7 @@ export default class TitleBar extends React.PureComponent {
         <div className="TitleBar__center">
           <Content url={createDocumentLink('board-title', docId)} />
           <HashForm
-            formDocId={this.props.doc.currentDocUrl}
+            formDocId={this.state.currentDocUrl}
             onChanged={this.props.openDoc}
           />
         </div>
@@ -124,7 +140,7 @@ export default class TitleBar extends React.PureComponent {
             </DropdownTrigger>
             <DropdownContent>
               <Content
-                url={createDocumentLink('settings', this.props.doc.selfId)}
+                url={createDocumentLink('settings', this.state.selfId)}
               />
             </DropdownContent>
           </Dropdown>
