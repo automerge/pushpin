@@ -7,27 +7,40 @@ import { createDocumentLink } from '../share-link'
 export default class DocLink extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    doc: PropTypes.shape({
-      title: PropTypes.string,
-      backgroundColor: PropTypes.string,
-    }).isRequired,
     linkedDocumentType: PropTypes.string.isRequired
   }
 
-  constructor(props) {
-    super(props)
-    this.handleClick = this.handleClick.bind(this)
+  handleClick = (e) => {
+    window.location = createDocumentLink(this.props.linkedDocumentType, this.props.docId)
   }
 
-  handleClick(e) {
-    window.location = createDocumentLink(this.props.linkedDocumentType, this.props.docId)
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillUnmount = () => window.hm.release(this.handle)
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
+  }
+
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.release(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  // this should be overridden by components which care
+  onChange = (doc) => {
+    this.setState({ ...doc })
   }
 
   render() {
     return (
       <div className="DocLink" onClick={this.handleClick}>
-        <i className="fa fa-files-o" style={{ background: this.props.doc.backgroundColor }} />
-        <div className="DocLink__title">{ this.props.doc.title }</div>
+        <i className="fa fa-files-o" style={{ background: this.state.backgroundColor }} />
+        <div className="DocLink__title">{ this.state.title }</div>
       </div>
     )
   }
