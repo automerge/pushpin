@@ -5,18 +5,9 @@ import Path from 'path'
 import mkdirp from 'mkdirp'
 import Multicore from './hypermerge/multicore'
 
-import { HYPERFILE_DATA_PATH } from './constants'
+import { HYPERFILE_PATH } from './constants'
 
-const multicore = new Multicore(HYPERFILE_DATA_PATH)
-const hypercoreOptions = { valueEncoding: 'binary' }
-
-function corePath(dataPath, imgId) {
-  return Path.join(dataPath, imgId)
-}
-
-function serve(hypercore) {
-  Hyperdiscovery(hypercore)
-}
+const multicore = new Multicore(HYPERFILE_PATH)
 
 // callback = (err, key)
 export function write(filePath, callback) {
@@ -37,7 +28,7 @@ export function write(filePath, callback) {
 
         const hyperfileId = feed.key.toString('hex')
 
-        serve(feed)
+        Hyperdiscovery(feed)
         callback(null, hyperfileId)
       })
     })
@@ -52,7 +43,7 @@ export function fetch(hyperfileId, callback) {
 
     feed.on('error', callback)
     feed.ready(() => {
-      serve(feed)
+      Hyperdiscovery(feed)
       feed.get(0, null, (error, data) => {
         if (error) {
           callback(error)

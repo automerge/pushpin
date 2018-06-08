@@ -65,8 +65,7 @@ export default class ImageCard extends React.PureComponent {
       return null
     }
 
-    const fileUri = `hyperfile://${this.state.hyperfileId}`
-    return <img className="image" alt="" src={fileUri} />
+    return <img className="image" alt="" src={"hyperfile://" + this.state.hyperfileId} />
   }
 }
 

@@ -11,4 +11,4 @@ export const USER_PATH = Path.join('.', 'data', USER)
 
 export const WORKSPACE_ID_PATH = Path.join(USER_PATH, 'workspace-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
-export const HYPERFILE_DATA_PATH = Path.join(USER_PATH, 'hyperfile')
+export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
