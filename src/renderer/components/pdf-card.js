@@ -13,7 +13,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = '../node_modules/pdfjs-dist/build/pdf.work
 
 export default class PDFCard extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired,
+    cardId: PropTypes.string.isRequired
   }
 
   static initializeDocument(pdfDoc, { path }) {
@@ -25,39 +26,38 @@ export default class PDFCard extends React.PureComponent {
     this.handle = null
     this.pdfViewport = React.createRef()
     this.state = { pdfContentReady: false }
-    this.cardResized = this.cardResized.bind(this)
   }
 
-  componentWillMount() {
+  componentWillMount = () => {
     this.handle = window.hm.openHandle(this.props.docId)
     this.handle.onChange((doc) => {
       this.setState({ doc })
     })
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.workPDF()
     this.mounted = true
     document.addEventListener('cardResized', this.cardResized)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     this.mounted = false
     document.removeEventListener('cardResized', this.cardResized)
   }
 
-  componentDidUpdate() {
+  componentDidUpdate = () => {
     this.workPDF()
     this.renderPDF()
   }
 
-  cardResized(event) {
+  cardResized = (event) => {
     if (this.props.cardId === event.detail.cardId) {
       this.renderPDF()
     }
   }
 
-  workPDF() {
+  workPDF = () => {
     if (this.state.doc.path && !this.uploading) {
       this.uploading = true
       this.uploadPDF()
@@ -69,7 +69,7 @@ export default class PDFCard extends React.PureComponent {
     }
   }
 
-  uploadPDF() {
+  uploadPDF = () => {
     const fileId = uuid()
     Hyperfile.writePath(fileId, this.state.doc.path, (err, hyperfile) => {
       if (err) {
@@ -83,7 +83,7 @@ export default class PDFCard extends React.PureComponent {
     })
   }
 
-  loadPDF() {
+  loadPDF = () => {
     Hyperfile.fetch(this.state.doc.hyperfile, (error, pdfPath) => {
       if (error) {
         log(error)
@@ -100,7 +100,7 @@ export default class PDFCard extends React.PureComponent {
     })
   }
 
-  renderPDF() {
+  renderPDF = () => {
     const container = this.pdfViewport.current
     if (!this.state.pdfContentReady || container.clientWidth === this.renderedWidth) {
       return
@@ -118,12 +118,13 @@ export default class PDFCard extends React.PureComponent {
       container.appendChild(spacer)
       this.renderedWidth = container.parentNode.clientWidth
       container.removeChild(spacer)
-      container.parentNode.style.width = this.renderedWidth + 'px'
+      container.parentNode.style.width = `${this.renderedWidth}px`
     }
 
     this.state.pdfDocument.getPage(1).then((page) => {
       const resolution = window.devicePixelRatio || 1
-      const viewport = page.getViewport(resolution * this.renderedWidth / (page.view[2] - page.view[0]))
+      const scalingFactor = resolution * this.renderedWidth / (page.view[2] - page.view[0])
+      const viewport = page.getViewport(scalingFactor)
 
       const canvas = document.createElement('canvas')
       canvas.width = viewport.width
@@ -138,12 +139,11 @@ export default class PDFCard extends React.PureComponent {
     })
   }
 
-  render() {
+  render = () => {
     if (this.state.pdfContentReady) {
-      return <div ref={this.pdfViewport} className="pdf-card"/>
-    } else {
-      return null
+      return <div ref={this.pdfViewport} className="pdf-card" />
     }
+    return null
   }
 }
 
