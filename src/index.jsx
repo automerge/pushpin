@@ -7,22 +7,20 @@ import { HYPERMERGE_PATH, WORKSPACE_ID_PATH } from './constants'
 import Hypermerge from './hypermerge'
 import Content from './components/content'
 
-// We load these modules here so that the content registry will have them
-// and we supppress the eslint warning just for this file here.
-/* eslint no-unused-vars: ["error", { "varsIgnorePattern": "[A-Z]\w+" }] */
-import Workspace from './components/workspace'
-import Board from './components/board'
-import ImageCard from './components/image-card'
-import CodeMirrorEditor from './components/code-mirror-editor'
-import TitleBar from './components/title-bar'
-import BoardTitle from './components/board-title'
-import Toggle from './components/toggle'
-import Contact from './components/contact'
-import Share from './components/share'
-import Settings from './components/settings'
-import DocLink from './components/doc-link'
-import Chat from './components/chat'
-import MiniAvatar from './components/mini-avatar'
+// We load these modules here so that the content registry will have them.
+import './components/board'
+import './components/board-title'
+import './components/chat'
+import './components/code-mirror-editor'
+import './components/contact'
+import './components/doc-link'
+import './components/image-card'
+import './components/mini-avatar'
+import './components/settings'
+import './components/share'
+import './components/title-bar'
+import './components/toggle'
+import './components/workspace'
 
 import { createDocumentLink } from './share-link'
 
