@@ -162,6 +162,9 @@ input {
 
 }
 .Avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   position: relative;
   width: 40px;
@@ -171,11 +174,30 @@ input {
   padding:2px;
 }
 
+.Avatar--online {
+  border: 2px solid rgba(113, 227, 65, 1);
+  box-shadow: 0 0 4px 0 rgba(113, 227, 65, 1);
+  animation: pulse 2s infinite;
+}
+
 .Avatar img {
   width: 36px;
   height: 36px;
   border-radius: 50%;
 }
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(113, 227, 65, .5);
+  }
+  70% {
+      box-shadow: 0 0 0 10px rgba(113, 227, 65, 0);
+  }
+  100% {
+      box-shadow: 0 0 0 0 rgba(113, 227, 65, 0);
+  }
+}
+
 
 .ContextMenu {
   background-color: #ffffff;

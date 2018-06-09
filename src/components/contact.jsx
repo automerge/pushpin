@@ -20,8 +20,15 @@ export default class Contact extends React.PureComponent {
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillMount = () => {
+    this.refreshHandle(this.props.docId)
+  }
+
+  componentWillUnmount = () => {
+    window.hm.releaseHandle(this.handle)
+    clearTimeout(this.timerId)
+  }
+
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -34,11 +41,21 @@ export default class Contact extends React.PureComponent {
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
+    this.handle.onMessage(this.onMessage)
   }
 
   // this should be overridden by components which care
   onChange = (doc) => {
     this.setState({ ...doc })
+  }
+
+  onMessage = ({ msg, peer }) => {
+    clearTimeout(this.timerId)
+    // if we miss two heartbeats (11s), assume they've gone offline
+    this.timerId = setTimeout(() => {
+      this.setState({ online: false })
+    }, 11000)
+    this.setState({ online: true })
   }
 
   render() {
@@ -69,7 +86,7 @@ export default class Contact extends React.PureComponent {
     return (
       <div className="ListMenu__item">
         <div className="ListMenu__thumbnail">
-          <div className="Avatar">
+          <div className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}>
             { avatar }
           </div>
         </div>
