@@ -170,7 +170,7 @@ input {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  box-shadow: 0 0 4px 0 rgba(0,0,0, 0.27);
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
   padding:2px;
 }
 
@@ -185,19 +185,6 @@ input {
   height: 36px;
   border-radius: 50%;
 }
-
-/* pop .75s forwards ease-in-out, */
-/* @keyframes pop {
-  0% {
-    transform: scale(1.25);
-  }
-  50% {
-    transform: scale(.75);
-  }
-  100% {
-    transform: scale(1);
-  }
-} */
 
 @keyframes pulse {
   0% {
