@@ -50,7 +50,11 @@ export default class Workspace extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillUnmount = () => {
+    window.hm.releaseHandle(this.handle)
+    clearInterval(this.timerId)
+  }
+
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -74,9 +78,10 @@ export default class Workspace extends React.PureComponent {
 
   refreshHeartbeat = (doc) => {
     const selfHandle = window.hm.openHandle(doc.selfId)
+    selfHandle.message('heartbeat')
     this.timerId = setInterval(() => {
       selfHandle.message('heartbeat')
-    }, 1000)
+    }, 5000) // send a heartbeat every 2.5s
   }
 
   openDoc = (docUrl, options = {}) => {
