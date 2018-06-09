@@ -34,11 +34,11 @@ class MiniAvatar extends React.PureComponent {
   }
 
   onMessage = ({ msg, peer }) => {
-    if (this.timerId) {
-      clearTimeout(this.timerId)
-    }
-    this.timerId = setTimeout(() =>
-      this.setState({ online: false }), 5000)
+    clearTimeout(this.timerId)
+    // if we miss two heartbeats (11s), assume they've gone offline
+    this.timerId = setTimeout(() => {
+      this.setState({ online: false })
+    }, 11000)
     this.setState({ online: true })
   }
 
