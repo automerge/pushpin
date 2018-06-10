@@ -636,7 +636,7 @@ class Hypermerge extends EventEmitter {
           }
         })
     })
-    return Promise.all(promises)
+    return Promise.race(promises)
   }
 
   // Ensures that metadata for the feed corresponding to `actorId` has been
