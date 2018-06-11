@@ -146,24 +146,11 @@ export default class Board extends React.PureComponent {
     this.handle.onChange(this.onChange)
   }
 
-  // this should be overridden by components which care
   onChange = (doc) => {
     if (doc.cards && doc.cards.length === 0) {
       this.populateDemoBoard()
     }
     this.setState({ doc })
-  }
-
-  componentDidMount = () => {
-    log('componentDidMount')
-  }
-
-  componentWillUnmount = () => {
-    log('componentWillUnmount')
-  }
-
-  componentWillReceiveProps = () => {
-    log('componentWillReceiveProps')
   }
 
   onKeyDown = (e) => {
