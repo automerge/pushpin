@@ -1,10 +1,7 @@
-import Hypercore from 'hypercore'
 import Hyperdiscovery from 'hyperdiscovery'
 import Fs from 'fs'
-import Path from 'path'
-import mkdirp from 'mkdirp'
-import Multicore from './hypermerge/multicore'
 
+import Multicore from './hypermerge/multicore'
 import { HYPERFILE_PATH } from './constants'
 
 const multicore = new Multicore(HYPERFILE_PATH)

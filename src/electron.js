@@ -1,7 +1,8 @@
 import { app, protocol, BrowserWindow, Menu, shell } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
-import * as Hyperfile from './hyperfile'
 import Debug from 'debug'
+
+import * as Hyperfile from './hyperfile'
 
 const log = Debug('pushpin:electron')
 
@@ -36,11 +37,13 @@ const createWindow = async () => {
 
         callback({ data })
       })
-    } catch(e) {
+    } catch (e) {
       log(e)
     }
   }, (error) => {
-    if (error) console.error('Failed to register protocol')
+    if (error) {
+      log('Failed to register protocol')
+    }
   })
 
   // and load the index.html of the app.

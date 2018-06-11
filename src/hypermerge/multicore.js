@@ -28,7 +28,7 @@ class Multicore extends EventEmitter {
   }
 
   ready(cb) {
-    if(this.isReady) {
+    if (this.isReady) {
       cb()
     } else {
       this.on('ready', cb)

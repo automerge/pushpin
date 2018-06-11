@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import uuid from 'uuid/v4'
 
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../content-types'
@@ -16,8 +15,6 @@ export default class ImageCard extends React.PureComponent {
   static initializeDocument = (image, { path }) => {
     image.path = path
   }
-
-  state = { imageContentReady: false }
 
   componentDidMount = () => {
     this.handle = window.hm.openHandle(this.props.docId)
@@ -61,7 +58,12 @@ export default class ImageCard extends React.PureComponent {
     log('render')
 
     if (this.state.hyperfile && this.state.hyperfile.key) {
-      return <p>Error: This image uses an outdated version of hyperfile, please delete and re-upload.</p>
+      return (
+        <p>
+          Error: This image uses an outdated version of hyperfile,
+          please delete and re-upload.
+        </p>
+      )
     }
 
     if (!this.state.hyperfileId) {
@@ -70,7 +72,7 @@ export default class ImageCard extends React.PureComponent {
       return null
     }
 
-    return <img className="image" alt="" src={"hyperfile://" + this.state.hyperfileId} />
+    return <img className="image" alt="" src={`hyperfile://${this.state.hyperfileId}`} />
   }
 }
 
