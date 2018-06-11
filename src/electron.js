@@ -1,5 +1,10 @@
 import { app, protocol, BrowserWindow, Menu, shell } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+import Debug from 'debug'
+
+import * as Hyperfile from './hyperfile'
+
+const log = Debug('pushpin:electron')
 
 protocol.registerStandardSchemes(['pushpin'])
 
@@ -18,6 +23,27 @@ const createWindow = async () => {
     // we don't want to use loadURL because we don't want to reset the whole app state
     // so we use the workspace manipulation function here
     mainWindow.webContents.send('loadDocumentUrl', req.url)
+  })
+
+  protocol.registerBufferProtocol('hyperfile', (request, callback) => {
+    try {
+      const hyperfileId = request.url.split('//')[1]
+
+      Hyperfile.fetch(hyperfileId, (err, data) => {
+        if (err) {
+          log(err)
+          return
+        }
+
+        callback({ data })
+      })
+    } catch (e) {
+      log(e)
+    }
+  }, (error) => {
+    if (error) {
+      log('Failed to register protocol')
+    }
   })
 
   // and load the index.html of the app.
