@@ -114,23 +114,16 @@ export default class Workspace extends React.PureComponent {
     }
   }
 
-  disableBack = () => {
-    return this.state.backIndex === (this.state.sessionHistory.length - 1)
-  }
+  disableBack = () => this.state.backIndex === (this.state.sessionHistory.length - 1)
 
-  disableForward = () => {
-    return this.state.backIndex === 0
-  }
+  disableForward = () => this.state.backIndex === 0
 
   back = () => {
     if (this.disableBack()) {
       throw new Error('Can not go back further than session history')
     }
 
-    let { backIndex } = this.state
-    const state = this.state
-
-    backIndex = this.state.backIndex + 1
+    const backIndex = this.state.backIndex + 1
     this.setState({ backIndex }, () => {
       this.openDoc(this.state.sessionHistory[backIndex], { saveHistory: false })
     })
@@ -141,9 +134,7 @@ export default class Workspace extends React.PureComponent {
       throw new Error('Can not go forward past session history')
     }
 
-    let { backIndex } = this.state
-
-    backIndex = this.state.backIndex - 1
+    const backIndex = this.state.backIndex - 1
     this.setState({ backIndex }, () => {
       this.openDoc(this.state.sessionHistory[backIndex], { saveHistory: false })
     })
