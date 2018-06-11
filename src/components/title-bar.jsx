@@ -13,22 +13,14 @@ const log = Debug('pushpin:title-bar')
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    openDoc: PropTypes.func.isRequired
+    openDoc: PropTypes.func.isRequired,
+    onBack: PropTypes.func.isRequired,
+    onForward: PropTypes.func.isRequired,
+    disableBack: PropTypes.bool.isRequired,
+    disableForward: PropTypes.bool.isRequired
   }
 
   boardHistory = React.createRef()
-
-  backIndex = () => this.state.viewedDocUrls.findIndex(url => url === this.state.currentDocUrl)
-
-  back = () => {
-    const index = this.backIndex()
-    this.props.openDoc(this.state.viewedDocUrls[index + 1], { saveHistory: false })
-  }
-
-  forward = () => {
-    const index = this.backIndex()
-    this.props.openDoc(this.state.viewedDocUrls[index - 1], { saveHistory: false })
-  }
 
   hideBoardHistory = () => {
     this.boardHistory.current.hide()
@@ -74,9 +66,6 @@ export default class TitleBar extends React.PureComponent {
     })
 
     const { docId } = parseDocumentLink(this.state.currentDocUrl)
-    const index = this.backIndex()
-    const disableBack = index === (this.state.viewedDocUrls.length - 1)
-    const disableForward = index === 0
 
     return (
       <div className="TitleBar">
@@ -95,10 +84,10 @@ export default class TitleBar extends React.PureComponent {
               </div>
             </DropdownContent>
           </Dropdown>
-          <button disabled={disableBack} onClick={this.back} className="TitleBar__menuItem">
+          <button disabled={this.props.disableBack} onClick={this.props.onBack} className="TitleBar__menuItem">
             <i className="fa fa-angle-left" />
           </button>
-          <button disabled={disableForward} onClick={this.forward} className="TitleBar__menuItem">
+          <button disabled={this.props.disableForward} onClick={this.props.onForward} className="TitleBar__menuItem">
             <i className="fa fa-angle-right" />
           </button>
         </div>
