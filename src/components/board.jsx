@@ -146,7 +146,6 @@ export default class Board extends React.PureComponent {
     this.handle.onChange(this.onChange)
   }
 
-  // this should be overridden by components which care
   onChange = (doc) => {
     if (doc.cards && doc.cards.length === 0) {
       this.populateDemoBoard()
