@@ -153,18 +153,6 @@ export default class Board extends React.PureComponent {
     this.setState({ doc })
   }
 
-  componentDidMount = () => {
-    log('componentDidMount')
-  }
-
-  componentWillUnmount = () => {
-    log('componentWillUnmount')
-  }
-
-  componentWillReceiveProps = () => {
-    log('componentWillReceiveProps')
-  }
-
   onKeyDown = (e) => {
     // this event can be consumed by a card if it wants to keep control of backspace
     // for example, see code-mirror-editor.jsx onKeyDown
