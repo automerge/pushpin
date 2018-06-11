@@ -6,7 +6,7 @@ import { HYPERFILE_PATH } from './constants'
 
 const multicore = new Multicore(HYPERFILE_PATH)
 
-// callback = (err, key)
+// callback = (err, hyperfileId)
 export function write(filePath, callback) {
   multicore.ready(() => {
     const feed = multicore.createFeed()

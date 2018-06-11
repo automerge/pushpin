@@ -16,6 +16,7 @@ import Content from './content'
 import ContentTypes from '../content-types'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 import { createDocumentLink } from '../share-link'
+import * as Hyperfile from '../hyperfile'
 
 const { dialog } = remote
 
@@ -69,7 +70,7 @@ Double click to create a card. Type something.
 Paste some text from your clipboard into a note, or paste it as a new note.
 Drag in some text, or an image, or several images at once.
 Copy an image in Chrome and paste it. (Dragging images in won't work.)
-Open a second copy of the app with a different profile. 
+Open a second copy of the app with a different profile.
 ($ export NAME="Someone")
 Connect your apps: copy the URL above and paste it into the other app.
 Make a change on each side and watch it go.
@@ -124,8 +125,8 @@ export default class Board extends React.PureComponent {
     this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
     this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
-    this.createCard({ type: 'image', x: 550, y: 500, typeAttrs: { path: KAY_PATH } })
-    this.createCard({ type: 'image', x: 600, y: 150, typeAttrs: { path: WORKSHOP_PATH } })
+    this.createImageCardFromPath({ x: 550, y: 500 }, KAY_PATH)
+    this.createImageCardFromPath({ x: 600, y: 150 }, WORKSHOP_PATH)
   }
 
   // This is the New Boilerplate
@@ -152,6 +153,7 @@ export default class Board extends React.PureComponent {
     }
     this.setState({ doc })
   }
+
   componentDidMount = () => {
     log('componentDidMount')
   }
@@ -326,9 +328,8 @@ export default class Board extends React.PureComponent {
       if (paths.length !== 1) {
         throw new Error('Expected exactly one path?')
       }
-      const path = paths[0]
-      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { path } })
-      this.selectOnly(cardId)
+
+      this.createImageCardFromPath({ x, y }, paths[0])
     })
   }
 
@@ -342,12 +343,26 @@ export default class Board extends React.PureComponent {
       if (err) {
         throw err
       }
+
       Fs.appendFile(path, Buffer.from(reader.result), (err) => {
         if (err) {
           throw err
         }
-        this.createCard({ x, y, type: 'image', typeAttrs: { path } })
+
+        this.createImageCardFromPath({ x, y }, path)
       })
+    })
+  }
+
+  createImageCardFromPath = ({ x, y }, path) => {
+    Hyperfile.write(path, (err, hyperfileId) => {
+      if (err) {
+        log(err)
+        return
+      }
+
+      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { hyperfileId } })
+      this.selectOnly(cardId)
     })
   }
 

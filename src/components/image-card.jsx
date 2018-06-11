@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:image-card')
@@ -12,46 +11,17 @@ export default class ImageCard extends React.PureComponent {
     docId: PropTypes.string.isRequired
   }
 
-  static initializeDocument = (image, { path }) => {
-    image.path = path
+  static initializeDocument = (image, { hyperfileId }) => {
+    image.hyperfileId = hyperfileId
   }
+
+  state = {}
 
   componentDidMount = () => {
     this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange((doc) => this.setState({ ...doc, path: doc.path }))
+    this.handle.onChange((doc) => this.setState({ ...doc }))
 
     log('componentDidMount')
-    this.workImage()
-    this.mounted = true
-  }
-
-  componentWillUnmount = () => {
-    log('componentWillUnmount')
-    this.mounted = false
-  }
-
-  componentDidUpdate = () => {
-    log('componentDidUpdate')
-    this.workImage()
-  }
-
-  workImage = () => {
-    if (this.state.path) {
-      this.uploadImage()
-    }
-  }
-
-  uploadImage = () => {
-    Hyperfile.write(this.state.path, (err, hyperfileId) => {
-      if (err) {
-        log(err)
-      }
-
-      this.handle.change(d => {
-        delete d.path
-        d.hyperfileId = hyperfileId
-      })
-    })
   }
 
   render = () => {
