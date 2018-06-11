@@ -68,7 +68,7 @@ class MiniAvatar extends React.PureComponent {
 }
 
 const css = {
-  chatWrapper: {
+  threadWrapper: {
     display: 'flex',
     backgroundColor: 'white',
     width: '100%',

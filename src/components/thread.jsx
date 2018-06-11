@@ -5,13 +5,13 @@ import ContentTypes from '../content-types'
 import Content from './content'
 import { createDocumentLink } from '../share-link'
 
-export default class Chat extends React.PureComponent {
+export default class Thread extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
 
-  static initializeDocument(chatDoc) {
-    chatDoc.messages = []
+  static initializeDocument(threadDoc) {
+    threadDoc.messages = []
   }
 
   state = { message: '', messages: null }
@@ -40,11 +40,9 @@ export default class Chat extends React.PureComponent {
 
   render = () => {
     const messages = (this.state.messages || [])
-    const twoHoursAgo = new Date().getTime() - (2 * 60 * 60 * 1000)
-    const recentMessages = messages.filter((m) => m.time > twoHoursAgo)
     const groupedMessages = []
     let currentGroup = null
-    recentMessages.forEach((message) => {
+    messages.forEach((message) => {
       if (!currentGroup
         || (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)) {
         currentGroup = []
@@ -53,7 +51,7 @@ export default class Chat extends React.PureComponent {
       currentGroup.push(message)
     })
     return (
-      <div style={css.chatWrapper}>
+      <div style={css.threadWrapper}>
         <div style={css.messageWrapper}>
           <div style={css.messages} onScroll={this.onScroll}>
             {groupedMessages.map(this.renderGroupedMessages, this)}
@@ -115,8 +113,8 @@ export default class Chat extends React.PureComponent {
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      this.handle.change((chatDoc) => {
-        chatDoc.messages.push({
+      this.handle.change((threadDoc) => {
+        threadDoc.messages.push({
           authorId: window.selfId,
           content: this.state.message,
           time: new Date().getTime()
@@ -131,7 +129,7 @@ export default class Chat extends React.PureComponent {
 }
 
 const css = {
-  chatWrapper: {
+  threadWrapper: {
     display: 'flex',
     backgroundColor: 'white',
     width: '100%',
@@ -204,8 +202,8 @@ const css = {
 }
 
 ContentTypes.register({
-  component: Chat,
-  type: 'chat',
-  name: 'Chat',
-  icon: 'group',
+  component: Thread,
+  type: 'thread',
+  name: 'Thread',
+  icon: 'comments',
 })
