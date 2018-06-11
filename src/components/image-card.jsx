@@ -24,6 +24,20 @@ export default class ImageCard extends React.PureComponent {
     log('componentDidMount')
   }
 
+  // If an ImageCard changes docId, React will re-use this component
+  // and update the props instead of instantiating a new one and calling
+  // componentDidMount. We have to check for prop updates here and
+  // update our doc handle
+  componentWillReceiveProps = (nextProps) => {
+    log('componentWillReceiveProps')
+
+    if (nextProps.docId !== this.props.docId) {
+      window.hm.releaseHandle(this.handle)
+      this.handle = window.hm.openHandle(nextProps.docId)
+      this.handle.onChange((doc) => this.setState({ ...doc }))
+    }
+  }
+
   render = () => {
     log('render')
 
