@@ -158,8 +158,11 @@ export default class Share extends React.PureComponent {
       />
     ))
 
-    // this .filter is probably very slow if you have a lot of authors
-    const nonAuthorContactIds = contactIds.filter(contactId => (!authorIds.includes(contactId)))
+    // Remove both contacts that are already in the authors list above, and duplicate
+    // contacts which may exist due to an outstanding race.
+    // This .filter is probably very slow if you have a lot of authors.
+    const nonAuthorContactIds = contactIds.filter((contactId, i, array) =>
+      !authorIds.includes(contactId) && (array.indexOf(contactId) === i))
     const contacts = nonAuthorContactIds.map(id => (
       <Content
         key={id}
