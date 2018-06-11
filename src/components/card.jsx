@@ -20,7 +20,7 @@ export default class Card extends React.PureComponent {
       moveY: PropTypes.number,
       resizeWidth: PropTypes.number,
       resizeHeight: PropTypes.number,
-    }).isRequired,
+    }),
     card: PropTypes.shape({
       id: PropTypes.string,
       url: PropTypes.string,
@@ -29,6 +29,10 @@ export default class Card extends React.PureComponent {
       height: PropTypes.number,
       width: PropTypes.number
     }).isRequired
+  }
+
+  static defaultProps = {
+    dragState: {}
   }
 
   constructor(props) {

@@ -713,7 +713,7 @@ export default class Board extends React.PureComponent {
             <Card
               ref={node => { this.cardRefs[id] = node }}
               card={card}
-              dragState={this.state.cards[id] || {}}
+              dragState={this.state.cards[id]}
               selected={selected}
               uniquelySelected={uniquelySelected}
               onCardClicked={this.onCardClicked}
