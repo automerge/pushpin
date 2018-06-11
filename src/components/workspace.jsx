@@ -69,7 +69,6 @@ export default class Workspace extends React.PureComponent {
     this.handle.onChange(this.onChange)
   }
 
-  // this should be overridden by components which care
   onChange = (doc) => {
     window.selfId = doc.selfId // Be mad (:
     this.setState({ ...doc })
