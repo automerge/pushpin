@@ -35,7 +35,11 @@ const log = Debug('pushpin:code-mirror-editor')
 export default class CodeMirrorEditor extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    uniquelySelected: PropTypes.bool.isRequired,
+    uniquelySelected: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    uniquelySelected: false
   }
 
   static initializeDocument(editor, { text }) {
