@@ -7,7 +7,6 @@ import ContentTypes from '../content-types'
 import { createDocumentLink } from '../share-link'
 import * as Hyperfile from '../hyperfile'
 
-// we should make the avatar image a proper ImageCard
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 import Content from './content'
 
