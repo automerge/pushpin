@@ -56,17 +56,12 @@ export default class CodeMirrorEditor extends React.PureComponent {
     this.editorRef = null
     this.handle = null
 
-    this.onKeyDown = this.onKeyDown.bind(this)
-    this.onCodeMirrorChange = this.onCodeMirrorChange.bind(this)
-    this.onDocChange = this.onDocChange.bind(this)
-    this.setEditorRef = this.setEditorRef.bind(this)
-
     this.state = { text: null }
   }
 
   // When the components mounts, and we therefore have refs to the DOM,
   // set up the editor.
-  componentDidMount() {
+  componentDidMount = () => {
     log('componentDidMount')
 
     // The props after `autofocus` are needed to get an editor that resizes
@@ -84,7 +79,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
     this.handle.onChange(this.onDocChange)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     log('componentDidUnmount')
 
     window.hm.releaseHandle(this.handle)
@@ -93,7 +88,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
 
   // Transform declarative React selection prop into imperative focus changes
   // in the editor.
-  componentWillReceiveProps(props) {
+  componentWillReceiveProps = (props) => {
     if (!this.codeMirror) {
       return
     }
@@ -101,7 +96,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
   }
 
   // Ensure the CodeMirror editor is focused if we expect it to be.
-  ensureFocus(uniquelySelected) {
+  ensureFocus = (uniquelySelected) => {
     if (uniquelySelected && !this.codeMirror.hasFocus()) {
       log('ensureFocus.forceFocus')
       this.codeMirror.focus()
@@ -110,7 +105,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
 
   // Observe changes to the editor and make corresponding updates to the
   // Automerge text.
-  onCodeMirrorChange(codeMirror, change) {
+  onCodeMirrorChange = (codeMirror, change) => {
     // We don't want to re-apply changes we already applied because of updates
     // from Automerge.
     if (change.origin === 'automerge') {
@@ -136,7 +131,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
 
   // Transform updates from the Automerge text into imperative text changes
   // in the editor.
-  onDocChange(doc) {
+  onDocChange = (doc) => {
     const { text } = doc
 
     // Short circuit if the text didn't change. This happens when a prop
@@ -193,18 +188,18 @@ export default class CodeMirrorEditor extends React.PureComponent {
     }
   }
 
-  setEditorRef(e) {
+  setEditorRef = (e) => {
     this.editorRef = e
   }
 
-  onKeyDown(e) {
+  onKeyDown = (e) => {
     if (e.key === 'Backspace' && this.state.text.length === 0) {
       return
     }
     e.stopPropagation()
   }
 
-  render() {
+  render = () => {
     log('render')
 
     return (

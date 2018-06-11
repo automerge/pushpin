@@ -57,7 +57,7 @@ export default class Contact extends React.PureComponent {
     this.setState({ online: true })
   }
 
-  render() {
+  render = () => {
     const actions = []
     if (this.props.actions.includes('share')) {
       actions.push((

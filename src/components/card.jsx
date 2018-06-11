@@ -49,7 +49,7 @@ export default class Card extends React.PureComponent {
     e.stopPropagation()
   }
 
-  render() {
+  render = () => {
     log('render')
 
     const { card, dragState } = this.props

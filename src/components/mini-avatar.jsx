@@ -50,7 +50,7 @@ class MiniAvatar extends React.PureComponent {
     this.setState({ online: true })
   }
 
-  render() {
+  render = () => {
     let avatar
     if (this.state.avatarDocId) {
       avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
