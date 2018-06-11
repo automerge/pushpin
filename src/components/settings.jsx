@@ -5,8 +5,8 @@ import Debug from 'debug'
 
 import ContentTypes from '../content-types'
 import { createDocumentLink } from '../share-link'
+import * as Hyperfile from '../hyperfile'
 
-// we should make the avatar image a proper ImageCard
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 import Content from './content'
 
@@ -39,7 +39,6 @@ export default class Settings extends React.PureComponent {
   }
 
   chooseAvatar = () => {
-    // TODO: Images only update on refresh sometimes
     dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
       // User aborted.
       if (!paths) {
@@ -48,10 +47,17 @@ export default class Settings extends React.PureComponent {
       if (paths.length !== 1) {
         throw new Error('Expected exactly one path?')
       }
-      const path = paths[0]
-      const docId = Content.initializeContentDoc('image', { path })
-      this.handle.change((d) => {
-        d.avatarDocId = docId
+
+      Hyperfile.write(paths[0], (err, hyperfileId) => {
+        if (err) {
+          log(err)
+          return
+        }
+
+        const docId = Content.initializeContentDoc('image', { hyperfileId })
+        this.handle.change((d) => {
+          d.avatarDocId = docId
+        })
       })
     })
   }
