@@ -44,7 +44,6 @@ export default class Contact extends React.PureComponent {
     this.handle.onMessage(this.onMessage)
   }
 
-  // this should be overridden by components which care
   onChange = (doc) => {
     this.setState({ ...doc })
   }

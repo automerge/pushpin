@@ -11,8 +11,16 @@ class MiniAvatar extends React.PureComponent {
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillMount = () => {
+    this.refreshHandle(this.props.docId)
+    this.timerId = null
+  }
+
+  componentWillUnmount = () => {
+    window.hm.releaseHandle(this.handle)
+    clearTimeout(this.timerId)
+  }
+
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -23,12 +31,12 @@ class MiniAvatar extends React.PureComponent {
     if (this.handle) {
       window.hm.releaseHandle(this.handle)
     }
+    clearTimeout(this.timerId)
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
     this.handle.onMessage(this.onMessage)
   }
 
-  // this should be overridden by components which care
   onChange = (doc) => {
     this.setState({ ...doc })
   }
