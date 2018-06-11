@@ -24,7 +24,7 @@ class ColorPicker extends React.PureComponent {
     }, e)
   }
 
-  render() {
+  render = () => {
     const swatches = this.props.colors.map((c) => (
       <div key={c} className="ColorPicker__swatch">
         <Swatch
