@@ -1,6 +1,9 @@
 import { app, protocol, BrowserWindow, Menu, shell } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import * as Hyperfile from './hyperfile'
+import Debug from 'debug'
+
+const log = Debug('pushpin:electron')
 
 protocol.registerStandardSchemes(['pushpin'])
 
@@ -22,15 +25,20 @@ const createWindow = async () => {
   })
 
   protocol.registerBufferProtocol('hyperfile', (request, callback) => {
-    const hyperfileId = request.url.split('//')[1]
-    Hyperfile.fetch(hyperfileId, (err, data) => {
-      if (err) {
-        console.log(err)
-        return
-      }
+    try {
+      const hyperfileId = request.url.split('//')[1]
 
-      callback({ data })
-    })
+      Hyperfile.fetch(hyperfileId, (err, data) => {
+        if (err) {
+          log(err)
+          return
+        }
+
+        callback({ data })
+      })
+    } catch(e) {
+      log(e)
+    }
   }, (error) => {
     if (error) console.error('Failed to register protocol')
   })
