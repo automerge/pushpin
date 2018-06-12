@@ -119,6 +119,7 @@ export default class Workspace extends React.PureComponent {
     return (
       <div className="Workspace">
         <Content openDoc={this.openDoc} url={createDocumentLink('title-bar', this.props.docId)} />
+        <Content url={createDocumentLink('omnibox', this.props.docId)} />
         { content }
       </div>
     )

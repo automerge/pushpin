@@ -1,15 +1,39 @@
 import React from 'react'
 
+import Content from './content'
+import ContentTypes from '../content-types'
+import { createDocumentLink, parseDocumentLink } from '../share-link'
+
 export default class Omnibox extends React.PureComponent {
-  componentDidMount = () => {
-    document.addEventListener('keydown', this.onKeyDown)
-  }
+  state = { visible: true }
+
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.docId)
+
+  componentDidMount = () => document.addEventListener('keydown', this.onKeyDown)
 
   componentWillUnmount = () => {
     document.removeEventListener('keydown', this.onKeyDown)
+    window.hm.releaseHandle(this.handle)
   }
 
-  state = { visible: false }
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
+    }
+  }
+
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      window.hm.releaseHandle(this.handle)
+    }
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
+  }
+
+  onChange = (doc) => {
+    this.setState({ ...doc })
+  }
 
   onKeyDown = (e) => {
     if (e.metaKey && e.key === '/') {
@@ -22,8 +46,34 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
+    const boardDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
+    const boardDocLinks = boardDocUrls.map(url => {
+      const { docId, type } = parseDocumentLink(url)
+      const docLinkUrl = createDocumentLink('doc-link', docId)
+
+      return (
+        <div key={url} className="ListMenu__item">
+          <Content url={docLinkUrl} linkedDocumentType={type} />
+        </div>
+      )
+    })
+
     return <div className="Omnibox">
-      <h1>Omnibox</h1>
+      <div className="ListMenu">
+        <div className="ListMenu__segment">All Boards</div>
+        <div className="ListMenuSection">
+          { boardDocLinks }
+        </div>
+
+      </div>
     </div>
   }
 }
+
+ContentTypes.register({
+  component: Omnibox,
+  type: 'omnibox',
+  name: 'Omnibox',
+  icon: 'sticky-note',
+  unlisted: true
+})
