@@ -40,15 +40,19 @@ export default class BoardTitle extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  render() {
-    return (<RIEInput
-      value={this.state.title || ''}
-      change={this.setTitle}
-      propName="title"
-      className="TitleBar__titleText"
-      classLoading="TitleBar__titleText--loading"
-      classInvalid="TitleBar__titleText--invalid"
-    />)
+  render = () => {
+    log('render')
+
+    return (
+      <RIEInput
+        value={this.state.title || ''}
+        change={this.setTitle}
+        propName="title"
+        className="TitleBar__titleText"
+        classLoading="TitleBar__titleText--loading"
+        classInvalid="TitleBar__titleText--invalid"
+      />
+    )
   }
 }
 

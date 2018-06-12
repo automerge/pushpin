@@ -706,14 +706,14 @@ export default class Board extends React.PureComponent {
           allowAnyClick={false}
           disabled={false}
           enableUserSelectHack={false}
-          onDrag={(e, d) => this.onDrag.bind(this)(card, e, d)}
-          onStop={(e, d) => this.onStop.bind(this)(card, e, d)}
+          onDrag={(e, d) => this.onDrag(card, e, d)}
+          onStop={(e, d) => this.onStop(card, e, d)}
         >
           <div>
             <Card
               ref={node => { this.cardRefs[id] = node }}
               card={card}
-              dragState={this.state.cards[id] || {}}
+              dragState={this.state.cards[id]}
               selected={selected}
               uniquelySelected={uniquelySelected}
               onCardClicked={this.onCardClicked}
