@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Debug from 'debug'
 
 import { CustomPicker } from 'react-color'
 import { Swatch } from 'react-color/lib/components/common'
+
+const log = Debug('pushpin:color-picker')
 
 /* This class is adapted from the react-color TwitterPicker
    by stripping out most of the functionality and just leaving swatches */
@@ -25,6 +28,8 @@ class ColorPicker extends React.PureComponent {
   }
 
   render = () => {
+    log('render')
+
     const swatches = this.props.colors.map((c) => (
       <div key={c} className="ColorPicker__swatch">
         <Swatch
