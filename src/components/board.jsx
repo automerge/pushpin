@@ -3,29 +3,24 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
-import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 'react-contextmenu'
-import { DraggableCore } from 'react-draggable'
+import { ContextMenuTrigger } from 'react-contextmenu'
 import uuid from 'uuid/v4'
-import classNames from 'classnames'
 import Tmp from 'tmp'
 import Fs from 'fs'
 
-import Card from './card'
-import ColorPicker from './color-picker'
 import Content from './content'
 import ContentTypes from '../content-types'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 import { createDocumentLink } from '../share-link'
 import * as Hyperfile from '../hyperfile'
+import BoardCard from './board-card'
+import BoardContextMenu from './board-context-menu'
 
 const { dialog } = remote
 
 const log = Debug('pushpin:board')
 
-const BOARD_MENU_ID = 'BoardMenu'
-
 const BOARD_COLORS = {
-
   DEFAULT: '#D5DFE5',
   SNOW: '#EBEDF4',
   BEIGE: '#f3f1ec',
@@ -562,6 +557,10 @@ export default class Board extends React.PureComponent {
     }
   }
 
+  setCardRef = (id, node) => {
+    this.cardRefs[id] = node
+  }
+
   onDrag = (card, e, d) => {
     log('onDrag')
     const tracking = this.tracking[card.id]
@@ -696,65 +695,25 @@ export default class Board extends React.PureComponent {
     log('render')
 
     const cards = this.state.doc.cards || {}
-    // rework selected functioning, this is a slow implementation
     const cardChildren = Object.entries(cards).map(([id, card]) => {
       const selected = this.state.selected.includes(id)
       const uniquelySelected = selected && this.state.selected.length === 1
       return (
-        <DraggableCore
+        <BoardCard
           key={id}
-          allowAnyClick={false}
-          disabled={false}
-          enableUserSelectHack={false}
-          onDrag={(e, d) => this.onDrag(card, e, d)}
-          onStop={(e, d) => this.onStop(card, e, d)}
-        >
-          <div>
-            <Card
-              ref={node => { this.cardRefs[id] = node }}
-              card={card}
-              dragState={this.state.cards[id]}
-              selected={selected}
-              uniquelySelected={uniquelySelected}
-              onCardClicked={this.onCardClicked}
-              onCardDoubleClicked={this.onCardDoubleClicked}
-            />
-          </div>
-        </DraggableCore>
+          id={id}
+          card={card}
+          selected={selected}
+          uniquelySelected={uniquelySelected}
+          dragState={this.state.cards[id]}
+          onDrag={this.onDrag}
+          onStop={this.onStop}
+          onCardClicked={this.onCardClicked}
+          onCardDoubleClicked={this.onCardDoubleClicked}
+          setCardRef={this.setCardRef}
+        />
       )
     })
-
-    // We should optimize to avoid creating a new function for onClick each render.
-    const createMenuItems = ContentTypes.list().map((contentType) => (
-      <ContextMenuItem key={contentType.type} onClick={(e) => { this.addContent(e, contentType) }}>
-        <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-          <i className={classNames('fa', `fa-${contentType.icon}`)} />
-        </div>
-        <span className="ContextMenu__label">{contentType.name}</span>
-      </ContextMenuItem>
-    ))
-
-    const contextMenu = (
-      <ContextMenu id={BOARD_MENU_ID} onShow={this.onShowContextMenu} className="ContextMenu">
-
-        <div className="ContextMenu__section">
-          { createMenuItems }
-        </div>
-
-
-        <div className="ContextMenu__section">
-          <h6>Board Color</h6>
-          <div className="ContextMenu__divider" />
-          <ContextMenuItem>
-            <ColorPicker
-              color={this.state.doc.backgroundColor}
-              colors={BOARD_COLOR_VALUES}
-              onChangeComplete={this.changeBackgroundColor}
-            />
-          </ContextMenuItem>
-        </div>
-      </ContextMenu>
-    )
 
     return (
       <div
@@ -773,8 +732,15 @@ export default class Board extends React.PureComponent {
         onPaste={this.onPaste}
         role="presentation"
       >
-        { contextMenu }
-        <ContextMenuTrigger holdToDisplay={-1} id={BOARD_MENU_ID}>
+        <BoardContextMenu
+          contentTypes={ContentTypes.list()}
+          addContent={this.addContent}
+          onShowContextMenu={this.onShowContextMenu}
+          backgroundColor={this.state.doc.backgroundColor}
+          backgroundColors={BOARD_COLOR_VALUES}
+          changeBackgroundColor={this.changeBackgroundColor}
+        />
+        <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
           <div>
             {cardChildren}
           </div>
