@@ -14,13 +14,11 @@ export default class TitleBar extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
     openDoc: PropTypes.func.isRequired,
-    onBack: PropTypes.func.isRequired,
-    onForward: PropTypes.func.isRequired,
-    disableBack: PropTypes.bool.isRequired,
-    disableForward: PropTypes.bool.isRequired
   }
 
   boardHistory = React.createRef()
+
+  state = { sessionHistory: [], historyIndex: 0 }
 
   hideBoardHistory = () => {
     this.boardHistory.current.hide()
@@ -43,8 +41,47 @@ export default class TitleBar extends React.PureComponent {
     this.handle.onChange(this.onChange)
   }
 
+  disableBack = () => this.state.historyIndex === (this.state.sessionHistory.length - 1)
+
+  disableForward = () => this.state.historyIndex === 0
+
+  back = () => {
+    if (this.disableBack()) {
+      throw new Error('Can not go back further than session history')
+    }
+
+    const historyIndex = this.state.historyIndex + 1
+    this.setState({ historyIndex }, () => {
+      this.props.openDoc(this.state.sessionHistory[historyIndex])
+    })
+  }
+
+  forward = () => {
+    if (this.disableForward()) {
+      throw new Error('Can not go forward past session history')
+    }
+
+    const historyIndex = this.state.historyIndex - 1
+
+    this.setState({ historyIndex }, () => {
+      this.props.openDoc(this.state.sessionHistory[historyIndex])
+    })
+  }
+
   onChange = (doc) => {
-    this.setState({ ...doc })
+    let { historyIndex, sessionHistory } = this.state
+
+    // Init sessionHistory
+    if (sessionHistory.length === 0) {
+      sessionHistory = [doc.currentDocUrl]
+    // If we're opening a new document (as opposed to going back or forward),
+    // add it to our sessionHistory and remove all docs 'forward' of the current index
+    } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
+      sessionHistory = [doc.currentDocUrl, ...(sessionHistory.slice(historyIndex))]
+      historyIndex = 0
+    }
+
+    this.setState({ ...doc, sessionHistory, historyIndex })
   }
 
   render = () => {
@@ -84,10 +121,10 @@ export default class TitleBar extends React.PureComponent {
               </div>
             </DropdownContent>
           </Dropdown>
-          <button disabled={this.props.disableBack} onClick={this.props.onBack} className="TitleBar__menuItem">
+          <button disabled={this.disableBack()} onClick={this.back} className="TitleBar__menuItem">
             <i className="fa fa-angle-left" />
           </button>
-          <button disabled={this.props.disableForward} onClick={this.props.onForward} className="TitleBar__menuItem">
+          <button disabled={this.disableForward()} onClick={this.forward} className="TitleBar__menuItem">
             <i className="fa fa-angle-right" />
           </button>
         </div>

@@ -38,8 +38,6 @@ export default class Workspace extends React.PureComponent {
     super(props)
     log('constructor')
 
-    this.state = { sessionHistory: [], backIndex: 0 }
-
     ipcRenderer.on('loadDocumentUrl', (event, url) => {
       this.openDoc(url)
     })
@@ -74,12 +72,7 @@ export default class Workspace extends React.PureComponent {
   onChange = (doc) => {
     window.selfId = doc.selfId // Be mad (:
 
-    let { sessionHistory } = this.state
-    if (sessionHistory.length === 0) {
-      sessionHistory = [doc.currentDocUrl]
-    }
-
-    this.setState({ ...doc, sessionHistory })
+    this.setState({ ...doc })
     this.refreshHeartbeat(doc)
   }
 
@@ -91,9 +84,7 @@ export default class Workspace extends React.PureComponent {
     }, 5000) // send a heartbeat every 2.5s
   }
 
-  openDoc = (docUrl, options = {}) => {
-    const { saveHistory = true } = options
-
+  openDoc = (docUrl) => {
     try {
       parseDocumentLink(docUrl)
     } catch (e) {
@@ -107,37 +98,6 @@ export default class Workspace extends React.PureComponent {
       ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
       ws.viewedDocUrls.unshift(docUrl)
     })
-
-    if (saveHistory) {
-      const sessionHistory = [docUrl, ...(this.state.sessionHistory.slice(this.state.backIndex))]
-      this.setState({ sessionHistory, backIndex: 0 })
-    }
-  }
-
-  disableBack = () => this.state.backIndex === (this.state.sessionHistory.length - 1)
-
-  disableForward = () => this.state.backIndex === 0
-
-  back = () => {
-    if (this.disableBack()) {
-      throw new Error('Can not go back further than session history')
-    }
-
-    const backIndex = this.state.backIndex + 1
-    this.setState({ backIndex }, () => {
-      this.openDoc(this.state.sessionHistory[backIndex], { saveHistory: false })
-    })
-  }
-
-  forward = () => {
-    if (this.disableForward()) {
-      throw new Error('Can not go forward past session history')
-    }
-
-    const backIndex = this.state.backIndex - 1
-    this.setState({ backIndex }, () => {
-      this.openDoc(this.state.sessionHistory[backIndex], { saveHistory: false })
-    })
   }
 
   render = () => {
@@ -148,10 +108,6 @@ export default class Workspace extends React.PureComponent {
         <Content
           openDoc={this.openDoc}
           url={createDocumentLink('title-bar', this.props.docId)}
-          onBack={this.back}
-          onForward={this.forward}
-          disableBack={this.disableBack()}
-          disableForward={this.disableForward()}
         />
         <div className={`Workspace__container Workspace__container--${type}`}>
           <Content url={this.state.currentDocUrl} />
