@@ -40,7 +40,10 @@ export default class Toggle extends React.PureComponent {
     })
   }
 
-  render = () => <ReactToggle checked={this.state.toggled} onChange={this.flipToggle} />
+  render = () => {
+    throw new Error("oops")
+    return <ReactToggle checked={this.state.toggled} onChange={this.flipToggle} />
+  }
 }
 
 ContentTypes.register({
