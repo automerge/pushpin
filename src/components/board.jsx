@@ -25,7 +25,6 @@ const log = Debug('pushpin:board')
 const BOARD_MENU_ID = 'BoardMenu'
 
 const BOARD_COLORS = {
-
   DEFAULT: '#D5DFE5',
   SNOW: '#EBEDF4',
   BEIGE: '#f3f1ec',
@@ -696,7 +695,6 @@ export default class Board extends React.PureComponent {
     log('render')
 
     const cards = this.state.doc.cards || {}
-    // rework selected functioning, this is a slow implementation
     const cardChildren = Object.entries(cards).map(([id, card]) => {
       const selected = this.state.selected.includes(id)
       const uniquelySelected = selected && this.state.selected.length === 1
@@ -724,36 +722,15 @@ export default class Board extends React.PureComponent {
       )
     })
 
-    // We should optimize to avoid creating a new function for onClick each render.
-    const createMenuItems = ContentTypes.list().map((contentType) => (
-      <ContextMenuItem key={contentType.type} onClick={(e) => { this.addContent(e, contentType) }}>
-        <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-          <i className={classNames('fa', `fa-${contentType.icon}`)} />
-        </div>
-        <span className="ContextMenu__label">{contentType.name}</span>
-      </ContextMenuItem>
-    ))
 
     const contextMenu = (
-      <ContextMenu id={BOARD_MENU_ID} onShow={this.onShowContextMenu} className="ContextMenu">
-
-        <div className="ContextMenu__section">
-          { createMenuItems }
-        </div>
-
-
-        <div className="ContextMenu__section">
-          <h6>Board Color</h6>
-          <div className="ContextMenu__divider" />
-          <ContextMenuItem>
-            <ColorPicker
-              color={this.state.doc.backgroundColor}
-              colors={BOARD_COLOR_VALUES}
-              onChangeComplete={this.changeBackgroundColor}
-            />
-          </ContextMenuItem>
-        </div>
-      </ContextMenu>
+      <BoardContextMenu
+        contentTypes={ContentTypes.list()}
+        addContent={this.addContent}
+        onShowContextMenu={this.onShowContextMenu}
+        backgroundColor={this.state.doc.backgroundColor}
+        changeBackgroundColor={this.changeBackgroundColor}
+      />
     )
 
     return (
@@ -780,6 +757,46 @@ export default class Board extends React.PureComponent {
           </div>
         </ContextMenuTrigger>
       </div>
+    )
+  }
+}
+
+class BoardContextMenu extends React.PureComponent {
+  render = () => {
+    log('board-context-menu.render')
+
+    const createMenuItems = this.props.contentTypes.map((contentType) => (
+      <ContextMenuItem
+        key={contentType.type}
+        onClick={(e) => { this.props.addContent(e, contentType) }}
+      >
+        <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+          <i className={classNames('fa', `fa-${contentType.icon}`)} />
+        </div>
+        <span className="ContextMenu__label">{contentType.name}</span>
+      </ContextMenuItem>
+    ))
+
+    return (
+      <ContextMenu id={BOARD_MENU_ID}
+        onShow={this.props.onShowContextMenu}
+        className="ContextMenu"
+      >
+        <div className="ContextMenu__section">
+          { createMenuItems }
+        </div>
+        <div className="ContextMenu__section">
+          <h6>Board Color</h6>
+          <div className="ContextMenu__divider" />
+          <ContextMenuItem>
+            <ColorPicker
+              color={this.props.backgroundColor}
+              colors={BOARD_COLOR_VALUES}
+              onChangeComplete={this.props.changeBackgroundColor}
+            />
+          </ContextMenuItem>
+        </div>
+      </ContextMenu>
     )
   }
 }

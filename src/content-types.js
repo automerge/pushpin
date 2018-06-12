@@ -3,28 +3,27 @@ import Debug from 'debug'
 const log = Debug('pushpin:content-types')
 
 const registry = []
+const registryListed = []
 
-function register({ component, type, name, icon, unlisted, resizable }) {
+function register(contentType) {
+  const { component, type, name, icon, unlisted, resizable } = contentType
+
   if (!component || !type || !name || !icon) {
     throw new Error('Missing something in register')
   }
   log('register', component.name, type, name, icon, unlisted, resizable)
 
-  registry.push({
-    component,
-    type,
-    name,
-    icon,
-    unlisted,
-    resizable
-  })
+  registry.push(contentType)
+  if (!unlisted) {
+    registryListed.push(contentType)
+  }
 }
 
 function list({ withUnlisted = false } = {}) {
   if (withUnlisted) {
     return registry
   }
-  return registry.filter((t) => !t.unlisted)
+  return registryListed
 }
 
 export default { register, list }
