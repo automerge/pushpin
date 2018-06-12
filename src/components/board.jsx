@@ -9,6 +9,7 @@ import uuid from 'uuid/v4'
 import classNames from 'classnames'
 import Tmp from 'tmp'
 import Fs from 'fs'
+import Prompt from 'electron-prompt'
 
 import Card from './card'
 import ColorPicker from './color-picker'
@@ -301,23 +302,41 @@ export default class Board extends React.PureComponent {
     const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
     const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
 
-    if (contentType.type !== 'image') {
-      const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
-      this.selectOnly(cardId)
+
+    if (contentType.type === 'image') {
+      dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
+        // User aborted.
+        if (!paths) {
+          return
+        }
+        if (paths.length !== 1) {
+          throw new Error('Expected exactly one path?')
+        }
+
+        this.createImageCardFromPath({ x, y }, paths[0])
+      })
+    }
+
+    if (contentType.type === 'url') {
+      Prompt({
+        title: 'What URL?',
+        label: 'URL:',
+        value: 'http://example.org',
+        inputAttrs: { // attrs to be set if using 'input'
+          type: 'url'
+        },
+        type: 'input', // 'select' or 'input, defaults to 'input'
+      })
+        .then((r) => {
+          console.log('result', r) // null if window was closed, or user clicked Cancel
+          const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { url: r } })
+          this.selectOnly(cardId)
+        })
       return
     }
 
-    dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
-      // User aborted.
-      if (!paths) {
-        return
-      }
-      if (paths.length !== 1) {
-        throw new Error('Expected exactly one path?')
-      }
-
-      this.createImageCardFromPath({ x, y }, paths[0])
-    })
+    const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
+    this.selectOnly(cardId)
   }
 
   // Bridge that enables up to create image cards - which currently require a
