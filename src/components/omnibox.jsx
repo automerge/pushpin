@@ -1,23 +1,42 @@
 import React from 'react'
+import Debug from 'debug'
 
 import Content from './content'
 import ContentTypes from '../content-types'
+import InvitationsView from '../invitations-view'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
 
+const log = Debug('pushpin:omnibox')
+
 export default class Omnibox extends React.PureComponent {
-  state = { visible: true }
+  state = { visible: true, invitations: [] }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => {
+    log('componentWillMount')
+    this.invitationsView = new InvitationsView(this.props.docId)
+    this.invitationsView.onChange((invitations) => {
+      log('invitations change')
+      // This does not trigger a re-render for some reason,
+      // adding a forceUpdate for now
+      this.setState({ invitations }, () => this.forceUpdate())
+    })
+    this.refreshHandle(this.props.docId)
+  }
 
-  componentDidMount = () => document.addEventListener('keydown', this.onKeyDown)
+  componentDidMount = () => {
+    log('componentDidMount')
+    document.addEventListener('keydown', this.onKeyDown)
+  }
 
   componentWillUnmount = () => {
+    log('componentWillUnmount')
     document.removeEventListener('keydown', this.onKeyDown)
     window.hm.releaseHandle(this.handle)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
+    log('componentDidUpdate')
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
     }
@@ -42,6 +61,8 @@ export default class Omnibox extends React.PureComponent {
   }
 
   render() {
+    log('render')
+
     if (!this.state.visible) {
       return null
     }
@@ -62,6 +83,15 @@ export default class Omnibox extends React.PureComponent {
       return <Content url={createDocumentLink('contact', id)} />
     })
 
+    const invitations = this.state.invitations.map(invitation => {
+      return <div key={`${invitation.sender.docId}-${invitation.documentUrl}`} className="ListMenu__item">
+        <div className="ListMenu__typegroup">
+          <h4 className="Type--primary">{ invitation.doc.title || 'Untitled' }</h4>
+          <p className="Type--secondary">From { invitation.sender.name }</p>
+        </div>
+      </div>
+    })
+
     return <div className="Omnibox">
       <div className="ListMenu">
         <div className="ListMenu__segment">All Boards</div>
@@ -72,6 +102,11 @@ export default class Omnibox extends React.PureComponent {
         <div className="ListMenu__segment">Contacts</div>
         <div className="ListMenuSection">
           { contacts }
+        </div>
+
+        <div className="ListMenu__segment">Invitations</div>
+        <div className="ListMenuSection">
+          { invitations }
         </div>
       </div>
     </div>
