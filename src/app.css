@@ -198,6 +198,17 @@ input {
   }
 }
 
+.Omnibox {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  width: 478px;
+  height: 260px;
+  z-index: 10;
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  margin-left: -239px;
+}
 
 .ContextMenu {
   background-color: #ffffff;

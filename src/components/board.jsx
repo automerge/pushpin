@@ -10,6 +10,7 @@ import Fs from 'fs'
 
 import Content from './content'
 import ContentTypes from '../content-types'
+import Omnibox from './omnibox'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 import { createDocumentLink } from '../share-link'
 import * as Hyperfile from '../hyperfile'
@@ -732,6 +733,7 @@ export default class Board extends React.PureComponent {
         onPaste={this.onPaste}
         role="presentation"
       >
+        <Omnibox />
         <BoardContextMenu
           contentTypes={ContentTypes.list()}
           addContent={this.addContent}
