@@ -58,6 +58,10 @@ export default class Omnibox extends React.PureComponent {
       )
     })
 
+    const contacts = this.state.contactIds.map(id => {
+      return <Content url={createDocumentLink('contact', id)} />
+    })
+
     return <div className="Omnibox">
       <div className="ListMenu">
         <div className="ListMenu__segment">All Boards</div>
@@ -65,6 +69,10 @@ export default class Omnibox extends React.PureComponent {
           { boardDocLinks }
         </div>
 
+        <div className="ListMenu__segment">Contacts</div>
+        <div className="ListMenuSection">
+          { contacts }
+        </div>
       </div>
     </div>
   }
