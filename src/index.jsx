@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
 import Fs from 'fs'
 
-import { HYPERMERGE_PATH, WORKSPACE_ID_PATH } from './constants'
+import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
 import Hypermerge from './hypermerge'
 import Content from './components/content'
 
@@ -42,32 +42,39 @@ function initHypermerge(cb) {
   })
 }
 
-function loadWorkspaceId() {
-  if (Fs.existsSync(WORKSPACE_ID_PATH)) {
-    const json = JSON.parse(Fs.readFileSync(WORKSPACE_ID_PATH))
+function loadWorkspaceUrl() {
+  if (Fs.existsSync(WORKSPACE_URL_PATH)) {
+    const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH))
+    // the next four lines are to cover a migration for existing accounts to URLs
+    // if you're reading this long after 6/11/18 go ahead and delete this bit
     if (json.workspaceDocId) {
-      return json.workspaceDocId
+      const workspaceUrl = createDocumentLink('workspace', json.workspaceDocId)
+      saveWorkspaceUrl(workspaceUrl) // upgrade to new format
+      return workspaceUrl
+    } else if (json.workspaceUrl) {
+      return json.workspaceUrl
     }
   }
   return ''
 }
 
-function saveWorkspaceId(docId) {
-  const workspaceIdFile = { workspaceDocId: docId }
-  Fs.writeFileSync(WORKSPACE_ID_PATH, JSON.stringify(workspaceIdFile))
+function saveWorkspaceUrl(workspaceUrl) {
+  const workspaceUrlData = { workspaceUrl }
+  Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
 }
 
 function initWorkspace() {
-  let workspaceId
-  const existingWorkspaceId = loadWorkspaceId()
-  if (existingWorkspaceId !== '') {
-    workspaceId = existingWorkspaceId
+  let workspaceUrl
+  const existingWorkspaceUrl = loadWorkspaceUrl()
+  if (existingWorkspaceUrl !== '') {
+    workspaceUrl = existingWorkspaceUrl
   } else {
     const newWorkspaceId = Content.initializeContentDoc('workspace')
-    saveWorkspaceId(newWorkspaceId)
-    workspaceId = newWorkspaceId
+    const newWorkspaceUrl = createDocumentLink('workspace', newWorkspaceId)
+    saveWorkspaceUrl(newWorkspaceUrl)
+    workspaceUrl = newWorkspaceUrl
   }
-  const workspace = <Content url={createDocumentLink('workspace', workspaceId)} />
+  const workspace = <Content url={workspaceUrl} />
   const element = document.getElementById('workspace')
   ReactDOM.render(workspace, element)
 }
