@@ -71,6 +71,7 @@ export default class Workspace extends React.PureComponent {
 
   onChange = (doc) => {
     window.selfId = doc.selfId // Be mad (:
+
     this.setState({ ...doc })
     this.refreshHeartbeat(doc)
   }
@@ -83,9 +84,7 @@ export default class Workspace extends React.PureComponent {
     }, 5000) // send a heartbeat every 2.5s
   }
 
-  openDoc = (docUrl, options = {}) => {
-    const { saveHistory = true } = options
-
+  openDoc = (docUrl) => {
     try {
       parseDocumentLink(docUrl)
     } catch (e) {
@@ -96,10 +95,8 @@ export default class Workspace extends React.PureComponent {
     this.handle.change((ws) => {
       ws.currentDocUrl = docUrl
 
-      if (saveHistory) {
-        ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
-        ws.viewedDocUrls.unshift(docUrl)
-      }
+      ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
+      ws.viewedDocUrls.unshift(docUrl)
     })
   }
 

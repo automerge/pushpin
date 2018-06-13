@@ -13,22 +13,12 @@ const log = Debug('pushpin:title-bar')
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    openDoc: PropTypes.func.isRequired
+    openDoc: PropTypes.func.isRequired,
   }
 
   boardHistory = React.createRef()
 
-  backIndex = () => this.state.viewedDocUrls.findIndex(url => url === this.state.currentDocUrl)
-
-  back = () => {
-    const index = this.backIndex()
-    this.props.openDoc(this.state.viewedDocUrls[index + 1], { saveHistory: false })
-  }
-
-  forward = () => {
-    const index = this.backIndex()
-    this.props.openDoc(this.state.viewedDocUrls[index - 1], { saveHistory: false })
-  }
+  state = { sessionHistory: [], historyIndex: 0 }
 
   hideBoardHistory = () => {
     this.boardHistory.current.hide()
@@ -51,8 +41,47 @@ export default class TitleBar extends React.PureComponent {
     this.handle.onChange(this.onChange)
   }
 
+  disableBack = () => this.state.historyIndex === (this.state.sessionHistory.length - 1)
+
+  disableForward = () => this.state.historyIndex === 0
+
+  back = () => {
+    if (this.disableBack()) {
+      throw new Error('Can not go back further than session history')
+    }
+
+    const historyIndex = this.state.historyIndex + 1
+    this.setState({ historyIndex }, () => {
+      this.props.openDoc(this.state.sessionHistory[historyIndex])
+    })
+  }
+
+  forward = () => {
+    if (this.disableForward()) {
+      throw new Error('Can not go forward past session history')
+    }
+
+    const historyIndex = this.state.historyIndex - 1
+
+    this.setState({ historyIndex }, () => {
+      this.props.openDoc(this.state.sessionHistory[historyIndex])
+    })
+  }
+
   onChange = (doc) => {
-    this.setState({ ...doc })
+    let { historyIndex, sessionHistory } = this.state
+
+    // Init sessionHistory
+    if (sessionHistory.length === 0) {
+      sessionHistory = [doc.currentDocUrl]
+    // If we're opening a new document (as opposed to going back or forward),
+    // add it to our sessionHistory and remove all docs 'forward' of the current index
+    } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
+      sessionHistory = [doc.currentDocUrl, ...(sessionHistory.slice(historyIndex))]
+      historyIndex = 0
+    }
+
+    this.setState({ ...doc, sessionHistory, historyIndex })
   }
 
   render = () => {
@@ -74,9 +103,6 @@ export default class TitleBar extends React.PureComponent {
     })
 
     const { docId } = parseDocumentLink(this.state.currentDocUrl)
-    const index = this.backIndex()
-    const disableBack = index === (this.state.viewedDocUrls.length - 1)
-    const disableForward = index === 0
 
     return (
       <div className="TitleBar">
@@ -95,10 +121,10 @@ export default class TitleBar extends React.PureComponent {
               </div>
             </DropdownContent>
           </Dropdown>
-          <button disabled={disableBack} onClick={this.back} className="TitleBar__menuItem">
+          <button disabled={this.disableBack()} onClick={this.back} className="TitleBar__menuItem">
             <i className="fa fa-angle-left" />
           </button>
-          <button disabled={disableForward} onClick={this.forward} className="TitleBar__menuItem">
+          <button disabled={this.disableForward()} onClick={this.forward} className="TitleBar__menuItem">
             <i className="fa fa-angle-right" />
           </button>
         </div>
