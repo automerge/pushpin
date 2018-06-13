@@ -1,5 +1,6 @@
 import React from 'react'
 import Debug from 'debug'
+import PropTypes from 'prop-types'
 
 import Content from './content'
 import ContentTypes from '../content-types'
@@ -9,9 +10,20 @@ import { createDocumentLink, parseDocumentLink } from '../share-link'
 const log = Debug('pushpin:omnibox')
 
 export default class Omnibox extends React.PureComponent {
+  static propTypes = {
+    visible: PropTypes.bool.isRequired,
+    search: PropTypes.string,
+    move: PropTypes.string,
+    getKeyController: PropTypes.func
+  }
+
+  static defaultProps = {
+    search: ''
+  }
+
   constructor(props) {
     super(props)
-    this.state = { visible: true, invitations: [] }
+    this.state = { invitations: [], selectedIndex: 0 }
   }
 
   // This is the New Boilerplate
@@ -24,12 +36,11 @@ export default class Omnibox extends React.PureComponent {
     this.refreshHandle(this.props.docId)
     this.invitationsView = new InvitationsView(this.props.docId)
     this.invitationsView.onChange(this.onInvitationsChange)
-    document.addEventListener('keydown', this.onKeyDown)
+    this.props.getKeyController({ moveUp: this.moveUp, moveDown: this.moveDown })
   }
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    document.removeEventListener('keydown', this.onKeyDown)
     window.hm.releaseHandle(this.handle)
   }
 
@@ -58,16 +69,23 @@ export default class Omnibox extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  onKeyDown = (e) => {
-    if (e.metaKey && e.key === '/') {
-      this.setState({ visible: !this.state.visible })
+  moveUp = () => {
+    let { selectedIndex } = this.state
+
+    if (selectedIndex > 0) {
+      selectedIndex -= 1
+      this.setState({ selectedIndex })
     }
+  }
+
+  moveDown = () => {
+    this.setState({ selectedIndex: this.state.selectedIndex + 1 })
   }
 
   render() {
     log('render', this.state)
 
-    if (!this.state.visible) {
+    if (!this.props.visible) {
       return null
     }
 

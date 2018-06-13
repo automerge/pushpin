@@ -130,11 +130,7 @@ export default class TitleBar extends React.PureComponent {
         </div>
 
         <div className="TitleBar__center">
-          <Content url={createDocumentLink('board-title', docId)} />
-          <HashForm
-            formDocId={this.state.currentDocUrl}
-            onChanged={this.props.openDoc}
-          />
+          <Content url={createDocumentLink('board-title', this.props.docId)} />
         </div>
 
         <div className="TitleBar__right">

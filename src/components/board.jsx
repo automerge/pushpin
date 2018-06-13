@@ -733,7 +733,6 @@ export default class Board extends React.PureComponent {
         onPaste={this.onPaste}
         role="presentation"
       >
-        <Omnibox />
         <BoardContextMenu
           contentTypes={ContentTypes.list()}
           addContent={this.addContent}

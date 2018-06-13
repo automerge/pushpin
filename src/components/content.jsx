@@ -30,6 +30,8 @@ export default class Content extends React.PureComponent {
     return docId
   }
 
+  component = React.createRef()   
+
   // This is the New Boilerplate, adapted slightly for content
   state = {}
   componentWillMount = () => {
@@ -91,6 +93,7 @@ export default class Content extends React.PureComponent {
 
     return (
       <contentType.component
+        ref={this.component}
         docId={docId}
         {...filteredProps}
       />
