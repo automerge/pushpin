@@ -109,7 +109,8 @@ const css = {
     objectFit: 'cover',
     width: '100%',
     height: '50%',
-    marginBottom: 12
+    marginBottom: 12,
+    minHeight: 96
   },
   title: {
     fontFamily: 'IBM Plex Sans',
@@ -120,7 +121,8 @@ const css = {
     marginBottom: 12,
     maxHeight: 72,
     overflowY: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    flexShrink:0
   },
   titleAnchor: {
     color: 'inherit',
@@ -141,6 +143,7 @@ const css = {
     color: '#637389',
     justifySelf: 'flex-end',
     overflowY: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    flexShrink: 0
   }
 }
