@@ -252,7 +252,13 @@ export default class Board extends React.PureComponent {
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
     if (plainText) {
-      this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
+      try {
+        const url = new URL(plainText)
+        this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
+      } catch (e) {
+        // i guess it's not a URL, just make a text card
+        this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
+      }
     }
   }
 
