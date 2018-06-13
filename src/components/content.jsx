@@ -44,7 +44,7 @@ export default class Content extends React.PureComponent {
     }
   }
   componentDidCatch = (e) => {
-    this.setState({contentCrashed: e})
+    this.setState({ contentCrashed: e })
   }
 
   refreshHandle = (docId) => {
@@ -83,11 +83,11 @@ export default class Content extends React.PureComponent {
       .find((ct) => ct.type === type)
 
     if (!contentType) {
-      return missingType(type)
+      return renderMissingType(type)
     }
 
     if (this.state.contentCrashed) {
-      return errorInRender(type, this.state.contentCrashed)
+      return renderError(type, this.state.contentCrashed)
     }
 
     if (!this.state.doc) {
@@ -105,14 +105,14 @@ export default class Content extends React.PureComponent {
   }
 }
 
-const errorInRender = (type, error) => (
+const renderError = (type, error) => (
   <div>
     <i className="fa fa-exclamation-triangle" />
     A &quot;{type}&quot; threw an error during render.
   </div>
 )
 
-const missingType = type => (
+const renderMissingType = type => (
   <div>
     <i className="fa fa-exclamation-triangle" />
     Component of type &quot;{type}&quot; not found.
