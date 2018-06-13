@@ -107,9 +107,11 @@ const css = {
   img: {
     display: 'block',
     objectFit: 'cover',
-    width: '100%',
     height: '50%',
     marginBottom: 12,
+    marginLeft: -12,
+    marginTop: -12,
+    marginRight: -12,
     minHeight: 96
   },
   title: {
