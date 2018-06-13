@@ -4,8 +4,15 @@ import Unfluff from 'unfluff'
 import * as Hyperfile from '../hyperfile'
 
 import ContentTypes from '../content-types'
-import Content from './content'
-import { createDocumentLink } from '../share-link'
+
+const removeEmpty = (obj) =>
+  Object.entries(obj).forEach(([key, val]) => {
+    if (val && typeof val === 'object') {
+      removeEmpty(val)
+    } else if (val == null) {
+      delete obj[key]
+    }
+  })
 
 export default class Url extends React.PureComponent {
   static propTypes = {
@@ -18,7 +25,6 @@ export default class Url extends React.PureComponent {
 
   state = { urlInput: '' }
 
-  // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -64,31 +70,8 @@ export default class Url extends React.PureComponent {
       response.text().then((text) => {
         const data = Unfluff(text)
         this.handle.change((doc) => {
-          const removeEmpty = (obj) =>
-            Object.entries(obj).forEach(([key, val]) => {
-              if (val && typeof val === 'object') {
-                removeEmpty(val)
-              } else if (val == null) {
-                delete obj[key]
-              }
-            })
           if (data.image) {
-            const imageCanonicalUrl = new URL(data.image, this.state.url)
-            fetch(imageCanonicalUrl).then((response => {
-              response.arrayBuffer().then((buffer) => {
-                // we need to convert the ArrayBuffer into a Uint8Buffer
-                Hyperfile.writeBuffer(Buffer.from(buffer), (err, hyperfileId) => {
-                  if (err) {
-                    console.log(err)
-                    return
-                  }
-
-                  this.handle.change((doc) => {
-                    doc.imageHyperfileUrl = `hyperfile://${hyperfileId}`
-                  })
-                })
-              })
-            }))
+            this.uploadImage(data)
           }
           removeEmpty(data)
           doc.data = data
@@ -97,12 +80,31 @@ export default class Url extends React.PureComponent {
     })
   }
 
+  uploadImage = (data) => {
+    const imageCanonicalUrl = new URL(data.image, this.state.url)
+    fetch(imageCanonicalUrl).then((response => {
+      response.arrayBuffer().then((buffer) => {
+        // we need to convert the ArrayBuffer into a Uint8Buffer
+        Hyperfile.writeBuffer(Buffer.from(buffer), (err, hyperfileId) => {
+          if (err) {
+            throw new Error(err)
+          }
+
+          this.handle.change((doc) => {
+            doc.imageHyperfileUrl = `hyperfile://${hyperfileId}`
+          })
+        })
+      })
+    }))
+  }
+
   render = () => {
     const { data, url } = this.state
     if (!url) {
       return (
         <div style={css.urlCard}>
           <input
+            autoFocus
             type="text"
             style={css.input}
             value={this.state.urlInput}

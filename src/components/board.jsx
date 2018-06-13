@@ -5,7 +5,6 @@ import { remote } from 'electron'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import uuid from 'uuid/v4'
-import classNames from 'classnames'
 
 import Content from './content'
 import ContentTypes from '../content-types'
