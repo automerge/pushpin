@@ -7,8 +7,6 @@ import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from 're
 import { DraggableCore } from 'react-draggable'
 import uuid from 'uuid/v4'
 import classNames from 'classnames'
-import Tmp from 'tmp'
-import Fs from 'fs'
 
 import Card from './card'
 import ColorPicker from './color-picker'
@@ -235,7 +233,7 @@ export default class Board extends React.PureComponent {
       const y = localY + (i * (GRID_SIZE * 2))
       if (entry.type.match('image/')) {
         reader.onload = () => {
-          this.createImageCardFromReader(x, y, reader)
+          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result))
         }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
@@ -283,7 +281,7 @@ export default class Board extends React.PureComponent {
 
         const reader = new FileReader()
         reader.onload = () => {
-          this.createImageCardFromReader(x, y, reader)
+          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result))
         }
         reader.readAsArrayBuffer(file)
       })
@@ -326,29 +324,20 @@ export default class Board extends React.PureComponent {
     this.selectOnly(cardId)
   }
 
-  // Bridge that enables up to create image cards - which currently require a
-  // local file path, when the browser APIs only give us a FileReader on paste
-  // and drop.
-  // For now we write temp files, though we should do something more efficient
-  // here eventually.
-  createImageCardFromReader = (x, y, reader) => {
-    Tmp.file((err, path, fd, cleanup) => {
+  createImageCardFromPath = ({ x, y }, path) => {
+    Hyperfile.write(path, (err, hyperfileId) => {
       if (err) {
-        throw err
+        log(err)
+        return
       }
 
-      Fs.appendFile(path, Buffer.from(reader.result), (err) => {
-        if (err) {
-          throw err
-        }
-
-        this.createImageCardFromPath({ x, y }, path)
-      })
+      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { hyperfileId } })
+      this.selectOnly(cardId)
     })
   }
 
-  createImageCardFromPath = ({ x, y }, path) => {
-    Hyperfile.write(path, (err, hyperfileId) => {
+  createImageCardFromBuffer = ({ x, y }, buffer) => {
+    Hyperfile.writeBuffer(buffer, (err, hyperfileId) => {
       if (err) {
         log(err)
         return

@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Unfluff from 'unfluff'
+import * as Hyperfile from '../hyperfile'
 
 import ContentTypes from '../content-types'
+import Content from './content'
+import { createDocumentLink } from '../share-link'
 
 export default class Url extends React.PureComponent {
   static propTypes = {
@@ -70,6 +73,25 @@ export default class Url extends React.PureComponent {
                 delete obj[key]
               }
             })
+          if (data.image) {
+            const imageCanonicalUrl = new URL(data.image, this.state.url)
+            fetch(imageCanonicalUrl).then((response => {
+              response.arrayBuffer().then((buffer) => {
+                // we need to convert the ArrayBuffer into a Uint8Buffer
+                Hyperfile.writeBuffer(Buffer.from(buffer), (err, hyperfileId) => {
+                  if (err) {
+                    console.log(err)
+                    return
+                  }
+
+                  const docId = Content.initializeContentDoc('image', { hyperfileId })
+                  this.handle.change((doc) => {
+                    doc.imageContentUrl = createDocumentLink('image', docId)
+                  })
+                })
+              })
+            }))
+          }
           removeEmpty(data)
           doc.data = data
           doc.loaded = true
@@ -104,11 +126,11 @@ export default class Url extends React.PureComponent {
     }
     // I'm leaving this in here for a while to help
     // debug any surprising links we come across more easily.
-    console.log(data)
+    console.log(this.state)
 
     return (
       <div style={css.urlCard}>
-        {data.image ? <img style={css.img} src={data.image} alt={data.description} /> : null }
+        {this.state.imageContentUrl ? <Content url={this.state.imageContentUrl} /> : null }
         <p style={css.title}>
           <a style={css.titleAnchor} href={url}>{data.title}</a>
         </p>
