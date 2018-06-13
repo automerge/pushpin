@@ -14,7 +14,6 @@ export default class Url extends React.PureComponent {
 
   static initializeDocument = (urlDoc, { url = '' }) => {
     urlDoc.url = url
-    urlDoc.loaded = false // todo: use timestamps
   }
 
   state = { urlInput: '' }
@@ -37,7 +36,7 @@ export default class Url extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    if (doc.url && !doc.loaded) {
+    if (doc.url && !doc.data) {
       this.refreshContent(doc)
     }
     this.setState({ ...doc })
@@ -84,9 +83,8 @@ export default class Url extends React.PureComponent {
                     return
                   }
 
-                  const docId = Content.initializeContentDoc('image', { hyperfileId })
                   this.handle.change((doc) => {
-                    doc.imageContentUrl = createDocumentLink('image', docId)
+                    doc.imageHyperfileUrl = `hyperfile://${hyperfileId}`
                   })
                 })
               })
@@ -94,7 +92,6 @@ export default class Url extends React.PureComponent {
           }
           removeEmpty(data)
           doc.data = data
-          doc.loaded = true
         })
       })
     })
@@ -130,7 +127,13 @@ export default class Url extends React.PureComponent {
 
     return (
       <div style={css.urlCard}>
-        {this.state.imageContentUrl ? <Content url={this.state.imageContentUrl} /> : null }
+        {this.state.imageHyperfileUrl ?
+          <img
+            style={css.img}
+            src={this.state.imageHyperfileUrl}
+            alt={data.description}
+          />
+          : null }
         <p style={css.title}>
           <a style={css.titleAnchor} href={url}>{data.title}</a>
         </p>
