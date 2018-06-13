@@ -88,7 +88,7 @@ export default class BoardCard extends React.PureComponent {
           className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
           style={style}
           onClick={this.onCardClicked}
-          onDoubleClick={this.onCardDoubleClick}
+          onDoubleClick={this.onCardDoubleClicked}
           onContextMenu={this.stopPropagation}
         >
           <Content
