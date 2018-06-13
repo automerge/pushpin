@@ -9,23 +9,21 @@ import { createDocumentLink, parseDocumentLink } from '../share-link'
 const log = Debug('pushpin:omnibox')
 
 export default class Omnibox extends React.PureComponent {
-  state = { visible: true, invitations: [] }
+  constructor(props) {
+    super(props)
+    this.state = { visible: true, invitations: [] }
+  }
 
   // This is the New Boilerplate
   componentWillMount = () => {
     log('componentWillMount')
-    this.invitationsView = new InvitationsView(this.props.docId)
-    this.invitationsView.onChange((invitations) => {
-      log('invitations change')
-      // This does not trigger a re-render for some reason,
-      // adding a forceUpdate for now
-      this.setState({ invitations }, () => this.forceUpdate())
-    })
-    this.refreshHandle(this.props.docId)
   }
 
   componentDidMount = () => {
     log('componentDidMount')
+    this.refreshHandle(this.props.docId)
+    this.invitationsView = new InvitationsView(this.props.docId)
+    this.invitationsView.onChange(this.onInvitationsChange)
     document.addEventListener('keydown', this.onKeyDown)
   }
 
@@ -50,7 +48,13 @@ export default class Omnibox extends React.PureComponent {
     this.handle.onChange(this.onChange)
   }
 
+  onInvitationsChange = (invitations) => {
+    log('invitations change')
+    this.setState({ invitations })
+  }
+
   onChange = (doc) => {
+    log('onChange', doc)
     this.setState({ ...doc })
   }
 
@@ -61,9 +65,13 @@ export default class Omnibox extends React.PureComponent {
   }
 
   render() {
-    log('render')
+    log('render', this.state)
 
     if (!this.state.visible) {
+      return null
+    }
+
+    if (!this.state.currentDocUrl) {
       return null
     }
 
@@ -80,7 +88,7 @@ export default class Omnibox extends React.PureComponent {
     })
 
     const contacts = this.state.contactIds.map(id => {
-      return <Content url={createDocumentLink('contact', id)} />
+      return <Content key={id} url={createDocumentLink('contact', id)} />
     })
 
     const invitations = this.state.invitations.map(invitation => {
