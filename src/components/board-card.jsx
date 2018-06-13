@@ -81,23 +81,21 @@ export default class BoardCard extends React.PureComponent {
         onDrag={this.onDrag}
         onStop={this.onStop}
       >
-        <div>
-          <div
-            ref={this.setCardRef}
-            tabIndex="-1"
-            id={`card-${card.id}`}
-            className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
-            style={style}
-            onClick={this.onCardClicked}
-            onDoubleClick={this.onCardDoubleClick}
-            onContextMenu={this.stopPropagation}
-          >
-            <Content
-              url={this.props.card.url}
-              uniquelySelected={this.props.uniquelySelected}
-            />
-            { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }
-          </div>
+        <div
+          ref={this.setCardRef}
+          tabIndex="-1"
+          id={`card-${card.id}`}
+          className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
+          style={style}
+          onClick={this.onCardClicked}
+          onDoubleClick={this.onCardDoubleClick}
+          onContextMenu={this.stopPropagation}
+        >
+          <Content
+            url={this.props.card.url}
+            uniquelySelected={this.props.uniquelySelected}
+          />
+          { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }
         </div>
       </DraggableCore>
     )
