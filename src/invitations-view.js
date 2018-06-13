@@ -21,8 +21,8 @@ export default class InvitationsView {
   }
 
   onChange = (callback) => {
-    this.onChange = callback
-    this.onChange(this.invitations)
+    this.onChangeCb = callback
+    this.onChangeCb(this.invitations)
   }
 
   watchContact = (contactId) => {
@@ -48,7 +48,9 @@ export default class InvitationsView {
         }
       })
 
-      this.onChange(this.invitations)
+      if (this.onChangeCb) {
+        this.onChangeCb(this.invitations)
+      }
     })
   }
 }
