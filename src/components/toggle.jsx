@@ -13,6 +13,8 @@ export default class Toggle extends React.PureComponent {
     toggleDoc.toggled = false
   }
 
+  state = {}
+
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)

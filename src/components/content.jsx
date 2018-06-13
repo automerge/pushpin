@@ -30,33 +30,10 @@ export default class Content extends React.PureComponent {
     return docId
   }
 
-  // This is the New Boilerplate, adapted slightly for content
   state = {}
-  componentWillMount = () => {
-    const { docId } = parseDocumentLink(this.props.url)
-    this.refreshHandle(docId)
-  }
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.url !== this.props.url) {
-      const { docId } = parseDocumentLink(this.props.url)
-      this.refreshHandle(docId)
-    }
-  }
+
   componentDidCatch = (e) => {
     this.setState({ contentCrashed: e })
-  }
-
-  refreshHandle = (docId) => {
-    if (this.handle) {
-      window.hm.releaseHandle(this.handle)
-    }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
-  }
-
-  onChange = (doc) => {
-    this.setState({ doc })
   }
 
   filterProps = (props) => {
@@ -88,10 +65,6 @@ export default class Content extends React.PureComponent {
 
     if (this.state.contentCrashed) {
       return renderError(type, this.state.contentCrashed)
-    }
-
-    if (!this.state.doc) {
-      return null
     }
 
     const filteredProps = this.filterProps(this.props)

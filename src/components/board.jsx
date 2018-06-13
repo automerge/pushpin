@@ -103,7 +103,7 @@ export default class Board extends React.PureComponent {
 
     this.tracking = {}
     this.cardRefs = {}
-    this.state = { cards: {}, selected: [] }
+    this.state = { doc: {}, cards: {}, selected: [] }
   }
 
   static initializeDocument(board) {

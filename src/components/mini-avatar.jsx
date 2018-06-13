@@ -10,6 +10,8 @@ class MiniAvatar extends React.PureComponent {
     docId: PropTypes.string.isRequired
   }
 
+  state = {}
+
   // This is the New Boilerplate
   componentWillMount = () => {
     this.refreshHandle(this.props.docId)
