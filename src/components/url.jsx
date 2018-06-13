@@ -64,18 +64,23 @@ export default class Url extends React.PureComponent {
     console.log(data)
     if (!data) {
       return (
-        <div>
-          <h3><a href={url}>{url}</a></h3>
+        <div style={css.urlCard}>
+          <p style={css.title}>Loading...</p>
+          <p style={css.link}><a style={css.titleAnchor} href={url}>{url}</a></p>
         </div>
       )
     }
 
     return (
       <div style={css.urlCard}>
-        <img style={css.img} src={data.image} />
-        <a style={css.title} href={url}>{data.title}</a>
-        <p style={css.text}>{data.text}</p>
-        <a style={css.link} href={data.canonicalLink}>{data.canonicalLink}</a>
+        {data.image ? <img style={css.img} src={data.image} /> : null }
+        <p style={css.title}>
+          <a style={css.titleAnchor} href={url}>{data.title}</a>
+        </p>
+        <p style={css.text}>{data.description}</p>
+        <p style={css.link}>
+          <a style={css.titleAnchor} href={data.canonicalLink}>{data.canonicalLink}</a>
+        </p>
       </div>
     )
   }
@@ -91,34 +96,51 @@ ContentTypes.register({
 
 const css = {
   urlCard: {
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: 'white',
-    width: '100%',
     overflow: 'auto',
-    height: '100%',
-    margin: '8px',
+    position: 'relative',
+    padding: 12,
+    flex: '1 1 auto'
   },
   img: {
+    display: 'block',
     objectFit: 'cover',
-    height: '50%',
     width: '100%',
+    height: '50%',
+    marginBottom: 12
   },
   title: {
     fontFamily: 'IBM Plex Sans',
     fontSize: '18px',
-    lineHeight: 1.33,
+    lineHeight: '24px',
     color: 'black',
     textDecoration: 'none',
+    marginBottom: 12,
+    maxHeight: 72,
+    overflowY: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  titleAnchor: {
+    color: 'inherit',
+    textDecoration: 'none'
   },
   text: {
     fontFamily: 'IBM Plex Sans',
     fontSize: '12px',
-    lineHeight: 1.33,
-    color: '#637389'
+    lineHeight: '16px',
+    color: '#637389',
+    marginBottom: 12,
+    flex: 1,
   },
   link: {
     fontFamily: 'IBM Plex Sans',
     fontSize: '10px',
-    lineHeight: 1.6,
-    color: '#637389'
+    lineHeight: 1.2,
+    color: '#637389',
+    justifySelf: 'flex-end',
+    overflowY: 'hidden',
+    textOverflow: 'ellipsis'
   }
 }
