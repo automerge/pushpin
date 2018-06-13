@@ -53,7 +53,7 @@ export default class Content extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    this.setState({ doc })
+    this.setState({ hasDoc: true })
   }
 
   filterProps = (props) => {
@@ -83,7 +83,7 @@ export default class Content extends React.PureComponent {
       return missingType(type)
     }
 
-    if (!this.state.doc) {
+    if (!this.state.hasDoc) {
       return null
     }
 
