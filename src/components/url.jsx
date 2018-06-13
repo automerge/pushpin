@@ -38,6 +38,29 @@ export default class Url extends React.PureComponent {
     this.setState({ ...doc })
   }
 
+  onInput = (e) => {
+    this.setState({
+      urlInput: e.target.value
+    })
+  }
+
+  onKeyDown = (e) => {
+    e.stopPropagation()
+
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      this.handle.change((urlDoc) => {
+        urlDoc.url = this.state.urlInput
+        urlDoc.urlUpdatedAt = new Date()
+        this.refreshContent(urlDoc)
+      })
+
+      this.setState({
+        urlInput: ''
+      })
+    }
+  }
+
   refreshContent = (doc) => {
     fetch(doc.url).then((response) => {
       response.text().then((text) => {
@@ -62,6 +85,19 @@ export default class Url extends React.PureComponent {
   render = () => {
     const { data, url } = this.state
     console.log(data)
+    if (!url) {
+      return (
+        <div style={css.urlCard}>
+          <input
+            style={css.input}
+            value={this.state.urlInput}
+            onKeyDown={this.onKeyDown}
+            onInput={this.onInput}
+            placeholder="Enter a URL..."
+          />
+        </div>
+      )
+    }
     if (!data) {
       return (
         <div style={css.urlCard}>
@@ -73,13 +109,15 @@ export default class Url extends React.PureComponent {
 
     return (
       <div style={css.urlCard}>
-        {data.image ? <img style={css.img} src={data.image} /> : null }
+        {data.image ? <img style={css.img} src={data.image} alt={data.description} /> : null }
         <p style={css.title}>
           <a style={css.titleAnchor} href={url}>{data.title}</a>
         </p>
         <p style={css.text}>{data.description}</p>
         <p style={css.link}>
-          <a style={css.titleAnchor} href={data.canonicalLink ? data.canonicalLink : url}>{data.canonicalLink ? data.canonicalLink : url}</a>
+          <a style={css.titleAnchor} href={data.canonicalLink || url}>
+            {data.canonicalLink || url}
+          </a>
         </p>
       </div>
     )
@@ -108,6 +146,7 @@ const css = {
     display: 'block',
     objectFit: 'cover',
     height: '50%',
+    maxWidth: '34em',
     marginBottom: 12,
     marginLeft: -12,
     marginTop: -12,
@@ -124,13 +163,14 @@ const css = {
     maxHeight: 72,
     overflowY: 'hidden',
     textOverflow: 'ellipsis',
-    flexShrink:0
+    flexShrink: 0
   },
   titleAnchor: {
     color: 'inherit',
     textDecoration: 'none'
   },
   text: {
+    maxWidth: '34em',
     fontFamily: 'IBM Plex Sans',
     fontSize: '12px',
     lineHeight: '16px',

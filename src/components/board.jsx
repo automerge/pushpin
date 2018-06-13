@@ -9,7 +9,6 @@ import uuid from 'uuid/v4'
 import classNames from 'classnames'
 import Tmp from 'tmp'
 import Fs from 'fs'
-import Prompt from 'electron-prompt'
 
 import Card from './card'
 import ColorPicker from './color-picker'
@@ -292,7 +291,13 @@ export default class Board extends React.PureComponent {
 
     const plainTextData = dataTransfer.getData('text/plain')
     if (plainTextData) {
-      this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
+      try {
+        const url = new URL(plainTextData)
+        this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
+      } catch (e) {
+        // i guess it's not a URL, just make a text card
+        this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
+      }
     }
   }
 
@@ -315,24 +320,6 @@ export default class Board extends React.PureComponent {
 
         this.createImageCardFromPath({ x, y }, paths[0])
       })
-    }
-
-    if (contentType.type === 'url') {
-      Prompt({
-        title: 'What URL?',
-        label: 'URL:',
-        value: 'http://example.org',
-        inputAttrs: { // attrs to be set if using 'input'
-          type: 'url'
-        },
-        type: 'input', // 'select' or 'input, defaults to 'input'
-      })
-        .then((r) => {
-          console.log('result', r) // null if window was closed, or user clicked Cancel
-          const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { url: r } })
-          this.selectOnly(cardId)
-        })
-      return
     }
 
     const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
