@@ -130,7 +130,7 @@ export default class TitleBar extends React.PureComponent {
         </div>
 
         <div className="TitleBar__center">
-          <Content url={createDocumentLink('board-title', this.props.docId)} />
+          <Content openDoc={this.props.openDoc} url={createDocumentLink('board-title', this.props.docId)} />
         </div>
 
         <div className="TitleBar__right">

@@ -23,7 +23,7 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { invitations: [], selectedIndex: 0 }
+    this.state = { invitations: [], selectedIndex: -1 }
   }
 
   // This is the New Boilerplate
@@ -76,6 +76,8 @@ export default class Omnibox extends React.PureComponent {
       selectedIndex -= 1
       this.setState({ selectedIndex })
     }
+
+    return this.menuItems().items[selectedIndex]
   }
 
   moveDown = () => {
@@ -86,6 +88,8 @@ export default class Omnibox extends React.PureComponent {
       selectedIndex += 1
       this.setState({ selectedIndex })
     }
+
+    return this.menuItems().items[selectedIndex]
   }
 
   menuItems = () => {
@@ -101,7 +105,9 @@ export default class Omnibox extends React.PureComponent {
     sectionIndices.viewedDocUrls = { start: items.length }
     items = items.concat(viewedDocItems)
 
-    items[this.state.selectedIndex].selected = true
+    if (items[this.state.selectedIndex]) {
+      items[this.state.selectedIndex].selected = true
+    }
 
     return { items, sectionIndices }
   }

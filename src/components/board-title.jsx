@@ -12,9 +12,10 @@ const log = Debug('pushpin:board-title')
 export default class BoardTitle extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
+    openDoc: PropTypes.func.isRequired
   }
 
-  state = { activeOmnibox: false, search: null, move: null }
+  state = { activeOmnibox: false, search: null, selected: -1 }
   input = React.createRef()
 
   setTitle = ({ title }) => {
@@ -70,20 +71,34 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   deactivateOmnibox = () => {
-    // this.setState({ activeOmnibox: false })
+    this.setState({ activeOmnibox: false })
   }
 
   handleChange = (e) => {
     this.setState({ search: e.target.value })
   }
 
-  handleArrowKeys = (e) => {
+  handleCommandKeys = (e) => {
     if (e.key === 'ArrowDown') {
-      this.omniboxControl.moveDown()
+      const selected = this.omniboxControl.moveDown()
+      this.setState({ selected })
     }
 
     if (e.key === 'ArrowUp') {
-      this.omniboxControl.moveUp()
+     const selected = this.omniboxControl.moveUp()
+     this.setState({ selected })
+    }
+
+    if (e.key === 'Enter') {
+      const { selected } = this.state
+
+      if (this.state.selected.type === 'invitation') {
+        this.props.openDoc(selected.object.documentUrl)
+      }
+
+      if (this.state.selected.type === 'viewedDocUrl') {
+        this.props.openDoc(selected.object)
+      }
     }
   }
 
@@ -111,7 +126,7 @@ export default class BoardTitle extends React.PureComponent {
           onFocus={this.activateOmnibox}
           onBlur={this.deactivateOmnibox}
           onChange={this.handleChange}
-          onKeyDown={this.handleArrowKeys}
+          onKeyDown={this.handleCommandKeys}
         />
       </div>
     )
