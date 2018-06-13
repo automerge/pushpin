@@ -37,7 +37,7 @@ export default class DocLink extends React.PureComponent {
 
   render = () => (
     <div className="DocLink" onClick={this.handleClick}>
-      <i className="fa fa-files-o" style={{ background: this.state.backgroundColor }} />
+      <i className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
       <div className="DocLink__title">{ this.state.title }</div>
     </div>
   )

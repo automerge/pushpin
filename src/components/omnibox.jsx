@@ -93,28 +93,26 @@ export default class Omnibox extends React.PureComponent {
 
     const invitations = this.state.invitations.map(invitation => {
       return <div key={`${invitation.sender.docId}-${invitation.documentUrl}`} className="ListMenu__item">
-        <div className="ListMenu__typegroup">
-          <h4 className="Type--primary">{ invitation.doc.title || 'Untitled' }</h4>
-          <p className="Type--secondary">From { invitation.sender.name }</p>
+        <div className="Invitation">
+          <i className="Badge fa fa-envelope" style={{ background: invitation.doc && invitation.doc.backgroundColor }} />
+          <div className="Invitation__body">
+            <h4 className="Type--primary">{ invitation.doc.title || 'Untitled' }</h4>
+            <p className="Type--secondary">From { invitation.sender.name }</p>
+          </div>
         </div>
       </div>
     })
 
     return <div className="Omnibox">
       <div className="ListMenu">
-        <div className="ListMenu__segment">All Boards</div>
-        <div className="ListMenuSection">
-          { boardDocLinks }
-        </div>
-
-        <div className="ListMenu__segment">Contacts</div>
-        <div className="ListMenuSection">
-          { contacts }
-        </div>
-
         <div className="ListMenu__segment">Invitations</div>
         <div className="ListMenuSection">
           { invitations }
+        </div>
+
+        <div className="ListMenu__segment">Boards</div>
+        <div className="ListMenuSection">
+          { boardDocLinks }
         </div>
       </div>
     </div>

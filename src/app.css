@@ -427,6 +427,15 @@ input.TitleBar__titleText::selection {
   background: white;
 }
 
+.Invitation {
+  display: flex;
+  align-items: center;
+}
+
+.Invitation__body {
+  margin-left: 10px;
+}
+
 .DocLink {
   display: flex;
   align-items: center;
@@ -437,7 +446,7 @@ input.TitleBar__titleText::selection {
   margin-left: 10px;
 }
 
-.DocLink .fa {
+.Badge {
   padding: 8px;
   font-size: 24px;
   border-radius: 50%;
