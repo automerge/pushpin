@@ -43,6 +43,9 @@ export default class Content extends React.PureComponent {
       this.refreshHandle(docId)
     }
   }
+  componentDidCatch = (e) => {
+    this.setState({contentCrashed: e})
+  }
 
   refreshHandle = (docId) => {
     if (this.handle) {
@@ -83,6 +86,10 @@ export default class Content extends React.PureComponent {
       return missingType(type)
     }
 
+    if (this.state.contentCrashed) {
+      return errorInRender(type, this.state.contentCrashed)
+    }
+
     if (!this.state.doc) {
       return null
     }
@@ -97,6 +104,13 @@ export default class Content extends React.PureComponent {
     )
   }
 }
+
+const errorInRender = (type, error) => (
+  <div>
+    <i className="fa fa-exclamation-triangle" />
+    A &quot;{type}&quot; threw an error during render.
+  </div>
+)
 
 const missingType = type => (
   <div>
