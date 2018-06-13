@@ -5,7 +5,7 @@ import { RIEInput } from 'riek'
 
 import Content from './content'
 import ContentTypes from '../content-types'
-import { createDocumentLink } from '../share-link'
+import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:board-title')
 
@@ -42,6 +42,17 @@ export default class BoardTitle extends React.PureComponent {
     }
   }
 
+  refreshBoardHandle = (boardId) => {
+    if (this.boardHandle) {
+      window.hm.releaseHandle(this.boardHandle)
+    }
+
+    this.boardHandle = window.hm.openHandle(boardId)
+    this.boardHandle.onChange((doc) => {
+      this.setState({ board: doc })
+    })
+  }
+
   onKeyDown = (e) => {
     if (e.metaKey && e.key === '/') {
       this.setState({ activeOmnibox: !this.state.activeOmnibox }, () => {
@@ -63,7 +74,15 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    this.setState({ ...doc })
+    this.setState({ ...doc }, () => {
+      if (this.state.currentDocUrl) {
+        const { docId } = parseDocumentLink(this.state.currentDocUrl)
+
+        if (!this.state.board || this.state.board.docId !== docId) {
+          this.refreshBoardHandle(docId)
+        }
+      }
+    })
   }
 
   activateOmnibox = () => {
@@ -122,7 +141,7 @@ export default class BoardTitle extends React.PureComponent {
           ref={this.input}
           type="text"
           className="TitleBar__titleText"
-          value={this.state.title || ''}
+          value={this.state.board && this.state.board.title || ''}
           onFocus={this.activateOmnibox}
           onBlur={this.deactivateOmnibox}
           onChange={this.handleChange}
