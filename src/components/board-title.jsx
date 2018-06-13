@@ -70,7 +70,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   deactivateOmnibox = () => {
-    this.setState({ activeOmnibox: false })
+    // this.setState({ activeOmnibox: false })
   }
 
   handleChange = (e) => {

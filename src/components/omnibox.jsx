@@ -79,7 +79,38 @@ export default class Omnibox extends React.PureComponent {
   }
 
   moveDown = () => {
-    this.setState({ selectedIndex: this.state.selectedIndex + 1 })
+    const { items, sectionIndices } = this.menuItems()
+    let { selectedIndex } = this.state
+
+    if (selectedIndex < (items.length - 1)) {
+      selectedIndex += 1
+      this.setState({ selectedIndex })
+    }
+  }
+
+  menuItems = () => {
+    let items = []
+    const sectionIndices = {}
+
+    const invitationItems = this.state.invitations.map(invitation => ({ type: 'invitation', object: invitation }))
+    sectionIndices.invitations = { start: items.length, end: invitationItems.length }
+    items = items.concat(invitationItems)
+
+    const viewedDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
+    const viewedDocItems = viewedDocUrls.map(docUrl => ({ type: 'viewedDocUrl', object: docUrl }))
+    sectionIndices.viewedDocUrls = { start: items.length }
+    items = items.concat(viewedDocItems)
+
+    items[this.state.selectedIndex].selected = true
+
+    return { items, sectionIndices }
+  }
+
+  sectionItems = (name) => {
+    const { items, sectionIndices } = this.menuItems()
+    const { start, end } = sectionIndices[name]
+
+    return items.slice(start, end)
   }
 
   render() {
@@ -93,24 +124,11 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
-    const boardDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
-    const boardDocLinks = boardDocUrls.map(url => {
-      const { docId, type } = parseDocumentLink(url)
-      const docLinkUrl = createDocumentLink('doc-link', docId)
+    const invitations = this.sectionItems('invitations').map((item) => {
+      const invitation = item.object
+      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
-      return (
-        <div key={url} className="ListMenu__item">
-          <Content url={docLinkUrl} linkedDocumentType={type} />
-        </div>
-      )
-    })
-
-    const contacts = this.state.contactIds.map(id => {
-      return <Content key={id} url={createDocumentLink('contact', id)} />
-    })
-
-    const invitations = this.state.invitations.map(invitation => {
-      return <div key={`${invitation.sender.docId}-${invitation.documentUrl}`} className="ListMenu__item">
+      return <div key={`${invitation.sender.docId}-${invitation.documentUrl}`} className={classes}>
         <div className="Invitation">
           <i className="Badge fa fa-envelope" style={{ background: invitation.doc && invitation.doc.backgroundColor }} />
           <div className="Invitation__body">
@@ -118,7 +136,30 @@ export default class Omnibox extends React.PureComponent {
             <p className="Type--secondary">From { invitation.sender.name }</p>
           </div>
         </div>
+
+        <div className="ListMenu Actions">
+          <span className="Type--secondary">⌫  Archive</span>
+          <span className="Type--secondary">⏎ View</span>
+        </div>
       </div>
+    })
+
+    const boardDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
+      const url = item.object
+      const { docId, type } = parseDocumentLink(url)
+      const docLinkUrl = createDocumentLink('doc-link', docId)
+      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
+
+      return (
+        <div key={url} className={classes}>
+          <Content url={docLinkUrl} linkedDocumentType={type} />
+
+          <div className="ListMenu Actions">
+            <span className="Type--secondary">⌫  Archive</span>
+            <span className="Type--secondary">⏎ View</span>
+          </div>
+        </div>
+      )
     })
 
     return <div className="Omnibox">

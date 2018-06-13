@@ -202,13 +202,19 @@ input {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   width: 478px;
-  height: 260px;
   z-index: 10;
   position: fixed;
   top: 80px;
   left: 50%;
   margin-left: -239px;
-  overflow-y: auto;
+}
+
+.Omnibox .ListMenu__item .Actions {
+  visibility: hidden;
+}
+
+.Omnibox .ListMenu__item--selected .Actions {
+  visibility: visible;
 }
 
 .ContextMenu {
@@ -720,6 +726,10 @@ div.card.image {
   min-height: 32px;
 }
 
+.ListMenu .ListMenu__item--selected {
+  background: #EEE;
+}
+
 .ListMenu .ListMenu__item:hover{
 }
 
@@ -731,6 +741,7 @@ div.card.image {
 .ListMenu .Actions {
   flex: none;
   display: flex;
+  padding-bottom: 0;
   margin-left: auto;
 }
 
