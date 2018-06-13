@@ -65,7 +65,7 @@ export default class Url extends React.PureComponent {
     if (!data) {
       return (
         <div style={css.urlCard}>
-          <p style={css.title}>Loading...</p>
+          <p style={css.title}>Fetching...</p>
           <p style={css.link}><a style={css.titleAnchor} href={url}>{url}</a></p>
         </div>
       )
