@@ -14,6 +14,8 @@ export default class Url extends React.PureComponent {
     urlDoc.loaded = false // todo: use timestamps
   }
 
+  state = { urlInput: '' }
+
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)
@@ -38,7 +40,7 @@ export default class Url extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  onInput = (e) => {
+  onInputChange = (e) => {
     this.setState({
       urlInput: e.target.value
     })
@@ -47,16 +49,10 @@ export default class Url extends React.PureComponent {
   onKeyDown = (e) => {
     e.stopPropagation()
 
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter') {
       e.preventDefault()
-      this.handle.change((urlDoc) => {
-        urlDoc.url = this.state.urlInput
-        urlDoc.urlUpdatedAt = new Date()
-        this.refreshContent(urlDoc)
-      })
-
-      this.setState({
-        urlInput: ''
+      this.handle.change((doc) => {
+        doc.url = this.state.urlInput
       })
     }
   }
@@ -84,15 +80,15 @@ export default class Url extends React.PureComponent {
 
   render = () => {
     const { data, url } = this.state
-    console.log(data)
     if (!url) {
       return (
         <div style={css.urlCard}>
           <input
+            type="text"
             style={css.input}
             value={this.state.urlInput}
+            onChange={this.onInputChange}
             onKeyDown={this.onKeyDown}
-            onInput={this.onInput}
             placeholder="Enter a URL..."
           />
         </div>
@@ -106,6 +102,9 @@ export default class Url extends React.PureComponent {
         </div>
       )
     }
+    // I'm leaving this in here for a while to help
+    // debug any surprising links we come across more easily.
+    console.log(data)
 
     return (
       <div style={css.urlCard}>
@@ -135,6 +134,7 @@ ContentTypes.register({
 const css = {
   urlCard: {
     display: 'flex',
+    maxWidth: '250px',
     flexDirection: 'column',
     backgroundColor: 'white',
     overflow: 'auto',
@@ -143,10 +143,10 @@ const css = {
     flex: '1 1 auto'
   },
   img: {
+    maxHeight: '250px',
     display: 'block',
     objectFit: 'cover',
     height: '50%',
-    maxWidth: '34em',
     marginBottom: 12,
     marginLeft: -12,
     marginTop: -12,
@@ -170,7 +170,6 @@ const css = {
     textDecoration: 'none'
   },
   text: {
-    maxWidth: '34em',
     fontFamily: 'IBM Plex Sans',
     fontSize: '12px',
     lineHeight: '16px',
@@ -184,7 +183,8 @@ const css = {
     lineHeight: 1.2,
     color: '#637389',
     justifySelf: 'flex-end',
-    overflowY: 'hidden',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
     textOverflow: 'ellipsis',
     flexShrink: 0
   }

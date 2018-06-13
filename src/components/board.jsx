@@ -776,7 +776,6 @@ export default class Board extends React.PureComponent {
         onDoubleClick={this.onDoubleClick}
         onDragOver={this.onDragOver}
         onDrop={this.onDrop}
-        onPaste={this.onPaste}
         role="presentation"
       >
         { contextMenu }
