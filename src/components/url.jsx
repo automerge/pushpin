@@ -79,7 +79,7 @@ export default class Url extends React.PureComponent {
         </p>
         <p style={css.text}>{data.description}</p>
         <p style={css.link}>
-          <a style={css.titleAnchor} href={data.canonicalLink}>{data.canonicalLink}</a>
+          <a style={css.titleAnchor} href={data.canonicalLink ? data.canonicalLink : url}>{data.canonicalLink ? data.canonicalLink : url}</a>
         </p>
       </div>
     )
