@@ -150,17 +150,7 @@ export default class Omnibox extends React.PureComponent {
     return []
   }
 
-  render() {
-    log('render', this.state)
-
-    if (!this.props.visible) {
-      return null
-    }
-
-    if (!this.state.currentDocUrl) {
-      return null
-    }
-
+  renderInvitationsSection() {
     const invitations = this.sectionItems('invitations').map((item) => {
       const invitation = item.object
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
@@ -181,6 +171,19 @@ export default class Omnibox extends React.PureComponent {
       </div>
     })
 
+    if (invitations.length > 0) {
+      return (
+        <div>
+          <div className="ListMenu__segment">Invitations</div>
+          <div className="ListMenuSection">
+            { invitations }
+          </div>
+        </div>
+      )
+    }
+  }
+
+  renderViewedDocLinksSection() {
     const viewedDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
       const { url } = item.object
       const { docId, type } = parseDocumentLink(url)
@@ -199,6 +202,19 @@ export default class Omnibox extends React.PureComponent {
       )
     })
 
+    if (viewedDocLinks.length > 0) {
+      return (
+        <div>
+          <div className="ListMenu__segment">Boards</div>
+          <div className="ListMenuSection">
+            { viewedDocLinks }
+          </div>
+        </div>
+      )
+    }
+  }
+
+  renderDocLinksSection() {
     const docLinks = this.sectionItems('docUrls').map((item) => {
       const url = item.object
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
@@ -218,21 +234,31 @@ export default class Omnibox extends React.PureComponent {
       )
     })
 
-    return <div className="Omnibox">
-      <div className="ListMenu">
-        <div className="ListMenu__segment">Invitations</div>
-        <div className="ListMenuSection">
-          { invitations }
-        </div>
-
-        <div className="ListMenu__segment">Boards</div>
-        <div className="ListMenuSection">
-          { viewedDocLinks }
-        </div>
-
+    if (docLinks.length > 0) {
+      return (
         <div className="ListMenuSection">
           { docLinks }
         </div>
+      )
+    }
+  }
+
+  render() {
+    log('render', this.state)
+
+    if (!this.props.visible) {
+      return null
+    }
+
+    if (!this.state.currentDocUrl) {
+      return null
+    }
+
+    return <div className="Omnibox">
+      <div className="ListMenu">
+        { this.renderInvitationsSection() }
+        { this.renderViewedDocLinksSection() }
+        { this.renderDocLinksSection() }
       </div>
     </div>
   }
