@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import Content from './content'
 import ContentTypes from '../content-types'
@@ -80,6 +81,17 @@ export default class BoardTitle extends React.PureComponent {
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
+  }
+
+  refreshBoardHandle = (boardId) => {
+    if (this.boardHandle) {
+      window.hm.releaseHandle(this.boardHandle)
+    }
+
+    this.boardHandle = window.hm.openHandle(boardId)
+    this.boardHandle.onChange((doc) => {
+      this.setState({ board: doc })
+    })
   }
 
   onChange = (doc) => {
@@ -171,6 +183,17 @@ export default class BoardTitle extends React.PureComponent {
         <div>
           { invitationsNotification }
           <i className="fa fa-edit" onClick={this.activateTitleEditor} />
+          <Dropdown>
+            <DropdownTrigger>
+              <i className="fa fa-group" />
+            </DropdownTrigger>
+            <DropdownContent>
+              <Content
+                url={createDocumentLink('share', this.props.docId)}
+                openDocument={this.props.openDoc}
+              />
+            </DropdownContent>
+          </Dropdown>
           <input
             ref={this.titleInput}
             type="text"

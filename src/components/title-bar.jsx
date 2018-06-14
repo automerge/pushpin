@@ -136,17 +136,6 @@ export default class TitleBar extends React.PureComponent {
         <div className="TitleBar__right">
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <i className="fa fa-group" />
-            </DropdownTrigger>
-            <DropdownContent>
-              <Content
-                url={createDocumentLink('share', this.props.docId)}
-                openDocument={this.props.openDoc}
-              />
-            </DropdownContent>
-          </Dropdown>
-          <Dropdown className="TitleBar__menuItem">
-            <DropdownTrigger>
               <i className="fa fa-gear" />
             </DropdownTrigger>
             <DropdownContent>

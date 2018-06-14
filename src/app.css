@@ -198,6 +198,14 @@ input {
   }
 }
 
+.BoardTitle .dropdown {
+  display: inline-block;
+}
+
+.BoardTitle .dropdown__content {
+  margin-top: 20px;
+}
+
 .Omnibox {
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
@@ -373,7 +381,7 @@ button[disabled].TitleBar__menuItem .fa {
   color: var(--colorBlueBlack);
 }
 
-.TitleBar .dropdown__trigger {
+.TitleBar .TitleBar__right .dropdown__trigger {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -381,12 +389,12 @@ button[disabled].TitleBar__menuItem .fa {
   height: 40px;
 }
 
-.TitleBar .dropdown.dropdown--active {
+.TitleBar .TitleBar__right .dropdown.dropdown--active {
   background-color: var(--colorInputGrey);
 }
 
 
-.TitleBar .dropdown__content {
+.TitleBar .TitleBar__right .dropdown__content {
   top: 48px;
   right: 0px;
 }
@@ -610,7 +618,7 @@ div.card.image {
   border-radius: 4px;
   width: 296px;
   max-height: 480px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /* Buttons */
