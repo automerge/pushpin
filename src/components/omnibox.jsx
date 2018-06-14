@@ -23,7 +23,8 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { selectedIndex: -1 }
+    this.state = { selectedIndex: -1, viewedDocs: [] }
+    this.viewedDocHandles = []
   }
 
   // This is the New Boilerplate
@@ -40,6 +41,7 @@ export default class Omnibox extends React.PureComponent {
   componentWillUnmount = () => {
     log('componentWillUnmount')
     window.hm.releaseHandle(this.handle)
+    this.viewedDocHandles.forEach(handle => window.hm.releaseHandle(handle))
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -64,7 +66,19 @@ export default class Omnibox extends React.PureComponent {
 
   onChange = (doc) => {
     log('onChange', doc)
-    this.setState({ ...doc })
+    this.setState({ ...doc }, () => {
+      this.state.viewedDocUrls.forEach(url => {
+        if (!this.state.viewedDocs.find(({url: u}) => u === url)) {
+          const { docId } = parseDocumentLink(url)
+          const handle = window.hm.openHandle(docId)
+          this.viewedDocHandles.push(handle)
+          handle.onChange((doc) => {
+            const viewedDocs = [ ...this.state.viewedDocs, { url, doc } ]
+            this.setState({ viewedDocs })
+          })
+        }
+      })
+    })
   }
 
   moveUp = () => {
@@ -114,16 +128,8 @@ export default class Omnibox extends React.PureComponent {
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
 
-    const viewedDocItems = this.state.viewedDocUrls.
-      filter(url => (parseDocumentLink(url).type === 'board')).
-      map(url => {
-        const { docId } = parseDocumentLink(url)
-        const handle = window.hm.openHandle(docId)
-        const doc = handle.get()
-        window.hm.releaseHandle(handle)
-
-        return { doc, url }
-      }).
+    const viewedDocItems = this.state.viewedDocs.
+      filter(({url}) => (parseDocumentLink(url).type === 'board')).
       filter(({doc, url}) => {
         return doc.title.match(new RegExp(search, 'i'))
       }).

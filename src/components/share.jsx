@@ -38,7 +38,10 @@ export default class Share extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillUnmount = () => {
+    window.hm.releaseHandle(this.handle)
+    window.hm.releaseHandle(this.boardHandle)
+  }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
