@@ -768,7 +768,19 @@ class Hypermerge extends EventEmitter {
     log('_applyChanges', docId)
     if (changes.length > 0) {
       const oldDoc = this.find(docId)
-      const newDoc = Automerge.applyChanges(oldDoc, changes)
+      const oldDeps = oldDoc._state.getIn(['opSet', 'deps'])
+
+      let prevSeq = 0
+      const filteredChanges = []
+      changes.forEach((change) => {
+        if (change.seq > prevSeq) {
+          filteredChanges.push(change)
+          prevSeq = change.seq
+        } else {
+          log('_applyChanges.skipDuplicate', change.actor, change.seq)
+        }
+      })
+      const newDoc = Automerge.applyChanges(oldDoc, filteredChanges)
       this._setRemote(docId, newDoc)
     }
   }
