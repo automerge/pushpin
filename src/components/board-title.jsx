@@ -141,6 +141,9 @@ export default class BoardTitle extends React.PureComponent {
       return null
     }
 
+    let { invitations, viewedDocUrls } = this.state
+    invitations = invitations.filter(i => !viewedDocUrls.some(url => url === i.documentUrl))
+
     let inputBar
     if (this.state.activeOmnibox) {
       inputBar = (
@@ -156,7 +159,7 @@ export default class BoardTitle extends React.PureComponent {
       )
     } else {
       let invitationsClasses = 'fa fa-envelope'
-      if (this.state.invitations.length === 0) {
+      if (invitations.length === 0) {
         invitationsClasses += ' hidden'
       }
 
@@ -202,7 +205,7 @@ export default class BoardTitle extends React.PureComponent {
           visible={this.state.activeOmnibox}
           search={this.state.search}
           getKeyController={this.setOmniboxControl}
-          invitations={this.state.invitations}
+          invitations={invitations}
         />
       </div>
     )
