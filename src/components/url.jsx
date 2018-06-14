@@ -172,6 +172,7 @@ const css = {
     flex: '1 1 auto'
   },
   img: {
+    WebkitUserDrag: 'none',
     minHeight: '192px',
     display: 'block',
     objectFit: 'cover',
@@ -180,7 +181,6 @@ const css = {
     marginLeft: -12,
     marginTop: -12,
     marginRight: -12,
-    minHeight: 96
   },
   title: {
     fontFamily: 'IBM Plex Sans',
@@ -195,6 +195,7 @@ const css = {
     flexShrink: 0
   },
   titleAnchor: {
+    WebkitUserDrag: 'none',
     color: 'inherit',
     textDecoration: 'none'
   },
