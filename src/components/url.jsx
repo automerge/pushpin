@@ -77,6 +77,11 @@ export default class Url extends React.PureComponent {
           doc.data = data
         })
       })
+    }).catch((reason) => {
+      console.log('caught', reason)
+      this.handle.change((doc) => {
+        doc.data = { error: reason }
+      })
     })
   }
 
@@ -104,7 +109,7 @@ export default class Url extends React.PureComponent {
       return (
         <div style={css.urlCard}>
           <div style={css.inputGroup}>
-            <i style={css.inputGroupIcon} className="fa fa-link"/>
+            <i style={css.inputGroupIcon} className="fa fa-link" />
             <input
               autoFocus
               type="text"
@@ -126,10 +131,6 @@ export default class Url extends React.PureComponent {
         </div>
       )
     }
-    // I'm leaving this in here for a while to help
-    // debug any surprising links we come across more easily.
-    console.log(this.state)
-
     return (
       <div style={css.urlCard}>
         {this.state.imageHyperfileUrl ?
@@ -142,6 +143,7 @@ export default class Url extends React.PureComponent {
         <p style={css.title}>
           <a style={css.titleAnchor} href={url}>{data.title}</a>
         </p>
+        { data.error ? <p style={css.error}>(URL did not load.)</p> : null }
         <p style={css.text}>{data.description}</p>
         <p style={css.link}>
           <a style={css.titleAnchor} href={data.canonicalLink || url}>
@@ -206,6 +208,12 @@ const css = {
     color: '#637389',
     marginBottom: 12,
     flex: 1,
+  },
+  error: {
+    fontFamily: 'IBM Plex Sans',
+    fontSize: '10px',
+    lineHeight: 1.2,
+    color: '#637389'
   },
   link: {
     fontFamily: 'IBM Plex Sans',
