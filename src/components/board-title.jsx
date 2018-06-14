@@ -122,13 +122,8 @@ export default class BoardTitle extends React.PureComponent {
     if (e.key === 'Enter') {
       const { selected } = this.state
 
-      if (this.state.selected.type === 'invitation') {
-        this.props.openDoc(selected.object.documentUrl)
-        this.deactivateOmnibox()
-      }
-
-      if (this.state.selected.type === 'viewedDocUrl') {
-        this.props.openDoc(selected.object)
+      if (this.state.selected.url) {
+        this.props.openDoc(selected.url)
         this.deactivateOmnibox()
       }
     }

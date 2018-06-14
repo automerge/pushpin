@@ -75,11 +75,11 @@ export default class Omnibox extends React.PureComponent {
       this.setState({ selectedIndex })
     }
 
-    return this.menuItems().items[selectedIndex]
+    return this.menuSections().items[selectedIndex]
   }
 
   moveDown = () => {
-    const { items, sectionIndices } = this.menuItems()
+    const { items, sectionIndices } = this.menuSections()
     let { selectedIndex } = this.state
 
     if (selectedIndex < (items.length - 1)) {
@@ -87,17 +87,29 @@ export default class Omnibox extends React.PureComponent {
       this.setState({ selectedIndex })
     }
 
-    return this.menuItems().items[selectedIndex]
+    return this.menuSections().items[selectedIndex]
   }
 
-  menuItems = () => {
+  menuSections = () => {
     let items = []
     const sectionIndices = {}
     const { search } = this.props
 
+    try {
+      let { docId, type } = parseDocumentLink(search)
+      items.push({ type: 'docUrl', object: search, url: search })
+      sectionIndices.docUrls = { start: 0 }
+
+      if (items[this.state.selectedIndex]) {
+        items[this.state.selectedIndex].selected = true
+      }
+
+      return { items, sectionIndices }
+    } catch (e) { }
+
     const invitationItems = this.props.invitations.
       filter(invitation => invitation.board.title.match(new RegExp(search, 'i'))).
-      map(invitation => ({ type: 'invitation', object: invitation }))
+      map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
@@ -115,7 +127,7 @@ export default class Omnibox extends React.PureComponent {
       filter(({doc, url}) => {
         return doc.title.match(new RegExp(search, 'i'))
       }).
-      map(object  => ({ type: 'viewedDocUrl', object }))
+      map(object  => ({ type: 'viewedDocUrl', object, url: object.url }))
 
     sectionIndices.viewedDocUrls = { start: items.length }
     items = items.concat(viewedDocItems)
@@ -128,10 +140,14 @@ export default class Omnibox extends React.PureComponent {
   }
 
   sectionItems = (name) => {
-    const { items, sectionIndices } = this.menuItems()
-    const { start, end } = sectionIndices[name]
+    const { items, sectionIndices } = this.menuSections()
+    const { start, end } = sectionIndices[name] || {}
 
-    return items.slice(start, end)
+    if (Number.isInteger(start)) {
+      return items.slice(start, end)
+    }
+
+    return []
   }
 
   render() {
@@ -165,7 +181,7 @@ export default class Omnibox extends React.PureComponent {
       </div>
     })
 
-    const boardDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
+    const viewedDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
       const { url } = item.object
       const { docId, type } = parseDocumentLink(url)
       const docLinkUrl = createDocumentLink('doc-link', docId)
@@ -183,6 +199,25 @@ export default class Omnibox extends React.PureComponent {
       )
     })
 
+    const docLinks = this.sectionItems('docUrls').map((item) => {
+      const url = item.object
+      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
+
+      return (
+        <div key={url} className={classes}>
+          <i className="Badge ListMenu__thumbnail fa fa-files-o" />
+          <div>
+            <h4 className="Type--primary">Open Board</h4>
+            <p className="Type--secondary">{url.slice(0, 50)}…</p>
+          </div>
+
+          <div className="ListMenu Actions">
+            <span className="Type--secondary">⏎ Open</span>
+          </div>
+        </div>
+      )
+    })
+
     return <div className="Omnibox">
       <div className="ListMenu">
         <div className="ListMenu__segment">Invitations</div>
@@ -192,7 +227,11 @@ export default class Omnibox extends React.PureComponent {
 
         <div className="ListMenu__segment">Boards</div>
         <div className="ListMenuSection">
-          { boardDocLinks }
+          { viewedDocLinks }
+        </div>
+
+        <div className="ListMenuSection">
+          { docLinks }
         </div>
       </div>
     </div>
