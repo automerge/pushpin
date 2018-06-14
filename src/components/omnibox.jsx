@@ -12,9 +12,9 @@ export default class Omnibox extends React.PureComponent {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
     search: PropTypes.string,
-    move: PropTypes.string,
-    getKeyController: PropTypes.func,
-    invitations: PropTypes.arrayOf({}).isRequired
+    getKeyController: PropTypes.func.isRequired,
+    invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    docId: PropTypes.string.isRequired
   }
 
   static defaultProps = {
@@ -69,24 +69,23 @@ export default class Omnibox extends React.PureComponent {
     log('onChange', doc)
     this.setState({ ...doc }, () => {
       this.state.viewedDocUrls.forEach(url => {
-        if (!this.state.viewedDocs.find(({url: u}) => u === url)) {
+        if (!this.state.viewedDocs.find(({ url: u }) => u === url)) {
           const { docId } = parseDocumentLink(url)
           const handle = window.hm.openHandle(docId)
           this.viewedDocHandles.push(handle)
           handle.onChange((doc) => {
-            const viewedDocs = [ ...this.state.viewedDocs, { url, doc } ]
+            const viewedDocs = [...this.state.viewedDocs, { url, doc }]
             this.setState({ viewedDocs })
           })
         }
       })
 
       this.state.contactIds.forEach(contactId => {
-        const state = this.state
-        if (!this.state.contacts.find(({id}) => id === contactId)) {
+        if (!this.state.contacts.find(({ id }) => id === contactId)) {
           const handle = window.hm.openHandle(contactId)
           this.contactHandles.push(handle)
           handle.onChange((doc) => {
-            const contacts = [ ...this.state.contacts, { id: contactId, doc } ]
+            const contacts = [...this.state.contacts, { id: contactId, doc }]
             this.setState({ contacts })
           })
         }
@@ -106,7 +105,7 @@ export default class Omnibox extends React.PureComponent {
   }
 
   moveDown = () => {
-    const { items, sectionIndices } = this.menuSections()
+    const { items } = this.menuSections()
     let { selectedIndex } = this.state
 
     if (selectedIndex < (items.length - 1)) {
@@ -123,7 +122,7 @@ export default class Omnibox extends React.PureComponent {
     const { search } = this.props
 
     try {
-      let { docId, type } = parseDocumentLink(search)
+      parseDocumentLink(search)
       items.push({ type: 'docUrl', object: search, url: search })
       sectionIndices.docUrls = { start: 0 }
 
@@ -134,31 +133,27 @@ export default class Omnibox extends React.PureComponent {
       return { items, sectionIndices }
     } catch (e) { }
 
-    const invitationItems = this.props.invitations.
-      filter(invitation => invitation.doc.title.match(new RegExp(search, 'i'))).
-      map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
+    const invitationItems = this.props.invitations
+      .filter(invitation => invitation.doc.title.match(new RegExp(search, 'i')))
+      .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
 
-    const state = this.state
-
     if (search.length > 0) {
-      const contactItems = this.state.contacts.
-        filter(({doc}) => doc.name).
-        filter(({doc}) => doc.name.match(new RegExp(search, 'i'))).
-        map(contact => ({ type: 'contact', object: contact }))
+      const contactItems = this.state.contacts
+        .filter(({ doc }) => doc.name)
+        .filter(({ doc }) => doc.name.match(new RegExp(search, 'i')))
+        .map(contact => ({ type: 'contact', object: contact }))
 
       sectionIndices.contacts = { start: items.length, end: (items.length + contactItems.length) }
       items = items.concat(contactItems)
     }
 
-    const viewedDocItems = this.state.viewedDocs.
-      filter(({url}) => (parseDocumentLink(url).type === 'board')).
-      filter(({doc, url}) => {
-        return doc.title.match(new RegExp(search, 'i'))
-      }).
-      map(object  => ({ type: 'viewedDocUrl', object, url: object.url }))
+    const viewedDocItems = this.state.viewedDocs
+      .filter(({ url }) => (parseDocumentLink(url).type === 'board'))
+      .filter(({ doc, url }) => doc.title.match(new RegExp(search, 'i')))
+      .map(object => ({ type: 'viewedDocUrl', object, url: object.url }))
 
     sectionIndices.viewedDocUrls = { start: items.length }
     items = items.concat(viewedDocItems)
@@ -186,19 +181,21 @@ export default class Omnibox extends React.PureComponent {
       const invitation = item.object
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
-      return <div key={`${invitation.sender.docId}-${invitation.documentUrl}`} className={classes}>
-        <div className="Invitation">
-          <i className="Badge fa fa-envelope" style={{ background: invitation.doc && invitation.doc.backgroundColor }} />
-          <div className="Invitation__body">
-            <h4 className="Type--primary">{ invitation.doc.title || 'Untitled' }</h4>
-            <p className="Type--secondary">From { invitation.sender.name }</p>
+      return (
+        <div key={`${invitation.sender.docId}-${invitation.documentUrl}`} className={classes}>
+          <div className="Invitation">
+            <i className="Badge fa fa-envelope" style={{ background: invitation.doc && invitation.doc.backgroundColor }} />
+            <div className="Invitation__body">
+              <h4 className="Type--primary">{ invitation.doc.title || 'Untitled' }</h4>
+              <p className="Type--secondary">From { invitation.sender.name }</p>
+            </div>
+          </div>
+
+          <div className="ListMenu Actions">
+            <span className="Type--secondary">⏎ View</span>
           </div>
         </div>
-
-        <div className="ListMenu Actions">
-          <span className="Type--secondary">⏎ View</span>
-        </div>
-      </div>
+      )
     })
 
     if (invitations.length > 0) {
@@ -211,6 +208,8 @@ export default class Omnibox extends React.PureComponent {
         </div>
       )
     }
+
+    return null
   }
 
   renderViewedDocLinksSection() {
@@ -241,6 +240,8 @@ export default class Omnibox extends React.PureComponent {
         </div>
       )
     }
+
+    return null
   }
 
   renderDocLinksSection() {
@@ -270,6 +271,8 @@ export default class Omnibox extends React.PureComponent {
         </div>
       )
     }
+
+    return null
   }
 
   renderContactsSection() {
@@ -295,6 +298,8 @@ export default class Omnibox extends React.PureComponent {
         </div>
       )
     }
+
+    return null
   }
 
   render() {
@@ -308,14 +313,16 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
-    return <div className="Omnibox">
-      <div className="ListMenu">
-        { this.renderInvitationsSection() }
-        { this.renderViewedDocLinksSection() }
-        { this.renderDocLinksSection() }
-        { this.renderContactsSection() }
+    return (
+      <div className="Omnibox">
+        <div className="ListMenu">
+          { this.renderInvitationsSection() }
+          { this.renderViewedDocLinksSection() }
+          { this.renderDocLinksSection() }
+          { this.renderContactsSection() }
+        </div>
       </div>
-    </div>
+    )
   }
 }
 

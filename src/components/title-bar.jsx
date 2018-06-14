@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
-import HashForm from './hash-form'
 import Content from './content'
 import ContentTypes from '../content-types'
-import { createDocumentLink, parseDocumentLink } from '../share-link'
+import { createDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:title-bar')
 
@@ -83,8 +82,6 @@ export default class TitleBar extends React.PureComponent {
     if (!this.state.currentDocUrl) {
       return null
     }
-
-    const { docId } = parseDocumentLink(this.state.currentDocUrl)
 
     return (
       <div className="TitleBar">

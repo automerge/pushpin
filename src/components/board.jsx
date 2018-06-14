@@ -8,7 +8,6 @@ import uuid from 'uuid/v4'
 
 import Content from './content'
 import ContentTypes from '../content-types'
-import Omnibox from './omnibox'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 import { createDocumentLink } from '../share-link'
 import * as Hyperfile from '../hyperfile'

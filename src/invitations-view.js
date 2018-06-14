@@ -18,7 +18,7 @@ export default class InvitationsView {
     this.workspaceHandle = window.hm.openHandle(workspaceId)
     this.workspaceHandle.onChange((doc) => {
       this.selfId = doc.selfId
-      doc.contactIds.forEach(id => this.watchContact(id))    
+      doc.contactIds.forEach(id => this.watchContact(id))
     })
   }
 
@@ -65,9 +65,11 @@ export default class InvitationsView {
 
       offersForUs.forEach((documentUrl) => {
         const { docId } = parseDocumentLink(documentUrl)
-        const doc = window.hm.openHandle(docId).get()
+        const matchOffer = (offer) => (
+          offer.documentUrl === documentUrl && offer.offererId === offererId
+        )
 
-        if (!this.pendingInvitations.some((offer) => (offer.documentUrl === documentUrl && offer.offererId === offererId))) {
+        if (!this.pendingInvitations.some(matchOffer)) {
           this.pendingInvitations.push({ documentUrl, offererId, sender: contact, docId })
           this.watchDoc(docId)
         }

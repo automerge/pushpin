@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import { RIEInput } from 'riek'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
@@ -18,7 +17,7 @@ export default class BoardTitle extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  state = { invitations: [], activeOmnibox: false, activeTitleEditor: false, search: '', selected: null }
+  state = { invitations: [], activeOmnibox: false, search: '', selected: null }
   omniboxInput = React.createRef()
   titleInput = React.createRef()
 
@@ -106,8 +105,8 @@ export default class BoardTitle extends React.PureComponent {
     }
 
     if (e.key === 'ArrowUp') {
-     const selected = this.omniboxControl.moveUp()
-     this.setState({ selected })
+      const selected = this.omniboxControl.moveUp()
+      this.setState({ selected })
     }
 
     if (e.key === 'Enter') {
@@ -130,7 +129,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   activateTitleEditor = () => {
-    this.setState({ activeTitleEditor: true }, () => this.titleInput.current.focus())
+    this.titleInput.current.focus()
   }
 
   editTitle = (e) => {
@@ -174,8 +173,10 @@ export default class BoardTitle extends React.PureComponent {
       return null
     }
 
-    let { invitations, viewedDocUrls } = this.state
-    invitations = invitations.filter(i => !viewedDocUrls.some(url => url === i.documentUrl))
+    const { viewedDocUrls } = this.state
+    const invitations = this.state.invitations.filter((i) => (
+      !viewedDocUrls.some(url => url === i.documentUrl)
+    ))
 
     let inputBar
     if (this.state.activeOmnibox) {

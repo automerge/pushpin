@@ -7,8 +7,7 @@ import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 export default class Share extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
-    openDocument: PropTypes.func.isRequired
+    docId: PropTypes.string.isRequired
   }
 
   state = { tab: 'authors' }
@@ -104,7 +103,7 @@ export default class Share extends React.PureComponent {
   }
 
   renderContacts = () => {
-    const { currentDocUrl, contactIds = [] } = this.state.doc || {}
+    const { contactIds = [] } = this.state.doc || {}
 
     const contacts = contactIds.map(id => (
       <Content
@@ -135,12 +134,14 @@ export default class Share extends React.PureComponent {
       />
     ))
 
-    return <div>
-      <div className="ListMenu__segment">On Board</div>
-      <div className="ListMenu__section">
-        { authors }
+    return (
+      <div>
+        <div className="ListMenu__segment">On Board</div>
+        <div className="ListMenu__section">
+          { authors }
+        </div>
       </div>
-    </div>
+    )
   }
 
   tabClasses = (name) => {
