@@ -123,6 +123,10 @@ export default class BoardTitle extends React.PureComponent {
 
       this.deactivateOmnibox()
     }
+
+    if (e.key === 'Escape') {
+      this.deactivateOmnibox()
+    }
   }
 
   activateTitleEditor = () => {
