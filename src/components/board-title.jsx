@@ -22,13 +22,6 @@ export default class BoardTitle extends React.PureComponent {
   omniboxInput = React.createRef()
   titleInput = React.createRef()
 
-  setTitle = ({ title }) => {
-    log('onChangeTitle')
-    this.handle.change((b) => {
-      b.title = title
-    })
-  }
-
   // This is the New Boilerplate
   componentDidMount = () => {
     this.refreshHandle(this.props.docId)
