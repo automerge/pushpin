@@ -16,13 +16,7 @@ export default class TitleBar extends React.PureComponent {
     openDoc: PropTypes.func.isRequired,
   }
 
-  boardHistory = React.createRef()
-
   state = { sessionHistory: [], historyIndex: 0 }
-
-  hideBoardHistory = () => {
-    this.boardHistory.current.hide()
-  }
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
@@ -90,37 +84,11 @@ export default class TitleBar extends React.PureComponent {
       return null
     }
 
-    const boardDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
-    const boardDocLinks = boardDocUrls.map(url => {
-      const { docId, type } = parseDocumentLink(url)
-      const docLinkUrl = createDocumentLink('doc-link', docId)
-
-      return (
-        <div key={url} className="ListMenu__item">
-          <Content url={docLinkUrl} linkedDocumentType={type} />
-        </div>
-      )
-    })
-
     const { docId } = parseDocumentLink(this.state.currentDocUrl)
 
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <Dropdown ref={this.boardHistory} className="TitleBar__menuItem">
-            <DropdownTrigger>
-              <i className="fa fa-map" />
-            </DropdownTrigger>
-            <DropdownContent onClick={this.hideBoardHistory}>
-              <div className="PopOverWrapper">
-                <div className="ListMenu">
-                  <div className="ListMenuSection">
-                    { boardDocLinks }
-                  </div>
-                </div>
-              </div>
-            </DropdownContent>
-          </Dropdown>
           <button disabled={this.disableBack()} onClick={this.back} className="TitleBar__menuItem">
             <i className="fa fa-angle-left" />
           </button>
