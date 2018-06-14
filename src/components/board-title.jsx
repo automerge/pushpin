@@ -58,8 +58,6 @@ export default class BoardTitle extends React.PureComponent {
       this.setState({ activeOmnibox: !this.state.activeOmnibox }, () => {
         if (this.state.activeOmnibox) {
           this.omniboxInput.current.focus()
-        } else {
-          this.omniboxInput.current.blur()
         }
       })
     }
@@ -152,7 +150,7 @@ export default class BoardTitle extends React.PureComponent {
         <input
           ref={this.omniboxInput}
           type="text"
-          className="TitleBar__titleText"
+          className="TitleBar__titleText BoardTitle__omniboxInput"
           onBlur={this.deactivateOmnibox}
           onChange={this.handleChange}
           onKeyDown={this.handleCommandKeys}
@@ -160,28 +158,16 @@ export default class BoardTitle extends React.PureComponent {
         />
       )
     } else {
-      let invitationsNotification
-      if (this.state.invitations.length > 0)
-        invitationsNotification = <i className="fa fa-envelope" onClick={this.activateOmnibox} />
+      let invitationsClasses = 'fa fa-envelope'
+      if (this.state.invitations.length === 0) {
+        invitationsClasses += ' hidden'
+      }
 
       inputBar = (
-        <div>
-          { invitationsNotification }
-          <i className="fa fa-edit" onClick={this.activateTitleEditor} />
-          <CopyToClipboard text={this.state.currentDocUrl}>
-            <i className="fa fa-clipboard" />
-          </CopyToClipboard>
-          <Dropdown>
-            <DropdownTrigger>
-              <i className="fa fa-group" />
-            </DropdownTrigger>
-            <DropdownContent>
-              <Content
-                url={createDocumentLink('share', this.props.docId)}
-                openDocument={this.props.openDoc}
-              />
-            </DropdownContent>
-          </Dropdown>
+        <div className="BoardTitle__actionBar">
+          <div className="BoardTitle__actionBar__left">
+            <i className={invitationsClasses} onClick={this.activateOmnibox} />
+          </div>
           <input
             ref={this.titleInput}
             type="text"
@@ -190,6 +176,23 @@ export default class BoardTitle extends React.PureComponent {
             onClick={this.activateOmnibox}
             onChange={this.editTitle}
           />
+          <div className="BoardTitle__actionBar__right">
+            <i className="fa fa-edit" onClick={this.activateTitleEditor} />
+            <CopyToClipboard text={this.state.currentDocUrl}>
+              <i className="fa fa-clipboard" />
+            </CopyToClipboard>
+            <Dropdown>
+              <DropdownTrigger>
+                <i className="fa fa-group" />
+              </DropdownTrigger>
+              <DropdownContent>
+                <Content
+                  url={createDocumentLink('share', this.props.docId)}
+                  openDocument={this.props.openDoc}
+                />
+              </DropdownContent>
+            </Dropdown>
+          </div>
         </div>
       )
     }

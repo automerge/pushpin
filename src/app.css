@@ -69,6 +69,10 @@ a {
   cursor: pointer;
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 
 /* Dropdown React component functional styles */
 
@@ -204,6 +208,36 @@ input {
 
 .BoardTitle .dropdown__content {
   margin-top: 20px;
+}
+
+.BoardTitle__actionBar {
+  background: var(--colorInputGrey);
+  padding: 0 4px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.BoardTitle__actionBar__right .fa {
+  margin-left: 2px
+}
+
+.BoardTitle__actionBar__right .dropdown__trigger .fa.fa-group {
+  color: var(--colorLink);
+}
+
+.BoardTitle__actionBar input[type='text'] {
+  text-align: center;
+}
+
+.BoardTitle {
+  width: 400px;
+}
+
+.BoardTitle__omniboxInput {
+  width: 100% !important;
+  max-width: none !important;
 }
 
 .Omnibox {
@@ -416,7 +450,7 @@ button[disabled].TitleBar__menuItem .fa {
   text-overflow: ellipsis;
 }
 
-input.TitleBar__titleText{
+.TitleBar__titleText{
   width: 244px;
   font-size: 14px;
   color: black;
@@ -429,7 +463,7 @@ input.TitleBar__titleText{
   line-height:24px;
 }
 
-input.TitleBar__titleText::selection {
+.TitleBar__titleText::selection {
   background: rgba(0,0,0,.05);
 }
 
