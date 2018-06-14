@@ -60,6 +60,13 @@ const createWindow = async () => {
     }
   })
 
+  mainWindow.webContents.on('new-window', (event, url) => {
+    if (isSafeishURL(url)) {
+      event.preventDefault()
+      shell.openExternal(url)
+    }
+  })
+
   // Menubar template
   const template = [
     {
