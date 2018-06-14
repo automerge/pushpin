@@ -232,7 +232,7 @@ const css = {
     backgroundColor: 'white',
     padding: '4px',
     height: 24,
-    minWidth: 196
+    flex: 1,
   },
   inputGroup: {
     display: 'flex',
