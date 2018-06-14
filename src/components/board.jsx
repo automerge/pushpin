@@ -736,7 +736,7 @@ export default class Board extends React.PureComponent {
           contentTypes={ContentTypes.list()}
           addContent={this.addContent}
           onShowContextMenu={this.onShowContextMenu}
-          backgroundColor={this.state.doc.backgroundColor}
+          backgroundColor={this.state.doc.backgroundColor || BOARD_COLORS.DEFAULT}
           backgroundColors={BOARD_COLOR_VALUES}
           changeBackgroundColor={this.changeBackgroundColor}
         />
