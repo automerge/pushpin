@@ -5,8 +5,6 @@ import { remote } from 'electron'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import uuid from 'uuid/v4'
-import Tmp from 'tmp'
-import Fs from 'fs'
 
 import Content from './content'
 import ContentTypes from '../content-types'
@@ -230,7 +228,7 @@ export default class Board extends React.PureComponent {
       const y = localY + (i * (GRID_SIZE * 2))
       if (entry.type.match('image/')) {
         reader.onload = () => {
-          this.createImageCardFromReader(x, y, reader)
+          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result))
         }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
@@ -249,7 +247,13 @@ export default class Board extends React.PureComponent {
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
     if (plainText) {
-      this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
+      try {
+        const url = new URL(plainText)
+        this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
+      } catch (e) {
+        // i guess it's not a URL, just make a text card
+        this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
+      }
     }
   }
 
@@ -278,7 +282,7 @@ export default class Board extends React.PureComponent {
 
         const reader = new FileReader()
         reader.onload = () => {
-          this.createImageCardFromReader(x, y, reader)
+          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result))
         }
         reader.readAsArrayBuffer(file)
       })
@@ -286,7 +290,13 @@ export default class Board extends React.PureComponent {
 
     const plainTextData = dataTransfer.getData('text/plain')
     if (plainTextData) {
-      this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
+      try {
+        const url = new URL(plainTextData)
+        this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
+      } catch (e) {
+        // i guess it's not a URL, just make a text card
+        this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
+      }
     }
   }
 
@@ -296,48 +306,39 @@ export default class Board extends React.PureComponent {
     const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
     const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
 
-    if (contentType.type !== 'image') {
-      const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
-      this.selectOnly(cardId)
-      return
-    }
 
-    dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
-      // User aborted.
-      if (!paths) {
-        return
-      }
-      if (paths.length !== 1) {
-        throw new Error('Expected exactly one path?')
-      }
-
-      this.createImageCardFromPath({ x, y }, paths[0])
-    })
-  }
-
-  // Bridge that enables up to create image cards - which currently require a
-  // local file path, when the browser APIs only give us a FileReader on paste
-  // and drop.
-  // For now we write temp files, though we should do something more efficient
-  // here eventually.
-  createImageCardFromReader = (x, y, reader) => {
-    Tmp.file((err, path, fd, cleanup) => {
-      if (err) {
-        throw err
-      }
-
-      Fs.appendFile(path, Buffer.from(reader.result), (err) => {
-        if (err) {
-          throw err
+    if (contentType.type === 'image') {
+      dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
+        // User aborted.
+        if (!paths) {
+          return
+        }
+        if (paths.length !== 1) {
+          throw new Error('Expected exactly one path?')
         }
 
-        this.createImageCardFromPath({ x, y }, path)
+        this.createImageCardFromPath({ x, y }, paths[0])
       })
-    })
+    }
+
+    const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
+    this.selectOnly(cardId)
   }
 
   createImageCardFromPath = ({ x, y }, path) => {
     Hyperfile.write(path, (err, hyperfileId) => {
+      if (err) {
+        log(err)
+        return
+      }
+
+      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { hyperfileId } })
+      this.selectOnly(cardId)
+    })
+  }
+
+  createImageCardFromBuffer = ({ x, y }, buffer) => {
+    Hyperfile.writeBuffer(buffer, (err, hyperfileId) => {
       if (err) {
         log(err)
         return
@@ -729,7 +730,6 @@ export default class Board extends React.PureComponent {
         onDoubleClick={this.onDoubleClick}
         onDragOver={this.onDragOver}
         onDrop={this.onDrop}
-        onPaste={this.onPaste}
         role="presentation"
       >
         <BoardContextMenu

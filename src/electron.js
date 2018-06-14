@@ -54,8 +54,27 @@ const createWindow = async () => {
   }
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (isSafeishURL(url)) {
+    // we only allow pushpin links to navigate
+    // to avoid ever being in a position where we're loading rando files
+    // or URLs within the app and getting stranded there
+    if (!url.startsWith('pushpin://')) {
       event.preventDefault()
+    }
+    if (isSafeishURL(url)) {
+      shell.openExternal(url)
+    }
+  })
+
+  mainWindow.webContents.on('new-window', (event, url) => {
+    // we only allow pushpin links to navigate
+    // to avoid ever being in a position where we're loading rando files
+    // or URLs within the app and getting stranded there
+    // NB: i don't think we actually use new-window pushpin links, but
+    //     this will hopefully guard it if for some reason we do in the future
+    if (!url.startsWith('pushpin://')) {
+      event.preventDefault()
+    }
+    if (isSafeishURL(url)) {
       shell.openExternal(url)
     }
   })
