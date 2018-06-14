@@ -44,30 +44,39 @@ export default class BoardLink extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  render = () => (
-    <div className="BoardLink" onDoubleClick={this.handleDoubleClick} style={css.wrapper}>
-      <i className="fa fa-files-o" style={{ ...css.icon, background: this.state.backgroundColor }} />
-      <div style={css.title}>{ this.state.title }</div>
-    </div>
-  )
+  render = () => {
+    const childCardCount = Object.keys(this.state.cards || {}).length
+    return (
+      <div className="BoardLink" onDoubleClick={this.handleDoubleClick} style={css.wrapper}>
+        <i className="fa fa-files-o" style={{ ...css.icon, background: this.state.backgroundColor }} />
+        <div style={css.caption}>
+          <span style={css.title}>{ this.state.title }</span>
+          <br />
+          { `${childCardCount} card${childCardCount === 1 ? '' : 's'}` }
+        </div>
+      </div>
+    )
+  }
 }
 
 const css = {
   icon: {
-    fontSize: '60px',
-    padding: '18px',
-    borderRadius: '48px'
+    fontSize: '64px',
+    padding: '16px',
+    borderRadius: '48px',
+    boxShadow: '0 0 4px 0 rgba(0, 0, 0, 0.27)'
+  },
+  caption: {
+    fontSize: '14px',
+    lineHeight: '24px',
+    textAlign: 'center',
   },
   title: {
-    paddingTop: '4px',
-    lineHeight: '20px',
-    width: '96px',
-    textAlign: 'center',
-    overflowY: 'hidden',
-    textOverflow: 'ellipsis',
+    fontWeight: 'bold',
   },
   wrapper: {
-    flexDirection: 'vertical',
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center'
   },
 }
