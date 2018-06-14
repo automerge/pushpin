@@ -23,8 +23,9 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { selectedIndex: -1, viewedDocs: [] }
+    this.state = { selectedIndex: -1, viewedDocs: [], contacts: [] }
     this.viewedDocHandles = []
+    this.contactHandles = []
   }
 
   // This is the New Boilerplate
@@ -78,6 +79,17 @@ export default class Omnibox extends React.PureComponent {
           })
         }
       })
+
+      this.state.contactIds.forEach(id => {
+        if (!this.state.contacts.find(({i: id}) => i === id)) {
+          const handle = window.hm.openHandle(id)
+          this.contactHandles.push(handle)
+          handle.onChange((doc) => {
+            const contacts = [ ...this.state.contacts, { id, doc } ]
+            this.setState({ contacts })
+          })
+        }
+      })
     })
   }
 
@@ -127,6 +139,18 @@ export default class Omnibox extends React.PureComponent {
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
+
+    const state = this.state
+
+    if (search.length > 0) {
+      const contactItems = this.state.contacts.
+        filter(({doc}) => doc.name).
+        filter(({doc}) => doc.name.match(new RegExp(search, 'i'))).
+        map(contact => ({ type: 'contact', object: contact }))
+
+      sectionIndices.contacts = { start: items.length, end: (items.length + contactItems.length) }
+      items = items.concat(contactItems)
+    }
 
     const viewedDocItems = this.state.viewedDocs.
       filter(({url}) => (parseDocumentLink(url).type === 'board')).
@@ -249,6 +273,31 @@ export default class Omnibox extends React.PureComponent {
     }
   }
 
+  renderContactsSection() {
+    const contacts = this.sectionItems('contacts').map((item) => {
+      const url = createDocumentLink('contact', item.object.id)
+      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
+
+      return (
+        <div key={url} className={classes}>
+          <Content url={url} />
+
+          <div className="ListMenu Actions">
+            <span className="Type--secondary">⏎ Open</span>
+          </div>
+        </div>
+      )
+    })
+
+    if (contacts.length > 0) {
+      return (
+        <div className="ListMenuSection">
+          { contacts }
+        </div>
+      )
+    }
+  }
+
   render() {
     log('render', this.state)
 
@@ -265,6 +314,7 @@ export default class Omnibox extends React.PureComponent {
         { this.renderInvitationsSection() }
         { this.renderViewedDocLinksSection() }
         { this.renderDocLinksSection() }
+        { this.renderContactsSection() }
       </div>
     </div>
   }
