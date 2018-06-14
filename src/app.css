@@ -874,7 +874,7 @@ div.card.image {
 .CodeMirrorEditor div.CodeMirror-lines {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
-  line-height: 20px;
+  line-height: 24px;
   padding: 0;
 }
 
@@ -967,7 +967,7 @@ div.card.image {
 
 .CodeMirrorEditor__renderer p {
   font-size: 14px;
-  line-height:20px;
+  line-height:24px;
   margin-bottom: 8px;
 }
 

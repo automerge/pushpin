@@ -30,32 +30,11 @@ export default class Content extends React.PureComponent {
     return docId
   }
 
-  component = React.createRef()   
-
   // This is the New Boilerplate, adapted slightly for content
   state = {}
-  componentWillMount = () => {
-    const { docId } = parseDocumentLink(this.props.url)
-    this.refreshHandle(docId)
-  }
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.url !== this.props.url) {
-      const { docId } = parseDocumentLink(this.props.url)
-      this.refreshHandle(docId)
-    }
-  }
 
-  refreshHandle = (docId) => {
-    if (this.handle) {
-      window.hm.releaseHandle(this.handle)
-    }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
-  }
-
-  onChange = (doc) => {
-    this.setState({ doc })
+  componentDidCatch = (e) => {
+    this.setState({ contentCrashed: e })
   }
 
   filterProps = (props) => {
@@ -82,11 +61,11 @@ export default class Content extends React.PureComponent {
       .find((ct) => ct.type === type)
 
     if (!contentType) {
-      return missingType(type)
+      return renderMissingType(type)
     }
 
-    if (!this.state.doc) {
-      return null
+    if (this.state.contentCrashed) {
+      return renderError(type, this.state.contentCrashed)
     }
 
     const filteredProps = this.filterProps(this.props)
@@ -101,7 +80,14 @@ export default class Content extends React.PureComponent {
   }
 }
 
-const missingType = type => (
+const renderError = (type, error) => (
+  <div>
+    <i className="fa fa-exclamation-triangle" />
+    A &quot;{type}&quot; threw an error during render.
+  </div>
+)
+
+const renderMissingType = type => (
   <div>
     <i className="fa fa-exclamation-triangle" />
     Component of type &quot;{type}&quot; not found.

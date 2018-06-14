@@ -21,6 +21,7 @@ import './components/share'
 import './components/thread'
 import './components/title-bar'
 import './components/toggle'
+import './components/url'
 import './components/workspace'
 
 import { createDocumentLink } from './share-link'

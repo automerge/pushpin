@@ -32,6 +32,24 @@ export function write(filePath, callback) {
   })
 }
 
+export function writeBuffer(buffer, callback) {
+  multicore.ready(() => {
+    const feed = multicore.createFeed()
+
+    feed.append(buffer, (error) => {
+      if (error) {
+        callback(error)
+        return
+      }
+
+      const hyperfileId = feed.key.toString('hex')
+
+      Hyperdiscovery(feed)
+      callback(null, hyperfileId)
+    })
+  })
+}
+
 // callback = (err, blob)
 export function fetch(hyperfileId, callback) {
   multicore.ready(() => {

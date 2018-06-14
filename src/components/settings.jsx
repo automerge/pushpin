@@ -18,6 +18,8 @@ export default class Settings extends React.PureComponent {
     docId: PropTypes.string.isRequired
   }
 
+  state = {}
+
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)
