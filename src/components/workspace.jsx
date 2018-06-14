@@ -80,10 +80,13 @@ export default class Workspace extends React.PureComponent {
 
   refreshHeartbeat = (doc) => {
     const selfHandle = window.hm.openHandle(doc.selfId)
-    selfHandle.message('heartbeat')
-    this.timerId = setInterval(() => {
+
+    if (!this.timerId) {
       selfHandle.message('heartbeat')
-    }, 5000) // send a heartbeat every 2.5s
+      this.timerId = setInterval(() => {
+        selfHandle.message('heartbeat')
+      }, 5000) // send a heartbeat every 5s
+    }
   }
 
   openDoc = (docUrl) => {
