@@ -74,8 +74,10 @@ export default class Omnibox extends React.PureComponent {
           const handle = window.hm.openHandle(docId)
           this.viewedDocHandles.push(handle)
           handle.onChange((doc) => {
-            const viewedDocs = [...this.state.viewedDocs, { url, doc }]
-            this.setState({ viewedDocs })
+            this.setState((state, props) => {
+              const viewedDocs = [...state.viewedDocs, { url, doc }]
+              return { viewedDocs }
+            })
           })
         }
       })
@@ -85,8 +87,10 @@ export default class Omnibox extends React.PureComponent {
           const handle = window.hm.openHandle(contactId)
           this.contactHandles.push(handle)
           handle.onChange((doc) => {
-            const contacts = [...this.state.contacts, { id: contactId, doc }]
-            this.setState({ contacts })
+            this.setState((state, props) => {
+              const contacts = [...state.contacts, { id: contactId, doc }]
+              return { contacts }
+            })
           })
         }
       })
