@@ -9,6 +9,7 @@ import Content from './components/content'
 
 // We load these modules here so that the content registry will have them.
 import './components/board'
+import './components/board-link'
 import './components/board-title'
 import './components/code-mirror-editor'
 import './components/contact'
