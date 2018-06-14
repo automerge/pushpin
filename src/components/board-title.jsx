@@ -15,8 +15,9 @@ export default class BoardTitle extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  state = { activeOmnibox: false, search: null, selected: -1 }
-  input = React.createRef()
+  state = { activeOmnibox: false, activeTitleEditor: false, search: null, selected: null }
+  omniboxInput = React.createRef()
+  titleInput = React.createRef()
 
   setTitle = ({ title }) => {
     log('onChangeTitle')
@@ -57,9 +58,9 @@ export default class BoardTitle extends React.PureComponent {
     if (e.metaKey && e.key === '/') {
       this.setState({ activeOmnibox: !this.state.activeOmnibox }, () => {
         if (this.state.activeOmnibox) {
-          this.input.current.focus()
+          this.omniboxInput.current.focus()
         } else {
-          this.input.current.blur()
+          this.omniboxInput.current.blur()
         }
       })
     }
@@ -86,7 +87,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   activateOmnibox = () => {
-    this.setState({ activeOmnibox: true })
+    this.setState({ activeOmnibox: true }, () => this.omniboxInput.current.focus())
   }
 
   deactivateOmnibox = () => {
@@ -113,14 +114,24 @@ export default class BoardTitle extends React.PureComponent {
 
       if (this.state.selected.type === 'invitation') {
         this.props.openDoc(selected.object.documentUrl)
-        this.setState({ activeOmnibox: false }, () => this.input.current.blur())
+        this.deactivateOmnibox()
       }
 
       if (this.state.selected.type === 'viewedDocUrl') {
         this.props.openDoc(selected.object)
-        this.setState({ activeOmnibox: false }, () => this.input.current.blur())
+        this.deactivateOmnibox()
       }
     }
+  }
+
+  activateTitleEditor = () => {
+    this.setState({ activeTitleEditor: true }, () => this.titleInput.current.focus())
+  }
+
+  editTitle = (e) => {
+    this.boardHandle.change((doc) => {
+      doc.title = e.target.value
+    })
   }
 
   setOmniboxControl = (controller) => {
@@ -130,24 +141,44 @@ export default class BoardTitle extends React.PureComponent {
   render = () => {
     log('render')
 
+    let inputBar
+    if (this.state.activeOmnibox) {
+      inputBar = (
+        <input
+          ref={this.omniboxInput}
+          type="text"
+          className="TitleBar__titleText"
+          onBlur={this.deactivateOmnibox}
+          onChange={this.handleChange}
+          onKeyDown={this.handleCommandKeys}
+          placeholder="Start typing..."
+        />
+      )
+    } else {
+      inputBar = (
+        <div>
+          <i className="fa fa-edit" onClick={this.activateTitleEditor} />
+          <input
+            ref={this.titleInput}
+            type="text"
+            className="TitleBar__titleText"
+            value={this.state.board && this.state.board.title || ''}
+            onClick={this.activateOmnibox}
+            onChange={this.editTitle}
+          />
+        </div>
+      )
+    }
+
     return (
       <div className="BoardTitle">
+        { inputBar }
         <Content
           ref={this.omnibox}
           url={createDocumentLink('omnibox', this.props.docId)}
           visible={this.state.activeOmnibox}
           search={this.state.search}
           getKeyController={this.setOmniboxControl}
-        />
-        <input
-          ref={this.input}
-          type="text"
-          className="TitleBar__titleText"
-          value={this.state.board && this.state.board.title || ''}
-          onFocus={this.activateOmnibox}
-          onBlur={this.deactivateOmnibox}
-          onChange={this.handleChange}
-          onKeyDown={this.handleCommandKeys}
         />
       </div>
     )
