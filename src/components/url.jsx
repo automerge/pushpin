@@ -60,7 +60,9 @@ export default class Url extends React.PureComponent {
     if (e.key === 'Enter') {
       e.preventDefault()
       this.handle.change((doc) => {
-        doc.url = this.state.urlInput
+        const input = this.state.urlInput
+        const url = (input.indexOf('://') === -1) ? 'http://' + input : input
+        doc.url = url
       })
     }
   }
