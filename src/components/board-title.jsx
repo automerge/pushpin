@@ -115,8 +115,13 @@ export default class BoardTitle extends React.PureComponent {
 
       if (this.state.selected.url) {
         this.props.openDoc(selected.url)
-        this.deactivateOmnibox()
       }
+
+      if (this.state.selected.type === 'contact') {
+        this.offerDocumentToIdentity(this.state.selected.object.id)
+      }
+
+      this.deactivateOmnibox()
     }
   }
 
@@ -132,6 +137,30 @@ export default class BoardTitle extends React.PureComponent {
 
   setOmniboxControl = (controller) => {
     this.omniboxControl = controller
+  }
+
+  offerDocumentToIdentity = (contactId) => {
+    if (!this.state.selfId) {
+      return
+    }
+
+    const selfHandle = window.hm.openHandle(this.state.selfId)
+
+    selfHandle.change((s) => {
+      if (!s.offeredUrls) {
+        s.offeredUrls = {}
+      }
+
+      if (!s.offeredUrls[contactId]) {
+        s.offeredUrls[contactId] = []
+      }
+
+      if (!s.offeredUrls[contactId].includes(this.state.currentDocUrl)) {
+        s.offeredUrls[contactId].push(this.state.currentDocUrl)
+      }
+    })
+
+    window.hm.releaseHandle(selfHandle)
   }
 
   render = () => {

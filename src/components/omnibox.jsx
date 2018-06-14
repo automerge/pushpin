@@ -80,12 +80,13 @@ export default class Omnibox extends React.PureComponent {
         }
       })
 
-      this.state.contactIds.forEach(id => {
-        if (!this.state.contacts.find(({i: id}) => i === id)) {
-          const handle = window.hm.openHandle(id)
+      this.state.contactIds.forEach(contactId => {
+        const state = this.state
+        if (!this.state.contacts.find(({id}) => id === contactId)) {
+          const handle = window.hm.openHandle(contactId)
           this.contactHandles.push(handle)
           handle.onChange((doc) => {
-            const contacts = [ ...this.state.contacts, { id, doc } ]
+            const contacts = [ ...this.state.contacts, { id: contactId, doc } ]
             this.setState({ contacts })
           })
         }
@@ -195,7 +196,6 @@ export default class Omnibox extends React.PureComponent {
         </div>
 
         <div className="ListMenu Actions">
-          <span className="Type--secondary">⌫  Archive</span>
           <span className="Type--secondary">⏎ View</span>
         </div>
       </div>
@@ -225,7 +225,6 @@ export default class Omnibox extends React.PureComponent {
           <Content url={docLinkUrl} linkedDocumentType={type} />
 
           <div className="ListMenu Actions">
-            <span className="Type--secondary">⌫  Archive</span>
             <span className="Type--secondary">⏎ View</span>
           </div>
         </div>
@@ -283,7 +282,7 @@ export default class Omnibox extends React.PureComponent {
           <Content url={url} />
 
           <div className="ListMenu Actions">
-            <span className="Type--secondary">⏎ Open</span>
+            <span className="Type--secondary">⏎ Invite</span>
           </div>
         </div>
       )
