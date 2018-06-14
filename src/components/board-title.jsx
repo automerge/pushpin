@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import Content from './content'
 import ContentTypes from '../content-types'
@@ -50,17 +51,6 @@ export default class BoardTitle extends React.PureComponent {
   onInvitationsChange = (invitations) => {
     log('invitations change')
     this.setState({ invitations })
-  }
-
-  refreshBoardHandle = (boardId) => {
-    if (this.boardHandle) {
-      window.hm.releaseHandle(this.boardHandle)
-    }
-
-    this.boardHandle = window.hm.openHandle(boardId)
-    this.boardHandle.onChange((doc) => {
-      this.setState({ board: doc })
-    })
   }
 
   onKeyDown = (e) => {
@@ -183,6 +173,9 @@ export default class BoardTitle extends React.PureComponent {
         <div>
           { invitationsNotification }
           <i className="fa fa-edit" onClick={this.activateTitleEditor} />
+          <CopyToClipboard text={this.state.currentDocUrl}>
+            <i className="fa fa-clipboard" />
+          </CopyToClipboard>
           <Dropdown>
             <DropdownTrigger>
               <i className="fa fa-group" />
