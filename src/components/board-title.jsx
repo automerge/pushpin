@@ -5,6 +5,7 @@ import { RIEInput } from 'riek'
 
 import Content from './content'
 import ContentTypes from '../content-types'
+import InvitationsView from '../invitations-view'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:board-title')
@@ -15,7 +16,7 @@ export default class BoardTitle extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  state = { activeOmnibox: false, activeTitleEditor: false, search: null, selected: null }
+  state = { invitations: [], activeOmnibox: false, activeTitleEditor: false, search: null, selected: null }
   omniboxInput = React.createRef()
   titleInput = React.createRef()
 
@@ -29,6 +30,8 @@ export default class BoardTitle extends React.PureComponent {
   // This is the New Boilerplate
   componentWillMount = () => {
     this.refreshHandle(this.props.docId)
+    this.invitationsView = new InvitationsView(this.props.docId)
+    this.invitationsView.onChange(this.onInvitationsChange)
     document.addEventListener('keydown', this.onKeyDown)
   }
 
@@ -41,6 +44,11 @@ export default class BoardTitle extends React.PureComponent {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
     }
+  }
+
+  onInvitationsChange = (invitations) => {
+    log('invitations change')
+    this.setState({ invitations })
   }
 
   refreshBoardHandle = (boardId) => {
@@ -155,8 +163,13 @@ export default class BoardTitle extends React.PureComponent {
         />
       )
     } else {
+      let invitationsNotification
+      if (this.state.invitations.length > 0)
+        invitationsNotification = <i className="fa fa-envelope" onClick={this.activateOmnibox} />
+
       inputBar = (
         <div>
+          { invitationsNotification }
           <i className="fa fa-edit" onClick={this.activateTitleEditor} />
           <input
             ref={this.titleInput}
@@ -174,11 +187,11 @@ export default class BoardTitle extends React.PureComponent {
       <div className="BoardTitle">
         { inputBar }
         <Content
-          ref={this.omnibox}
           url={createDocumentLink('omnibox', this.props.docId)}
           visible={this.state.activeOmnibox}
           search={this.state.search}
           getKeyController={this.setOmniboxControl}
+          invitations={this.state.invitations}
         />
       </div>
     )

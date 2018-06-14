@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 
 import Content from './content'
 import ContentTypes from '../content-types'
-import InvitationsView from '../invitations-view'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:omnibox')
@@ -14,7 +13,8 @@ export default class Omnibox extends React.PureComponent {
     visible: PropTypes.bool.isRequired,
     search: PropTypes.string,
     move: PropTypes.string,
-    getKeyController: PropTypes.func
+    getKeyController: PropTypes.func,
+    invitations: PropTypes.arrayOf({}).isRequired
   }
 
   static defaultProps = {
@@ -23,7 +23,7 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { invitations: [], selectedIndex: -1 }
+    this.state = { selectedIndex: -1 }
   }
 
   // This is the New Boilerplate
@@ -34,8 +34,6 @@ export default class Omnibox extends React.PureComponent {
   componentDidMount = () => {
     log('componentDidMount')
     this.refreshHandle(this.props.docId)
-    this.invitationsView = new InvitationsView(this.props.docId)
-    this.invitationsView.onChange(this.onInvitationsChange)
     this.props.getKeyController({ moveUp: this.moveUp, moveDown: this.moveDown })
   }
 
@@ -57,11 +55,6 @@ export default class Omnibox extends React.PureComponent {
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
-  }
-
-  onInvitationsChange = (invitations) => {
-    log('invitations change')
-    this.setState({ invitations })
   }
 
   onChange = (doc) => {
@@ -96,7 +89,7 @@ export default class Omnibox extends React.PureComponent {
     let items = []
     const sectionIndices = {}
 
-    const invitationItems = this.state.invitations.map(invitation => ({ type: 'invitation', object: invitation }))
+    const invitationItems = this.props.invitations.map(invitation => ({ type: 'invitation', object: invitation }))
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
 
