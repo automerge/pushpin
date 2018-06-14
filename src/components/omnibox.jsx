@@ -47,6 +47,11 @@ export default class Omnibox extends React.PureComponent {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
     }
+
+    if ((this.props.visible && !prevProps.visible) ||
+        (this.props.search !== prevProps.search)) {
+      this.setState({ selectedIndex: -1 })
+    }
   }
 
   refreshHandle = (docId) => {
@@ -88,13 +93,30 @@ export default class Omnibox extends React.PureComponent {
   menuItems = () => {
     let items = []
     const sectionIndices = {}
+    const { search } = this.props
 
-    const invitationItems = this.props.invitations.map(invitation => ({ type: 'invitation', object: invitation }))
+    const invitationItems = this.props.invitations.
+      filter(invitation => invitation.board.title.match(new RegExp(search, 'i'))).
+      map(invitation => ({ type: 'invitation', object: invitation }))
+
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
 
-    const viewedDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
-    const viewedDocItems = viewedDocUrls.map(docUrl => ({ type: 'viewedDocUrl', object: docUrl }))
+    const viewedDocItems = this.state.viewedDocUrls.
+      filter(url => (parseDocumentLink(url).type === 'board')).
+      map(url => {
+        const { docId } = parseDocumentLink(url)
+        const handle = window.hm.openHandle(docId)
+        const doc = handle.get()
+        window.hm.releaseHandle(handle)
+
+        return { doc, url }
+      }).
+      filter(({doc, url}) => {
+        return doc.title.match(new RegExp(search, 'i'))
+      }).
+      map(object  => ({ type: 'viewedDocUrl', object }))
+
     sectionIndices.viewedDocUrls = { start: items.length }
     items = items.concat(viewedDocItems)
 
@@ -144,7 +166,7 @@ export default class Omnibox extends React.PureComponent {
     })
 
     const boardDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
-      const url = item.object
+      const { url } = item.object
       const { docId, type } = parseDocumentLink(url)
       const docLinkUrl = createDocumentLink('doc-link', docId)
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'

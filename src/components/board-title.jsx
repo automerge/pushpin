@@ -18,7 +18,7 @@ export default class BoardTitle extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  state = { invitations: [], activeOmnibox: false, activeTitleEditor: false, search: null, selected: null }
+  state = { invitations: [], activeOmnibox: false, activeTitleEditor: false, search: '', selected: null }
   omniboxInput = React.createRef()
   titleInput = React.createRef()
 
@@ -101,7 +101,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   deactivateOmnibox = () => {
-    this.setState({ activeOmnibox: false })
+    this.setState({ activeOmnibox: false, search: '' })
   }
 
   handleChange = (e) => {
