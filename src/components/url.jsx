@@ -103,15 +103,18 @@ export default class Url extends React.PureComponent {
     if (!url) {
       return (
         <div style={css.urlCard}>
-          <input
-            autoFocus
-            type="text"
-            style={css.input}
-            value={this.state.urlInput}
-            onChange={this.onInputChange}
-            onKeyDown={this.onKeyDown}
-            placeholder="Enter a URL..."
-          />
+          <div style={css.inputGroup}>
+            <i style={css.inputGroupIcon} className="fa fa-link"/>
+            <input
+              autoFocus
+              type="text"
+              style={css.urlInput}
+              value={this.state.urlInput}
+              onChange={this.onInputChange}
+              onKeyDown={this.onKeyDown}
+              placeholder="Enter a URL..."
+            />
+          </div>
         </div>
       )
     }
@@ -161,7 +164,6 @@ ContentTypes.register({
 const css = {
   urlCard: {
     display: 'flex',
-    maxWidth: '250px',
     flexDirection: 'column',
     backgroundColor: 'white',
     overflow: 'auto',
@@ -170,7 +172,7 @@ const css = {
     flex: '1 1 auto'
   },
   img: {
-    maxHeight: '250px',
+    minHeight: '192px',
     display: 'block',
     objectFit: 'cover',
     height: '50%',
@@ -214,5 +216,21 @@ const css = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     flexShrink: 0
+  },
+  urlInput: {
+    backgroundColor: 'white',
+    padding: '4px',
+    height: 24,
+    minWidth: 196
+  },
+  inputGroup: {
+    display: 'flex',
+    width: 280,
+    alignItems: 'center'
+  },
+  inputGroupIcon: {
+    fontSize: 24,
+    flex: 'none',
+    color: '#637389'
   }
 }
