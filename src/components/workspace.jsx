@@ -34,6 +34,8 @@ export default class Workspace extends React.PureComponent {
     workspace.viewedDocUrls = [docUrl]
   }
 
+  state = {}
+
   constructor(props) {
     super(props)
     log('constructor')

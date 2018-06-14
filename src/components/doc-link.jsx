@@ -10,6 +10,8 @@ export default class DocLink extends React.PureComponent {
     linkedDocumentType: PropTypes.string.isRequired
   }
 
+  state = {}
+
   handleClick = (e) => {
     window.location = createDocumentLink(this.props.linkedDocumentType, this.props.docId)
   }

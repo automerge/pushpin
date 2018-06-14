@@ -12,6 +12,8 @@ export default class BoardTitle extends React.PureComponent {
     docId: PropTypes.string.isRequired,
   }
 
+  state = {}
+
   setTitle = ({ title }) => {
     log('onChangeTitle')
     this.handle.change((b) => {

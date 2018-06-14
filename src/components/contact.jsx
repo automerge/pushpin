@@ -19,6 +19,8 @@ export default class Contact extends React.PureComponent {
     onUnshare: () => {}
   }
 
+  state = {}
+
   // This is the New Boilerplate
   componentWillMount = () => {
     this.refreshHandle(this.props.docId)
