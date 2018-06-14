@@ -30,7 +30,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => {
+  componentDidMount = () => {
     this.refreshHandle(this.props.docId)
     this.invitationsView = new InvitationsView(this.props.docId)
     this.invitationsView.onChange(this.onInvitationsChange)
@@ -50,7 +50,7 @@ export default class BoardTitle extends React.PureComponent {
 
   onInvitationsChange = (invitations) => {
     log('invitations change')
-    this.setState({ invitations })
+    this.setState({ invitations }, () => this.forceUpdate())
   }
 
   onKeyDown = (e) => {
@@ -143,6 +143,10 @@ export default class BoardTitle extends React.PureComponent {
 
   render = () => {
     log('render')
+
+    if (!this.state.currentDocUrl) {
+      return null
+    }
 
     let inputBar
     if (this.state.activeOmnibox) {

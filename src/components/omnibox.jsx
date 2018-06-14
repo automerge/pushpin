@@ -108,7 +108,7 @@ export default class Omnibox extends React.PureComponent {
     } catch (e) { }
 
     const invitationItems = this.props.invitations.
-      filter(invitation => invitation.board.title.match(new RegExp(search, 'i'))).
+      filter(invitation => invitation.doc.title.match(new RegExp(search, 'i'))).
       map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }

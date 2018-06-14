@@ -78,6 +78,28 @@ export default class Share extends React.PureComponent {
     })
   }
 
+  offerDocumentToIdentity = (e, contactId) => {
+    if (!this.state.doc.selfId) {
+      return
+    }
+
+    const selfHandle = window.hm.openHandle(this.state.doc.selfId)
+
+    selfHandle.change((s) => {
+      if (!s.offeredUrls) {
+        s.offeredUrls = {}
+      }
+
+      if (!s.offeredUrls[contactId]) {
+        s.offeredUrls[contactId] = []
+      }
+
+      if (!s.offeredUrls[contactId].includes(this.state.doc.currentDocUrl)) {
+        s.offeredUrls[contactId].push(this.state.doc.currentDocUrl)
+      }
+    })
+  }
+
   renderContacts = () => {
     const { currentDocUrl, contactIds = [] } = this.state.doc || {}
 
