@@ -158,7 +158,7 @@ export default class Omnibox extends React.PureComponent {
       const contactItems = Object.entries(this.state.contacts)
         .filter(([id, doc]) => doc.name)
         .filter(([id, doc]) => doc.name.match(new RegExp(search, 'i')))
-        .map(([id, doc]) => ({ type: 'contact', object: doc, url: createDocumentLink('contact', id) }))
+        .map(([id, doc]) => ({ type: 'contact', object: doc, id, url: createDocumentLink('contact', id) }))
 
       sectionIndices.contacts = { start: items.length, end: (items.length + contactItems.length) }
       items = items.concat(contactItems)
