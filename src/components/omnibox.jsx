@@ -23,9 +23,9 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { selectedIndex: -1, viewedDocs: [], contacts: [] }
-    this.viewedDocHandles = []
-    this.contactHandles = []
+    this.state = { selectedIndex: -1, viewedDocs: {}, contacts: {} }
+    this.viewedDocHandles = {}
+    this.contactHandles = {}
   }
 
   // This is the New Boilerplate
@@ -42,7 +42,8 @@ export default class Omnibox extends React.PureComponent {
   componentWillUnmount = () => {
     log('componentWillUnmount')
     window.hm.releaseHandle(this.handle)
-    this.viewedDocHandles.forEach(handle => window.hm.releaseHandle(handle))
+    Object.values(this.viewedDocHandles).forEach(handle => window.hm.releaseHandle(handle))
+    Object.values(this.contactHandles).forEach(handle => window.hm.releaseHandle(handle))
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -69,13 +70,18 @@ export default class Omnibox extends React.PureComponent {
     log('onChange', doc)
     this.setState({ ...doc }, () => {
       this.state.viewedDocUrls.forEach(url => {
-        if (!this.state.viewedDocs.find(({ url: u }) => u === url)) {
+        // create a handle for this document
+        if (!this.viewedDocHandles[url]) {
           const { docId } = parseDocumentLink(url)
           const handle = window.hm.openHandle(docId)
-          this.viewedDocHandles.push(handle)
+          this.viewedDocHandles[url] = handle
+
+          // when it changes, stick the contents of the document
+          // into this.state.viewedDocs[url]
           handle.onChange((doc) => {
             this.setState((state, props) => {
-              const viewedDocs = [...state.viewedDocs, { url, doc }]
+              const { viewedDocs } = state
+              viewedDocs[url] = doc
               return { viewedDocs }
             })
           })
@@ -83,12 +89,16 @@ export default class Omnibox extends React.PureComponent {
       })
 
       this.state.contactIds.forEach(contactId => {
-        if (!this.state.contacts.find(({ id }) => id === contactId)) {
+        // create a handle for each contact
+        if (!this.contactHandles[contactId]) {
           const handle = window.hm.openHandle(contactId)
-          this.contactHandles.push(handle)
+          this.contactHandles[contactId] = handle
+
+          // when it changes, put it into this.state.contacts[contactId]
           handle.onChange((doc) => {
             this.setState((state, props) => {
-              const contacts = [...state.contacts, { id: contactId, doc }]
+              const { contacts } = state
+              contacts[contactId] = doc
               return { contacts }
             })
           })
@@ -145,19 +155,19 @@ export default class Omnibox extends React.PureComponent {
     items = items.concat(invitationItems)
 
     if (search.length > 0) {
-      const contactItems = this.state.contacts
-        .filter(({ doc }) => doc.name)
-        .filter(({ doc }) => doc.name.match(new RegExp(search, 'i')))
-        .map(contact => ({ type: 'contact', object: contact }))
+      const contactItems = Object.entries(this.state.contacts)
+        .filter(([id, doc]) => doc.name)
+        .filter(([id, doc]) => doc.name.match(new RegExp(search, 'i')))
+        .map(([id, doc]) => ({ type: 'contact', object: doc, url: createDocumentLink('contact', id) }))
 
       sectionIndices.contacts = { start: items.length, end: (items.length + contactItems.length) }
       items = items.concat(contactItems)
     }
 
-    const viewedDocItems = this.state.viewedDocs
-      .filter(({ url }) => (parseDocumentLink(url).type === 'board'))
-      .filter(({ doc, url }) => doc.title.match(new RegExp(search, 'i')))
-      .map(object => ({ type: 'viewedDocUrl', object, url: object.url }))
+    const viewedDocItems = Object.entries(this.state.viewedDocs)
+      .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
+      .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
+      .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
 
     sectionIndices.viewedDocUrls = { start: items.length }
     items = items.concat(viewedDocItems)
@@ -218,7 +228,7 @@ export default class Omnibox extends React.PureComponent {
 
   renderViewedDocLinksSection() {
     const viewedDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
-      const { url } = item.object
+      const { url } = item
       const { docId, type } = parseDocumentLink(url)
       const docLinkUrl = createDocumentLink('doc-link', docId)
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
@@ -250,7 +260,7 @@ export default class Omnibox extends React.PureComponent {
 
   renderDocLinksSection() {
     const docLinks = this.sectionItems('docUrls').map((item) => {
-      const url = item.object
+      const { url } = item
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
       return (
@@ -281,7 +291,7 @@ export default class Omnibox extends React.PureComponent {
 
   renderContactsSection() {
     const contacts = this.sectionItems('contacts').map((item) => {
-      const url = createDocumentLink('contact', item.object.id)
+      const { url } = item
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
       return (
