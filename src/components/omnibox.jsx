@@ -319,7 +319,7 @@ export default class Omnibox extends React.PureComponent {
   }
 
   render() {
-    log('render', this.state)
+    log('render')
 
     if (!this.props.visible) {
       return null
