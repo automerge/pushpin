@@ -36,7 +36,7 @@ function bufferToHex(key) {
 }
 
 if (process.argv.length !== 4) {
-  console.error('Usage: node try.js [user] [target-url]')
+  console.error('Usage: node bench.js [user] [target-url]')
   process.exit(1)
 }
 
