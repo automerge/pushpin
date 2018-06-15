@@ -74,7 +74,10 @@ export default class Share extends React.PureComponent {
   updateIdentityReferences = (workspaceHandle, boardHandle) => {
     log('updateIdentityReferences')
     const { authorIds } = boardHandle.get() || {}
-    // TODO: doc
+    // If there is no authorIds yet, we've just loaded a uninitialized board. We'll
+    // shortly get an onChange callback with the initialized board, so don't try to
+    // do anything before then. Without this guard, the boardHandle.change block is
+    // liable to throw cryptic errors.
     if (authorIds) {
       const { selfId, contactIds = [] } = workspaceHandle.get() || {}
 
