@@ -207,7 +207,7 @@ input {
 }
 
 .BoardTitle .dropdown__content {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .BoardTitle__actionBar {
@@ -215,12 +215,38 @@ input {
   padding: 0 4px;
   border-radius: 4px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
+
+.BoardTitle__actionBar__left,
+.BoardTitle__actionBar__right {
+  position: absolute;
+  display: flex;
+}
+
+.BoardTitle__actionBar__left {
+  left: 4px;
+}
+
+.BoardTitle__actionBar__right {
+  right: 4px;
+}
+
+.BoardTitle__actionBar__left .fa,
 .BoardTitle__actionBar__right .fa {
-  margin-left: 2px
+  cursor: pointer;
+  width:24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.BoardTitle__actionBar__left .fa:hover,
+.BoardTitle__actionBar__right .fa:hover {
+  color: var(--colorBlueBlack);
+  transform: scale(1.2);
 }
 
 .BoardTitle__actionBar__right .dropdown__trigger .fa.fa-group {
@@ -232,7 +258,8 @@ input {
 }
 
 .BoardTitle {
-  width: 400px;
+  width: 480px;
+  position: relative;
 }
 
 .BoardTitle__omniboxInput {
@@ -246,7 +273,7 @@ input {
   width: 478px;
   z-index: 10;
   position: fixed;
-  top: 80px;
+  top: 52px;
   left: 50%;
   margin-left: -239px;
 }
@@ -443,7 +470,6 @@ button[disabled].TitleBar__menuItem .fa {
 }
 
 .TitleBar__titleText {
-  max-width: 244px;
   padding: 0px 4px;
   white-space: nowrap;
   overflow:hidden;
@@ -451,7 +477,7 @@ button[disabled].TitleBar__menuItem .fa {
 }
 
 .TitleBar__titleText{
-  width: 244px;
+  width: 336px;
   font-size: 14px;
   color: black;
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
@@ -797,7 +823,9 @@ div.card.image {
   display: flex;
 }
 
-.Tabs .fa {
+.Tabs__tab > .fa {
+  height: auto;
+  width: auto;
   font-size: 16px;
   margin-right: 4px;
 }
