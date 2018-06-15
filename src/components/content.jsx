@@ -75,6 +75,9 @@ export default class Content extends React.PureComponent {
     return (
       <contentType.component
         ref={this.component}
+        context={context}
+        url={url}
+        type={type}
         docId={docId}
         {...filteredProps}
       />

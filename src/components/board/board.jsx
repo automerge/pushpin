@@ -172,6 +172,12 @@ export default class Board extends React.PureComponent {
     const localX = pageX - this.boardRef.offsetLeft
     const localY = pageY - this.boardRef.offsetTop
 
+    const url = e.dataTransfer.getData('application/pushpin-url')
+    if (url) {
+      this.linkCard({ x: localX, y: localY, url })
+      return
+    }
+
     /* Adapted from:
       https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
     const { length } = e.dataTransfer.files
@@ -335,6 +341,30 @@ export default class Board extends React.PureComponent {
       const newCard = {
         id,
         url: createDocumentLink(type, docId),
+        x: snapX,
+        y: snapY,
+        width: width ? this.snapMeasureToGrid(width) : null,
+        height: height ? this.snapMeasureToGrid(height) : null,
+        slackWidth: 0,
+        slackHeight: 0,
+        resizing: false,
+        moving: false,
+      }
+      b.cards[id] = newCard
+    })
+
+    return id
+  }
+
+  linkCard = ({ x, y, width, height, url }) => {
+    const id = uuid()
+
+    this.handle.change((b) => {
+      const snapX = this.snapCoordinateToGrid(x)
+      const snapY = this.snapCoordinateToGrid(y)
+      const newCard = {
+        id,
+        url,
         x: snapX,
         y: snapY,
         width: width ? this.snapMeasureToGrid(width) : null,

@@ -2,10 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import ContentTypes from '../../content-types'
-import { createDocumentLink } from '../../share-link'
 
 export default class BoardInList extends React.PureComponent {
   static propTypes = {
+    url: PropTypes.string.isRequired,
     docId: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.string)
   }
@@ -17,7 +17,12 @@ export default class BoardInList extends React.PureComponent {
   state = {}
 
   handleClick = (e) => {
-    window.location = createDocumentLink('board', this.props.docId)
+    window.location = this.props.url
+  }
+
+  onDragStart = (e) => {
+    e.dataTransfer.setData('application/pushpin-url', this.props.url)
+    e.dataTransfer.setDragImage(this.badgeRef, 0, 0)
   }
 
   // This is the New Boilerplate
@@ -52,8 +57,8 @@ export default class BoardInList extends React.PureComponent {
     }
 
     return (
-      <div className="DocLink" onClick={this.handleClick}>
-        <i className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
+      <div draggable="true" onDragStart={this.onDragStart} className="DocLink" onClick={this.handleClick}>
+        <i ref={(ref) => { this.badgeRef = ref }} className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
         <div className="DocLink__title">{ this.state.title }</div>
         { actions }
       </div>

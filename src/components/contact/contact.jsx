@@ -47,9 +47,6 @@ export default class ContactInList extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    if (window.selfId === this.props.docId) {
-      this.setState({ online: true })
-    }
     this.setState({ ...doc })
   }
 
@@ -87,10 +84,6 @@ export default class ContactInList extends React.PureComponent {
       ))
     }
 
-    if (this.props.actions.includes('invite')) {
-      actions.push(<span className="Type--secondary">⏎ Invite</span>)
-    }
-
     let avatar
     if (this.state.avatarDocId) {
       avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
@@ -99,11 +92,9 @@ export default class ContactInList extends React.PureComponent {
     }
 
     return (
-      <div draggable="true" onDragStart={this.onDragStart} className="ContactListItem">
-        <div className="ListMenu__thumbnail">
-          <div className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}>
-            { avatar }
-          </div>
+      <div className="Contact">
+        <div className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}>
+          { avatar }
         </div>
         <div className="Label">
           <p className="Type--primary">
@@ -120,8 +111,9 @@ export default class ContactInList extends React.PureComponent {
 ContentTypes.register({
   component: ContactInList,
   type: 'contact',
-  context: 'list',
+  context: 'default',
   name: 'Contact',
   icon: 'sticky-note',
+  resizable: false,
   unlisted: true,
 })

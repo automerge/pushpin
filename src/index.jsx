@@ -16,6 +16,7 @@ import './components/board/board-in-board'
 import './components/board/board-in-list'
 
 // contact in various contexts
+import './components/contact/contact'
 import './components/contact/contact-in-list'
 import './components/contact/contact-in-mini'
 

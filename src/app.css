@@ -153,6 +153,19 @@ input {
   margin: 0;
 }
 
+.Notification {
+  margin: 8px;
+  border: 1px solid #e9edf0;
+  border-radius: 4px;
+  padding: 8px;
+  padding-bottom: 0px;
+}
+
+.ContactListItem {
+  display: flex;
+  align-items: center;
+}
+
 .Avatar {
   display: flex;
   align-items: center;
@@ -511,6 +524,8 @@ button[disabled].TitleBar__menuItem .fa {
 
 .DocLink__title {
   margin-left: 10px;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .Badge {
@@ -752,9 +767,8 @@ div.card.image {
 .ListMenu__typegroup {
   padding: 4px 8px;
 }
-.ListMenu .ListMenu__item {
-  display: flex;
-  align-items: center;
+
+.ListMenu__item {
   padding: 4px 8px;
   color: var(--colorBlueBlack);
   line-height:16px;
@@ -763,11 +777,8 @@ div.card.image {
   width: 100%;
 }
 
-.ListMenu .ListMenu__item--selected {
+.ListMenu__item--selected {
   background: #EEE;
-}
-
-.ListMenu .ListMenu__item:hover{
 }
 
 .ListMenu__thumbnail {
@@ -775,11 +786,12 @@ div.card.image {
   margin-right: 8px;
 }
 
-.ListMenu .Actions {
-  flex: none;
-  display: flex;
-  padding-bottom: 0;
-  margin-left: auto;
+.ListMenu__item .Actions {
+  pointer-events: none;
+  position: absolute;
+  right: 8px;
+  transform: translateY(-50%);
+  top: 50%;
 }
 
 .ListMenu .Actions > * {
