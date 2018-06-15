@@ -104,8 +104,9 @@ export default class Share extends React.PureComponent {
 
   renderContacts = () => {
     const { contactIds = [] } = this.state.doc || {}
+    const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
 
-    const contacts = contactIds.map(id => (
+    const contacts = uniqueContactIds.map(id => (
       <Content
         key={id}
         url={createDocumentLink('contact', id)}
@@ -126,8 +127,9 @@ export default class Share extends React.PureComponent {
 
   renderAuthors = () => {
     const authorIds = this.state.board ? this.state.board.authorIds : []
+    const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
 
-    const authors = authorIds.map(id => (
+    const authors = uniqueAuthorIds.map(id => (
       <Content
         key={id}
         url={createDocumentLink('contact', id)}
