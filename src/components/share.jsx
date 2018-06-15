@@ -1,44 +1,29 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Debug from 'debug'
 
 import Content from './content'
 import ContentTypes from '../content-types'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
 
+const log = Debug('pushpin:share')
+
 export default class Share extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired // Workspace
   }
 
   state = { tab: 'authors' }
 
-  updateIdentityReferences = (workspaceHandle, documentHandle) => {
-    const { authorIds = [] } = documentHandle.get() || {}
-    const { selfId, contactIds = [] } = workspaceHandle.get() || {}
-
-    // add any never-before seen authors to our contacts
-    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
-    if (newContactIds.length > 0) {
-      workspaceHandle.change((workspace) => {
-        workspace.contactIds.push(...newContactIds)
-      })
-    }
-
-    // add ourselves to the authors if we haven't yet
-    if (selfId && !authorIds.includes(selfId)) {
-      documentHandle.change((document) => {
-        if (!document.authorIds) {
-          document.authorIds = []
-        }
-        document.authorIds.push(selfId)
-      })
-    }
+  // This is the New Boilerplate
+  componentWillMount = () => {
+    log('componentWillMount')
+    this.refreshWorkspaceHandle(this.props.docId)
   }
 
-  // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => {
-    window.hm.releaseHandle(this.handle)
+    log('componentWillUnmount')
+    window.hm.releaseHandle(this.workspaceHandle)
     window.hm.releaseHandle(this.boardHandle)
   }
 
@@ -48,30 +33,36 @@ export default class Share extends React.PureComponent {
     }
   }
 
+  refreshWorkspaceHandle = (docId) => {
+    log('refreshWorkspaceHandle')
+    if (this.workspaceHandle) {
+      window.hm.releaseHandle(this.workspaceHandle)
+    }
+    this.workspaceHandle = window.hm.openHandle(docId)
+    this.workspaceHandle.onChange(this.onWorkspaceChange)
+  }
+
   refreshBoardHandle = (boardId) => {
+    log('refreshBoardHandle')
     if (this.boardHandle) {
       window.hm.releaseHandle(this.boardHandle)
     }
 
     this.boardHandle = window.hm.openHandle(boardId)
-    this.boardHandle.onChange((doc) => {
-      this.updateIdentityReferences(this.handle, this.boardHandle)
-      this.setState({ board: doc })
-    })
+    this.boardHandle.onChange(this.onBoardChange)
   }
 
-  refreshHandle = (docId) => {
-    if (this.handle) {
-      window.hm.releaseHandle(this.handle)
-    }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+  onBoardChange = (doc) => {
+    log('onBoardChange')
+    this.updateIdentityReferences(this.workspaceHandle, this.boardHandle)
+    this.setState({ board: doc })
   }
 
-  onChange = (doc) => {
-    this.setState({ doc }, () => {
-      if (this.state.doc.currentDocUrl) {
-        const { docId } = parseDocumentLink(this.state.doc.currentDocUrl)
+  onWorkspaceChange = (doc) => {
+    log('onWorkspaceChange')
+    this.setState({ workspace: doc }, () => {
+      if (this.state.workspace.currentDocUrl) {
+        const { docId } = parseDocumentLink(this.state.workspace.currentDocUrl)
 
         if (!this.state.board || this.state.board.docId !== docId) {
           this.refreshBoardHandle(docId)
@@ -80,12 +71,42 @@ export default class Share extends React.PureComponent {
     })
   }
 
+  updateIdentityReferences = (workspaceHandle, boardHandle) => {
+    log('updateIdentityReferences')
+    const { authorIds } = boardHandle.get() || {}
+    // TODO: doc
+    if (authorIds) {
+      const { selfId, contactIds = [] } = workspaceHandle.get() || {}
+
+      // Add any never-before seen authors to our contacts.
+      const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
+      if (newContactIds.length > 0) {
+        workspaceHandle.change((workspace) => {
+          workspace.contactIds.push(...newContactIds)
+        })
+      }
+
+      // Add ourselves to the authors if we haven't yet.
+      if (selfId && !authorIds.includes(selfId)) {
+        log('updateIdentityReferences.addSelf')
+        boardHandle.change((board) => {
+          if (!board.authorIds) {
+            board.authorIds = []
+          }
+          board.authorIds.push(selfId)
+        })
+      }
+    }
+  }
+
   offerDocumentToIdentity = (e, contactId) => {
-    if (!this.state.doc.selfId) {
+    if (!this.state.workspace.selfId) {
       return
     }
 
-    const selfHandle = window.hm.openHandle(this.state.doc.selfId)
+    log('offerDocumentToIdentity')
+
+    const selfHandle = window.hm.openHandle(this.state.workspace.selfId)
 
     selfHandle.change((s) => {
       if (!s.offeredUrls) {
@@ -96,14 +117,14 @@ export default class Share extends React.PureComponent {
         s.offeredUrls[contactId] = []
       }
 
-      if (!s.offeredUrls[contactId].includes(this.state.doc.currentDocUrl)) {
-        s.offeredUrls[contactId].push(this.state.doc.currentDocUrl)
+      if (!s.offeredUrls[contactId].includes(this.state.workspace.currentDocUrl)) {
+        s.offeredUrls[contactId].push(this.state.workspace.currentDocUrl)
       }
     })
   }
 
   renderContacts = () => {
-    const { contactIds = [] } = this.state.doc || {}
+    const { contactIds = [] } = (this.state.workspace || {})
     const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
 
     const contacts = uniqueContactIds.map(id => (
@@ -126,7 +147,7 @@ export default class Share extends React.PureComponent {
   }
 
   renderAuthors = () => {
-    const authorIds = this.state.board ? this.state.board.authorIds : []
+    const { authorIds = [] } = (this.state.board || {})
     const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
 
     const authors = uniqueAuthorIds.map(id => (
