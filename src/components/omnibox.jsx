@@ -145,7 +145,9 @@ export default class Omnibox extends React.PureComponent {
       }
 
       return { items, sectionIndices }
-    } catch (e) { }
+    } catch (e) {
+      log('menuSections.error', e)
+    }
 
     const invitationItems = this.props.invitations
       .filter(invitation => invitation.doc.title.match(new RegExp(search, 'i')))

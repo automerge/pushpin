@@ -1,9 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Unfluff from 'unfluff'
-import * as Hyperfile from '../hyperfile'
+import Debug from 'debug'
 
+import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../content-types'
+
+const log = Debug('pushpin:url')
 
 const removeEmpty = (obj) =>
   Object.entries(obj).forEach(([key, val]) => {
@@ -61,7 +64,7 @@ export default class Url extends React.PureComponent {
       e.preventDefault()
       this.handle.change((doc) => {
         const input = this.state.urlInput
-        const url = (input.indexOf('://') === -1) ? 'http://' + input : input
+        const url = (input.indexOf('://') === -1) ? `http://${input}` : input
         doc.url = url
       })
     }
@@ -80,7 +83,7 @@ export default class Url extends React.PureComponent {
         })
       })
     }).catch((reason) => {
-      console.log('caught', reason)
+      log('refreshContent.caught', reason)
       this.handle.change((doc) => {
         doc.data = { error: reason }
       })
