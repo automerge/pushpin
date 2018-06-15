@@ -46,12 +46,11 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   onKeyDown = (e) => {
-    if (e.metaKey && e.key === '/') {
-      this.setState({ activeOmnibox: !this.state.activeOmnibox }, () => {
-        if (this.state.activeOmnibox) {
-          this.omniboxInput.current.focus()
-        }
-      })
+    if (e.key === '/') {
+      if (!this.state.activeOmnibox) {
+        this.activateOmnibox()
+        e.preventDefault()
+      }
     }
   }
 
@@ -87,7 +86,9 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   activateOmnibox = () => {
-    this.setState({ activeOmnibox: true }, () => this.omniboxInput.current.focus())
+    this.setState({ activeOmnibox: true }, () => {
+      this.omniboxInput.current.focus()
+    })
   }
 
   deactivateOmnibox = () => {
