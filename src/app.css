@@ -268,8 +268,10 @@ input {
 }
 
 .Omnibox {
+  border-radius: 4px;
+  overflow: hiden;
   background-color: #ffffff;
-  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.2);
   width: 478px;
   z-index: 10;
   position: fixed;
@@ -470,16 +472,16 @@ button[disabled].TitleBar__menuItem .fa {
 }
 
 .TitleBar__titleText {
-  padding: 0px 4px;
+  padding: 0px 8px;
   white-space: nowrap;
   overflow:hidden;
   text-overflow: ellipsis;
 }
 
-.TitleBar__titleText{
+.TitleBar__titleText {
   width: 336px;
   font-size: 14px;
-  color: black;
+  color: var(--colorBlueBlack);
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   background: var(--colorInputGrey);
   border:0px;
