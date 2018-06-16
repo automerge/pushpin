@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Content from './content'
-import ContentTypes from '../content-types'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 export default class Share extends React.PureComponent {
@@ -299,11 +298,3 @@ export default class Share extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  component: Share,
-  type: 'share',
-  name: 'Share',
-  icon: 'sticky-note',
-  unlisted: 'true',
-})

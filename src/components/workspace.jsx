@@ -6,6 +6,7 @@ import { ipcRenderer } from 'electron'
 import { USER } from '../constants'
 import ContentTypes from '../content-types'
 import Content from './content'
+import TitleBar from './title-bar'
 import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:workspace')
@@ -113,7 +114,7 @@ export default class Workspace extends React.PureComponent {
     const { type } = parseDocumentLink(currentDocUrl)
     return (
       <div className={`Workspace__container Workspace__container--${type}`}>
-        <Content url={this.state.currentDocUrl} />
+        <Content context="workspace" url={this.state.currentDocUrl} />
       </div>)
   }
 
@@ -123,11 +124,7 @@ export default class Workspace extends React.PureComponent {
     const content = this.renderContent(this.state.currentDocUrl)
     return (
       <div className="Workspace">
-        <Content
-          openDoc={this.openDoc}
-          context="workspace"
-          url={createDocumentLink('title-bar', this.props.docId)}
-        />
+        <TitleBar docId={this.props.docId} openDoc={this.openDoc} />
         { content }
       </div>
     )

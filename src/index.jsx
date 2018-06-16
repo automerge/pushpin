@@ -15,8 +15,6 @@ import './components/board-link' // board in board
 import './components/doc-link' // board in list
 
 import './components/title-bar' // not really content?
-import './components/share' // not really content
-import './components/settings' // not really content?
 
 import './components/board-title' // generic title editor... hmmm.
 
