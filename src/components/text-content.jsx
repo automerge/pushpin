@@ -32,7 +32,7 @@ const log = Debug('pushpin:code-mirror-editor')
 //
 // This component is not "pure" in the literal sense. But PureComponent still
 // seems to give the right caching behaviour, so for now we'll extend from it.
-export default class CodeMirrorEditor extends React.PureComponent {
+export default class TextContent extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
     uniquelySelected: PropTypes.bool,
@@ -215,7 +215,7 @@ export default class CodeMirrorEditor extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: CodeMirrorEditor,
+  component: TextContent,
   type: 'text',
   name: 'Text',
   icon: 'sticky-note'

@@ -3,12 +3,11 @@ import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import ContentTypes from '../content-types'
-import { createDocumentLink } from '../share-link'
-import * as Hyperfile from '../hyperfile'
+import { createDocumentLink } from '../../share-link'
+import * as Hyperfile from '../../hyperfile'
 
-import { IMAGE_DIALOG_OPTIONS } from '../constants'
-import Content from './content'
+import { IMAGE_DIALOG_OPTIONS } from '../../constants'
+import Content from '../content'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -108,10 +107,3 @@ export default class Settings extends React.PureComponent {
   }
 }
 
-ContentTypes.register({
-  component: Settings,
-  type: 'settings',
-  name: 'Settings',
-  icon: 'sticky-note',
-  unlisted: true,
-})

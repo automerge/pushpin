@@ -2,9 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import Content from './content'
-import ContentTypes from '../content-types'
-import { createDocumentLink, parseDocumentLink } from '../share-link'
+import Content from '../content'
+import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:share')
 
@@ -133,6 +132,7 @@ export default class Share extends React.PureComponent {
     const contacts = uniqueContactIds.map(id => (
       <Content
         key={id}
+        context="list"
         url={createDocumentLink('contact', id)}
         actions={['share']}
         onShare={e => this.offerDocumentToIdentity(e, id)}
@@ -211,11 +211,3 @@ export default class Share extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  component: Share,
-  type: 'share',
-  name: 'Share',
-  icon: 'sticky-note',
-  unlisted: 'true',
-})

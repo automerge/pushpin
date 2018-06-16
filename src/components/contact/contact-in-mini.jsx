@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../content-types'
-import Content from './content'
-import { createDocumentLink } from '../share-link'
+import ContentTypes from '../../content-types'
+import Content from '../content'
+import { createDocumentLink } from '../../share-link'
 
-class MiniAvatar extends React.PureComponent {
+class ContactInThread extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
@@ -150,8 +150,9 @@ const css = {
 }
 
 ContentTypes.register({
-  component: MiniAvatar,
-  type: 'mini-avatar',
+  component: ContactInThread,
+  type: 'contact',
+  context: 'mini',
   name: 'Mini Avatar',
   icon: 'user',
   unlisted: true,

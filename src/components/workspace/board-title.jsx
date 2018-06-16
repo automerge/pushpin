@@ -4,10 +4,10 @@ import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-import Content from './content'
-import ContentTypes from '../content-types'
-import InvitationsView from '../invitations-view'
-import { createDocumentLink, parseDocumentLink } from '../share-link'
+import InvitationsView from '../../invitations-view'
+import { parseDocumentLink } from '../../share-link'
+import Share from './share'
+import Omnibox from './omnibox'
 
 const log = Debug('pushpin:board-title')
 
@@ -219,8 +219,8 @@ export default class BoardTitle extends React.PureComponent {
                 <i className="fa fa-group" />
               </DropdownTrigger>
               <DropdownContent>
-                <Content
-                  url={createDocumentLink('share', this.props.docId)}
+                <Share
+                  docId={this.props.docId}
                   openDocument={this.props.openDoc}
                 />
               </DropdownContent>
@@ -233,8 +233,8 @@ export default class BoardTitle extends React.PureComponent {
     return (
       <div className="BoardTitle">
         { inputBar }
-        <Content
-          url={createDocumentLink('omnibox', this.props.docId)}
+        <Omnibox
+          docId={this.props.docId}
           visible={this.state.activeOmnibox}
           search={this.state.search}
           getKeyController={this.setOmniboxControl}
@@ -245,10 +245,3 @@ export default class BoardTitle extends React.PureComponent {
   }
 }
 
-ContentTypes.register({
-  component: BoardTitle,
-  type: 'board-title',
-  name: 'Board Title',
-  icon: 'sticky-note',
-  unlisted: true,
-})

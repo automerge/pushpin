@@ -6,7 +6,7 @@ import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:image-card')
 
-export default class ImageCard extends React.PureComponent {
+export default class ImageContent extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
@@ -70,7 +70,7 @@ export default class ImageCard extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: ImageCard,
+  component: ImageContent,
   type: 'image',
   name: 'Image',
   icon: 'image'

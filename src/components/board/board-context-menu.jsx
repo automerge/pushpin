@@ -4,7 +4,7 @@ import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 import classNames from 'classnames'
 
-import ColorPicker from './color-picker'
+import ColorPicker from '../color-picker'
 
 const log = Debug('pushpin:board-context-menu')
 

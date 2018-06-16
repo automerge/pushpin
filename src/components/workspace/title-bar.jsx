@@ -3,9 +3,8 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
-import Content from './content'
-import ContentTypes from '../content-types'
-import { createDocumentLink } from '../share-link'
+import Settings from './settings'
+import BoardTitle from './board-title'
 
 const log = Debug('pushpin:title-bar')
 
@@ -95,7 +94,7 @@ export default class TitleBar extends React.PureComponent {
         </div>
 
         <div className="TitleBar__center">
-          <Content openDoc={this.props.openDoc} url={createDocumentLink('board-title', this.props.docId)} />
+          <BoardTitle openDoc={this.props.openDoc} docId={this.props.docId} />
         </div>
 
         <div className="TitleBar__right">
@@ -104,9 +103,7 @@ export default class TitleBar extends React.PureComponent {
               <i className="fa fa-gear" />
             </DropdownTrigger>
             <DropdownContent>
-              <Content
-                url={createDocumentLink('settings', this.state.selfId)}
-              />
+              <Settings docId={this.state.selfId} />
             </DropdownContent>
           </Dropdown>
         </div>
@@ -114,11 +111,3 @@ export default class TitleBar extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  component: TitleBar,
-  type: 'title-bar',
-  name: 'Title Bar',
-  icon: 'sticky-note',
-  unlisted: true,
-})

@@ -1,20 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import ReactToggle from 'react-toggle'
 
 import ContentTypes from '../content-types'
-import { createDocumentLink } from '../share-link'
 
-export default class DocLink extends React.PureComponent {
+export default class ToggleContent extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
-    linkedDocumentType: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired
+  }
+
+  static initializeDocument = (toggleDoc) => {
+    toggleDoc.toggled = false
   }
 
   state = {}
-
-  handleClick = (e) => {
-    window.location = createDocumentLink(this.props.linkedDocumentType, this.props.docId)
-  }
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
@@ -37,18 +36,19 @@ export default class DocLink extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  render = () => (
-    <div className="DocLink" onClick={this.handleClick}>
-      <i className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
-      <div className="DocLink__title">{ this.state.title }</div>
-    </div>
-  )
+  flipToggle = () => {
+    this.handle.change((doc) => {
+      doc.toggled = !doc.toggled
+    })
+  }
+
+  render = () => <ReactToggle checked={this.state.toggled} onChange={this.flipToggle} />
 }
 
 ContentTypes.register({
-  component: DocLink,
-  type: 'doc-link',
-  name: 'Document Link',
-  icon: 'sticky-note',
-  unlisted: true,
+  component: ToggleContent,
+  type: 'toggle',
+  name: 'Toggle',
+  icon: 'toggle-off',
+  resizable: false
 })

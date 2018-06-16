@@ -2,9 +2,9 @@ import React from 'react'
 import Debug from 'debug'
 import PropTypes from 'prop-types'
 
-import Content from './content'
-import ContentTypes from '../content-types'
-import { createDocumentLink, parseDocumentLink } from '../share-link'
+import Content from '../content'
+import ContentTypes from '../../content-types'
+import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:omnibox')
 
