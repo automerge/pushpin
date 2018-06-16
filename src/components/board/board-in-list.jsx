@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../content-types'
-import { createDocumentLink } from '../share-link'
+import ContentTypes from '../../content-types'
+import { createDocumentLink } from '../../share-link'
 
-export default class DocLink extends React.PureComponent {
+export default class BoardInList extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
     linkedDocumentType: PropTypes.string.isRequired
@@ -46,7 +46,7 @@ export default class DocLink extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: DocLink,
+  component: BoardInList,
   type: 'board',
   context: 'list',
   name: 'Document Link',

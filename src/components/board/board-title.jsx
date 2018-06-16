@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { RIEInput } from 'riek'
 
-import ContentTypes from '../content-types'
+import ContentTypes from '../../content-types'
 
 const log = Debug('pushpin:board-title')
 

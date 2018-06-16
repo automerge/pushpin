@@ -10,18 +10,18 @@ import Content from './components/content'
 // We load these modules here so that the content registry will have them.
 import './components/workspace'
 
-import './components/board' // board in workspace
-import './components/board-link' // board in board
-import './components/doc-link' // board in list
+// board in various contexts
+import './components/board/board'
+import './components/board/board-in-board'
+import './components/board/board-in-list'
 
-import './components/title-bar' // not really content?
+import './components/board/board-title' // generic title editor... hmmm.
 
-import './components/board-title' // generic title editor... hmmm.
-
+// contact in various contexts
 import './components/contact' // contact in list
 import './components/mini-avatar' // contact in thread (?)
 
-// how do these show up in lists? write a generic answer?
+// other single-context components
 import './components/code-mirror-editor' // TextContent default
 import './components/image-card' // ImageContent
 import './components/thread' // default thread view

@@ -4,9 +4,9 @@ import Debug from 'debug'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
 
-import Content from './content'
-import ContentTypes from '../content-types'
-import { parseDocumentLink } from '../share-link'
+import Content from '../content'
+import ContentTypes from '../../content-types'
+import { parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:board-card')
 
