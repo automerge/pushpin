@@ -92,6 +92,7 @@ export default class BoardCard extends React.PureComponent {
           onContextMenu={this.stopPropagation}
         >
           <Content
+            context="board"
             url={this.props.card.url}
             uniquelySelected={this.props.uniquelySelected}
           />

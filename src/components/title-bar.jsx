@@ -97,7 +97,7 @@ export default class TitleBar extends React.PureComponent {
 
       return (
         <div key={url} className="ListMenu__item">
-          <Content url={docLinkUrl} linkedDocumentType={type} />
+          <Content context="list" url={docLinkUrl} linkedDocumentType={type} />
         </div>
       )
     })

@@ -153,6 +153,7 @@ export default class Share extends React.PureComponent {
     const authors = authorIds.map(id => (
       <Content
         key={id}
+        context="list"
         url={createDocumentLink('contact', id)}
       />
     ))
@@ -165,6 +166,7 @@ export default class Share extends React.PureComponent {
     const contacts = nonAuthorContactIds.map(id => (
       <Content
         key={id}
+        context="list"
         url={createDocumentLink('contact', id)}
         actions={['share']}
         onShare={e => this.offerDocumentToIdentity(e, id)}
