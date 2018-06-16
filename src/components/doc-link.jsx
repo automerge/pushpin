@@ -47,7 +47,8 @@ export default class DocLink extends React.PureComponent {
 
 ContentTypes.register({
   component: DocLink,
-  type: 'doc-link',
+  type: 'board',
+  context: 'list',
   name: 'Document Link',
   icon: 'sticky-note',
   unlisted: true,

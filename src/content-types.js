@@ -41,7 +41,8 @@ function list({ withUnlisted = false } = {}) {
   if (withUnlisted) {
     return Object.values(registry).map(e => e.default)
   }
-  return Object.values(registryListed).map(e => e.default)
+  // temporary solution, remove pre-merge
+  return Object.values(registryListed).map(e => e.default || e.board)
 }
 
 export default { register, lookup, list }

@@ -83,7 +83,8 @@ const css = {
 
 ContentTypes.register({
   component: BoardLink,
-  type: 'board-link',
+  type: 'board',
+  context: 'board',
   name: 'Board',
   icon: 'sticky-note',
   resizable: false,

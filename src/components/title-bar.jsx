@@ -93,7 +93,7 @@ export default class TitleBar extends React.PureComponent {
     const boardDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
     const boardDocLinks = boardDocUrls.map(url => {
       const { docId, type } = parseDocumentLink(url)
-      const docLinkUrl = createDocumentLink('doc-link', docId)
+      const docLinkUrl = createDocumentLink('board', docId)
 
       return (
         <div key={url} className="ListMenu__item">
