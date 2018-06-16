@@ -3,7 +3,6 @@ import Debug from 'debug'
 import PropTypes from 'prop-types'
 
 import Content from '../content'
-import ContentTypes from '../../content-types'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:omnibox')
@@ -231,13 +230,11 @@ export default class Omnibox extends React.PureComponent {
   renderViewedDocLinksSection() {
     const viewedDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
       const { url } = item
-      const { docId, type } = parseDocumentLink(url)
-      const docLinkUrl = createDocumentLink('doc-link', docId)
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
       return (
         <div key={url} className={classes}>
-          <Content url={docLinkUrl} linkedDocumentType={type} />
+          <Content context="list" url={url} />
 
           <div className="ListMenu Actions">
             <span className="Type--secondary">⏎ View</span>
@@ -298,7 +295,7 @@ export default class Omnibox extends React.PureComponent {
 
       return (
         <div key={url} className={classes}>
-          <Content url={url} />
+          <Content context="list" url={url} />
 
           <div className="ListMenu Actions">
             <span className="Type--secondary">⏎ Invite</span>
@@ -341,11 +338,3 @@ export default class Omnibox extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  component: Omnibox,
-  type: 'omnibox',
-  name: 'Omnibox',
-  icon: 'sticky-note',
-  unlisted: true
-})

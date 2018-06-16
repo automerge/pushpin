@@ -156,6 +156,7 @@ export default class Share extends React.PureComponent {
     const authors = uniqueAuthorIds.map(id => (
       <Content
         key={id}
+        context="list"
         url={createDocumentLink('contact', id)}
       />
     ))
