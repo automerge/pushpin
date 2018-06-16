@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Content from './content'
-import { createDocumentLink, parseDocumentLink } from '../share-link'
+import Content from '../content'
+import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 export default class Share extends React.PureComponent {
   static propTypes = {

@@ -5,7 +5,7 @@ import ContentTypes from '../content-types'
 import Content from './content'
 import { createDocumentLink } from '../share-link'
 
-export default class Thread extends React.PureComponent {
+export default class ThreadContent extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
@@ -71,7 +71,7 @@ export default class Thread extends React.PureComponent {
 
   renderGroupedMessages = (groupOfMessages, idx) => (
     <div style={css.messageGroup} key={idx}>
-      <Content url={createDocumentLink('mini-avatar', groupOfMessages[0].authorId)} />
+      <Content context="mini" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
       <div style={css.groupedMessages}>
         { groupOfMessages.map(this.renderMessage) }
       </div>
@@ -201,7 +201,7 @@ const css = {
 }
 
 ContentTypes.register({
-  component: Thread,
+  component: ThreadContent,
   type: 'thread',
   name: 'Thread',
   icon: 'comments',

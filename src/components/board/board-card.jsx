@@ -68,9 +68,8 @@ export default class BoardCard extends React.PureComponent {
     }
 
     const { type } = parseDocumentLink(card.url)
-    const contentType = ContentTypes
-      .list({ withUnlisted: true })
-      .find(contentType => contentType.type === type)
+    const context = 'board'
+    const contentType = ContentTypes.lookup({ type, context })
 
     return (
       <DraggableCore

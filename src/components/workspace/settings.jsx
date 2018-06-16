@@ -3,11 +3,11 @@ import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import { createDocumentLink } from '../share-link'
-import * as Hyperfile from '../hyperfile'
+import { createDocumentLink } from '../../share-link'
+import * as Hyperfile from '../../hyperfile'
 
-import { IMAGE_DIALOG_OPTIONS } from '../constants'
-import Content from './content'
+import { IMAGE_DIALOG_OPTIONS } from '../../constants'
+import Content from '../content'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')

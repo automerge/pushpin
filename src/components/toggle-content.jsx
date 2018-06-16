@@ -4,7 +4,7 @@ import ReactToggle from 'react-toggle'
 
 import ContentTypes from '../content-types'
 
-export default class Toggle extends React.PureComponent {
+export default class ToggleContent extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
@@ -46,7 +46,7 @@ export default class Toggle extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: Toggle,
+  component: ToggleContent,
   type: 'toggle',
   name: 'Toggle',
   icon: 'toggle-off',

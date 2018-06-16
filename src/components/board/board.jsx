@@ -319,6 +319,7 @@ export default class Board extends React.PureComponent {
 
         this.createImageCardFromPath({ x, y }, paths[0])
       })
+      return
     }
 
     const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })

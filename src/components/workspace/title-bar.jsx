@@ -4,11 +4,11 @@ import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import HashForm from './hash-form'
-import Content from './content'
+import Content from '../content'
 import Share from './share'
 import Settings from './settings'
 
-import { createDocumentLink, parseDocumentLink } from '../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:title-bar')
 

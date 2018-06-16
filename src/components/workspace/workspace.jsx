@@ -3,11 +3,11 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 
-import { USER } from '../constants'
-import ContentTypes from '../content-types'
-import Content from './content'
+import { USER } from '../../constants'
+import ContentTypes from '../../content-types'
+import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import Content from '../content'
 import TitleBar from './title-bar'
-import { createDocumentLink, parseDocumentLink } from '../share-link'
 
 const log = Debug('pushpin:workspace')
 
