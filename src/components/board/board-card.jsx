@@ -4,9 +4,9 @@ import Debug from 'debug'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
 
-import Content from './content'
-import ContentTypes from '../content-types'
-import { parseDocumentLink } from '../share-link'
+import Content from '../content'
+import ContentTypes from '../../content-types'
+import { parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:board-card')
 
@@ -68,9 +68,8 @@ export default class BoardCard extends React.PureComponent {
     }
 
     const { type } = parseDocumentLink(card.url)
-    const contentType = ContentTypes
-      .list({ withUnlisted: true })
-      .find(contentType => contentType.type === type)
+    const context = 'board'
+    const contentType = ContentTypes.lookup({ type, context })
 
     return (
       <DraggableCore
@@ -92,6 +91,7 @@ export default class BoardCard extends React.PureComponent {
           onContextMenu={this.stopPropagation}
         >
           <Content
+            context="board"
             url={this.props.card.url}
             uniquelySelected={this.props.uniquelySelected}
           />

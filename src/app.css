@@ -69,6 +69,10 @@ a {
   cursor: pointer;
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 
 /* Dropdown React component functional styles */
 
@@ -198,6 +202,91 @@ input {
   }
 }
 
+.BoardTitle .dropdown {
+  display: inline-block;
+}
+
+.BoardTitle .dropdown__content {
+  margin-top: 24px;
+}
+
+.BoardTitle__actionBar {
+  background: var(--colorInputGrey);
+  padding: 0 4px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.BoardTitle__actionBar__left,
+.BoardTitle__actionBar__right {
+  position: absolute;
+  display: flex;
+}
+
+.BoardTitle__actionBar__left {
+  left: 4px;
+}
+
+.BoardTitle__actionBar__right {
+  right: 4px;
+}
+
+.BoardTitle__actionBar__left .fa,
+.BoardTitle__actionBar__right .fa {
+  cursor: pointer;
+  width:24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.BoardTitle__actionBar__left .fa:hover,
+.BoardTitle__actionBar__right .fa:hover {
+  color: var(--colorBlueBlack);
+  transform: scale(1.2);
+}
+
+.BoardTitle__actionBar__right .dropdown__trigger .fa.fa-group {
+  color: var(--colorLink);
+}
+
+.BoardTitle__actionBar input[type='text'] {
+  text-align: center;
+}
+
+.BoardTitle {
+  width: 480px;
+  position: relative;
+}
+
+.BoardTitle__omniboxInput {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.Omnibox {
+  border-radius: 4px;
+  overflow: hiden;
+  background-color: #ffffff;
+  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.2);
+  width: 478px;
+  z-index: 10;
+  position: fixed;
+  top: 52px;
+  left: 50%;
+  margin-left: -239px;
+}
+
+.Omnibox .ListMenu__item .Actions {
+  visibility: hidden;
+}
+
+.Omnibox .ListMenu__item--selected .Actions {
+  visibility: visible;
+}
 
 .ContextMenu {
   background-color: #ffffff;
@@ -355,7 +444,7 @@ button[disabled].TitleBar__menuItem .fa {
   color: var(--colorBlueBlack);
 }
 
-.TitleBar .dropdown__trigger {
+.TitleBar .TitleBar__right .dropdown__trigger {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -363,12 +452,12 @@ button[disabled].TitleBar__menuItem .fa {
   height: 40px;
 }
 
-.TitleBar .dropdown.dropdown--active {
+.TitleBar .TitleBar__right .dropdown.dropdown--active {
   background-color: var(--colorInputGrey);
 }
 
 
-.TitleBar .dropdown__content {
+.TitleBar .TitleBar__right .dropdown__content {
   top: 48px;
   right: 0px;
 }
@@ -383,17 +472,16 @@ button[disabled].TitleBar__menuItem .fa {
 }
 
 .TitleBar__titleText {
-  max-width: 244px;
-  padding: 0px 4px;
+  padding: 0px 8px;
   white-space: nowrap;
   overflow:hidden;
   text-overflow: ellipsis;
 }
 
-input.TitleBar__titleText{
-  width: 244px;
+.TitleBar__titleText {
+  width: 336px;
   font-size: 14px;
-  color: black;
+  color: var(--colorBlueBlack);
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   background: var(--colorInputGrey);
   border:0px;
@@ -403,7 +491,7 @@ input.TitleBar__titleText{
   line-height:24px;
 }
 
-input.TitleBar__titleText::selection {
+.TitleBar__titleText::selection {
   background: rgba(0,0,0,.05);
 }
 
@@ -413,6 +501,15 @@ input.TitleBar__titleText::selection {
 
 .ViewedDocs {
   background: white;
+}
+
+.Invitation {
+  display: flex;
+  align-items: center;
+}
+
+.Invitation__body {
+  margin-left: 10px;
 }
 
 .DocLink {
@@ -425,10 +522,11 @@ input.TitleBar__titleText::selection {
   margin-left: 10px;
 }
 
-.DocLink .fa {
+.Badge {
   padding: 8px;
   font-size: 24px;
   border-radius: 50%;
+  background-color: #D5DFE5;
 }
 
 .HashForm {
@@ -583,7 +681,7 @@ div.card.image {
   border-radius: 4px;
   width: 296px;
   max-height: 480px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /* Buttons */
@@ -699,6 +797,10 @@ div.card.image {
   min-height: 32px;
 }
 
+.ListMenu .ListMenu__item--selected {
+  background: #EEE;
+}
+
 .ListMenu .ListMenu__item:hover{
 }
 
@@ -710,6 +812,7 @@ div.card.image {
 .ListMenu .Actions {
   flex: none;
   display: flex;
+  padding-bottom: 0;
   margin-left: auto;
 }
 
@@ -722,7 +825,9 @@ div.card.image {
   display: flex;
 }
 
-.Tabs .fa {
+.Tabs__tab > .fa {
+  height: auto;
+  width: auto;
   font-size: 16px;
   margin-right: 4px;
 }

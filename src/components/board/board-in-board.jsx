@@ -1,12 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../content-types'
-import { createDocumentLink } from '../share-link'
+import ContentTypes from '../../content-types'
+import { createDocumentLink } from '../../share-link'
 
 import Board from './board'
 
-export default class BoardLink extends React.PureComponent {
+export default class BoardInBoard extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
@@ -82,8 +82,9 @@ const css = {
 }
 
 ContentTypes.register({
-  component: BoardLink,
-  type: 'board-link',
+  component: BoardInBoard,
+  type: 'board',
+  context: 'board',
   name: 'Board',
   icon: 'sticky-note',
   resizable: false,

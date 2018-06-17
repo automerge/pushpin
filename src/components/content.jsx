@@ -11,13 +11,16 @@ const FILTERED_PROPS = ['type', 'docId']
 export default class Content extends React.PureComponent {
   static propTypes = {
     url: PropTypes.string.isRequired,
+    context: PropTypes.string
+  }
+
+  static defaultProps = {
+    context: 'default'
   }
 
   static initializeContentDoc = (type, typeAttrs = {}) => {
     const { hm } = window // still not a great idea
-    const contentType = ContentTypes
-      .list({ withUnlisted: true })
-      .find(contentType => contentType.type === type)
+    const contentType = ContentTypes.lookup({ type })
 
     const initializeDocumentWithAttrs = (doc) => {
       contentType.component.initializeDocument(doc, typeAttrs)
@@ -30,6 +33,7 @@ export default class Content extends React.PureComponent {
     return docId
   }
 
+  // This is the New Boilerplate, adapted slightly for content
   state = {}
 
   componentDidCatch = (e) => {
@@ -48,16 +52,15 @@ export default class Content extends React.PureComponent {
 
   render = () => {
     log('render')
+    const { context, url } = this.props
 
-    if (!this.props.url) {
+    if (!url) {
       return null
     }
 
-    const { type, docId } = parseDocumentLink(this.props.url)
+    const { type, docId } = parseDocumentLink(url)
 
-    const contentType = ContentTypes
-      .list({ withUnlisted: true })
-      .find((ct) => ct.type === type)
+    const contentType = ContentTypes.lookup({ type, context })
 
     if (!contentType) {
       return renderMissingType(type)
@@ -71,6 +74,7 @@ export default class Content extends React.PureComponent {
 
     return (
       <contentType.component
+        ref={this.component}
         docId={docId}
         {...filteredProps}
       />

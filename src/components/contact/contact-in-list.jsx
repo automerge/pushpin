@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../content-types'
-import Content from './content'
-import { createDocumentLink } from '../share-link'
+import ContentTypes from '../../content-types'
+import Content from '../content'
+import { createDocumentLink } from '../../share-link'
 
-export default class Contact extends React.PureComponent {
+export default class ContactInList extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.string),
@@ -104,8 +104,9 @@ export default class Contact extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: Contact,
+  component: ContactInList,
   type: 'contact',
+  context: 'list',
   name: 'Contact',
   icon: 'sticky-note',
   unlisted: true,
