@@ -63,7 +63,7 @@ export default class Content extends React.PureComponent {
     const contentType = ContentTypes.lookup({ type, context })
 
     if (!contentType) {
-      return renderMissingType(type)
+      return renderMissingType(type, context)
     }
 
     if (this.state.contentCrashed) {
@@ -89,9 +89,9 @@ const renderError = (type, error) => (
   </div>
 )
 
-const renderMissingType = type => (
+const renderMissingType = (type, context) => (
   <div>
     <i className="fa fa-exclamation-triangle" />
-    Component of type &quot;{type}&quot; not found.
+    Component of type &quot;{type}&quot; in context &quot;{context}&quot; not found.
   </div>
 )
