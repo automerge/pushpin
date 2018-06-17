@@ -2,10 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
 import Fs from 'fs'
+import Sqlite3 from 'sqlite3'
 
 import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
 import Hypermerge from './hypermerge'
 import Content from './components/content'
+import { RandomAccessSqlite, ensureTables } from './random-access-sqlite'
 
 // We load these modules here so that the content registry will have them.
 import './components/board'
@@ -38,10 +40,21 @@ localStorage.removeItem('debug')
 EventEmitter.defaultMaxListeners = 500
 
 function initHypermerge(cb) {
-  window.hm = new Hypermerge({ storage: HYPERMERGE_PATH, port: 0 })
-  window.hm.once('ready', () => {
-    window.hm.joinSwarm()
-    cb()
+  const db = new Sqlite3.Database(HYPERMERGE_PATH, (err) => {
+    if (err) { throw err }
+
+    ensureTables(db, (err) => {
+      if (err) { throw err }
+
+      const storageFn = (path) => {
+        return new RandomAccessSqlite(db, path)
+      }
+      window.hm = new Hypermerge({ storage: storageFn, port: 0 })
+      window.hm.once('ready', () => {
+        window.hm.joinSwarm()
+        cb()
+      })
+    })
   })
 }
 

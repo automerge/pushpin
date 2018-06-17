@@ -81,6 +81,7 @@
     "react-simple-dropdown": "^3.2.0",
     "react-toggle": "4.0.2",
     "riek": "^1.1.0",
+    "sqlite3": "^4.0.0",
     "tmp": "0.0.33",
     "to-buffer": "^1.1.0",
     "unfluff": "^3.0.1"
