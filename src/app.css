@@ -76,10 +76,6 @@ a {
 
 /* Dropdown React component functional styles */
 
-.dropdown {
-  /* display: inline-block; */
-}
-
 .dropdown__content {
   display: none;
   position: absolute;
@@ -155,9 +151,6 @@ input {
   margin: 0;
 }
 
-.Notification p {
-
-}
 .Avatar {
   display: flex;
   align-items: center;
@@ -429,10 +422,6 @@ button[disabled].TitleBar__menuItem .fa {
   outline: none;
 }
 
-.TitleBar .TitleBar__menuItem:active {
-
-}
-
 .TitleBar .TitleBar__menuItem:hover {
   color: var(--colorBlueBlack);
 }
@@ -486,10 +475,6 @@ button[disabled].TitleBar__menuItem .fa {
 
 .TitleBar__titleText::selection {
   background: rgba(0,0,0,.05);
-}
-
-.TitleBar__dropDown {
-
 }
 
 .ViewedDocs {
@@ -919,10 +904,6 @@ div.card.image {
   margin-bottom:8px;
 }
 
-.CodeMirrorEditor__renderer h4, h5, h6 {
-  /* Placeholder Reminder: We don't anticipate these being used very often */
-}
-
 .CodeMirrorEditor__renderer h1 {
   font-size: 18px;
   line-height: 24px;
@@ -988,10 +969,6 @@ div.card.image {
   font-size: 12px;
   line-height:16px;
   margin-bottom: 8px;
-}
-
-.CodeMirrorEditor__renderer code {
-
 }
 
 .CodeMirrorEditor__renderer pre {
