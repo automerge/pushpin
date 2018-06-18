@@ -49,40 +49,6 @@ const CARD_MIN_HEIGHT = 49
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
-// ## Demo data
-
-const WELCOME_TEXT =
-`## Welcome
-
-This is our demo board!`
-
-const USAGE_TEXT =
-`A Guided Tour of Pushpin!
-
-Double click to create a card. Type something.
-Paste some text from your clipboard into a note, or paste it as a new note.
-Drag in some text, or an image, or several images at once.
-Copy an image in Chrome and paste it. (Dragging images in won't work.)
-Open a second copy of the app with a different profile.
-($ export NAME="Someone")
-Connect your apps: copy the URL above and paste it into the other app.
-Make a change on each side and watch it go.
-Click the gear to open your user profile.
-Set your name and avatar to something.
-See how in the contacts list are two authors "on board" with names and avatars.
-Make a new doc. Notice your other client isn't on the board yet and invite them.
-In the other client, check your notifications. Accept the invite.
-See how both clients see each other in the authors list.
-`
-
-const EXAMPLE_TEXT =
-`### Example data
-
-We've made some initial cards for you to play with. Have fun!`
-
-const KAY_PATH = './img/kay.jpg'
-const WORKSHOP_PATH = './img/carpenters-workshop.jpg'
-
 const draggableCards = (cards, selected, card) => {
   if (selected.length > 0 && selected.find(id => id === card.id)) {
     return selected.map(id => cards[id])
@@ -112,16 +78,6 @@ export default class Board extends React.PureComponent {
     board.authorIds = []
   }
 
-  populateDemoBoard = () => {
-    log('populateDemoBoard')
-    this.changeTitle('Example Board')
-    this.createCard({ type: 'text', x: 150, y: 100, typeAttrs: { text: WELCOME_TEXT } })
-    this.createCard({ type: 'text', x: 150, y: 250, typeAttrs: { text: USAGE_TEXT } })
-    this.createCard({ type: 'text', x: 150, y: 750, typeAttrs: { text: EXAMPLE_TEXT } })
-    this.createImageCardFromPath({ x: 550, y: 500 }, KAY_PATH)
-    this.createImageCardFromPath({ x: 600, y: 150 }, WORKSHOP_PATH)
-  }
-
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)
@@ -140,15 +96,12 @@ export default class Board extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    if (doc.cards && doc.cards.length === 0) {
-      this.populateDemoBoard()
-    }
     this.setState({ doc })
   }
 
   onKeyDown = (e) => {
     // this event can be consumed by a card if it wants to keep control of backspace
-    // for example, see code-mirror-editor.jsx onKeyDown
+    // for example, see text-content.jsx onKeyDown
     if (e.key === 'Backspace') {
       this.deleteCard(this.state.selected)
     }
