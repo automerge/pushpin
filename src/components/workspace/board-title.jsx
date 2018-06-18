@@ -6,7 +6,6 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import InvitationsView from '../../invitations-view'
 import { parseDocumentLink } from '../../share-link'
-import Share from './share'
 import Omnibox from './omnibox'
 
 const log = Debug('pushpin:board-title')
@@ -214,17 +213,6 @@ export default class BoardTitle extends React.PureComponent {
             <CopyToClipboard text={this.state.currentDocUrl}>
               <i className="fa fa-clipboard" />
             </CopyToClipboard>
-            <Dropdown>
-              <DropdownTrigger>
-                <i className="fa fa-group" />
-              </DropdownTrigger>
-              <DropdownContent>
-                <Share
-                  docId={this.props.docId}
-                  openDocument={this.props.openDoc}
-                />
-              </DropdownContent>
-            </Dropdown>
           </div>
         </div>
       )

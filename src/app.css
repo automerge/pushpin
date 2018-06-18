@@ -164,16 +164,26 @@ input {
   padding:2px;
 }
 
-.Avatar--online {
-  border: 2px solid rgba(113, 227, 65, 1);
-  box-shadow: 0 0 4px 0 rgba(113, 227, 65, 1);
-  animation: pulse 2s;
-}
-
 .Avatar img {
   width: 36px;
   height: 36px;
   border-radius: 50%;
+}
+
+.Avatar--small {
+  width: 30px;
+  height: 30px;
+}
+
+.Avatar--small img {
+  width: 26px;
+  height: 26px;
+}
+
+.Avatar--online {
+  border: 2px solid rgba(113, 227, 65, 1);
+  box-shadow: 0 0 4px 0 rgba(113, 227, 65, 1);
+  animation: pulse 2s;
 }
 
 @keyframes pulse {
@@ -445,8 +455,8 @@ button[disabled].TitleBar__menuItem .fa {
 }
 
 .TitleBar .TitleBar__left .dropdown__content {
-  right: inherit;
   left: 0px;
+  top: 48px;
 }
 
 .TitleBar__logo {
