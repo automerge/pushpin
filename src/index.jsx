@@ -8,21 +8,25 @@ import Hypermerge from './hypermerge'
 import Content from './components/content'
 
 // We load these modules here so that the content registry will have them.
-import './components/board'
-import './components/board-link'
-import './components/board-title'
-import './components/code-mirror-editor'
-import './components/contact'
-import './components/doc-link'
-import './components/image-card'
-import './components/mini-avatar'
-import './components/settings'
-import './components/share'
-import './components/thread'
-import './components/title-bar'
-import './components/toggle'
-import './components/url'
-import './components/workspace'
+import './components/workspace/workspace'
+
+// board in various contexts
+import './components/board/board'
+import './components/board/board-in-board'
+import './components/board/board-in-list'
+
+import './components/board/board-title' // generic title editor... hmmm.
+
+// contact in various contexts
+import './components/contact/contact-in-list'
+import './components/contact/contact-in-mini'
+
+// other single-context components
+import './components/text-content'
+import './components/image-content'
+import './components/thread-content'
+import './components/toggle-content'
+import './components/url-content'
 
 import { createDocumentLink } from './share-link'
 

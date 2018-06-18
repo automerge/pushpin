@@ -4,9 +4,11 @@ import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import HashForm from './hash-form'
-import Content from './content'
-import ContentTypes from '../content-types'
-import { createDocumentLink, parseDocumentLink } from '../share-link'
+import Content from '../content'
+import Share from './share'
+import Settings from './settings'
+
+import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:title-bar')
 
@@ -93,11 +95,11 @@ export default class TitleBar extends React.PureComponent {
     const boardDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
     const boardDocLinks = boardDocUrls.map(url => {
       const { docId, type } = parseDocumentLink(url)
-      const docLinkUrl = createDocumentLink('doc-link', docId)
+      const docLinkUrl = createDocumentLink('board', docId)
 
       return (
         <div key={url} className="ListMenu__item">
-          <Content url={docLinkUrl} linkedDocumentType={type} />
+          <Content context="list" url={docLinkUrl} linkedDocumentType={type} />
         </div>
       )
     })
@@ -143,8 +145,8 @@ export default class TitleBar extends React.PureComponent {
               <i className="fa fa-group" />
             </DropdownTrigger>
             <DropdownContent>
-              <Content
-                url={createDocumentLink('share', this.props.docId)}
+              <Share
+                docId={this.props.docId}
                 openDocument={this.props.openDoc}
               />
             </DropdownContent>
@@ -154,9 +156,7 @@ export default class TitleBar extends React.PureComponent {
               <i className="fa fa-gear" />
             </DropdownTrigger>
             <DropdownContent>
-              <Content
-                url={createDocumentLink('settings', this.state.selfId)}
-              />
+              <Settings docId={this.state.selfId} />
             </DropdownContent>
           </Dropdown>
         </div>
@@ -164,11 +164,3 @@ export default class TitleBar extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  component: TitleBar,
-  type: 'title-bar',
-  name: 'Title Bar',
-  icon: 'sticky-note',
-  unlisted: true,
-})

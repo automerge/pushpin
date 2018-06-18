@@ -14,7 +14,7 @@ const removeEmpty = (obj) =>
     }
   })
 
-export default class Url extends React.PureComponent {
+export default class UrlContent extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
@@ -61,7 +61,7 @@ export default class Url extends React.PureComponent {
       e.preventDefault()
       this.handle.change((doc) => {
         const input = this.state.urlInput
-        const url = (input.indexOf('://') === -1) ? 'http://' + input : input
+        const url = (input.indexOf('://') === -1) ? `http://${input}` : input
         doc.url = url
       })
     }
@@ -158,7 +158,7 @@ export default class Url extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: Url,
+  component: UrlContent,
   type: 'url',
   name: 'URL',
   icon: 'chain',

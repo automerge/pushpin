@@ -6,11 +6,11 @@ import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import uuid from 'uuid/v4'
 
-import Content from './content'
-import ContentTypes from '../content-types'
-import { IMAGE_DIALOG_OPTIONS } from '../constants'
-import { createDocumentLink } from '../share-link'
-import * as Hyperfile from '../hyperfile'
+import Content from '../content'
+import ContentTypes from '../../content-types'
+import { IMAGE_DIALOG_OPTIONS } from '../../constants'
+import { createDocumentLink } from '../../share-link'
+import * as Hyperfile from '../../hyperfile'
 import BoardCard from './board-card'
 import BoardContextMenu from './board-context-menu'
 
@@ -319,6 +319,7 @@ export default class Board extends React.PureComponent {
 
         this.createImageCardFromPath({ x, y }, paths[0])
       })
+      return
     }
 
     const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
