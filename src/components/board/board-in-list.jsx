@@ -6,14 +6,13 @@ import { createDocumentLink } from '../../share-link'
 
 export default class BoardInList extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
-    linkedDocumentType: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired
   }
 
   state = {}
 
   handleClick = (e) => {
-    window.location = createDocumentLink(this.props.linkedDocumentType, this.props.docId)
+    window.location = createDocumentLink('board', this.props.docId)
   }
 
   // This is the New Boilerplate
@@ -39,7 +38,7 @@ export default class BoardInList extends React.PureComponent {
 
   render = () => (
     <div className="DocLink" onClick={this.handleClick}>
-      <i className="fa fa-files-o" style={{ background: this.state.backgroundColor }} />
+      <i className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
       <div className="DocLink__title">{ this.state.title }</div>
     </div>
   )

@@ -87,7 +87,7 @@ export default class Settings extends React.PureComponent {
           <div className="ListMenu__section">
             <div className="ListMenu__label">Display Name</div>
             <div className="ListMenu__item">
-              <input type="text" onChange={this.setName} defaultValue={this.state.name} />
+              <input type="text" onChange={this.setName} value={this.state.name || ''} />
             </div>
             <div className="ListMenu__label">Avatar</div>
             <div className="ListMenu__item">

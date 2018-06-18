@@ -768,8 +768,6 @@ class Hypermerge extends EventEmitter {
     log('_applyChanges', docId)
     if (changes.length > 0) {
       const oldDoc = this.find(docId)
-      const oldDeps = oldDoc._state.getIn(['opSet', 'deps'])
-
       let prevSeq = 0
       const filteredChanges = []
       changes.forEach((change) => {

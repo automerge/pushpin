@@ -3,12 +3,8 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
-import HashForm from './hash-form'
-import Content from '../content'
-import Share from './share'
 import Settings from './settings'
-
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import BoardTitle from './board-title'
 
 const log = Debug('pushpin:title-bar')
 
@@ -18,13 +14,7 @@ export default class TitleBar extends React.PureComponent {
     openDoc: PropTypes.func.isRequired,
   }
 
-  boardHistory = React.createRef()
-
   state = { sessionHistory: [], historyIndex: 0 }
-
-  hideBoardHistory = () => {
-    this.boardHistory.current.hide()
-  }
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
@@ -92,37 +82,9 @@ export default class TitleBar extends React.PureComponent {
       return null
     }
 
-    const boardDocUrls = this.state.viewedDocUrls.filter(url => parseDocumentLink(url).type === 'board')
-    const boardDocLinks = boardDocUrls.map(url => {
-      const { docId, type } = parseDocumentLink(url)
-      const docLinkUrl = createDocumentLink('board', docId)
-
-      return (
-        <div key={url} className="ListMenu__item">
-          <Content context="list" url={docLinkUrl} linkedDocumentType={type} />
-        </div>
-      )
-    })
-
-    const { docId } = parseDocumentLink(this.state.currentDocUrl)
-
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <Dropdown ref={this.boardHistory} className="TitleBar__menuItem">
-            <DropdownTrigger>
-              <i className="fa fa-map" />
-            </DropdownTrigger>
-            <DropdownContent onClick={this.hideBoardHistory}>
-              <div className="PopOverWrapper">
-                <div className="ListMenu">
-                  <div className="ListMenuSection">
-                    { boardDocLinks }
-                  </div>
-                </div>
-              </div>
-            </DropdownContent>
-          </Dropdown>
           <button disabled={this.disableBack()} onClick={this.back} className="TitleBar__menuItem">
             <i className="fa fa-angle-left" />
           </button>
@@ -132,25 +94,10 @@ export default class TitleBar extends React.PureComponent {
         </div>
 
         <div className="TitleBar__center">
-          <Content url={createDocumentLink('board-title', docId)} />
-          <HashForm
-            formDocId={this.state.currentDocUrl}
-            onChanged={this.props.openDoc}
-          />
+          <BoardTitle openDoc={this.props.openDoc} docId={this.props.docId} />
         </div>
 
         <div className="TitleBar__right">
-          <Dropdown className="TitleBar__menuItem">
-            <DropdownTrigger>
-              <i className="fa fa-group" />
-            </DropdownTrigger>
-            <DropdownContent>
-              <Share
-                docId={this.props.docId}
-                openDocument={this.props.openDoc}
-              />
-            </DropdownContent>
-          </Dropdown>
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
               <i className="fa fa-gear" />

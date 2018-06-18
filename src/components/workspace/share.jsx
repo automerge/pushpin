@@ -1,123 +1,114 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Debug from 'debug'
 
 import Content from '../content'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
+const log = Debug('pushpin:share')
+
 export default class Share extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
-    openDocument: PropTypes.func.isRequired
+    docId: PropTypes.string.isRequired // Workspace
   }
 
-  state = {
-    consolidatedOffers: [],
-    tab: 'notifications'
-  }
-
-  updateIdentityReferences = (workspaceHandle, documentHandle) => {
-    const { authorIds = [] } = documentHandle.get() || {}
-    const { selfId, contactIds = [] } = workspaceHandle.get() || {}
-
-    // add any never-before seen authors to our contacts
-    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
-    if (newContactIds.length > 0) {
-      workspaceHandle.change((workspace) => {
-        workspace.contactIds.push(...newContactIds)
-      })
-    }
-
-    // add ourselves to the authors if we haven't yet
-    if (selfId && !authorIds.includes(selfId)) {
-      documentHandle.change((document) => {
-        if (!document.authorIds) {
-          document.authorIds = []
-        }
-        document.authorIds.push(selfId)
-      })
-    }
-  }
-
-  watchBoard = () => {
-    // we need to create a new current document handle each time the document changes
-    // NB: this is probably leaking listeners right now
-    if (this.state.doc.currentDocUrl && this.state.doc.currentDocUrl !== this.state.currentDocUrl) {
-      const workspaceHandle = window.hm.openHandle(this.props.docId)
-      const { docId: currentDocId } = parseDocumentLink(this.state.doc.currentDocUrl)
-      const currentDocHandle = window.hm.openHandle(currentDocId)
-      currentDocHandle.onChange((doc) => {
-        this.updateIdentityReferences(workspaceHandle, currentDocHandle)
-        this.setState({ currentDocUrl: this.state.doc.currentDocUrl })
-      })
-    }
-  }
-
-  onContactUpdated = (contactId, contact) => {
-    const { selfId } = this.state.doc
-    const { consolidatedOffers } = this.state
-
-    // record offers of boards for this account from this contact in our local state
-    if (!contact.offeredUrls) {
-      return
-    }
-
-    const offererId = contactId
-    const offersForUs = contact.offeredUrls[selfId] || []
-    offersForUs.forEach((documentUrl) => {
-      // add this to the offers if we haven't already got it
-      if (!consolidatedOffers.some((offer) =>
-        (offer.documentUrl === documentUrl && offer.offererId === offererId))) {
-        consolidatedOffers.push({ documentUrl, offererId })
-      }
-    })
-
-    this.setState({ consolidatedOffers })
-  }
-
-  watchContacts = () => {
-    const { contactIds = [] } = this.state.doc
-    const { watchedContacts = {} } = this.state
-
-    contactIds.forEach((contactId) => {
-      if (!watchedContacts[contactId]) {
-        watchedContacts[contactId] = window.hm.openHandle(contactId).onChange((doc) => {
-          this.onContactUpdated(contactId, doc)
-        })
-      }
-    })
-  }
+  state = { tab: 'authors' }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => {
+    log('componentWillMount')
+    this.refreshWorkspaceHandle(this.props.docId)
+  }
 
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillUnmount = () => {
+    log('componentWillUnmount')
+    window.hm.releaseHandle(this.workspaceHandle)
+    window.hm.releaseHandle(this.boardHandle)
+  }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
     }
-    this.watchBoard()
-    this.watchContacts()
   }
 
-  refreshHandle = (docId) => {
-    if (this.handle) {
-      window.hm.releaseHandle(this.handle)
+  refreshWorkspaceHandle = (docId) => {
+    log('refreshWorkspaceHandle')
+    if (this.workspaceHandle) {
+      window.hm.releaseHandle(this.workspaceHandle)
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+    this.workspaceHandle = window.hm.openHandle(docId)
+    this.workspaceHandle.onChange(this.onWorkspaceChange)
   }
 
-  onChange = (doc) => {
-    this.setState({ doc })
+  refreshBoardHandle = (boardId) => {
+    log('refreshBoardHandle')
+    if (this.boardHandle) {
+      window.hm.releaseHandle(this.boardHandle)
+    }
+
+    this.boardHandle = window.hm.openHandle(boardId)
+    this.boardHandle.onChange(this.onBoardChange)
+  }
+
+  onBoardChange = (doc) => {
+    log('onBoardChange')
+    this.updateIdentityReferences(this.workspaceHandle, this.boardHandle)
+    this.setState({ board: doc })
+  }
+
+  onWorkspaceChange = (doc) => {
+    log('onWorkspaceChange')
+    this.setState({ workspace: doc }, () => {
+      if (this.state.workspace.currentDocUrl) {
+        const { docId } = parseDocumentLink(this.state.workspace.currentDocUrl)
+
+        if (!this.state.board || this.state.board.docId !== docId) {
+          this.refreshBoardHandle(docId)
+        }
+      }
+    })
+  }
+
+  updateIdentityReferences = (workspaceHandle, boardHandle) => {
+    log('updateIdentityReferences')
+    const { authorIds } = boardHandle.get() || {}
+    // If there is no authorIds yet, we've just loaded a uninitialized board. We'll
+    // shortly get an onChange callback with the initialized board, so don't try to
+    // do anything before then. Without this guard, the boardHandle.change block is
+    // liable to throw cryptic errors.
+    if (authorIds) {
+      const { selfId, contactIds = [] } = workspaceHandle.get() || {}
+
+      // Add any never-before seen authors to our contacts.
+      const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
+      if (newContactIds.length > 0) {
+        workspaceHandle.change((workspace) => {
+          workspace.contactIds.push(...newContactIds)
+        })
+      }
+
+      // Add ourselves to the authors if we haven't yet.
+      if (selfId && !authorIds.includes(selfId)) {
+        log('updateIdentityReferences.addSelf')
+        boardHandle.change((board) => {
+          if (!board.authorIds) {
+            board.authorIds = []
+          }
+          board.authorIds.push(selfId)
+        })
+      }
+    }
   }
 
   offerDocumentToIdentity = (e, contactId) => {
-    if (!this.state.doc.selfId) {
+    if (!this.state.workspace.selfId) {
       return
     }
 
-    const selfHandle = window.hm.openHandle(this.state.doc.selfId)
+    log('offerDocumentToIdentity')
+
+    const selfHandle = window.hm.openHandle(this.state.workspace.selfId)
 
     selfHandle.change((s) => {
       if (!s.offeredUrls) {
@@ -128,41 +119,17 @@ export default class Share extends React.PureComponent {
         s.offeredUrls[contactId] = []
       }
 
-      if (!s.offeredUrls[contactId].includes(this.state.doc.currentDocUrl)) {
-        s.offeredUrls[contactId].push(this.state.doc.currentDocUrl)
+      if (!s.offeredUrls[contactId].includes(this.state.workspace.currentDocUrl)) {
+        s.offeredUrls[contactId].push(this.state.workspace.currentDocUrl)
       }
     })
   }
 
   renderContacts = () => {
-    const { currentDocUrl, contactIds = [] } = this.state.doc || {}
-    if (!currentDocUrl) {
-      return null
-    }
+    const { contactIds = [] } = (this.state.workspace || {})
+    const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
 
-    const { type, docId } = parseDocumentLink(this.state.doc.currentDocUrl)
-    if (type !== 'board') {
-      // right now only boards have authorIds (though maybe we can check that instead?)
-      return null
-    }
-
-    const boardHandle = window.hm.openHandle(docId)
-    const { authorIds = [] } = boardHandle.get() || {}
-
-    const authors = authorIds.map(id => (
-      <Content
-        key={id}
-        context="list"
-        url={createDocumentLink('contact', id)}
-      />
-    ))
-
-    // Remove both contacts that are already in the authors list above, and duplicate
-    // contacts which may exist due to an outstanding race.
-    // This .filter is probably very slow if you have a lot of authors.
-    const nonAuthorContactIds = contactIds.filter((contactId, i, array) =>
-      !authorIds.includes(contactId) && (array.indexOf(contactId) === i))
-    const contacts = nonAuthorContactIds.map(id => (
+    const contacts = uniqueContactIds.map(id => (
       <Content
         key={id}
         context="list"
@@ -174,11 +141,7 @@ export default class Share extends React.PureComponent {
 
     return (
       <div>
-        <div className="ListMenu__segment">On Board</div>
-        <div className="ListMenu__section">
-          { authors }
-        </div>
-        { (contacts.length > 0) && <div className="ListMenu__segment">All</div> }
+        <div className="ListMenu__segment">All Contacts</div>
         <div className="ListMenu__section">
           { contacts }
         </div>
@@ -186,73 +149,24 @@ export default class Share extends React.PureComponent {
     )
   }
 
-  acceptNotification = (notification) => {
-    this.props.openDocument(notification.documentUrl)
-  }
+  renderAuthors = () => {
+    const { authorIds = [] } = (this.state.board || {})
+    const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
 
-  renderNotifications = () => {
-    const notifications = []
-    this.state.consolidatedOffers.forEach(offer => {
-      const { offererId, documentUrl } = offer
-      const { docId } = parseDocumentLink(documentUrl)
-
-      const sender = window.hm.openHandle(offererId).get()
-      const docHandle = window.hm.openHandle(docId).get()
-
-      if (sender && docHandle) {
-        notifications.push({ type: 'Invitation', sender, documentUrl, docHandle })
-      }
-    })
-
-    const notificationsJSX = notifications.map(notification => (
-      // we should create a more unique key; do we want to allow the same share multiple times?
-      // i'm going to block it on the send side for now
-      <div key={`${notification.sender.docId}-${notification.documentUrl}`} className="ListMenu__item">
-        <div className="ListMenu__grouped">
-          <div className="ListMenu__typegroup">
-            <h4 className="Type--primary">{ notification.docHandle.title || 'Untitled' }</h4>
-            <p className="Type--secondary">From { notification.sender.name }</p>
-          </div>
-          <div className="ButtonGroup">
-            <div
-              role="button"
-              className="ButtonAction ButtonAction--primary"
-              onClick={e => this.acceptNotification(notification)}
-            >
-              <i className="fa fa-arrow-right" />
-              <p className="ButtonAction__label">View</p>
-            </div>
-            <div
-              role="button"
-              className="ButtonAction ButtonAction--destructive"
-              onClick={e => alert(`Archive ${notification.board.title}`)}
-            >
-              <i className="fa fa-archive" />
-              <p className="ButtonAction__label">Archive</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    const authors = uniqueAuthorIds.map(id => (
+      <Content
+        key={id}
+        context="list"
+        url={createDocumentLink('contact', id)}
+      />
     ))
 
     return (
-      <div className="ListMenu__section">
-        { notificationsJSX.length > 0 ? notificationsJSX :
-        <div className="ListMenu__item">
-          <div className="ListMenu__grouped">
-            <div className="ListMenu__typegroup">
-              <i className="fa fa-info-circle" />
-              <p className="Type--primary">
-                Nothing here!.
-              </p>
-              <p className="Type--secondary">
-                Documents are like love. You have got to give
-                a little to get a little.
-              </p>
-            </div>
-          </div>
+      <div>
+        <div className="ListMenu__segment">On Board</div>
+        <div className="ListMenu__section">
+          { authors }
         </div>
-        }
       </div>
     )
   }
@@ -269,8 +183,8 @@ export default class Share extends React.PureComponent {
     // NB: i have not implemented this, i'm just leaving a note to myself
     if (this.state.tab === 'contacts') {
       body = this.renderContacts()
-    } else if (this.state.tab === 'notifications') {
-      body = this.renderNotifications()
+    } else if (this.state.tab === 'authors') {
+      body = this.renderAuthors()
     }
 
     return (
@@ -279,17 +193,17 @@ export default class Share extends React.PureComponent {
           <div className="Tabs">
             <div
               role="button"
-              className={this.tabClasses('contacts')}
-              onClick={() => this.setState({ tab: 'contacts' })}
+              className={this.tabClasses('authors')}
+              onClick={() => this.setState({ tab: 'authors' })}
             >
-              <i className="fa fa-group" /> Contacts
+              <i className="fa fa-copy" /> On Board
             </div>
             <div
               role="button"
-              className={this.tabClasses('notifications')}
-              onClick={() => this.setState({ tab: 'notifications' })}
+              className={this.tabClasses('contacts')}
+              onClick={() => this.setState({ tab: 'contacts' })}
             >
-              Notifications
+              <i className="fa fa-group" /> All Contacts
             </div>
           </div>
           { body }

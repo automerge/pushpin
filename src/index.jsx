@@ -15,8 +15,6 @@ import './components/board/board'
 import './components/board/board-in-board'
 import './components/board/board-in-list'
 
-import './components/board/board-title' // generic title editor... hmmm.
-
 // contact in various contexts
 import './components/contact/contact-in-list'
 import './components/contact/contact-in-mini'

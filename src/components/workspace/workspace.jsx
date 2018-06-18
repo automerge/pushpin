@@ -9,6 +9,7 @@ import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import Content from '../content'
 import TitleBar from './title-bar'
 
+
 const log = Debug('pushpin:workspace')
 
 export default class Workspace extends React.PureComponent {
