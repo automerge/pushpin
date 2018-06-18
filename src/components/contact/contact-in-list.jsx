@@ -77,6 +77,10 @@ export default class ContactInList extends React.PureComponent {
       ))
     }
 
+    if (this.props.actions.includes('invite')) {
+      actions.push(<span className="Type--secondary">⏎ Invite</span>)
+    }
+
     let avatar
     if (this.state.avatarDocId) {
       avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />

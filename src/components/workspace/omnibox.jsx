@@ -27,11 +27,6 @@ export default class Omnibox extends React.PureComponent {
     this.contactHandles = {}
   }
 
-  // This is the New Boilerplate
-  componentWillMount = () => {
-    log('componentWillMount')
-  }
-
   componentDidMount = () => {
     log('componentDidMount')
     this.refreshHandle(this.props.docId)
@@ -191,7 +186,7 @@ export default class Omnibox extends React.PureComponent {
     return []
   }
 
-  renderInvitationsSection() {
+  renderInvitationsSection = () => {
     const invitations = this.sectionItems('invitations').map((item) => {
       const invitation = item.object
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
@@ -227,28 +222,26 @@ export default class Omnibox extends React.PureComponent {
     return null
   }
 
-  renderViewedDocLinksSection() {
-    const viewedDocLinks = this.sectionItems('viewedDocUrls').map((item) => {
+  renderContentSection = ({ name, label, actions }) => {
+    const items = this.sectionItems(name).map((item) => {
       const { url } = item
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
       return (
         <div key={url} className={classes}>
-          <Content context="list" url={url} />
-
-          <div className="ListMenu Actions">
-            <span className="Type--secondary">⏎ View</span>
-          </div>
+          <Content context="list" url={url} actions={actions} />
         </div>
       )
     })
 
-    if (viewedDocLinks.length > 0) {
+    if (items.length > 0) {
+      const labelPartial = label ? <div className="ListMenu__segment">{label}</div> : null
+
       return (
         <div>
-          <div className="ListMenu__segment">Boards</div>
+          { labelPartial }
           <div className="ListMenuSection">
-            { viewedDocLinks }
+            { items }
           </div>
         </div>
       )
@@ -257,65 +250,7 @@ export default class Omnibox extends React.PureComponent {
     return null
   }
 
-  renderDocLinksSection() {
-    const docLinks = this.sectionItems('docUrls').map((item) => {
-      const { url } = item
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
-
-      return (
-        <div key={url} className={classes}>
-          <i className="Badge ListMenu__thumbnail fa fa-files-o" />
-          <div>
-            <h4 className="Type--primary">Open Board</h4>
-            <p className="Type--secondary">{url.slice(0, 50)}…</p>
-          </div>
-
-          <div className="ListMenu Actions">
-            <span className="Type--secondary">⏎ Open</span>
-          </div>
-        </div>
-      )
-    })
-
-    if (docLinks.length > 0) {
-      return (
-        <div className="ListMenuSection">
-          { docLinks }
-        </div>
-      )
-    }
-
-    return null
-  }
-
-  renderContactsSection() {
-    const contacts = this.sectionItems('contacts').map((item) => {
-      const { url } = item
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
-
-      return (
-        <div key={url} className={classes}>
-          <Content context="list" url={url} />
-
-          <div className="ListMenu Actions">
-            <span className="Type--secondary">⏎ Invite</span>
-          </div>
-        </div>
-      )
-    })
-
-    if (contacts.length > 0) {
-      return (
-        <div className="ListMenuSection">
-          { contacts }
-        </div>
-      )
-    }
-
-    return null
-  }
-
-  render() {
+  render = () => {
     log('render')
 
     if (!this.props.visible) {
@@ -330,9 +265,9 @@ export default class Omnibox extends React.PureComponent {
       <div className="Omnibox">
         <div className="ListMenu">
           { this.renderInvitationsSection() }
-          { this.renderViewedDocLinksSection() }
-          { this.renderDocLinksSection() }
-          { this.renderContactsSection() }
+          { this.renderContentSection({ name: 'viewedDocUrls', label: 'Boards', actions: ['view'] }) }
+          { this.renderContentSection({ name: 'docUrls', actions: ['view'] }) }
+          { this.renderContentSection({ name: 'contacts', label: 'Contacts', actions: ['invite'] }) }
         </div>
       </div>
     )
