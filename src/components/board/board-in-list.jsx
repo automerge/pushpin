@@ -6,7 +6,12 @@ import { createDocumentLink } from '../../share-link'
 
 export default class BoardInList extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired,
+    actions: PropTypes.arrayOf(PropTypes.string)
+  }
+
+  static defaultProps = {
+    actions: []
   }
 
   state = {}
@@ -36,12 +41,24 @@ export default class BoardInList extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  render = () => (
-    <div className="DocLink" onClick={this.handleClick}>
-      <i className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
-      <div className="DocLink__title">{ this.state.title }</div>
-    </div>
-  )
+  render = () => {
+    let actions
+    if (this.props.actions.includes('view')) {
+      actions = (
+        <div className="Actions">
+          <span className="Type--secondary">⏎ View</span>
+        </div>
+      )
+    }
+
+    return (
+      <div className="DocLink" onClick={this.handleClick}>
+        <i className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
+        <div className="DocLink__title">{ this.state.title }</div>
+        { actions }
+      </div>
+    )
+  }
 }
 
 ContentTypes.register({

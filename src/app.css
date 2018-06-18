@@ -494,6 +494,7 @@ button[disabled].TitleBar__menuItem .fa {
   display: flex;
   align-items: center;
   cursor: pointer;
+  width: 100%;
 }
 
 .DocLink__title {
@@ -745,6 +746,8 @@ div.card.image {
   color: var(--colorBlueBlack);
   line-height:16px;
   min-height: 32px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .ListMenu .ListMenu__item--selected {
