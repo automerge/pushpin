@@ -76,10 +76,6 @@ a {
 
 /* Dropdown React component functional styles */
 
-.dropdown {
-  /* display: inline-block; */
-}
-
 .dropdown__content {
   display: none;
   position: absolute;
@@ -154,17 +150,7 @@ input {
 .Workspace__container.Workspace__container--text > *::-webkit-scrollbar-track {
   margin: 0;
 }
-.Notification {
-  margin: 8px;
-  border: 1px solid #e9edf0;
-  border-radius: 4px;
-  padding: 8px;
-  padding-bottom: 0px;
-}
 
-.Notification p {
-
-}
 .Avatar {
   display: flex;
   align-items: center;
@@ -436,10 +422,6 @@ button[disabled].TitleBar__menuItem .fa {
   outline: none;
 }
 
-.TitleBar .TitleBar__menuItem:active {
-
-}
-
 .TitleBar .TitleBar__menuItem:hover {
   color: var(--colorBlueBlack);
 }
@@ -495,10 +477,6 @@ button[disabled].TitleBar__menuItem .fa {
   background: rgba(0,0,0,.05);
 }
 
-.TitleBar__dropDown {
-
-}
-
 .ViewedDocs {
   background: white;
 }
@@ -528,34 +506,6 @@ button[disabled].TitleBar__menuItem .fa {
   border-radius: 50%;
   background-color: #D5DFE5;
 }
-
-.HashForm {
-  padding: 4px 8px;
-}
-
-.HashForm input {
-  padding: 0;
-  margin-left: auto;
-  box-sizing: border-box;
-  width: 66ch;
-  height: 24px;
-  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
-  color: var(--colorSecondaryGrey);
-  text-align: center;
-  font-size: 13px;
-  border-radius: 4px;
-  border: 0px;
-}
-
-.HashForm input:focus {
-  outline: none;
-  background: var(--colorInputGrey);
-}
-
-.HashForm input.loading {
-  background-color: #fff2cc;
-}
-
 
 div.board {
   position:relative;
@@ -954,10 +904,6 @@ div.card.image {
   margin-bottom:8px;
 }
 
-.CodeMirrorEditor__renderer h4, h5, h6 {
-  /* Placeholder Reminder: We don't anticipate these being used very often */
-}
-
 .CodeMirrorEditor__renderer h1 {
   font-size: 18px;
   line-height: 24px;
@@ -1023,10 +969,6 @@ div.card.image {
   font-size: 12px;
   line-height:16px;
   margin-bottom: 8px;
-}
-
-.CodeMirrorEditor__renderer code {
-
 }
 
 .CodeMirrorEditor__renderer pre {
