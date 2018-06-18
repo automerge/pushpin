@@ -46,7 +46,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   onKeyDown = (e) => {
-    if (e.key === '/') {
+    if (e.key === '/' && document.activeElement === document.body) {
       if (!this.state.activeOmnibox) {
         this.activateOmnibox()
         e.preventDefault()
