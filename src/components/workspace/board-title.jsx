@@ -27,11 +27,13 @@ export default class BoardTitle extends React.PureComponent {
     this.invitationsView = new InvitationsView(this.props.docId)
     this.invitationsView.onChange(this.onInvitationsChange)
     document.addEventListener('keydown', this.onKeyDown)
+    document.addEventListener('mousedown', this.handleClickOutside)
   }
 
   componentWillUnmount = () => {
     window.hm.releaseHandle(this.handle)
     document.removeEventListener('keydown', this.onKeyDown)
+    document.removeEventListener('mousedown', this.handleClickOutside)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -51,6 +53,10 @@ export default class BoardTitle extends React.PureComponent {
         this.activateOmnibox()
         e.preventDefault()
       }
+    }
+    if (e.key === 'Escape' && this.state.activeOmnibox) {
+      this.deactivateOmnibox()
+      e.preventDefault()
     }
   }
 
@@ -121,8 +127,10 @@ export default class BoardTitle extends React.PureComponent {
 
       this.deactivateOmnibox()
     }
+  }
 
-    if (e.key === 'Escape') {
+  handleClickOutside = (e) => {
+    if (this.omniboxRef && !this.omniboxRef.contains(e.target)) {
       this.deactivateOmnibox()
     }
   }
@@ -184,7 +192,6 @@ export default class BoardTitle extends React.PureComponent {
           ref={this.omniboxInput}
           type="text"
           className="TitleBar__titleText BoardTitle__omniboxInput"
-          onBlur={this.deactivateOmnibox}
           onChange={this.handleChange}
           onKeyDown={this.handleCommandKeys}
           placeholder="Start typing..."
@@ -231,7 +238,7 @@ export default class BoardTitle extends React.PureComponent {
     }
 
     return (
-      <div className="BoardTitle">
+      <div ref={(ref) => { this.omniboxRef = ref }} className="BoardTitle">
         { inputBar }
         <Omnibox
           docId={this.props.docId}
