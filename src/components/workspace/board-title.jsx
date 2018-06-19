@@ -139,6 +139,11 @@ export default class BoardTitle extends React.PureComponent {
     if (e.target.className !== 'TitleBar__titleText') {
       this.deactivateOmnibox()
     }
+
+    if ((e.target.className !== 'TitleBar__titleText') &&
+        (e.target.className !== 'fa fa-edit')) {
+      this.deactivateTitleEditor()
+    }
   }
 
   handleTitleKey = (e) => {
