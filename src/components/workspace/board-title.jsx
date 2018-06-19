@@ -136,22 +136,35 @@ export default class BoardTitle extends React.PureComponent {
 
   handleTitleKey = (e) => {
     if (e.key === 'Enter') {
-      if (this.state.newTitle !== '') {
+      if (this.state.newTitle) {
         this.boardHandle.change((doc) => {
           doc.title = this.state.newTitle
         })
 
         this.setState({newTitle: null, titleUpdated: true}, () => {
           setTimeout(() => this.setState({ titleUpdated: false }), 1000)
+          this.titleInput.current.blur()
         })
       } else {
         this.setState({newTitle: null})
+        this.titleInput.current.blur()
       }
     }
 
     if (e.key === 'Escape') {
-      this.setState({newTitle: null})
+      this.deactivateTitleEditor()
     }
+  }
+
+  deactivateTitleEditor = ({ titleUpdated }) => {
+    titleUpdated = !!titleUpdated
+
+    this.titleInput.current.blur()
+    this.setState({newTitle: null, titleUpdated}, () => {
+      if (titleUpdated) {
+        setTimeout(() => this.setState({ titleUpdated: false }), 1000)
+      }
+    })
   }
 
   activateTitleEditor = () => {
