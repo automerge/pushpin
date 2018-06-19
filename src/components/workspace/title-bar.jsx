@@ -17,7 +17,7 @@ export default class TitleBar extends React.PureComponent {
     openDoc: PropTypes.func.isRequired,
   }
 
-  state = { sessionHistory: [], historyIndex: 0, self: null }
+  state = { sessionHistory: [], historyIndex: 0 }
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
@@ -34,17 +34,6 @@ export default class TitleBar extends React.PureComponent {
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
-  }
-
-  refreshSelfHandle = (selfId) => {
-    if (this.selfHandle) {
-      window.hm.releaseHandle(this.selfHandle)
-    }
-
-    this.selfHandle = window.hm.openHandle(selfId)
-    this.selfHandle.onChange((doc) => {
-      this.setState({ self: doc })
-    })
   }
 
   disableBack = () => this.state.historyIndex === (this.state.sessionHistory.length - 1)
@@ -87,8 +76,6 @@ export default class TitleBar extends React.PureComponent {
       historyIndex = 0
     }
 
-    this.refreshSelfHandle(doc.selfId)
-
     this.setState({ ...doc, sessionHistory, historyIndex })
   }
 
@@ -98,19 +85,12 @@ export default class TitleBar extends React.PureComponent {
       return null
     }
 
-    let avatar
-    if (this.state.self && this.state.self.avatarDocId) {
-      avatar = <Content url={createDocumentLink('image', this.state.self.avatarDocId)} />
-    } else {
-      avatar = <img alt="avatar" src="../img/default-avatar.png" />
-    }
-
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <div className="Avatar Avatar--small">{ avatar }</div>
+              <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
             </DropdownTrigger>
             <DropdownContent>
               <Settings docId={this.state.selfId} />

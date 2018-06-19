@@ -71,7 +71,7 @@ export default class ThreadContent extends React.PureComponent {
 
   renderGroupedMessages = (groupOfMessages, idx) => (
     <div style={css.messageGroup} key={idx}>
-      <Content context="mini" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
+      <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
       <div style={css.groupedMessages}>
         { groupOfMessages.map(this.renderMessage) }
       </div>

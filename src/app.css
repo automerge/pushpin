@@ -186,14 +186,44 @@ input {
   pointer-events: none;
 }
 
-.Avatar--small {
+.Avatar--title-bar {
   width: 30px;
   height: 30px;
 }
 
-.Avatar--small img {
+.Avatar--title-bar img {
   width: 26px;
   height: 26px;
+}
+
+.Avatar--board {
+  width: 72px;
+  height: 72px;
+}
+
+.Avatar--board img {
+  width: 68px;
+  height: 68px;
+}
+
+.Contact--board .Label {
+  background-color: white;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
+  padding: 2px;
+  border-radius: 12px;
+  line-height: 20px;
+  text-align: center;
+  width: 68px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Contact--board .Label:hover {
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
+  width: auto;
+  overflow: auto;
+  text-overflow: none;
 }
 
 .Avatar--online {

@@ -76,12 +76,14 @@ export default class BoardInBoard extends React.PureComponent {
 
 const css = {
   icon: {
-    fontSize: '64px',
+    fontSize: '40px',
     padding: '16px',
-    borderRadius: '48px',
+    borderRadius: '36px',
     boxShadow: '0 0 4px 0 rgba(0, 0, 0, 0.27)'
   },
   caption: {
+    width: '72px',
+    textOverflow: 'ellipsis',
     fontSize: '14px',
     lineHeight: '24px',
     textAlign: 'center',

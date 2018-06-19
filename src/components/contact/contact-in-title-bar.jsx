@@ -64,99 +64,23 @@ class ContactInThread extends React.PureComponent {
     }
 
     return (
-      <div style={css.user}>
+      <div>
         <div
-          className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
-          style={css.avatar}
+          className={`Avatar Avatar--title-bar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
           title={this.state.name}
         >
           { avatar }
-        </div>
-        <div className="username" style={css.username}>
-          {this.state.name}
         </div>
       </div>
     )
   }
 }
 
-const css = {
-  threadWrapper: {
-    display: 'flex',
-    backgroundColor: 'white',
-    width: '100%',
-    overflow: 'auto',
-    height: '100%',
-  },
-  messageWrapper: {
-    padding: 12,
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    overflowY: 'scroll',
-    marginBottom: 49,
-    flexGrow: 1,
-  },
-  messageGroup: {
-    marginBottom: -24,
-    paddingTop: 12
-  },
-  groupedMessages: {
-    position: 'relative',
-    top: -20,
-    paddingLeft: 40 + 8
-  },
-  messages: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    flexGrow: '1',
-  },
-  message: {
-    color: 'black',
-    display: 'flex',
-    lineHeight: '20px',
-    padding: '2px 0'
-  },
-  user: {
-    display: 'flex'
-  },
-  username: {
-    paddingLeft: 8,
-    fontSize: 12,
-    color: 'var(--colorBlueBlack)'
-  },
-  avatar: {
-
-  },
-  time: {
-    flex: 'none',
-    marginLeft: 'auto',
-    fontSize: 12,
-    color: 'var(--colorSecondaryGrey)',
-    marginTop: -22
-  },
-  content: {
-  },
-  inputWrapper: {
-    boxSizing: 'border-box',
-    width: 'calc(100% - 1px)',
-    borderTop: '1px solid var(--colorInputGrey)',
-    position: 'absolute',
-    bottom: 0,
-    backgroundColor: 'white',
-    padding: 8,
-  },
-  input: {
-    width: '100%'
-  },
-}
-
 ContentTypes.register({
   component: ContactInThread,
   type: 'contact',
-  context: 'mini',
-  name: 'Mini Avatar',
+  context: 'title-bar',
+  name: 'Avatar',
   icon: 'user',
   unlisted: true,
 })

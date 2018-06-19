@@ -16,9 +16,10 @@ import './components/board/board-in-board'
 import './components/board/board-in-list'
 
 // contact in various contexts
-import './components/contact/contact'
+import './components/contact/contact-in-board'
+import './components/contact/contact-in-title-bar'
 import './components/contact/contact-in-list'
-import './components/contact/contact-in-mini'
+import './components/contact/contact-in-thread'
 
 // other single-context components
 import './components/text-content'

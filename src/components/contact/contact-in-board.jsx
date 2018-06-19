@@ -5,18 +5,9 @@ import ContentTypes from '../../content-types'
 import Content from '../content'
 import { createDocumentLink } from '../../share-link'
 
-export default class ContactInList extends React.PureComponent {
+export default class ContactInBoard extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.string),
-    onShare: PropTypes.func,
-    onUnshare: PropTypes.func
-  }
-
-  static defaultProps = {
-    actions: [],
-    onShare: () => {},
-    onUnshare: () => {}
   }
 
   state = {}
@@ -70,23 +61,6 @@ export default class ContactInList extends React.PureComponent {
   }
 
   render = () => {
-    const actions = []
-    if (this.props.actions.includes('share')) {
-      actions.push((
-        <div role="button" key="share" onClick={this.props.onShare} className="ButtonAction ButtonAction--primary">
-          <i className="fa fa-share-alt" />
-        </div>
-      ))
-    }
-
-    if (this.props.actions.includes('unshare')) {
-      actions.push((
-        <div role="button" key="unshare" onClick={this.props.onUnshare} className="ButtonAction ButtonAction--destructive">
-          <i className="fa fa-ban" />
-        </div>
-      ))
-    }
-
     let avatar
     if (this.state.avatarDocId) {
       avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
@@ -95,8 +69,8 @@ export default class ContactInList extends React.PureComponent {
     }
 
     return (
-      <div className="Contact">
-        <div className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}>
+      <div className="Contact--board">
+        <div className={`Avatar Avatar--board ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}>
           { avatar }
         </div>
         <div className="Label">
@@ -104,17 +78,15 @@ export default class ContactInList extends React.PureComponent {
             { this.state.name }
           </p>
         </div>
-
-        <div className="Actions"> { actions } </div>
       </div>
     )
   }
 }
 
 ContentTypes.register({
-  component: ContactInList,
+  component: ContactInBoard,
   type: 'contact',
-  context: 'default',
+  context: 'board',
   name: 'Contact',
   icon: 'sticky-note',
   resizable: false,
