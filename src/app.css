@@ -100,7 +100,6 @@ body {
   -webkit-font-smoothing: antialiased;
   height: calc(100% - 40px);
   user-select: none;
-  -webkit-user-select: none;
   cursor: default;
 }
 
