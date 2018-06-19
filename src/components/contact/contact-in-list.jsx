@@ -47,6 +47,9 @@ export default class ContactInList extends React.PureComponent {
   }
 
   onChange = (doc) => {
+    if (window.selfId === this.props.docId) {
+      this.setState({ online: true })
+    }
     this.setState({ ...doc })
   }
 
