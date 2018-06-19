@@ -27,13 +27,13 @@ export default class BoardTitle extends React.PureComponent {
     this.invitationsView = new InvitationsView(this.props.docId)
     this.invitationsView.onChange(this.onInvitationsChange)
     document.addEventListener('keydown', this.onKeyDown)
-    document.addEventListener('mousedown', this.handleClickOutside)
+    document.addEventListener('click', this.handleClickOutside)
   }
 
   componentWillUnmount = () => {
     window.hm.releaseHandle(this.handle)
     document.removeEventListener('keydown', this.onKeyDown)
-    document.removeEventListener('mousedown', this.handleClickOutside)
+    document.removeEventListener('click', this.handleClickOutside)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -130,9 +130,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   handleClickOutside = (e) => {
-    if (this.omniboxRef && !this.omniboxRef.contains(e.target)) {
-      this.deactivateOmnibox()
-    }
+    this.deactivateOmnibox()
   }
 
   activateTitleEditor = () => {
