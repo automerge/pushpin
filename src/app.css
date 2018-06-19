@@ -554,6 +554,7 @@ div.card.text.selected {
 
 div.card.selected {
   outline: solid 2px var(--colorBlueBlack);
+  z-index: 1;
 }
 
 div.card span.cardResizeHandle {
