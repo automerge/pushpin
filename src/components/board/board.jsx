@@ -139,6 +139,7 @@ export default class Board extends React.PureComponent {
     const cardId = this.createCard({
       x: e.pageX - this.boardRef.offsetLeft,
       y: e.pageY - this.boardRef.offsetTop,
+      width: GRID_SIZE * 10,
       type: 'text' })
     this.selectOnly(cardId)
   }
@@ -189,6 +190,7 @@ export default class Board extends React.PureComponent {
           this.createCard({
             x: localX + (i * (GRID_SIZE * 2)),
             y: localY + (i * (GRID_SIZE * 2)),
+            width: GRID_SIZE * 10,
             type: 'text',
             typeAttrs: { text: reader.readAsText(entry) }
           })
@@ -199,13 +201,14 @@ export default class Board extends React.PureComponent {
 
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
+    const width = GRID_SIZE * 10
     if (plainText) {
       try {
         const url = new URL(plainText)
-        this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
+        this.createCard({ x: pageX, y: pageY, width, type: 'url', typeAttrs: { url: url.toString() } })
       } catch (e) {
         // i guess it's not a URL, just make a text card
-        this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
+        this.createCard({ x: pageX, y: pageY, width, type: 'text', typeAttrs: { text: plainText } })
       }
     }
   }
@@ -242,13 +245,14 @@ export default class Board extends React.PureComponent {
     }
 
     const plainTextData = dataTransfer.getData('text/plain')
+    const width = GRID_SIZE * 10
     if (plainTextData) {
       try {
         const url = new URL(plainTextData)
-        this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
+        this.createCard({ x, y, width, type: 'url', typeAttrs: { url: url.toString() } })
       } catch (e) {
         // i guess it's not a URL, just make a text card
-        this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
+        this.createCard({ x, y, width, type: 'text', typeAttrs: { text: plainTextData } })
       }
     }
   }
@@ -275,7 +279,13 @@ export default class Board extends React.PureComponent {
       return
     }
 
-    const cardId = this.createCard({ x, y, type: contentType.type, typeAttrs: { text: '' } })
+    const cardId = this.createCard({
+      x,
+      y,
+      width: GRID_SIZE * 10,
+      type: contentType.type,
+      typeAttrs: { text: '' }
+    })
     this.selectOnly(cardId)
   }
 
@@ -286,7 +296,13 @@ export default class Board extends React.PureComponent {
         return
       }
 
-      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { hyperfileId } })
+      const cardId = this.createCard({
+        x,
+        y,
+        width: GRID_SIZE * 18,
+        type: 'image',
+        typeAttrs: { hyperfileId }
+      })
       this.selectOnly(cardId)
     })
   }
@@ -298,7 +314,13 @@ export default class Board extends React.PureComponent {
         return
       }
 
-      const cardId = this.createCard({ x, y, type: 'image', typeAttrs: { hyperfileId } })
+      const cardId = this.createCard({
+        x,
+        y,
+        width: GRID_SIZE * 18,
+        type: 'image',
+        typeAttrs: { hyperfileId }
+      })
       this.selectOnly(cardId)
     })
   }
