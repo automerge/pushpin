@@ -194,15 +194,15 @@ export default class TextContent extends React.PureComponent {
 
   onKeyDown = (e) => {
     if (this.state.text.length > 0) {
-      this.readyToDelete = false
+      this.stallDelete = true
     }
-    if (this.readyToDelete === true) {
+    if (!this.stallDelete) {
       // we normally prevent deletion by stopping event propagation
       // but if the card is already empty and we hit delete, allow it
       return
     }
     if (e.key === 'Backspace' && this.state.text.length === 0) {
-      this.readyToDelete = true
+      this.stallDelete = false
     }
 
     e.stopPropagation()
