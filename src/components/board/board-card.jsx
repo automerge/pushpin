@@ -63,8 +63,7 @@ export default class BoardCard extends React.PureComponent {
       width: Number.isInteger(dragState.resizeWidth) ? dragState.resizeWidth : card.width,
       height: Number.isInteger(dragState.resizeHeight) ? dragState.resizeHeight : card.height,
       position: 'absolute',
-      left: Number.isInteger(dragState.moveX) ? dragState.moveX : card.x,
-      top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
+      transform: 'translate(' + (Number.isInteger(dragState.moveX) ? dragState.moveX : card.x) + 'px, ' + (Number.isInteger(dragState.moveY) ? dragState.moveY : card.y) + 'px)'
     }
 
     const { type } = parseDocumentLink(card.url)
