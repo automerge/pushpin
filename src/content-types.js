@@ -3,28 +3,26 @@ import Debug from 'debug'
 const log = Debug('pushpin:content-types')
 
 const registry = {}
-const registryListed = {}
+
+// list() is called in Board's render; we need to return the same JS object each time
+// to avoid expensive React re-renders of the nested BoardContextMenu component.
+let listedCache = null
 
 function register(contentType) {
-  const { component, type, context = 'default', name, icon, unlisted, resizable } = contentType
+  const { component, type, name, icon } = contentType
+  const { context = 'default', unlisted = false, resizable = true } = contentType
 
   if (!component || !type || !name || !icon) {
     throw new Error('Missing something in register')
   }
 
-  log('register', component.name, type, name, icon, unlisted, resizable)
+  log('register', component.name, type, name, icon, context, unlisted, resizable)
 
   if (!registry[type]) {
     registry[type] = {}
   }
-
   registry[type][context] = contentType
-  if (!unlisted) {
-    if (!registryListed[type]) {
-      registryListed[type] = {}
-    }
-    registryListed[type][context] = contentType
-  }
+  listedCache = null
 }
 
 function lookup({ type, context = 'default' } = {}) {
@@ -39,10 +37,14 @@ function lookup({ type, context = 'default' } = {}) {
 
 function list({ withUnlisted = false } = {}) {
   if (withUnlisted) {
-    return Object.values(registry).map(e => e.default)
+    return Object.values(registry).map(cts => cts.default)
   }
-  // temporary solution, remove pre-merge
-  return Object.values(registryListed).map(e => e.default || e.board)
+  if (!listedCache) {
+    listedCache = Object.values(registry)
+      .map(cts => cts.default || cts.board)
+      .filter(ct => ct && !ct.unlisted)
+  }
+  return listedCache
 }
 
 export default { register, lookup, list }
