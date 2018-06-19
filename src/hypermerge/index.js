@@ -116,6 +116,7 @@ class Hypermerge extends EventEmitter {
     this.docIndex = {} // docId -> [actorId]
     this.metaIndex = {} // actorId -> metadata
     this.requestedBlocks = {} // docId -> actorId -> blockIndex (exclusive)
+    this.appliedSeqs = {} // actorId -> seq -> Boolean
 
     this._onMulticoreReady = this._onMulticoreReady.bind(this)
     this.core = new Multicore(storage)
@@ -768,14 +769,16 @@ class Hypermerge extends EventEmitter {
     log('_applyChanges', docId)
     if (changes.length > 0) {
       const oldDoc = this.find(docId)
-      let prevSeq = 0
       const filteredChanges = []
       changes.forEach((change) => {
-        if (change.seq > prevSeq) {
-          filteredChanges.push(change)
-          prevSeq = change.seq
-        } else {
+        if (!this.appliedSeqs[change.actor]) {
+          this.appliedSeqs[change.actor] = {}
+        }
+        if (this.appliedSeqs[change.actor][change.seq]) {
           log('_applyChanges.skipDuplicate', change.actor, change.seq)
+        } else {
+          filteredChanges.push(change)
+          this.appliedSeqs[change.actor][change.seq] = true
         }
       })
       const newDoc = Automerge.applyChanges(oldDoc, filteredChanges)
