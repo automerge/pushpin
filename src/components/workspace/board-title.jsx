@@ -16,7 +16,7 @@ export default class BoardTitle extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  state = { invitations: [], activeOmnibox: false, search: '', selected: null }
+  state = { invitations: [], activeOmnibox: false, search: '', newTitle: null, titleUpdated: false, selected: null }
   omniboxInput = React.createRef()
   titleInput = React.createRef()
 
@@ -134,14 +134,32 @@ export default class BoardTitle extends React.PureComponent {
     }
   }
 
+  handleTitleKey = (e) => {
+    if (e.key === 'Enter') {
+      if (this.state.newTitle !== '') {
+        this.boardHandle.change((doc) => {
+          doc.title = this.state.newTitle
+        })
+
+        this.setState({newTitle: null, titleUpdated: true}, () => {
+          setTimeout(() => this.setState({ titleUpdated: false }), 1000)
+        })
+      } else {
+        this.setState({newTitle: null})
+      }
+    }
+
+    if (e.key === 'Escape') {
+      this.setState({newTitle: null})
+    }
+  }
+
   activateTitleEditor = () => {
     this.titleInput.current.focus()
   }
 
   editTitle = (e) => {
-    this.boardHandle.change((doc) => {
-      doc.title = e.target.value
-    })
+    this.setState({ newTitle: e.target.value })
   }
 
   setOmniboxControl = (controller) => {
@@ -202,6 +220,18 @@ export default class BoardTitle extends React.PureComponent {
         invitationsClasses += ' hidden'
       }
 
+      let titleInputClasses = 'TitleBar__titleText'
+      if (this.state.titleUpdated) {
+        titleInputClasses += " TitleBar__titleText--updated"
+      }
+
+      let title = ''
+      if (this.state.newTitle !== null) {
+        title = this.state.newTitle
+      } else if (this.state.board && this.state.board.title) {
+        title = this.state.board.title
+      }
+
       inputBar = (
         <div className="BoardTitle__actionBar">
           <div className="BoardTitle__actionBar__left">
@@ -210,10 +240,11 @@ export default class BoardTitle extends React.PureComponent {
           <input
             ref={this.titleInput}
             type="text"
-            className="TitleBar__titleText"
-            value={this.state.board && this.state.board.title || ''}
+            className={titleInputClasses}
+            value={title}
             onClick={this.activateOmnibox}
             onChange={this.editTitle}
+            onKeyDown={this.handleTitleKey}
           />
           <div className="BoardTitle__actionBar__right">
             <i className="fa fa-edit" onClick={this.activateTitleEditor} />
