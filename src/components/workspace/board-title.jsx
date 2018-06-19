@@ -16,7 +16,16 @@ export default class BoardTitle extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  state = { invitations: [], activeOmnibox: false, search: '', newTitle: null, titleUpdated: false, selected: null }
+  state = {
+    invitations: [],
+    activeOmnibox: false,
+    titleEditor: { active: false },
+    search: '',
+    newTitle: null,
+    titleUpdated: false,
+    selected: null
+  }
+
   omniboxInput = React.createRef()
   titleInput = React.createRef()
 
@@ -141,13 +150,9 @@ export default class BoardTitle extends React.PureComponent {
           doc.title = this.state.newTitle
         })
 
-        this.setState({newTitle: null, titleUpdated: true}, () => {
-          setTimeout(() => this.setState({ titleUpdated: false }), 1000)
-          this.titleInput.current.blur()
-        })
+        this.deactivateTitleEditor({ titleUpdated: true })
       } else {
-        this.setState({newTitle: null})
-        this.titleInput.current.blur()
+        this.deactivateTitleEditor()
       }
     }
 
@@ -156,11 +161,19 @@ export default class BoardTitle extends React.PureComponent {
     }
   }
 
+  handleTitleClick = (e) => {
+    if (!this.state.titleEditor.active) {
+      this.activateOmnibox()
+    }
+  }
+
   deactivateTitleEditor = ({ titleUpdated }) => {
     titleUpdated = !!titleUpdated
+    const { titleEditor } = this.state
+    titleEditor.active = false
 
     this.titleInput.current.blur()
-    this.setState({newTitle: null, titleUpdated}, () => {
+    this.setState({newTitle: null, titleEditor, titleUpdated}, () => {
       if (titleUpdated) {
         setTimeout(() => this.setState({ titleUpdated: false }), 1000)
       }
@@ -168,6 +181,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   activateTitleEditor = () => {
+    this.setState({ titleEditor: { active: true } })
     this.titleInput.current.focus()
   }
 
@@ -255,7 +269,7 @@ export default class BoardTitle extends React.PureComponent {
             type="text"
             className={titleInputClasses}
             value={title}
-            onClick={this.activateOmnibox}
+            onClick={this.handleTitleClick}
             onChange={this.editTitle}
             onKeyDown={this.handleTitleKey}
           />
