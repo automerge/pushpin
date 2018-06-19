@@ -19,10 +19,8 @@ export default class BoardTitle extends React.PureComponent {
   state = {
     invitations: [],
     activeOmnibox: false,
-    titleEditor: { active: false },
+    titleEditor: { active: false, newTitle: null, updated: false },
     search: '',
-    newTitle: null,
-    titleUpdated: false,
     selected: null
   }
 
@@ -144,13 +142,15 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   handleTitleKey = (e) => {
+    const { titleEditor } = this.state
+
     if (e.key === 'Enter') {
-      if (this.state.newTitle) {
+      if (titleEditor.newTitle) {
         this.boardHandle.change((doc) => {
-          doc.title = this.state.newTitle
+          doc.title = titleEditor.newTitle
         })
 
-        this.deactivateTitleEditor({ titleUpdated: true })
+        this.deactivateTitleEditor({ updated: true })
       } else {
         this.deactivateTitleEditor()
       }
@@ -167,26 +167,46 @@ export default class BoardTitle extends React.PureComponent {
     }
   }
 
-  deactivateTitleEditor = ({ titleUpdated }) => {
-    titleUpdated = !!titleUpdated
-    const { titleEditor } = this.state
-    titleEditor.active = false
-
+  deactivateTitleEditor = ({ updated }={}) => {
     this.titleInput.current.blur()
-    this.setState({newTitle: null, titleEditor, titleUpdated}, () => {
-      if (titleUpdated) {
-        setTimeout(() => this.setState({ titleUpdated: false }), 1000)
+    this.setState((state, props) => {
+      const titleEditor = Object.assign({}, state.titleEditor)
+
+      titleEditor.active = false
+      titleEditor.newTitle = null
+      titleEditor.updated = !!updated
+
+      return { titleEditor }
+    }, () => {
+      if (updated) {
+        const titleEditor = Object.assign({}, this.state.titleEditor)
+        titleEditor.updated = false
+
+        setTimeout(() => this.setState({ titleEditor }), 1000)
       }
     })
   }
 
   activateTitleEditor = () => {
-    this.setState({ titleEditor: { active: true } })
+    this.setState((state, props) => {
+      const titleEditor = Object.assign({}, state.titleEditor)
+      titleEditor.active = true
+
+      return { titleEditor }
+    })
+
     this.titleInput.current.focus()
   }
 
   editTitle = (e) => {
-    this.setState({ newTitle: e.target.value })
+    const newTitle = e.target.value
+
+    this.setState((state, props) => {
+      const titleEditor = Object.assign({}, state.titleEditor)
+      titleEditor.newTitle = newTitle
+
+      return { titleEditor }
+    })
   }
 
   setOmniboxControl = (controller) => {
@@ -242,19 +262,21 @@ export default class BoardTitle extends React.PureComponent {
         />
       )
     } else {
+      const { titleEditor } = this.state
+
       let invitationsClasses = 'fa fa-envelope'
       if (invitations.length === 0) {
         invitationsClasses += ' hidden'
       }
 
       let titleInputClasses = 'TitleBar__titleText'
-      if (this.state.titleUpdated) {
+      if (titleEditor.updated) {
         titleInputClasses += " TitleBar__titleText--updated"
       }
 
       let title = ''
-      if (this.state.newTitle !== null) {
-        title = this.state.newTitle
+      if (titleEditor.newTitle !== null) {
+        title = titleEditor.newTitle
       } else if (this.state.board && this.state.board.title) {
         title = this.state.board.title
       }
