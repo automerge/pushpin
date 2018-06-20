@@ -90,7 +90,6 @@ const css = {
     lineHeight: '20px',
     textAlign: 'center',
     whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
     overflow: 'hidden',
   },
   title: {

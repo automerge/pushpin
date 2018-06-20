@@ -221,8 +221,6 @@ export default class BoardTitle extends React.PureComponent {
         />
       )
     } else {
-      const { titleEditor } = this.state
-
       let invitationsClasses = 'fa fa-envelope'
       if (invitations.length === 0) {
         invitationsClasses += ' hidden'
