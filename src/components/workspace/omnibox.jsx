@@ -22,7 +22,7 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { selectedIndex: -1, viewedDocs: {}, contacts: {} }
+    this.state = { selectedIndex: 0, viewedDocs: {}, contacts: {} }
     this.viewedDocHandles = {}
     this.contactHandles = {}
   }
@@ -48,7 +48,7 @@ export default class Omnibox extends React.PureComponent {
 
     if ((this.props.visible && !prevProps.visible) ||
         (this.props.search !== prevProps.search)) {
-      this.setState({ selectedIndex: -1 })
+      this.setState({ selectedIndex: 0 })
     }
   }
 
