@@ -43,9 +43,12 @@ const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
 const GRID_SIZE = 24
 
+<<<<<<< Updated upstream
 const CARD_MIN_WIDTH = 97
 const CARD_MIN_HEIGHT = 49
 
+=======
+>>>>>>> Stashed changes
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
@@ -552,19 +555,6 @@ export default class Board extends React.PureComponent {
     log('onDrag')
     const tracking = this.tracking[card.id]
 
-    // If the card has no fixed dimensions yet, get its current rendered dimensions
-    if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
-      this.handle.change(b => {
-        // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
-        // this prevents visual changes like scrollbar from triggering on drag
-        /* eslint react/no-find-dom-node: "off" */
-        b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth + 1
-        b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
-      })
-
-      card = this.state.doc.cards[card.id]
-    }
-
     // If we haven't started tracking this drag, initialize tracking
     if (!(tracking && (tracking.moving || tracking.resizing))) {
       const resizing = e.target.className === 'cardResizeHandle'
@@ -585,6 +575,19 @@ export default class Board extends React.PureComponent {
       }
 
       if (resizing) {
+        // If the card has no fixed dimensions yet, get its current rendered dimensions
+        if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
+          this.handle.change(b => {
+            // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
+            // this prevents visual changes like scrollbar from triggering on drag
+            /* eslint react/no-find-dom-node: "off" */
+            b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth + 1
+            b.cards[card.id].height = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
+          })
+
+          card = this.state.doc.cards[card.id]
+        }
+
         this.tracking[card.id] = {
           resizing: true,
           slackWidth: 0,
