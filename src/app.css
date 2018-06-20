@@ -868,7 +868,6 @@ div.card.image {
   box-sizing: border-box;
   background: white;
   border: solid 1px var(--colorPaleGrey);
-  margin: -1px;
   overflow: auto;
 }
 .CodeMirrorEditor:focus, .CodeMirrorEditor:active {
