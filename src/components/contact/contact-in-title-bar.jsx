@@ -5,7 +5,7 @@ import ContentTypes from '../../content-types'
 import Content from '../content'
 import { createDocumentLink } from '../../share-link'
 
-class ContactInThread extends React.PureComponent {
+class ContactInTitlebar extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
   }
@@ -77,7 +77,7 @@ class ContactInThread extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: ContactInThread,
+  component: ContactInTitlebar,
   type: 'contact',
   context: 'title-bar',
   name: 'Avatar',
