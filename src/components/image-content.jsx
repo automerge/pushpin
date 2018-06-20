@@ -15,6 +15,13 @@ export default class ImageContent extends React.PureComponent {
     image.hyperfileId = hyperfileId
   }
 
+  static minWidth = 4
+  static minHeight = 4
+  static defaultWidth = 18
+  // no default height to allow it to grow
+  static maxWidth = 36
+  static maxHeight = 36
+
   state = {}
 
   onChange = (doc) => {

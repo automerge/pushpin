@@ -9,7 +9,7 @@ import uuid from 'uuid/v4'
 import Content from '../content'
 import ContentTypes from '../../content-types'
 import { IMAGE_DIALOG_OPTIONS } from '../../constants'
-import { createDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
 import BoardCard from './board-card'
 import BoardContextMenu from './board-context-menu'
@@ -42,6 +42,9 @@ const BOARD_COLORS = {
 const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
 const GRID_SIZE = 24
+
+const CARD_MIN_WIDTH = 97
+const CARD_MIN_HEIGHT = 49
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
@@ -136,7 +139,6 @@ export default class Board extends React.PureComponent {
     const cardId = this.createCard({
       x: e.pageX - this.boardRef.offsetLeft,
       y: e.pageY - this.boardRef.offsetTop,
-      width: GRID_SIZE * 10,
       type: 'text' })
     this.selectOnly(cardId)
   }
@@ -193,7 +195,6 @@ export default class Board extends React.PureComponent {
           this.createCard({
             x: localX + (i * (GRID_SIZE * 2)),
             y: localY + (i * (GRID_SIZE * 2)),
-            width: GRID_SIZE * 10,
             type: 'text',
             typeAttrs: { text: reader.readAsText(entry) }
           })
@@ -204,14 +205,13 @@ export default class Board extends React.PureComponent {
 
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
-    const width = GRID_SIZE * 10
     if (plainText) {
       try {
         const url = new URL(plainText)
-        this.createCard({ x: pageX, y: pageY, width, type: 'url', typeAttrs: { url: url.toString() } })
+        this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
       } catch (e) {
         // i guess it's not a URL, just make a text card
-        this.createCard({ x: pageX, y: pageY, width, type: 'text', typeAttrs: { text: plainText } })
+        this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
       }
     }
   }
@@ -248,14 +248,13 @@ export default class Board extends React.PureComponent {
     }
 
     const plainTextData = dataTransfer.getData('text/plain')
-    const width = GRID_SIZE * 10
     if (plainTextData) {
       try {
         const url = new URL(plainTextData)
-        this.createCard({ x, y, width, type: 'url', typeAttrs: { url: url.toString() } })
+        this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
       } catch (e) {
         // i guess it's not a URL, just make a text card
-        this.createCard({ x, y, width, type: 'text', typeAttrs: { text: plainTextData } })
+        this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
       }
     }
   }
@@ -285,7 +284,6 @@ export default class Board extends React.PureComponent {
     const cardId = this.createCard({
       x,
       y,
-      width: GRID_SIZE * 10,
       type: contentType.type,
       typeAttrs: { text: '' }
     })
@@ -302,7 +300,6 @@ export default class Board extends React.PureComponent {
       const cardId = this.createCard({
         x,
         y,
-        width: GRID_SIZE * 18,
         type: 'image',
         typeAttrs: { hyperfileId }
       })
@@ -320,7 +317,6 @@ export default class Board extends React.PureComponent {
       const cardId = this.createCard({
         x,
         y,
-        width: GRID_SIZE * 18,
         type: 'image',
         typeAttrs: { hyperfileId }
       })
@@ -330,11 +326,17 @@ export default class Board extends React.PureComponent {
 
   createCard = ({ x, y, width, height, type, typeAttrs }) => {
     const docId = Content.initializeContentDoc(type, typeAttrs)
-    return this.linkCard({ x, y, width, height, url: createDocumentLink(type, docId) })
+    return this.linkCard({ x, y, width, height, type, url: createDocumentLink(type, docId) })
   }
 
-  linkCard = ({ x, y, width, height, url }) => {
+  linkCard = ({ x, y, width, height, type, url }) => {
     const id = uuid()
+
+    const { component } = ContentTypes.lookup({ type, context: 'board' })
+    width = width ? this.snapMeasureToGrid(width) : null
+    width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : null
+    height = height ? this.snapMeasureToGrid(height) : null
+    height = component.defaultHeight ? component.defaultHeight * GRID_SIZE : null
 
     this.handle.change((b) => {
       const snapX = this.snapCoordinateToGrid(x)
@@ -344,8 +346,8 @@ export default class Board extends React.PureComponent {
         url,
         x: snapX,
         y: snapY,
-        width: width ? this.snapMeasureToGrid(width) : null,
-        height: height ? this.snapMeasureToGrid(height) : null,
+        width,
+        height,
       }
       b.cards[id] = newCard
     })
@@ -515,10 +517,12 @@ export default class Board extends React.PureComponent {
       let newHeight = preClampHeight + tracking.slackHeight
 
       // Clamp to ensure card doesn't resize beyond the board or min dimensions.
-      newWidth = Math.max(CARD_MIN_WIDTH, newWidth)
+      newWidth = Math.max(tracking.minWidth, newWidth)
+      newWidth = Math.min(tracking.maxWidth, newWidth)
       newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
       tracking.resizeWidth = newWidth
-      newHeight = Math.max(CARD_MIN_HEIGHT, newHeight)
+      newHeight = Math.max(tracking.minHeight, newHeight)
+      newHeight = Math.min(tracking.maxHeight, newHeight)
       newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
       tracking.resizeHeight = newHeight
 
@@ -570,12 +574,23 @@ export default class Board extends React.PureComponent {
           card = this.state.doc.cards[card.id]
         }
 
+        const { type } = parseDocumentLink(card.url)
+        const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
+        const minWidth = (component.minWidth * GRID_SIZE) || CARD_MIN_WIDTH
+        const minHeight = (component.minHeight * GRID_SIZE) || CARD_MIN_HEIGHT
+        const maxWidth = (component.maxWidth * GRID_SIZE) || undefined
+        const maxHeight = (component.maxWidth * GRID_SIZE) || undefined
+
         this.tracking[card.id] = {
           resizing: true,
           slackWidth: 0,
           slackHeight: 0,
           resizeWidth: card.width,
-          resizeHeight: card.height
+          resizeHeight: card.height,
+          minWidth,
+          minHeight,
+          maxWidth,
+          maxHeight,
         }
       }
 
