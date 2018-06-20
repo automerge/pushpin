@@ -136,15 +136,15 @@ input {
 
 .Workspace__container.Workspace__container--text {
   box-sizing: border-box;
-  padding: 48px;
+  padding: 40px;
   background: var(--colorInputGrey);
   display: flex;
   justify-content: center;
 }
 .Workspace__container.Workspace__container--text > * {
-  padding: 48px;
+  padding: 40px;
   height: auto;
-  max-width: 768px;
+  max-width: 720px;
   background-color: white;
 }
 .Workspace__container.Workspace__container--text > *::-webkit-scrollbar-track {
@@ -195,33 +195,36 @@ input {
 }
 
 .Avatar--board {
-  width: 72px;
-  height: 72px;
+  flex: none;
+  width: 60px;
+  height: 60px;
 }
-
-.Avatar--board img {
-  width: 68px;
-  height: 68px;
+.Avatar--board > img {
+  width: 58px;
+  height: 58px;
 }
-
-.Contact--board .Label {
+.Contact--board {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width:100%;
+  box-sizing: border-box;
+  padding:10px;
   background-color: white;
-  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
-  padding: 2px;
-  border-radius: 12px;
+  border: 1px solid var(--colorPaleGrey);
+}
+.Contact--board .Label {
+  width: 100%;
+  margin-top: 2px;
+  color: var(--colorBlueBlack);
   line-height: 20px;
+  font-size: 12px;
+  font-weight: 600;
   text-align: center;
-  width: 68px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.Contact--board .Label:hover {
-  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
-  width: auto;
-  overflow: auto;
-  text-overflow: none;
 }
 
 .Avatar--online {
@@ -608,10 +611,12 @@ div.card.text {
 div.card.text.selected {
   /* attach the outline to the content, covering the 1px border */
   outline-offset: -1px;
-  outline: 2px solid black;
+  /* outline: 2px solid black; */
 }
 
 div.card.selected {
+  box-shadow: 4px 4px 24px 0px rgba(0,0,0,.25);
+  outline-offset: -1px;
   outline: solid 2px var(--colorBlueBlack);
   z-index: 2;
 }
@@ -917,7 +922,7 @@ div.card.image {
 .CodeMirrorEditor__editor {
   box-sizing: border-box;
   width: 100%;
-  padding: 12px;
+  padding: 10px;
 }
 
 .CodeMirrorEditor div.CodeMirror {
@@ -927,7 +932,7 @@ div.card.image {
 .CodeMirrorEditor div.CodeMirror-lines {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
-  line-height: 24px;
+  line-height:20px;
   padding: 0;
 }
 
@@ -1016,7 +1021,7 @@ div.card.image {
 
 .CodeMirrorEditor__renderer p {
   font-size: 14px;
-  line-height:24px;
+  line-height:20px;
   margin-bottom: 8px;
 }
 

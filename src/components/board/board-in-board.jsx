@@ -65,25 +65,42 @@ export default class BoardInBoard extends React.PureComponent {
 
 const css = {
   icon: {
-    fontSize: '40px',
-    padding: '16px',
-    borderRadius: '36px',
-    boxShadow: '0 0 4px 0 rgba(0, 0, 0, 0.27)'
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '32px',
+    borderRadius: '50%',
+    width: 60,
+    height: 60,
+    flex: 'none'
   },
   caption: {
-    width: '72px',
+    color: 'var(--colorSecondaryGrey)',
+    marginTop: '2px',
+    width: '100%',
     textOverflow: 'ellipsis',
-    fontSize: '14px',
-    lineHeight: '24px',
+    fontSize: '12px',
+    lineHeight: '20px',
     textAlign: 'center',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
   },
   title: {
-    fontWeight: 'bold',
+    color: 'var(--colorBlueBlack)',
+    fontWeight: '600'
   },
   wrapper: {
+    boxSizing: 'border-box',
+    border: '1px solid var(--colorPaleGrey)',
+    overflow: 'hidden',
+    padding: '10px',
+    backgroundColor: 'white',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
 }
 
@@ -93,5 +110,5 @@ ContentTypes.register({
   context: 'board',
   name: 'Board',
   icon: 'sticky-note',
-  resizable: false,
+  resizable: true,
 })
