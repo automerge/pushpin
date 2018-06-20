@@ -843,6 +843,16 @@ div.card.image {
   margin-left: 8px;
 }
 
+.NothingFound {
+  display: flex;
+  align-items: center;
+  padding: 15px 10px;
+}
+
+.NothingFound .fa {
+  font-size: 24px;
+}
+
 /* Tabs */
 .Tabs {
   display: flex;

@@ -165,8 +165,13 @@ export default class Omnibox extends React.PureComponent {
       .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
       .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
 
-    sectionIndices.viewedDocUrls = { start: items.length }
+    sectionIndices.viewedDocUrls = { start: items.length, end: items.length + viewedDocItems.length }
     items = items.concat(viewedDocItems)
+
+    if (items.length === 0) {
+      items.push({ type: 'nothingFound' })
+      sectionIndices.nothingFound = { start: 0, end: 1 }
+    }
 
     if (items[this.state.selectedIndex]) {
       items[this.state.selectedIndex].selected = true
@@ -184,6 +189,25 @@ export default class Omnibox extends React.PureComponent {
     }
 
     return []
+  }
+
+  renderNothingFound = () => {
+    const item = this.sectionItems('nothingFound')[0]
+
+    if (item) {
+      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected NothingFound' : 'NothingFound ListMenu__item'
+
+      return (
+        <div className={classes} key="nothingFound">
+          <div className="ListMenu__thumbnail">
+            <i className="fa fa-question-circle" />
+          </div>
+          <div className="ListMenu__label">
+            <p className="Type--primary">Nothing Found</p>
+          </div>
+        </div>
+      )
+    }
   }
 
   renderInvitationsSection = () => {
@@ -268,6 +292,7 @@ export default class Omnibox extends React.PureComponent {
           { this.renderContentSection({ name: 'viewedDocUrls', label: 'Boards', actions: ['view'] }) }
           { this.renderContentSection({ name: 'docUrls', actions: ['view'] }) }
           { this.renderContentSection({ name: 'contacts', label: 'Contacts', actions: ['invite'] }) }
+          { this.renderNothingFound() }
         </div>
       </div>
     )

@@ -88,7 +88,7 @@ export default class ContactInList extends React.PureComponent {
     }
 
     if (this.props.actions.includes('invite')) {
-      actions.push(<span className="Type--secondary">⏎ Invite</span>)
+      actions.push(<span key="invite" className="Type--secondary">⏎ Invite</span>)
     }
 
     let avatar
