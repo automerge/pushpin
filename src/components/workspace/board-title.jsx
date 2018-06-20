@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import InvitationsView from '../../invitations-view'
