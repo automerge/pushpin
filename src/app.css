@@ -593,10 +593,12 @@ div.card.text {
 div.card.text.selected {
   /* attach the outline to the content, covering the 1px border */
   outline-offset: -1px;
-  outline: 2px solid black;
+  /* outline: 2px solid black; */
 }
 
 div.card.selected {
+  box-shadow: 4px 4px 24px 0px rgba(0,0,0,.25);
+  outline-offset: -1px;
   outline: solid 2px var(--colorBlueBlack);
   z-index: 2;
 }
