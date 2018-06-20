@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
+import BoardTitleInput from './board-title-input'
 import InvitationsView from '../../invitations-view'
 import { parseDocumentLink } from '../../share-link'
 import Omnibox from './omnibox'
@@ -15,7 +16,14 @@ export default class BoardTitle extends React.PureComponent {
     openDoc: PropTypes.func.isRequired
   }
 
-  state = { invitations: [], activeOmnibox: false, search: '', selected: null }
+  state = {
+    invitations: [],
+    activeOmnibox: false,
+    activeTitleEditor: false,
+    search: '',
+    selected: null
+  }
+
   omniboxInput = React.createRef()
   titleInput = React.createRef()
 
@@ -131,16 +139,33 @@ export default class BoardTitle extends React.PureComponent {
     if (e.target.className !== 'TitleBar__titleText') {
       this.deactivateOmnibox()
     }
+
+    if ((e.target.className !== 'TitleBar__titleText') &&
+        (e.target.className !== 'fa fa-edit')) {
+      this.setState({ activeTitleEditor: false })
+    }
+  }
+
+  handleTitleClick = (e) => {
+    if (!this.state.activeTitleEditor) {
+      this.activateOmnibox()
+    }
   }
 
   activateTitleEditor = () => {
-    this.titleInput.current.focus()
+    this.setState({ activeTitleEditor: true })
   }
 
-  editTitle = (e) => {
+  updateTitle = (value) => {
     this.boardHandle.change((doc) => {
-      doc.title = e.target.value
+      doc.title = value
     })
+
+    this.setState({ activeTitleEditor: false })
+  }
+
+  cancelTitleEdit = () => {
+    this.setState({ activeTitleEditor: false })
   }
 
   setOmniboxControl = (controller) => {
@@ -196,6 +221,8 @@ export default class BoardTitle extends React.PureComponent {
         />
       )
     } else {
+      const { titleEditor } = this.state
+
       let invitationsClasses = 'fa fa-envelope'
       if (invitations.length === 0) {
         invitationsClasses += ' hidden'
@@ -206,13 +233,12 @@ export default class BoardTitle extends React.PureComponent {
           <div className="BoardTitle__actionBar__left">
             <i className={invitationsClasses} onClick={this.activateOmnibox} />
           </div>
-          <input
-            ref={this.titleInput}
-            type="text"
-            className="TitleBar__titleText"
-            value={this.state.board && this.state.board.title || ''}
+          <BoardTitleInput
+            active={this.state.activeTitleEditor}
+            onSubmit={this.updateTitle}
+            onCancel={this.cancelTitleEdit}
+            defaultValue={this.state.board && this.state.board.title}
             onClick={this.activateOmnibox}
-            onChange={this.editTitle}
           />
           <div className="BoardTitle__actionBar__right">
             <i className="fa fa-edit" onClick={this.activateTitleEditor} />

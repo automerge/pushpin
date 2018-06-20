@@ -527,6 +527,21 @@ button[disabled].TitleBar__menuItem .fa {
   line-height:24px;
 }
 
+@keyframes text-pop {
+  from {
+    font-size: 1.25em;
+  }
+
+  to {
+    font-size: 1em;
+  }
+}
+
+.TitleBar__titleText--updated {
+  animation-duration: 1s;
+  animation-name: text-pop;
+}
+
 .TitleBar__titleText::selection {
   background: rgba(0,0,0,.05);
 }
