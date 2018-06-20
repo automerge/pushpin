@@ -130,13 +130,14 @@ export default class Share extends React.PureComponent {
     const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
 
     const contacts = uniqueContactIds.map(id => (
-      <Content
-        key={id}
-        context="list"
-        url={createDocumentLink('contact', id)}
-        actions={['share']}
-        onShare={e => this.offerDocumentToIdentity(e, id)}
-      />
+      <div key={id} className="ListMenu__item">
+        <Content
+          context="list"
+          url={createDocumentLink('contact', id)}
+          actions={['share']}
+          onShare={e => this.offerDocumentToIdentity(e, id)}
+        />
+      </div>
     ))
 
     return (
@@ -154,11 +155,13 @@ export default class Share extends React.PureComponent {
     const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
 
     const authors = uniqueAuthorIds.map(id => (
-      <Content
-        key={id}
-        context="list"
-        url={createDocumentLink('contact', id)}
-      />
+      <div key={id} className="ListMenu__item">
+        <Content
+          key={id}
+          context="list"
+          url={createDocumentLink('contact', id)}
+        />
+      </div>
     ))
 
     return (
