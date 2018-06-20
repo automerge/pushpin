@@ -11,11 +11,11 @@ export default class ContactInBoard extends React.PureComponent {
   }
 
   static minWidth = 4
-  static minHeight = 4
+  static minHeight = 5
   static defaultWidth = 6
-  static defaultHeight = 9
-  static maxWidth = 18
-  static maxHeight = 18
+  static defaultHeight = 5
+  static maxWidth = 9
+  static maxHeight = 9
 
   state = {}
 
@@ -81,7 +81,7 @@ export default class ContactInBoard extends React.PureComponent {
           { avatar }
         </div>
         <div className="Label">
-            { this.state.name }
+          { this.state.name }
         </div>
       </div>
     )

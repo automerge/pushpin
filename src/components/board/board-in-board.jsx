@@ -16,6 +16,13 @@ export default class BoardInBoard extends React.PureComponent {
     Board.initializeDocument(board)
   }
 
+  static minWidth = 4
+  static minHeight = 6
+  static defaultWidth = 4
+  static defaultHeight = 6
+  static maxWidth = 9
+  static maxHeight = 9
+
   state = {}
 
   handleDoubleClick = (e) => {

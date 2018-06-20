@@ -580,8 +580,8 @@ export default class Board extends React.PureComponent {
         const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
         const minWidth = (component.minWidth * GRID_SIZE) || CARD_MIN_WIDTH
         const minHeight = (component.minHeight * GRID_SIZE) || CARD_MIN_HEIGHT
-        const maxWidth = (component.maxWidth * GRID_SIZE) || null
-        const maxHeight = (component.maxWidth * GRID_SIZE) || null
+        const maxWidth = (component.maxWidth * GRID_SIZE) || Infinity
+        const maxHeight = (component.maxWidth * GRID_SIZE) || Infinity
 
         this.tracking[card.id] = {
           resizing: true,
