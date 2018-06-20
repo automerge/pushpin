@@ -133,9 +133,7 @@ input {
 .Workspace__container.Workspace__container--image > * {
   box-shadow: 0 12px 48px rgba(0, 0, 0, .45);
 }
-.Workspace__container.Workspace__container--image > * :: {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, .45);
-}
+
 .Workspace__container.Workspace__container--text {
   box-sizing: border-box;
   padding: 48px;

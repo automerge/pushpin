@@ -332,28 +332,8 @@ export default class Board extends React.PureComponent {
   }
 
   createCard = ({ x, y, width, height, type, typeAttrs }) => {
-    const id = uuid()
     const docId = Content.initializeContentDoc(type, typeAttrs)
-
-    this.handle.change((b) => {
-      const snapX = this.snapCoordinateToGrid(x)
-      const snapY = this.snapCoordinateToGrid(y)
-      const newCard = {
-        id,
-        url: createDocumentLink(type, docId),
-        x: snapX,
-        y: snapY,
-        width: width ? this.snapMeasureToGrid(width) : null,
-        height: height ? this.snapMeasureToGrid(height) : null,
-        slackWidth: 0,
-        slackHeight: 0,
-        resizing: false,
-        moving: false,
-      }
-      b.cards[id] = newCard
-    })
-
-    return id
+    return this.linkCard({ x, y, width, height, url: createDocumentLink(type, docId) })
   }
 
   linkCard = ({ x, y, width, height, url }) => {
