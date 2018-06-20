@@ -41,10 +41,10 @@ const BOARD_COLORS = {
 
 const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
-const GRID_SIZE = 24
+const GRID_SIZE = 20
 
-const CARD_MIN_WIDTH = 97
-const CARD_MIN_HEIGHT = 49
+const CARD_MIN_WIDTH = 81
+const CARD_MIN_HEIGHT = 41
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)

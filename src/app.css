@@ -136,15 +136,15 @@ input {
 
 .Workspace__container.Workspace__container--text {
   box-sizing: border-box;
-  padding: 48px;
+  padding: 40px;
   background: var(--colorInputGrey);
   display: flex;
   justify-content: center;
 }
 .Workspace__container.Workspace__container--text > * {
-  padding: 48px;
+  padding: 40px;
   height: auto;
-  max-width: 768px;
+  max-width: 720px;
   background-color: white;
 }
 .Workspace__container.Workspace__container--text > *::-webkit-scrollbar-track {
@@ -868,6 +868,7 @@ div.card.image {
   box-sizing: border-box;
   background: white;
   border: solid 1px var(--colorPaleGrey);
+  margin: -1px;
   overflow: auto;
 }
 .CodeMirrorEditor:focus, .CodeMirrorEditor:active {
@@ -902,7 +903,7 @@ div.card.image {
 .CodeMirrorEditor__editor {
   box-sizing: border-box;
   width: 100%;
-  padding: 12px;
+  padding: 10px;
 }
 
 .CodeMirrorEditor div.CodeMirror {
@@ -912,7 +913,7 @@ div.card.image {
 .CodeMirrorEditor div.CodeMirror-lines {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
-  line-height: 24px;
+  line-height:20px;
   padding: 0;
 }
 
@@ -1001,7 +1002,7 @@ div.card.image {
 
 .CodeMirrorEditor__renderer p {
   font-size: 14px;
-  line-height:24px;
+  line-height:20px;
   margin-bottom: 8px;
 }
 
