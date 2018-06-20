@@ -23,16 +23,6 @@ export default class BoardInBoard extends React.PureComponent {
     window.location = createDocumentLink('board', this.props.docId)
   }
 
-  handleDrop = (e) => {
-    e.stopPropagation()
-    const pushpinUrl = e.dataTransfer.getData('application/pushpin-url')
-    if (pushpinUrl) {
-      // xxx: todo once we can actually drop things onto here
-      console.log(e.getTransferData('application/pushpin-url'))
-      console.log(e)
-    }
-  }
-
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)
@@ -60,7 +50,6 @@ export default class BoardInBoard extends React.PureComponent {
       <div
         className="BoardLink"
         onDoubleClick={this.handleDoubleClick}
-        onDrop={this.handleDrop}
         style={css.wrapper}
       >
         <i className="fa fa-files-o" style={{ ...css.icon, background: this.state.backgroundColor }} />
