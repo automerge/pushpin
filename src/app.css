@@ -803,6 +803,7 @@ div.card.image {
   line-height:16px;
   min-height: 32px;
   box-sizing: border-box;
+  position: relative;
   width: 100%;
 }
 
