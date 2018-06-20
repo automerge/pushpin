@@ -598,7 +598,7 @@ div.card.text.selected {
 
 div.card.selected {
   outline: solid 2px var(--colorBlueBlack);
-  z-index: 1;
+  z-index: 2;
 }
 
 div.card span.cardResizeHandle {
