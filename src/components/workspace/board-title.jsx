@@ -113,14 +113,17 @@ export default class BoardTitle extends React.PureComponent {
 
   handleCommandKeys = (e) => {
     if (e.key === 'ArrowDown') {
+      e.preventDefault()
       this.omniboxControl.moveDown()
     }
 
     if (e.key === 'ArrowUp') {
+      e.preventDefault()
       this.omniboxControl.moveUp()
     }
 
     if (e.key === 'Enter') {
+      e.preventDefault()
       const { selected } = this.state
 
       if (selected) {
