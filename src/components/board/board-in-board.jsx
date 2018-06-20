@@ -72,11 +72,11 @@ const css = {
     borderRadius: '50%',
     width: 60,
     height: 60,
-    boxShadow: '0 0 4px 0 rgba(0, 0, 0, 0.27)',
     flex: 'none'
   },
   caption: {
-    marginTop: '1px',
+    color: 'var(--colorSecondaryGrey)',
+    marginTop: '2px',
     width: '100%',
     textOverflow: 'ellipsis',
     fontSize: '12px',
@@ -87,12 +87,19 @@ const css = {
     overflow: 'hidden',
   },
   title: {
+    color: 'var(--colorBlueBlack)',
     fontWeight: 'bold'
   },
   wrapper: {
+    boxSizing: 'border-box',
+    border: '1px solid var(--colorPaleGrey)',
+    overflow: 'hidden',
+    padding: '10px',
+    backgroundColor: 'white',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
     width: '100%',
   },
 }
@@ -103,5 +110,5 @@ ContentTypes.register({
   context: 'board',
   name: 'Board',
   icon: 'sticky-note',
-  resizable: false,
+  resizable: true,
 })
