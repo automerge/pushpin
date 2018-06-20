@@ -147,12 +147,21 @@ export default class Omnibox extends React.PureComponent {
       log('menuSections.error', e)
     }
 
+    // Note: The order of sections built here needs to match the rendered order
     const invitationItems = this.props.invitations
       .filter(invitation => invitation.doc.title.match(new RegExp(search, 'i')))
       .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
+
+    const viewedDocItems = Object.entries(this.state.viewedDocs)
+      .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
+      .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
+      .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
+
+    sectionIndices.viewedDocUrls = { start: items.length, end: items.length + viewedDocItems.length }
+    items = items.concat(viewedDocItems)
 
     if (search.length > 0) {
       const contactItems = Object.entries(this.state.contacts)
@@ -164,13 +173,6 @@ export default class Omnibox extends React.PureComponent {
       items = items.concat(contactItems)
     }
 
-    const viewedDocItems = Object.entries(this.state.viewedDocs)
-      .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
-      .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
-      .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
-
-    sectionIndices.viewedDocUrls = { start: items.length, end: items.length + viewedDocItems.length }
-    items = items.concat(viewedDocItems)
 
     if (items.length === 0) {
       items.push({ type: 'nothingFound' })
