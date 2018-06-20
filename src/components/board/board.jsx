@@ -139,7 +139,7 @@ export default class Board extends React.PureComponent {
     const cardId = this.createCard({
       x: e.pageX - this.boardRef.offsetLeft,
       y: e.pageY - this.boardRef.offsetTop,
-      width: GRID_SIZE * 10,
+      width: GRID_SIZE * 9,
       type: 'text' })
     this.selectOnly(cardId)
   }
@@ -196,7 +196,7 @@ export default class Board extends React.PureComponent {
           this.createCard({
             x: localX + (i * (GRID_SIZE * 2)),
             y: localY + (i * (GRID_SIZE * 2)),
-            width: GRID_SIZE * 10,
+            width: GRID_SIZE * 9,
             type: 'text',
             typeAttrs: { text: reader.readAsText(entry) }
           })
@@ -207,7 +207,7 @@ export default class Board extends React.PureComponent {
 
     // If we can't get the item as a bunch of files, let's hope it works as plaintext.
     const plainText = e.dataTransfer.getData('text/plain')
-    const width = GRID_SIZE * 10
+    const width = GRID_SIZE * 9
     if (plainText) {
       try {
         const url = new URL(plainText)
@@ -251,7 +251,7 @@ export default class Board extends React.PureComponent {
     }
 
     const plainTextData = dataTransfer.getData('text/plain')
-    const width = GRID_SIZE * 10
+    const width = GRID_SIZE * 9
     if (plainTextData) {
       try {
         const url = new URL(plainTextData)
@@ -288,7 +288,7 @@ export default class Board extends React.PureComponent {
     const cardId = this.createCard({
       x,
       y,
-      width: GRID_SIZE * 10,
+      width: GRID_SIZE * 9,
       type: contentType.type,
       typeAttrs: { text: '' }
     })
