@@ -13,7 +13,8 @@ export default class Omnibox extends React.PureComponent {
     search: PropTypes.string,
     getKeyController: PropTypes.func.isRequired,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    docId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired,
+    onSelectChange: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -22,7 +23,7 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { selectedIndex: -1, viewedDocs: {}, contacts: {} }
+    this.state = { selectedIndex: 0, viewedDocs: {}, contacts: {} }
     this.viewedDocHandles = {}
     this.contactHandles = {}
   }
@@ -48,7 +49,7 @@ export default class Omnibox extends React.PureComponent {
 
     if ((this.props.visible && !prevProps.visible) ||
         (this.props.search !== prevProps.search)) {
-      this.setState({ selectedIndex: -1 })
+      this.setSelectedIndex(0)
     }
   }
 
@@ -101,15 +102,21 @@ export default class Omnibox extends React.PureComponent {
     })
   }
 
+  setSelectedIndex = (newIndex) => {
+    this.setState({ selectedIndex: newIndex }, () => {
+      const { items } = this.menuSections()
+      const { selectedIndex } = this.state
+
+      this.props.onSelectChange(items[selectedIndex])
+    })
+  }
+
   moveUp = () => {
     let { selectedIndex } = this.state
 
     if (selectedIndex > 0) {
-      selectedIndex -= 1
-      this.setState({ selectedIndex })
+      this.setSelectedIndex(selectedIndex - 1)
     }
-
-    return this.menuSections().items[selectedIndex]
   }
 
   moveDown = () => {
@@ -117,11 +124,8 @@ export default class Omnibox extends React.PureComponent {
     let { selectedIndex } = this.state
 
     if (selectedIndex < (items.length - 1)) {
-      selectedIndex += 1
-      this.setState({ selectedIndex })
+      this.setSelectedIndex(selectedIndex + 1)
     }
-
-    return this.menuSections().items[selectedIndex]
   }
 
   menuSections = () => {
@@ -143,12 +147,21 @@ export default class Omnibox extends React.PureComponent {
       log('menuSections.error', e)
     }
 
+    // Note: The order of sections built here needs to match the rendered order
     const invitationItems = this.props.invitations
       .filter(invitation => invitation.doc.title.match(new RegExp(search, 'i')))
       .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
+
+    const viewedDocItems = Object.entries(this.state.viewedDocs)
+      .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
+      .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
+      .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
+
+    sectionIndices.viewedDocUrls = { start: items.length, end: items.length + viewedDocItems.length }
+    items = items.concat(viewedDocItems)
 
     if (search.length > 0) {
       const contactItems = Object.entries(this.state.contacts)
@@ -160,13 +173,11 @@ export default class Omnibox extends React.PureComponent {
       items = items.concat(contactItems)
     }
 
-    const viewedDocItems = Object.entries(this.state.viewedDocs)
-      .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
-      .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
-      .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
 
-    sectionIndices.viewedDocUrls = { start: items.length }
-    items = items.concat(viewedDocItems)
+    if (items.length === 0) {
+      items.push({ type: 'nothingFound' })
+      sectionIndices.nothingFound = { start: 0, end: 1 }
+    }
 
     if (items[this.state.selectedIndex]) {
       items[this.state.selectedIndex].selected = true
@@ -184,6 +195,25 @@ export default class Omnibox extends React.PureComponent {
     }
 
     return []
+  }
+
+  renderNothingFound = () => {
+    const item = this.sectionItems('nothingFound')[0]
+
+    if (item) {
+      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected NothingFound' : 'NothingFound ListMenu__item'
+
+      return (
+        <div className={classes} key="nothingFound">
+          <div className="ListMenu__thumbnail">
+            <i className="fa fa-question-circle" />
+          </div>
+          <div className="ListMenu__label">
+            <p className="Type--primary">Nothing Found</p>
+          </div>
+        </div>
+      )
+    }
   }
 
   renderInvitationsSection = () => {
@@ -268,6 +298,7 @@ export default class Omnibox extends React.PureComponent {
           { this.renderContentSection({ name: 'viewedDocUrls', label: 'Boards', actions: ['view'] }) }
           { this.renderContentSection({ name: 'docUrls', actions: ['view'] }) }
           { this.renderContentSection({ name: 'contacts', label: 'Contacts', actions: ['invite'] }) }
+          { this.renderNothingFound() }
         </div>
       </div>
     )

@@ -771,7 +771,6 @@ div.card.image {
 
 .ListMenu {
   color: var(--colorBlueBlack);
-  padding-bottom: 4px;
 }
 
 .ListMenu input {
@@ -846,6 +845,16 @@ div.card.image {
 
 .ListMenu .Actions > * {
   margin-left: 8px;
+}
+
+.NothingFound {
+  display: flex;
+  align-items: center;
+  padding: 15px 10px;
+}
+
+.NothingFound .fa {
+  font-size: 24px;
 }
 
 /* Tabs */
