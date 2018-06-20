@@ -26,6 +26,13 @@ export default class UrlContent extends React.PureComponent {
     urlDoc.url = url
   }
 
+  static minWidth = 9
+  static minHeight = 9
+  static defaultWidth = 9
+  static defaultHeight = 18
+  static maxWidth = 18
+  static maxHeight = 36
+
   state = { urlInput: '' }
 
   componentWillMount = () => this.refreshHandle(this.props.docId)

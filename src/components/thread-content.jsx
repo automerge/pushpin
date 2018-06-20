@@ -14,6 +14,13 @@ export default class ThreadContent extends React.PureComponent {
     threadDoc.messages = []
   }
 
+  static minWidth = 9
+  static minHeight = 6
+  static defaultWidth = 12
+  static defaultHeight = 18
+  static maxWidth = 24
+  static maxHeight = 36
+
   state = { message: '', messages: null }
 
   // This is the New Boilerplate

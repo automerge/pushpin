@@ -10,6 +10,13 @@ export default class ContactInBoard extends React.PureComponent {
     docId: PropTypes.string.isRequired,
   }
 
+  static minWidth = 4
+  static minHeight = 4
+  static defaultWidth = 6
+  static defaultHeight = 9
+  static maxWidth = 18
+  static maxHeight = 18
+
   state = {}
 
   // This is the New Boilerplate
