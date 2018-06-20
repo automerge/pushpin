@@ -4,6 +4,7 @@ import Debug from 'debug'
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
+import BoardTitleInput from './board-title-input'
 import InvitationsView from '../../invitations-view'
 import { parseDocumentLink } from '../../share-link'
 import Omnibox from './omnibox'
@@ -19,7 +20,7 @@ export default class BoardTitle extends React.PureComponent {
   state = {
     invitations: [],
     activeOmnibox: false,
-    titleEditor: { active: false, newTitle: null, updated: false },
+    activeTitleEditor: false,
     search: '',
     selected: null
   }
@@ -142,76 +143,30 @@ export default class BoardTitle extends React.PureComponent {
 
     if ((e.target.className !== 'TitleBar__titleText') &&
         (e.target.className !== 'fa fa-edit')) {
-      this.deactivateTitleEditor()
-    }
-  }
-
-  handleTitleKey = (e) => {
-    const { titleEditor } = this.state
-
-    if (e.key === 'Enter') {
-      if (titleEditor.newTitle) {
-        this.boardHandle.change((doc) => {
-          doc.title = titleEditor.newTitle
-        })
-
-        this.deactivateTitleEditor({ updated: true })
-      } else {
-        this.deactivateTitleEditor()
-      }
-    }
-
-    if (e.key === 'Escape') {
-      this.deactivateTitleEditor()
+      this.setState({ activeTitleEditor: false })
     }
   }
 
   handleTitleClick = (e) => {
-    if (!this.state.titleEditor.active) {
+    if (!this.state.activeTitleEditor) {
       this.activateOmnibox()
     }
   }
 
-  deactivateTitleEditor = ({ updated }={}) => {
-    this.titleInput.current.blur()
-    this.setState((state, props) => {
-      const titleEditor = Object.assign({}, state.titleEditor)
-
-      titleEditor.active = false
-      titleEditor.newTitle = null
-      titleEditor.updated = !!updated
-
-      return { titleEditor }
-    }, () => {
-      if (updated) {
-        const titleEditor = Object.assign({}, this.state.titleEditor)
-        titleEditor.updated = false
-
-        setTimeout(() => this.setState({ titleEditor }), 1000)
-      }
-    })
-  }
-
   activateTitleEditor = () => {
-    this.setState((state, props) => {
-      const titleEditor = Object.assign({}, state.titleEditor)
-      titleEditor.active = true
-
-      return { titleEditor }
-    })
-
-    this.titleInput.current.focus()
+    this.setState({ activeTitleEditor: true })
   }
 
-  editTitle = (e) => {
-    const newTitle = e.target.value
-
-    this.setState((state, props) => {
-      const titleEditor = Object.assign({}, state.titleEditor)
-      titleEditor.newTitle = newTitle
-
-      return { titleEditor }
+  updateTitle = (value) => {
+    this.boardHandle.change((doc) => {
+      doc.title = value
     })
+
+    this.setState({ activeTitleEditor: false })
+  }
+
+  cancelTitleEdit = () => {
+    this.setState({ activeTitleEditor: false })
   }
 
   setOmniboxControl = (controller) => {
@@ -274,31 +229,17 @@ export default class BoardTitle extends React.PureComponent {
         invitationsClasses += ' hidden'
       }
 
-      let titleInputClasses = 'TitleBar__titleText'
-      if (titleEditor.updated) {
-        titleInputClasses += " TitleBar__titleText--updated"
-      }
-
-      let title = ''
-      if (titleEditor.newTitle !== null) {
-        title = titleEditor.newTitle
-      } else if (this.state.board && this.state.board.title) {
-        title = this.state.board.title
-      }
-
       inputBar = (
         <div className="BoardTitle__actionBar">
           <div className="BoardTitle__actionBar__left">
             <i className={invitationsClasses} onClick={this.activateOmnibox} />
           </div>
-          <input
-            ref={this.titleInput}
-            type="text"
-            className={titleInputClasses}
-            value={title}
-            onClick={this.handleTitleClick}
-            onChange={this.editTitle}
-            onKeyDown={this.handleTitleKey}
+          <BoardTitleInput
+            active={this.state.activeTitleEditor}
+            onSubmit={this.updateTitle}
+            onCancel={this.cancelTitleEdit}
+            defaultValue={this.state.board && this.state.board.title}
+            onClick={this.activateOmnibox}
           />
           <div className="BoardTitle__actionBar__right">
             <i className="fa fa-edit" onClick={this.activateTitleEditor} />
