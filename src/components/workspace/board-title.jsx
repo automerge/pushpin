@@ -113,13 +113,11 @@ export default class BoardTitle extends React.PureComponent {
 
   handleCommandKeys = (e) => {
     if (e.key === 'ArrowDown') {
-      const selected = this.omniboxControl.moveDown()
-      this.setState({ selected })
+      this.omniboxControl.moveDown()
     }
 
     if (e.key === 'ArrowUp') {
-      const selected = this.omniboxControl.moveUp()
-      this.setState({ selected })
+      this.omniboxControl.moveUp()
     }
 
     if (e.key === 'Enter') {
@@ -135,6 +133,10 @@ export default class BoardTitle extends React.PureComponent {
 
       this.deactivateOmnibox()
     }
+  }
+
+  handleSelectChange = (selected) => {
+    this.setState({ selected })
   }
 
   handleClickOutside = (e) => {
@@ -261,6 +263,7 @@ export default class BoardTitle extends React.PureComponent {
           search={this.state.search}
           getKeyController={this.setOmniboxControl}
           invitations={invitations}
+          onSelectChange={this.handleSelectChange}
         />
       </div>
     )

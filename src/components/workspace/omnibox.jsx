@@ -13,7 +13,8 @@ export default class Omnibox extends React.PureComponent {
     search: PropTypes.string,
     getKeyController: PropTypes.func.isRequired,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    docId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired,
+    onSelectChange: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -48,7 +49,7 @@ export default class Omnibox extends React.PureComponent {
 
     if ((this.props.visible && !prevProps.visible) ||
         (this.props.search !== prevProps.search)) {
-      this.setState({ selectedIndex: 0 })
+      this.setSelectedIndex(0)
     }
   }
 
@@ -101,15 +102,21 @@ export default class Omnibox extends React.PureComponent {
     })
   }
 
+  setSelectedIndex = (newIndex) => {
+    this.setState({ selectedIndex: newIndex }, () => {
+      const { items } = this.menuSections()
+      const { selectedIndex } = this.state
+
+      this.props.onSelectChange(items[selectedIndex])
+    })
+  }
+
   moveUp = () => {
     let { selectedIndex } = this.state
 
     if (selectedIndex > 0) {
-      selectedIndex -= 1
-      this.setState({ selectedIndex })
+      this.setSelectedIndex(selectedIndex - 1)
     }
-
-    return this.menuSections().items[selectedIndex]
   }
 
   moveDown = () => {
@@ -117,11 +124,8 @@ export default class Omnibox extends React.PureComponent {
     let { selectedIndex } = this.state
 
     if (selectedIndex < (items.length - 1)) {
-      selectedIndex += 1
-      this.setState({ selectedIndex })
+      this.setSelectedIndex(selectedIndex + 1)
     }
-
-    return this.menuSections().items[selectedIndex]
   }
 
   menuSections = () => {
