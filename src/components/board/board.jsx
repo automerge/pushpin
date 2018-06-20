@@ -326,13 +326,15 @@ export default class Board extends React.PureComponent {
 
   createCard = ({ x, y, width, height, type, typeAttrs }) => {
     const docId = Content.initializeContentDoc(type, typeAttrs)
-    return this.linkCard({ x, y, width, height, type, url: createDocumentLink(type, docId) })
+    return this.linkCard({ x, y, width, height, url: createDocumentLink(type, docId) })
   }
 
-  linkCard = ({ x, y, width, height, type, url }) => {
+  linkCard = ({ x, y, width, height, url }) => {
     const id = uuid()
 
-    const { component } = ContentTypes.lookup({ type, context: 'board' })
+    const { type } = parseDocumentLink(url)
+    const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
+
     width = width ? this.snapMeasureToGrid(width) : null
     width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : null
     height = height ? this.snapMeasureToGrid(height) : null
@@ -578,8 +580,8 @@ export default class Board extends React.PureComponent {
         const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
         const minWidth = (component.minWidth * GRID_SIZE) || CARD_MIN_WIDTH
         const minHeight = (component.minHeight * GRID_SIZE) || CARD_MIN_HEIGHT
-        const maxWidth = (component.maxWidth * GRID_SIZE) || undefined
-        const maxHeight = (component.maxWidth * GRID_SIZE) || undefined
+        const maxWidth = (component.maxWidth * GRID_SIZE) || null
+        const maxHeight = (component.maxWidth * GRID_SIZE) || null
 
         this.tracking[card.id] = {
           resizing: true,
