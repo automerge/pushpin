@@ -74,9 +74,7 @@ export default class ContactInBoard extends React.PureComponent {
           { avatar }
         </div>
         <div className="Label">
-          <p className="Type--primary">
             { this.state.name }
-          </p>
         </div>
       </div>
     )
@@ -89,6 +87,6 @@ ContentTypes.register({
   context: 'board',
   name: 'Contact',
   icon: 'sticky-note',
-  resizable: false,
+  resizable: true,
   unlisted: true,
 })

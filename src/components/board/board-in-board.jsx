@@ -88,7 +88,7 @@ const css = {
   },
   title: {
     color: 'var(--colorBlueBlack)',
-    fontWeight: 'bold'
+    fontWeight: '600'
   },
   wrapper: {
     boxSizing: 'border-box',
