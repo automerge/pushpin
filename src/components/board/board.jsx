@@ -43,12 +43,6 @@ const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
 const GRID_SIZE = 24
 
-<<<<<<< Updated upstream
-const CARD_MIN_WIDTH = 97
-const CARD_MIN_HEIGHT = 49
-
-=======
->>>>>>> Stashed changes
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
@@ -352,10 +346,6 @@ export default class Board extends React.PureComponent {
         y: snapY,
         width: width ? this.snapMeasureToGrid(width) : null,
         height: height ? this.snapMeasureToGrid(height) : null,
-        slackWidth: 0,
-        slackHeight: 0,
-        resizing: false,
-        moving: false,
       }
       b.cards[id] = newCard
     })
@@ -406,14 +396,6 @@ export default class Board extends React.PureComponent {
       const card = b.cards[id]
       card.x = snapX
       card.y = snapY
-    })
-  }
-
-  cardResizeHeightRoundingUp = ({ id, width, height }) => {
-    const snapHeight = this.snapMeasureOutwardToGrid(Math.max(height, CARD_MIN_HEIGHT))
-    this.handle.change((b) => {
-      const card = b.cards[id]
-      card.height = snapHeight
     })
   }
 
