@@ -4,7 +4,7 @@ A collaborative corkboard app.
 
 Built with Electron and the Dat p2p stack.
 
-## Running
+## Running from Source
 
 ```console
 $ npm install
@@ -16,7 +16,7 @@ To enable debug logging, e.g.:
 ```console
 $ DEBUG=* npm start
 $ DEBUG=pushpin:* npm start
-$ DEBUG=pushpin:card npm start
+$ DEBUG=pushpin:card,hypermerge:* npm start
 ```
 
 To run multiple clients and test syncing:
@@ -31,5 +31,27 @@ This is an alias for:
 $ NAME=userA npm start & NAME=userB npm start
 ```
 
-User data is stored in `./data/<NAME>`, this example will create `./data/userA` and `./data/userB` directories. You can remove a user directory to reset a user's data, or remove the entire data directory to reset all user data.
+User data is stored in a platform-dependent, shared location outside of the
+source code directory. To get the path to your data directory, run in the
+console:
+
+```javascript
+> require('./constants').USER_PATH
+"/Users/mmcgrana/Library/Application Support/Electron/pushpin-v01/mark"
+```
+
+You can remove a user directory to reset a user's data, or remove the entire data directory to reset all user data.
+
+
+## Packaging
+
+To produce a standale package:
+
+```console
+$ electron-forge package
+$ open out/PushPin-darwin-x64/PushPin.app  # on Mac, e.g.
+```
+
+Note that data directory will be different for the packaged app, even for the
+same user name.
 
