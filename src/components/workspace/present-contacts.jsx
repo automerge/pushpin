@@ -39,7 +39,6 @@ export default class PresentContacts extends React.PureComponent {
   }
 
   onMessage = ({ msg, peer }) => {
-    console.log(msg, peer)
     const { contact, departing } = msg
     if (contact) {
       if (departing) {

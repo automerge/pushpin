@@ -650,7 +650,6 @@ export default class Board extends React.PureComponent {
 
   heartbeatNotifyDeparture = () => {
     // notify peers on the current board that we're departing
-    console.log('leaving', this.handle.id)
     this.handle.message({ contact: window.selfId, departing: true })
   }
 
