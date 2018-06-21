@@ -136,6 +136,23 @@ export default class BoardTitle extends React.PureComponent {
 
       this.deactivateOmnibox()
     }
+
+    if (e.metaKey && e.key === 'Backspace') {
+      e.preventDefault()
+      const { selected } = this.state
+
+      if (selected && selected.type === 'viewedDocUrl') {
+        this.handle.change((doc) => {
+          if (!doc.archivedDocUrls) {
+            doc.archivedDocUrls = []
+          }
+
+          if (!doc.archivedDocUrls.includes(selected.url)) {
+            doc.archivedDocUrls.push(selected.url)
+          }
+        })
+      }
+    }
   }
 
   handleSelectChange = (selected) => {

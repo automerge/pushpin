@@ -132,6 +132,7 @@ export default class Omnibox extends React.PureComponent {
     let items = []
     const sectionIndices = {}
     const { search } = this.props
+    const { archivedDocUrls = [] } = this.state
 
     try {
       parseDocumentLink(search)
@@ -165,6 +166,7 @@ export default class Omnibox extends React.PureComponent {
     items = items.concat(invitationItems)
 
     const viewedDocItems = Object.entries(this.state.viewedDocs)
+      .filter(([url, doc]) => !archivedDocUrls.includes(url))
       .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
       .filter(([url, doc]) => doc.title.match(searchRegEx))
       .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
@@ -176,6 +178,14 @@ export default class Omnibox extends React.PureComponent {
     items = items.concat(viewedDocItems)
 
     if (search.length > 0) {
+      const archivedDocItems = archivedDocUrls.map(url => [url, this.state.viewedDocs[url]])
+        .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
+        .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
+        .map(([url, doc]) => ({ type: 'archivedDocUrl', object: doc, url }))
+
+      sectionIndices.archivedDocUrls = { start: items.length, end: items.length + archivedDocItems.length }
+      items = items.concat(archivedDocItems)
+
       const contactItems = Object.entries(this.state.contacts)
         .filter(([id, doc]) => doc.name)
         .filter(([id, doc]) => doc.name.match(searchRegEx))
@@ -184,7 +194,6 @@ export default class Omnibox extends React.PureComponent {
       sectionIndices.contacts = { start: items.length, end: (items.length + contactItems.length) }
       items = items.concat(contactItems)
     }
-
 
     if (items.length === 0) {
       items.push({ type: 'nothingFound' })
@@ -309,7 +318,8 @@ export default class Omnibox extends React.PureComponent {
       <div className="Omnibox">
         <div className="ListMenu">
           { this.renderInvitationsSection() }
-          { this.renderContentSection({ name: 'viewedDocUrls', label: 'Boards', actions: ['view'] }) }
+          { this.renderContentSection({ name: 'viewedDocUrls', label: 'Boards', actions: ['view', 'archive'] }) }
+          { this.renderContentSection({ name: 'archivedDocUrls', label: 'Archived', actions: ['view'] }) }
           { this.renderContentSection({ name: 'docUrls', actions: ['view'] }) }
           { this.renderContentSection({ name: 'contacts', label: 'Contacts', actions: ['invite'] }) }
           { this.renderNothingFound() }
