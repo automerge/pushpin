@@ -628,7 +628,7 @@ div.card.text.selected {
 div.card.selected {
   box-shadow: 4px 4px 24px 0px rgba(0,0,0,.25);
   outline-offset: -1px;
-  outline: solid 2px var(--highlight-color);
+  outline: solid 2px var(--highlight-color, var(--colorBlueBlack));
   z-index: 2;
 }
 
