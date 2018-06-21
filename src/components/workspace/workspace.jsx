@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 
-import { USER } from '../../constants'
 import ContentTypes from '../../content-types'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import Content from '../content'
@@ -18,14 +17,15 @@ export default class Workspace extends React.PureComponent {
   }
 
   static initializeDocument = (workspace) => {
-    // When creating a workspace we also need to create an identity and board,
-    // do that first so that we have IDs.
-    const identity = window.hm.create()
-    const selfId = window.hm.getId(identity)
-    window.hm.change(identity, (i) => {
-      i.name = `The Mysterious ${USER}`
-      i.docId = selfId
+    const selfId = Content.initializeContentDoc('contact')
+
+    // this is, uh, a nasty hack.
+    // we should refactor not to require the docId on the contact
+    // but i don't want to pull that in scope right now
+    window.hm.openHandle(selfId).change((doc) => {
+      doc.docId = selfId
     })
+
     const boardId = Content.initializeContentDoc('board', { selfId })
     const docUrl = createDocumentLink('board', boardId)
 

@@ -227,10 +227,13 @@ input {
   text-overflow: ellipsis;
 }
 
+.Avatar {
+  --highlight-color: rgba(113, 227, 65, 1);
+}
 .Avatar--online {
-  border: 2px solid rgba(113, 227, 65, 1);
-  box-shadow: 0 0 4px 0 rgba(113, 227, 65, 1);
-  animation: pulse 2s;
+  border: 2px solid var(--highlight-color);
+  box-shadow: 0 0 4px 0 var(--highlight-color);
+  /* animation: pulse 2s; */
 }
 
 @keyframes pulse {

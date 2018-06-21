@@ -6,15 +6,45 @@ import Debug from 'debug'
 import { createDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
 
-import { IMAGE_DIALOG_OPTIONS } from '../../constants'
+import { USER, IMAGE_DIALOG_OPTIONS } from '../../constants'
 import Content from '../content'
+import ContentTypes from '../../content-types'
+import ColorPicker from '../color-picker'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
 
-export default class Settings extends React.PureComponent {
+const USER_COLORS = {
+  DEFAULT: '#ED77AA',
+  SNOW: '#EBEDF4',
+  BEIGE: '#f3f1ec',
+  CANVAS: '#D8D1C0',
+  SKY: '#dcf3f6',
+  VIOLET: '#e5dcf6',
+  PINK: '#ffe1e7',
+  HERB: '#daefd2',
+  PEACH: '#ffd2cc',
+  RUST: '#D96767',
+  ENGINEER: '#FFE283',
+  KEYLIME: '#A1E991',
+  PINE: '#63D2A5',
+  SOFT: '#64BCDF',
+  BIGBLUE: '#3A66A3',
+  ROYAL: '#A485E2',
+  KAWAII: '#ED77AB',
+  BLACK: '#2b2b2b'
+}
+
+export default class ContactEditor extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired
+  }
+
+  static initializeDocument = (doc, typeAttrs) => {
+    doc.name = USER
+    const USER_COLOR_VALUES = Object.values(USER_COLORS)
+    const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
+    doc.color = color
   }
 
   state = {}
@@ -69,6 +99,12 @@ export default class Settings extends React.PureComponent {
     })
   }
 
+  setColor = (color) => {
+    this.handle.change((d) => {
+      d.color = color.hex
+    })
+  }
+
   render = () => {
     log('render')
     let avatar
@@ -100,6 +136,17 @@ export default class Settings extends React.PureComponent {
                 <button className="Type--action" onClick={this.chooseAvatar}>Choose from file...</button>
               </div>
             </div>
+            <div className="ListMenu__section">
+              <div className="ListMenu__label">Presence Color</div>
+              <div className="ListMenu__item">
+                <ColorPicker
+                  color={this.state.color}
+                  colors={Object.values(USER_COLORS)}
+                  onChangeComplete={this.setColor}
+                />
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -107,3 +154,15 @@ export default class Settings extends React.PureComponent {
   }
 }
 
+// this is a little silly, since we don't want the contact editor to be
+// the default view, but it's the only way to register the content initializer
+// at the moment, so pending fixes to that API, let's try this
+ContentTypes.register({
+  component: ContactEditor,
+  type: 'contact',
+  context: 'default',
+  name: 'Contact',
+  icon: 'sticky-note',
+  resizable: true,
+  unlisted: true,
+})

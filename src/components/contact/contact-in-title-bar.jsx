@@ -67,6 +67,7 @@ class ContactInTitlebar extends React.PureComponent {
       <div>
         <div
           className={`Avatar Avatar--title-bar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
+          style={{ '--highlight-color': this.state.color }}
           title={this.state.name}
         >
           { avatar }
