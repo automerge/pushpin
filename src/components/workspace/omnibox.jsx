@@ -112,7 +112,7 @@ export default class Omnibox extends React.PureComponent {
   }
 
   moveUp = () => {
-    let { selectedIndex } = this.state
+    const { selectedIndex } = this.state
 
     if (selectedIndex > 0) {
       this.setSelectedIndex(selectedIndex - 1)
@@ -121,7 +121,7 @@ export default class Omnibox extends React.PureComponent {
 
   moveDown = () => {
     const { items } = this.menuSections()
-    let { selectedIndex } = this.state
+    const { selectedIndex } = this.state
 
     if (selectedIndex < (items.length - 1)) {
       this.setSelectedIndex(selectedIndex + 1)
@@ -169,7 +169,10 @@ export default class Omnibox extends React.PureComponent {
       .filter(([url, doc]) => doc.title.match(searchRegEx))
       .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
 
-    sectionIndices.viewedDocUrls = { start: items.length, end: items.length + viewedDocItems.length }
+    sectionIndices.viewedDocUrls = {
+      start: items.length,
+      end: items.length + viewedDocItems.length
+    }
     items = items.concat(viewedDocItems)
 
     if (search.length > 0) {
@@ -223,6 +226,8 @@ export default class Omnibox extends React.PureComponent {
         </div>
       )
     }
+
+    return null
   }
 
   renderInvitationsSection = () => {
