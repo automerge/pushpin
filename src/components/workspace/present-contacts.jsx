@@ -20,6 +20,7 @@ export default class PresentContacts extends React.PureComponent {
   componentWillUnmount = () => window.hm.releaseHandle(this.handle)
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.currentDocUrl !== this.props.currentDocUrl) {
+      this.clearContacts()
       this.refreshHandle(this.props.currentDocUrl)
     }
   }
@@ -39,8 +40,13 @@ export default class PresentContacts extends React.PureComponent {
 
   onMessage = ({ msg, peer }) => {
     console.log(msg, peer)
-    const { contact } = msg
+    const { contact, departing } = msg
     if (contact) {
+      if (departing) {
+        clearTimeout(this.presentContactsTimerId[contact])
+        this.contactAbsent(contact)()
+        return
+      }
       this.contactPresent(contact)
       clearTimeout(this.presentContactsTimerId[contact])
       this.presentContactsTimerId[contact]
@@ -53,6 +59,10 @@ export default class PresentContacts extends React.PureComponent {
       this.setState({ presentContacts:
         { ...this.state.presentContacts, [contact]: true } })
     }
+  }
+
+  clearContacts = () => {
+    this.setState({ presentContacts: { } })
   }
 
   // note this is a function that returns a function for setTimeout to use

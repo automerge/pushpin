@@ -81,11 +81,13 @@ export default class Board extends React.PureComponent {
 
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => {
+    this.heartbeatNotifyDeparture()
     window.hm.releaseHandle(this.handle)
     clearInterval(this.heartbeatTimerId)
   }
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
+      this.heartbeatNotifyDeparture()
       this.refreshHandle(this.props.docId)
     }
   }
@@ -644,6 +646,12 @@ export default class Board extends React.PureComponent {
         this.handle.message({ contact: window.selfId, heartbeat: true })
       }, 5000) // send a heartbeat every 5s
     }
+  }
+
+  heartbeatNotifyDeparture = () => {
+    // notify peers on the current board that we're departing
+    console.log('leaving', this.handle.id)
+    this.handle.message({ contact: window.selfId, departing: true })
   }
 
   clearRemoteSelection = (contact) => {
