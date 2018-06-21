@@ -99,7 +99,6 @@ body {
   line-height: 20px;
   -webkit-font-smoothing: antialiased;
   height: calc(100% - 40px);
-  user-select: none;
   cursor: default;
 }
 
@@ -424,6 +423,7 @@ input {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
   color: var(--colorSecondaryGrey);
+  user-select: none;
 }
 
 .TitleBar__menuItem .fa {
@@ -583,15 +583,9 @@ button[disabled].TitleBar__menuItem .fa {
 }
 
 div.board {
-  position:relative;
+  position: relative;
   background-image: url(grid.svg);
   background-blend-mode: color-burn;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 
 .card {
@@ -648,12 +642,15 @@ div.card span.cardResizeHandle {
   outline: none;
 }
 
+div.card {
+  user-select: none;
+}
+
 div.card img.image {
   height: 100%;
   width: 100%;
   object-fit: cover;
   pointer-events: none;
-  user-select: none;
 }
 
 div.card.image {
