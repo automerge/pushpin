@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { clipboard } from 'electron'
 
 import BoardTitleInput from './board-title-input'
 import InvitationsView from '../../invitations-view'
@@ -203,6 +203,10 @@ export default class BoardTitle extends React.PureComponent {
     window.hm.releaseHandle(selfHandle)
   }
 
+  copyToClipboard = (e) => {
+    clipboard.writeText(this.state.currentDocUrl)
+  }
+
   render = () => {
     log('render')
 
@@ -247,9 +251,7 @@ export default class BoardTitle extends React.PureComponent {
           />
           <div className="BoardTitle__actionBar__right">
             <i className="fa fa-edit" onClick={this.activateTitleEditor} />
-            <CopyToClipboard text={this.state.currentDocUrl}>
-              <i className="fa fa-clipboard" />
-            </CopyToClipboard>
+            <i className="fa fa-clipboard" onClick={this.copyToClipboard} />
           </div>
         </div>
       )
