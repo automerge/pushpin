@@ -29,6 +29,7 @@ export default class BoardCard extends React.PureComponent {
     onCardClicked: PropTypes.func.isRequired,
     onCardDoubleClicked: PropTypes.func.isRequired,
     setCardRef: PropTypes.func.isRequired,
+    remoteSelected: PropTypes.arrayOf(PropTypes.string).isRequired,
     dragState: PropTypes.shape({
       moveX: PropTypes.number,
       moveY: PropTypes.number,
@@ -64,7 +65,10 @@ export default class BoardCard extends React.PureComponent {
       height: Number.isInteger(dragState.resizeHeight) ? dragState.resizeHeight : card.height,
       position: 'absolute',
       left: Number.isInteger(dragState.moveX) ? dragState.moveX : card.x,
-      top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
+      top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y,
+    }
+    if (this.props.remoteSelected.length > 0) {
+      style.outline = '5px solid red'
     }
 
     const { type } = parseDocumentLink(card.url)

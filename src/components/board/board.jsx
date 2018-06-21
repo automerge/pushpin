@@ -67,6 +67,7 @@ export default class Board extends React.PureComponent {
 
     this.tracking = {}
     this.cardRefs = {}
+    this.contactHeartbeatTimerId = {}
     this.state = { doc: {}, cards: {}, selected: [] }
   }
 
@@ -78,9 +79,11 @@ export default class Board extends React.PureComponent {
     board.authorIds = []
   }
 
-  // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillUnmount = () => {
+    window.hm.releaseHandle(this.handle)
+    clearInterval(this.heartbeatTimerId)
+  }
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -93,10 +96,12 @@ export default class Board extends React.PureComponent {
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
+    this.handle.onMessage(this.onMessage)
   }
 
   onChange = (doc) => {
     this.setState({ doc })
+    this.refreshHeartbeat()
   }
 
   onKeyDown = (e) => {
@@ -109,7 +114,7 @@ export default class Board extends React.PureComponent {
 
   onClick = (e) => {
     log('onClick')
-    this.setState({ selected: [] })
+    this.selectNone()
   }
 
   onCardClicked = (e, card) => {
@@ -614,20 +619,61 @@ export default class Board extends React.PureComponent {
     }
   }
 
+  onMessage = ({ msg, peer }) => {
+    const { remoteSelection = {} } = this.state
+    const { contact, selected } = msg
+
+    if (msg.contact) {
+      clearTimeout(this.contactHeartbeatTimerId[contact])
+      // if we miss two heartbeats (11s), assume they've gone offline
+      this.contactHeartbeatTimerId[contact] = setTimeout(() => {
+        this.clearRemoteSelection(contact)
+      }, 11000)
+    }
+
+    if (contact && selected) {
+      this.setState({ remoteSelection: { ...remoteSelection, [contact]: selected } })
+    }
+  }
+
+  refreshHeartbeat = (doc) => {
+    // XXX check how this work on board change
+    if (!this.heartbeatTimerId) {
+      this.handle.message({ contact: window.selfId, heartbeat: true })
+      this.heartbeatTimerId = setInterval(() => {
+        this.handle.message({ contact: window.selfId, heartbeat: true })
+      }, 5000) // send a heartbeat every 5s
+    }
+  }
+
+  clearRemoteSelection = (contact) => {
+    const { remoteSelection = {} } = this.state
+    this.setState({ remoteSelection: { ...remoteSelection, [contact]: undefined } })
+  }
+
+  updateSelection = (selected) => {
+    this.setState({ selected })
+    this.handle.message({ contact: window.selfId, selected })
+  }
+
   selectToggle = (cardId) => {
     const { selected } = this.state
 
     if (selected.includes(cardId)) {
       // remove from the current state if we have it
-      this.setState({ selected: selected.filter((filterId) => filterId !== cardId) })
+      this.updateSelection([selected.filter((filterId) => filterId !== cardId)])
     } else {
       // add to the current state if we don't
-      this.setState({ selected: [...selected, cardId] })
+      this.updateSelection([...selected, cardId])
     }
   }
 
   selectOnly = (cardId) => {
-    this.setState({ selected: [cardId] })
+    this.updateSelection([cardId])
+  }
+
+  selectNone = () => {
+    this.updateSelection([])
   }
 
   onStop = (card, e, d) => {
@@ -683,6 +729,18 @@ export default class Board extends React.PureComponent {
   render = () => {
     log('render')
 
+    // invert the client->cards to a cards->client mapping
+    const { remoteSelection = {} } = this.state
+    const cardsSelected = {}
+    Object.entries(remoteSelection).forEach(([contact, cards]) => {
+      (cards || []).forEach((card) => {
+        if (!cardsSelected[card]) {
+          cardsSelected[card] = []
+        }
+        cardsSelected[card].push(contact)
+      })
+    })
+
     const cards = this.state.doc.cards || {}
     const cardChildren = Object.entries(cards).map(([id, card]) => {
       const selected = this.state.selected.includes(id)
@@ -693,6 +751,7 @@ export default class Board extends React.PureComponent {
           id={id}
           card={card}
           selected={selected}
+          remoteSelected={cardsSelected[id] || []}
           uniquelySelected={uniquelySelected}
           dragState={this.state.cards[id]}
           onDrag={this.onDrag}
