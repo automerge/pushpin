@@ -6,6 +6,7 @@ import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdow
 import BoardTitle from './board-title'
 import Content from '../content'
 import Settings from './settings'
+import PresentContacts from './present-contacts'
 import Share from './share'
 import { createDocumentLink } from '../../share-link'
 
@@ -109,6 +110,9 @@ export default class TitleBar extends React.PureComponent {
         </div>
 
         <div className="TitleBar__right">
+          <PresentContacts
+            currentDocUrl={this.state.currentDocUrl}
+          />
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
               <i className="fa fa-group" />

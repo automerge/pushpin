@@ -530,6 +530,14 @@ button[disabled].TitleBar__menuItem .fa {
   line-height:24px;
 }
 
+.PresentContacts {
+  display: flex;
+  align-items: center;
+}
+.PresentContacts > * {
+  padding-left: 8px
+}
+
 @keyframes text-pop {
   from {
     font-size: 1.25em;
