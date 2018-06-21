@@ -50,7 +50,7 @@ export default class BoardInList extends React.PureComponent {
     const actionOptions = []
 
     if (this.props.actions.includes('archive')) {
-      actionOptions.push(<span key='archive' className="Type--secondary">⌫ Archive</span>)
+      actionOptions.push(<span key='archive' className="Type--secondary">⌘+⌫ Archive</span>)
     }
 
     if (this.props.actions.includes('view')) {
