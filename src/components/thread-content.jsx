@@ -16,7 +16,7 @@ export default class ThreadContent extends React.PureComponent {
 
   static minWidth = 9
   static minHeight = 6
-  static defaultWidth = 12
+  static defaultWidth = 16
   static defaultHeight = 18
   static maxWidth = 24
   static maxHeight = 36

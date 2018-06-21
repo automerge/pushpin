@@ -18,7 +18,7 @@ export default class BoardInBoard extends React.PureComponent {
 
   static minWidth = 4
   static minHeight = 6
-  static defaultWidth = 4
+  static defaultWidth = 6
   static defaultHeight = 6
   static maxWidth = 9
   static maxHeight = 9

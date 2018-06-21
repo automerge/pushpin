@@ -15,12 +15,13 @@ export default class ImageContent extends React.PureComponent {
     image.hyperfileId = hyperfileId
   }
 
-  static minWidth = 4
-  static minHeight = 4
+  static minWidth = 3
+  static minHeight = 3
   static defaultWidth = 18
   // no default height to allow it to grow
-  static maxWidth = 36
-  static maxHeight = 36
+  // suggestion: no max/min width on images, we dont know what aspect ratios people will be using day to day
+  // static maxWidth = 36
+  // static maxHeight = 36
 
   state = {}
 

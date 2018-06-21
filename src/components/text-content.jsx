@@ -51,7 +51,7 @@ export default class TextContent extends React.PureComponent {
 
   static minWidth = 6
   static minHeight = 2
-  static defaultWidth = 9
+  static defaultWidth = 12
   // no default height to allow it to grow
   static maxWidth = 24
   static maxHeight = 36

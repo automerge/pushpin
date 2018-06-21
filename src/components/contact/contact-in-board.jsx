@@ -13,7 +13,7 @@ export default class ContactInBoard extends React.PureComponent {
   static minWidth = 4
   static minHeight = 5
   static defaultWidth = 6
-  static defaultHeight = 5
+  static defaultHeight = 6
   static maxWidth = 9
   static maxHeight = 9
 
