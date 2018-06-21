@@ -28,10 +28,10 @@ export default class UrlContent extends React.PureComponent {
 
   static minWidth = 9
   static minHeight = 9
-  static defaultWidth = 9
-  static defaultHeight = 18
-  static maxWidth = 18
-  static maxHeight = 36
+  static defaultWidth = 12
+  // static defaultHeight = 18
+  static maxWidth = 24
+  static maxHeight = 32
 
   state = { urlInput: '' }
 
@@ -180,10 +180,12 @@ const css = {
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: 'white',
+    boxSizing: 'border-box',
     overflow: 'auto',
     position: 'relative',
     padding: 12,
-    flex: '1 1 auto'
+    flex: '1 1 auto',
+    border: '1px solid var(--colorPaleGrey)'
   },
   img: {
     WebkitUserDrag: 'none',
@@ -241,12 +243,13 @@ const css = {
   urlInput: {
     backgroundColor: 'white',
     padding: '4px',
-    height: 24,
+    height: 20,
     flex: 1,
+    width: 'calc(100% -32px)'
   },
   inputGroup: {
     display: 'flex',
-    width: 280,
+    flex: '1 0 auto',
     alignItems: 'center'
   },
   inputGroupIcon: {
