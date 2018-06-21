@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import BoardTitleInput from './board-title-input'
 import InvitationsView from '../../invitations-view'
@@ -9,6 +8,27 @@ import { parseDocumentLink } from '../../share-link'
 import Omnibox from './omnibox'
 
 const log = Debug('pushpin:board-title')
+
+// From: https://hackernoon.com/copying-text-to-clipboard-with-javascript-df4d4988697f
+const copyToClipboard = str => {
+  const el = document.createElement('textarea');  // Create a <textarea> element
+  el.value = str;                                 // Set its value to the string that you want copied
+  el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+  el.style.position = 'absolute';
+  el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+  document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+  const selected =
+    document.getSelection().rangeCount > 0        // Check if there is any content selected previously
+      ? document.getSelection().getRangeAt(0)     // Store selection if found
+      : false;                                    // Mark as false to know no selection existed before
+  el.select();                                    // Select the <textarea> content
+  document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
+  document.body.removeChild(el);                  // Remove the <textarea> element
+  if (selected) {                                 // If a selection existed before copying
+    document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
+    document.getSelection().addRange(selected);   // Restore the original selection
+  }
+}
 
 export default class BoardTitle extends React.PureComponent {
   static propTypes = {
@@ -203,6 +223,11 @@ export default class BoardTitle extends React.PureComponent {
     window.hm.releaseHandle(selfHandle)
   }
 
+  copyDocUrl = (e) => {
+    log('copy')
+    copyToClipboard(this.state.currentDocUrl)
+  }
+
   render = () => {
     log('render')
 
@@ -247,9 +272,7 @@ export default class BoardTitle extends React.PureComponent {
           />
           <div className="BoardTitle__actionBar__right">
             <i className="fa fa-edit" onClick={this.activateTitleEditor} />
-            <CopyToClipboard text={this.state.currentDocUrl}>
-              <i className="fa fa-clipboard" />
-            </CopyToClipboard>
+            <i className="fa fa-clipboard" onClick={this.copyDocUrl} />
           </div>
         </div>
       )
