@@ -235,7 +235,6 @@ export default class Omnibox extends React.PureComponent {
         </div>
       )
     }
-
     return null
   }
 

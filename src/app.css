@@ -58,6 +58,7 @@ table {
   --colorSecondaryGrey: #637389;
   --colorPaleGrey: #D5DFE5;
   --colorInputGrey: #E9EDF0;
+  --colorOnline: rgb(113, 227, 65);
   --colorLink: #0645ad;
   --colorDestructive: #F87060;
   --zIndexCard: 1;
@@ -227,21 +228,8 @@ input {
 }
 
 .Avatar--online {
-  border: 2px solid rgba(113, 227, 65, 1);
-  box-shadow: 0 0 4px 0 rgba(113, 227, 65, 1);
-  animation: pulse 2s;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(113, 227, 65, .5);
-  }
-  70% {
-      box-shadow: 0 0 0 8px rgba(113, 227, 65, 0);
-  }
-  100% {
-      box-shadow: 0 0 0 0 rgba(113, 227, 65, 0);
-  }
+  border: 2px solid var(--highlight-color, var(--colorOnline));
+  box-shadow: 0 0 4px 0 var(--highlight-color, var(--colorOnline));
 }
 
 .BoardTitle .dropdown {
@@ -530,6 +518,14 @@ button[disabled].TitleBar__menuItem .fa {
   line-height:24px;
 }
 
+.PresentContacts {
+  display: flex;
+  align-items: center;
+}
+.PresentContacts > * {
+  padding-left: 8px
+}
+
 @keyframes text-pop {
   from {
     font-size: 1.25em;
@@ -611,7 +607,7 @@ div.card.text.selected {
 div.card.selected {
   box-shadow: 4px 4px 24px 0px rgba(0,0,0,.25);
   outline-offset: -1px;
-  outline: solid 2px var(--colorBlueBlack);
+  outline: solid 2px var(--highlight-color, var(--colorBlueBlack));
   z-index: 2;
 }
 

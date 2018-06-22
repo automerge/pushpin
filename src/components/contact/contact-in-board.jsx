@@ -77,7 +77,10 @@ export default class ContactInBoard extends React.PureComponent {
 
     return (
       <div className="Contact--board">
-        <div className={`Avatar Avatar--board ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}>
+        <div
+          className={`Avatar Avatar--board ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
+          style={{ '--highlight-color': this.state.color }}
+        >
           { avatar }
         </div>
         <div className="Label">

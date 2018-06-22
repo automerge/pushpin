@@ -29,6 +29,7 @@ export default class BoardCard extends React.PureComponent {
     onCardClicked: PropTypes.func.isRequired,
     onCardDoubleClicked: PropTypes.func.isRequired,
     setCardRef: PropTypes.func.isRequired,
+    remoteSelected: PropTypes.arrayOf(PropTypes.string).isRequired,
     dragState: PropTypes.shape({
       moveX: PropTypes.number,
       moveY: PropTypes.number,
@@ -64,12 +65,21 @@ export default class BoardCard extends React.PureComponent {
       height: Number.isInteger(dragState.resizeHeight) ? dragState.resizeHeight : card.height,
       position: 'absolute',
       left: Number.isInteger(dragState.moveX) ? dragState.moveX : card.x,
-      top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y
+      top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y,
+    }
+    if (this.props.remoteSelected.length > 0) {
+      const contactHandle = window.hm.openHandle(this.props.remoteSelected[0])
+      const contact = contactHandle.get()
+      if (contact) {
+        style['--highlight-color'] = contact.color
+      }
     }
 
     const { type } = parseDocumentLink(card.url)
     const context = 'board'
     const contentType = ContentTypes.lookup({ type, context })
+
+    const selected = this.props.selected || this.props.remoteSelected.length > 0
 
     return (
       <DraggableCore
@@ -84,7 +94,7 @@ export default class BoardCard extends React.PureComponent {
           ref={this.setCardRef}
           tabIndex="-1"
           id={`card-${card.id}`}
-          className={classNames('card', card.type, this.props.selected ? 'selected' : 'unselected')}
+          className={classNames('card', card.type, selected ? 'selected' : 'unselected')}
           style={style}
           onClick={this.onCardClicked}
           onDoubleClick={this.onCardDoubleClicked}

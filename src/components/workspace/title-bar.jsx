@@ -5,7 +5,8 @@ import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdow
 
 import BoardTitle from './board-title'
 import Content from '../content'
-import Settings from './settings'
+import ContactEditor from '../contact/contact-editor'
+import PresentContacts from './present-contacts'
 import Share from './share'
 import { createDocumentLink } from '../../share-link'
 
@@ -93,7 +94,7 @@ export default class TitleBar extends React.PureComponent {
               <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
             </DropdownTrigger>
             <DropdownContent>
-              <Settings docId={this.state.selfId} />
+              <ContactEditor docId={this.state.selfId} />
             </DropdownContent>
           </Dropdown>
           <button disabled={this.disableBack()} onClick={this.back} className="TitleBar__menuItem">
@@ -109,6 +110,9 @@ export default class TitleBar extends React.PureComponent {
         </div>
 
         <div className="TitleBar__right">
+          <PresentContacts
+            currentDocUrl={this.state.currentDocUrl}
+          />
           <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
               <i className="fa fa-group" />

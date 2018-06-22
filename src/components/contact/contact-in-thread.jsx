@@ -63,11 +63,16 @@ class ContactInThread extends React.PureComponent {
       avatar = <img alt="avatar" src="../img/default-avatar.png" />
     }
 
+    const avatarStyle = { ...css.avatar }
+    if (this.state.color) {
+      avatarStyle['--highlight-color'] = this.state.color
+    }
+
     return (
       <div style={css.user}>
         <div
           className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
-          style={css.avatar}
+          style={avatarStyle}
           title={this.state.name}
         >
           { avatar }
