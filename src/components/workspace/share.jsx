@@ -128,7 +128,17 @@ export default class Share extends React.PureComponent {
   renderContacts = () => {
     const { contactIds = [] } = (this.state.workspace || {})
     const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
-
+    const noneFound = (
+      <div className="ListMenu__item">
+        <div className="ContactListItem">
+          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
+          <div className="Label">
+            <p className="Type--primary">None found</p>
+            <p className="Type--secondary">Copy a link to your board and start making friends</p>
+          </div>
+        </div>
+      </div>
+    )
     const contacts = uniqueContactIds.map(id => (
       <div key={id} className="ListMenu__item">
         <Content
@@ -142,9 +152,8 @@ export default class Share extends React.PureComponent {
 
     return (
       <div>
-        <div className="ListMenu__segment">All Contacts</div>
         <div className="ListMenu__section">
-          { contacts }
+          { uniqueContactIds.length != 0 ? contacts : noneFound}
         </div>
       </div>
     )
@@ -153,7 +162,17 @@ export default class Share extends React.PureComponent {
   renderAuthors = () => {
     const { authorIds = [] } = (this.state.board || {})
     const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
-
+    const noneFound = (
+      <div className="ListMenu__item">
+        <div className="ContactListItem">
+          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
+          <div className="Label">
+            <p className="Type--primary">None found</p>
+            <p className="Type--secondary">Nobody has access to this but you</p>
+          </div>
+        </div>
+      </div>
+    )
     const authors = uniqueAuthorIds.map(id => (
       <div key={id} className="ListMenu__item">
         <Content
@@ -163,12 +182,10 @@ export default class Share extends React.PureComponent {
         />
       </div>
     ))
-
     return (
       <div>
-        <div className="ListMenu__segment">On Board</div>
         <div className="ListMenu__section">
-          { authors }
+          { uniqueAuthorIds.length != 0 ? authors : noneFound}
         </div>
       </div>
     )
@@ -199,7 +216,7 @@ export default class Share extends React.PureComponent {
               className={this.tabClasses('authors')}
               onClick={() => this.setState({ tab: 'authors' })}
             >
-              <i className="fa fa-copy" /> On Board
+              <i className="fa fa-pencil" /> Authors
             </div>
             <div
               role="button"

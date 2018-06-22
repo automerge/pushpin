@@ -15,24 +15,24 @@ const { dialog } = remote
 const log = Debug('pushpin:settings')
 
 const USER_COLORS = {
-  DEFAULT: '#ED77AA',
-  SNOW: '#EBEDF4',
-  BEIGE: '#f3f1ec',
-  CANVAS: '#D8D1C0',
-  SKY: '#dcf3f6',
-  VIOLET: '#e5dcf6',
-  PINK: '#ffe1e7',
-  HERB: '#daefd2',
-  PEACH: '#ffd2cc',
-  RUST: '#D96767',
-  ENGINEER: '#FFE283',
-  KEYLIME: '#A1E991',
-  PINE: '#63D2A5',
-  SOFT: '#64BCDF',
-  BIGBLUE: '#3A66A3',
-  ROYAL: '#A485E2',
-  KAWAII: '#ED77AB',
-  BLACK: '#2b2b2b'
+  // RUST: '#D96767',
+  // ENGINEER: '#FFE283',
+  // KEYLIME: '#A1E991',
+  // PINE: '#63D2A5',
+  // SOFT: '#64BCDF',
+  // BIGBLUE: '#3A66A3',
+  // ROYAL: '#A485E2',
+  // KAWAII: '#ED77AB',
+  // BLACK: '#2b2b2b',
+  RED: '#F87060',
+  VORANGE: '#FFC919',
+  DARKGRE: '#6CCB44',
+  PINETO: '#00CA7B',
+  VBLAU: '#3395E8',
+  CHILBLAU: '#004098',
+  OPTIROYA: '#4700D8',
+  MAGEGENTA: '#E80FA7',
+  GRAU: '#626262'
 }
 
 export default class ContactEditor extends React.PureComponent {
@@ -126,7 +126,7 @@ export default class ContactEditor extends React.PureComponent {
               <input type="text" onChange={this.setName} value={this.state.name || ''} />
             </div>
             <div className="ListMenu__label">Avatar</div>
-            <div className="ListMenu__item">
+            <div className="ListMenu__item ContactListItem">
               <div className="ListMenu__thumbnail">
                 <div className="Avatar">
                   { avatar }
@@ -136,17 +136,17 @@ export default class ContactEditor extends React.PureComponent {
                 <button className="Type--action" onClick={this.chooseAvatar}>Choose from file...</button>
               </div>
             </div>
-            <div className="ListMenu__section">
-              <div className="ListMenu__label">Presence Color</div>
-              <div className="ListMenu__item">
-                <ColorPicker
-                  color={this.state.color}
-                  colors={Object.values(USER_COLORS)}
-                  onChangeComplete={this.setColor}
-                />
-              </div>
+            <div className="ListMenu__label">Presence Color</div>
+            <div className="ListMenu__item">
+              <ColorPicker
+                color={this.state.color}
+                colors={Object.values(USER_COLORS)}
+                onChangeComplete={this.setColor}
+              />
             </div>
-
+            <div className="ListMenu__label">
+              <p className="Type--secondary">Your presence colour will be used to by other authors identify you when you are active on a board.</p>
+            </div>
           </div>
         </div>
       </div>

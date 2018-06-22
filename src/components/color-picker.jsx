@@ -36,7 +36,7 @@ class ColorPicker extends React.PureComponent {
           color={c}
           hex={c}
           onClick={this.handleChange}
-          focusStyle={{ boxShadow: `0 0 4px ${c}` }}
+          focusStyle={{ border: `0 0 4px ${c}` }}
         />
       </div>
     ))

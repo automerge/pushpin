@@ -185,13 +185,13 @@ input {
 }
 
 .Avatar--title-bar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
 }
 
 .Avatar--title-bar img {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
 }
 
 .Avatar--board {
@@ -386,15 +386,16 @@ input {
   border: 0 solid rgba(0,0,0,0.25);
   border-radius: 2px;
   display: grid;
-  grid-template-columns: repeat(6, 24px);
+  grid-template-columns: repeat(auto-fill, minmax(24px, 24px));
   grid-gap: 8px;
 }
 
 .ColorPicker__swatch {
   width: 24px;
   height: 24px;
-  border-radius: 2px;
-  overflow: hidden;
+}
+.ColorPicker__swatch > span > div {
+  border-radius: 4px
 }
 
 .TitleBar {
@@ -521,10 +522,41 @@ button[disabled].TitleBar__menuItem .fa {
 .PresentContacts {
   display: flex;
   align-items: center;
+  padding: 0 4px;
 }
+
 .PresentContacts > * {
-  padding-left: 8px
+  padding-right: 4px;
 }
+.PresentContacts > * > .Avatar {
+  width: 28px; height: 28px;
+  position: relative;
+}
+.PresentContacts > * > .Avatar:hover {
+
+}
+.PresentContacts > * > .Avatar:hover:after {
+  display: block;
+  position: absolute;
+  /* border: 2px solid var(--highlight-color, var(--colorOnline)); */
+  white-space: nowrap;
+  max-width: 104px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 0 4px rgba(0,0,0,.25);
+  padding: 2px 4px;
+  background-color: white;
+  border-radius: 4px;
+  content: attr(data-name);
+  top: 36px;
+  font-size: 12px;
+  line-height: 16px;
+}
+.PresentContacts > * > div > img {
+  width: 24px; height: 24px;
+}
+
 
 @keyframes text-pop {
   from {
@@ -820,7 +852,7 @@ div.card.image {
 }
 
 .ListMenu__item--selected {
-  background: #EEE;
+  background: var(--colorInputGrey);
 }
 
 .ListMenu__thumbnail {
@@ -841,9 +873,7 @@ div.card.image {
 }
 
 .NothingFound {
-  display: flex;
-  align-items: center;
-  padding: 15px 10px;
+
 }
 
 .NothingFound .fa {
