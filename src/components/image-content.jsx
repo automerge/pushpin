@@ -31,7 +31,7 @@ export default class ImageContent extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      window.hm.releaseHandle(this.handle)
+      this.handle.release()
     }
 
     this.handle = window.hm.openHandle(docId)

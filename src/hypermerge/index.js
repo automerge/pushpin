@@ -75,6 +75,10 @@ class DocHandle {
     return this
   }
 
+  release() {
+    this.hm.releaseHandle(this)
+  }
+
   _message({ peer, msg }) {
     if (this._messageCb) {
       this._messageCb({ peer, msg })

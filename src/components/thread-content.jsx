@@ -25,7 +25,7 @@ export default class ThreadContent extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillUnmount = () => this.handle.release()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -34,7 +34,7 @@ export default class ThreadContent extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      window.hm.releaseHandle(this.handle)
+      this.handle.release()
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)

@@ -37,7 +37,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   componentWillUnmount = () => {
-    window.hm.releaseHandle(this.handle)
+    this.handle.release()
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('click', this.handleClickOutside)
   }
@@ -68,7 +68,7 @@ export default class BoardTitle extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      window.hm.releaseHandle(this.handle)
+      this.handle.release()
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)
@@ -76,7 +76,7 @@ export default class BoardTitle extends React.PureComponent {
 
   refreshBoardHandle = (boardId) => {
     if (this.boardHandle) {
-      window.hm.releaseHandle(this.boardHandle)
+      this.boardHandle.release()
     }
 
     this.boardHandle = window.hm.openHandle(boardId)
@@ -200,7 +200,7 @@ export default class BoardTitle extends React.PureComponent {
       }
     })
 
-    window.hm.releaseHandle(selfHandle)
+    selfHandle.release()
   }
 
   copyToClipboard = (e) => {

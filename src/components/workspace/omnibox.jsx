@@ -36,9 +36,9 @@ export default class Omnibox extends React.PureComponent {
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    window.hm.releaseHandle(this.handle)
-    Object.values(this.viewedDocHandles).forEach(handle => window.hm.releaseHandle(handle))
-    Object.values(this.contactHandles).forEach(handle => window.hm.releaseHandle(handle))
+    this.handle.release()
+    Object.values(this.viewedDocHandles).forEach(handle => handle.release())
+    Object.values(this.contactHandles).forEach(handle => handle.release())
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -55,7 +55,7 @@ export default class Omnibox extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      window.hm.releaseHandle(this.handle)
+      this.handle.release()
     }
     this.handle = window.hm.openHandle(docId)
     this.handle.onChange(this.onChange)

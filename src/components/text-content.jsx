@@ -89,7 +89,7 @@ export default class TextContent extends React.PureComponent {
   componentWillUnmount = () => {
     log('componentDidUnmount')
 
-    window.hm.releaseHandle(this.handle)
+    this.handle.release()
     this.handle = null
   }
 
