@@ -730,24 +730,18 @@ class Hypermerge extends EventEmitter {
   // Returns a promise that resolves to an array of blocks corresponding to the
   // arguments, once all of those fetches are complete.
   _getBlockRange(actorId, first, last) {
-    const length = Math.max(0, last - first)
-    log('_getBlockRange', actorId, first, last)
+    log('_getBlockRange.start', actorId, first, last)
 
-    return Promise.all(Array(length).fill().map((_, i) =>
-      this._getBlock(actorId, first + i)))
-  }
-
-  // Returns a promise that resolves to the block in the feed for `actorId` at
-  // the given `index`, when that fetch is complete.
-  _getBlock(actorId, index) {
-    log('_getBlock.start', actorId, index)
+    if (last < first) {
+      throw new Error(`Unexpected last < first: ${last}, ${first}`)
+    }
     return new Promise((resolve, reject) => {
-      this._trackedFeed(actorId).get(index, (err, data) => {
+      this._trackedFeed(actorId).getBatch(first, last, (err, blocks) => {
         if (err) {
           reject(err)
         } else {
-          log('_getBlock.resolve', actorId, index)
-          resolve(data)
+          log('getBlockRange.resolve', actorId, first, last)
+          resolve(blocks)
         }
       })
     })
