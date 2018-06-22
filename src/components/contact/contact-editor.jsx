@@ -126,7 +126,7 @@ export default class ContactEditor extends React.PureComponent {
               <input type="text" onChange={this.setName} value={this.state.name || ''} />
             </div>
             <div className="ListMenu__label">Avatar</div>
-            <div className="ListMenu__item">
+            <div className="ListMenu__item ContactListItem">
               <div className="ListMenu__thumbnail">
                 <div className="Avatar">
                   { avatar }

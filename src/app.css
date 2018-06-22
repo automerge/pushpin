@@ -386,7 +386,7 @@ input {
   border: 0 solid rgba(0,0,0,0.25);
   border-radius: 2px;
   display: grid;
-  grid-template-columns: repeat(6, 24px);
+  grid-template-columns: repeat(auto-fill, minmax(24px, 24px));
   grid-gap: 8px;
 }
 
@@ -841,8 +841,6 @@ div.card.image {
 }
 
 .ListMenu__item {
-  display: flex;
-  align-items: center;
   padding: 4px 8px;
   color: var(--colorBlueBlack);
   line-height:16px;
