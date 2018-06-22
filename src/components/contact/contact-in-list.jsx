@@ -27,7 +27,7 @@ export default class ContactInList extends React.PureComponent {
   }
 
   componentWillUnmount = () => {
-    window.hm.releaseHandle(this.handle)
+    this.handle.release()
     clearTimeout(this.timerId)
   }
 

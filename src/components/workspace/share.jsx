@@ -22,8 +22,8 @@ export default class Share extends React.PureComponent {
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    window.hm.releaseHandle(this.workspaceHandle)
-    window.hm.releaseHandle(this.boardHandle)
+    this.workspaceHandle.release()
+    this.boardHandle.release()
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -35,7 +35,7 @@ export default class Share extends React.PureComponent {
   refreshWorkspaceHandle = (docId) => {
     log('refreshWorkspaceHandle')
     if (this.workspaceHandle) {
-      window.hm.releaseHandle(this.workspaceHandle)
+      this.workspaceHandle.release()
     }
     this.workspaceHandle = window.hm.openHandle(docId)
     this.workspaceHandle.onChange(this.onWorkspaceChange)
@@ -44,7 +44,7 @@ export default class Share extends React.PureComponent {
   refreshBoardHandle = (boardId) => {
     log('refreshBoardHandle')
     if (this.boardHandle) {
-      window.hm.releaseHandle(this.boardHandle)
+      this.boardHandle.release()
     }
 
     this.boardHandle = window.hm.openHandle(boardId)

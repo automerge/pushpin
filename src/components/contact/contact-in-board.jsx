@@ -25,7 +25,7 @@ export default class ContactInBoard extends React.PureComponent {
   }
 
   componentWillUnmount = () => {
-    window.hm.releaseHandle(this.handle)
+    this.handle.release()
     clearTimeout(this.timerId)
   }
 
