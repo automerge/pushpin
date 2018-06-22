@@ -7,7 +7,8 @@ import { createDocumentLink } from '../share-link'
 
 export default class ThreadContent extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired,
+    selfId: PropTypes.string.isRequired
   }
 
   static initializeDocument(threadDoc) {
@@ -126,7 +127,7 @@ export default class ThreadContent extends React.PureComponent {
       e.preventDefault()
       this.handle.change((threadDoc) => {
         threadDoc.messages.push({
-          authorId: window.selfId,
+          authorId: this.props.selfId,
           content: this.state.message,
           time: new Date().getTime()
         })

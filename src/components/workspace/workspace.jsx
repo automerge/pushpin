@@ -6,6 +6,7 @@ import { ipcRenderer } from 'electron'
 import ContentTypes from '../../content-types'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import Content from '../content'
+import SelfContext from '../self-context'
 import TitleBar from './title-bar'
 
 
@@ -74,8 +75,6 @@ export default class Workspace extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    window.selfId = doc.selfId // Be mad (:
-
     this.setState({ ...doc })
     this.refreshHeartbeat(doc)
   }
@@ -128,10 +127,12 @@ export default class Workspace extends React.PureComponent {
 
     const content = this.renderContent(this.state.currentDocUrl)
     return (
-      <div className="Workspace">
-        <TitleBar docId={this.props.docId} openDoc={this.openDoc} />
-        { content }
-      </div>
+      <SelfContext.Provider value={this.state.selfId}>
+        <div className="Workspace">
+          <TitleBar docId={this.props.docId} openDoc={this.openDoc} />
+          { content }
+        </div>
+      </SelfContext.Provider>  
     )
   }
 }

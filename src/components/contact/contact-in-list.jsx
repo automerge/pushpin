@@ -8,6 +8,7 @@ import { createDocumentLink } from '../../share-link'
 export default class ContactInList extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
+    selfId: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.string),
     onShare: PropTypes.func,
     onUnshare: PropTypes.func
@@ -47,7 +48,7 @@ export default class ContactInList extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    if (window.selfId === this.props.docId) {
+    if (this.props.selfId === this.props.docId) {
       this.setState({ online: true })
     }
     this.setState({ ...doc })
