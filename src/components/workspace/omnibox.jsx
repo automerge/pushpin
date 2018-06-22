@@ -183,7 +183,10 @@ export default class Omnibox extends React.PureComponent {
         .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
         .map(([url, doc]) => ({ type: 'archivedDocUrl', object: doc, url }))
 
-      sectionIndices.archivedDocUrls = { start: items.length, end: items.length + archivedDocItems.length }
+      sectionIndices.archivedDocUrls = {
+        start: items.length,
+        end: items.length + archivedDocItems.length
+      }
       items = items.concat(archivedDocItems)
 
       const contactItems = Object.entries(this.state.contacts)
