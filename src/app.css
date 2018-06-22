@@ -58,6 +58,7 @@ table {
   --colorSecondaryGrey: #637389;
   --colorPaleGrey: #D5DFE5;
   --colorInputGrey: #E9EDF0;
+  --colorOnline: rgb(113, 227, 65);
   --colorLink: #0645ad;
   --colorDestructive: #F87060;
   --zIndexCard: 1;
@@ -227,25 +228,9 @@ input {
   text-overflow: ellipsis;
 }
 
-.Avatar {
-  --highlight-color: rgba(113, 227, 65, 1);
-}
 .Avatar--online {
-  border: 2px solid var(--highlight-color);
-  box-shadow: 0 0 4px 0 var(--highlight-color);
-  /* animation: pulse 2s; */
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(113, 227, 65, .5);
-  }
-  70% {
-      box-shadow: 0 0 0 8px rgba(113, 227, 65, 0);
-  }
-  100% {
-      box-shadow: 0 0 0 0 rgba(113, 227, 65, 0);
-  }
+  border: 2px solid var(--highlight-color, var(--colorOnline));
+  box-shadow: 0 0 4px 0 var(--highlight-color, var(--colorOnline));
 }
 
 .BoardTitle .dropdown {
