@@ -17,7 +17,7 @@ export default class PresentContacts extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.currentDocUrl)
-  componentWillUnmount = () => window.hm.releaseHandle(this.handle)
+  componentWillUnmount = () => this.handle.release()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.currentDocUrl !== this.props.currentDocUrl) {
       this.clearContacts()
@@ -26,7 +26,7 @@ export default class PresentContacts extends React.PureComponent {
   }
   refreshHandle = (currentDocUrl) => {
     if (this.handle) {
-      window.hm.releaseHandle(this.handle)
+      this.handle.release()
     }
     const { docId } = parseDocumentLink(currentDocUrl)
     this.handle = window.hm.openHandle(docId)
