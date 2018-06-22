@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import uuid from 'uuid/v4'
 import pdfjs from 'pdfjs-dist'
 
 import * as Hyperfile from '../hyperfile'
