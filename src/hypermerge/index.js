@@ -167,20 +167,6 @@ class Hypermerge extends EventEmitter {
   }
 
   /**
-   * Returns `true` if `docId` has been opened.
-   */
-  has(docId) {
-    return !!this.docs[docId]
-  }
-
-  /**
-   * Returns true if `document:ready` has already been emitted for this doc.
-   */
-  isReady(docId) {
-    return !!this.readyIndex[docId]
-  }
-
-  /**
    * Returns the document for the given docId.
    * Throws if the document has not been opened yet.
    */
@@ -204,33 +190,6 @@ class Hypermerge extends EventEmitter {
    */
   getId(doc) {
     return this._actorToId(this._getActorId(doc))
-  }
-
-  /**
-   * Opens an existing document.
-   * Will download the document over the network if `hm.joinSwarm()` was called.
-   * The document is opened asynchronously, and a promise is returned with the
-   * opened document after it is 'ready'.
-   *
-   * @param {string} docId - docId of document to open
-   * @returns {Promise.<Document>}
-   */
-  open(docId, metadata = null) {
-    this._ensureReady()
-    log('open', docId)
-    this._trackedFeed(docId)
-
-    if (this.readyIndex[docId]) {
-      return Promise.resolve(this.docs[docId])
-    }
-
-    return new Promise((res, rej) => {
-      this.on('document:ready', (updatedId, doc) => {
-        if (docId === updatedId) {
-          res(doc)
-        }
-      })
-    })
   }
 
   openHandle(docId) {
@@ -552,8 +511,8 @@ class Hypermerge extends EventEmitter {
   // Callback will load metadata for the feed, ensure we have an in-memory
   // doc corresponding to the logical doc of which the feed is a part, set
   // up download callback, and load & apply all existing blocks in the feed
-  // plus their dependencies. Finally, it will emit `document:ready` when
-  // the doc is indeed ready.
+  // plus their dependencies. Finally, it will notify corresponding open
+  // handles that the doc is ready.
   _onFeedReady(actorId, feed) {
     return () => {
       log('_onFeedReady', actorId)
@@ -574,16 +533,7 @@ class Hypermerge extends EventEmitter {
               }
 
               this.readyIndex[docId] = true
-              /**
-               * Emitted when a document has been fully loaded.
-               *
-               * @event document:ready
-               *
-               * @param {string} docId - the hex id representing this document
-               * @param {Document} document - Automerge document
-               */
               const doc = this.find(docId)
-              this.emit('document:ready', docId, doc)
               this._handles(docId).forEach(handle => {
                 handle._ready(doc)
               })
@@ -867,7 +817,7 @@ class Hypermerge extends EventEmitter {
         /**
          * Emitted when all document metadata has been loaded from storage, and the
          * Hypermerge instance is ready for use. Documents will continue loading from
-         * storage and the network. Required before `.create()`, `.open()`, etc. can be used.
+         * storage and the network. Required before `.openHandle()`, etc. can be used.
          *
          * @event ready
          */
