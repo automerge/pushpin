@@ -744,5 +744,4 @@ ContentTypes.register({
   type: 'board',
   name: 'Board',
   icon: 'sticky-note',
-  unlisted: true,
 })
