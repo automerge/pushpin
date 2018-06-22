@@ -393,8 +393,9 @@ input {
 .ColorPicker__swatch {
   width: 24px;
   height: 24px;
-  border-radius: 2px;
-  overflow: hidden;
+}
+.ColorPicker__swatch > span > div {
+  border-radius: 4px
 }
 
 .TitleBar {
