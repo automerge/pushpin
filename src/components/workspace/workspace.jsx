@@ -104,6 +104,10 @@ export default class Workspace extends React.PureComponent {
 
       ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
       ws.viewedDocUrls.unshift(docUrl)
+
+      if (ws.archivedDocUrls) {
+        ws.archivedDocUrls = ws.archivedDocUrls.filter(url => url !== docUrl)
+      }
     })
   }
 

@@ -46,21 +46,30 @@ export default class BoardInList extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  render = () => {
-    let actions
-    if (this.props.actions.includes('view')) {
-      actions = (
-        <div className="Actions">
-          <span className="Type--secondary">⏎ View</span>
-        </div>
-      )
+  renderActions = () => {
+    const actionOptions = []
+
+    if (this.props.actions.includes('archive')) {
+      actionOptions.push(<span key='archive' className="Type--secondary">⌘+⌫ Archive</span>)
     }
 
+    if (this.props.actions.includes('view')) {
+      actionOptions.push(<span key='view' className="Type--secondary">⏎ View</span>)
+    }
+
+    if (actionOptions.length > 0) {
+      return <div className="Actions">{ actionOptions }</div>
+    }
+
+    return null
+  }
+
+  render = () => {
     return (
       <div draggable="true" onDragStart={this.onDragStart} className="DocLink" onClick={this.handleClick}>
         <i ref={(ref) => { this.badgeRef = ref }} className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
         <div className="DocLink__title">{ this.state.title }</div>
-        { actions }
+        { this.renderActions() }
       </div>
     )
   }
