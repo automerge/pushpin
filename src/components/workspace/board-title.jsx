@@ -263,7 +263,7 @@ export default class BoardTitle extends React.PureComponent {
             active={this.state.activeTitleEditor}
             onSubmit={this.updateTitle}
             onCancel={this.cancelTitleEdit}
-            defaultValue={this.state.board && this.state.board.title}
+            defaultValue={this.state.board && this.state.board.title || ''}
             onClick={this.activateOmnibox}
           />
           <div className="BoardTitle__actionBar__right">
