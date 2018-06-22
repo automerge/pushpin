@@ -841,6 +841,8 @@ div.card.image {
 }
 
 .ListMenu__item {
+  display: flex;
+  align-items: center;
   padding: 4px 8px;
   color: var(--colorBlueBlack);
   line-height:16px;
@@ -851,7 +853,7 @@ div.card.image {
 }
 
 .ListMenu__item--selected {
-  background: #EEE;
+  background: var(--colorInputGrey);
 }
 
 .ListMenu__thumbnail {
@@ -872,9 +874,7 @@ div.card.image {
 }
 
 .NothingFound {
-  display: flex;
-  align-items: center;
-  padding: 15px 10px;
+
 }
 
 .NothingFound .fa {

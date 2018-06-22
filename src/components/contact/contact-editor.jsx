@@ -136,17 +136,14 @@ export default class ContactEditor extends React.PureComponent {
                 <button className="Type--action" onClick={this.chooseAvatar}>Choose from file...</button>
               </div>
             </div>
-            <div className="ListMenu__section">
-              <div className="ListMenu__label">Presence Color</div>
-              <div className="ListMenu__item">
-                <ColorPicker
-                  color={this.state.color}
-                  colors={Object.values(USER_COLORS)}
-                  onChangeComplete={this.setColor}
-                />
-              </div>
+            <div className="ListMenu__label">Presence Color</div>
+            <div className="ListMenu__item">
+              <ColorPicker
+                color={this.state.color}
+                colors={Object.values(USER_COLORS)}
+                onChangeComplete={this.setColor}
+              />
             </div>
-
           </div>
         </div>
       </div>
