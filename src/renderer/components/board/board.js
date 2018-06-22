@@ -450,9 +450,9 @@ export default class Board extends React.PureComponent {
       card.width = snapWidth
       card.height = snapHeight
     })
-    document.dispatchEvent(new CustomEvent('cardResized', {detail: {
+    document.dispatchEvent(new CustomEvent('cardResized', { detail: {
       cardId: id, width: snapWidth, height: snapHeight
-    }}))
+    } }))
   }
 
   /**
