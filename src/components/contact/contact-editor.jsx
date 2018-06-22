@@ -145,7 +145,7 @@ export default class ContactEditor extends React.PureComponent {
               />
             </div>
             <div className="ListMenu__label">
-              <p className="Type--secondary">Your presence colour will be used to identify by your peers when you when you are active on a board</p>
+              <p className="Type--secondary">Your presence colour will be used to by other authors identify you when you are active on a board.</p>
             </div>
           </div>
         </div>
