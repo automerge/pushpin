@@ -137,7 +137,7 @@ export default class BoardTitle extends React.PureComponent {
       this.deactivateOmnibox()
     }
 
-    if (e.metaKey && e.key === 'Backspace') {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
       e.preventDefault()
       const { selected } = this.state
 
