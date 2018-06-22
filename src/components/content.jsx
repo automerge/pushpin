@@ -4,6 +4,7 @@ import Debug from 'debug'
 
 import ContentTypes from '../content-types'
 import { parseDocumentLink } from '../share-link'
+import SelfContext from './self-context'
 
 const log = Debug('pushpin:content')
 const FILTERED_PROPS = ['type', 'docId']
@@ -73,14 +74,20 @@ export default class Content extends React.PureComponent {
     const filteredProps = this.filterProps(this.props)
 
     return (
-      <contentType.component
-        ref={this.component}
-        context={context}
-        url={url}
-        type={type}
-        docId={docId}
-        {...filteredProps}
-      />
+      <SelfContext.Consumer>
+        {selfId => (
+          <contentType.component
+            ref={this.component}
+            context={context}
+            url={url}
+            type={type}
+            docId={docId}
+            selfId={selfId}
+            {...filteredProps}
+          />
+          )
+        }
+      </SelfContext.Consumer>
     )
   }
 }

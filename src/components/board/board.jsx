@@ -59,6 +59,7 @@ const draggableCards = (cards, selected, card) => {
 export default class Board extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
+    selfId: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -641,16 +642,16 @@ export default class Board extends React.PureComponent {
   refreshHeartbeat = (doc) => {
     // XXX check how this work on board change
     if (!this.heartbeatTimerId) {
-      this.handle.message({ contact: window.selfId, heartbeat: true })
+      this.handle.message({ contact: this.props.selfId, heartbeat: true })
       this.heartbeatTimerId = setInterval(() => {
-        this.handle.message({ contact: window.selfId, heartbeat: true })
+        this.handle.message({ contact: this.props.selfId, heartbeat: true })
       }, 5000) // send a heartbeat every 5s
     }
   }
 
   heartbeatNotifyDeparture = () => {
     // notify peers on the current board that we're departing
-    this.handle.message({ contact: window.selfId, departing: true })
+    this.handle.message({ contact: this.props.selfId, departing: true })
   }
 
   clearRemoteSelection = (contact) => {
@@ -660,7 +661,7 @@ export default class Board extends React.PureComponent {
 
   updateSelection = (selected) => {
     this.setState({ selected })
-    this.handle.message({ contact: window.selfId, selected })
+    this.handle.message({ contact: this.props.selfId, selected })
   }
 
   selectToggle = (cardId) => {

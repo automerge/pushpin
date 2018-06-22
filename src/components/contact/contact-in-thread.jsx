@@ -7,7 +7,8 @@ import { createDocumentLink } from '../../share-link'
 
 class ContactInThread extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired,
+    selfId: PropTypes.string.isRequired
   }
 
   state = {}
@@ -40,7 +41,7 @@ class ContactInThread extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    if (window.selfId === this.props.docId) {
+    if (this.props.selfId === this.props.docId) {
       this.setState({ online: true })
     }
     this.setState({ ...doc })

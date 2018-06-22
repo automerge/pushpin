@@ -8,6 +8,7 @@ import { createDocumentLink } from '../../share-link'
 export default class ContactInBoard extends React.PureComponent {
   static propTypes = {
     docId: PropTypes.string.isRequired,
+    selfId: PropTypes.string.isRequired
   }
 
   static minWidth = 4
@@ -45,7 +46,7 @@ export default class ContactInBoard extends React.PureComponent {
   }
 
   onChange = (doc) => {
-    if (window.selfId === this.props.docId) {
+    if (this.props.selfId === this.props.docId) {
       this.setState({ online: true })
     }
     this.setState({ ...doc })
