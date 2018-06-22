@@ -303,24 +303,58 @@ export default class Board extends React.PureComponent {
       return
     }
 
+    let cardId
+
     if (contentType.type === 'board') {
-      const cardId = this.createCard({
+      cardId = this.createCard({
         x,
         y,
         type: contentType.type,
         typeAttrs: { title: `Sub-board of ${this.state.doc.title}` }
       })
+    }
+
+    if (contentType.type === 'pdf') {
+      dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
+        // User aborted.
+        if (!paths) {
+          return
+        }
+        if (paths.length !== 1) {
+          throw new Error('Expected exactly one path?')
+        }
+
+        this.createPdfCardFromPath({ x, y }, paths[0])
+      })
       this.selectOnly(cardId)
       return
     }
 
-    const cardId = this.createCard({
+    cardId = this.createCard({
       x,
       y,
       type: contentType.type,
       typeAttrs: { text: '' }
     })
+
     this.selectOnly(cardId)
+  }
+
+  createPdfCardFromPath = ({ x, y }, path) => {
+    Hyperfile.write(path, (err, hyperfileId) => {
+      if (err) {
+        log(err)
+        return
+      }
+
+      const cardId = this.createCard({
+        x,
+        y,
+        type: 'pdf',
+        typeAttrs: { hyperfileId }
+      })
+      this.selectOnly(cardId)
+    })
   }
 
   createImageCardFromPath = ({ x, y }, path) => {

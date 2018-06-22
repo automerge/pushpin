@@ -13,93 +13,75 @@ pdfjs.GlobalWorkerOptions.workerSrc = '../node_modules/pdfjs-dist/build/pdf.work
 
 export default class PDFCard extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
-    cardId: PropTypes.string.isRequired
+    docId: PropTypes.string.isRequired
   }
 
-  static initializeDocument(pdfDoc, { path }) {
-    pdfDoc.path = path
+  static initializeDocument = (pdf, { hyperfileId }) => {
+    pdf.hyperfileId = hyperfileId
   }
 
-  constructor(props) {
-    super(props)
-    this.handle = null
-    this.pdfViewport = React.createRef()
-    this.state = { pdfContentReady: false }
+  static minWidth = 3
+  static minHeight = 3
+  static defaultWidth = 18
+  // no default height to allow it to grow
+  // suggestion: no max/min width on images, we dont
+  // know what aspect ratios people will be using day to day
+  //
+  static maxWidth = 72
+
+  state = { pdfContentReady: false }
+  pdfViewport = React.createRef()
+
+  onChange = (doc) => {
+    this.setState({ ...doc })
+  }
+
+  refreshHandle = (docId) => {
+    if (this.handle) {
+      this.handle.release()
+    }
+
+    this.handle = window.hm.openHandle(docId)
+    this.handle.onChange(this.onChange)
   }
 
   componentDidMount = () => {
-    this.mounted = true
-    this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange((doc) => {
-      this.setState({ doc })
-    })
-    this.workPDF()
-    document.addEventListener('cardResized', this.cardResized)
+    log('componentDidMount')
+    this.refreshHandle(this.props.docId)
   }
 
-  componentWillUnmount = () => {
-    document.removeEventListener('cardResized', this.cardResized)
-    window.hm.releaseHandle(this.handle)
-    this.handle = null
-    this.mounted = false
-  }
+  // If an ImageCard changes docId, React will re-use this component
+  // and update the props instead of instantiating a new one and calling
+  // componentDidMount. We have to check for prop updates here and
+  // update our doc handle
+  componentDidUpdate = (prevProps) => {
+    log('componentWillReceiveProps')
 
-  componentDidUpdate = () => {
-    this.workPDF()
+    // not sure this is the best way to solve this
+    this.loadPDF()
     this.renderPDF()
-  }
 
-  cardResized = (event) => {
-    if (this.props.cardId === event.detail.cardId) {
-      this.renderPDF()
+    if (prevProps.docId !== this.props.docId) {
+      this.refreshHandle(this.props.docId)
     }
-  }
-
-  workPDF = () => {
-    if (!this.state.doc) {
-      return
-    }
-
-    if (this.state.doc.path && !this.uploading) {
-      this.uploading = true
-      this.uploadPDF()
-    }
-
-    if (this.state.doc.hyperfile && !this.loading) {
-      this.loading = true
-      this.loadPDF()
-    }
-  }
-
-  uploadPDF = () => {
-    const fileId = uuid()
-    Hyperfile.writePath(fileId, this.state.doc.path, (err, hyperfile) => {
-      if (err) {
-        log(err)
-      }
-
-      this.handle.change(d => {
-        delete d.path
-        d.hyperfile = hyperfile
-      })
-    })
   }
 
   loadPDF = () => {
-    Hyperfile.fetch(this.state.doc.hyperfile, (error, pdfPath) => {
+    if (this.state.pdfContentReady) {
+      return
+    }
+    Hyperfile.fetch(this.state.hyperfileId, (error, pdfData) => {
       if (error) {
         log(error)
       }
-
-      pdfjs.getDocument(`../${pdfPath}`).then((pdf) => {
+      pdfjs.getDocument({ data: pdfData }).then((pdf) => {
         // Check if the card has been deleted by the time we get here
-        if (!this.mounted) {
+        /* if (!this.mounted) {
           return
-        }
+        } */
 
         this.setState({ pdfContentReady: true, pdfDocument: pdf })
-      }, (err) => { log(err) })
+      })
     })
   }
 
@@ -146,7 +128,7 @@ export default class PDFCard extends React.PureComponent {
     if (this.state.pdfContentReady) {
       return <div ref={this.pdfViewport} className="pdf-card" />
     }
-    return null
+    return <div className="pdf-card">Loading...</div>
   }
 }
 
