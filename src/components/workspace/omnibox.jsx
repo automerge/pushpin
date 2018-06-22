@@ -159,7 +159,7 @@ export default class Omnibox extends React.PureComponent {
 
     // Note: The order of sections built here needs to match the rendered order
     const invitationItems = this.props.invitations
-      .filter(invitation => invitation.doc.title.match(searchRegEx))
+      .filter(invitation => (invitation.doc.title || 'Loading...').match(searchRegEx))
       .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
@@ -234,7 +234,7 @@ export default class Omnibox extends React.PureComponent {
           </div>
           <div className="ListMenu__section">
             <div className={classes} key="nothingFound">
-              <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
+              <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
               <p className="Type--primary">Nothing Found</p>
             </div>
           </div>
