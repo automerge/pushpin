@@ -215,6 +215,10 @@ export default class TextContent extends React.PureComponent {
     e.stopPropagation()
   }
 
+  handlePaste = (e) => {
+    e.stopPropagation()
+  }
+
   render = () => {
     log('render')
 
@@ -224,6 +228,7 @@ export default class TextContent extends React.PureComponent {
           id={`editor-${this.props.docId}`}
           className="CodeMirrorEditor__editor"
           ref={this.setEditorRef}
+          onPaste={this.handlePaste}
         />
       </div>
     )

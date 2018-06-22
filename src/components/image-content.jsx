@@ -19,7 +19,9 @@ export default class ImageContent extends React.PureComponent {
   static minHeight = 3
   static defaultWidth = 18
   // no default height to allow it to grow
-  // suggestion: no max/min width on images, we dont know what aspect ratios people will be using day to day
+  // suggestion: no max/min width on images, we dont
+  // know what aspect ratios people will be using day to day
+  //
   // static maxWidth = 36
   // static maxHeight = 36
 

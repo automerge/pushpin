@@ -3,16 +3,18 @@ import PropTypes from 'prop-types'
 
 export default class BoardTitleInput extends React.PureComponent {
   static propTypes = {
-    defaultValue: PropTypes.string,
+    defaultValue: PropTypes.string.isRequired,
     active: PropTypes.bool,
     onSubmit: PropTypes.func,
-    onCancel: PropTypes.func
+    onCancel: PropTypes.func,
+    onClick: PropTypes.func
   }
 
   static defaultProps = {
     active: false,
     onSubmit: () => {},
-    onCancel: () => {}
+    onCancel: () => {},
+    onClick: () => {}
   }
 
   state = { newTitle: null, updated: false }
@@ -55,7 +57,7 @@ export default class BoardTitleInput extends React.PureComponent {
   render = () => {
     let titleInputClasses = 'TitleBar__titleText'
     if (this.state.updated) {
-      titleInputClasses += " TitleBar__titleText--updated"
+      titleInputClasses += ' TitleBar__titleText--updated'
     }
 
     let title = ''

@@ -77,6 +77,10 @@ export default class UrlContent extends React.PureComponent {
     }
   }
 
+  onPaste = (e) => {
+    e.stopPropagation()
+  }
+
   refreshContent = (doc) => {
     fetch(doc.url).then((response) => {
       response.text().then((text) => {
@@ -129,6 +133,7 @@ export default class UrlContent extends React.PureComponent {
               value={this.state.urlInput}
               onChange={this.onInputChange}
               onKeyDown={this.onKeyDown}
+              onPaste={this.onPaste}
               placeholder="Enter a URL..."
             />
           </div>

@@ -69,6 +69,7 @@ export default class ThreadContent extends React.PureComponent {
             value={this.state.message}
             onKeyDown={this.onKeyDown}
             onInput={this.onInput}
+            onPaste={this.onPaste}
             placeholder="Enter your message..."
           />
         </div>
@@ -112,6 +113,10 @@ export default class ThreadContent extends React.PureComponent {
     this.setState({
       message: e.target.value
     })
+  }
+
+  onPaste = (e) => {
+    e.stopPropagation()
   }
 
   onKeyDown = (e) => {
