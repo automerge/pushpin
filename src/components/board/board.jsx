@@ -809,5 +809,5 @@ ContentTypes.register({
   component: Board,
   type: 'board',
   name: 'Board',
-  icon: 'sticky-note',
+  icon: 'copy',
 })

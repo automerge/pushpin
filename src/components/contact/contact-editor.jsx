@@ -144,6 +144,9 @@ export default class ContactEditor extends React.PureComponent {
                 onChangeComplete={this.setColor}
               />
             </div>
+            <div className="ListMenu__label">
+              <p className="Type--secondary">Your presence colour will be used to identify by your peers when you when you are active on a board</p>
+            </div>
           </div>
         </div>
       </div>

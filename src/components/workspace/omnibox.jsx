@@ -225,7 +225,7 @@ export default class Omnibox extends React.PureComponent {
     const item = this.sectionItems('nothingFound')[0]
 
     if (item) {
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected NothingFound' : 'NothingFound ListMenu__item'
+      const classes = item.selected ? 'ListMenu__item DocLink ListMenu__item--selected NothingFound' : 'NothingFound ListMenu__item'
 
       return (
         <div>
@@ -234,7 +234,7 @@ export default class Omnibox extends React.PureComponent {
           </div>
           <div className="ListMenu__section">
             <div className={classes} key="nothingFound">
-              <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'transparent'}}/>
+              <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
               <p className="Type--primary">Nothing Found</p>
             </div>
           </div>
