@@ -129,14 +129,12 @@ export default class Share extends React.PureComponent {
     const { contactIds = [] } = (this.state.workspace || {})
     const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
     const noneFound = (
-      <div className="ListMenu__section">
-        <div className="ListMenu__item">
-          <div className="ContactListItem">
-            <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
-              <div className="Label">
-                <p className="Type--primary">None found</p>
-                <p className="Type--secondary">Nobody has access to this but you</p>
-              </div>
+      <div className="ListMenu__item">
+        <div className="ContactListItem">
+          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
+          <div className="Label">
+            <p className="Type--primary">None found</p>
+            <p className="Type--secondary">Copy a link to your board and start making friends</p>
           </div>
         </div>
       </div>
@@ -155,7 +153,7 @@ export default class Share extends React.PureComponent {
     return (
       <div>
         <div className="ListMenu__section">
-          { contacts }
+          { uniqueContactIds.length != 0 ? contacts : noneFound}
         </div>
       </div>
     )
@@ -165,14 +163,12 @@ export default class Share extends React.PureComponent {
     const { authorIds = [] } = (this.state.board || {})
     const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
     const noneFound = (
-      <div className="ListMenu__section">
-        <div className="ListMenu__item">
-          <div className="ContactListItem">
-            <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
-            <div className="Label">
-              <p className="Type--primary">None found</p>
-              <p className="Type--secondary">Nobody has access to this but you</p>
-            </div>
+      <div className="ListMenu__item">
+        <div className="ContactListItem">
+          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
+          <div className="Label">
+            <p className="Type--primary">None found</p>
+            <p className="Type--secondary">Nobody has access to this but you</p>
           </div>
         </div>
       </div>
