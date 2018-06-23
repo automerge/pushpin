@@ -55,7 +55,7 @@ class Multicore extends EventEmitter {
     }
   }
 
-  hypercore(key, opts = {}) {
+  hypercore(key = null, opts = {}) {
     this._ensureReady()
     log('hypercore', key && key.toString('hex'))
 
@@ -66,10 +66,20 @@ class Multicore extends EventEmitter {
       opts.secretKey = keyPair.secretKey
     }
 
+    log('hypercore key', key)
+
     const dk = Hypercore.discoveryKey(toBuffer(key, 'hex')).toString('hex')
+
+    if (this.feeds[dk]) {
+      return this.feeds[dk]
+    }
+
     this._addDiscoveryKey(dk)
 
-    return this.hypercoreFromDiscoveryKey(dk, opts)
+    const feed = Hypercore(this._feedStorage(dk), key, opts)
+    this.feeds[dk] = feed
+
+    return feed
   }
 
   hypercoreFromDiscoveryKey(dk, opts = {}) {
@@ -126,7 +136,7 @@ class Multicore extends EventEmitter {
 
   replicate(opts = {}) {
     this._ensureReady()
-    log('replicate')
+    log('replicate', opts)
 
     if (opts.discoveryKey) {
       opts.discoveryKey = toBuffer(opts.discoveryKey, 'hex')
@@ -145,6 +155,7 @@ class Multicore extends EventEmitter {
 
     stream.on('feed', this._feedRequested(stream))
 
+    console.log('channel:', opts.channel)
     if (!opts.channel) {
       // TODO figure out when channel can be missing
       throw new Error('opts.channel is missing and i dont\' know why')
