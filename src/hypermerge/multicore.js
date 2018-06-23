@@ -155,13 +155,11 @@ class Multicore extends EventEmitter {
 
     stream.on('feed', this._feedRequested(stream))
 
-    console.log('channel:', opts.channel)
-    if (!opts.channel) {
+    if (opts.channel) {
+      this._addDiscoveryKey(opts.channel)
       // TODO figure out when channel can be missing
-      throw new Error('opts.channel is missing and i dont\' know why')
     }
 
-    this._addDiscoveryKey(opts.channel)
 
     return stream
   }
