@@ -28,7 +28,11 @@ export default class PDFCard extends React.PureComponent {
   //
   static maxWidth = 72
 
-  state = { pdfContentReady: false }
+  state = {
+    pdfContentReady: false,
+    pageNum: 1
+  }
+
   pdfViewport = React.createRef()
 
   onChange = (doc) => {
@@ -86,7 +90,7 @@ export default class PDFCard extends React.PureComponent {
 
   renderPDF = () => {
     const container = this.pdfViewport.current
-    if (!this.state.pdfContentReady || container.clientWidth === this.renderedWidth) {
+    if (!this.state.pdfContentReady) {
       return
     }
 
@@ -105,7 +109,7 @@ export default class PDFCard extends React.PureComponent {
       container.parentNode.style.width = `${this.renderedWidth}px`
     }
 
-    this.state.pdfDocument.getPage(1).then((page) => {
+    this.state.pdfDocument.getPage(this.state.pageNum).then((page) => {
       const resolution = window.devicePixelRatio || 1
       const scalingFactor = resolution * this.renderedWidth / (page.view[2] - page.view[0])
       const viewport = page.getViewport(scalingFactor)
@@ -123,9 +127,33 @@ export default class PDFCard extends React.PureComponent {
     })
   }
 
+  nextPage = () => {
+    let { pageNum } = this.state
+    if (pageNum < this.state.pdfDocument.numPages) {
+      pageNum += 1
+    }
+
+    this.setState({ pageNum })
+  }
+
+  prevPage = () => {
+    let { pageNum } = this.state
+    if (pageNum > 1) {
+      pageNum -= 1
+    }
+
+    this.setState({ pageNum })
+  }
+
   render = () => {
     if (this.state.pdfContentReady) {
-      return <div ref={this.pdfViewport} className="pdf-card" />
+      return (
+        <div className="pdf-card">
+          <button onClick={this.nextPage}>Next</button>
+          <button onClick={this.prevPage}>Prev</button>
+          <div ref={this.pdfViewport} />
+        </div>
+      )
     }
     return <div className="pdf-card">Loading...</div>
   }
