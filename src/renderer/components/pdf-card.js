@@ -145,17 +145,27 @@ export default class PDFCard extends React.PureComponent {
     this.setState({ pageNum })
   }
 
+  onKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      this.prevPage()
+      e.stopPropagation()
+    } else if (e.key === 'ArrowRight') {
+      this.nextPage()
+      e.stopPropagation()
+    }
+  }
+
   render = () => {
     if (this.state.pdfContentReady) {
       return (
         <div className="pdf-card">
           <button onClick={this.nextPage}>Next</button>
           <button onClick={this.prevPage}>Prev</button>
-          <div ref={this.pdfViewport} />
+          <div tabIndex="0" onKeyDown={this.onKeyDown} ref={this.pdfViewport} />
         </div>
       )
     }
-    return <div className="pdf-card">Loading...</div>
+    return <div className="pdf-card">Loading PDF content...</div>
   }
 }
 
