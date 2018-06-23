@@ -73,6 +73,11 @@ export default class PDFCard extends React.PureComponent {
     if (this.state.pdfContentReady) {
       return
     }
+
+    if (!this.state.hyperfileId) {
+      return
+    }
+
     Hyperfile.fetch(this.state.hyperfileId, (error, pdfData) => {
       if (error) {
         log(error)
