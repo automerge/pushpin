@@ -29,13 +29,19 @@ export default class PDFCard extends React.PureComponent {
   static maxWidth = 72
 
   state = {
-    pdfContentReady: false,
+    currentHyperfileId: '',
+    newPageNum: 1,
     pageNum: 1
   }
 
   pdfViewport = React.createRef()
+  input = React.createRef()
 
   onChange = (doc) => {
+    console.log(doc)
+    if (doc.hyperfileId && doc.hyperfileId !== this.state.currentHyperfileId) {
+      this.loadPDF(doc.hyperfileId)
+    }
     this.setState({ ...doc })
   }
 
@@ -58,27 +64,13 @@ export default class PDFCard extends React.PureComponent {
   // componentDidMount. We have to check for prop updates here and
   // update our doc handle
   componentDidUpdate = (prevProps) => {
-    log('componentWillReceiveProps')
-
-    // not sure this is the best way to solve this
-    this.loadPDF()
-    this.renderPDF()
-
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
     }
   }
 
-  loadPDF = () => {
-    if (this.state.pdfContentReady) {
-      return
-    }
-
-    if (!this.state.hyperfileId) {
-      return
-    }
-
-    Hyperfile.fetch(this.state.hyperfileId, (error, pdfData) => {
+  loadPDF = (hyperfileId) => {
+    Hyperfile.fetch(hyperfileId, (error, pdfData) => {
       if (error) {
         log(error)
       }
@@ -88,14 +80,92 @@ export default class PDFCard extends React.PureComponent {
           return
         } */
 
-        this.setState({ pdfContentReady: true, pdfDocument: pdf })
+        this.setState({ currentHyperfileId: hyperfileId, pdfDocument: pdf })
       })
     })
   }
 
-  renderPDF = () => {
-    const container = this.pdfViewport.current
-    if (!this.state.pdfContentReady) {
+  nextPage = () => {
+    let { pageNum } = this.state
+    if (pageNum < this.state.pdfDocument.numPages) {
+      pageNum += 1
+    }
+
+    this.setState({ pageNum, newPageNum: pageNum })
+  }
+
+  prevPage = () => {
+    let { pageNum } = this.state
+    if (pageNum > 1) {
+      pageNum -= 1
+    }
+
+    this.setState({ pageNum, newPageNum: pageNum })
+  }
+
+  onKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      this.prevPage()
+      e.stopPropagation()
+    } else if (e.key === 'ArrowRight') {
+      this.nextPage()
+      e.stopPropagation()
+    }
+  }
+
+  handleInputKey = (e) => {
+    const { newPageNum, pageNum, pdfDocument } = this.state
+
+    if (e.key === 'Enter') {
+      const nextPageNum = Number.parseInt(newPageNum, 10)
+      if (nextPageNum > 0 && nextPageNum <= pdfDocument.numPages) {
+        this.setState({ pageNum: nextPageNum })
+      } else {
+        this.setState({ newPageNum: pageNum })
+      }
+      this.input.current.blur()
+    }
+
+    if (e.key === 'Backspace') {
+      e.stopPropagation()
+    }
+
+    if (e.key === 'Escape') {
+      this.input.current.blur()
+      this.setState({ newPageNum: pageNum })
+    }
+  }
+
+  handleInputChange = (e) => {
+    this.setState({ newPageNum: e.target.value })
+  }
+
+  render = () => {
+    const { pdfDocument, pageNum, newPageNum } = this.state
+    if (pdfDocument) {
+      // trigger a fresh PDF render
+      setTimeout(() => this.renderPDF(this.pdfViewport.current, pdfDocument, pageNum), 0)
+
+      return (
+        <div className="pdf-card">
+          <button onClick={this.prevPage}>Prev</button>
+          <input
+            ref={this.input}
+            value={newPageNum}
+            onChange={this.handleInputChange}
+            onKeyDown={this.handleInputKey}
+          />
+          of {pdfDocument.numPages}
+          <button onClick={this.nextPage}>Next</button>
+          <div tabIndex="0" onKeyDown={this.onKeyDown} ref={this.pdfViewport} />
+        </div>
+      )
+    }
+    return <div className="pdf-card">Loading PDF content from {this.hyperfileId}...</div>
+  }
+
+  renderPDF = (container, pdfDocument, pageNum) => {
+    if (!container) {
       return
     }
 
@@ -114,7 +184,7 @@ export default class PDFCard extends React.PureComponent {
       container.parentNode.style.width = `${this.renderedWidth}px`
     }
 
-    this.state.pdfDocument.getPage(this.state.pageNum).then((page) => {
+    pdfDocument.getPage(pageNum).then((page) => {
       const resolution = window.devicePixelRatio || 1
       const scalingFactor = resolution * this.renderedWidth / (page.view[2] - page.view[0])
       const viewport = page.getViewport(scalingFactor)
@@ -130,47 +200,6 @@ export default class PDFCard extends React.PureComponent {
       }
       container.appendChild(canvas)
     })
-  }
-
-  nextPage = () => {
-    let { pageNum } = this.state
-    if (pageNum < this.state.pdfDocument.numPages) {
-      pageNum += 1
-    }
-
-    this.setState({ pageNum })
-  }
-
-  prevPage = () => {
-    let { pageNum } = this.state
-    if (pageNum > 1) {
-      pageNum -= 1
-    }
-
-    this.setState({ pageNum })
-  }
-
-  onKeyDown = (e) => {
-    if (e.key === 'ArrowLeft') {
-      this.prevPage()
-      e.stopPropagation()
-    } else if (e.key === 'ArrowRight') {
-      this.nextPage()
-      e.stopPropagation()
-    }
-  }
-
-  render = () => {
-    if (this.state.pdfContentReady) {
-      return (
-        <div className="pdf-card">
-          <button onClick={this.nextPage}>Next</button>
-          <button onClick={this.prevPage}>Prev</button>
-          <div tabIndex="0" onKeyDown={this.onKeyDown} ref={this.pdfViewport} />
-        </div>
-      )
-    }
-    return <div className="pdf-card">Loading PDF content...</div>
   }
 }
 
