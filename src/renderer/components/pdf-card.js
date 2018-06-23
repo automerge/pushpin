@@ -38,7 +38,6 @@ export default class PDFCard extends React.PureComponent {
   input = React.createRef()
 
   onChange = (doc) => {
-    console.log(doc)
     if (doc.hyperfileId && doc.hyperfileId !== this.state.currentHyperfileId) {
       this.loadPDF(doc.hyperfileId)
     }
@@ -55,7 +54,6 @@ export default class PDFCard extends React.PureComponent {
   }
 
   componentDidMount = () => {
-    log('componentDidMount')
     this.refreshHandle(this.props.docId)
   }
 
@@ -141,7 +139,7 @@ export default class PDFCard extends React.PureComponent {
   }
 
   render = () => {
-    const { pdfDocument, pageNum, newPageNum } = this.state
+    const { hyperfileId, pdfDocument, pageNum, newPageNum } = this.state
     if (pdfDocument) {
       // trigger a fresh PDF render
       setTimeout(() => this.renderPDF(this.pdfViewport.current, pdfDocument, pageNum), 0)
@@ -161,7 +159,7 @@ export default class PDFCard extends React.PureComponent {
         </div>
       )
     }
-    return <div className="pdf-card">Loading PDF content from {this.hyperfileId}...</div>
+    return <div className="pdf-card">Loading PDF content from {hyperfileId}...</div>
   }
 
   renderPDF = (container, pdfDocument, pageNum) => {
