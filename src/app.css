@@ -1193,3 +1193,52 @@ div.card.image {
   color: #102542;
   line-height: 36px;
 }
+
+.Button {
+  border-radius: 4px;
+  background: #637389;
+  padding: 0.75em 2em;
+  color: white;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.Downloads__options {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.Download__options__option {
+}
+
+.Download__options__option img {
+  margin: 0 auto 30px;
+  display: block;
+}
+
+.Banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.Banner__label {
+  margin: 0 20px;
+  color: #637389;
+}
+
+.Banner__wing {
+  height: 1px;
+  background: #e9edf0;
+  flex-grow: 1;
+}
+
+.Gallery {
+  margin: 40px 0;
+}
+
+.Features {
+  margin-top: 20px;
+}
