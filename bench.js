@@ -88,7 +88,7 @@ function loadAndBuildDoc(feeds) {
   const loadStart = Date.now()
   const loadPromises = []
   feeds.forEach((feed) => {
-    for (i=1; i<feed.length; i++) {
+    for (let i=1; i<feed.length; i++) {
       const promise = new Promise((res, rej) => {
         feed.get(i, (err, dataStr) => {
           if (err) {
@@ -124,7 +124,11 @@ function loadAndBuildDoc(feeds) {
   })
 }
 
+const openFeedsStart = Date.now()
 openAllFeeds().then((docFeeds) => {
+  const openFeedsTime = Date.now() - openFeedsStart
+  console.log(`openAllFeeds() took ${openFeedsTime} ms`)
+
   loadAndBuildDoc(docFeeds[targetDocId]).then((result) => {
     console.log(targetUrl, result.loadTime, result.buildTime, Object.values(result.doc.cards).length)
 
