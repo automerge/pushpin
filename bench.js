@@ -106,18 +106,19 @@ function loadAndBuildDoc(feeds) {
 
     const buildStart = Date.now()
     const prevSeqs = {}
-    let doc = Automerge.init()
-    changes.forEach((change) => {
+    changes = changes.filter((change) => {
       if (!prevSeqs[change.actor]) {
         prevSeqs[change.actor] = 0
       }
       if (change.seq > prevSeqs[change.actor]) {
         prevSeqs[change.actor] = change.seq
-        doc = Automerge.applyChanges(doc, [change])
+        return true
       } else {
         console.log('skip', change.actor, change.seq)
+        return false
       }
     })
+    let doc = Automerge.applyChanges(Automerge.init(), changes)
     const buildTime = Date.now() - buildStart
 
     return Promise.resolve({doc: doc, loadTime: loadTime, buildTime: buildTime})
