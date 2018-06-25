@@ -1159,3 +1159,37 @@ div.card.image {
 .CodeMirrorEditor__renderer :last-child {
   margin-bottom: 0;
 }
+
+/* Homepage */
+
+.container {
+  width: 75%;
+  margin: 0 auto;
+}
+
+.Jumbotron {
+  margin: 20px 0;
+}
+
+.Jumbotron__branding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Jumbotron__branding h1 {
+  font-size: 24px;
+  margin-left: 10px;
+  color: #102542;
+  text-transform: lowercase;
+}
+
+.Jumbotron__tagline {
+  width: 50%;
+  margin: 0 auto;
+  font-size: 24px;
+  text-align: center;
+  margin-top: 10px;
+  color: #102542;
+  line-height: 36px;
+}
