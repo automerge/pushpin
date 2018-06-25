@@ -5,3 +5,4 @@ out
 *.swo
 data/
 *.DS_Store
+.cache
