@@ -14,7 +14,7 @@
     "publish": "electron-forge publish",
     "lint": "eslint --cache --color --ext .jsx,.js src",
     "test": "electron-mocha --renderer test/**/*.{js,jsx}",
-    "build-docs": "rm -rf ./docs && parcel build src/homepage.html -d docs -o index --public-url '.'"
+    "build-docs": "rm -rf ./docs && parcel build src/docs.html -d docs -o index --public-url '.'"
   },
   "keywords": [],
   "author": "inkandswitch",

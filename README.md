@@ -55,3 +55,10 @@ $ open out/PushPin-darwin-x64/PushPin.app  # on Mac, e.g.
 Note that data directory will be different for the packaged app, even for the
 same user name.
 
+## Docs
+
+The source for docs are in `src/docs.html` and hosted on GitHub pages at https://inkandswitch.github.io/pushpin.
+
+To update the docs, edit `docs.html`, run `npm run build-docs`, and push to GitHub.
+
+
