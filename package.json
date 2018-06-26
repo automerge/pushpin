@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@ibm/plex": "^1.0.2",
-    "automerge": "^0.7.8",
+    "automerge": "^0.7.11",
     "bs58": "^4.0.1",
     "classnames": "^2.2.5",
     "codemirror": "^5.37.0",
