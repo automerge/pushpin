@@ -6,7 +6,7 @@ import Debug from 'debug'
 import { createDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
 
-import { USER, IMAGE_DIALOG_OPTIONS } from '../../constants'
+import { USER, IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
 import Content from '../content'
 import ContentTypes from '../../content-types'
 import ColorPicker from '../color-picker'
@@ -111,7 +111,7 @@ export default class ContactEditor extends React.PureComponent {
     if (this.state.avatarDocId) {
       avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
     } else {
-      avatar = <img alt="avatar" src="../img/default-avatar.png" />
+      avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
 
     return (

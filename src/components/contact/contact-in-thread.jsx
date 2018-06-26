@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import ContentTypes from '../../content-types'
 import Content from '../content'
 import { createDocumentLink } from '../../share-link'
+import { DEFAULT_AVATAR_PATH } from '../../constants'
 
 class ContactInThread extends React.PureComponent {
   static propTypes = {
@@ -61,7 +62,7 @@ class ContactInThread extends React.PureComponent {
     if (this.state.avatarDocId) {
       avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
     } else {
-      avatar = <img alt="avatar" src="../img/default-avatar.png" />
+      avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
 
     const avatarStyle = { ...css.avatar }
