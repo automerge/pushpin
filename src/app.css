@@ -1324,3 +1324,26 @@ div.card.image {
 .Feature__body__label {
   font-weight: bold;
 }
+
+.Technology__list {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  color: #102542;
+}
+
+.Technology__list__section {
+  width: 25%;
+}
+
+.Technology__label {
+  margin-bottom: 20px;
+}
+
+.Footer p {
+  margin-top: 60px;
+}
+
+.Footer {
+  margin: 40px 0 60px;
+}
