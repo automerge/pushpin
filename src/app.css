@@ -1237,8 +1237,29 @@ div.card.image {
 }
 
 .Download__options__option img {
-  margin: 0 auto 30px;
   display: block;
+}
+
+.ImageBadge {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+}
+
+.ImageBadge--dark {
+  background: #102542;
+}
+
+.ImageBadge--blue {
+  background: #00adef;
+}
+
+.ImageBadge--green {
+  background: #388816;
 }
 
 .Banner {
