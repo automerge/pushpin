@@ -10,8 +10,7 @@
     <div class="container">
       <div class="Jumbotron">
         <div class="Jumbotron__branding">
-          <img src="http://via.placeholder.com/50x50">
-          <h1>Pushpin</h1>
+          <img src="./images/homepage/iconPushpinLogo.svg">
         </div>
 
         <div class="Jumbotron__tagline">
@@ -31,16 +30,16 @@
 
         <div class="Downloads__options">
           <div class="Download__options__option">
-            <img src="http://via.placeholder.com/50x50">
+            <div class="ImageBadge ImageBadge--dark"> <img src="./images/homepage/iconMac.svg"> </div>
             <a class="Button" href="">MacOS Download</a>
           </div>
           <div class="Download__options__option">
-            <img src="http://via.placeholder.com/50x50">
+            <div class="ImageBadge ImageBadge--blue"><img src="./images/homepage/iconWindows.svg"></div>
             <a class="Button" href="">Windows Download</a>
           </div>
           <div class="Download__options__option">
-            <img src="http://via.placeholder.com/50x50">
-            <a class="Button" href="">Linux Download</a>
+            <div class="ImageBadge ImageBadge--green"><img src="./images/homepage/iconGithub.svg"></div>
+            <a class="Button" href="https://github.com/inkandswitch/pushpin">View on GitHub</a>
           </div>
         </div>
       </div>
@@ -111,10 +110,53 @@
         </div>
       </div>
 
+      <div class="Technology">
+        <div class="Banner">
+          <div class="Banner__wing"></div>
+          <p class="Banner__label">Technology</p>
+          <div class="Banner__wing"></div>
+        </div>
+
+        <div class="Technology__list">
+          <div class="Technology__list__section">
+            <div class="Technology__label Type--primary">Automerge</div>
+            <div class="Technology__body Type--secondary">
+              A JSON-like data structure that can be modified concurrently by different users, and merged again automatically.
+              <br />
+              <br />
+              <br />
+              <a href="https://github.com/automerge/automerge">https://github.com/automerge/automerge</a>
+            </div>
+          </div>
+
+          <div class="Technology__list__section">
+            <div class="Technology__label Type--primary">Hypercore</div>
+            <div class="Technology__body Type--secondary">
+              Hypercore is a secure, distributed append-only log. Built for sharing large datasets and streams of real time data as part of the Dat project.
+              <br />
+              <br />
+              <a href="https://github.com/automerge/automerge">https://github.com/automerge/automerge</a>
+            </div>
+          </div>
+
+          <div class="Technology__list__section">
+            <div class="Technology__label Type--primary">React</div>
+            <p class="Type--secondary"><a href="https://reactjs.org">https://reactjs.org</a></p>
+
+            <br />
+            <br />
+            <div class="Technology__label Type--primary">Electron</div>
+            <p class="Type--secondary"><a href="https://electronjs.org">https://electronjs.org</a></p>
+          </div>
+        </div>
+      </div>
+
       <div class="Footer">
         <div class="Banner">
           <div class="Banner__wing"> </div>
         </div>
+
+        <p class="Type--secondary">Pushpin is an <a href="https://inkandswitch.com/">Ink & Switch project</a>. Pushpin is distributed under a specific license and is provided without warrantee.</p>
       </div>
     </div>
   </body>

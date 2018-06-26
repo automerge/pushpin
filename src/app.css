@@ -1237,8 +1237,29 @@ div.card.image {
 }
 
 .Download__options__option img {
-  margin: 0 auto 30px;
   display: block;
+}
+
+.ImageBadge {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+}
+
+.ImageBadge--dark {
+  background: #102542;
+}
+
+.ImageBadge--blue {
+  background: #00adef;
+}
+
+.ImageBadge--green {
+  background: #388816;
 }
 
 .Banner {
@@ -1302,4 +1323,27 @@ div.card.image {
 
 .Feature__body__label {
   font-weight: bold;
+}
+
+.Technology__list {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  color: #102542;
+}
+
+.Technology__list__section {
+  width: 25%;
+}
+
+.Technology__label {
+  margin-bottom: 20px;
+}
+
+.Footer p {
+  margin-top: 60px;
+}
+
+.Footer {
+  margin: 40px 0 60px;
 }
