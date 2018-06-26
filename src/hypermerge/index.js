@@ -397,7 +397,7 @@ class Hypermerge extends EventEmitter {
   _feed(actorId = null) {
     const key = actorId ? Buffer.from(actorId, 'hex') : null
     log('_feed', actorId)
-    return this.core.createFeed(key)
+    return this.core.hypercore(key)
   }
 
   // Finds or creates, and returns, a tracked feed. This means that updates to
@@ -769,7 +769,7 @@ class Hypermerge extends EventEmitter {
     log('_onMulticoreReady')
 
     const actorIds =
-      Object.values(this.core.archiver.feeds)
+      Object.values(this.core.feeds)
         .map(feed => feed.key.toString('hex'))
 
     this._initFeeds(actorIds)
