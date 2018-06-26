@@ -4,3 +4,4 @@ out
 *.swp
 *.swo
 data/
+bench/

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+    Needs to be served over http. Easiest way is:
+    $ npm install http-server
+    $ http-server &
+    $ open http://localhost:8080/bench-am.html
+-->
+<body><p id="status">loading...</p></body>
+<script src="node_modules/automerge/dist/automerge.js"></script>
+<script>
+const cardUrls = [
+  'bench/0753d01988ac67eb04fae8ce9c05b30a518389590794f7cec9ef41c60be746ed.json',
+  'bench/09d8a9391c0b6d8b7f838eddb2ceebc3486c9350999acba24f7f38a05c1f57cf.json',
+  'bench/12af5ee95ecf3d1be1700ac213db0f801d2d7f4c5ba5185ff4e31468c2f40994.json',
+  'bench/1c7f9cd857d14613c10dc21b774c90fd5c887a396ec04fb1a8a673a5db5aa932.json',
+  'bench/1e5674a3e4b22c07f3281c7da08c73ad11fdf973d726aa592f446e3e0ec7c71c.json',
+  'bench/24392970a68207d4c058b6cb37198ed4a3687687376cbb3319234d186eecc109.json',
+  'bench/2cbe6b40ecb8be409647eb770f129908ab52a23fd2fa09068a98e3596b8bc336.json',
+  'bench/2d598bd35c942de67997d7c84c3a520c60549c6b7705b63d6a9263985ce7d404.json',
+  'bench/30b958d66f6e3967f31cd4266b12df2f04fe7ed2a532c4646d433c809e693957.json',
+  'bench/344dc6778e875a4f37f338ca5bae98bcad9d55e69411fc279b5a83b39bb9580a.json',
+  'bench/3d578704d518359694a9c488c0cc2feec1f5227ca4289c4f789ae31047fa9703.json',
+  'bench/461985ad4c51c91cb3b81b7b67474b9966dfe3843514af2e24347fed8add0392.json',
+  'bench/487663a3a10c65aca5ff8e8abd4e6216690ff79de43c11e6b9cfb6386330f864.json',
+  'bench/4aeda1b3e4b1832e2c8875c536ff2673dfbe3e770ff290c862b84fbd5aba6910.json',
+  'bench/5a4fad99b3acdf519043df2d8961acc8ea5c76fa07e48a96e755964bbaf35f0c.json',
+  'bench/610860293fd0e8c369b2e5708a475c20030ebaa78f056c61f5e55816176c95f6.json',
+  'bench/618106946e257654982910ea1fa90e11411175469bc32cf51b182c539ce92f14.json',
+  'bench/62c0822d0c7c97605fb0d5e81b057e7928df57824d73385159abc015cef2808f.json',
+  'bench/739f26514f1d10390c2a5beb479018353bcc9b704ac4977b7434f6b9e95ac7ac.json', // this is the board pushpin://board/8nLe1KH86KMYb6tpRDZi9WeQjrewPrVoVyEcAQ8QYzfd/Gn2
+  'bench/7a4beef10f1f77da6ffd9c53c129e6ae5defd422ce1c85ef65754c7085c05ae6.json',
+  'bench/7b6e2bb6181f744aa3d60daed08c40c4c9412104d0c6a34c9e65037117b55eb0.json',
+  'bench/7ef4b12b80e186d53dca26309fec5f5883ba56dd8e0d9d2ca4611a886a4f6077.json',
+  'bench/7f8acf48ff78e0a77429d93aadedb62e91b67ad1b210129404334e0afe0ab830.json',
+  'bench/82c9346a7bf2e6e6fc6fc821f2fa36997a84403d1b186deb13286e06479078c9.json',
+  'bench/8860d3931b386bc71d9800b1aca966d6dad8bbc28b05ba20c8a9cbbb4e85713d.json',
+  'bench/93dc7b43cb89d614602f588de10f4e0a59422531673335fe1531efb7163d1c3b.json',
+  'bench/9453f3db824de87b837cebd342e7919e4dd1928ad6b15d15e1000bea21f3b7b1.json',
+  'bench/a2181517ef91d18350189279bb503b6e10ac32c7ba0526013feb6310025b15d2.json',
+  'bench/a803fa8a65f7600d8eb1a6e27b42eb9c560e2a976ef7f8bc113a6f5cfd885a8c.json',
+  'bench/a96948f6ece157f75b4efae4de9b33eec385589e27a36336b37dcb8e724e464f.json',
+  'bench/ac140dde2444b221426c7abe20be40729868942341f7aa1e11cb78e283cf7b7f.json',
+  'bench/ac4989f0a86e7dac2d864caf51158534c5bc4cb7f85aa81232f20535fc9167df.json',
+  'bench/b3842789c19fbbb2ab0353679621514943b0bbb823ad7c3b2387b664d2af7477.json',
+  'bench/b44f727f156808fc9e51b8e728a568cc4f886f8f9e0b9bb66858e0e1b2250c0e.json',
+  'bench/b64b333c9cc50f18c26c9731ea2e3740c3b1c9871489e9b5a62a7ac69e4a1eac.json',
+  'bench/bbb7a125bc6dfe44517afd4ed35745ada709a75f2bf5d495e9c268651215ed69.json',
+  'bench/c9e4d9d8fe164d60be5a50fc0bd8e9a61967f9fe17b864480839a2d9f8a8b3fa.json',
+  'bench/dbc41fae9550f7a7ef8c37c5f27688880b8771bcc976ba30fd4ebbb609e2c90e.json',
+  'bench/e24aa619cc805ceba1aae891ce3b95d358d5bc5ea8bfd6ea6aa1adedda28c254.json',
+  'bench/e3c3b002de45010fe18ba14652a35b6b10bb3a4eeccd06a1137480556c2eeb83.json',
+  'bench/e7c951d72db586c8ad43f676d8e20315c4e864a3a29c125203c21c265ced763b.json',
+  'bench/e8432a7b4ba6ba693d41335a01e7f5ae46a01c375d95493b634987740700d3d9.json',
+  'bench/eb65cd5ccaf8f854c2612da5885de364db784ad0dce9f6d8558916151756364b.json',
+  'bench/ee10876d3aabf0475600cb2f571a4ecc3044ad434066f0357e75573583d9f2d0.json',
+  'bench/ef72be89bdd94376eadad22a8c9bec3e251a14d41fd4c289260285d0bde39864.json',
+  'bench/f0eb2b40e498112ec0130493f410a48ec3a5484cfb7278a2df182232b7c5c327.json',
+  'bench/fab81d3b65942acea1d922a285a1caa40a30e14ebfe111a6ee96f9d57ff475a8.json'
+]
+
+function load(path, callback) {
+  let req = new XMLHttpRequest();
+  req.addEventListener('load', function () {
+    callback(JSON.parse(this.responseText))
+  })
+  req.open('GET', path)
+  req.send()
+}
+
+let buildTime = 0, numLoaded = 0
+const cards = {}
+
+for (const cardUrl of cardUrls) {
+  load(cardUrl, (changes) => {
+    const buildStart = Date.now()
+    cards[cardUrl] = Automerge.applyChanges(Automerge.init(), changes)
+    buildTime = buildTime + Date.now() - buildStart
+    numLoaded += 1
+
+    if (numLoaded === cardUrls.length) {
+      document.getElementById('status').textContent = 'loaded in ' + buildTime + ' ms'
+    }
+  })
+}
+</script>

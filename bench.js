@@ -40,6 +40,10 @@ if (process.argv.length !== 4) {
   process.exit(1)
 }
 
+if (!FS.existsSync('./bench')) {
+  FS.mkdirSync('./bench')
+}
+
 const user = process.argv[2]
 const targetUrl = process.argv[3]
 const targetType = parse(targetUrl).type
@@ -84,7 +88,7 @@ function openAllFeeds() {
   })
 }
 
-function loadAndBuildDoc(feeds) {
+function loadAndBuildDoc(docId, feeds) {
   const loadStart = Date.now()
   const loadPromises = []
   feeds.forEach((feed) => {
@@ -104,7 +108,6 @@ function loadAndBuildDoc(feeds) {
   return Promise.all(loadPromises).then((changes) => {
     const loadTime = Date.now() - loadStart
 
-    const buildStart = Date.now()
     const prevSeqs = {}
     changes = changes.filter((change) => {
       if (!prevSeqs[change.actor]) {
@@ -118,10 +121,9 @@ function loadAndBuildDoc(feeds) {
         return false
       }
     })
-    let doc = Automerge.applyChanges(Automerge.init(), changes)
-    const buildTime = Date.now() - buildStart
+    FS.writeFileSync(`./bench/${docId}.json`, JSON.stringify(changes))
 
-    return Promise.resolve({doc: doc, loadTime: loadTime, buildTime: buildTime})
+    return Promise.resolve({changes, loadTime})
   })
 }
 
@@ -130,19 +132,18 @@ openAllFeeds().then((docFeeds) => {
   const openFeedsTime = Date.now() - openFeedsStart
   console.log(`openAllFeeds() took ${openFeedsTime} ms`)
 
-  loadAndBuildDoc(docFeeds[targetDocId]).then((result) => {
-    console.log(targetUrl, result.loadTime, result.buildTime, Object.values(result.doc.cards).length)
-
+  loadAndBuildDoc(targetDocId, docFeeds[targetDocId]).then((result) => {
     if (targetType === 'board') {
-      const cardPromises = Object.values(result.doc.cards).forEach((card) => {
+      let doc = Automerge.applyChanges(Automerge.init(), result.changes)
+      const cardPromises = Object.values(doc.cards).forEach((card) => {
         const cardUrl = card.url
         const cardDocId = parse(cardUrl).docId
         if (!docFeeds[cardDocId]) {
           console.log('missing', cardUrl)
           return
         }
-        loadAndBuildDoc(docFeeds[cardDocId]).then((result) => {
-          console.log(cardUrl, result.loadTime, result.buildTime)
+        loadAndBuildDoc(cardDocId, docFeeds[cardDocId]).then((result) => {
+          console.log(cardUrl, result.loadTime)
         })
       })
     }
