@@ -87,3 +87,15 @@ To update the docs, edit `docs.html`, run `npm run build-docs`, and push to GitH
 ## Contributing
 
 Please do! Bug reports and pull requests are welcome.
+
+## Credits
+
+This project was written by
+ * Roshan Choxi
+ * Ignatius Gilfedder
+ * Mark McGranaghan
+ * Jeff Peterson
+ * Peter van Hardenberg
+and was produced under the auspices of [Ink & Switch](inkandswitch.com).
+
+Special thanks to Martin Kleppmann (automerge) and Mathias Buus (hypercore) for their advice and contributions.
