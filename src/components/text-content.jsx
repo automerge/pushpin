@@ -200,7 +200,7 @@ export default class TextContent extends React.PureComponent {
   }
 
   onKeyDown = (e) => {
-    if (this.state.text.length > 0) {
+    if (e.key !== 'Backspace') {
       this.stallDelete = true
     }
     if (!this.stallDelete) {
