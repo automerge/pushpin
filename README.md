@@ -1,12 +1,12 @@
 # PushPin
 
-A collaborative corkboard app.
+[A collaborative corkboard app.](http://inkandswitch.github.io/pushpin)
 
-Built with Electron and the Dat p2p stack.
+Built with Electron, React, automerge and the Dat p2p stack.
 
 A project by [Ink & Switch](https://inkandswitch.com/). 
 
-If you think this is cool, wait until you see what we're working on next. Why not [reach out](hello@inkandswitch.com)? We're always excited to meet folks with similar interests.
+If you think this is cool, wait until you see what we're working on next. Why not [reach out](mailto:hello@inkandswitch.com)? We're always excited to meet folks with similar interests.
 
 ## Running from Source
 
@@ -64,7 +64,9 @@ You can also see who's online in the top right corner of your workspace.
 
 ## Hacking on PushPin
 
-PushPin is built to be easily extended. You could add new kinds of cards like movies or music, a fancier text editor, a PDF viewer, a deck of cards, or a drum machine. You could replace our card layout with your own code, or build a 3d game using WebGL. The sky's the limit. See [HACKING.md] for a getting started guide.
+PushPin is built to be easily extended. You could add new kinds of cards like movies or music, a fancier text editor, a PDF viewer, a deck of cards, or a drum machine. You could replace our card layout with your own code, or build a 3d game using WebGL. The sky's the limit. 
+
+See [HACKING](hacking.md) for a getting started guide.
 
 ## Packaging
 
