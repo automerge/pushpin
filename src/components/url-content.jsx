@@ -194,10 +194,9 @@ const css = {
   },
   img: {
     WebkitUserDrag: 'none',
-    minHeight: '192px',
+    height: '192px',
     display: 'block',
     objectFit: 'cover',
-    height: '50%',
     marginBottom: 12,
     marginLeft: -12,
     marginTop: -12,
