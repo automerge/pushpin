@@ -45,7 +45,7 @@ You can remove a user directory to reset a user's data, or remove the entire dat
 
 ## Packaging
 
-To produce a standale package:
+To produce a standalone package:
 
 ```console
 $ electron-forge package
