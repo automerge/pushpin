@@ -160,7 +160,12 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   handleClickOutside = (e) => {
-    if (e.target.className === 'fa fa-envelope') {
+    if (this.state.activeTitleEditor) {
+      return
+    }
+
+    if (e.target.className === 'fa fa-envelope' ||
+      e.target.className === 'BoardTitle__actionBar') {
       return
     }
 
@@ -178,10 +183,12 @@ export default class BoardTitle extends React.PureComponent {
     if (!this.state.activeTitleEditor) {
       this.activateOmnibox()
     }
+    e.stopPropagation()
   }
 
-  activateTitleEditor = () => {
+  activateTitleEditor = (e) => {
     this.setState({ activeTitleEditor: true })
+    e.stopPropagation()
   }
 
   updateTitle = (value) => {
@@ -259,16 +266,15 @@ export default class BoardTitle extends React.PureComponent {
       }
 
       inputBar = (
-        <div className="BoardTitle__actionBar">
+        <div className="BoardTitle__actionBar" onClick={this.handleTitleClick}>
           <div className="BoardTitle__actionBar__left">
-            <i className={invitationsClasses} onClick={this.activateOmnibox} />
+            <i className={invitationsClasses} />
           </div>
           <BoardTitleInput
             active={this.state.activeTitleEditor}
             onSubmit={this.updateTitle}
             onCancel={this.cancelTitleEdit}
             defaultValue={this.state.board && this.state.board.title || ''}
-            onClick={this.activateOmnibox}
           />
           <div className="BoardTitle__actionBar__right">
             <i className="fa fa-edit" onClick={this.activateTitleEditor} />

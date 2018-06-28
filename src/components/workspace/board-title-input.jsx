@@ -50,6 +50,11 @@ export default class BoardTitleInput extends React.PureComponent {
     }
   }
 
+  handleBlur = (e) => {
+    this.props.onCancel()
+    this.setState({ newTitle: null })
+  }
+
   handleChange = (e) => {
     this.setState({ newTitle: e.target.value })
   }
@@ -73,6 +78,7 @@ export default class BoardTitleInput extends React.PureComponent {
         type="text"
         className={titleInputClasses}
         value={title}
+        onBlur={this.handleBlur}
         onChange={this.handleChange}
         onKeyDown={this.handleKey}
         onClick={this.props.onClick}
