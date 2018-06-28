@@ -10,10 +10,18 @@
   --colorDestructive: #F87060;
   --zIndexCard: 1;
 }
-
+h1,h2,h3,h4,h5,h6, p, ul, ol, blockquote {
+  font-size: .66666rem;
+  line-height: 1rem;
+  font-family: 'IBM Plex Sans';
+  font-weight: 400;
+  margin:0;
+  padding: 0;
+}
 /* Homepage */
 html {
   font-size: 24px;
+  -webkit-font-smoothing: antialiased;
 }
 body {
   color: #102542;
@@ -23,21 +31,28 @@ body {
   line-height: 1rem;
 }
 
+h2 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
 .container {
   box-sizing: border-box;
-  padding: 2.5rem;
+  padding: 0 1.5rem;
   max-width: 1116px;
   margin: 0 auto;
 }
 
 .Jumbotron {
-  margin: 3rem 0;
+  max-width: 576px;
+  margin: 3rem auto;
 }
 
 .Jumbotron__branding {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 2.5rem;
 }
 
 .Jumbotron__branding h1 {
@@ -47,14 +62,15 @@ body {
 }
 
 .Jumbotron__tagline {
-  padding: 0rem 2.5rem;
   font-size: 1rem;
   text-align: center;
   color: #102542;
   line-height: 1.5rem;
+  margin: 0 auto;
 }
 
 .Button {
+  font-family: 'IBM Plex Sans';
   border-radius: 4px;
   background: #637389;
   padding: 0.5rem 1rem;
@@ -121,13 +137,14 @@ body {
 .Gallery {
 }
 
-.Gallery p {
-  font-size: 1.125rem;
-  color: var(--colorSecondaryGrey);
+.Gallery h2 {
+  font-size: 1rem;
   line-height: 1.5rem;
   text-align: center;
   padding: 1rem;
   margin-bottom: 2rem;
+  max-width: 576px;
+  margin: 0 auto;
 }
 
 .Gallery img {
@@ -157,11 +174,10 @@ body {
 }
 
 .Feature__body {
-  margin-left: 10px;
+  margin-left: 1rem;
 }
 
 .Feature__body__label {
-  font-weight: bold;
 }
 
 .Technology__list {
@@ -199,4 +215,34 @@ body {
 .Type-tertiary {
   font-size: .5rem;
   line-height: 1rem;
+}
+.Badge {
+  padding: 8px;
+  font-size: 24px;
+  border-radius: 50%;
+  background-color: #D5DFE5;
+}
+
+.Badge--blue {
+  background: #8edce6;
+}
+
+.Badge--red {
+  background: #f87060;
+}
+
+.Badge--purple {
+  background: #c7abff;
+}
+
+.Badge--yellow {
+  background: #ffe17e;
+}
+
+.Badge--green {
+  background: #b5e6a1;
+}
+
+.Badge--pink {
+  background: #ff84cd;
 }
