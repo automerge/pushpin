@@ -1,0 +1,202 @@
+
+:root {
+  --colorBlueBlack: #102542;
+  --colorBlack: var(--colorBlack);
+  --colorSecondaryGrey: #637389;
+  --colorPaleGrey: #D5DFE5;
+  --colorInputGrey: #E9EDF0;
+  --colorOnline: rgb(113, 227, 65);
+  --colorLink: #0645ad;
+  --colorDestructive: #F87060;
+  --zIndexCard: 1;
+}
+
+/* Homepage */
+html {
+  font-size: 24px;
+}
+body {
+  color: #102542;
+  margin: 0;
+  padding:0 ;
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+.container {
+  box-sizing: border-box;
+  padding: 2.5rem;
+  max-width: 1116px;
+  margin: 0 auto;
+}
+
+.Jumbotron {
+  margin: 3rem 0;
+}
+
+.Jumbotron__branding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Jumbotron__branding h1 {
+  font-size: 1rem;
+  color: #102542;
+  text-transform: lowercase;
+}
+
+.Jumbotron__tagline {
+  padding: 0rem 2.5rem;
+  font-size: 1rem;
+  text-align: center;
+  color: #102542;
+  line-height: 1.5rem;
+}
+
+.Button {
+  border-radius: 4px;
+  background: #637389;
+  padding: 0.5rem 1rem;
+  color: white;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.Downloads__options {
+  margin-top: 2.5rem;
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.Download__options__option {
+  flex-shrink: 0;
+}
+
+.Download__options__option img {
+  display: block;
+}
+
+.ImageBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 4px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.ImageBadge--dark {
+  background: #102542;
+}
+
+.ImageBadge--blue {
+  background: #00adef;
+}
+
+.ImageBadge--green {
+  background: #388816;
+}
+
+.Banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.Banner__label {
+  font-size: .66rem;
+  margin: 0 1rem;
+  color: var(--colorSecondaryGrey);
+}
+
+.Banner__wing {
+  height: 1px;
+  background: #e9edf0;
+  flex-grow: 1;
+}
+
+.Gallery {
+}
+
+.Gallery p {
+  font-size: 1.125rem;
+  color: var(--colorSecondaryGrey);
+  line-height: 1.5rem;
+  text-align: center;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.Gallery img {
+  width: 100%;
+}
+
+.Features {
+  font-size: .666666rem;
+  margin: 1rem 0;
+}
+
+.Features__list {
+  margin-top: 2.5rem;
+  margin-bottom: 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-rows: auto;
+  grid-gap: 3rem 1.5rem;
+}
+
+.Feature {
+  display: flex;
+}
+
+.Feature .Badge {
+  margin-bottom: auto;
+}
+
+.Feature__body {
+  margin-left: 10px;
+}
+
+.Feature__body__label {
+  font-weight: bold;
+}
+
+.Technology__list {
+  font-size: .666666rem;
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  color: #102542;
+}
+
+.Technology__list__section {
+  width: 25%;
+}
+
+.Technology__label {
+  margin-bottom: 1rem;;
+}
+
+.Footer p {
+  font-size: .66666rem;
+  margin-top: 2.5rem;
+}
+
+.Footer {
+  margin: 2.5rem 0 3rem;
+}
+
+.Type--primary {
+  color: var(--colorBlueBlack);
+  font-size: .66666rem;
+}
+.Type--secondary {
+  color var(--colorSecondaryGrey));
+}
+.Type-tertiary {
+  font-size: .5rem;
+  line-height: 1rem;
+}
