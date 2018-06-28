@@ -72,10 +72,13 @@ export default class Board extends React.PureComponent {
     this.state = { doc: {}, cards: {}, selected: [] }
   }
 
-  static initializeDocument(board) {
+  static initializeDocument(board, { title, backgroundColor }) {
     log('initializeDocument')
-    board.title = 'No Title'
-    board.backgroundColor = BOARD_COLORS.SKY
+    board.title = title || 'No Title'
+    const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
+    const color = backgroundColor ||
+      BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
+    board.backgroundColor = color
     board.cards = {}
     board.authorIds = []
   }
@@ -286,6 +289,17 @@ export default class Board extends React.PureComponent {
 
         this.createImageCardFromPath({ x, y }, paths[0])
       })
+      return
+    }
+
+    if (contentType.type === 'board') {
+      const cardId = this.createCard({
+        x,
+        y,
+        type: contentType.type,
+        typeAttrs: { title: `Sub-board of ${this.state.doc.title}` }
+      })
+      this.selectOnly(cardId)
       return
     }
 

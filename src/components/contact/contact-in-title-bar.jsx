@@ -57,6 +57,13 @@ class ContactInTitlebar extends React.PureComponent {
     this.setState({ online: true })
   }
 
+  onDragStart = (e) => {
+    e.dataTransfer.setData(
+      'application/pushpin-url',
+      createDocumentLink('contact', this.props.docId)
+    )
+  }
+
   render = () => {
     let avatar
     if (this.state.avatarDocId) {
@@ -68,6 +75,8 @@ class ContactInTitlebar extends React.PureComponent {
     return (
       <div>
         <div
+          draggable="true"
+          onDragStart={this.onDragStart}
           className={`Avatar Avatar--title-bar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
           style={{ '--highlight-color': this.state.color }}
           data-name={this.state.name}
