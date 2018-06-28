@@ -160,6 +160,10 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   handleClickOutside = (e) => {
+    if (e.target.className === 'fa fa-envelope') {
+      return
+    }
+
     if (e.target.className !== 'TitleBar__titleText') {
       this.deactivateOmnibox()
     }
