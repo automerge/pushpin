@@ -13,7 +13,6 @@
 h1,h2,h3,h4,h5,h6, p, ul, ol, blockquote {
   font-size: .66666rem;
   line-height: 1rem;
-  font-family: 'IBM Plex Sans';
   font-weight: 400;
   margin:0;
   padding: 0;
@@ -21,6 +20,7 @@ h1,h2,h3,h4,h5,h6, p, ul, ol, blockquote {
 /* Homepage */
 html {
   font-size: 24px;
+  font-family: 'IBM Plex Sans';
   -webkit-font-smoothing: antialiased;
 }
 body {
@@ -71,6 +71,7 @@ h2 {
 
 .Button {
   font-family: 'IBM Plex Sans';
+  font-weight: 500;
   border-radius: 4px;
   background: #637389;
   padding: 0.5rem 1rem;
@@ -141,10 +142,10 @@ h2 {
   font-size: 1rem;
   line-height: 1.5rem;
   text-align: center;
-  padding: 1rem;
-  margin-bottom: 2rem;
-  max-width: 576px;
   margin: 0 auto;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  max-width: 576px;
 }
 
 .Gallery img {
@@ -160,9 +161,9 @@ h2 {
   margin-top: 2.5rem;
   margin-bottom: 3rem;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   grid-rows: auto;
-  grid-gap: 3rem 1.5rem;
+  grid-gap: 2.5rem 1.5rem;
 }
 
 .Feature {
@@ -181,7 +182,7 @@ h2 {
 }
 
 .Technology__list {
-  font-size: .666666rem;
+  font-size: 0.666666rem;
   margin-top: 2.5rem;
   display: flex;
   justify-content: space-between;
@@ -210,7 +211,7 @@ h2 {
   font-size: .66666rem;
 }
 .Type--secondary {
-  color var(--colorSecondaryGrey));
+  color: var(--colorSecondaryGrey);
 }
 .Type-tertiary {
   font-size: .5rem;
