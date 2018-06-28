@@ -137,7 +137,16 @@ h2 {
 
 .Gallery {
 }
+.Gallery .Gallery__videoContainer {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(0,0,0,.25);
 
+}
+.Gallery video {
+  margin-left:-1px;
+  max-width: 100%;
+}
 .Gallery h2 {
   font-size: 1rem;
   line-height: 1.5rem;
