@@ -260,7 +260,7 @@ export default class BoardTitle extends React.PureComponent {
         />
       )
     } else {
-      let invitationsClasses = 'fa fa-envelope'
+      let invitationsClasses = 'BoardTitle__labeledIcon BoardTitle__envelope fa fa-envelope'
       if (invitations.length === 0) {
         invitationsClasses += ' hidden'
       }
@@ -277,8 +277,8 @@ export default class BoardTitle extends React.PureComponent {
             defaultValue={this.state.board && this.state.board.title || ''}
           />
           <div className="BoardTitle__actionBar__right">
-            <i className="fa fa-edit" onClick={this.activateTitleEditor} />
-            <i className="fa fa-clipboard" onClick={this.copyToClipboard} />
+            <i className="BoardTitle__labeledIcon BoardTitle__edit fa fa-edit" onClick={this.activateTitleEditor} />
+            <i className="BoardTitle__labeledIcon BoardTitle__clipboard fa fa-clipboard" onClick={this.copyToClipboard} />
           </div>
         </div>
       )
