@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
@@ -8,7 +9,7 @@ import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import Content from '../content'
 import SelfContext from '../self-context'
 import TitleBar from './title-bar'
-
+import Board from '../board/board'
 
 const log = Debug('pushpin:workspace')
 
@@ -27,8 +28,30 @@ export default class Workspace extends React.PureComponent {
       doc.docId = selfId
     })
 
-    const boardId = Content.initializeContentDoc('board', { selfId })
+    const boardId = Content.initializeContentDoc('board', { title: 'Welcome to PushPin!', selfId })
     const docUrl = createDocumentLink('board', boardId)
+
+    const text = `Welcome to PushPin!
+
+We've created your first text card for you.
+You can edit it, or make more by double-clicking the background.
+
+You can drag or paste images, text, and URLs onto the board. They'll be stored for offline usage.
+If you right-click, you can choose the kind of card to make.
+You can make new boards from the right-click menu or with Ctrl-N.
+
+To edit the title of a board, click the pencil.
+To share a board with another person, click the clipboard, then have them paste that value into the omnibox.
+
+Quick travel around by clicking the Omnibox. Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
+
+To create links to boards or contacts, drag them from the title bar or the omnibox.`
+
+    const theBoard = ReactDOM.render(<Board docId={boardId} />, document.createElement('div'))
+    theBoard.createCard({ x: 20,
+      y: 20,
+      type: 'text',
+      typeAttrs: { text } })
 
     // Then make changes to workspace doc.
     workspace.selfId = selfId
@@ -132,7 +155,7 @@ export default class Workspace extends React.PureComponent {
           <TitleBar docId={this.props.docId} openDoc={this.openDoc} />
           { content }
         </div>
-      </SelfContext.Provider>  
+      </SelfContext.Provider>
     )
   }
 }

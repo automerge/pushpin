@@ -35,6 +35,11 @@ This is an alias for:
 $ NAME=userA npm start & NAME=userB npm start
 ```
 
+To start with the dev tools open, set OPEN_DEV_TOOLS on your CLI as follows:
+```console
+$ OPEN_DEV_TOOLS=true npm start
+```
+
 User data is stored in a platform-dependent, shared location outside of the
 source code directory. To get the path to your data directory, run in the
 console:
