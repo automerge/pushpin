@@ -164,8 +164,8 @@ export default class BoardTitle extends React.PureComponent {
       return
     }
 
-    if (e.target.className === 'fa fa-envelope' ||
-      e.target.className === 'BoardTitle__actionBar') {
+    if (e.target.className.match('BoardTitle__envelope') ||
+      e.target.className.match('BoardTitle__actionBar')) {
       return
     }
 
