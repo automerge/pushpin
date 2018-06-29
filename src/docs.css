@@ -11,11 +11,24 @@
   --zIndexCard: 1;
 }
 h1,h2,h3,h4,h5,h6, p, ul, ol, blockquote {
-  font-size: .66666rem;
+  font-size: .666666rem;
   line-height: 1rem;
   font-weight: 400;
   margin:0;
   padding: 0;
+}
+p {
+  margin-bottom: 1rem;
+}
+a:link {
+  color: var(--colorLink);
+  text-decoration: none;
+}
+a:visited {
+  color: var(--colorLink);
+}
+a:hover {
+  text-decoration: underline;
 }
 /* Homepage */
 html {
@@ -44,7 +57,7 @@ h2 {
 }
 
 .Jumbotron {
-  max-width: 576px;
+  max-width: 16rem;
   margin: 3rem auto;
 }
 
@@ -69,13 +82,13 @@ h2 {
   margin: 0 auto;
 }
 
-.Button {
+a.Button {
+  color: white;
   font-family: 'IBM Plex Sans';
   font-weight: 500;
   border-radius: 4px;
   background: #637389;
-  padding: 0.5rem 1rem;
-  color: white;
+  padding: 0.25rem 1rem;
   text-decoration: none;
   font-size: 12px;
 }
@@ -83,12 +96,16 @@ h2 {
 .Downloads__options {
   margin-top: 2.5rem;
   margin-bottom: 3rem;
-  display: flex;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  grid-gap: 2.5rem 1.5rem;
 }
 
 .Download__options__option {
-  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .Download__options__option img {
@@ -102,7 +119,7 @@ h2 {
   display: flex;
   text-align: center;
   justify-content: center;
-  margin: 0 auto 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .ImageBadge--dark {
@@ -136,12 +153,14 @@ h2 {
 }
 
 .Gallery {
+  margin-bottom: 3rem;
 }
+
 .Gallery .Gallery__videoContainer {
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 12px 24px rgba(0,0,0,.25);
-
+  margin-bottom: 3rem;
 }
 .Gallery video {
   margin-left:-1px;
@@ -152,7 +171,6 @@ h2 {
   line-height: 1.5rem;
   text-align: center;
   margin: 0 auto;
-  margin-top: 1rem;
   margin-bottom: 3rem;
   max-width: 576px;
 }
@@ -162,7 +180,7 @@ h2 {
 }
 
 .Features {
-  font-size: .666666rem;
+  font-size: .6666666rem;
   margin: 1rem 0;
 }
 
@@ -171,7 +189,6 @@ h2 {
   margin-bottom: 3rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  grid-rows: auto;
   grid-gap: 2.5rem 1.5rem;
 }
 
@@ -193,13 +210,15 @@ h2 {
 .Technology__list {
   font-size: 0.666666rem;
   margin-top: 2.5rem;
-  display: flex;
-  justify-content: space-between;
+  margin-bottom: 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-gap: 2.5rem 1.5rem;
+
   color: #102542;
 }
 
 .Technology__list__section {
-  width: 25%;
 }
 
 .Technology__label {
@@ -217,7 +236,7 @@ h2 {
 
 .Type--primary {
   color: var(--colorBlueBlack);
-  font-size: .66666rem;
+  font-size: .666666rem;
 }
 .Type--secondary {
   color: var(--colorSecondaryGrey);
