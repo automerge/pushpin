@@ -219,7 +219,11 @@ export default class Board extends React.PureComponent {
     if (plainText) {
       try {
         const url = new URL(plainText)
-        this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
+        if (url.protocol === 'pushpin:') {
+          this.linkCard({ x: pageX, y: pageY, url: url.toString() })
+        } else {
+          this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
+        }
       } catch (e) {
         // i guess it's not a URL, just make a text card
         this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
@@ -262,7 +266,11 @@ export default class Board extends React.PureComponent {
     if (plainTextData) {
       try {
         const url = new URL(plainTextData)
-        this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
+        if (url.protocol === 'pushpin:') {
+          this.linkCard({ x, y, url: url.toString() })
+        } else {
+          this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
+        }
       } catch (e) {
         // i guess it's not a URL, just make a text card
         this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
