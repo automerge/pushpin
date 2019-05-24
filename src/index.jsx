@@ -30,9 +30,9 @@ import './components/url-content'
 
 import { createDocumentLink } from './share-link'
 
-const DiscoverySwarm = require('discovery-swarm')
-const defaults = require('dat-swarm-defaults')
-
+// const DiscoverySwarm = require('discovery-swarm')
+// const defaults = require('dat-swarm-defaults')
+import DiscoverySwarm from 'discovery-cloud-client'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
@@ -46,7 +46,11 @@ EventEmitter.defaultMaxListeners = 500
 
 function initHypermerge(cb) {
   const repo = new Repo({ storage: raf, path: HYPERMERGE_PATH, port: 0 })
-  const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
+  // const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
+
+  const url = 'wss://discovery-cloud.herokuapp.com'
+  const discovery = new DiscoverySwarm({ url, id: repo.id, stream: repo.stream })
+
   repo.replicate(discovery)
 
   window.repo = repo

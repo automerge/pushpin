@@ -58,6 +58,7 @@
     "classnames": "^2.2.6",
     "codemirror": "^5.47.0",
     "diff-match-patch": "^1.0.4",
+    "discovery-cloud-client": "0.0.1",
     "electron-compile": "^6.4.4",
     "electron-devtools-installer": "^2.2.4",
     "electron-prompt": "^0.5.0",

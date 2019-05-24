@@ -106,3 +106,11 @@ This project was written by
 and was produced under the auspices of [Ink & Switch](inkandswitch.com).
 
 Special thanks to Martin Kleppmann (automerge) and Mathias Buus (hypercore) for their advice and contributions.
+
+## Upgrade Hackage Notes
+
+### sodium-native
+Compiling sodium-native is a pain. Go into node_modules/sodium-native and run `node preinstall`.
+
+### automerge
+There's a regression in Automerge where types are being wrapped in a proxy preventing instanceof Text from working correctly. Until a fix arrives, edit node_modules/hypermerge/node_modules/automerge/frontend/context.js#69 and change value instanceof Text to value.constructor.name === "Text".

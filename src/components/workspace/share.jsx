@@ -69,8 +69,8 @@ export default class Share extends React.PureComponent {
 
   updateIdentityReferences = (workspaceHandle, boardHandle) => {
     log('updateIdentityReferences')
-    const { authorIds = [] } = boardHandle.state
-    const { selfId, contactIds = [] } = workspaceHandle.state
+    const { authorIds = [] } = boardHandle.state || {}
+    const { selfId, contactIds = [] } = workspaceHandle.state || {}
     // Add any never-before seen authors to our contacts.
     const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
     if (newContactIds.length > 0) {
