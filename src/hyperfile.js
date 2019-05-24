@@ -6,7 +6,7 @@ import { HYPERFILE_PATH } from './constants'
 
 const storage = require('random-access-file')
 
-const repo = new Repo({ HYPERFILE_PATH, storage })
+const repo = new Repo({ storage, path: HYPERFILE_PATH, })
 
 // DAT's discovery swarm or truly serverless discovery
 const DiscoverySwarm = require('discovery-swarm')
