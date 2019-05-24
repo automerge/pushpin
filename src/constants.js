@@ -17,7 +17,7 @@ if (!USER) {
 
 // We want these constants available from both the main and render threads.
 const app = electron.app || electron.remote.app
-export const USER_PATH = Path.join(app.getPath('userData'), 'pushpin-v01', USER)
+export const USER_PATH = Path.join(app.getPath('userData'), 'pushpin-v10', USER)
 
 export const WORKSPACE_URL_PATH = Path.join(USER_PATH, 'workspace-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')

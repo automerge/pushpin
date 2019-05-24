@@ -22,8 +22,8 @@ export default class Share extends React.PureComponent {
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    this.workspaceHandle.release()
-    this.boardHandle.release()
+    this.workspaceHandle.close()
+    this.boardHandle.close()
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -31,24 +31,21 @@ export default class Share extends React.PureComponent {
       this.refreshHandle(this.props.docId)
     }
   }
-
+  // XXX FIXTHIS
   refreshWorkspaceHandle = (docId) => {
     log('refreshWorkspaceHandle')
     if (this.workspaceHandle) {
-      this.workspaceHandle.release()
+      this.workspaceHandle.close()
     }
-    this.workspaceHandle = window.hm.openHandle(docId)
-    this.workspaceHandle.onChange(this.onWorkspaceChange)
+    this.workspaceHandle = window.repo.watch(docId, (doc) => this.onWorkspaceChange(doc))
   }
 
   refreshBoardHandle = (boardId) => {
     log('refreshBoardHandle')
     if (this.boardHandle) {
-      this.boardHandle.release()
+      this.boardHandle.close()
     }
-
-    this.boardHandle = window.hm.openHandle(boardId)
-    this.boardHandle.onChange(this.onBoardChange)
+    this.boardHandle = window.repo.watch(boardId, (doc) => this.onBoardChange(doc))
   }
 
   onBoardChange = (doc) => {
@@ -72,32 +69,25 @@ export default class Share extends React.PureComponent {
 
   updateIdentityReferences = (workspaceHandle, boardHandle) => {
     log('updateIdentityReferences')
-    const { authorIds } = boardHandle.get() || {}
-    // If there is no authorIds yet, we've just loaded a uninitialized board. We'll
-    // shortly get an onChange callback with the initialized board, so don't try to
-    // do anything before then. Without this guard, the boardHandle.change block is
-    // liable to throw cryptic errors.
-    if (authorIds) {
-      const { selfId, contactIds = [] } = workspaceHandle.get() || {}
+    const { authorIds = [] } = boardHandle.state
+    const { selfId, contactIds = [] } = workspaceHandle.state
+    // Add any never-before seen authors to our contacts.
+    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
+    if (newContactIds.length > 0) {
+      workspaceHandle.change((workspace) => {
+        workspace.contactIds.push(...newContactIds)
+      })
+    }
 
-      // Add any never-before seen authors to our contacts.
-      const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
-      if (newContactIds.length > 0) {
-        workspaceHandle.change((workspace) => {
-          workspace.contactIds.push(...newContactIds)
-        })
-      }
-
-      // Add ourselves to the authors if we haven't yet.
-      if (selfId && !authorIds.includes(selfId)) {
-        log('updateIdentityReferences.addSelf')
-        boardHandle.change((board) => {
-          if (!board.authorIds) {
-            board.authorIds = []
-          }
-          board.authorIds.push(selfId)
-        })
-      }
+    // Add ourselves to the authors if we haven't yet.
+    if (selfId && !authorIds.includes(selfId)) {
+      log('updateIdentityReferences.addSelf')
+      boardHandle.change((board) => {
+        if (!board.authorIds) {
+          board.authorIds = []
+        }
+        board.authorIds.push(selfId)
+      })
     }
   }
 
@@ -131,7 +121,7 @@ export default class Share extends React.PureComponent {
     const noneFound = (
       <div className="ListMenu__item">
         <div className="ContactListItem">
-          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
+          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
           <div className="Label">
             <p className="Type--primary">None found</p>
             <p className="Type--secondary">Copy a link to your board and start making friends</p>
@@ -165,7 +155,7 @@ export default class Share extends React.PureComponent {
     const noneFound = (
       <div className="ListMenu__item">
         <div className="ContactListItem">
-          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{backgroundColor: 'var(--colorPaleGrey)'}}/>
+          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
           <div className="Label">
             <p className="Type--primary">None found</p>
             <p className="Type--secondary">Nobody has access to this but you</p>

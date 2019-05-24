@@ -37,7 +37,7 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   componentWillUnmount = () => {
-    this.handle.release()
+    this.handle.close()
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('click', this.handleClickOutside)
   }
@@ -68,19 +68,17 @@ export default class BoardTitle extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+    this.boardHandle = window.repo.watch(docId, (doc) => this.onChange(doc))
   }
 
   refreshBoardHandle = (boardId) => {
     if (this.boardHandle) {
-      this.boardHandle.release()
+      this.boardHandle.close()
     }
 
-    this.boardHandle = window.hm.openHandle(boardId)
-    this.boardHandle.onChange((doc) => {
+    this.boardHandle = window.repo.watch(boardId, (doc) => {
       this.setState({ board: doc })
     })
   }
@@ -88,10 +86,10 @@ export default class BoardTitle extends React.PureComponent {
   onChange = (doc) => {
     this.setState({ ...doc }, () => {
       if (this.state.currentDocUrl) {
-        const { docId } = parseDocumentLink(this.state.currentDocUrl)
+        const { hypermergeUrl } = parseDocumentLink(this.state.currentDocUrl)
 
-        if (!this.state.board || this.state.board.docId !== docId) {
-          this.refreshBoardHandle(docId)
+        if (!this.state.board || this.state.board.docId !== hypermergeUrl) {
+          this.refreshBoardHandle(hypermergeUrl)
         }
       }
     })
@@ -228,7 +226,7 @@ export default class BoardTitle extends React.PureComponent {
       }
     })
 
-    selfHandle.release()
+    selfhandle.close()
   }
 
   copyToClipboard = (e) => {

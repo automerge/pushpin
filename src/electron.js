@@ -27,14 +27,7 @@ const createWindow = async () => {
 
   protocol.registerBufferProtocol('hyperfile', (request, callback) => {
     try {
-      const hyperfileId = request.url.split('//')[1]
-
-      Hyperfile.fetch(hyperfileId, (err, data) => {
-        if (err) {
-          log(err)
-          return
-        }
-
+      Hyperfile.fetch(request.url, (data) => {
         callback({ data })
       })
     } catch (e) {

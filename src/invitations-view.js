@@ -15,8 +15,7 @@ export default class InvitationsView {
     this.pendingInvitations = []
     this.selfId = null
 
-    this.workspaceHandle = window.hm.openHandle(workspaceId)
-    this.workspaceHandle.onChange((doc) => {
+    this.workspaceHandle = window.repo.watch(workspaceId, (doc) => {
       this.selfId = doc.selfId
       doc.contactIds.forEach(id => this.watchContact(id))
     })
@@ -28,7 +27,7 @@ export default class InvitationsView {
   }
 
   watchDoc = (docId) => {
-    if (this.docHandles[docId]) {
+    /* if (this.docHandles[docId]) {
       return
     }
 
@@ -46,11 +45,11 @@ export default class InvitationsView {
           this.onChangeCb(this.invitations)
         }
       }
-    })
+    }) */
   }
 
   watchContact = (contactId) => {
-    if (this.contactHandles[contactId]) {
+    /* if (this.contactHandles[contactId]) {
       return
     }
 
@@ -74,6 +73,6 @@ export default class InvitationsView {
           this.watchDoc(docId)
         }
       })
-    })
+    }) */
   }
 }

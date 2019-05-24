@@ -68,11 +68,11 @@ export default class BoardCard extends React.PureComponent {
       top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y,
     }
     if (this.props.remoteSelected.length > 0) {
-      const contactHandle = window.hm.openHandle(this.props.remoteSelected[0])
-      const contact = contactHandle.get()
-      if (contact) {
-        style['--highlight-color'] = contact.color
-      }
+      window.repo.watch(this.props.remoteSelected[0], (doc) => {
+        if (doc) {
+          style['--highlight-color'] = doc.color
+        }
+      })
     }
 
     const { type } = parseDocumentLink(card.url)

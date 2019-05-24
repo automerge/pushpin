@@ -18,6 +18,7 @@ export default class ImageContent extends React.PureComponent {
   static minWidth = 3
   static minHeight = 3
   static defaultWidth = 18
+  static defaultHeight = 6 // REMOVE THIS
   // no default height to allow it to grow
   // suggestion: no max/min width on images, we dont
   // know what aspect ratios people will be using day to day
@@ -33,12 +34,11 @@ export default class ImageContent extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
   }
+
 
   componentDidMount = () => {
     log('componentDidMount')
@@ -75,7 +75,7 @@ export default class ImageContent extends React.PureComponent {
       return null
     }
 
-    return <img className="image" alt="" src={`hyperfile://${this.state.hyperfileId}`} />
+    return <img className="image" alt="" src={this.state.hyperfileId} />
   }
 }
 

@@ -22,7 +22,7 @@ export default class TitleBar extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => this.handle.release()
+  componentWillUnmount = () => this.handle.close()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -31,10 +31,9 @@ export default class TitleBar extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
   }
 
   disableBack = () => this.state.historyIndex === (this.state.sessionHistory.length - 1)

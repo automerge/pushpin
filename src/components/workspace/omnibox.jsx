@@ -36,9 +36,9 @@ export default class Omnibox extends React.PureComponent {
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    this.handle.release()
-    Object.values(this.viewedDocHandles).forEach(handle => handle.release())
-    Object.values(this.contactHandles).forEach(handle => handle.release())
+    this.handle.close()
+    Object.values(this.viewedDocHandles).forEach(handle => handle.close())
+    Object.values(this.contactHandles).forEach(handle => handle.close())
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -55,11 +55,11 @@ export default class Omnibox extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
   }
+
 
   onChange = (doc) => {
     log('onChange', doc)
@@ -68,18 +68,16 @@ export default class Omnibox extends React.PureComponent {
         // create a handle for this document
         if (!this.viewedDocHandles[url]) {
           const { docId } = parseDocumentLink(url)
-          const handle = window.hm.openHandle(docId)
-          this.viewedDocHandles[url] = handle
-
           // when it changes, stick the contents of the document
           // into this.state.viewedDocs[url]
-          handle.onChange((doc) => {
+          const handle = window.repo.watch(docId, (doc) => {
             this.setState((state, props) => {
               const { viewedDocs } = state
               viewedDocs[url] = doc
               return { viewedDocs }
             })
           })
+          this.viewedDocHandles[url] = handle
         }
       })
 

@@ -86,7 +86,7 @@ export default class Board extends React.PureComponent {
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => {
     this.heartbeatNotifyDeparture()
-    this.handle.release()
+    this.handle.close()
     clearInterval(this.heartbeatTimerId)
   }
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -98,12 +98,11 @@ export default class Board extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
-    this.handle.onMessage(this.onMessage)
-  }
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+  } // onMessage!?
+
 
   onChange = (doc) => {
     this.setState({ doc })
@@ -664,16 +663,16 @@ export default class Board extends React.PureComponent {
   refreshHeartbeat = (doc) => {
     // XXX check how this work on board change
     if (!this.heartbeatTimerId) {
-      this.handle.message({ contact: this.props.selfId, heartbeat: true })
+      // this.handle.message({ contact: this.props.selfId, heartbeat: true })
       this.heartbeatTimerId = setInterval(() => {
-        this.handle.message({ contact: this.props.selfId, heartbeat: true })
+        // this.handle.message({ contact: this.props.selfId, heartbeat: true })
       }, 5000) // send a heartbeat every 5s
     }
   }
 
   heartbeatNotifyDeparture = () => {
     // notify peers on the current board that we're departing
-    this.handle.message({ contact: this.props.selfId, departing: true })
+    // this.handle.message({ contact: this.props.selfId, departing: true })
   }
 
   clearRemoteSelection = (contact) => {
@@ -683,7 +682,7 @@ export default class Board extends React.PureComponent {
 
   updateSelection = (selected) => {
     this.setState({ selected })
-    this.handle.message({ contact: this.props.selfId, selected })
+    // this.handle.message({ contact: this.props.selfId, selected })
   }
 
   selectToggle = (cardId) => {

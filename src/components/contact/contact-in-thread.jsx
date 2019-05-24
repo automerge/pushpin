@@ -21,7 +21,7 @@ class ContactInThread extends React.PureComponent {
   }
 
   componentWillUnmount = () => {
-    this.handle.release()
+    this.handle.close()
     clearTimeout(this.timerId)
   }
 
@@ -33,13 +33,11 @@ class ContactInThread extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    clearTimeout(this.timerId)
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
-    this.handle.onMessage(this.onMessage)
-  }
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+  } // onMessage
+
 
   onChange = (doc) => {
     if (this.props.selfId === this.props.docId) {

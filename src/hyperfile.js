@@ -1,72 +1,48 @@
-import Hyperdiscovery from 'hyperdiscovery'
 import Fs from 'fs'
+import mime from 'mime-types'
 
-import Multicore from './hypermerge/multicore'
+import { Repo } from 'hypermerge'
 import { HYPERFILE_PATH } from './constants'
 
-const multicore = new Multicore(HYPERFILE_PATH)
+const storage = require('random-access-file')
+
+const repo = new Repo({ HYPERFILE_PATH, storage })
+
+// DAT's discovery swarm or truly serverless discovery
+const DiscoverySwarm = require('discovery-swarm')
+const defaults = require('dat-swarm-defaults')
+
+const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
+
+repo.replicate(discovery)
 
 // callback = (err, hyperfileId)
 export function write(filePath, callback) {
-  multicore.ready(() => {
-    const feed = multicore.createFeed()
+  Fs.readFile(filePath, (error, buffer) => {
+    if (error) {
+      callback(error)
+      return
+    }
 
-    Fs.readFile(filePath, (error, buffer) => {
-      if (error) {
-        callback(error)
-        return
-      }
-
-      feed.append(buffer, (error) => {
-        if (error) {
-          callback(error)
-          return
-        }
-
-        const hyperfileId = feed.key.toString('hex')
-
-        Hyperdiscovery(feed)
-        callback(null, hyperfileId)
-      })
-    })
+    const mimeType = mime.lookup(filePath) || 'application/octet-stream'
+    const hyperfileUrl = repo.writeFile(buffer, mimeType)
+    callback(null, hyperfileUrl)
   })
 }
 
 export function writeBuffer(buffer, callback) {
-  multicore.ready(() => {
-    const feed = multicore.createFeed()
-
-    feed.append(buffer, (error) => {
-      if (error) {
-        callback(error)
-        return
-      }
-
-      const hyperfileId = feed.key.toString('hex')
-
-      Hyperdiscovery(feed)
-      callback(null, hyperfileId)
-    })
-  })
+  const hyperfileUrl = repo.writeFile(buffer, 'application/octet-stream') // TODO: mime type
+  callback(null, hyperfileUrl)
 }
 
 // callback = (err, blob)
 export function fetch(hyperfileId, callback) {
-  multicore.ready(() => {
-    const feedKey = Buffer.from(hyperfileId, 'hex')
-    const feed = multicore.createFeed(feedKey)
+  repo.readFile(hyperfileId, (error, data) => {
+    if (error) {
+      callback(error)
+      return
+    }
 
-    feed.on('error', callback)
-    feed.ready(() => {
-      Hyperdiscovery(feed)
-      feed.get(0, null, (error, data) => {
-        if (error) {
-          callback(error)
-          return
-        }
-
-        callback(null, data)
-      })
-    })
+    callback(null, data)
   })
 }

@@ -36,7 +36,7 @@ export default class UrlContent extends React.PureComponent {
   state = { urlInput: '' }
 
   componentWillMount = () => this.refreshHandle(this.props.docId)
-  componentWillUnmount = () => this.handle.release()
+  componentWillUnmount = () => this.handle.close()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.docId !== this.props.docId) {
       this.refreshHandle(this.props.docId)
@@ -45,11 +45,11 @@ export default class UrlContent extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
   }
+
 
   onChange = (doc) => {
     if (doc.url && !doc.data) {

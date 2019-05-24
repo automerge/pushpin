@@ -82,14 +82,14 @@ export default class TextContent extends React.PureComponent {
     })
     this.codeMirror.on('change', this.onCodeMirrorChange)
 
-    this.handle = window.hm.openHandle(this.props.docId)
-    this.handle.onChange(this.onDocChange)
+    const { docId } = this.props
+    this.handle = window.repo.watch(docId, (doc) => this.onDocChange(doc))
   }
 
   componentWillUnmount = () => {
     log('componentDidUnmount')
 
-    this.handle.release()
+    this.handle.close()
     this.handle = null
   }
 

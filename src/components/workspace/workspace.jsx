@@ -24,7 +24,7 @@ export default class Workspace extends React.PureComponent {
     // this is, uh, a nasty hack.
     // we should refactor not to require the docId on the contact
     // but i don't want to pull that in scope right now
-    window.hm.openHandle(selfId).change((doc) => {
+    window.repo.change(selfId, (doc) => {
       doc.docId = selfId
     })
 
@@ -79,7 +79,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.docId)
   componentWillUnmount = () => {
-    this.handle.release()
+    this.handle.close()
     clearInterval(this.timerId)
   }
 
@@ -91,10 +91,9 @@ To create links to boards or contacts, drag them from the title bar or the omnib
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
   }
 
   onChange = (doc) => {
@@ -103,14 +102,14 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   }
 
   refreshHeartbeat = (doc) => {
-    const selfHandle = window.hm.openHandle(doc.selfId)
+    /*    const selfHandle = window.repo.watch(doc.selfId)
 
     if (!this.timerId) {
       selfHandle.message('heartbeat')
       this.timerId = setInterval(() => {
         selfHandle.message('heartbeat')
       }, 5000) // send a heartbeat every 5s
-    }
+    } */ // no onMessage support in this HM
   }
 
   openDoc = (docUrl) => {

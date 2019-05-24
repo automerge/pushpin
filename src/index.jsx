@@ -2,9 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
 import Fs from 'fs'
+import { Repo } from 'hypermerge'
+import raf from 'random-access-file'
 
 import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
-import Hypermerge from './hypermerge'
 import Content from './components/content'
 
 // We load these modules here so that the content registry will have them.
@@ -29,6 +30,10 @@ import './components/url-content'
 
 import { createDocumentLink } from './share-link'
 
+const DiscoverySwarm = require('discovery-swarm')
+const defaults = require('dat-swarm-defaults')
+
+
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
 // doesn't confuse future instances.
@@ -40,11 +45,13 @@ localStorage.removeItem('debug')
 EventEmitter.defaultMaxListeners = 500
 
 function initHypermerge(cb) {
-  window.hm = new Hypermerge({ storage: HYPERMERGE_PATH, port: 0 })
-  window.hm.once('ready', () => {
-    window.hm.joinSwarm()
-    cb()
-  })
+  const repo = new Repo({ storage: raf, path: HYPERMERGE_PATH, port: 0 })
+  const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
+  repo.replicate(discovery)
+
+  window.repo = repo
+
+  cb() // no need to wait for .ready?
 }
 
 function loadWorkspaceUrl() {

@@ -27,7 +27,7 @@ export default class ContactInBoard extends React.PureComponent {
   }
 
   componentWillUnmount = () => {
-    this.handle.release()
+    this.handle.close()
     clearTimeout(this.timerId)
   }
 
@@ -39,12 +39,11 @@ export default class ContactInBoard extends React.PureComponent {
 
   refreshHandle = (docId) => {
     if (this.handle) {
-      window.hm.release(this.handle)
+      this.handle.close()
     }
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
-    this.handle.onMessage(this.onMessage)
-  }
+    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+  } // onMessage!?
+
 
   onChange = (doc) => {
     if (this.props.selfId === this.props.docId) {

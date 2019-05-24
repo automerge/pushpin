@@ -17,22 +17,21 @@ export default class PresentContacts extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.currentDocUrl)
-  componentWillUnmount = () => this.handle.release()
+  componentWillUnmount = () => this.handle.close()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.currentDocUrl !== this.props.currentDocUrl) {
       this.clearContacts()
       this.refreshHandle(this.props.currentDocUrl)
     }
   }
+
   refreshHandle = (currentDocUrl) => {
     if (this.handle) {
-      this.handle.release()
+      this.handle.close()
     }
-    const { docId } = parseDocumentLink(currentDocUrl)
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
-    this.handle.onMessage(this.onMessage)
-  }
+    const { hypermergeUrl } = parseDocumentLink(currentDocUrl)
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+  } // onMessage
 
   onChange = (doc) => {
     this.setState({ ...doc })

@@ -20,18 +20,17 @@ export default class Content extends React.PureComponent {
   }
 
   static initializeContentDoc = (type, typeAttrs = {}) => {
-    const { hm } = window // still not a great idea
+    const { repo } = window // still not a great idea
     const contentType = ContentTypes.lookup({ type })
 
     const initializeDocumentWithAttrs = (doc) => {
       contentType.component.initializeDocument(doc, typeAttrs)
     }
 
-    let doc = hm.create()
-    const docId = hm.getId(doc)
-    doc = hm.change(doc, initializeDocumentWithAttrs)
+    const url = repo.create()
+    repo.change(url, initializeDocumentWithAttrs)
 
-    return docId
+    return url
   }
 
   // This is the New Boilerplate, adapted slightly for content

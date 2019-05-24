@@ -5,17 +5,20 @@ import { crc16 } from 'js-crc'
  * lifted and adapted from pixelpusher
  */
 
-export const createDocumentLink = (type, id) => {
+export const createDocumentLink = (type, url) => {
+  if (!url.match('hypermerge:/')) {
+    throw new Error('expecting a hypermerge URL as input')
+  }
+  if (url.match('pushpin')) {
+    throw new Error('so-called ID contains "pushpin". you appear to have passed a URL as an ID')
+  }
+
+  const id = url.substring(12)
+
   if (!type) {
     throw new Error('no type when creating URL')
   }
-  if (id.match('pushpin')) {
-    throw new Error('so-called ID contains "pushpin". you appear to have passed a URL as an ID')
-  }
-  if (!id || id.length !== 64) {
-    throw new Error('expected a 64 character base16 key as input')
-  }
-  return withCrc(`pushpin://${type}/${encode(id)}`)
+  return withCrc(`pushpin://${type}/${id}`)
 }
 
 export const parseDocumentLink = link => {
@@ -33,15 +36,13 @@ export const parseDocumentLink = link => {
     throw new Error(`Invalid url scheme: ${scheme} (expected pushpin)`)
   }
 
-  if (docId.length !== 64) {
-    throw new Error(`Invalid docId: ${docId} (should be length 64)`)
-  }
-
   if (!type) {
     throw new Error(`Missing type in ${this.props.url}`)
   }
 
-  return { scheme, type, docId }
+  const hypermergeUrl = `hypermerge:/${docId}`
+
+  return { scheme, type, docId, hypermergeUrl }
 }
 
 export const isValidCRCShareLink = (nonCrc, crc) =>
@@ -53,7 +54,7 @@ export const parts = str => {
   return {
     scheme: p.scheme,
     type: p.type,
-    docId: p.docId && decode(p.docId),
+    docId: p.docId,
     nonCrc: p.nonCrc,
     crc: p.crc && decode(p.crc),
   }
