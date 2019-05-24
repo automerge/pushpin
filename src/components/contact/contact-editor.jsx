@@ -79,13 +79,13 @@ export default class ContactEditor extends React.PureComponent {
         throw new Error('Expected exactly one path?')
       }
 
-      Hyperfile.write(paths[0], (err, hyperfileId) => {
+      Hyperfile.write(paths[0], (err, hyperfileUrl) => {
         if (err) {
           log(err)
           return
         }
 
-        const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileId })
+        const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileUrl })
         this.handle.change((d) => {
           d.avatarDocId = hypermergeUrl
         })

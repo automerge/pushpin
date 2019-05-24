@@ -320,7 +320,7 @@ export default class Board extends React.PureComponent {
   }
 
   createImageCardFromPath = ({ x, y }, path) => {
-    Hyperfile.write(path, (err, hyperfileId) => {
+    Hyperfile.write(path, (err, hyperfileUrl) => {
       if (err) {
         log(err)
         return
@@ -330,14 +330,14 @@ export default class Board extends React.PureComponent {
         x,
         y,
         type: 'image',
-        typeAttrs: { hyperfileId }
+        typeAttrs: { hyperfileUrl }
       })
       this.selectOnly(cardId)
     })
   }
 
   createImageCardFromBuffer = ({ x, y }, buffer) => {
-    Hyperfile.writeBuffer(buffer, (err, hyperfileId) => {
+    Hyperfile.writeBuffer(buffer, (err, hyperfileUrl) => {
       if (err) {
         log(err)
         return
@@ -347,7 +347,7 @@ export default class Board extends React.PureComponent {
         x,
         y,
         type: 'image',
-        typeAttrs: { hyperfileId }
+        typeAttrs: { hyperfileUrl }
       })
       this.selectOnly(cardId)
     })
