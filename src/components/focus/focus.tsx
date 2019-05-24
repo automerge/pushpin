@@ -3,6 +3,7 @@ import Debug from "debug";
 
 import ContentTypes from "../../content-types";
 import { cardDimensions } from "./logic/constants";
+import CardSpread from "./components/focus-card-spread";
 
 const log = Debug("pushpin:focus");
 
