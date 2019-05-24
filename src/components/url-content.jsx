@@ -106,13 +106,13 @@ export default class UrlContent extends React.PureComponent {
     fetch(imageCanonicalUrl).then((response => {
       response.arrayBuffer().then((buffer) => {
         // we need to convert the ArrayBuffer into a Uint8Buffer
-        Hyperfile.writeBuffer(Buffer.from(buffer), (err, hyperfileId) => {
+        Hyperfile.writeBuffer(Buffer.from(buffer), (err, hyperfileUrl) => {
           if (err) {
             throw new Error(err)
           }
 
           this.handle.change((doc) => {
-            doc.imageHyperfileUrl = `hyperfile://${hyperfileId}`
+            doc.imageHyperfileUrl = hyperfileUrl
           })
         })
       })

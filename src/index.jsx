@@ -4,6 +4,9 @@ import { EventEmitter } from 'events'
 import Fs from 'fs'
 import { Repo } from 'hypermerge'
 import raf from 'random-access-file'
+// const DiscoverySwarm = require('discovery-swarm')
+// const defaults = require('dat-swarm-defaults')
+import DiscoverySwarm from 'discovery-cloud-client'
 
 import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
 import Content from './components/content'
@@ -29,10 +32,6 @@ import './components/thread-content'
 import './components/url-content'
 
 import { createDocumentLink } from './share-link'
-
-// const DiscoverySwarm = require('discovery-swarm')
-// const defaults = require('dat-swarm-defaults')
-import DiscoverySwarm from 'discovery-cloud-client'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it

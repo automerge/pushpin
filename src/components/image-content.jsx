@@ -11,14 +11,13 @@ export default class ImageContent extends React.PureComponent {
     docId: PropTypes.string.isRequired
   }
 
-  static initializeDocument = (image, { hyperfileId }) => {
-    image.hyperfileId = hyperfileId
+  static initializeDocument = (image, { hyperfileUrl }) => {
+    image.hyperfileUrl = hyperfileUrl
   }
 
   static minWidth = 3
   static minHeight = 3
   static defaultWidth = 18
-  static defaultHeight = 6 // REMOVE THIS
   // no default height to allow it to grow
   // suggestion: no max/min width on images, we dont
   // know what aspect ratios people will be using day to day
@@ -60,22 +59,13 @@ export default class ImageContent extends React.PureComponent {
   render = () => {
     log('render')
 
-    if (this.state.hyperfile && this.state.hyperfile.key) {
-      return (
-        <p>
-          Error: This image uses an outdated version of hyperfile,
-          please delete and re-upload.
-        </p>
-      )
-    }
-
-    if (!this.state.hyperfileId) {
+    if (!this.state.hyperfileUrl) {
       // we used to show some kind of stand-in value but we don't have a design
       // for one that works everywhere the image works, so for now: nothing.
       return null
     }
 
-    return <img className="image" alt="" src={this.state.hyperfileId} />
+    return <img className="image" alt="" src={this.state.hyperfileUrl} />
   }
 }
 

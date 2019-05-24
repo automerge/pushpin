@@ -141,7 +141,7 @@ export default class Share extends React.PureComponent {
     return (
       <div>
         <div className="ListMenu__section">
-          { uniqueContactIds.length != 0 ? contacts : noneFound}
+          { uniqueContactIds.length !== 0 ? contacts : noneFound}
         </div>
       </div>
     )
@@ -173,7 +173,7 @@ export default class Share extends React.PureComponent {
     return (
       <div>
         <div className="ListMenu__section">
-          { uniqueAuthorIds.length != 0 ? authors : noneFound}
+          { uniqueAuthorIds.length !== 0 ? authors : noneFound}
         </div>
       </div>
     )
