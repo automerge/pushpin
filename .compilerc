@@ -8,6 +8,17 @@
         ],
         "plugins": ["transform-async-to-generator", "transform-class-properties", "transform-object-rest-spread", "transform-es2015-classes", "react-hot-loader/babel"],
         "sourceMaps": "inline"
+      },
+      "text/typescript": {
+        "esModuleInterop": true,
+        "strict": true,
+        "noFallthroughCasesInSwitch": true,
+        "module": "commonjs",
+        "target": "es2015",
+        "lib": ["es2017", "es6", "dom", "dom.iterable", "scripthost"],
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "sourceMap": true
       }
     },
     "production": {
@@ -18,6 +29,17 @@
         ],
         "plugins": ["transform-async-to-generator", "transform-class-properties", "transform-object-rest-spread", "transform-es2015-classes"],
         "sourceMaps": "none"
+      },
+      "text/typescript": {
+        "esModuleInterop": true,
+        "strict": true,
+        "noFallthroughCasesInSwitch": true,
+        "module": "commonjs",
+        "target": "es2015",
+        "lib": ["es2017", "es6", "dom", "dom.iterable", "scripthost"],
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "sourceMap": true
       }
     }
   }

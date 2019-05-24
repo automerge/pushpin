@@ -84,9 +84,12 @@
     "riek": "^1.1.0",
     "tmp": "0.0.33",
     "to-buffer": "^1.1.0",
+    "tslib": "^1.9.3",
     "unfluff": "^3.2.0"
   },
   "devDependencies": {
+    "@types/react": "^16.8.18",
+    "@types/react-dom": "^16.8.4",
     "babel-eslint": "^8.2.6",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-class-properties": "6.24.1",
@@ -107,6 +110,7 @@
     "eslint-plugin-react": "^7.13.0",
     "mocha": "^5.2.0",
     "parcel-bundler": "1.9.3",
-    "react-test-renderer": "^15.6.2"
+    "react-test-renderer": "^15.6.2",
+    "typescript": "^3.4.5"
   }
 }
