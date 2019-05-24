@@ -31,7 +31,7 @@ export default class Share extends React.PureComponent {
       this.refreshHandle(this.props.hypermergeUrl)
     }
   }
-  // XXX FIXTHIS
+
   refreshWorkspaceHandle = (hypermergeUrl) => {
     log('refreshWorkspaceHandle')
     if (this.workspaceHandle) {
@@ -71,6 +71,12 @@ export default class Share extends React.PureComponent {
     log('updateIdentityReferences')
     const { authorIds = [] } = boardHandle.state || {}
     const { selfId, contactIds = [] } = workspaceHandle.state || {}
+
+    // no work required if there's no board...
+    if (!boardHandle || !boardHandle.state) {
+      return
+    }
+
     // Add any never-before seen authors to our contacts.
     const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
     if (newContactIds.length > 0) {
