@@ -15,17 +15,17 @@ const log = Debug('pushpin:workspace')
 
 export default class Workspace extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
   }
 
   static initializeDocument = (workspace) => {
     const selfId = Content.initializeContentDoc('contact')
 
     // this is, uh, a nasty hack.
-    // we should refactor not to require the docId on the contact
+    // we should refactor not to require the hypermergeUrl on the contact
     // but i don't want to pull that in scope right now
     window.repo.change(selfId, (doc) => {
-      doc.docId = selfId
+      doc.hypermergeUrl = selfId
     })
 
     const boardId = Content.initializeContentDoc('board', { title: 'Welcome to PushPin!', selfId })
@@ -47,7 +47,7 @@ Quick travel around by clicking the Omnibox. Typing part of a name will show you
 
 To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-    const theBoard = ReactDOM.render(<Board docId={boardId} />, document.createElement('div'))
+    const theBoard = ReactDOM.render(<Board hypermergeUrl={boardId} />, document.createElement('div'))
     theBoard.createCard({ x: 20,
       y: 20,
       type: 'text',
@@ -71,29 +71,29 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     })
 
     ipcRenderer.on('newDocument', () => {
-      const docId = Content.initializeContentDoc('board', { selfId: this.state.selfId })
-      this.openDoc(createDocumentLink('board', docId))
+      const hypermergeUrl = Content.initializeContentDoc('board', { selfId: this.state.selfId })
+      this.openDoc(createDocumentLink('board', hypermergeUrl))
     })
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => {
     this.handle.close()
     clearInterval(this.timerId)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
   onChange = (doc) => {
@@ -151,7 +151,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     return (
       <SelfContext.Provider value={this.state.selfId}>
         <div className="Workspace">
-          <TitleBar docId={this.props.docId} openDoc={this.openDoc} />
+          <TitleBar hypermergeUrl={this.props.hypermergeUrl} openDoc={this.openDoc} />
           { content }
         </div>
       </SelfContext.Provider>

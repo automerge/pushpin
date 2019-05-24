@@ -14,26 +14,26 @@ const log = Debug('pushpin:title-bar')
 
 export default class TitleBar extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     openDoc: PropTypes.func.isRequired,
   }
 
   state = { sessionHistory: [], historyIndex: 0 }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => this.handle.close()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
   disableBack = () => this.state.historyIndex === (this.state.sessionHistory.length - 1)
@@ -93,7 +93,7 @@ export default class TitleBar extends React.PureComponent {
               <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
             </DropdownTrigger>
             <DropdownContent>
-              <ContactEditor docId={this.state.selfId} />
+              <ContactEditor hypermergeUrl={this.state.selfId} />
             </DropdownContent>
           </Dropdown>
           <button disabled={this.disableBack()} onClick={this.back} className="TitleBar__menuItem">
@@ -105,7 +105,7 @@ export default class TitleBar extends React.PureComponent {
         </div>
 
         <div className="TitleBar__center">
-          <BoardTitle openDoc={this.props.openDoc} docId={this.props.docId} />
+          <BoardTitle openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
         </div>
 
         <div className="TitleBar__right">
@@ -118,7 +118,7 @@ export default class TitleBar extends React.PureComponent {
             </DropdownTrigger>
             <DropdownContent>
               <Share
-                docId={this.props.docId}
+                hypermergeUrl={this.props.hypermergeUrl}
                 openDocument={this.props.openDoc}
               />
             </DropdownContent>

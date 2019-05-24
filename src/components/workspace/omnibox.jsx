@@ -13,7 +13,7 @@ export default class Omnibox extends React.PureComponent {
     search: PropTypes.string,
     getKeyController: PropTypes.func.isRequired,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     onSelectChange: PropTypes.func.isRequired
   }
 
@@ -30,7 +30,7 @@ export default class Omnibox extends React.PureComponent {
 
   componentDidMount = () => {
     log('componentDidMount')
-    this.refreshHandle(this.props.docId)
+    this.refreshHandle(this.props.hypermergeUrl)
     this.props.getKeyController({ moveUp: this.moveUp, moveDown: this.moveDown })
   }
 
@@ -43,8 +43,8 @@ export default class Omnibox extends React.PureComponent {
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     log('componentDidUpdate')
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
 
     if ((this.props.visible && !prevProps.visible) ||
@@ -53,11 +53,11 @@ export default class Omnibox extends React.PureComponent {
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
 
@@ -67,10 +67,10 @@ export default class Omnibox extends React.PureComponent {
       this.state.viewedDocUrls.forEach(url => {
         // create a handle for this document
         if (!this.viewedDocHandles[url]) {
-          const { docId } = parseDocumentLink(url)
+          const { hypermergeUrl } = parseDocumentLink(url)
           // when it changes, stick the contents of the document
           // into this.state.viewedDocs[url]
-          const handle = window.repo.watch(docId, (doc) => {
+          const handle = window.repo.watch(hypermergeUrl, (doc) => {
             this.setState((state, props) => {
               const { viewedDocs } = state
               viewedDocs[url] = doc
@@ -246,7 +246,7 @@ export default class Omnibox extends React.PureComponent {
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
       return (
-        <div key={`${invitation.sender.docId}-${invitation.documentUrl}`} className={classes}>
+        <div key={`${invitation.sender.hypermergeUrl}-${invitation.documentUrl}`} className={classes}>
           <div className="Invitation">
             <i className="Badge fa fa-envelope" style={{ background: invitation.doc && invitation.doc.backgroundColor }} />
             <div className="Invitation__body">

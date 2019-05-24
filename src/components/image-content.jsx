@@ -8,7 +8,7 @@ const log = Debug('pushpin:image-card')
 
 export default class ImageContent extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    hypermergeUrl: PropTypes.string.isRequired
   }
 
   static initializeDocument = (image, { hyperfileUrl }) => {
@@ -31,28 +31,28 @@ export default class ImageContent extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
 
   componentDidMount = () => {
     log('componentDidMount')
-    this.refreshHandle(this.props.docId)
+    this.refreshHandle(this.props.hypermergeUrl)
   }
 
-  // If an ImageCard changes docId, React will re-use this component
+  // If an ImageCard changes hypermergeUrl, React will re-use this component
   // and update the props instead of instantiating a new one and calling
   // componentDidMount. We have to check for prop updates here and
   // update our doc handle
   componentDidUpdate = (prevProps) => {
     log('componentWillReceiveProps')
 
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 

@@ -9,7 +9,7 @@ const log = Debug('pushpin:share')
 
 export default class Share extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired // Workspace
+    hypermergeUrl: PropTypes.string.isRequired // Workspace
   }
 
   state = { tab: 'authors' }
@@ -17,7 +17,7 @@ export default class Share extends React.PureComponent {
   // This is the New Boilerplate
   componentWillMount = () => {
     log('componentWillMount')
-    this.refreshWorkspaceHandle(this.props.docId)
+    this.refreshWorkspaceHandle(this.props.hypermergeUrl)
   }
 
   componentWillUnmount = () => {
@@ -27,17 +27,17 @@ export default class Share extends React.PureComponent {
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
   // XXX FIXTHIS
-  refreshWorkspaceHandle = (docId) => {
+  refreshWorkspaceHandle = (hypermergeUrl) => {
     log('refreshWorkspaceHandle')
     if (this.workspaceHandle) {
       this.workspaceHandle.close()
     }
-    this.workspaceHandle = window.repo.watch(docId, (doc) => this.onWorkspaceChange(doc))
+    this.workspaceHandle = window.repo.watch(hypermergeUrl, (doc) => this.onWorkspaceChange(doc))
   }
 
   refreshBoardHandle = (boardId) => {
@@ -58,10 +58,10 @@ export default class Share extends React.PureComponent {
     log('onWorkspaceChange')
     this.setState({ workspace: doc }, () => {
       if (this.state.workspace.currentDocUrl) {
-        const { docId } = parseDocumentLink(this.state.workspace.currentDocUrl)
+        const { hypermergeUrl } = parseDocumentLink(this.state.workspace.currentDocUrl)
 
-        if (!this.state.board || this.state.board.docId !== docId) {
-          this.refreshBoardHandle(docId)
+        if (!this.state.board || this.state.board.hypermergeUrl !== hypermergeUrl) {
+          this.refreshBoardHandle(hypermergeUrl)
         }
       }
     })

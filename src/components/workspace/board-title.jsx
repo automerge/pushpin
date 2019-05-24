@@ -12,7 +12,7 @@ const log = Debug('pushpin:board-title')
 
 export default class BoardTitle extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     openDoc: PropTypes.func.isRequired
   }
 
@@ -29,8 +29,8 @@ export default class BoardTitle extends React.PureComponent {
 
   // This is the New Boilerplate
   componentDidMount = () => {
-    this.refreshHandle(this.props.docId)
-    this.invitationsView = new InvitationsView(this.props.docId)
+    this.refreshHandle(this.props.hypermergeUrl)
+    this.invitationsView = new InvitationsView(this.props.hypermergeUrl)
     this.invitationsView.onChange(this.onInvitationsChange)
     document.addEventListener('keydown', this.onKeyDown)
     document.addEventListener('click', this.handleClickOutside)
@@ -43,8 +43,8 @@ export default class BoardTitle extends React.PureComponent {
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 
@@ -66,11 +66,11 @@ export default class BoardTitle extends React.PureComponent {
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.boardHandle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.boardHandle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
   refreshBoardHandle = (boardId) => {
@@ -88,7 +88,7 @@ export default class BoardTitle extends React.PureComponent {
       if (this.state.currentDocUrl) {
         const { hypermergeUrl } = parseDocumentLink(this.state.currentDocUrl)
 
-        if (!this.state.board || this.state.board.docId !== hypermergeUrl) {
+        if (!this.state.board || this.state.board.hypermergeUrl !== hypermergeUrl) {
           this.refreshBoardHandle(hypermergeUrl)
         }
       }
@@ -282,7 +282,7 @@ export default class BoardTitle extends React.PureComponent {
       <div ref={(ref) => { this.omniboxRef = ref }} className="BoardTitle">
         { inputBar }
         <Omnibox
-          docId={this.props.docId}
+          hypermergeUrl={this.props.hypermergeUrl}
           visible={this.state.activeOmnibox}
           search={this.state.search}
           getKeyController={this.setOmniboxControl}

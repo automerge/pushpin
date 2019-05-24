@@ -7,7 +7,7 @@ import { createDocumentLink } from '../share-link'
 
 export default class ThreadContent extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     selfId: PropTypes.string.isRequired
   }
 
@@ -25,19 +25,19 @@ export default class ThreadContent extends React.PureComponent {
   state = { message: '', messages: null }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => this.handle.close()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
 

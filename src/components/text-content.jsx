@@ -34,7 +34,7 @@ const log = Debug('pushpin:code-mirror-editor')
 // seems to give the right caching behaviour, so for now we'll extend from it.
 export default class TextContent extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     uniquelySelected: PropTypes.bool,
   }
 
@@ -82,8 +82,8 @@ export default class TextContent extends React.PureComponent {
     })
     this.codeMirror.on('change', this.onCodeMirrorChange)
 
-    const { docId } = this.props
-    this.handle = window.repo.watch(docId, (doc) => this.onDocChange(doc))
+    const { hypermergeUrl } = this.props
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onDocChange(doc))
   }
 
   componentWillUnmount = () => {
@@ -225,7 +225,7 @@ export default class TextContent extends React.PureComponent {
     return (
       <div className="CodeMirrorEditor" onKeyDown={this.onKeyDown}>
         <div
-          id={`editor-${this.props.docId}`}
+          id={`editor-${this.props.hypermergeUrl}`}
           className="CodeMirrorEditor__editor"
           ref={this.setEditorRef}
           onPaste={this.handlePaste}

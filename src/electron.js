@@ -17,6 +17,9 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 1000,
+    webPreferences: {
+      nodeIntegration: true,
+    }
   })
 
   protocol.registerHttpProtocol('pushpin', (req, cb) => {

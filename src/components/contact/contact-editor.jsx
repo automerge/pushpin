@@ -37,7 +37,7 @@ const USER_COLORS = {
 
 export default class ContactEditor extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    hypermergeUrl: PropTypes.string.isRequired
   }
 
   static initializeDocument = (doc, typeAttrs) => {
@@ -50,18 +50,18 @@ export default class ContactEditor extends React.PureComponent {
   state = {}
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => this.handle.close()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
 
@@ -85,9 +85,9 @@ export default class ContactEditor extends React.PureComponent {
           return
         }
 
-        const docId = Content.initializeContentDoc('image', { hyperfileId })
+        const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileId })
         this.handle.change((d) => {
-          d.avatarDocId = docId
+          d.avatarDocId = hypermergeUrl
         })
       })
     })

@@ -58,7 +58,7 @@ const draggableCards = (cards, selected, card) => {
 
 export default class Board extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     selfId: PropTypes.string.isRequired,
   }
 
@@ -83,24 +83,24 @@ export default class Board extends React.PureComponent {
     board.authorIds = []
   }
 
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => {
     this.heartbeatNotifyDeparture()
     this.handle.close()
     clearInterval(this.heartbeatTimerId)
   }
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
       this.heartbeatNotifyDeparture()
-      this.refreshHandle(this.props.docId)
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   } // onMessage!?
 
 
@@ -354,8 +354,8 @@ export default class Board extends React.PureComponent {
   }
 
   createCard = ({ x, y, width, height, type, typeAttrs }) => {
-    const docId = Content.initializeContentDoc(type, typeAttrs)
-    return this.linkCard({ x, y, width, height, url: createDocumentLink(type, docId) })
+    const hypermergeUrl = Content.initializeContentDoc(type, typeAttrs)
+    return this.linkCard({ x, y, width, height, url: createDocumentLink(type, hypermergeUrl) })
   }
 
   linkCard = ({ x, y, width, height, url }) => {

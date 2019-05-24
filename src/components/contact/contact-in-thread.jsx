@@ -8,7 +8,7 @@ import { DEFAULT_AVATAR_PATH } from '../../constants'
 
 class ContactInThread extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     selfId: PropTypes.string.isRequired
   }
 
@@ -16,7 +16,7 @@ class ContactInThread extends React.PureComponent {
 
   // This is the New Boilerplate
   componentWillMount = () => {
-    this.refreshHandle(this.props.docId)
+    this.refreshHandle(this.props.hypermergeUrl)
     this.timerId = null
   }
 
@@ -26,21 +26,21 @@ class ContactInThread extends React.PureComponent {
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   } // onMessage
 
 
   onChange = (doc) => {
-    if (this.props.selfId === this.props.docId) {
+    if (this.props.selfId === this.props.hypermergeUrl) {
       this.setState({ online: true })
     }
     this.setState({ ...doc })

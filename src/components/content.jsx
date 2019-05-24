@@ -7,7 +7,7 @@ import { parseDocumentLink } from '../share-link'
 import SelfContext from './self-context'
 
 const log = Debug('pushpin:content')
-const FILTERED_PROPS = ['type', 'docId']
+const FILTERED_PROPS = ['type', 'hypermergeUrl']
 
 export default class Content extends React.PureComponent {
   static propTypes = {
@@ -58,7 +58,7 @@ export default class Content extends React.PureComponent {
       return null
     }
 
-    const { type, docId } = parseDocumentLink(url)
+    const { type, hypermergeUrl } = parseDocumentLink(url)
 
     const contentType = ContentTypes.lookup({ type, context })
 
@@ -80,7 +80,7 @@ export default class Content extends React.PureComponent {
             context={context}
             url={url}
             type={type}
-            docId={docId}
+            hypermergeUrl={hypermergeUrl}
             selfId={selfId}
             {...filteredProps}
           />

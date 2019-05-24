@@ -19,7 +19,7 @@ const removeEmpty = (obj) =>
 
 export default class UrlContent extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    hypermergeUrl: PropTypes.string.isRequired
   }
 
   static initializeDocument = (urlDoc, { url = '' }) => {
@@ -35,19 +35,19 @@ export default class UrlContent extends React.PureComponent {
 
   state = { urlInput: '' }
 
-  componentWillMount = () => this.refreshHandle(this.props.docId)
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => this.handle.close()
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
     }
   }
 
-  refreshHandle = (docId) => {
+  refreshHandle = (hypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(docId, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
 

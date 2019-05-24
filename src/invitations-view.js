@@ -2,7 +2,7 @@ import { parseDocumentLink } from './share-link'
 
 //
 // Example:
-//   this.invitationsView = new InvitationsView(this.props.docId)
+//   this.invitationsView = new InvitationsView(this.props.hypermergeUrl)
 //   this.invitationsView.onChange((invitations) => {
 //     debugger
 //   })
@@ -26,13 +26,13 @@ export default class InvitationsView {
     this.onChangeCb(this.invitations)
   }
 
-  watchDoc = (docId) => {
-    if (this.docHandles[docId]) {
+  watchDoc = (hypermergeUrl) => {
+    if (this.docHandles[hypermergeUrl]) {
       return
     }
 
-    const handle = window.repo.watch(docId, (doc) => {
-      const index = this.pendingInvitations.findIndex(i => i.docId === docId)
+    const handle = window.repo.watch(hypermergeUrl, (doc) => {
+      const index = this.pendingInvitations.findIndex(i => i.hypermergeUrl === hypermergeUrl)
       if (index !== -1) {
         const invite = this.pendingInvitations[index]
         this.pendingInvitations.splice(index, 1)
@@ -45,7 +45,7 @@ export default class InvitationsView {
         }
       }
     })
-    this.docHandles[docId] = handle
+    this.docHandles[hypermergeUrl] = handle
   }
 
   watchContact = (contactId) => {
@@ -62,14 +62,14 @@ export default class InvitationsView {
       const offersForUs = contact.offeredUrls[this.selfId] || []
 
       offersForUs.forEach((documentUrl) => {
-        const { docId } = parseDocumentLink(documentUrl)
+        const { hypermergeUrl } = parseDocumentLink(documentUrl)
         const matchOffer = (offer) => (
           offer.documentUrl === documentUrl && offer.offererId === offererId
         )
 
         if (!this.pendingInvitations.some(matchOffer)) {
-          this.pendingInvitations.push({ documentUrl, offererId, sender: contact, docId })
-          this.watchDoc(docId)
+          this.pendingInvitations.push({ documentUrl, offererId, sender: contact, hypermergeUrl })
+          this.watchDoc(hypermergeUrl)
         }
       })
     })
