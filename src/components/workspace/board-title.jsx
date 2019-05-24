@@ -210,9 +210,7 @@ export default class BoardTitle extends React.PureComponent {
       return
     }
 
-    const selfHandle = window.hm.openHandle(this.state.selfId)
-
-    selfHandle.change((s) => {
+    window.repo.change(this.state.selfId, (s) => {
       if (!s.offeredUrls) {
         s.offeredUrls = {}
       }
@@ -225,8 +223,6 @@ export default class BoardTitle extends React.PureComponent {
         s.offeredUrls[contactId].push(this.state.currentDocUrl)
       }
     })
-
-    selfhandle.close()
   }
 
   copyToClipboard = (e) => {

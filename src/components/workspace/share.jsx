@@ -98,9 +98,7 @@ export default class Share extends React.PureComponent {
 
     log('offerDocumentToIdentity')
 
-    const selfHandle = window.hm.openHandle(this.state.workspace.selfId)
-
-    selfHandle.change((s) => {
+    window.repo.change(this.state.workspace.selfId, (s) => {
       if (!s.offeredUrls) {
         s.offeredUrls = {}
       }

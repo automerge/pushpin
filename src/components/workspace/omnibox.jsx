@@ -84,17 +84,15 @@ export default class Omnibox extends React.PureComponent {
       this.state.contactIds.forEach(contactId => {
         // create a handle for each contact
         if (!this.contactHandles[contactId]) {
-          const handle = window.hm.openHandle(contactId)
-          this.contactHandles[contactId] = handle
-
           // when it changes, put it into this.state.contacts[contactId]
-          handle.onChange((doc) => {
+          const handle = window.repo.watch(contactId, (doc) => {
             this.setState((state, props) => {
               const { contacts } = state
               contacts[contactId] = doc
               return { contacts }
             })
           })
+          this.contactHandles[contactId] = handle
         }
       })
     })

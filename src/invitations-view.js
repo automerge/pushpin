@@ -27,13 +27,12 @@ export default class InvitationsView {
   }
 
   watchDoc = (docId) => {
-    /* if (this.docHandles[docId]) {
+    if (this.docHandles[docId]) {
       return
     }
 
-    this.docHandles[docId] = window.hm.openHandle(docId)
-    this.docHandles[docId].onChange((doc) => {
-      const index = this.pendingInvitations.findIndex(i => i.docId === window.hm.getId(doc))
+    const handle = window.repo.watch(docId, (doc) => {
+      const index = this.pendingInvitations.findIndex(i => i.docId === docId)
       if (index !== -1) {
         const invite = this.pendingInvitations[index]
         this.pendingInvitations.splice(index, 1)
@@ -45,16 +44,16 @@ export default class InvitationsView {
           this.onChangeCb(this.invitations)
         }
       }
-    }) */
+    })
+    this.docHandles[docId] = handle
   }
 
   watchContact = (contactId) => {
-    /* if (this.contactHandles[contactId]) {
+    if (this.contactHandles[contactId]) {
       return
     }
 
-    this.contactHandles[contactId] = window.hm.openHandle(contactId)
-    this.contactHandles[contactId].onChange((contact) => {
+    this.contactHandles[contactId] = window.repo.watch(contactId, (contact) => {
       if (!contact.offeredUrls) {
         return
       }
@@ -73,6 +72,6 @@ export default class InvitationsView {
           this.watchDoc(docId)
         }
       })
-    }) */
+    })
   }
 }

@@ -11,9 +11,5 @@ before((done) => {
   // we need to initialize the model to get loop configured
   Model.init()
 
-  if (!window.hm.isReady()) {
-    window.hm.on('ready', done())
-  } else {
-    done()
-  }
+  done()
 })
