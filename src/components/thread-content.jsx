@@ -69,7 +69,7 @@ export default class ThreadContent extends React.PureComponent {
             style={css.input}
             value={this.state.message}
             onKeyDown={this.onKeyDown}
-            onInput={this.onInput}
+            onChange={this.onInput}
             onPaste={this.onPaste}
             placeholder="Enter your message..."
           />
@@ -147,6 +147,7 @@ const css = {
     width: '100%',
     overflow: 'auto',
     height: '100%',
+    padding: '1px 1px 0px 1px'
   },
   messageWrapper: {
     padding: 12,
@@ -201,10 +202,10 @@ const css = {
   },
   inputWrapper: {
     boxSizing: 'border-box',
-    width: 'calc(100% - 1px)',
+    width: 'calc(100% - 2px)',
     borderTop: '1px solid var(--colorInputGrey)',
     position: 'absolute',
-    bottom: 0,
+    bottom: 1,
     backgroundColor: 'white',
     padding: 8,
   },
