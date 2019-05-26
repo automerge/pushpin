@@ -2,6 +2,7 @@ import Fs from 'fs'
 import mime from 'mime-types'
 
 import { Repo } from 'hypermerge'
+import DiscoverySwarm from 'discovery-cloud-client'
 import { HYPERFILE_PATH } from './constants'
 
 const storage = require('random-access-file')
@@ -9,10 +10,13 @@ const storage = require('random-access-file')
 const repo = new Repo({ storage, path: HYPERFILE_PATH, })
 
 // DAT's discovery swarm or truly serverless discovery
-const DiscoverySwarm = require('discovery-swarm')
-const defaults = require('dat-swarm-defaults')
+// const DiscoverySwarm = require('discovery-swarm')
+// const defaults = require('dat-swarm-defaults')
 
-const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
+// const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
+
+const url = 'wss://discovery-cloud.herokuapp.com'
+const discovery = new DiscoverySwarm({ url, id: repo.id, stream: repo.stream })
 
 repo.replicate(discovery)
 

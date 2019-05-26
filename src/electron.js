@@ -134,6 +134,8 @@ const createWindow = async () => {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 
+  process.throwDeprecation = true
+
   // Install DevTools if in dev mode. Open dev tools if indicated by env.
   const isDevMode = process.execPath.match(/[\\/]electron/)
   const openDevTools = process.env.OPEN_DEV_TOOLS
