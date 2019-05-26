@@ -69,11 +69,15 @@ export default class Share extends React.PureComponent {
 
   updateIdentityReferences = (workspaceHandle, boardHandle) => {
     log('updateIdentityReferences')
+    if (!workspaceHandle || !boardHandle) {
+      log('update called without both handles')
+      return
+    }
     const { authorIds = [] } = boardHandle.state || {}
     const { selfId, contactIds = [] } = workspaceHandle.state || {}
 
     // no work required if there's no board...
-    if (!boardHandle || !boardHandle.state) {
+    if (!boardHandle.state) {
       return
     }
 
