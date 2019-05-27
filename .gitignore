@@ -1,5 +1,6 @@
 node_modules
 out
+dist
 .eslintcache
 *.swp
 *.swo

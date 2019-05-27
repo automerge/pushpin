@@ -47,15 +47,15 @@ export default class PresentContacts extends React.PureComponent {
       }
       this.contactPresent(contact)
       clearTimeout(this.presentContactsTimerId[contact])
-      this.presentContactsTimerId[contact]
-        = setTimeout(this.contactAbsent(contact), 11000)
+      this.presentContactsTimerId[contact] = setTimeout(this.contactAbsent(contact), 11000)
     }
   }
 
   contactPresent = (contact) => {
     if (!this.state.presentContacts[contact]) {
-      this.setState({ presentContacts:
-        { ...this.state.presentContacts, [contact]: true } })
+      this.setState((prevState) => ({ presentContacts:
+        { ...prevState.presentContacts, [contact]: true } }
+      ))
     }
   }
 
@@ -66,10 +66,12 @@ export default class PresentContacts extends React.PureComponent {
   // note this is a function that returns a function for setTimeout to use
   contactAbsent = (contact) => () => {
     if (this.state.presentContacts[contact]) {
-      // destructure to make a copy rather than mutating the old one
-      const presentContacts = { ...this.state.presentContacts }
-      delete presentContacts[contact]
-      this.setState({ presentContacts })
+      this.setState((prevState) => {
+        // destructure to make a copy rather than mutating the old one
+        const presentContacts = { ...prevState.presentContacts }
+        delete presentContacts[contact]
+        return { presentContacts }
+      })
     }
   }
 
@@ -87,4 +89,3 @@ export default class PresentContacts extends React.PureComponent {
     )
   }
 }
-

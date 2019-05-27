@@ -1,17 +1,16 @@
 {
   "name": "pushpin",
-  "productName": "pushpin",
-  "version": "1.0.0",
+  "productName": "PushPin",
+  "version": "1.1.0",
   "description": "A collaborative corkboard app",
   "repository": "https://github.com/inkandswitch/pushpin",
-  "main": "src/electron.js",
   "scripts": {
-    "start": "electron-forge start",
-    "start2": "NAME=userA npm start & NAME=userB npm start",
+    "compile": "electron-webpack",
+    "start": "electron-webpack dev",
+    "start2": "NAME=userA yarn start & NAME=userB yarn start",
     "start3": "NAME=userA npm start & NAME=userB npm start & NAME=userC npm start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
+    "dist": "yarn compile && electron-builder",
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "lint": "eslint --cache --color --ext .jsx,.js src",
     "test": "electron-mocha --renderer test/**/*.{js,jsx}",
     "build-docs": "rm -rf ./docs && parcel build src/docs.html -d docs -o index --public-url '.' && rm -rf .cache"
@@ -19,38 +18,7 @@
   "keywords": [],
   "author": "inkandswitch",
   "license": "MIT",
-  "config": {
-    "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ],
-        "linux": [
-          "deb",
-          "rpm"
-        ]
-      },
-      "electronPackagerConfig": {
-        "packageManager": "npm"
-      },
-      "electronWinstallerConfig": {
-        "name": "pushpin"
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "inkandswitch",
-        "name": "pushpin"
-      },
-      "windowsStoreConfig": {
-        "packageName": "",
-        "name": "pushpin"
-      }
-    }
-  },
+  "config": {},
   "dependencies": {
     "@ibm/plex": "^1.4.1",
     "automerge": "^0.10.1",
@@ -60,7 +28,6 @@
     "diff-match-patch": "^1.0.4",
     "discovery-cloud-client": "0.0.1",
     "discovery-swarm": "^5.1.4",
-    "electron-compile": "^6.4.4",
     "electron-devtools-installer": "^2.2.4",
     "electron-prompt": "^1.3.1",
     "electron-squirrel-startup": "^1.0.0",
@@ -82,22 +49,23 @@
     "react-rnd": "^9.1.2",
     "react-simple-dropdown": "^3.2.3",
     "riek": "^1.1.0",
+    "source-map-support": "^0.5.12",
     "tmp": "0.1.0",
     "to-buffer": "^1.1.1",
     "unfluff": "^3.2.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-plugin-transform-class-properties": "6.24.1",
-    "babel-plugin-transform-es2015-classes": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
     "chai": "^4.2.0",
-    "electron-forge": "^5.2.4",
+    "electron": "4.0.0",
+    "electron-builder": "^20.41.0",
     "electron-mocha": "^8.0.2",
-    "electron-prebuilt-compile": "4.0.0",
+    "electron-webpack": "^2.6.2",
+    "electron-webpack-eslint": "^4.0.2",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-15": "^1.4.0",
     "eslint": "^5.16.0",
@@ -107,6 +75,7 @@
     "eslint-plugin-react": "^7.13.0",
     "mocha": "^6.1.4",
     "parcel-bundler": ">=1.12.3",
-    "react-test-renderer": "^16.8.6"
+    "react-test-renderer": "^16.8.6",
+    "webpack": "4.28.4"
   }
 }

@@ -84,7 +84,7 @@ export default class Content extends React.PureComponent {
             selfId={selfId}
             {...filteredProps}
           />
-          )
+        )
         }
       </SelfContext.Consumer>
     )

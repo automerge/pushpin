@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
+// import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
 
 import BoardTitle from './board-title'
 import Content from '../content'
@@ -45,9 +45,10 @@ export default class TitleBar extends React.PureComponent {
       throw new Error('Can not go back further than session history')
     }
 
-    const historyIndex = this.state.historyIndex + 1
-    this.setState({ historyIndex }, () => {
-      this.props.openDoc(this.state.sessionHistory[historyIndex])
+    this.setState((prevState) => {
+      const historyIndex = prevState.historyIndex + 1
+      this.props.openDoc(prevState.sessionHistory[historyIndex])
+      return { historyIndex }
     })
   }
 
@@ -56,27 +57,29 @@ export default class TitleBar extends React.PureComponent {
       throw new Error('Can not go forward past session history')
     }
 
-    const historyIndex = this.state.historyIndex - 1
-
-    this.setState({ historyIndex }, () => {
-      this.props.openDoc(this.state.sessionHistory[historyIndex])
+    this.setState((prevState) => {
+      const historyIndex = prevState.historyIndex - 1
+      this.props.openDoc(prevState.sessionHistory[historyIndex])
+      return { historyIndex }
     })
   }
 
   onChange = (doc) => {
-    let { historyIndex, sessionHistory } = this.state
+    this.setState((prevState) => {
+      let { historyIndex, sessionHistory } = prevState
 
-    // Init sessionHistory
-    if (sessionHistory.length === 0) {
-      sessionHistory = [doc.currentDocUrl]
-    // If we're opening a new document (as opposed to going back or forward),
-    // add it to our sessionHistory and remove all docs 'forward' of the current index
-    } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
-      sessionHistory = [doc.currentDocUrl, ...(sessionHistory.slice(historyIndex))]
-      historyIndex = 0
-    }
+      // Init sessionHistory
+      if (sessionHistory.length === 0) {
+        sessionHistory = [doc.currentDocUrl]
+        // If we're opening a new document (as opposed to going back or forward),
+        // add it to our sessionHistory and remove all docs 'forward' of the current index
+      } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
+        sessionHistory = [doc.currentDocUrl, ...(sessionHistory.slice(historyIndex))]
+        historyIndex = 0
+      }
 
-    this.setState({ ...doc, sessionHistory, historyIndex })
+      return { ...doc, sessionHistory, historyIndex }
+    })
   }
 
   render = () => {
@@ -88,18 +91,18 @@ export default class TitleBar extends React.PureComponent {
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <Dropdown className="TitleBar__menuItem">
+          <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
+          <ContactEditor hypermergeUrl={this.state.selfId} />
+          { /* <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
             </DropdownTrigger>
             <DropdownContent>
-              <ContactEditor hypermergeUrl={this.state.selfId} />
             </DropdownContent>
-          </Dropdown>
-          <button disabled={this.disableBack()} onClick={this.back} className="TitleBar__menuItem">
+    </Dropdown> */ }
+          <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
             <i className="fa fa-angle-left" />
           </button>
-          <button disabled={this.disableForward()} onClick={this.forward} className="TitleBar__menuItem">
+          <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
             <i className="fa fa-angle-right" />
           </button>
         </div>
@@ -112,17 +115,17 @@ export default class TitleBar extends React.PureComponent {
           <PresentContacts
             currentDocUrl={this.state.currentDocUrl}
           />
-          <Dropdown className="TitleBar__menuItem">
+          <i className="fa fa-group" />
+          <Share
+            hypermergeUrl={this.props.hypermergeUrl}
+            openDocument={this.props.openDoc}
+          />
+          {/* <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
-              <i className="fa fa-group" />
             </DropdownTrigger>
             <DropdownContent>
-              <Share
-                hypermergeUrl={this.props.hypermergeUrl}
-                openDocument={this.props.openDoc}
-              />
             </DropdownContent>
-          </Dropdown>
+  </Dropdown> */ }
         </div>
       </div>
     )

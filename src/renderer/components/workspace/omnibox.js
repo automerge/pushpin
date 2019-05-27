@@ -47,8 +47,8 @@ export default class Omnibox extends React.PureComponent {
       this.refreshHandle(this.props.hypermergeUrl)
     }
 
-    if ((this.props.visible && !prevProps.visible) ||
-        (this.props.search !== prevProps.search)) {
+    if ((this.props.visible && !prevProps.visible)
+        || (this.props.search !== prevProps.search)) {
       this.setSelectedIndex(0)
     }
   }

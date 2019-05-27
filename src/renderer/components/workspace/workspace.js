@@ -46,7 +46,7 @@ To share a board with another person, click the clipboard, then have them paste 
 Quick travel around by clicking the Omnibox. Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
 
 To create links to boards or contacts, drag them from the title bar or the omnibox.`
-
+    // eslint-disable-next-line react/no-render-return-value
     const theBoard = ReactDOM.render(<Board hypermergeUrl={boardId} />, document.createElement('div'))
     theBoard.createCard({ x: 20,
       y: 20,
@@ -141,7 +141,8 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     return (
       <div className={`Workspace__container Workspace__container--${type}`}>
         <Content context="workspace" url={this.state.currentDocUrl} />
-      </div>)
+      </div>
+    )
   }
 
   render = () => {

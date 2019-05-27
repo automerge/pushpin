@@ -162,8 +162,8 @@ export default class BoardTitle extends React.PureComponent {
       return
     }
 
-    if (e.target.className.match('BoardTitle__envelope') ||
-      e.target.className.match('BoardTitle__actionBar')) {
+    if (e.target.className.match('BoardTitle__envelope')
+      || e.target.className.match('BoardTitle__actionBar')) {
       return
     }
 
@@ -171,8 +171,8 @@ export default class BoardTitle extends React.PureComponent {
       this.deactivateOmnibox()
     }
 
-    if ((e.target.className !== 'TitleBar__titleText') &&
-        (e.target.className !== 'fa fa-edit')) {
+    if ((e.target.className !== 'TitleBar__titleText')
+        && (e.target.className !== 'fa fa-edit')) {
       this.setState({ activeTitleEditor: false })
     }
   }
@@ -293,4 +293,3 @@ export default class BoardTitle extends React.PureComponent {
     )
   }
 }
-

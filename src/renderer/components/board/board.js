@@ -59,6 +59,8 @@ const draggableCards = (cards, selected, card) => {
 export default class Board extends React.PureComponent {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired,
+    // temporary hack during upgrade
+    // eslint-disable-next-line react/no-unused-prop-types
     selfId: PropTypes.string.isRequired,
   }
 
@@ -76,8 +78,8 @@ export default class Board extends React.PureComponent {
     log('initializeDocument')
     board.title = title || 'No Title'
     const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
-    const color = backgroundColor ||
-      BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
+    const color = backgroundColor
+      || BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
     board.backgroundColor = color
     board.cards = {}
     board.authorIds = []
@@ -437,8 +439,8 @@ export default class Board extends React.PureComponent {
     // document change if in fact the card won't resize mod snapping.
     const snapWidth = this.snapMeasureToGrid(width)
     const snapHeight = this.snapMeasureToGrid(height)
-    if (snapWidth === this.state.doc.cards[id].width &&
-        snapHeight === this.state.doc.cards[id].height) {
+    if (snapWidth === this.state.doc.cards[id].width
+        && snapHeight === this.state.doc.cards[id].height) {
       return
     }
     this.handle.change((b) => {
@@ -483,16 +485,13 @@ export default class Board extends React.PureComponent {
 
   // Copy view-relevant move/resize state over to React.
   setDragState = (card, tracking) => {
-    const cards = { ...this.state.cards }
-
-    cards[card.id] = {
+    this.setState((prevState) => ({ [card.id]: {
       moveX: tracking.moveX,
       moveY: tracking.moveY,
       resizeWidth: tracking.resizeWidth,
       resizeHeight: tracking.resizeHeight
-    }
-
-    this.setState({ cards })
+    },
+    ...prevState.cards }))
   }
 
   effectDrag = (card, tracking, { deltaX, deltaY }) => {

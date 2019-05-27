@@ -42,7 +42,7 @@ class ColorPicker extends React.PureComponent {
     ))
 
     return (
-      <div className="ColorPicker" >
+      <div className="ColorPicker">
         { swatches }
       </div>
     )

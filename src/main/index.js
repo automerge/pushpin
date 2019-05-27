@@ -1,8 +1,10 @@
 import { app, protocol, BrowserWindow, Menu, shell } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
+import * as path from 'path'
+import { format as formatUrl } from 'url'
 
-import * as Hyperfile from './hyperfile'
+import * as Hyperfile from '../renderer/hyperfile'
 
 const log = Debug('pushpin:electron')
 
@@ -41,9 +43,32 @@ const createWindow = async () => {
       log('Failed to register protocol')
     }
   })
+  const isDevelopment = process.env.NODE_ENV !== 'production'
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(`file://${__dirname}/index.html`)
+  if (isDevelopment) {
+    mainWindow.webContents.openDevTools()
+  }
+
+  if (isDevelopment) {
+    mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+  } else {
+    mainWindow.loadURL(formatUrl({
+      pathname: path.join(__dirname, 'index.html'),
+      protocol: 'file',
+      slashes: true
+    }))
+  }
+
+  window.on('closed', () => {
+    mainWindow = null
+  })
+
+  window.webContents.on('devtools-opened', () => {
+    window.focus()
+    setImmediate(() => {
+      window.focus()
+    })
+  })
 
   function isSafeishURL(url) {
     return url.startsWith('http:') || url.startsWith('https:')
@@ -133,8 +158,6 @@ const createWindow = async () => {
   // Create the menubar
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
-
-  process.throwDeprecation = true
 
   // Install DevTools if in dev mode. Open dev tools if indicated by env.
   const isDevMode = process.execPath.match(/[\\/]electron/)

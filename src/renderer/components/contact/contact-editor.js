@@ -133,7 +133,7 @@ export default class ContactEditor extends React.PureComponent {
                 </div>
               </div>
               <div className="Label">
-                <button className="Type--action" onClick={this.chooseAvatar}>Choose from file...</button>
+                <button className="Type--action" type="button" onClick={this.chooseAvatar}>Choose from file...</button>
               </div>
             </div>
             <div className="ListMenu__label">Presence Color</div>

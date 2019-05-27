@@ -33,6 +33,11 @@ import './components/url-content'
 
 import { createDocumentLink } from './share-link'
 
+require('./app.css')
+require('../../node_modules/@ibm/plex/css/ibm-plex.css')
+require('../../node_modules/codemirror/lib/codemirror.css')
+require('./line-awesome/css/line-awesome.min.css')
+
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
 // doesn't confuse future instances.
@@ -66,7 +71,8 @@ function loadWorkspaceUrl() {
       const workspaceUrl = createDocumentLink('workspace', json.workspaceDocId)
       saveWorkspaceUrl(workspaceUrl) // upgrade to new format
       return workspaceUrl
-    } else if (json.workspaceUrl) {
+    }
+    if (json.workspaceUrl) {
       return json.workspaceUrl
     }
   }
@@ -90,7 +96,7 @@ function initWorkspace() {
     workspaceUrl = newWorkspaceUrl
   }
   const workspace = <Content url={workspaceUrl} />
-  const element = document.getElementById('workspace')
+  const element = document.getElementById('app')
   ReactDOM.render(workspace, element)
 }
 

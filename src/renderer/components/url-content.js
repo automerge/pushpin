@@ -8,14 +8,13 @@ import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:url')
 
-const removeEmpty = (obj) =>
-  Object.entries(obj).forEach(([key, val]) => {
-    if (val && typeof val === 'object') {
-      removeEmpty(val)
-    } else if (val == null) {
-      delete obj[key]
-    }
-  })
+const removeEmpty = (obj) => Object.entries(obj).forEach(([key, val]) => {
+  if (val && typeof val === 'object') {
+    removeEmpty(val)
+  } else if (val == null) {
+    delete obj[key]
+  }
+})
 
 export default class UrlContent extends React.PureComponent {
   static propTypes = {
@@ -150,12 +149,14 @@ export default class UrlContent extends React.PureComponent {
     }
     return (
       <div style={css.urlCard}>
-        {this.state.imageHyperfileUrl ?
-          <img
-            style={css.img}
-            src={this.state.imageHyperfileUrl}
-            alt={data.description}
-          />
+        {this.state.imageHyperfileUrl
+          ? (
+            <img
+              style={css.img}
+              src={this.state.imageHyperfileUrl}
+              alt={data.description}
+            />
+          )
           : null }
         <p style={css.title}>
           <a style={css.titleAnchor} href={url}>{data.title}</a>
