@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-// import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown'
+
+import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/lib/components/dropdown'
 
 import BoardTitle from './board-title'
 import Content from '../content'
@@ -91,14 +92,14 @@ export default class TitleBar extends React.PureComponent {
     return (
       <div className="TitleBar">
         <div className="TitleBar__left">
-          <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
-          <ContactEditor hypermergeUrl={this.state.selfId} />
-          { /* <Dropdown className="TitleBar__menuItem">
+          <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
+              <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
             </DropdownTrigger>
             <DropdownContent>
+              <ContactEditor hypermergeUrl={this.state.selfId} />
             </DropdownContent>
-    </Dropdown> */ }
+          </Dropdown>
           <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
             <i className="fa fa-angle-left" />
           </button>
@@ -115,17 +116,17 @@ export default class TitleBar extends React.PureComponent {
           <PresentContacts
             currentDocUrl={this.state.currentDocUrl}
           />
-          <i className="fa fa-group" />
-          <Share
-            hypermergeUrl={this.props.hypermergeUrl}
-            openDocument={this.props.openDoc}
-          />
-          {/* <Dropdown className="TitleBar__menuItem">
+          <Dropdown className="TitleBar__menuItem">
             <DropdownTrigger>
+              <i className="fa fa-group" />
             </DropdownTrigger>
             <DropdownContent>
+              <Share
+                hypermergeUrl={this.props.hypermergeUrl}
+                openDocument={this.props.openDoc}
+              />
             </DropdownContent>
-  </Dropdown> */ }
+          </Dropdown>
         </div>
       </div>
     )

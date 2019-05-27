@@ -4,10 +4,9 @@ import electron from 'electron'
 
 /* we need to resolve static assets differently in local HMR development mode */
 const isDevelopment = process.env.NODE_ENV !== 'production'
-console.log(isDevelopment)
 
 function getStatic(val) {
-  if (isDevelopment) {
+  if ((typeof window !== 'undefined') && isDevelopment) {
     return Url.resolve(window.location.origin, val)
   }
   return Path.resolve(__static, val)

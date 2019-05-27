@@ -36,6 +36,9 @@ import { createDocumentLink } from './share-link'
 require('./app.css')
 require('../../node_modules/@ibm/plex/css/ibm-plex.css')
 require('../../node_modules/codemirror/lib/codemirror.css')
+require('./line-awesome/fonts/line-awesome.ttf')
+require('./line-awesome/fonts/line-awesome.woff')
+require('./line-awesome/fonts/line-awesome.woff2')
 require('./line-awesome/css/line-awesome.min.css')
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
