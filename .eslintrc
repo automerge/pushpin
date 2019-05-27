@@ -26,6 +26,7 @@
     "implicit-arrow-linebreak": "off",
     "no-use-before-define": "off",
     "no-shadow": "off",
+    "react/prop-types": [2, {"ignore": "style"}],
     "react/no-did-mount-set-state": "off",
     "react/destructuring-assignment": "off",
     "react/jsx-filename-extension": "off",
