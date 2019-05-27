@@ -1,12 +1,10 @@
 import React from "react";
-import { cardDimensions } from "../logic/constants";
 import Content from "../../content";
-
-import * as model from "../logic/model";
 
 export interface Props {
   cards: string[]; //card doc urls
   onDrop: (event: any) => void;
+  onCardDrag: (event: any, card: string) => void;
 }
 
 export default class FocusCardSpread extends React.PureComponent<Props> {
@@ -27,7 +25,12 @@ export default class FocusCardSpread extends React.PureComponent<Props> {
         onDrop={this.onDrop}
       >
         {this.props.cards.map(card => (
-          <Content key={card} url={card} />
+          <div
+            draggable
+            onDragStart={event => this.props.onCardDrag(event, card)}
+          >
+            <Content key={card} url={card} />
+          </div>
         ))}
       </div>
     );

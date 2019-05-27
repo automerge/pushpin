@@ -20,12 +20,6 @@ export default class FocusCard extends React.PureComponent<Props> {
     doc.id = attrs.id || uuid();
   }
 
-  onDragStart = (event: any) => {
-    console.log("drag start");
-    console.log(this.props);
-    event.dataTransfer.setData("application/pushpin-url", this.props.url);
-  };
-
   onTitleChange = (event: any) => {
     this.props.change(draft => {
       draft.title = event.target.value;
@@ -41,15 +35,17 @@ export default class FocusCard extends React.PureComponent<Props> {
   render() {
     const { doc } = this.props;
     return (
-      <div draggable onDragStart={this.onDragStart} className="FocusCard">
+      <div className="FocusCard">
         <input
           className="FocusCard-title"
+          placeholder="Title..."
           type="text"
           onChange={this.onTitleChange}
           value={doc.title}
         />
         <textarea
           className="FocusCard-description"
+          placeholder="Description..."
           onChange={this.onDescriptionChange}
           value={doc.description}
         />
