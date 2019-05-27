@@ -1,40 +1,67 @@
 import React from "react";
-import { cardDimensions } from "../logic/constants";
+import ContentTypes from "../../../content-types";
+import uuid from "uuid/v4";
+
 import * as model from "../logic/model";
-
-const styles = {
-  host: {
-    "box-sizing": "border-box" as "border-box",
-    display: "block" as "block",
-    padding: "10px",
-    "background-color": "#e7e7e7",
-    width: `${cardDimensions.width}px`,
-    height: `${cardDimensions.height}px`
-  },
-
-  h1: {
-    "margin-bottom": "5px",
-    "font-size": "16px"
-  }
-};
+import withDocument from "../withDocument";
 
 export interface Props {
-  card: model.Card;
+  url: string;
+  doc: model.Card;
+  change: Function;
 }
 
-export default class Card extends React.PureComponent<Props> {
-  onDragStart(event: any) {
-    console.log("drag start");
-    event.dataTransfer.setData("text/plain", this.props.card.id);
+export default class FocusCard extends React.PureComponent<Props> {
+  static contentType = "FocusCard";
+  static contentName = "Focus Card";
+  static initializeDocument(doc, attrs) {
+    doc.title = attrs.title || null;
+    doc.description = attrs.description || null;
+    doc.id = attrs.id || uuid();
   }
 
+  onDragStart = (event: any) => {
+    console.log("drag start");
+    console.log(this.props);
+    event.dataTransfer.setData("application/pushpin-url", this.props.url);
+  };
+
+  onTitleChange = (event: any) => {
+    this.props.change(draft => {
+      draft.title = event.target.value;
+    });
+  };
+
+  onDescriptionChange = (event: any) => {
+    this.props.change(draft => {
+      draft.description = event.target.value;
+    });
+  };
+
   render() {
-    const { card } = this.props;
+    const { doc } = this.props;
     return (
-      <div style={styles.host}>
-        <h1>${card.title}</h1>
-        <p>${card.description}</p>
+      <div draggable onDragStart={this.onDragStart} className="FocusCard">
+        <input
+          className="FocusCard-title"
+          type="text"
+          onChange={this.onTitleChange}
+          value={doc.title}
+        />
+        <textarea
+          className="FocusCard-description"
+          onChange={this.onDescriptionChange}
+          value={doc.description}
+        />
       </div>
     );
   }
 }
+
+// TODO: Should this be a ContentType?
+ContentTypes.register({
+  component: withDocument(FocusCard, FocusCard.initializeDocument),
+  type: FocusCard.contentType,
+  name: FocusCard.contentName,
+  icon: "focus"
+});

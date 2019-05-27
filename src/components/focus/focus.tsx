@@ -2,55 +2,23 @@ import React from "react";
 import Debug from "debug";
 
 import ContentTypes from "../../content-types";
+import Content from "../content";
+
 import { cardDimensions } from "./logic/constants";
 import CardSpread from "./components/focus-card-spread";
+import FocusCard from "./components/focus-card";
+import withDocument from "./withDocument";
 
 const log = Debug("pushpin:focus");
 
-const css = {
-  host: {
-    "box-sizing": "border-box",
-    width: "100%",
-    height: "100%",
-    position: "relative",
-    "background-color": "red",
-    display: "grid",
-    "grid-template-columns": `1fr 1fr 1fr minmax(
-        ${cardDimensions.width + 25}px,
-        1fr
-      )`,
-    "grid-template-rows": "1fr 1fr 1fr",
-    "grid-template-areas":
-      '"Plan Plan Plan Deck" "Plan Plan Plan Deck" "Complete Discard Discard New"',
-    "grid-gap": "1px"
-  },
+export interface Props {
+  doc: any;
+  change: Function;
+}
 
-  plan: {
-    "grid-area": "Plan"
-  },
-
-  deck: {
-    "grid-area": "Deck"
-  },
-
-  new: {
-    "grid-area": "New"
-  },
-
-  discard: {
-    "grid-area": "Discard"
-  },
-
-  complete: {
-    "grid-area": "Complete"
-  }
-};
-
-//export interface Props {
-//  docId: string;
-//}
-
-export default class Focus extends React.PureComponent {
+export default class Focus extends React.PureComponent<Props> {
+  static contentType = "focus";
+  static contentName = "Focus";
   static initializeDocument(focus, typeAttrs) {
     log("initializeDocument:Focus");
     focus.cards = {};
@@ -60,51 +28,70 @@ export default class Focus extends React.PureComponent {
     focus.complete = [];
   }
 
-  state = {};
-  handle: any;
-
-  onChange = doc => {
-    this.setState({ ...doc });
-  };
-
-  refreshHandle = docId => {
-    if (this.handle) {
-      this.handle.close();
-    }
-    this.handle = (window as any).repo.watch(docId, doc => this.onChange(doc));
-  };
-
-  componentDidMount = () => {
-    log("componentDidMount");
-    this.refreshHandle((this.props as any).docId);
-  };
-
-  // If an ImageCard changes docId, React will re-use this component
-  // and update the props instead of instantiating a new one and calling
-  // componentDidMount. We have to check for prop updates here and
-  // update our doc handle
-  componentDidUpdate = prevProps => {
-    log("componentWillReceiveProps");
-
-    if (prevProps.docId !== (this.props as any).docId) {
-      this.refreshHandle((this.props as any).docId);
-    }
+  onCardSpreadDrop = (event: any) => {
+    const url = event.dataTransfer.getData("application/pushpin-url");
+    if (!url) return;
+    log(`dropping card: ${url}`);
+    this.props.change(draft => {
+      draft.discard.push(url);
+    });
   };
 
   render = () => {
     log("render");
+    const storedCards = localStorage.getItem("cards");
+    let cards;
+    if (storedCards) {
+      cards = JSON.parse(storedCards);
+    }
+    if (!storedCards) {
+      cards = [
+        Content.create(FocusCard.contentType, {
+          title: "Card title",
+          description: "Description"
+        }),
+        Content.create(FocusCard.contentType, {
+          title: "Card title",
+          description: "Description"
+        }),
+        Content.create(FocusCard.contentType, {
+          title: "Card title",
+          description: "Description"
+        }),
+        Content.create(FocusCard.contentType, {
+          title: "Card title",
+          description: "Description"
+        })
+      ];
+      localStorage.setItem("cards", JSON.stringify(cards));
+    }
 
     return (
-      <div>
-        <h1>Focus</h1>
+      <div className="Focus">
+        <div className="Focus-plan">
+          <CardSpread onDrop={this.onCardSpreadDrop} cards={cards} />
+        </div>
+        <div className="Focus-deck">
+          <CardSpread onDrop={this.onCardSpreadDrop} cards={cards} />
+        </div>
+        <div className="Focus-complete">
+          <CardSpread onDrop={this.onCardSpreadDrop} cards={cards} />
+        </div>
+        <div className="Focus-discard">
+          <CardSpread
+            onDrop={this.onCardSpreadDrop}
+            cards={this.props.doc.discard}
+          />
+        </div>
+        <div className="Focus-new" />
       </div>
     );
   };
 }
 
 ContentTypes.register({
-  component: Focus,
-  type: "focus",
-  name: "Focus",
+  component: withDocument(Focus, Focus.initializeDocument),
+  type: Focus.contentType,
+  name: Focus.contentName,
   icon: "focus"
 });
