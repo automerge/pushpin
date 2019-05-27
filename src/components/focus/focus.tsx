@@ -4,7 +4,6 @@ import Debug from "debug";
 import ContentTypes from "../../content-types";
 import Content from "../content";
 
-import { cardDimensions } from "./logic/constants";
 import CardSpread from "./components/focus-card-spread";
 import FocusCard from "./components/focus-card";
 import withDocument from "./withDocument";
