@@ -74,19 +74,6 @@ a {
   visibility: hidden;
 }
 
-
-/* Dropdown React component functional styles */
-
-.dropdown__content {
-  display: none;
-  position: absolute;
-}
-
-.dropdown--active .dropdown__content {
-  display: block;
-}
-
-
 /* App Styles */
 
 html, body, #app, [data-reactroot], .react-contextmenu-wrapper, .board {

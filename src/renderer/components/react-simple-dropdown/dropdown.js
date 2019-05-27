@@ -6,11 +6,11 @@ import PropTypes from 'prop-types'
 import { findDOMNode } from 'react-dom'
 import cx from 'classnames'
 
-import DropdownTrigger from './dropdown-trigger.jsx'
-import DropdownContent from './dropdown-content.jsx'
+import DropdownTrigger from './dropdown-trigger.js'
+import DropdownContent from './dropdown-content.js'
 
 class Dropdown extends Component {
-  displayName: 'Dropdown'
+  // displayName: 'Dropdown'
 
   componentDidMount() {
     window.addEventListener('click', this._onWindowClick)
@@ -132,12 +132,6 @@ Dropdown.propTypes = {
 }
 
 Dropdown.defaultProps = {
-  disabled: false,
-  active: true,
-  onHide: () => {},
-  onShow: () => {},
-  removeElement: false,
-  style: {},
   className: ''
 }
 

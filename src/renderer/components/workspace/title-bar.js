@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/lib/components/dropdown'
+import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
 
 import BoardTitle from './board-title'
 import Content from '../content'

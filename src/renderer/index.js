@@ -34,6 +34,7 @@ import './components/url-content'
 import { createDocumentLink } from './share-link'
 
 require('./app.css')
+require('./components/react-simple-dropdown/dropdown.css')
 require('../../node_modules/@ibm/plex/css/ibm-plex.css')
 require('../../node_modules/codemirror/lib/codemirror.css')
 require('./line-awesome/fonts/line-awesome.ttf')
