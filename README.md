@@ -11,6 +11,7 @@ If you think this is cool, wait until you see what we're working on next. Why no
 ## Running from Source
 
 ```console
+$ yarn
 $ yarn build-deps
 $ yarn start
 ```
