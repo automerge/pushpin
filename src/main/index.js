@@ -59,14 +59,14 @@ const createWindow = async () => {
     }))
   }
 
-  window.on('closed', () => {
+  mainWindow.on('closed', () => {
     mainWindow = null
   })
 
-  window.webContents.on('devtools-opened', () => {
-    window.focus()
+  mainWindow.webContents.on('devtools-opened', () => {
+    mainWindow.focus()
     setImmediate(() => {
-      window.focus()
+      mainWindow.focus()
     })
   })
 

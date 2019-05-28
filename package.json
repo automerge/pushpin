@@ -20,6 +20,9 @@
   "author": "inkandswitch",
   "license": "MIT",
   "config": {},
+  "electronWebpack": {
+    "title": "PushPin"
+  },
   "dependencies": {
     "@ibm/plex": "^1.4.1",
     "automerge": "^0.10.1",
