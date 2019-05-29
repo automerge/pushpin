@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@ibm/plex": "^1.4.1",
-    "automerge": "^0.10.1",
+    "automerge": "git+https://github.com/automerge/automerge#text-hack",
     "bs58": "^4.0.1",
     "classnames": "^2.2.6",
     "codemirror": "^5.47.0",
