@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
 import Fs from 'fs'
-import { Repo } from 'hypermerge'
+import { RepoFrontend, RepoBackend } from 'hypermerge'
 import raf from 'random-access-file'
 // const DiscoverySwarm = require('discovery-swarm')
 // const defaults = require('dat-swarm-defaults')
@@ -52,16 +52,23 @@ localStorage.removeItem('debug')
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 500
 
+function initBackend(front) {
+  const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH, port: 0 })
+
+  back.subscribe((msg) => front.receive(JSON.parse(JSON.stringify(msg))))
+  front.subscribe((msg) => back.receive(JSON.parse(JSON.stringify(msg))))
+  const url = 'wss://discovery-cloud.herokuapp.com'
+  const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
+
+  back.replicate(discovery)
+}
+
 function initHypermerge(cb) {
-  const repo = new Repo({ storage: raf, path: HYPERMERGE_PATH, port: 0 })
+  const front = new RepoFrontend()
+  initBackend(front)
   // const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
 
-  const url = 'wss://discovery-cloud.herokuapp.com'
-  const discovery = new DiscoverySwarm({ url, id: repo.id, stream: repo.stream })
-
-  repo.replicate(discovery)
-
-  window.repo = repo
+  window.repo = front
 
   cb() // no need to wait for .ready?
 }
