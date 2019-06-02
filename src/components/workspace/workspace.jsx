@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
