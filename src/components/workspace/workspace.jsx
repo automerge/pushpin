@@ -1,15 +1,14 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
+import uuid from 'uuid'
 
 import ContentTypes from '../../content-types'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import Content from '../content'
 import SelfContext from '../self-context'
 import TitleBar from './title-bar'
-import Board from '../board/board'
 
 const log = Debug('pushpin:workspace')
 
@@ -20,13 +19,16 @@ export default class Workspace extends React.PureComponent {
 
   static initializeDocument = (workspace) => {
     const selfId = Content.initializeContentDoc('contact')
+    let handle
 
     // this is, uh, a nasty hack.
     // we should refactor not to require the docId on the contact
     // but i don't want to pull that in scope right now
-    window.hm.openHandle(selfId).change((doc) => {
+    handle = window.hm.openHandle(selfId)
+    handle.change(doc => {
       doc.docId = selfId
     })
+    handle.release()
 
     const boardId = Content.initializeContentDoc('board', { title: 'Welcome to PushPin!', selfId })
     const docUrl = createDocumentLink('board', boardId)
@@ -47,16 +49,27 @@ Quick travel around by clicking the Omnibox. Typing part of a name will show you
 
 To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-    const theBoard = ReactDOM.render(<Board docId={boardId} />, document.createElement('div'))
-    theBoard.createCard({ x: 20,
-      y: 20,
-      type: 'text',
-      typeAttrs: { text } })
+    const textDocId = Content.initializeContentDoc('text', { text })
+    const textDocUrl = createDocumentLink('text', textDocId)
+
+    const id = uuid()
+    handle = window.hm.openHandle(boardId)
+    handle.change(doc => {
+      doc.cards[id] = {
+        id,
+        url: textDocUrl,
+        x: 20,
+        y: 20,
+        width: 320,
+        height: 540
+      }
+    })
+    handle.release()
 
     // Then make changes to workspace doc.
     workspace.selfId = selfId
     workspace.contactIds = []
-    workspace.currentDocUrl = createDocumentLink('board', boardId)
+    workspace.currentDocUrl = docUrl
     workspace.viewedDocUrls = [docUrl]
   }
 
