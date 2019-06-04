@@ -39,7 +39,7 @@
     "hypercore": "^7.2.0",
     "hypercore-protocol": "^6.11.0",
     "hyperdiscovery": "^9.0.1",
-    "hypermerge": "github:inkandswitch/hypermerge",
+    "hypermerge": "git+https://github.com/automerge/hypermerge#document-message-prototype",
     "immutable": "^3.8.2",
     "jimp": "^0.6.4",
     "js-crc": "^0.2.0",

@@ -102,8 +102,10 @@ export default class Board extends React.PureComponent {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  } // onMessage!?
+    this.handle = window.repo.open(hypermergeUrl)
+    this.handle.subscribe((doc) => this.onChange(doc))
+    this.handle.subscribeMessage((msg) => this.onMessage(msg))
+  }
 
 
   onChange = (doc) => {
@@ -642,7 +644,7 @@ export default class Board extends React.PureComponent {
     }
   }
 
-  onMessage = ({ msg, peer }) => {
+  onMessage = (msg) => {
     const { remoteSelection = {} } = this.state
     const { contact, selected } = msg
 
@@ -661,17 +663,20 @@ export default class Board extends React.PureComponent {
 
   refreshHeartbeat = (doc) => {
     // XXX check how this work on board change
+    if (!this.handle) {
+      return
+    }
     if (!this.heartbeatTimerId) {
-      // this.handle.message({ contact: this.props.selfId, heartbeat: true })
+      this.handle.message({ contact: this.props.selfId, heartbeat: true })
       this.heartbeatTimerId = setInterval(() => {
-        // this.handle.message({ contact: this.props.selfId, heartbeat: true })
+        this.handle.message({ contact: this.props.selfId, heartbeat: true })
       }, 5000) // send a heartbeat every 5s
     }
   }
 
   heartbeatNotifyDeparture = () => {
     // notify peers on the current board that we're departing
-    // this.handle.message({ contact: this.props.selfId, departing: true })
+    this.handle.message({ contact: this.props.selfId, departing: true })
   }
 
   clearRemoteSelection = (contact) => {
@@ -681,7 +686,7 @@ export default class Board extends React.PureComponent {
 
   updateSelection = (selected) => {
     this.setState({ selected })
-    // this.handle.message({ contact: this.props.selfId, selected })
+    this.handle.message({ contact: this.props.selfId, selected })
   }
 
   selectToggle = (cardId) => {
