@@ -30,14 +30,16 @@ export default class PresentContacts extends React.PureComponent {
       this.handle.close()
     }
     const { hypermergeUrl } = parseDocumentLink(currentDocUrl)
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  } // onMessage
+    this.handle = window.repo.open(hypermergeUrl)
+    this.handle.subscribe((doc) => this.onChange(doc))
+    this.handle.subscribeMessage((msg) => this.onMessage(msg))
+  }
 
   onChange = (doc) => {
     this.setState({ ...doc })
   }
 
-  onMessage = ({ msg, peer }) => {
+  onMessage = (msg) => {
     const { contact, departing } = msg
     if (contact) {
       if (departing) {

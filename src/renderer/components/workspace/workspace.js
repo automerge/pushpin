@@ -93,7 +93,8 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+    this.handle = window.repo.open(hypermergeUrl)
+    this.handle.subscribe((doc) => this.onChange(doc))
   }
 
   onChange = (doc) => {
@@ -102,14 +103,14 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   }
 
   refreshHeartbeat = (doc) => {
-    /*    const selfHandle = window.repo.watch(doc.selfId)
+    const selfHandle = window.repo.open(doc.selfId)
 
     if (!this.timerId) {
       selfHandle.message('heartbeat')
       this.timerId = setInterval(() => {
         selfHandle.message('heartbeat')
       }, 5000) // send a heartbeat every 5s
-    } */ // no onMessage support in this HM
+    }
   }
 
   openDoc = (docUrl) => {

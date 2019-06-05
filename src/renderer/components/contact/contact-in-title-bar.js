@@ -35,8 +35,10 @@ class ContactInTitlebar extends React.PureComponent {
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  } // onMessage!?
+    this.handle = window.repo.open(hypermergeUrl)
+    this.handle.subscribe((doc) => this.onChange(doc))
+    this.handle.subscribeMessage((msg) => this.onMessage(msg))
+  }
 
 
   onChange = (doc) => {
@@ -46,7 +48,7 @@ class ContactInTitlebar extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  onMessage = ({ msg, peer }) => {
+  onMessage = (msg) => {
     clearTimeout(this.timerId)
     // if we miss two heartbeats (11s), assume they've gone offline
     this.timerId = setTimeout(() => {
