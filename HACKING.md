@@ -1,4 +1,4 @@
-![alt_text](docs/iconPushpinLogo.5bbf3057.svg "PushPin logo")
+![alt_text](docs/iconPushpinLogo.28b06dc7.svg "PushPin logo")
 
 
 PushPin is a dynamic playground for creating and sharing your ideas. PushPin works online, offline, and with or without access to the broader internet. PushPin is designed to be extended, and we want you to give that a try.
