@@ -50,8 +50,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     const textDocUrl = createDocumentLink('text', textDocId)
 
     const id = uuid()
-    handle = window.hm.openHandle(boardId)
-    handle.change(doc => {
+    window.repo.change(boardId, doc => {
       doc.cards[id] = {
         id,
         url: textDocUrl,
@@ -61,7 +60,6 @@ To create links to boards or contacts, drag them from the title bar or the omnib
         height: 540
       }
     })
-    handle.release()
 
     // Then make changes to workspace doc.
     workspace.selfId = selfId
