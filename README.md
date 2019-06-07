@@ -11,33 +11,34 @@ If you think this is cool, wait until you see what we're working on next. Why no
 ## Running from Source
 
 ```console
-$ npm install
-$ npm start
+$ yarn
+$ yarn build-deps
+$ yarn start
 ```
 
 To enable debug logging, e.g.:
 
 ```console
-$ DEBUG=* npm start
-$ DEBUG=pushpin:* npm start
-$ DEBUG=pushpin:card,hypermerge:* npm start
+$ DEBUG=* yarn start
+$ DEBUG=pushpin:* yarn start
+$ DEBUG=pushpin:card,hypermerge:* yarn start
 ```
 
 To run multiple clients and test syncing:
 
 ```console
-$ npm run start2
+$ yarn run start2
 ```
 
 This is an alias for:
 
 ```console
-$ NAME=userA npm start & NAME=userB npm start
+$ NAME=userA yarn start & NAME=userB yarn start
 ```
 
 To start with the dev tools open, set OPEN_DEV_TOOLS on your CLI as follows:
 ```console
-$ OPEN_DEV_TOOLS=true npm start
+$ OPEN_DEV_TOOLS=true yarn start
 ```
 
 User data is stored in a platform-dependent, shared location outside of the
@@ -75,21 +76,13 @@ See [HACKING](hacking.md) for a getting started guide.
 
 ## Packaging
 
-To produce a standalone package:
-
-```console
-$ electron-forge package
-$ open out/PushPin-darwin-x64/PushPin.app  # on Mac, e.g.
-```
-
-Note that data directory will be different for the packaged app, even for the
-same user name.
+Packaging is not currently supported on this build. We'll probably adopt `electron-package` for this, but have not yet implemented it.
 
 ## Docs
 
 The source for docs are in `src/docs.html` and hosted on GitHub pages at https://inkandswitch.github.io/pushpin.
 
-To update the docs, edit `docs.html`, run `npm run build-docs`, and push to GitHub.
+To update the docs, edit `docs.html`, run `yarn run build-docs`, and push to GitHub.
 
 ## Contributing
 
@@ -106,3 +99,11 @@ This project was written by
 and was produced under the auspices of [Ink & Switch](inkandswitch.com).
 
 Special thanks to Martin Kleppmann (automerge) and Mathias Buus (hypercore) for their advice and contributions.
+
+## Upgrade Hackage Notes
+
+### sodium-native
+Compiling sodium-native is a pain. Go into node_modules/sodium-native and run `node preinstall` if you have trouble.
+
+### automerge
+There's a regression in Automerge where types are being wrapped in a proxy preventing instanceof Text from working correctly. Until a fix arrives, edit node_modules/hypermerge/node_modules/automerge/frontend/context.js#69 and change value instanceof Text to value.constructor.name === "Text".

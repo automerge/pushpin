@@ -1,4 +1,4 @@
-![alt_text](docs/iconPushpinLogo.5bbf3057.svg "PushPin logo")
+![alt_text](docs/iconPushpinLogo.28b06dc7.svg "PushPin logo")
 
 
 PushPin is a dynamic playground for creating and sharing your ideas. PushPin works online, offline, and with or without access to the broader internet. PushPin is designed to be extended, and we want you to give that a try.
@@ -36,8 +36,16 @@ Let's start with a basic example of a PushPin component.
 
 Open `./src/components/thread.jsx` in your preferred editor.
 
-You can see that the Thread code looks mostly like a simple React component. That's because it is! The Toggle component gets it state from a Hypermerge document. The document is available inside the component by creating a "handle" to the document from `docId` property. 
+You can see that the Thread code looks mostly like a simple React component. That's because it is! The Toggle component gets it state from a Hypermerge document. The document is available inside the component by creating a "handle" to the document from `hypermergeUrl` property. 
 
+
+## Pushpin URIs
+
+Pushpin establishes a `pushpin:` protocol for URIs that can be shared. Underneath the hood, a `pushpin:` URI is translated to a `hypermerge:` URI. Let's take a look at the parts:
+
+![Pushpin URI](./docs/pushpin-uri.svg)
+
+The content type is used to determine what React component should be used to render the document content. Meanwhile, the `docId` portion is passed on to hypermerge by prefixing its protocol, becoming: `hypermerge:/5vmhLfwX3J2332pZUtA9QWi1Pu5Dvux9E9xVYWPnnTKc`. The last portion of the pushpin URI, the "CRC" is used as a check on the preceding portion so that if anything is mistyped the app can respond immediately with suggestions to the user rather than waiting and finding out after a long, unsuccessful attempt that there are no peers sharing data about the so-called docId.
 
 ## Hypermerge Document
 
@@ -45,7 +53,7 @@ A Hypermerge document is a live, versioned data structure. You can read its cont
 
 A document is an instance of an Automerge document. It's a data structure that includes its own full history, along with all the identities of the authors that edited it. You can treat it like a basic Javascript object, and store and nest numbers, strings, arrays, or maps. To read it, just index into it like any other Javascript object.
 
-To update your document, create a handle from the docId, and then modify it via the `change() `function. Inside the callback, mutate the data structure how you like, and Automerge will record the changes you make and append them to your personal work log for distribution to other clients.
+To update your document, create a handle from the hypermergeUrl, and then modify it via the `change() `function. Inside the callback, mutate the data structure how you like, and Automerge will record the changes you make and append them to your personal work log for distribution to other clients.
 
 Those changes are also written into a Hypercore. Hypercore is an append-only log which is subsequently distributed using Hyperdiscovery to any other client who has the key to request it. Each entry in a hypercore is signed with the previous element's hash and a private key only the author has access to. This ensures that hypercores can be validated and distributed by anyone regardless of their contents.
 

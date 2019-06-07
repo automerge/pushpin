@@ -1,9 +1,9 @@
 import assert from 'assert'
-import { configure, shallow, mount, render } from 'enzyme'
+import { configure, mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
 import * as React from 'react'
 
-import Board from '../src/components/board'
+import Board from '../src/components/board/board'
 
 configure({ adapter: new Adapter() })
 
