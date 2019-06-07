@@ -1819,10 +1819,10 @@ atomic-batcher@^1.0.2:
   resolved "https://registry.yarnpkg.com/atomic-batcher/-/atomic-batcher-1.0.2.tgz#d16901d10ccec59516c197b9ccd8930689b813b4"
   integrity sha1-0WkB0QzOxZUWwZe5zNiTBom4E7Q=
 
-automerge@^0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/automerge/-/automerge-0.10.1.tgz#a0a66b9aafc7597c7e98b29625b257f9a8fe4562"
-  integrity sha512-X7k6tlpmm/EbOlz84aLRXb8E8DiKI+gF6mNIVb1wqU9zun45v/tG01JuWNBhP6EDTJaGW1lcN2AQzvApm0ABWQ==
+automerge@^0.10.1, "automerge@https://github.com/automerge/automerge#text-hack":
+  version "0.10.3"
+  uid "5674263647ebd1e736862fd029060548c7fbaa0b"
+  resolved "https://github.com/automerge/automerge#5674263647ebd1e736862fd029060548c7fbaa0b"
   dependencies:
     immutable "^3.8.2"
     transit-immutable-js "^0.7.0"

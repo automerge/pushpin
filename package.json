@@ -14,9 +14,9 @@
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "lint": "eslint --cache --color --ext .jsx,.js src",
     "test": "electron-mocha --renderer test/**/*.{js,jsx}",
-    "build-docs": "rm -rf ./docs && parcel build src/docs.html -d docs -o index --public-url '.' && rm -rf .cache"
+    "build-docs": "rm -rf ./docs && parcel build src/docs.html -d docs -o index --public-url '.' && rm -rf .cache",
+    "postinstall": "electron-builder install-app-deps"
   },
-  "postinstall": "electron-builder install-app-deps",
   "keywords": [],
   "author": "inkandswitch",
   "license": "MIT",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@ibm/plex": "^1.4.1",
-    "automerge": "^0.10.1",
+    "automerge": "https://github.com/automerge/automerge#text-hack",
     "bs58": "^4.0.1",
     "classnames": "^2.2.6",
     "codemirror": "^5.47.0",
@@ -83,6 +83,7 @@
     "webpack": "4.28.4"
   },
   "resolutions": {
-    "random-access-file": "https://github.com/pvh/random-access-file"
+    "random-access-file": "https://github.com/pvh/random-access-file",
+    "automerge": "https://github.com/automerge/automerge#text-hack"
   }
 }
