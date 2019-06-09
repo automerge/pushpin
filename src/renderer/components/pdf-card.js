@@ -1,22 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Debug from 'debug'
 import pdfjs from 'pdfjs-dist'
 
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../content-types'
 
-const log = Debug('pushpin:pdf-card')
 
 pdfjs.GlobalWorkerOptions.workerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.js'
 
 export default class PDFCard extends React.PureComponent {
   static propTypes = {
-    docId: PropTypes.string.isRequired
+    hypermergeUrl: PropTypes.string.isRequired
   }
 
-  static initializeDocument = (pdf, { hyperfileId }) => {
-    pdf.hyperfileId = hyperfileId
+  static initializeDocument = (pdf, { hyperfileUrl }) => {
+    pdf.hyperfileUrl = hyperfileUrl
   }
 
   static minWidth = 3
@@ -29,7 +27,7 @@ export default class PDFCard extends React.PureComponent {
   static maxWidth = 72
 
   state = {
-    currentHyperfileId: '',
+    currentHyperfileUrl: '',
     newPageNum: 1,
     pageNum: 1
   }
@@ -37,48 +35,39 @@ export default class PDFCard extends React.PureComponent {
   pdfViewport = React.createRef()
   input = React.createRef()
 
+
+  // This is the New Boilerplate
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
+  componentWillUnmount = () => this.handle.close()
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
+    }
+  }
+
+  refreshHandle = (hypermergeUrl) => {
+    if (this.handle) {
+      this.handle.close()
+    }
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+  }
+
   onChange = (doc) => {
-    if (doc.hyperfileId && doc.hyperfileId !== this.state.currentHyperfileId) {
-      this.loadPDF(doc.hyperfileId)
+    if (doc.hyperfileUrl && doc.hyperfileUrl !== this.state.currentHyperfileUrl) {
+      this.loadPDF(doc.hyperfileUrl)
     }
     this.setState({ ...doc })
   }
 
-  refreshHandle = (docId) => {
-    if (this.handle) {
-      this.handle.release()
-    }
-
-    this.handle = window.hm.openHandle(docId)
-    this.handle.onChange(this.onChange)
-  }
-
-  componentDidMount = () => {
-    this.refreshHandle(this.props.docId)
-  }
-
-  // If an ImageCard changes docId, React will re-use this component
-  // and update the props instead of instantiating a new one and calling
-  // componentDidMount. We have to check for prop updates here and
-  // update our doc handle
-  componentDidUpdate = (prevProps) => {
-    if (prevProps.docId !== this.props.docId) {
-      this.refreshHandle(this.props.docId)
-    }
-  }
-
-  loadPDF = (hyperfileId) => {
-    Hyperfile.fetch(hyperfileId, (error, pdfData) => {
-      if (error) {
-        log(error)
-      }
+  loadPDF = (hyperfileUrl) => {
+    Hyperfile.fetch(hyperfileUrl, (pdfData) => {
       pdfjs.getDocument({ data: pdfData }).then((pdf) => {
         // Check if the card has been deleted by the time we get here
         /* if (!this.mounted) {
           return
         } */
 
-        this.setState({ currentHyperfileId: hyperfileId, pdfDocument: pdf })
+        this.setState({ currentHyperfileUrl: hyperfileUrl, pdfDocument: pdf })
       })
     })
   }
@@ -139,14 +128,14 @@ export default class PDFCard extends React.PureComponent {
   }
 
   render = () => {
-    const { hyperfileId, pdfDocument, pageNum, newPageNum } = this.state
+    const { hyperfileUrl, pdfDocument, pageNum, newPageNum } = this.state
     if (pdfDocument) {
       // trigger a fresh PDF render
       setTimeout(() => this.renderPDF(this.pdfViewport.current, pdfDocument, pageNum), 0)
 
       return (
         <div className="pdf-card">
-          <button onClick={this.prevPage}>Prev</button>
+          <button onClick={this.prevPage} type="button">Prev</button>
           <input
             ref={this.input}
             value={newPageNum}
@@ -154,12 +143,12 @@ export default class PDFCard extends React.PureComponent {
             onKeyDown={this.handleInputKey}
           />
           of {pdfDocument.numPages}
-          <button onClick={this.nextPage}>Next</button>
+          <button onClick={this.nextPage} type="button">Next</button>
           <div tabIndex="0" onKeyDown={this.onKeyDown} ref={this.pdfViewport} />
         </div>
       )
     }
-    return <div className="pdf-card">Loading PDF content from {hyperfileId}...</div>
+    return <div className="pdf-card">Loading PDF content from {hyperfileUrl}...</div>
   }
 
   renderPDF = (container, pdfDocument, pageNum) => {

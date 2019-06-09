@@ -8,7 +8,7 @@ import uuid from 'uuid/v4'
 
 import Content from '../content'
 import ContentTypes from '../../content-types'
-import { IMAGE_DIALOG_OPTIONS } from '../../constants'
+import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
 import BoardCard from './board-card'
@@ -341,7 +341,7 @@ export default class Board extends React.PureComponent {
   }
 
   createPdfCardFromPath = ({ x, y }, path) => {
-    Hyperfile.write(path, (err, hyperfileId) => {
+    Hyperfile.write(path, (err, hyperfileUrl) => {
       if (err) {
         log(err)
         return
@@ -351,7 +351,7 @@ export default class Board extends React.PureComponent {
         x,
         y,
         type: 'pdf',
-        typeAttrs: { hyperfileId }
+        typeAttrs: { hyperfileUrl }
       })
       this.selectOnly(cardId)
     })
