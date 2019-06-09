@@ -1,40 +1,65 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
-import { clipboard } from 'electron'
 
-import BoardTitleInput from './board-title-input'
+import InvitationsView from '../../invitations-view'
 import { parseDocumentLink } from '../../share-link'
+import Omnibox from './omnibox'
 
 const log = Debug('pushpin:board-title')
 
-export default class BoardTitle extends React.PureComponent {
+export default class OmniPrompt extends React.PureComponent {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired,
     openDoc: PropTypes.func.isRequired
   }
 
   state = {
-    activeTitleEditor: false,
+    invitations: [],
+    activeOmnibox: false,
+    search: '',
     selected: null
   }
 
+  omniboxInput = React.createRef()
   titleInput = React.createRef()
 
   // This is the New Boilerplate
   componentDidMount = () => {
     this.refreshHandle(this.props.hypermergeUrl)
+    this.invitationsView = new InvitationsView(this.props.hypermergeUrl)
+    this.invitationsView.onChange(this.onInvitationsChange)
+    document.addEventListener('keydown', this.onKeyDown)
     document.addEventListener('click', this.handleClickOutside)
   }
 
   componentWillUnmount = () => {
     this.handle.close()
+    document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('click', this.handleClickOutside)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
       this.refreshHandle(this.props.hypermergeUrl)
+    }
+  }
+
+  onInvitationsChange = (invitations) => {
+    log('invitations change')
+    this.setState({ invitations }, () => this.forceUpdate())
+  }
+
+  onKeyDown = (e) => {
+    if (e.key === '/' && document.activeElement === document.body) {
+      if (!this.state.activeOmnibox) {
+        this.activateOmnibox()
+        e.preventDefault()
+      }
+    }
+    if (e.key === 'Escape' && this.state.activeOmnibox) {
+      this.deactivateOmnibox()
+      e.preventDefault()
     }
   }
 
@@ -67,18 +92,42 @@ export default class BoardTitle extends React.PureComponent {
     })
   }
 
+  activateOmnibox = () => {
+    this.setState({ activeOmnibox: true }, () => {
+      this.omniboxInput.current.focus()
+    })
+  }
+
+  deactivateOmnibox = () => {
+    this.setState({ activeOmnibox: false, search: '' }, () => {
+      this.omniboxInput.current.blur()
+    })
+  }
+
+  handleChange = (e) => {
+    this.setState({ search: e.target.value })
+  }
+
   handleCommandKeys = (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      this.omniboxControl.moveDown()
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      this.omniboxControl.moveUp()
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault()
       const { selected } = this.state
 
       if (selected) {
-        if (selected.type === 'contact') {
-          this.offerDocumentToIdentity(this.state.selected.id)
-        } else if (selected.url) {
-          this.props.openDoc(selected.url)
-        }
+        this.resolveDocumentSelection(selected)
       }
+
+      this.deactivateOmnibox()
     }
 
     if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
@@ -99,45 +148,35 @@ export default class BoardTitle extends React.PureComponent {
     }
   }
 
+  resolveDocumentSelection = (selected) => {
+    switch (selected.type) {
+      case 'contact':
+        this.offerDocumentToIdentity(this.state.selected.id)
+        break
+      default:
+        if (selected.url) {
+          this.props.openDoc(selected.url)
+        }
+    }
+  }
+
   handleSelectChange = (selected) => {
     this.setState({ selected })
   }
 
   handleClickOutside = (e) => {
-    if (this.state.activeTitleEditor) {
-      return
-    }
-
-    if (e.target.className.match('BoardTitle__envelope')
-      || e.target.className.match('BoardTitle__actionBar')) {
-      return
-    }
-
-    if ((e.target.className !== 'TitleBar__titleText')
-        && (e.target.className !== 'fa fa-edit')) {
-      this.setState({ activeTitleEditor: false })
+    if (!e.path.includes(this.omniboxInput.current)) {
+      this.deactivateOmnibox()
     }
   }
 
   handleTitleClick = (e) => {
+    this.activateOmnibox()
     e.stopPropagation()
   }
 
-  activateTitleEditor = (e) => {
-    this.setState({ activeTitleEditor: true })
-    e.stopPropagation()
-  }
-
-  updateTitle = (value) => {
-    this.boardHandle.change((doc) => {
-      doc.title = value
-    })
-
-    this.setState({ activeTitleEditor: false })
-  }
-
-  cancelTitleEdit = () => {
-    this.setState({ activeTitleEditor: false })
+  setOmniboxControl = (controller) => {
+    this.omniboxControl = controller
   }
 
   offerDocumentToIdentity = (contactId) => {
@@ -160,10 +199,6 @@ export default class BoardTitle extends React.PureComponent {
     })
   }
 
-  copyToClipboard = (e) => {
-    clipboard.writeText(this.state.currentDocUrl)
-  }
-
   render = () => {
     log('render')
 
@@ -171,24 +206,30 @@ export default class BoardTitle extends React.PureComponent {
       return null
     }
 
-    const inputBar = (
-      <div className="BoardTitle__actionBar" onClick={this.handleTitleClick}>
-        <div className="BoardTitle__actionBar__left">
-          <i className="BoardTitle__labeledIcon BoardTitle__clipboard fa fa-clipboard" onClick={this.copyToClipboard} />
-        </div>
-        <BoardTitleInput
-          active={this.state.activeTitleEditor}
-          onSubmit={this.updateTitle}
-          onCancel={this.cancelTitleEdit}
-          defaultValue={this.state.board && this.state.board.title || ''}
-          onClick={this.activateTitleEditor}
-        />
-      </div>
-    )
+    const { viewedDocUrls } = this.state
+    const invitations = this.state.invitations.filter((i) => (
+      !viewedDocUrls.some(url => url === i.documentUrl)
+    ))
 
     return (
-      <div className="BoardTitle">
-        { inputBar }
+      <div ref={(ref) => { this.omniboxRef = ref }} className="OmniboxInput">
+        <input
+          ref={this.omniboxInput}
+          type="text"
+          className="OmniboxInput__input"
+          onClick={this.handleTitleClick}
+          onChange={this.handleChange}
+          onKeyDown={this.handleCommandKeys}
+          placeholder="Search..."
+        />
+        <Omnibox
+          hypermergeUrl={this.props.hypermergeUrl}
+          visible={this.state.activeOmnibox}
+          search={this.state.search}
+          getKeyController={this.setOmniboxControl}
+          invitations={invitations}
+          onSelectChange={this.handleSelectChange}
+        />
       </div>
     )
   }

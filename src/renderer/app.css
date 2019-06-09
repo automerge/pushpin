@@ -232,14 +232,12 @@ input {
   padding: 0 4px;
   border-radius: 4px;
   display: flex;
-  justify-content: center;
   align-items: center;
 }
 
 
 .BoardTitle__actionBar__left,
 .BoardTitle__actionBar__right {
-  position: absolute;
   display: flex;
 }
 
@@ -268,10 +266,6 @@ input {
 
 .BoardTitle__actionBar__right .dropdown__trigger .fa.fa-group {
   color: var(--colorLink);
-}
-
-.BoardTitle__actionBar input[type='text'] {
-  text-align: center;
 }
 
 .BoardTitle__labeledIcon:hover:after {
@@ -309,7 +303,12 @@ input {
   position: relative;
 }
 
-.BoardTitle__omniboxInput {
+.TitleBar__titleText {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.OmniboxInput {
   width: 100% !important;
   max-width: none !important;
 }
@@ -323,7 +322,7 @@ input {
   z-index: 10;
   position: fixed;
   top: 52px;
-  left: 50%;
+  right: 5%;
   margin-left: -239px;
 }
 
@@ -516,14 +515,14 @@ button[disabled].TitleBar__menuItem .fa {
   margin-right: 8px;
 }
 
-.TitleBar__titleText {
+.OmniboxInput {
   padding: 0px 8px;
   white-space: nowrap;
   overflow:hidden;
   text-overflow: ellipsis;
 }
 
-.TitleBar__titleText {
+.OmniboxInput {
   width: 336px;
   font-size: 14px;
   color: var(--colorBlueBlack);
