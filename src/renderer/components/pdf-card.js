@@ -2,11 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import pdfjs from 'pdfjs-dist'
 
+import path from 'path'
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../content-types'
 
-
-pdfjs.GlobalWorkerOptions.workerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.js'
+pdfjs.GlobalWorkerOptions.workerSrc = path.join(__static, '/pdf.worker.js')
 
 export default class PDFCard extends React.PureComponent {
   static propTypes = {
