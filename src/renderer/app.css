@@ -549,9 +549,6 @@ button[disabled].TitleBar__menuItem .fa {
   width: 28px; height: 28px;
   position: relative;
 }
-.PresentContacts > * > .Avatar:hover {
-
-}
 .PresentContacts > * > .Avatar:hover:after {
   display: block;
   position: absolute;
@@ -913,10 +910,6 @@ div.card.image {
   margin-left: 8px;
 }
 
-.NothingFound {
-
-}
-
 .NothingFound .fa {
   font-size: 24px;
 }
@@ -1250,9 +1243,6 @@ div.card.image {
   justify-content: space-around;
 }
 
-.Download__options__option {
-}
-
 .Download__options__option img {
   display: block;
 }
@@ -1322,7 +1312,7 @@ div.card.image {
   margin-top: 40px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-rows: auto;
+  grid-row: auto;
   grid-gap: 50px 95px;
 }
 

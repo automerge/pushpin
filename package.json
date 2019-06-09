@@ -22,10 +22,7 @@
   "license": "MIT",
   "config": {},
   "electronWebpack": {
-    "title": "PushPin",
-    "renderer": {
-      "webpackConfig": "webpack.additions.renderer.js"
-    }
+    "title": "PushPin"
   },
   "dependencies": {
     "@ibm/plex": "^1.4.1",
