@@ -99,7 +99,7 @@ input {
   box-sizing: border-box;
   height: 32px;
   border-radius: 4px;
-  background: var(--colorInputGrey);
+  background: transparent;
   border: 0px;
   outline: none;
 }
@@ -228,13 +228,15 @@ input {
 }
 
 .BoardTitle__actionBar {
-  background: var(--colorInputGrey);
   padding: 0 4px;
   border-radius: 4px;
   display: flex;
   align-items: center;
 }
 
+.BoardTitle__actionBar:focus-within {
+  background: var(--colorInputGrey);
+}
 
 .BoardTitle__actionBar__left,
 .BoardTitle__actionBar__right {
@@ -299,18 +301,19 @@ input {
 }
 
 .BoardTitle {
-  width: 480px;
+  flex: 1;
   position: relative;
 }
 
 .TitleBar__titleText {
+  flex: 1;
   font-size: 18px;
   font-weight: bold;
 }
 
+
 .OmniboxInput {
-  width: 100% !important;
-  max-width: none !important;
+  flex: 0 1 200px;
 }
 
 .Omnibox {
@@ -420,14 +423,13 @@ input {
   position: fixed;
   top: 0px;
   height: 40px;
-  padding: 0px 8px;
+  padding: 0px 8px 0px 8px;
   width: 100%;
   align-items: center;
   align-content: space-between;
   background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
-  color: var(--colorSecondaryGrey);
   user-select: none;
 }
 
@@ -450,18 +452,6 @@ button[disabled].TitleBar__menuItem .fa {
   align-items: center;
   display: flex;
   height: 40px;
-}
-
-.TitleBar .TitleBar__left {
-  position: absolute;
-  left:8px;
-  top:0;
-
-}
-.TitleBar .TitleBar__right {
-  position: absolute;
-  top:0;
-  right: 8px;
 }
 
 .TitleBar .TitleBar__menuItem {

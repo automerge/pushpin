@@ -6,15 +6,13 @@ export default class BoardTitleInput extends React.PureComponent {
     defaultValue: PropTypes.string.isRequired,
     active: PropTypes.bool,
     onSubmit: PropTypes.func,
-    onCancel: PropTypes.func,
-    onClick: PropTypes.func
+    onCancel: PropTypes.func
   }
 
   static defaultProps = {
     active: false,
     onSubmit: () => {},
     onCancel: () => {},
-    onClick: () => {}
   }
 
   state = { newTitle: null, updated: false }
@@ -81,7 +79,6 @@ export default class BoardTitleInput extends React.PureComponent {
         onBlur={this.handleBlur}
         onChange={this.handleChange}
         onKeyDown={this.handleKey}
-        onClick={this.props.onClick}
       />
     )
   }

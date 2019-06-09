@@ -92,41 +92,37 @@ export default class TitleBar extends React.PureComponent {
 
     return (
       <div className="TitleBar">
-        <div className="TitleBar__left">
-          <Dropdown className="TitleBar__menuItem">
-            <DropdownTrigger>
-              <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
-            </DropdownTrigger>
-            <DropdownContent>
-              <ContactEditor hypermergeUrl={this.state.selfId} />
-            </DropdownContent>
-          </Dropdown>
-          <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
-            <i className="fa fa-angle-left" />
-          </button>
-          <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
-            <i className="fa fa-angle-right" />
-          </button>
-          <BoardTitle openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
-        </div>
+        <Dropdown className="TitleBar__menuItem TitleBar__left">
+          <DropdownTrigger>
+            <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
+          </DropdownTrigger>
+          <DropdownContent>
+            <ContactEditor hypermergeUrl={this.state.selfId} />
+          </DropdownContent>
+        </Dropdown>
+        <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
+          <i className="fa fa-angle-left" />
+        </button>
+        <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
+          <i className="fa fa-angle-right" />
+        </button>
+        <BoardTitle openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
 
-        <div className="TitleBar__right">
-          <OmniPrompt openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
-          <PresentContacts
-            currentDocUrl={this.state.currentDocUrl}
-          />
-          <Dropdown className="TitleBar__menuItem">
-            <DropdownTrigger>
-              <i className="fa fa-group" />
-            </DropdownTrigger>
-            <DropdownContent>
-              <Share
-                hypermergeUrl={this.props.hypermergeUrl}
-                openDocument={this.props.openDoc}
-              />
-            </DropdownContent>
-          </Dropdown>
-        </div>
+        <OmniPrompt openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
+        <PresentContacts
+          currentDocUrl={this.state.currentDocUrl}
+        />
+        <Dropdown className="TitleBar__menuItem TitleBar__right">
+          <DropdownTrigger>
+            <i className="fa fa-group" />
+          </DropdownTrigger>
+          <DropdownContent>
+            <Share
+              hypermergeUrl={this.props.hypermergeUrl}
+              openDocument={this.props.openDoc}
+            />
+          </DropdownContent>
+        </Dropdown>
       </div>
     )
   }
