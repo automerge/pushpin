@@ -105,17 +105,34 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     this.handle.subscribe((doc) => this.onChange(doc))
   }
 
-  onChange = (doc) => {
-    this.setState({ ...doc })
-    this.refreshHeartbeat(doc)
+  refreshCurrentDocHandle = ({ selfId, currentDocUrl }) => {
+    if (this.currentDocHandle) {
+      this.currentDocHandle.close()
+      // TODO: departure?
+    }
+    const { hypermergeUrl } = parseDocumentLink(currentDocUrl)
+    this.currentDocHandle = window.repo.open(hypermergeUrl)
+
+    if (!this.currentDocTimerId) {
+      this.currentDocHandle.message({ contact: selfId, heartbeat: true })
+      this.currentDocTimerId = setInterval(() => {
+        this.currentDocHandle.message({ contact: selfId, heartbeat: true })
+      }, 5000) // send a heartbeat every 5s
+    }
   }
 
-  refreshHeartbeat = (doc) => {
+  onChange = (doc) => {
+    this.setState({ ...doc })
+    this.refreshSelfHeartbeat(doc)
+    this.refreshCurrentDocHandle(doc)
+  }
+
+  refreshSelfHeartbeat = (doc) => {
     const selfHandle = window.repo.open(doc.selfId)
 
-    if (!this.timerId) {
+    if (!this.selfTimerId) {
       selfHandle.message('heartbeat')
-      this.timerId = setInterval(() => {
+      this.selfTimerId = setInterval(() => {
         selfHandle.message('heartbeat')
       }, 5000) // send a heartbeat every 5s
     }
