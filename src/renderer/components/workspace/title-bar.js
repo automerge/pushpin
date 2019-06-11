@@ -107,11 +107,11 @@ export default class TitleBar extends React.PureComponent {
           <i className="fa fa-angle-right" />
         </button>
         <BoardTitle openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
-
-        <OmniPrompt openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
         <PresentContacts
           currentDocUrl={this.state.currentDocUrl}
         />
+        <OmniPrompt openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
+
         <Dropdown className="TitleBar__menuItem TitleBar__right">
           <DropdownTrigger>
             <i className="fa fa-group" />

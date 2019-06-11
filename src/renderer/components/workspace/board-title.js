@@ -171,6 +171,8 @@ export default class BoardTitle extends React.PureComponent {
       return null
     }
 
+    const { type } = parseDocumentLink(this.state.currentDocUrl)
+
     const inputBar = (
       <div className="BoardTitle__actionBar" onClick={this.handleTitleClick}>
         <div className="BoardTitle__actionBar__left">
@@ -180,7 +182,7 @@ export default class BoardTitle extends React.PureComponent {
           active={this.state.activeTitleEditor}
           onSubmit={this.updateTitle}
           onCancel={this.cancelTitleEdit}
-          defaultValue={this.state.board && this.state.board.title || ''}
+          defaultValue={this.state.board && this.state.board.title || `Untitled ${type}...`}
           onClick={this.activateTitleEditor}
         />
       </div>

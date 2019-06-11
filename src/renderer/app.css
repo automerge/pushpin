@@ -97,8 +97,6 @@ input {
   color: var(--colorBlueBlack);
   padding: 0 8px;
   box-sizing: border-box;
-  height: 32px;
-  border-radius: 4px;
   background: transparent;
   border: 0px;
   outline: none;
@@ -307,12 +305,14 @@ input {
 
 .TitleBar__titleText {
   flex: 1;
-  font-size: 18px;
+  height: 1.25em;
+  font-size: 1.25em;
   font-weight: bold;
 }
 
 
 .OmniboxInput {
+  margin-left: 8px;
   flex: 0 1 200px;
 }
 
@@ -566,11 +566,11 @@ button[disabled].TitleBar__menuItem .fa {
 
 @keyframes text-pop {
   from {
-    font-size: 1.25em;
+    font-size: 1.35em;
   }
 
   to {
-    font-size: 1em;
+    font-size: 1.25em;
   }
 }
 
