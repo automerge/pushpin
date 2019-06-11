@@ -42,7 +42,7 @@ export default class BoardTitle extends React.PureComponent {
     if (this.handle) {
       this.handle.close()
     }
-    this.boardHandle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
   refreshBoardHandle = (boardId) => {

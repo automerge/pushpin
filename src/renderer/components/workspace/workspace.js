@@ -88,6 +88,9 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => {
     this.handle.close()
+    if (this.state.selfId) {
+      this.heartbeatNotifyDeparture(this.state.selfId)
+    }
     clearInterval(this.timerId)
   }
 
@@ -107,18 +110,53 @@ To create links to boards or contacts, drag them from the title bar or the omnib
 
   onChange = (doc) => {
     this.setState({ ...doc })
-    this.refreshHeartbeat(doc)
+    this.refreshSelfHeartbeat(doc)
+    this.refreshCurrentDocHandle(doc)
   }
 
-  refreshHeartbeat = (doc) => {
+  // The workspace takes on two responsibilities around presence.
+  // First, it posts on the self-contact ID that we're online.
+  // This means any avatar anywhere will have a colored ring around it
+  // if that user is online.
+  refreshSelfHeartbeat = (doc) => {
     const selfHandle = window.repo.open(doc.selfId)
 
-    if (!this.timerId) {
+    if (!this.selfTimerId) {
       selfHandle.message('heartbeat')
-      this.timerId = setInterval(() => {
+      this.selfTimerId = setInterval(() => {
         selfHandle.message('heartbeat')
-      }, 5000) // send a heartbeat every 5s
+      }, 1000) // send a heartbeat every 5s
     }
+  }
+
+  // Second, it posts a presence heartbeat on the document currently
+  // considered to be open, allowing any kind of card to render a list of
+  // "present" folks.
+  // Any time the document changes, we throw away the old handle and
+  // make a new one for the new document.
+  // NB: The current implementation doesn't have any caching of messages,
+  //     so "present" avatars will have to wait for a second heartbeat to arrive
+  //     before appearing present since the first one will have passed in causing
+  //     them to render...
+  refreshCurrentDocHandle = ({ selfId, currentDocUrl }) => {
+    if (this.currentDocHandle) {
+      this.currentDocHandle.close()
+      this.heartbeatNotifyDeparture(selfId)
+    }
+    const { hypermergeUrl } = parseDocumentLink(currentDocUrl)
+    this.currentDocHandle = window.repo.open(hypermergeUrl)
+
+    if (!this.currentDocTimerId) {
+      this.currentDocHandle.message({ contact: selfId, heartbeat: true })
+      this.currentDocTimerId = setInterval(() => {
+        this.currentDocHandle.message({ contact: selfId, heartbeat: true })
+      }, 1000) // send a heartbeat every 5s
+    }
+  }
+
+  heartbeatNotifyDeparture = (selfId) => {
+    // notify peers on the current board that we're departing
+    this.currentDocHandle.message({ contact: selfId, departing: true })
   }
 
   openDoc = (docUrl) => {

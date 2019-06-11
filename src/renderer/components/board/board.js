@@ -87,13 +87,11 @@ export default class Board extends React.PureComponent {
 
   componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => {
-    this.heartbeatNotifyDeparture()
     this.handle.close()
     clearInterval(this.heartbeatTimerId)
   }
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.heartbeatNotifyDeparture()
       this.refreshHandle(this.props.hypermergeUrl)
     }
   }
@@ -110,7 +108,6 @@ export default class Board extends React.PureComponent {
 
   onChange = (doc) => {
     this.setState({ doc })
-    this.refreshHeartbeat()
   }
 
   onKeyDown = (e) => {
@@ -645,43 +642,31 @@ export default class Board extends React.PureComponent {
   }
 
   onMessage = (msg) => {
-    const { remoteSelection = {} } = this.state
     const { contact, selected } = msg
 
-    if (msg.contact) {
+    if (contact && selected) {
+      this.setState((prevState) =>
+        ({ remoteSelection: {
+          ...prevState.remoteSelection,
+          [contact]: selected } }
+        ))
+    }
+
+    // if we don't hear from another user for a while, assume they've gone offline
+    if (contact) {
       clearTimeout(this.contactHeartbeatTimerId[contact])
       // if we miss two heartbeats (11s), assume they've gone offline
       this.contactHeartbeatTimerId[contact] = setTimeout(() => {
         this.clearRemoteSelection(contact)
-      }, 11000)
+      }, 3000)
     }
-
-    if (contact && selected) {
-      this.setState({ remoteSelection: { ...remoteSelection, [contact]: selected } })
-    }
-  }
-
-  refreshHeartbeat = (doc) => {
-    // XXX check how this work on board change
-    if (!this.handle) {
-      return
-    }
-    if (!this.heartbeatTimerId) {
-      this.handle.message({ contact: this.props.selfId, heartbeat: true })
-      this.heartbeatTimerId = setInterval(() => {
-        this.handle.message({ contact: this.props.selfId, heartbeat: true })
-      }, 5000) // send a heartbeat every 5s
-    }
-  }
-
-  heartbeatNotifyDeparture = () => {
-    // notify peers on the current board that we're departing
-    this.handle.message({ contact: this.props.selfId, departing: true })
   }
 
   clearRemoteSelection = (contact) => {
-    const { remoteSelection = {} } = this.state
-    this.setState({ remoteSelection: { ...remoteSelection, [contact]: undefined } })
+    this.setState((prevState) =>
+      ({ remoteSelection: {
+        ...prevState.remoteSelection,
+        [contact]: undefined } }))
   }
 
   updateSelection = (selected) => {

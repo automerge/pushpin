@@ -4,15 +4,12 @@
 
 Built with Electron, React, automerge and the Dat p2p stack.
 
-A project by [Ink & Switch](https://inkandswitch.com/). 
-
-If you think this is cool, wait until you see what we're working on next. Why not [reach out](mailto:hello@inkandswitch.com)? We're always excited to meet folks with similar interests.
+A project initiated by [Ink & Switch](https://inkandswitch.com/). 
 
 ## Running from Source
 
 ```console
 $ yarn
-$ yarn build-deps
 $ yarn start
 ```
 
@@ -58,8 +55,6 @@ PushPin is an offline-first collaborative cork board. You can make new text note
 
 You can also drag boards and contacts from the search bar onto a board, right click to create new elements like conversation threads or change the background color of a board.
 
-Edit a board title with the little pencil icon next to its name. Press enter to keep your changes.
-
 In the top left is your avatar image. Give yourself a name and a profile picture, then invite someone else to see your work by clicking the clipboard in the search box to copy the URL.
 
 They'll have to paste that link into their search bar and with that, you'll be connected.
@@ -76,7 +71,7 @@ See [HACKING](hacking.md) for a getting started guide.
 
 ## Packaging
 
-Packaging is not currently supported on this build. We'll probably adopt `electron-package` for this, but have not yet implemented it.
+Create a package for your platform with `yarn dist`.
 
 ## Docs
 
