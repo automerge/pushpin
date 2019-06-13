@@ -1359,6 +1359,13 @@ div.card.image {
   text-align: center;
 }
 
+.PDFCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
 .PDFCardHeader__input {
   width: 5ch;
   text-align: right;
@@ -1375,13 +1382,7 @@ div.card.image {
   margin-right: 4px;
 }
 
-.PDFCard__content {
-  padding: 4px;
-}
-
-.PDFCardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
+.react-pdf__Page__canvas {
+  width: 100% !important;
+  height: unset !important;
 }
