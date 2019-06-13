@@ -668,15 +668,8 @@ div.card.text {
   max-width: 481px;
 }
 
-div.card.text.selected {
-  /* attach the outline to the content, covering the 1px border */
-  outline-offset: -1px;
-  /* outline: 2px solid black; */
-}
-
 div.card.selected {
   box-shadow: 4px 4px 24px 0px rgba(0,0,0,.25);
-  outline-offset: -1px;
   outline: solid 2px var(--highlight-color, var(--colorBlueBlack));
   z-index: 2;
 }
@@ -1355,8 +1348,40 @@ div.card.image {
   margin: 40px 0 60px;
 }
 
-.pdf-card {
+.PDFCard {
   width: 100%;
   overflow: hidden;
   background: white;
+}
+
+.PDFCard__loading {
+  /* probably want to eliminate this state eventually */
+  text-align: center;
+}
+
+.PDFCardHeader__input {
+  width: 5ch;
+  text-align: right;
+  margin-left: 4px;
+}
+
+.PDFCardHeader__input::-webkit-inner-spin-button,
+.PDFCardHeader__input::-webkit-outer-spin-button {
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+.PDFCardHeader__numPages {
+  margin-right: 4px;
+}
+
+.PDFCard__content {
+  padding: 4px;
+}
+
+.PDFCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
 }

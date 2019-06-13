@@ -72,7 +72,8 @@ export default class PDFCard extends React.PureComponent {
     })
   }
 
-  nextPage = () => {
+  disableForward = () => this.pageNum >= this.state.pdfDocument.numPages
+  forward = () => {
     let { pageNum } = this.state
     if (pageNum < this.state.pdfDocument.numPages) {
       pageNum += 1
@@ -81,7 +82,8 @@ export default class PDFCard extends React.PureComponent {
     this.setState({ pageNum, newPageNum: pageNum })
   }
 
-  prevPage = () => {
+  disableBack = () => this.pageNum <= 0
+  back = () => {
     let { pageNum } = this.state
     if (pageNum > 1) {
       pageNum -= 1
@@ -134,21 +136,40 @@ export default class PDFCard extends React.PureComponent {
       setTimeout(() => this.renderPDF(this.pdfViewport.current, pdfDocument, pageNum), 0)
 
       return (
-        <div className="pdf-card">
-          <button onClick={this.prevPage} type="button">Prev</button>
-          <input
-            ref={this.input}
-            value={newPageNum}
-            onChange={this.handleInputChange}
-            onKeyDown={this.handleInputKey}
-          />
-          of {pdfDocument.numPages}
-          <button onClick={this.nextPage} type="button">Next</button>
-          <div tabIndex="0" onKeyDown={this.onKeyDown} ref={this.pdfViewport} />
+        <div className="PDFCard">
+          <div className="PDFCardHeader">
+            <button
+              disabled={this.disableBack()}
+              type="button"
+              onClick={this.back}
+              className="ButtonAction"
+            >
+              <i className="fa fa-angle-left" />
+            </button>
+            <input
+              className="PDFCardHeader__input"
+              ref={this.input}
+              value={newPageNum}
+              type="number"
+              min="1"
+              max={this.state.pdfDocument.numPages}
+              onChange={this.handleInputChange}
+              onKeyDown={this.handleInputKey}
+            />
+            <div className="PDFCardHeader__numPages">/ {pdfDocument.numPages}</div>
+            <button disabled={this.disableForward()} type="button" onClick={this.forward} className="ButtonAction">
+              <i className="fa fa-angle-right" />
+            </button>
+          </div>
+          <div className="PDFCard__content" tabIndex="0" onKeyDown={this.onKeyDown} ref={this.pdfViewport} />
         </div>
       )
     }
-    return <div className="pdf-card">Loading PDF content from {hyperfileUrl}...</div>
+    return (
+      <div className="PDFCard">
+        <span className="PDFCard__loading">Loading PDF content from {hyperfileUrl}...</span>
+      </div>
+    )
   }
 
   renderPDF = (container, pdfDocument, pageNum) => {
@@ -166,7 +187,7 @@ export default class PDFCard extends React.PureComponent {
       const spacer = document.createElement('div')
       spacer.style.width = '250px'
       container.appendChild(spacer)
-      this.renderedWidth = container.parentNode.clientWidth
+      this.renderedWidth = container.parentNode.clientWidth - 8
       container.removeChild(spacer)
       container.parentNode.style.width = `${this.renderedWidth}px`
     }
