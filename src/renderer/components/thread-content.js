@@ -3,7 +3,15 @@ import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
 import Content from './content'
-import { createDocumentLink } from '../share-link'
+import { createDocumentLink, parseDocumentLink } from '../share-link'
+
+// Message {
+//  authorId: string
+//  content: string, // text message content
+//  embed: string // embedded pushpin doc. This could be cleaned up.
+//  time: number
+// }
+
 
 export default class ThreadContent extends React.PureComponent {
   static propTypes = {
@@ -58,7 +66,7 @@ export default class ThreadContent extends React.PureComponent {
       currentGroup.push(message)
     })
     return (
-      <div style={css.threadWrapper}>
+      <div onDragOver={this.onDragOver} onDrop={this.onDrop} style={css.threadWrapper}>
         <div style={css.messageWrapper}>
           <div style={css.messages} onScroll={this.onScroll}>
             {groupedMessages.map(this.renderGroupedMessages, this)}
@@ -82,7 +90,7 @@ export default class ThreadContent extends React.PureComponent {
     <div style={css.messageGroup} key={idx}>
       <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
       <div style={css.groupedMessages}>
-        { groupOfMessages.map(this.renderMessage) }
+        {groupOfMessages.map(this.renderMessage)}
       </div>
     </div>
   )
@@ -100,13 +108,51 @@ export default class ThreadContent extends React.PureComponent {
     }
     return (
       <div style={css.message} key={idx}>
-        <div style={css.content}>{content}</div>
-        { idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div> : null}
+        {this.isEmbed(content) ? (
+          <div style={css.embed} onDoubleClick={(e) => this.onDoubleClickEmbed(e, content)}>
+            <Content
+              context="list"
+              url={content}
+            />
+          </div>
+        ) : (
+          <div style={css.content}>{content}</div>
+        )}
+        {idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div> : null}
       </div>
     )
   }
 
-  onScroll= (e) => {
+  isEmbed(message) {
+    try {
+      parseDocumentLink(message)
+    } catch {
+      return false
+    }
+    return true
+  }
+
+  onDragOver = (e) => {
+    console.log('ONDRAG')
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  onDrop = (e) => {
+    console.log('ONDROP')
+    e.preventDefault()
+    e.stopPropagation()
+    const url = e.dataTransfer.getData('application/pushpin-url')
+    if (url) {
+      this.appendMessage({
+        authorId: this.props.selfId,
+        content: url,
+        time: new Date().getTime()
+      })
+    }
+  }
+
+  onScroll = (e) => {
     e.stopPropagation()
   }
 
@@ -120,13 +166,18 @@ export default class ThreadContent extends React.PureComponent {
     e.stopPropagation()
   }
 
+  onDoubleClickEmbed = (e, content) => {
+    e.stopPropagation()
+    window.location = content
+  }
+
   onKeyDown = (e) => {
     e.stopPropagation()
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       this.handle.change((threadDoc) => {
-        threadDoc.messages.push({
+        this.appendMessage({
           authorId: this.props.selfId,
           content: this.state.message,
           time: new Date().getTime()
@@ -137,6 +188,13 @@ export default class ThreadContent extends React.PureComponent {
         message: ''
       })
     }
+  }
+
+
+  appendMessage(message) {
+    this.handle.change((threadDoc) => {
+      threadDoc.messages.push(message)
+    })
   }
 }
 
@@ -199,6 +257,10 @@ const css = {
     marginTop: -22
   },
   content: {
+  },
+  embed: {
+    maxHeight: '50px',
+    overflow: 'hidden'
   },
   inputWrapper: {
     boxSizing: 'border-box',
