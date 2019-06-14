@@ -17,6 +17,11 @@ export const IMAGE_DIALOG_OPTIONS = {
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
 }
 
+export const PDF_DIALOG_OPTIONS = {
+  properties: ['openFile'],
+  filters: [{ name: 'PDF files', extensions: ['pdf'] }]
+}
+
 // Prefer NAME if explicitly set.
 // Otherwise look for OS-level USER (Mac / Linux) or USERNAME (Windows.)
 export const USER = process.env.NAME

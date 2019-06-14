@@ -33,6 +33,7 @@ import './components/text-content'
 import './components/image-content'
 import './components/thread-content'
 import './components/url-content'
+import './components/pdf-content'
 
 import { createDocumentLink } from './share-link'
 
