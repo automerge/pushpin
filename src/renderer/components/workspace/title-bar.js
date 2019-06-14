@@ -4,7 +4,6 @@ import Debug from 'debug'
 
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
 
-import BoardTitle from './board-title'
 import OmniPrompt from './omni-prompt'
 import Content from '../content'
 import ContactEditor from '../contact/contact-editor'
@@ -106,7 +105,7 @@ export default class TitleBar extends React.PureComponent {
         <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
           <i className="fa fa-angle-right" />
         </button>
-        <BoardTitle openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
+        <Content url={this.state.currentDocUrl} context="list" />
         <PresentContacts
           currentDocUrl={this.state.currentDocUrl}
         />

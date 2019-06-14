@@ -65,7 +65,6 @@ export default class DefaultInList extends React.PureComponent {
 
   render = () => (
     <div draggable="true" onDragStart={this.onDragStart} className="DocLink" onClick={this.handleClick}>
-      pooh
       <i ref={(ref) => { this.badgeRef = ref }} className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
       <div className="DocLink__title">{ this.state.title }</div>
       { this.renderActions() }
@@ -75,7 +74,7 @@ export default class DefaultInList extends React.PureComponent {
 
 ContentTypes.register({
   component: DefaultInList,
-  type: 'board',
+  type: 'default',
   context: 'list',
   name: 'Document Link',
   icon: 'sticky-note',
