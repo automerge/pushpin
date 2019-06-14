@@ -89,10 +89,9 @@ class ContactInTitlebar extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: ContactInTitlebar,
   type: 'contact',
-  context: 'title-bar',
   name: 'Avatar',
   icon: 'user',
+  contexts: { 'title-bar': ContactInTitlebar },
   unlisted: true,
 })

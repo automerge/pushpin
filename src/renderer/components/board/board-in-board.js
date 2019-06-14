@@ -110,9 +110,8 @@ const css = {
 }
 
 ContentTypes.register({
-  component: BoardInBoard,
   type: 'board',
-  context: 'board',
+  contexts: { board: BoardInBoard },
   name: 'Board',
   icon: 'sticky-note',
   resizable: true,

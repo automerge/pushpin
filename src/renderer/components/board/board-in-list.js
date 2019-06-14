@@ -73,9 +73,8 @@ export default class BoardInList extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: BoardInList,
   type: 'board',
-  context: 'list',
+  contexts: { list: BoardInList },
   name: 'Document Link',
   icon: 'sticky-note',
   unlisted: true,

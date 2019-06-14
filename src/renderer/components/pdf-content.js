@@ -179,25 +179,12 @@ export default class PDFCard extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: PDFCard,
-  context: 'default',
   type: 'pdf',
   name: 'PDF',
-  icon: 'book'
-})
-
-ContentTypes.register({
-  component: PDFCard,
-  context: 'workspace',
-  type: 'pdf',
-  name: 'PDF',
-  icon: 'book'
-})
-
-ContentTypes.register({
-  component: PDFCard,
-  context: 'board',
-  type: 'pdf',
-  name: 'PDF',
-  icon: 'book'
+  icon: 'book',
+  contexts: {
+    default: PDFCard,
+    workspace: PDFCard,
+    board: PDFCard
+  }
 })

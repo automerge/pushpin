@@ -160,9 +160,8 @@ const css = {
 }
 
 ContentTypes.register({
-  component: ContactInThread,
   type: 'contact',
-  context: 'thread',
+  contexts: { thread: ContactInThread },
   name: 'Mini Avatar',
   icon: 'user',
   unlisted: true,

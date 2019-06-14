@@ -124,9 +124,8 @@ export default class ContactInList extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: ContactInList,
   type: 'contact',
-  context: 'list',
+  contexts: { list: ContactInList },
   name: 'Contact',
   icon: 'sticky-note',
   unlisted: true,

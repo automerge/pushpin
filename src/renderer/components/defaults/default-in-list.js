@@ -48,10 +48,7 @@ const css = {
 }
 
 
-ContentTypes.register({
+ContentTypes.registerDefault({
   component: ListItem,
-  context: 'list',
-  type: 'default',
-  name: 'Generic List Item',
-  icon: 'question'
+  context: 'list'
 })

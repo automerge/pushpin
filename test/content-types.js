@@ -7,9 +7,8 @@ class UrlContent {}
 describe('ContentTypes', () => {
   describe('should be able to register a type', () => {
     ContentTypes.register({
-      component: UrlContent,
       type: 'url',
-      context: ['workspace', 'board'],
+      contexts: { workspace: UrlContent, board: UrlContent },
       name: 'URL',
       icon: 'chain'
     })
@@ -25,23 +24,26 @@ describe('ContentTypes', () => {
 
     it('should default to a sensible default for a context', () => {
       class DefaultListContent {}
-      ContentTypes.register({
+      ContentTypes.registerDefault({
         component: DefaultListContent,
-        type: 'default',
-        context: ['list'],
-        name: 'URL',
-        icon: 'chain'
+        context: 'list'
       })
       const type = ContentTypes.lookup({ type: 'url', context: 'list' })
+      console.log('should default', type)
       assert.strictEqual(type.component, DefaultListContent)
+    })
+
+    it('should preserve the type-name and icon when returning a default renderer', () => {
+      const type = ContentTypes.lookup({ type: 'url', context: 'list' })
+      assert.strictEqual(type.name, 'URL')
+      assert.strictEqual(type.icon, 'chain')
     })
 
     it('should use a specific option if available for a context', () => {
       class ImageInListContent {}
       ContentTypes.register({
-        component: ImageInListContent,
         type: 'image',
-        context: ['list'],
+        contexts: { list: ImageInListContent },
         name: 'Image',
         icon: 'chain'
       })

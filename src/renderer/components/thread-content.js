@@ -215,9 +215,11 @@ const css = {
 }
 
 ContentTypes.register({
-  component: ThreadContent,
   type: 'thread',
-  context: ['workspace', 'board'],
   name: 'Thread',
   icon: 'comments',
+  contexts: {
+    workspace: ThreadContent,
+    board: ThreadContent
+  }
 })

@@ -95,9 +95,8 @@ export default class ContactInBoard extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: ContactInBoard,
   type: 'contact',
-  context: 'board',
+  contexts: { board: ContactInBoard },
   name: 'Contact',
   icon: 'sticky-note',
   resizable: true,

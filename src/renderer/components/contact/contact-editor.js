@@ -158,9 +158,8 @@ export default class ContactEditor extends React.PureComponent {
 // the default view, but it's the only way to register the content initializer
 // at the moment, so pending fixes to that API, let's try this
 ContentTypes.register({
-  component: ContactEditor,
   type: 'contact',
-  context: 'workspace',
+  contexts: { workspace: ContactEditor },
   name: 'Contact',
   icon: 'sticky-note',
   resizable: true,

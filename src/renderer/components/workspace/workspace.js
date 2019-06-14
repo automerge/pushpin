@@ -208,11 +208,10 @@ To create links to boards or contacts, drag them from the title bar or the omnib
 }
 
 ContentTypes.register({
-  component: Workspace,
   type: 'workspace',
-  context: 'default',
   name: 'Workspace',
   icon: 'briefcase',
+  contexts: { default: Workspace },
   resizable: false,
   unlisted: true
 })
