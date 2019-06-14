@@ -7,7 +7,7 @@ import { Document, Page } from 'react-pdf/dist/entry.webpack'
 import * as Hyperfile from '../../hyperfile'
 import ContentTypes from '../../content-types'
 
-export default class PDFCard extends React.PureComponent {
+export default class PDFCardInBoard extends React.PureComponent {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired
   }
@@ -128,34 +128,10 @@ export default class PDFCard extends React.PureComponent {
   }
 
   render = () => {
-    const { reactPDFData, numPages, newPageNum } = this.state
+    const { reactPDFData } = this.state
 
     return (
       <div className="PDFCard">
-        <div className="PDFCardHeader">
-          <button
-            disabled={this.disableBack()}
-            type="button"
-            onClick={this.back}
-            className="ButtonAction"
-          >
-            <i className="fa fa-angle-left" />
-          </button>
-          <input
-            className="PDFCardHeader__input"
-            ref={this.input}
-            value={newPageNum}
-            type="number"
-            min="1"
-            max={this.state.numPages}
-            onChange={this.handleInputChange}
-            onKeyDown={this.handleInputKey}
-          />
-          <div className="PDFCardHeader__numPages">/ {numPages}</div>
-          <button disabled={this.disableForward()} type="button" onClick={this.forward} className="ButtonAction">
-            <i className="fa fa-angle-right" />
-          </button>
-        </div>
         { reactPDFData
           ? (
             <Document
@@ -163,7 +139,7 @@ export default class PDFCard extends React.PureComponent {
               onLoadSuccess={this.onDocumentLoadSuccess}
             >
               <Page
-                pageNumber={this.state.pageNum}
+                pageNumber={1}
                 className="PDFCard__page"
                 width="1600"
                 renderTextLayer={false}
@@ -178,8 +154,9 @@ export default class PDFCard extends React.PureComponent {
 
 
 ContentTypes.register({
-  component: PDFCard,
+  component: PDFCardInBoard,
   type: 'pdf',
+  context: 'board',
   name: 'PDF',
   icon: 'book'
 })
