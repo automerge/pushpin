@@ -66,7 +66,7 @@ export default class OmniPrompt extends React.PureComponent {
     if (this.handle) {
       this.handle.close()
     }
-    this.boardHandle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
   refreshBoardHandle = (boardId) => {
@@ -211,11 +211,11 @@ export default class OmniPrompt extends React.PureComponent {
     ))
 
     return (
-      <div ref={(ref) => { this.omniboxRef = ref }} className="OmniboxInput">
+      <div ref={(ref) => { this.omniboxRef = ref }} style={css.omniboxInput}>
         <input
           ref={this.omniboxInput}
           type="text"
-          className="OmniboxInput__input"
+          style={css.omniboxInputElt}
           onClick={this.handleTitleClick}
           onChange={this.handleChange}
           onKeyDown={this.handleCommandKeys}
@@ -232,4 +232,29 @@ export default class OmniPrompt extends React.PureComponent {
       </div>
     )
   }
+}
+
+const css = {
+  omniboxInput: {
+    marginLeft: '8px',
+    flex: '0 1 200px',
+    padding: '0px 8px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+
+  omniboxInputElt: {
+    width: '336px',
+    fontSize: '14px',
+    color: 'var(--colorBlueBlack)',
+    fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
+    background: 'var(--colorInputGrey)',
+    border: '0px',
+    outline: 'none',
+    borderRadius: '4px',
+    height: '24px',
+    lineHeight: '24px'
+  }
+
 }
