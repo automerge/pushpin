@@ -25,15 +25,12 @@ import './components/contact/contact-in-title-bar'
 import './components/contact/contact-in-list'
 import './components/contact/contact-in-thread'
 
-// pdf in various contexts
-import './components/pdf/pdf-card'
-import './components/pdf/pdf-in-board'
-
 // other single-context components
 import './components/text-content'
 import './components/image-content'
 import './components/thread-content'
 import './components/url-content'
+import './components/pdf-content'
 
 import { createDocumentLink } from './share-link'
 

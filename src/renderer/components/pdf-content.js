@@ -3,13 +3,13 @@ import PropTypes from 'prop-types'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
-// import path from 'path'
-import * as Hyperfile from '../../hyperfile'
-import ContentTypes from '../../content-types'
+import * as Hyperfile from '../hyperfile'
+import ContentTypes from '../content-types'
 
-export default class PDFCardInBoard extends React.PureComponent {
+export default class PDFCard extends React.PureComponent {
   static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired
+    hypermergeUrl: PropTypes.string.isRequired,
+    context: PropTypes.string.isRequired
   }
 
   static initializeDocument = (pdf, { hyperfileUrl }) => {
@@ -27,14 +27,10 @@ export default class PDFCardInBoard extends React.PureComponent {
 
   state = {
     currentHyperfileUrl: '',
-    newPageNum: 1,
+    pageInputValue: 1,
     pageNum: 1,
     numPages: 0
   }
-
-  pdfViewport = React.createRef()
-  input = React.createRef()
-
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
@@ -73,17 +69,17 @@ export default class PDFCardInBoard extends React.PureComponent {
       pageNum += 1
     }
 
-    this.setState({ pageNum, newPageNum: pageNum })
+    this.setState({ pageNum, pageInputValue: pageNum })
   }
 
-  disableBack = () => this.pageNum <= 0
+  disableBack = () => this.pageNum <= 1
   back = () => {
     let { pageNum } = this.state
     if (pageNum > 1) {
       pageNum -= 1
     }
 
-    this.setState({ pageNum, newPageNum: pageNum })
+    this.setState({ pageNum, pageInputValue: pageNum })
   }
 
   onKeyDown = (e) => {
@@ -97,16 +93,16 @@ export default class PDFCardInBoard extends React.PureComponent {
   }
 
   handleInputKey = (e) => {
-    const { newPageNum, pageNum, pdfDocument } = this.state
+    const { pageInputValue, pageNum, numPages } = this.state
 
     if (e.key === 'Enter') {
-      const nextPageNum = Number.parseInt(newPageNum, 10)
-      if (nextPageNum > 0 && nextPageNum <= pdfDocument.numPages) {
+      const nextPageNum = Number.parseInt(pageInputValue, 10)
+      if (nextPageNum > 0 && nextPageNum <= numPages) {
         this.setState({ pageNum: nextPageNum })
       } else {
-        this.setState({ newPageNum: pageNum })
+        this.setState({ pageInputValue: pageNum })
       }
-      this.input.current.blur()
+      e.target.blur()
     }
 
     if (e.key === 'Backspace') {
@@ -114,13 +110,13 @@ export default class PDFCardInBoard extends React.PureComponent {
     }
 
     if (e.key === 'Escape') {
-      this.input.current.blur()
-      this.setState({ newPageNum: pageNum })
+      e.target.blur()
+      this.setState({ pageInputValue: pageNum })
     }
   }
 
   handleInputChange = (e) => {
-    this.setState({ newPageNum: e.target.value })
+    this.setState({ pageInputValue: e.target.value })
   }
 
   onDocumentLoadSuccess = ({ numPages }) => {
@@ -128,10 +124,40 @@ export default class PDFCardInBoard extends React.PureComponent {
   }
 
   render = () => {
-    const { reactPDFData } = this.state
+    const { reactPDFData, numPages, pageInputValue } = this.state
+    const { context } = this.props
+
+    const header = (context === 'workspace')
+      ? (
+        <div className="PDFCardHeader">
+          <button
+            disabled={this.disableBack()}
+            type="button"
+            onClick={this.back}
+            className="ButtonAction"
+          >
+            <i className="fa fa-angle-left" />
+          </button>
+          <input
+            className="PDFCardHeader__input"
+            value={pageInputValue}
+            type="number"
+            min="1"
+            max={this.state.numPages}
+            onChange={this.handleInputChange}
+            onKeyDown={this.handleInputKey}
+          />
+          <div className="PDFCardHeader__numPages">/ {numPages}</div>
+          <button disabled={this.disableForward()} type="button" onClick={this.forward} className="ButtonAction">
+            <i className="fa fa-angle-right" />
+          </button>
+        </div>
+      )
+      : null
 
     return (
       <div className="PDFCard">
+        { header }
         { reactPDFData
           ? (
             <Document
@@ -139,9 +165,9 @@ export default class PDFCardInBoard extends React.PureComponent {
               onLoadSuccess={this.onDocumentLoadSuccess}
             >
               <Page
-                pageNumber={1}
+                pageNumber={this.state.pageNum}
                 className="PDFCard__page"
-                width="1600"
+                width={1600}
                 renderTextLayer={false}
               />
             </Document>
@@ -154,9 +180,17 @@ export default class PDFCardInBoard extends React.PureComponent {
 
 
 ContentTypes.register({
-  component: PDFCardInBoard,
+  component: PDFCard,
+  context: 'workspace',
   type: 'pdf',
+  name: 'PDF',
+  icon: 'book'
+})
+
+ContentTypes.register({
+  component: PDFCard,
   context: 'board',
+  type: 'pdf',
   name: 'PDF',
   icon: 'book'
 })
