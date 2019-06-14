@@ -18,15 +18,8 @@ import './components/workspace/workspace'
 import './components/defaults/default-in-list'
 
 // board in various contexts
-import './components/board/board'
-import './components/board/board-in-board'
-import './components/board/board-in-list'
-
-// contact in various contexts
-import './components/contact/contact-in-board'
-import './components/contact/contact-in-title-bar'
-import './components/contact/contact-in-list'
-import './components/contact/contact-in-thread'
+import './components/board'
+import './components/contact'
 
 // other single-context components
 import './components/text-content'

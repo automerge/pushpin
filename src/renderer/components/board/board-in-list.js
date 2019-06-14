@@ -1,8 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../../content-types'
-
 export default class BoardInList extends React.PureComponent {
   static propTypes = {
     url: PropTypes.string.isRequired,
@@ -71,11 +69,3 @@ export default class BoardInList extends React.PureComponent {
     </div>
   )
 }
-
-ContentTypes.register({
-  type: 'board',
-  contexts: { list: BoardInList },
-  name: 'Document Link',
-  icon: 'sticky-note',
-  unlisted: true,
-})

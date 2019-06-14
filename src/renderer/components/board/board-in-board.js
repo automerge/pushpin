@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../../content-types'
 import { createDocumentLink } from '../../share-link'
 
 import Board from './board'
@@ -108,11 +107,3 @@ const css = {
     width: '100%',
   },
 }
-
-ContentTypes.register({
-  type: 'board',
-  contexts: { board: BoardInBoard },
-  name: 'Board',
-  icon: 'sticky-note',
-  resizable: true,
-})

@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../../content-types'
 import Content from '../content'
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
@@ -93,12 +92,3 @@ export default class ContactInBoard extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  type: 'contact',
-  contexts: { board: ContactInBoard },
-  name: 'Contact',
-  icon: 'sticky-note',
-  resizable: true,
-  unlisted: true,
-})

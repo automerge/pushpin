@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../../content-types'
 import Content from '../content'
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
-class ContactInThread extends React.PureComponent {
+export default class ContactInThread extends React.PureComponent {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired,
     selfId: PropTypes.string.isRequired
@@ -158,11 +157,3 @@ const css = {
     width: '100%'
   },
 }
-
-ContentTypes.register({
-  type: 'contact',
-  contexts: { thread: ContactInThread },
-  name: 'Mini Avatar',
-  icon: 'user',
-  unlisted: true,
-})

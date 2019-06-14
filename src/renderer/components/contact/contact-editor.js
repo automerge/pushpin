@@ -8,7 +8,6 @@ import * as Hyperfile from '../../hyperfile'
 
 import { USER, IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
 import Content from '../content'
-import ContentTypes from '../../content-types'
 import ColorPicker from '../color-picker'
 
 const { dialog } = remote
@@ -153,15 +152,3 @@ export default class ContactEditor extends React.PureComponent {
     )
   }
 }
-
-// this is a little silly, since we don't want the contact editor to be
-// the default view, but it's the only way to register the content initializer
-// at the moment, so pending fixes to that API, let's try this
-ContentTypes.register({
-  type: 'contact',
-  contexts: { workspace: ContactEditor },
-  name: 'Contact',
-  icon: 'sticky-note',
-  resizable: true,
-  unlisted: true,
-})
