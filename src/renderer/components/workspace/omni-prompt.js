@@ -22,7 +22,6 @@ export default class OmniPrompt extends React.PureComponent {
   }
 
   omniboxInput = React.createRef()
-  titleInput = React.createRef()
 
   // This is the New Boilerplate
   componentDidMount = () => {

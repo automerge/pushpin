@@ -196,9 +196,15 @@ export default class Board extends React.PureComponent {
       const reader = new FileReader()
       const x = localX + (i * (GRID_SIZE * 2))
       const y = localY + (i * (GRID_SIZE * 2))
+
       if (entry.type.match('image/')) {
         reader.onload = () => {
           this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result))
+        }
+        reader.readAsArrayBuffer(entry)
+      } else if (entry.type.match('application/pdf')) {
+        reader.onload = () => {
+          this.createPdfCardFromBuffer({ x, y }, Buffer.from(reader.result))
         }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
@@ -340,6 +346,23 @@ export default class Board extends React.PureComponent {
 
   createPdfCardFromPath = ({ x, y }, path) => {
     Hyperfile.write(path, (err, hyperfileUrl) => {
+      if (err) {
+        log(err)
+        return
+      }
+
+      const cardId = this.createCard({
+        x,
+        y,
+        type: 'pdf',
+        typeAttrs: { hyperfileUrl }
+      })
+      this.selectOnly(cardId)
+    })
+  }
+
+  createPdfCardFromBuffer = ({ x, y }, buffer) => {
+    Hyperfile.writeBuffer(buffer, (err, hyperfileUrl) => {
       if (err) {
         log(err)
         return
