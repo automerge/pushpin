@@ -22,7 +22,10 @@
   "license": "MIT",
   "config": {},
   "electronWebpack": {
-    "title": "PushPin"
+    "title": "PushPin",
+    "renderer": {
+      "webpackConfig": "webpack.renderer.additions.js"
+    }
   },
   "dependencies": {
     "@ibm/plex": "^1.4.1",
@@ -52,6 +55,7 @@
     "react-dom": ">=16.8.6",
     "react-hot-loader": "^4.8.8",
     "react-measure": "^2.3.0",
+    "react-pdf": "^4.1.0",
     "react-rnd": "^9.1.2",
     "source-map-support": "^0.5.12",
     "tmp": "0.1.0",

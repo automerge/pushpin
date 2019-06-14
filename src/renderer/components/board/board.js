@@ -8,7 +8,7 @@ import uuid from 'uuid/v4'
 
 import Content from '../content'
 import ContentTypes from '../../content-types'
-import { IMAGE_DIALOG_OPTIONS } from '../../constants'
+import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
 import BoardCard from './board-card'
@@ -284,40 +284,75 @@ export default class Board extends React.PureComponent {
     const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
     const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
 
+    let cardId
+    /* the contents of this switch statement
+       should almost certainly run in the relevant components */
+    switch (contentType.type) {
+      case 'image':
+        dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
+          // User aborted.
+          if (!paths) {
+            return
+          }
+          if (paths.length !== 1) {
+            throw new Error('Expected exactly one path?')
+          }
 
-    if (contentType.type === 'image') {
-      dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
-        // User aborted.
-        if (!paths) {
-          return
-        }
-        if (paths.length !== 1) {
-          throw new Error('Expected exactly one path?')
-        }
+          cardId = this.createImageCardFromPath({ x, y }, paths[0])
+          // this happens here because we're in a callback
+          this.selectOnly(cardId)
+        })
+        break
+      case 'pdf':
+        dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
+          // User aborted.
+          if (!paths) {
+            return
+          }
+          if (paths.length !== 1) {
+            throw new Error('Expected exactly one path?')
+          }
 
-        this.createImageCardFromPath({ x, y }, paths[0])
-      })
-      return
+          cardId = this.createPdfCardFromPath({ x, y }, paths[0])
+          // this happens here because we're in a callback
+          this.selectOnly(cardId)
+        })
+        break
+      case 'board':
+        cardId = this.createCard({
+          x,
+          y,
+          type: contentType.type,
+          typeAttrs: { title: `Sub-board of ${this.state.doc.title}` }
+        })
+        this.selectOnly(cardId)
+        break
+      default:
+        cardId = this.createCard({
+          x,
+          y,
+          type: contentType.type,
+          typeAttrs: { text: '' }
+        })
+        this.selectOnly(cardId)
     }
+  }
 
-    if (contentType.type === 'board') {
+  createPdfCardFromPath = ({ x, y }, path) => {
+    Hyperfile.write(path, (err, hyperfileUrl) => {
+      if (err) {
+        log(err)
+        return
+      }
+
       const cardId = this.createCard({
         x,
         y,
-        type: contentType.type,
-        typeAttrs: { title: `Sub-board of ${this.state.doc.title}` }
+        type: 'pdf',
+        typeAttrs: { hyperfileUrl }
       })
       this.selectOnly(cardId)
-      return
-    }
-
-    const cardId = this.createCard({
-      x,
-      y,
-      type: contentType.type,
-      typeAttrs: { text: '' }
     })
-    this.selectOnly(cardId)
   }
 
   createImageCardFromPath = ({ x, y }, path) => {
