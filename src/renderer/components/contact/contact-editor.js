@@ -160,7 +160,7 @@ export default class ContactEditor extends React.PureComponent {
 ContentTypes.register({
   component: ContactEditor,
   type: 'contact',
-  context: 'default',
+  context: 'workspace',
   name: 'Contact',
   icon: 'sticky-note',
   resizable: true,

@@ -10,38 +10,49 @@ let listedCache = null
 
 function register(contentType) {
   const { component, type, name, icon } = contentType
-  const { context = 'default', unlisted = false, resizable = true } = contentType
+  const { unlisted = false, resizable = true } = contentType
+  let { context } = contentType
 
   if (!component || !type || !name || !icon) {
-    throw new Error('Missing something in register')
+    throw new Error('Register requires a component, a type, a name, and an icon.')
+  }
+
+  if (!context) {
+    throw new Error('Register requires a context... for now.')
   }
 
   log('register', component.name, type, name, icon, context, unlisted, resizable)
 
-  if (!registry[type]) {
-    registry[type] = {}
+  if (!Array.isArray(context)) {
+    context = [context]
   }
-  registry[type][context] = contentType
+
+  context.forEach((cxt) => {
+    if (!registry[cxt]) {
+      registry[cxt] = {}
+    }
+    registry[cxt][type] = contentType
+  })
+
   listedCache = null
 }
 
-function lookup({ type, context = 'default' } = {}) {
-  if (!(type && registry[type])) {
+function lookup({ type, context = 'workspace' } = {}) {
+  if (!(type && registry[context])) {
     return null
   }
-  if (registry[type][context]) {
-    return registry[type][context]
+  if (registry[context][type]) {
+    return registry[context][type]
   }
-  return registry[type].default
+  return registry[context].default
 }
 
 function list({ withUnlisted = false } = {}) {
   if (withUnlisted) {
-    return Object.values(registry).map(cts => cts.default)
+    return Object.values(registry.board)
   }
   if (!listedCache) {
-    listedCache = Object.values(registry)
-      .map(cts => cts.default || cts.board)
+    listedCache = Object.values(registry.board)
       .filter(ct => ct && !ct.unlisted)
   }
   return listedCache

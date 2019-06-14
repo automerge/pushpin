@@ -823,6 +823,7 @@ export default class Board extends React.PureComponent {
 ContentTypes.register({
   component: Board,
   type: 'board',
+  context: 'workspace',
   name: 'Board',
   icon: 'copy',
 })

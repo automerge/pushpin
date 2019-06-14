@@ -238,6 +238,7 @@ export default class TextContent extends React.PureComponent {
 ContentTypes.register({
   component: TextContent,
   type: 'text',
+  context: ['workspace', 'board'],
   name: 'Text',
   icon: 'sticky-note'
 })

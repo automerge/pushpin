@@ -72,6 +72,7 @@ export default class ImageContent extends React.PureComponent {
 ContentTypes.register({
   component: ImageContent,
   type: 'image',
+  context: ['default', 'workspace', 'board'],
   name: 'Image',
   icon: 'image'
 })

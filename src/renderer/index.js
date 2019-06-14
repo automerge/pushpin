@@ -14,6 +14,9 @@ import Content from './components/content'
 // We load these modules here so that the content registry will have them.
 import './components/workspace/workspace'
 
+// default context components
+import './components/defaults/default-in-list'
+
 // board in various contexts
 import './components/board/board'
 import './components/board/board-in-board'
