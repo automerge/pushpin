@@ -484,13 +484,17 @@ export default class Board extends React.PureComponent {
 
   // Copy view-relevant move/resize state over to React.
   setDragState = (card, tracking) => {
-    this.setState((prevState) => ({ [card.id]: {
-      moveX: tracking.moveX,
-      moveY: tracking.moveY,
-      resizeWidth: tracking.resizeWidth,
-      resizeHeight: tracking.resizeHeight
-    },
-    ...prevState.cards }))
+    this.setState((prevState) => {
+      const cards = { ...prevState.cards,
+        [card.id]: {
+          moveX: tracking.moveX,
+          moveY: tracking.moveY,
+          resizeWidth: tracking.resizeWidth,
+          resizeHeight: tracking.resizeHeight
+        }
+      }
+      return ({ cards })
+    })
   }
 
   effectDrag = (card, tracking, { deltaX, deltaY }) => {
