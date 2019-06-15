@@ -285,8 +285,9 @@ export default class Omnibox extends React.PureComponent {
 
       return (
         <div key={url} className={classes}>
-          <Content context="list" url={url} />
-          <Actions url={url} actions={actions} />
+          <Actions url={url} actions={actions}>
+            <Content context="list" url={url} />
+          </Actions>
         </div>
       )
     })

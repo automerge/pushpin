@@ -140,14 +140,15 @@ export default class Share extends React.PureComponent {
     )
     const contacts = uniqueContactIds.map(id => (
       <div key={id} className="ListMenu__item">
-        <Content
-          context="list"
-          url={createDocumentLink('contact', id)}
-        />
         <Actions
           url={createDocumentLink('contact', id)}
           actions={{ share: (url) => (e) => this.offerDocumentToIdentity(url) }}
-        />
+        >
+          <Content
+            context="list"
+            url={createDocumentLink('contact', id)}
+          />
+        </Actions>
       </div>
     ))
 

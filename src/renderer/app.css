@@ -739,10 +739,12 @@ div.card.image {
   border-radius: 4px;
   padding: 4px 8px;
 }
+
 .ListMenu button:focus {
   outline: none;
   background-color: var(--colorInputGrey);
 }
+
 .ButtonGroup {
   display: flex;
   padding: 4px 8px;
@@ -762,12 +764,15 @@ div.card.image {
   cursor: pointer;
   border: 1px solid transparent;
 }
+
 .ButtonAction--destructive {
   color: var(--colorDestructive);
 }
+
 .ButtonAction--primary {
   color: var(--colorLink);
 }
+
 .ButtonAction:hover {
   border: 1px solid;
 }
@@ -875,6 +880,10 @@ div.card.image {
 
 .ListMenu .Actions > * {
   margin-left: 8px;
+}
+
+.Actions__withDefault:hover {
+  background: var(--colorInputGrey);
 }
 
 .NothingFound .fa {

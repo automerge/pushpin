@@ -9,11 +9,13 @@ const log = Debug('pushpin:actions')
    by stripping out most of the functionality and just leaving swatches */
 export default class Actions extends React.PureComponent {
   static propTypes = {
+    children: PropTypes.node,
     actions: PropTypes.objectOf(PropTypes.func),
     url: PropTypes.string.isRequired
   }
 
   static defaultProps = {
+    children: null,
     actions: {}
   }
 
@@ -129,13 +131,29 @@ export default class Actions extends React.PureComponent {
       )
     }
 
-    const result = <div className="actions" style={css.actions}>{actions}</div>
+    // XX change this to "primary" or something
+    if (view) {
+      return (
+        <div className="actions Actions__withDefault" style={{ ...css.actions }} onClick={view(url)}>
+          {this.props.children}
+          {actions}
+        </div>
+      )
+    }
+
+    const result = (
+      <div className="actions" style={css.actions}>
+        {this.props.children}
+        {actions}
+      </div>
+    )
     return result
   }
 }
 
 const css = {
   actions: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'row'
   }
