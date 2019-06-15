@@ -3,6 +3,8 @@ import Debug from 'debug'
 import PropTypes from 'prop-types'
 
 import Content from '../content'
+import Actions from './actions'
+
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:omnibox')
@@ -283,7 +285,8 @@ export default class Omnibox extends React.PureComponent {
 
       return (
         <div key={url} className={classes}>
-          <Content context="list" url={url} actions={actions} />
+          <Content context="list" url={url} />
+          <Actions url={url} actions={actions} />
         </div>
       )
     })
@@ -315,14 +318,34 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
+    const view = (selected) => { window.location = selected.url }
+    const invite = (selected) => this.offerDocumentToIdentity(selected.id)
     return (
       <div className="Omnibox">
         <div className="ListMenu">
           { this.renderInvitationsSection() }
-          { this.renderContentSection({ name: 'viewedDocUrls', label: 'Boards', actions: ['view', 'archive'] }) }
-          { this.renderContentSection({ name: 'archivedDocUrls', label: 'Archived', actions: ['view'] }) }
-          { this.renderContentSection({ name: 'docUrls', actions: ['view'] }) }
-          { this.renderContentSection({ name: 'contacts', label: 'Contacts', actions: ['invite'] }) }
+          { this.renderContentSection({
+            name: 'viewedDocUrls',
+            label: 'Boards',
+            actions: {
+              view,
+              archive: () => alert('TODO') }
+          }) }
+          { this.renderContentSection({
+            name: 'archivedDocUrls',
+            label: 'Archived',
+            actions: {
+              view,
+              unarchive: () => alert('TODO') }
+          }) }
+          { this.renderContentSection({
+            name: 'docUrls',
+            actions: { view } }) }
+          { this.renderContentSection({
+            name: 'contacts',
+            label: 'Contacts',
+            actions: { invite }
+          }) }
           { this.renderNothingFound() }
         </div>
       </div>

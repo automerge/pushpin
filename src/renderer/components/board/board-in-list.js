@@ -4,19 +4,10 @@ import PropTypes from 'prop-types'
 export default class BoardInList extends React.PureComponent {
   static propTypes = {
     url: PropTypes.string.isRequired,
-    hypermergeUrl: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.string)
-  }
-
-  static defaultProps = {
-    actions: []
+    hypermergeUrl: PropTypes.string.isRequired
   }
 
   state = {}
-
-  handleClick = (e) => {
-    window.location = this.props.url
-  }
 
   onDragStart = (e) => {
     e.dataTransfer.setData('application/pushpin-url', this.props.url)
@@ -43,29 +34,10 @@ export default class BoardInList extends React.PureComponent {
     this.setState({ ...doc })
   }
 
-  renderActions = () => {
-    const actionOptions = []
-
-    if (this.props.actions.includes('archive')) {
-      actionOptions.push(<span key="archive" className="Type--secondary">⌘+⌫ Archive</span>)
-    }
-
-    if (this.props.actions.includes('view')) {
-      actionOptions.push(<span key="view" className="Type--secondary">⏎ View</span>)
-    }
-
-    if (actionOptions.length > 0) {
-      return <div className="Actions">{ actionOptions }</div>
-    }
-
-    return null
-  }
-
   render = () => (
     <div draggable="true" onDragStart={this.onDragStart} className="DocLink" onClick={this.handleClick}>
       <i ref={(ref) => { this.badgeRef = ref }} className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
       <div className="DocLink__title">{ this.state.title }</div>
-      { this.renderActions() }
     </div>
   )
 }

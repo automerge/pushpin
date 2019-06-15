@@ -227,6 +227,7 @@ export default class OmniPrompt extends React.PureComponent {
           search={this.state.search}
           getKeyController={this.setOmniboxControl}
           invitations={invitations}
+          offerDocumentToIdentity={this.offerDocumentToIdentity}
           onSelectChange={this.handleSelectChange}
         />
       </div>

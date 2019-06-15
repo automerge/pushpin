@@ -142,8 +142,7 @@ export default class Share extends React.PureComponent {
         <Content
           context="list"
           url={createDocumentLink('contact', id)}
-          actions={['share']}
-          onShare={e => this.offerDocumentToIdentity(e, id)}
+          actions={{ share: e => this.offerDocumentToIdentity(e, id) }}
         />
       </div>
     ))
