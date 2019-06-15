@@ -753,7 +753,7 @@ div.card.image {
   color: var(--colorSecondaryGrey);
   min-width: 32px;
   padding: 0px 4px;
-  height: 48px;
+  height: 32px;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -770,6 +770,19 @@ div.card.image {
 }
 .ButtonAction:hover {
   border: 1px solid;
+}
+
+.ButtonAction__label {
+  color: transparent;
+  background: rgba(0,0,0,0);
+  transition: color 0.25s linear, background 0.25s linear;
+  position: absolute;
+  text-align: center;
+}
+
+.ButtonAction__label:hover {
+  color: var(--colorLink);
+  background: var(--colorInputGrey);
 }
 
 .ButtonAction .fa {
