@@ -144,11 +144,6 @@ input {
   padding-bottom: 0px;
 }
 
-.ContactListItem {
-  display: flex;
-  align-items: center;
-}
-
 .Avatar {
   display: flex;
   align-items: center;
@@ -758,9 +753,10 @@ div.card.image {
   color: var(--colorSecondaryGrey);
   min-width: 32px;
   padding: 0px 4px;
-  height: 32px;
+  height: 48px;
   border-radius: 4px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -843,6 +839,8 @@ div.card.image {
   box-sizing: border-box;
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .ListMenu__item--selected {

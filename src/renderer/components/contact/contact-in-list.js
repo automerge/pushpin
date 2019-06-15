@@ -71,7 +71,7 @@ export default class ContactInList extends React.PureComponent {
     }
 
     return (
-      <div draggable="true" onDragStart={this.onDragStart} className="ContactListItem">
+      <div draggable="true" onDragStart={this.onDragStart} className="DocLink">
         <div className="ListMenu__thumbnail">
           <div
             className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}

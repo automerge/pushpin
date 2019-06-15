@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import Content from '../content'
+import Actions from './actions'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:share')
@@ -142,7 +143,10 @@ export default class Share extends React.PureComponent {
         <Content
           context="list"
           url={createDocumentLink('contact', id)}
-          actions={{ share: e => this.offerDocumentToIdentity(e, id) }}
+        />
+        <Actions
+          url={createDocumentLink('contact', id)}
+          actions={{ share: (url) => (e) => this.offerDocumentToIdentity(url) }}
         />
       </div>
     ))
