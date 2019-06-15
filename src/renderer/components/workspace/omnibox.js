@@ -318,8 +318,8 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
-    const view = (selected) => { window.location = selected.url }
-    const invite = (selected) => this.offerDocumentToIdentity(selected.id)
+    const view = (selectedUrl) => (e) => { window.location = selectedUrl }
+    const invite = (selectedUrl) => (e) => this.offerDocumentToIdentity(selectedUrl)
     return (
       <div className="Omnibox">
         <div className="ListMenu">
@@ -329,14 +329,14 @@ export default class Omnibox extends React.PureComponent {
             label: 'Boards',
             actions: {
               view,
-              archive: () => alert('TODO') }
+              archive: (url) => (e) => alert('TODO') }
           }) }
           { this.renderContentSection({
             name: 'archivedDocUrls',
             label: 'Archived',
             actions: {
               view,
-              unarchive: () => alert('TODO') }
+              unarchive: (url) => (e) => alert('TODO') }
           }) }
           { this.renderContentSection({
             name: 'docUrls',
