@@ -308,6 +308,22 @@ export default class Omnibox extends React.PureComponent {
     return null
   }
 
+  navigate = (url) => {
+    window.location = url
+  }
+
+  offerDocumentToIdentity = (url) => {
+
+  }
+
+  archiveDocument = (url) => {
+
+  }
+
+  unarchiveDocument = (url) => {
+
+  }
+
   render = () => {
     log('render')
 
@@ -319,8 +335,39 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
-    const view = (selectedUrl) => (e) => { window.location = selectedUrl }
-    const invite = (selectedUrl) => (e) => this.offerDocumentToIdentity(selectedUrl)
+    const view = {
+      name: 'view',
+      callback: (url) => () => this.navigate(url),
+      faIcon: 'fa-compass',
+      label: 'View',
+      shortcut: '⏎'
+    }
+
+    const invite = {
+      name: 'invite',
+      callback: (url) => (e) => this.offerDocumentToIdentity(url),
+      faIcon: 'fa-compass',
+      label: 'Invite',
+      shortcut: '⏎'
+    }
+
+    const archive = {
+      name: 'archive',
+      destructive: true,
+      callback: (url) => () => this.archiveDocument(url),
+      faIcon: 'fa-trash',
+      label: 'Archive',
+      shortcut: '⌘+⌫'
+    }
+
+    const unarchive = {
+      name: 'unarchive',
+      callback: (url) => (e) => this.unarchiveDocument(url),
+      faIcon: 'fa-trash-restore',
+      label: 'Unarchive',
+      shortcut: '⌘+⌫'
+    }
+
     return (
       <div className="Omnibox">
         <div className="ListMenu">
@@ -328,24 +375,20 @@ export default class Omnibox extends React.PureComponent {
           { this.renderContentSection({
             name: 'viewedDocUrls',
             label: 'Boards',
-            actions: {
-              view,
-              archive: (url) => (e) => alert('TODO') }
+            actions: [view, archive]
           }) }
           { this.renderContentSection({
             name: 'archivedDocUrls',
             label: 'Archived',
-            actions: {
-              view,
-              unarchive: (url) => (e) => alert('TODO') }
+            actions: [view, unarchive]
           }) }
           { this.renderContentSection({
             name: 'docUrls',
-            actions: { view } }) }
+            actions: [view] }) }
           { this.renderContentSection({
             name: 'contacts',
             label: 'Contacts',
-            actions: { invite }
+            actions: [invite]
           }) }
           { this.renderNothingFound() }
         </div>

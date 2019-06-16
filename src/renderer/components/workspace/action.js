@@ -5,7 +5,6 @@ export default function Action(props) {
   return (
     <div
       role="button"
-      key={props.name}
       onClick={props.callback}
       className={`ButtonAction ${
         (props.destructive
@@ -15,7 +14,6 @@ export default function Action(props) {
     >
       <i className={`fa ${props.faIcon}`} />
       <div
-        key="archive"
         className="ButtonAction__label Type--secondary"
       >
         {props.label}
@@ -27,7 +25,6 @@ export default function Action(props) {
 }
 
 Action.propTypes = {
-  name: PropTypes.string.isRequired,
   callback: PropTypes.func.isRequired,
   destructive: PropTypes.bool,
   faIcon: PropTypes.string.isRequired,

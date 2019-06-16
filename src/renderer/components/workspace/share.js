@@ -138,11 +138,31 @@ export default class Share extends React.PureComponent {
         </div>
       </div>
     )
+
+    const share = {
+      name: 'share',
+      callback: (url) => (e) => this.offerDocumentToIdentity(url),
+      faIcon: 'fa-share-alt',
+      label: 'Share' }
+
+    /* This doesn't make sense in a Pushpin world, I think.
+       Once you've written a share offer into your history,
+       anyone could go back and find it again.
+       I'll leave it here for posterity for now.
+    const unshare = {
+      name: 'unshare',
+      destructive: true,
+      callback: (url) => (e) => this.revokeOfferDocumentToIdentity(url),
+      faIcon: 'fa-ban',
+      label: 'Unshare'
+    }
+    */
+
     const contacts = uniqueContactIds.map(id => (
       <div key={id} className="ListMenu__item">
         <Actions
           url={createDocumentLink('contact', id)}
-          actions={{ share: (url) => (e) => this.offerDocumentToIdentity(url) }}
+          actions={[share]}
         >
           <Content
             context="list"
