@@ -23,126 +23,86 @@ export default class Actions extends React.PureComponent {
     log('actions', this.props.actions)
     const { url } = this.props
     const { share, unshare, archive, unarchive, view, invite } = this.props.actions
-    const actions = []
 
+    const data = []
     if (share) {
-      actions.push((
-        <div
-          role="button"
-          key="share"
-          onClick={share(url)}
-          className="ButtonAction ButtonAction--primary"
-        >
-          <i className="fa fa-share-alt" />
-          <div
-            key="archive"
-            className="ButtonAction__label Type--secondary"
-            onClick={share(url)}
-          >Share
-          </div>
-        </div>
-      ))
+      data.push({ name: 'share',
+        callback: share,
+        faIcon: 'fa-share-alt',
+        label: 'Share' })
     }
 
     if (unshare) {
-      actions.push((
-        <div
-          role="button"
-          key="unshare"
-          onClick={unshare(url)}
-          className="ButtonAction ButtonAction--destructive"
-        >
-          <i className="fa fa-ban" />
-          <div
-            key="archive"
-            className="ButtonAction__label Type--secondary"
-            onClick={unshare(url)}
-          >Unshare
-          </div>
-        </div>
-      ))
+      data.push({ name: 'unshare',
+        destructive: true,
+        callback: unshare,
+        faIcon: 'fa-ban',
+        label: 'Unshare' })
     }
 
     if (archive) {
-      actions.push(
-        <div
-          role="button"
-          key="archive"
-          onClick={archive(url)}
-          className="ButtonAction ButtonAction--destructive"
-        >
-          <i className="fa fa-trash" />
-          <div
-            key="archive"
-            className="ButtonAction__label Type--secondary"
-            onClick={archive(url)}
-          >Archive<br />⌘+⌫
-          </div>
-        </div>
-      )
+      data.push({ name: 'archive',
+        destructive: true,
+        callback: view,
+        faIcon: 'fa-trash',
+        label: 'Archive',
+        shortcut: '⌘+⌫' })
     }
 
     if (unarchive) {
-      actions.push(
-        <div
-          role="button"
-          key="unarchive"
-          onClick={unarchive(url)}
-          className="ButtonAction"
-        >
-          <i className="fa fa-trash-restore" />
-          <div
-            key="archive"
-            className="ButtonAction__label Type--secondary"
-            onClick={unarchive(url)}
-          >Unarchive<br />⌘+⌫
-          </div>
-        </div>
-      )
+      data.push({ name: 'unarchive',
+        callback: view,
+        faIcon: 'fa-trash-restore',
+        label: 'Unarchive',
+        shortcut: '⌘+⌫' })
     }
 
     if (view) {
-      actions.push(
-        <div
-          role="button"
-          key="view"
-          onClick={view(url)}
-          className="ButtonAction"
-        >
-          <i className="fa fa-compass" />
-          <div
-            key="view"
-            className="ButtonAction__label Type--secondary"
-            onClick={view(url)}
-          >View<br />⏎
-          </div>
-        </div>
-      )
+      data.push({ name: 'view',
+        callback: view,
+        faIcon: 'fa-compass',
+        label: 'View',
+        shortcut: '⏎' })
     }
 
     if (invite) {
-      actions.push(
-        <span
-          key="invite"
-          onClick={invite(url)}
-          className="Type--secondary"
-        >⏎ Invite
-        </span>
-      )
+      data.push({ name: 'invite',
+        callback: invite,
+        faIcon: 'fa-compass',
+        label: 'Invite',
+        shortcut: '⏎' })
     }
 
-    // XX change this to "primary" or something
-    if (view) {
-      return (
-        <div className="actions Actions__withDefault" style={{ ...css.actions }} onClick={view(url)}>
-          {this.props.children}
-          {actions}
+    const actions = data.map((elt) =>
+      (
+        <div
+          role="button"
+          key={elt.name}
+          onClick={elt.callback(url)}
+          className={`ButtonAction ${
+            (elt.destructive
+              ? 'ButtonAction-destructive'
+              : 'ButtonAction--primary')
+          }`}
+        >
+          <i className={`fa ${elt.faIcon}`} />
+          <div
+            key="archive"
+            className="ButtonAction__label Type--secondary"
+          >
+            {elt.label}
+            <br />
+            {elt.shortcut}
+          </div>
         </div>
-      )
-    }
+      ))
 
     const result = (
-      <div className="actions" style={css.actions}>
+      <div
+        className={`actions ${view ? 'Actions__withDefault' : ''}`}
+        style={css.actions}
+        onClick={view ? view(url) : null}
+      >
         {this.props.children}
         {actions}
       </div>
