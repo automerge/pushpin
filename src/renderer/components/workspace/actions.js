@@ -2,6 +2,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
+import Action from './action'
 
 const log = Debug('pushpin:actions')
 
@@ -73,30 +74,6 @@ export default class Actions extends React.PureComponent {
         shortcut: '⏎' })
     }
 
-    const actions = data.map((elt) =>
-      (
-        <div
-          role="button"
-          key={elt.name}
-          onClick={elt.callback(url)}
-          className={`ButtonAction ${
-            (elt.destructive
-              ? 'ButtonAction-destructive'
-              : 'ButtonAction--primary')
-          }`}
-        >
-          <i className={`fa ${elt.faIcon}`} />
-          <div
-            key="archive"
-            className="ButtonAction__label Type--secondary"
-          >
-            {elt.label}
-            <br />
-            {elt.shortcut}
-          </div>
-        </div>
-      ))
-
     const result = (
       <div
         className={`actions ${view ? 'Actions__withDefault' : ''}`}
@@ -104,7 +81,16 @@ export default class Actions extends React.PureComponent {
         onClick={view ? view(url) : null}
       >
         {this.props.children}
-        {actions}
+        {data.map((elt) => (
+          <Action
+            name={elt.name}
+            callback={elt.callback(url)}
+            faIcon={elt.faIcon}
+            label={elt.label}
+            shortcut={elt.shortcut}
+            destructive={elt.destructive}
+          />
+        ))}
       </div>
     )
     return result
