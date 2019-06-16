@@ -23,6 +23,8 @@ export default class Actions extends React.PureComponent {
   render = () => {
     log('actions', this.props.actions)
     const { url } = this.props
+
+    // TODO: move these data definitions out of this class, this is silly
     const { share, unshare, archive, unarchive, view, invite } = this.props.actions
 
     const data = []

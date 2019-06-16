@@ -750,6 +750,7 @@ div.card.image {
   padding: 4px 8px;
 }
 
+/* TODO: These should go into the CSS file for the Action component */
 .ButtonAction {
   box-sizing: border-box;
   color: var(--colorSecondaryGrey);
