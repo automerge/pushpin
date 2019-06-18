@@ -112,7 +112,7 @@ export default class OmniPrompt extends React.PureComponent {
     ))
 
     return (
-      <div ref={(ref) => { this.omniboxRef = ref }} style={css.omniboxInput}>
+      <div style={css.omniboxInput}>
         <input
           ref={this.omniboxInput}
           type="text"
