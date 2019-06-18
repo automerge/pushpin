@@ -133,16 +133,12 @@ export default class Omnibox extends React.PureComponent {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
       e.preventDefault()
 
-      if (selected && selected.type === 'viewedDocUrl') {
-        this.handle.change((doc) => {
-          if (!doc.archivedDocUrls) {
-            doc.archivedDocUrls = []
-          }
-
-          if (!doc.archivedDocUrls.includes(selected.url)) {
-            doc.archivedDocUrls.push(selected.url)
-          }
-        })
+      if (!selected) {
+        return
+      }
+      const { url, type } = selected
+      if (type === 'viewedDocUrl') {
+        this.archiveDocument(url)
       }
     }
   }
@@ -362,12 +358,76 @@ export default class Omnibox extends React.PureComponent {
     return null
   }
 
+  /* begin actions */
+  view = {
+    name: 'view',
+    callback: (url) => () => this.navigate(url),
+    faIcon: 'fa-compass',
+    label: 'View',
+    shortcut: '⏎'
+  }
+
+  invite = {
+    name: 'invite',
+    callback: (url) => (e) => this.offerDocumentToIdentity(url),
+    faIcon: 'fa-compass',
+    label: 'Invite',
+    shortcut: '⏎'
+  }
+
+  archive = {
+    name: 'archive',
+    destructive: true,
+    callback: (url) => () => this.archiveDocument(url),
+    faIcon: 'fa-trash',
+    label: 'Archive',
+    shortcut: '⌘+⌫'
+  }
+
+  unarchive = {
+    name: 'unarchive',
+    callback: (url) => (e) => this.unarchiveDocument(url),
+    faIcon: 'fa-trash-restore',
+    label: 'Unarchive',
+    shortcut: '⌘+⌫'
+  }
+  /* end actions */
+
+  /* sections begin */
+  sectionDefinitions = [
+    {
+      name: 'viewedDocUrls',
+      label: 'Boards',
+      actions: [this.view, this.archive]
+    },
+    {
+      name: 'archivedDocUrls',
+      label: 'Archived',
+      actions: [this.view, this.unarchive]
+    },
+    {
+      name: 'docUrls',
+      actions: [this.view] },
+    {
+      name: 'contacts',
+      label: 'Contacts',
+      actions: [this.invite]
+    }
+  ]
+
+  /* end sections */
+
   navigate = (url) => {
     window.location = url
   }
 
-  // XX: this should be a URL not a contactId
-  offerDocumentToIdentity = (contactId) => {
+  offerDocumentToIdentity = (contactUrl) => {
+    // XXX out of scope RN but consider if we should change the key for consistency?
+    const { type, id } = parseDocumentLink(contactUrl)
+    if (type !== 'contact') {
+      throw (new Error('Offer the current document to a contact by passing in the contact id document.'))
+    }
+
     if (!this.state.selfId) {
       return
     }
@@ -377,18 +437,28 @@ export default class Omnibox extends React.PureComponent {
         s.offeredUrls = {}
       }
 
-      if (!s.offeredUrls[contactId]) {
-        s.offeredUrls[contactId] = []
+      // XXX right now this code leaks identity documents and document URLs to
+      //     every single person who knows you
+      if (!s.offeredUrls[id]) {
+        s.offeredUrls[id] = []
       }
 
-      if (!s.offeredUrls[contactId].includes(this.state.currentDocUrl)) {
-        s.offeredUrls[contactId].push(this.state.currentDocUrl)
+      if (!s.offeredUrls[id].includes(this.state.currentDocUrl)) {
+        s.offeredUrls[id].push(this.state.currentDocUrl)
       }
     })
   }
 
   archiveDocument = (url) => {
+    this.handle.change((doc) => {
+      if (!doc.archivedDocUrls) {
+        doc.archivedDocUrls = []
+      }
 
+      if (!doc.archivedDocUrls.includes(url)) {
+        doc.archivedDocUrls.push(url)
+      }
+    })
   }
 
   unarchiveDocument = (url) => {
@@ -406,61 +476,14 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
-    const view = {
-      name: 'view',
-      callback: (url) => () => this.navigate(url),
-      faIcon: 'fa-compass',
-      label: 'View',
-      shortcut: '⏎'
-    }
-
-    const invite = {
-      name: 'invite',
-      callback: (url) => (e) => this.offerDocumentToIdentity(url),
-      faIcon: 'fa-compass',
-      label: 'Invite',
-      shortcut: '⏎'
-    }
-
-    const archive = {
-      name: 'archive',
-      destructive: true,
-      callback: (url) => () => this.archiveDocument(url),
-      faIcon: 'fa-trash',
-      label: 'Archive',
-      shortcut: '⌘+⌫'
-    }
-
-    const unarchive = {
-      name: 'unarchive',
-      callback: (url) => (e) => this.unarchiveDocument(url),
-      faIcon: 'fa-trash-restore',
-      label: 'Unarchive',
-      shortcut: '⌘+⌫'
-    }
 
     return (
       <div className="Omnibox">
         <div className="ListMenu">
           { this.renderInvitationsSection() }
-          { this.renderContentSection({
-            name: 'viewedDocUrls',
-            label: 'Boards',
-            actions: [view, archive]
-          }) }
-          { this.renderContentSection({
-            name: 'archivedDocUrls',
-            label: 'Archived',
-            actions: [view, unarchive]
-          }) }
-          { this.renderContentSection({
-            name: 'docUrls',
-            actions: [view] }) }
-          { this.renderContentSection({
-            name: 'contacts',
-            label: 'Contacts',
-            actions: [invite]
-          }) }
+          { this.sectionDefinitions.map(
+            (sectionDefinition) => this.renderContentSection(sectionDefinition)
+          ) }
           { this.renderNothingFound() }
         </div>
       </div>
