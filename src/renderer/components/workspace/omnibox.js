@@ -11,6 +11,8 @@ const log = Debug('pushpin:omnibox')
 
 export default class Omnibox extends React.PureComponent {
   static propTypes = {
+    // this seems silly, but the omnibox maintains a lot of in-memory state
+    // so we keep it around even when it isn't visible
     visible: PropTypes.bool.isRequired,
     search: PropTypes.string,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
