@@ -13,10 +13,9 @@ export default class Omnibox extends React.PureComponent {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
     search: PropTypes.string,
-    getKeyController: PropTypes.func.isRequired,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     hypermergeUrl: PropTypes.string.isRequired,
-    onSelectChange: PropTypes.func.isRequired
+    omniboxFinished: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -33,12 +32,14 @@ export default class Omnibox extends React.PureComponent {
   componentDidMount = () => {
     log('componentDidMount')
     this.refreshHandle(this.props.hypermergeUrl)
-    this.props.getKeyController({ moveUp: this.moveUp, moveDown: this.moveDown })
+    document.addEventListener('keydown', this.handleCommandKeys)
   }
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
     this.handle.close()
+    document.removeEventListener('keydown', this.handleCommandKeys)
+
     Object.values(this.viewedDocHandles).forEach(handle => handle.close())
     Object.values(this.contactHandles).forEach(handle => handle.close())
   }
@@ -100,13 +101,64 @@ export default class Omnibox extends React.PureComponent {
     })
   }
 
-  setSelectedIndex = (newIndex) => {
-    this.setState({ selectedIndex: newIndex }, () => {
-      const { items } = this.menuSections()
-      const { selectedIndex } = this.state
 
-      this.props.onSelectChange(items[selectedIndex])
-    })
+  handleCommandKeys = (e) => {
+    // XXX: this is left-over mess that used to be in omni-prompt
+    const { selectedIndex } = this.state
+    const { items } = this.menuSections()
+    const selected = items[selectedIndex]
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      this.moveDown()
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      this.moveUp()
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault()
+
+      if (selected) {
+        this.resolveDocumentSelection(selected)
+      }
+
+      this.props.omniboxFinished()
+    }
+
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
+      e.preventDefault()
+
+      if (selected && selected.type === 'viewedDocUrl') {
+        this.handle.change((doc) => {
+          if (!doc.archivedDocUrls) {
+            doc.archivedDocUrls = []
+          }
+
+          if (!doc.archivedDocUrls.includes(selected.url)) {
+            doc.archivedDocUrls.push(selected.url)
+          }
+        })
+      }
+    }
+  }
+
+  resolveDocumentSelection = (selected) => {
+    switch (selected.type) {
+      case 'contact':
+        this.offerDocumentToIdentity(this.state.selected.id)
+        break
+      default:
+        if (selected.url) {
+          this.navigate(selected.url)
+        }
+    }
+  }
+
+  setSelectedIndex = (newIndex) => {
+    this.setState({ selectedIndex: newIndex })
   }
 
   moveUp = () => {
@@ -312,8 +364,25 @@ export default class Omnibox extends React.PureComponent {
     window.location = url
   }
 
-  offerDocumentToIdentity = (url) => {
+  // XX: this should be a URL not a contactId
+  offerDocumentToIdentity = (contactId) => {
+    if (!this.state.selfId) {
+      return
+    }
 
+    window.repo.change(this.state.selfId, (s) => {
+      if (!s.offeredUrls) {
+        s.offeredUrls = {}
+      }
+
+      if (!s.offeredUrls[contactId]) {
+        s.offeredUrls[contactId] = []
+      }
+
+      if (!s.offeredUrls[contactId].includes(this.state.currentDocUrl)) {
+        s.offeredUrls[contactId].push(this.state.currentDocUrl)
+      }
+    })
   }
 
   archiveDocument = (url) => {

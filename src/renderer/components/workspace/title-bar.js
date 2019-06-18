@@ -109,17 +109,14 @@ export default class TitleBar extends React.PureComponent {
         <PresentContacts
           currentDocUrl={this.state.currentDocUrl}
         />
-        <OmniPrompt openDoc={this.props.openDoc} hypermergeUrl={this.props.hypermergeUrl} />
+        <OmniPrompt hypermergeUrl={this.props.hypermergeUrl} />
 
         <Dropdown className="TitleBar__menuItem TitleBar__right">
           <DropdownTrigger>
             <i className="fa fa-group" />
           </DropdownTrigger>
           <DropdownContent>
-            <Share
-              hypermergeUrl={this.props.hypermergeUrl}
-              openDocument={this.props.openDoc}
-            />
+            <Share hypermergeUrl={this.props.hypermergeUrl} />
           </DropdownContent>
         </Dropdown>
       </div>
