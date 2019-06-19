@@ -157,6 +157,7 @@ export default class Omnibox extends React.PureComponent {
     const { search } = this.props
 
     let searchRegEx
+    // if we have an invalid regex, shortcircuit out of here
     try {
       searchRegEx = new RegExp(search, 'i')
     } catch (e) {
@@ -165,7 +166,7 @@ export default class Omnibox extends React.PureComponent {
       return { items, sectionIndices }
     }
 
-    // Note: The order of sections built here needs to match the rendered order
+    // invitations are sort of a pseudo-section right now with lots of weird behaviour
     const invitationItems = this.props.invitations
       .filter(invitation => (invitation.doc.title || 'Loading...').match(searchRegEx))
       .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl, actions: [this.view] }))
@@ -173,6 +174,7 @@ export default class Omnibox extends React.PureComponent {
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
 
+    // add each section definition's items to the output
     this.sectionDefinitions.forEach((sectionDefinition) => {
       // this is really, really not my favorite thing
       const sectionItems = sectionDefinition.items(this.state, this.props)
@@ -187,6 +189,9 @@ export default class Omnibox extends React.PureComponent {
       }
     })
 
+    // if after putting all the sections together, we still don't have anything,
+    // just put in an "empty results" pseudosection
+    // we could, uh, do better here too
     if (items.length === 0) {
       items.push({ type: 'nothingFound' })
       sectionIndices.nothingFound = { start: 0, end: 1 }
@@ -238,6 +243,9 @@ export default class Omnibox extends React.PureComponent {
       const invitation = item.object
       const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
+      // XXX: it seems to me that we should register an invitation as a kind of unlisted "type"
+      //      and make this a list context renderer for that type
+      // ... i'm not really sure how we ought approach that
       return (
         <div key={`${invitation.sender.hypermergeUrl}-${invitation.documentUrl}`} className={classes}>
           <div className="Invitation">
@@ -419,7 +427,15 @@ export default class Omnibox extends React.PureComponent {
   }
 
   unarchiveDocument = (url) => {
-    // xxx TODO
+    this.handle.change((doc) => {
+      if (!doc.archivedDocUrls) {
+        return
+      }
+      const unarchiveIndex = doc.archivedDocUrls.findIndex((i) => i === url)
+      if (unarchiveIndex >= 0) {
+        delete doc.archivedDocUrls[unarchiveIndex]
+      }
+    })
   }
 
   render = () => {
