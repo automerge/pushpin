@@ -2,8 +2,7 @@ import React from 'react'
 import Debug from 'debug'
 import PropTypes from 'prop-types'
 
-import Content from '../content'
-import Actions from './actions'
+import ContentSection from './content-section'
 
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
@@ -64,7 +63,6 @@ export default class Omnibox extends React.PureComponent {
     }
     this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
-
 
   onChange = (doc) => {
     log('onChange', doc)
@@ -329,33 +327,19 @@ export default class Omnibox extends React.PureComponent {
   }
 
   renderContentSection = ({ name, label, actions }) => {
-    const items = this.sectionItems(name).map((item) => {
-      const { url } = item
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
+    const items = this.sectionItems(name)
 
-      return (
-        <div key={url} className={classes}>
-          <Actions url={url} actions={actions}>
-            <Content context="list" url={url} />
-          </Actions>
-        </div>
-      )
-    })
-
-    if (items.length > 0) {
-      const labelPartial = label ? <div className="ListMenu__segment">{label}</div> : null
-
-      return (
-        <div>
-          { labelPartial }
-          <div className="ListMenu__section">
-            { items }
-          </div>
-        </div>
-      )
+    if (items.length === 0) {
+      return null
     }
-
-    return null
+    return (
+      <ContentSection
+        name={name}
+        label={label}
+        actions={actions}
+        items={items}
+      />
+    )
   }
 
   /* begin actions */
@@ -414,7 +398,6 @@ export default class Omnibox extends React.PureComponent {
       actions: [this.invite]
     }
   ]
-
   /* end sections */
 
   navigate = (url) => {
@@ -462,7 +445,7 @@ export default class Omnibox extends React.PureComponent {
   }
 
   unarchiveDocument = (url) => {
-
+    // xxx TODO
   }
 
   render = () => {
@@ -475,7 +458,6 @@ export default class Omnibox extends React.PureComponent {
     if (!this.state.currentDocUrl) {
       return null
     }
-
 
     return (
       <div className="Omnibox">
