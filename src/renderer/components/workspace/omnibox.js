@@ -25,7 +25,7 @@ export default class Omnibox extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = { selectedIndex: 0, viewedDocs: {}, contacts: {} }
+    this.state = { selectedIndex: 0, viewedDocs: {}, contacts: {}, archivedDocUrls: [] }
     this.viewedDocHandles = {}
     this.contactHandles = {}
   }
@@ -103,11 +103,6 @@ export default class Omnibox extends React.PureComponent {
 
 
   handleCommandKeys = (e) => {
-    // XXX: this is left-over mess that used to be in omni-prompt
-    const { selectedIndex } = this.state
-    const { items } = this.menuSections()
-    const selected = items[selectedIndex]
-
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       this.moveDown()
@@ -118,39 +113,21 @@ export default class Omnibox extends React.PureComponent {
       this.moveUp()
     }
 
-    if (e.key === 'Enter') {
-      e.preventDefault()
-
-      if (selected) {
-        this.resolveDocumentSelection(selected)
-      }
-
-      this.props.omniboxFinished()
+    const { selectedIndex } = this.state
+    const { items } = this.menuSections()
+    const selected = items[selectedIndex]
+    if (!selected) {
+      return
     }
 
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
-      e.preventDefault()
-
-      if (!selected) {
-        return
+    // see if any of the actions for the currently selected item are triggered by the keypress
+    // XXX: we might want to use the mousetrap library for this
+    selected.actions.forEach((action) => {
+      if (action.keysForActionPressed(e)) {
+        action.callback(selected.url)()
+        this.props.omniboxFinished()
       }
-      const { url, type } = selected
-      if (type === 'viewedDocUrl') {
-        this.archiveDocument(url)
-      }
-    }
-  }
-
-  resolveDocumentSelection = (selected) => {
-    switch (selected.type) {
-      case 'contact':
-        this.offerDocumentToIdentity(this.state.selected.id)
-        break
-      default:
-        if (selected.url) {
-          this.navigate(selected.url)
-        }
-    }
+    })
   }
 
   setSelectedIndex = (newIndex) => {
@@ -178,21 +155,6 @@ export default class Omnibox extends React.PureComponent {
     let items = []
     const sectionIndices = {}
     const { search } = this.props
-    const { archivedDocUrls = [] } = this.state
-
-    try {
-      parseDocumentLink(search)
-      items.push({ type: 'docUrl', object: search, url: search })
-      sectionIndices.docUrls = { start: 0 }
-
-      if (items[this.state.selectedIndex]) {
-        items[this.state.selectedIndex].selected = true
-      }
-
-      return { items, sectionIndices }
-    } catch (e) {
-      log('menuSections.error', e)
-    }
 
     let searchRegEx
     try {
@@ -206,43 +168,24 @@ export default class Omnibox extends React.PureComponent {
     // Note: The order of sections built here needs to match the rendered order
     const invitationItems = this.props.invitations
       .filter(invitation => (invitation.doc.title || 'Loading...').match(searchRegEx))
-      .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl }))
+      .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl, actions: [this.view] }))
 
     sectionIndices.invitations = { start: items.length, end: invitationItems.length }
     items = items.concat(invitationItems)
 
-    const viewedDocItems = Object.entries(this.state.viewedDocs)
-      .filter(([url, doc]) => !archivedDocUrls.includes(url))
-      .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
-      .filter(([url, doc]) => doc.title.match(searchRegEx))
-      .map(([url, doc]) => ({ type: 'viewedDocUrl', object: doc, url }))
-
-    sectionIndices.viewedDocUrls = {
-      start: items.length,
-      end: items.length + viewedDocItems.length
-    }
-    items = items.concat(viewedDocItems)
-
-    if (search.length > 0) {
-      const archivedDocItems = archivedDocUrls.map(url => [url, this.state.viewedDocs[url]])
-        .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
-        .filter(([url, doc]) => doc.title.match(new RegExp(search, 'i')))
-        .map(([url, doc]) => ({ type: 'archivedDocUrl', object: doc, url }))
-
-      sectionIndices.archivedDocUrls = {
-        start: items.length,
-        end: items.length + archivedDocItems.length
+    this.sectionDefinitions.forEach((sectionDefinition) => {
+      // this is really, really not my favorite thing
+      const sectionItems = sectionDefinition.items(this.state, this.props)
+      // don't tell my mom about this next line
+      sectionItems.forEach(item => { item.actions = sectionDefinition.actions })
+      if (sectionItems.length > 0) {
+        sectionIndices[sectionDefinition.name] = {
+          start: items.length,
+          end: items.length + sectionItems.length
+        }
+        items = items.concat(sectionItems)
       }
-      items = items.concat(archivedDocItems)
-
-      const contactItems = Object.entries(this.state.contacts)
-        .filter(([id, doc]) => doc.name)
-        .filter(([id, doc]) => doc.name.match(searchRegEx))
-        .map(([id, doc]) => ({ type: 'contact', object: doc, id, url: createDocumentLink('contact', id) }))
-
-      sectionIndices.contacts = { start: items.length, end: (items.length + contactItems.length) }
-      items = items.concat(contactItems)
-    }
+    })
 
     if (items.length === 0) {
       items.push({ type: 'nothingFound' })
@@ -348,15 +291,17 @@ export default class Omnibox extends React.PureComponent {
     callback: (url) => () => this.navigate(url),
     faIcon: 'fa-compass',
     label: 'View',
-    shortcut: '⏎'
+    shortcut: '⏎',
+    keysForActionPressed: (e) => (e.key === 'Enter')
   }
 
   invite = {
     name: 'invite',
     callback: (url) => (e) => this.offerDocumentToIdentity(url),
-    faIcon: 'fa-compass',
+    faIcon: 'fa-share-alt',
     label: 'Invite',
-    shortcut: '⏎'
+    shortcut: '⏎',
+    keysForActionPressed: (e) => (e.key === 'Enter')
   }
 
   archive = {
@@ -365,7 +310,9 @@ export default class Omnibox extends React.PureComponent {
     callback: (url) => () => this.archiveDocument(url),
     faIcon: 'fa-trash',
     label: 'Archive',
-    shortcut: '⌘+⌫'
+    shortcut: '⌘+⌫',
+    keysForActionPressed: (e) => ((e.metaKey || e.ctrlKey) && e.key === 'Backspace')
+
   }
 
   unarchive = {
@@ -373,7 +320,8 @@ export default class Omnibox extends React.PureComponent {
     callback: (url) => (e) => this.unarchiveDocument(url),
     faIcon: 'fa-trash-restore',
     label: 'Unarchive',
-    shortcut: '⌘+⌫'
+    shortcut: '⌘+⌫',
+    keysForActionPressed: (e) => ((e.metaKey || e.ctrlKey) && e.key === 'Backspace')
   }
   /* end actions */
 
@@ -382,20 +330,46 @@ export default class Omnibox extends React.PureComponent {
     {
       name: 'viewedDocUrls',
       label: 'Boards',
-      actions: [this.view, this.archive]
+      actions: [this.view, this.archive],
+      items: (state, props) => Object.entries(this.state.viewedDocs)
+        .filter(([url, doc]) => !state.archivedDocUrls.includes(url))
+        .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
+        .filter(([url, doc]) => doc.title.match(props.searchRegEx))
+        .map(([url, doc]) => ({ url }))
     },
     {
       name: 'archivedDocUrls',
       label: 'Archived',
-      actions: [this.view, this.unarchive]
+      actions: [this.view, this.unarchive],
+      items: (state, props) => ((props.search === '')
+        ? [] // don't show archived URLs unless there's a current search term
+        : state.archivedDocUrls.map(url => [url, this.state.viewedDocs[url]])
+          .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
+          .filter(([url, doc]) => doc.title.match(new RegExp(props.search, 'i')))
+          .map(([url, doc]) => ({ url })))
+
     },
     {
       name: 'docUrls',
-      actions: [this.view] },
+      actions: [this.view],
+      items: (state, props) => {
+        // try parsing the "search" to see if it is a valid document URL
+        try {
+          parseDocumentLink(state.search)
+          return [{ url: state.search }]
+        } catch {
+          return []
+        }
+      }
+    },
     {
       name: 'contacts',
       label: 'Contacts',
-      actions: [this.invite]
+      actions: [this.invite],
+      items: (state, props) => Object.entries(this.state.contacts)
+        .filter(([id, doc]) => doc.name)
+        .filter(([id, doc]) => doc.name.match(new RegExp(props.search, 'i')))
+        .map(([id, doc]) => ({ url: createDocumentLink('contact', id) }))
     }
   ]
   /* end sections */
