@@ -298,11 +298,8 @@ input {
   position: relative;
 }
 
-.TitleBar__titleText {
-  flex: 1;
-  height: 1.25em;
+.TitleEditor {
   font-size: 1.25em;
-  font-weight: bold;
 }
 
 .Omnibox {
@@ -538,15 +535,6 @@ button[disabled].TitleBar__menuItem .fa {
   to {
     font-size: 1.25em;
   }
-}
-
-.TitleBar__titleText--updated {
-  animation-duration: 1s;
-  animation-name: text-pop;
-}
-
-.TitleBar__titleText::selection {
-  background: rgba(0,0,0,.05);
 }
 
 .ViewedDocs {

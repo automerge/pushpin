@@ -105,7 +105,7 @@ export default class TitleBar extends React.PureComponent {
         <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
           <i className="fa fa-angle-right" />
         </button>
-        <Content url={this.state.currentDocUrl} context="list" />
+        <Content url={this.state.currentDocUrl} context="list" editable />
         <PresentContacts
           currentDocUrl={this.state.currentDocUrl}
         />

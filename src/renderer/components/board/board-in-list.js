@@ -1,10 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import TitleEditor from '../title-editor'
 
 export default class BoardInList extends React.PureComponent {
   static propTypes = {
     url: PropTypes.string.isRequired,
-    hypermergeUrl: PropTypes.string.isRequired
+    hypermergeUrl: PropTypes.string.isRequired,
+    editable: PropTypes.bool
+  }
+
+  static defaultProps = {
+    editable: false
   }
 
   state = {}
@@ -37,7 +43,11 @@ export default class BoardInList extends React.PureComponent {
   render = () => (
     <div draggable="true" onDragStart={this.onDragStart} className="DocLink" onClick={this.handleClick}>
       <i ref={(ref) => { this.badgeRef = ref }} className="Badge fa fa-files-o" style={{ background: this.state.backgroundColor }} />
-      <div className="DocLink__title">{ this.state.title }</div>
+      {this.props.editable ? (
+        <TitleEditor url={this.props.hypermergeUrl} preventDrag />
+      ) : (
+        <div className="DocLink__title">{this.state.title}</div>
+      )}
     </div>
   )
 }

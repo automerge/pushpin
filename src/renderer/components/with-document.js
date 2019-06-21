@@ -10,15 +10,14 @@ export default function withDocument(
     static initializeDocument = documentInitializer
 
     static propTypes = {
-      docId: PropTypes.string.isRequired,
-      selfId: PropTypes.string.isRequired
+      url: PropTypes.string.isRequired,
     }
 
     handle
     state = { doc: null }
 
     componentWillMount = () => {
-      this.refreshHandle(this.props.docId)
+      this.refreshHandle(this.props.url)
     };
 
     componentWillUnmount = () => {
@@ -28,8 +27,8 @@ export default function withDocument(
     };
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
-      if (prevProps.docId !== this.props.docId) {
-        this.refreshHandle(this.props.docId)
+      if (prevProps.url !== this.props.url) {
+        this.refreshHandle(this.props.url)
       }
     };
 
