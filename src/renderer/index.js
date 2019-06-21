@@ -1,14 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
+import { ipcRenderer } from 'electron'
 import Fs from 'fs'
-import { RepoFrontend, RepoBackend } from 'hypermerge'
-import raf from 'random-access-file'
-// const DiscoverySwarm = require('discovery-swarm')
-// const defaults = require('dat-swarm-defaults')
-import DiscoverySwarm from 'discovery-cloud-client'
-
-import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
+import { RepoFrontend, } from 'hypermerge'
+import { WORKSPACE_URL_PATH } from './constants'
 import Content from './components/content'
 
 // We load these modules here so that the content registry will have them.
@@ -54,14 +50,11 @@ localStorage.removeItem('debug')
 EventEmitter.defaultMaxListeners = 500
 
 function initBackend(front) {
-  const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH, port: 0 })
+  ipcRenderer.on('hypermerge', (event, message) => {
+    front.receive(JSON.parse(message))
+  })
 
-  back.subscribe((msg) => front.receive(JSON.parse(JSON.stringify(msg))))
-  front.subscribe((msg) => back.receive(JSON.parse(JSON.stringify(msg))))
-  const url = 'wss://discovery-cloud.herokuapp.com'
-  const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
-
-  back.replicate(discovery)
+  front.subscribe((msg) => ipcRenderer.send('hypermerge', JSON.stringify(msg)))
 }
 
 function initHypermerge(cb) {

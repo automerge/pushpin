@@ -1,10 +1,12 @@
-import { app, protocol, BrowserWindow, Menu, shell } from 'electron'
+import { app, protocol, ipcMain, BrowserWindow, Menu, shell } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
-
+import ChildProcess from 'child_process'
 import * as Hyperfile from '../renderer/hyperfile'
+import { HYPERMERGE_PATH } from '../renderer/constants'
+
 
 const log = Debug('pushpin:electron')
 
@@ -198,6 +200,37 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+const serverProc = ChildProcess.fork(
+  './src/background/index.js', // this is not suitable for a production build!
+  [HYPERMERGE_PATH], // pass to process.argv into child
+  {
+    stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+  }
+)
+
+serverProc.on('message', message => {
+  mainWindow.webContents.send('hypermerge', 'data')
+})
+
+ipcMain.on('message', (msg) => serverProc.send(msg))
+
+serverProc.on('exit', (code, sig) => {
+  console.log('child exited', code, sig)
+})
+serverProc.on('error', (error) => {
+  console.log('child error', error)
+})
+serverProc.stdout.on('data', (data) => {
+  console.log(`stdout: ${data}`)
+})
+serverProc.stderr.on('data', (data) => {
+  console.log(`stderr: ${data}`)
+})
+
+ipcMain.on('hypermerge', (event, arg) => {
+  console.log(arg) // prints "ping"
 })
 
 // In this file you can include the rest of your app's specific main process
