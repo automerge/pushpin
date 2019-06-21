@@ -214,7 +214,7 @@ serverProc.on('message', message => {
   mainWindow.webContents.send('hypermerge', 'data')
 })
 
-ipcMain.on('message', (msg) => serverProc.send(msg))
+ipcMain.on('hypermerge', (event, msg) => serverProc.send(msg))
 
 serverProc.on('exit', (code, sig) => {
   console.log('child exited', code, sig)
@@ -227,10 +227,6 @@ serverProc.stdout.on('data', (data) => {
 })
 serverProc.stderr.on('data', (data) => {
   console.log(`stderr: ${data}`)
-})
-
-ipcMain.on('hypermerge', (event, arg) => {
-  console.log(arg) // prints "ping"
 })
 
 // In this file you can include the rest of your app's specific main process
