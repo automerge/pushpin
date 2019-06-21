@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
 import { ipcRenderer } from 'electron'
 import Fs from 'fs'
-import { RepoFrontend, } from 'hypermerge'
+import { RepoFrontend } from 'hypermerge'
 import { WORKSPACE_URL_PATH } from './constants'
 import Content from './components/content'
 
@@ -50,11 +50,11 @@ localStorage.removeItem('debug')
 EventEmitter.defaultMaxListeners = 500
 
 function initBackend(front) {
-  ipcRenderer.on('hypermerge', (event, message) => {
+  ipcRenderer.on('frontend', (event, message) => {
     front.receive(JSON.parse(message))
   })
 
-  front.subscribe((msg) => ipcRenderer.send('hypermerge', JSON.stringify(msg)))
+  front.subscribe((msg) => ipcRenderer.send('frontend', JSON.stringify(msg)))
 }
 
 function initHypermerge(cb) {

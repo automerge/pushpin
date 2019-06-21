@@ -3,9 +3,7 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 import Debug from 'debug'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
-import ChildProcess from 'child_process'
 import * as Hyperfile from '../renderer/hyperfile'
-import { HYPERMERGE_PATH } from '../renderer/constants'
 
 
 const log = Debug('pushpin:electron')
@@ -52,10 +50,10 @@ const createWindow = async () => {
   }
 
   if (isDevelopment) {
-    mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+    mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}/foreground.html`)
   } else {
     mainWindow.loadURL(formatUrl({
-      pathname: path.join(__dirname, 'index.html'),
+      pathname: path.join(__dirname, 'foreground.html'),
       protocol: 'file',
       slashes: true
     }))
@@ -183,7 +181,7 @@ const createWindow = async () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () => { createWindow(); createBackgroundWindow() })
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -202,32 +200,41 @@ app.on('activate', () => {
   }
 })
 
-const serverProc = ChildProcess.fork(
-  './src/background/index.js', // this is not suitable for a production build!
-  [HYPERMERGE_PATH], // pass to process.argv into child
-  {
-    stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+let backgroundWindow
+const createBackgroundWindow = async () => {
+  // Create the browser window.
+  backgroundWindow = new BrowserWindow({
+    width: 1400,
+    height: 1000,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+    }
+  })
+  const isDevelopment = process.env.NODE_ENV !== 'production'
+
+  if (isDevelopment) {
+    backgroundWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}/background.html`)
+  } else {
+    backgroundWindow.loadURL(formatUrl({
+      pathname: path.join(__dirname, 'background.html'),
+      protocol: 'file',
+      slashes: true
+    }))
   }
-)
 
-serverProc.on('message', message => {
-  mainWindow.webContents.send('hypermerge', 'data')
-})
+  ipcMain.on('backend', (event, msg) => {
+    mainWindow.webContents.send('frontend', msg)
+  })
+  ipcMain.on('frontend', (event, msg) => {
+    backgroundWindow.webContents.send('backend', msg)
+  })
 
-ipcMain.on('hypermerge', (event, msg) => serverProc.send(msg))
+  mainWindow.on('unload', () => {
+    backgroundWindow.reload()
+  })
 
-serverProc.on('exit', (code, sig) => {
-  console.log('child exited', code, sig)
-})
-serverProc.on('error', (error) => {
-  console.log('child error', error)
-})
-serverProc.stdout.on('data', (data) => {
-  console.log(`stdout: ${data}`)
-})
-serverProc.stderr.on('data', (data) => {
-  console.log(`stderr: ${data}`)
-})
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+  backgroundWindow.on('closed', () => {
+    backgroundWindow = null
+  })
+}
