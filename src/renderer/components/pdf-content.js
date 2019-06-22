@@ -119,8 +119,23 @@ export default class PDFCard extends React.PureComponent {
     this.setState({ pageInputValue: e.target.value })
   }
 
-  onDocumentLoadSuccess = ({ numPages }) => {
+  onDocumentLoadSuccess = (result) => {
+    const { numPages } = result
+
+    result.getMetadata().then(metadata => this.onDocumentMetadata(metadata))
+
     this.setState({ numPages })
+  }
+
+  onDocumentMetadata = (metadata) => {
+    const { info = {} } = metadata
+    const { Title } = info
+
+    if (Title) {
+      this.handle.change((doc) => {
+        doc.title = Title
+      })
+    }
   }
 
   render = () => {
