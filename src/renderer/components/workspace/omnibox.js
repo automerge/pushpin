@@ -2,8 +2,7 @@ import React from 'react'
 import Debug from 'debug'
 import PropTypes from 'prop-types'
 
-import Content from '../content'
-import Actions from './actions'
+import OmniItem from './list-item'
 
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
@@ -53,7 +52,7 @@ export default class Omnibox extends React.PureComponent {
     }
 
     if ((this.props.visible && !prevProps.visible)
-        || (this.props.search !== prevProps.search)) {
+      || (this.props.search !== prevProps.search)) {
       this.setSelectedIndex(0)
     }
   }
@@ -302,8 +301,8 @@ export default class Omnibox extends React.PureComponent {
           <div className="Invitation">
             <i className="Badge fa fa-envelope" style={{ background: invitation.doc && invitation.doc.backgroundColor }} />
             <div className="Invitation__body">
-              <h4 className="Type--primary">{ invitation.doc.title || 'Untitled' }</h4>
-              <p className="Type--secondary">From { invitation.sender.name }</p>
+              <h4 className="Type--primary">{invitation.doc.title || 'Untitled'}</h4>
+              <p className="Type--secondary">From {invitation.sender.name}</p>
             </div>
           </div>
 
@@ -319,7 +318,7 @@ export default class Omnibox extends React.PureComponent {
         <div>
           <div className="ListMenu__segment">Invitations</div>
           <div className="ListMenu__section">
-            { invitations }
+            {invitations}
           </div>
         </div>
       )
@@ -330,16 +329,8 @@ export default class Omnibox extends React.PureComponent {
 
   renderContentSection = ({ name, label, actions }) => {
     const items = this.sectionItems(name).map((item) => {
-      const { url } = item
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
-
-      return (
-        <div key={url} className={classes}>
-          <Actions url={url} actions={actions}>
-            <Content context="list" url={url} />
-          </Actions>
-        </div>
-      )
+      const { url, selected } = item
+      return <OmniItem key={url} contentUrl={url} actions={actions} selected={selected} />
     })
 
     if (items.length > 0) {
@@ -347,9 +338,9 @@ export default class Omnibox extends React.PureComponent {
 
       return (
         <div>
-          { labelPartial }
+          {labelPartial}
           <div className="ListMenu__section">
-            { items }
+            {items}
           </div>
         </div>
       )
@@ -407,7 +398,8 @@ export default class Omnibox extends React.PureComponent {
     },
     {
       name: 'docUrls',
-      actions: [this.view] },
+      actions: [this.view]
+    },
     {
       name: 'contacts',
       label: 'Contacts',
@@ -480,11 +472,11 @@ export default class Omnibox extends React.PureComponent {
     return (
       <div className="Omnibox">
         <div className="ListMenu">
-          { this.renderInvitationsSection() }
-          { this.sectionDefinitions.map(
+          {this.renderInvitationsSection()}
+          {this.sectionDefinitions.map(
             (sectionDefinition) => this.renderContentSection(sectionDefinition)
-          ) }
-          { this.renderNothingFound() }
+          )}
+          {this.renderNothingFound()}
         </div>
       </div>
     )

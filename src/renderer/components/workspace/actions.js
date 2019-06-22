@@ -1,10 +1,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Debug from 'debug'
 import Action from './action'
-
-const log = Debug('pushpin:actions')
 
 /* This class is adapted from the react-color TwitterPicker
    by stripping out most of the functionality and just leaving swatches */
@@ -20,23 +17,24 @@ export default class Actions extends React.PureComponent {
     actions: []
   }
 
-  render = () => {
-    log('actions', this.props.actions)
-    const { url, actions } = this.props
+  onActionClick = (e, callback) => {
+    e.stopPropagation()
+    callback()
+  }
 
-    const first = actions[0]
+  render = () => {
+    const { url, actions } = this.props
 
     const result = (
       <div
-        className={`actions ${first ? 'Actions__withDefault' : ''}`}
+        className="actions"
         style={css.actions}
-        onClick={first ? first.callback(url) : null}
       >
         {this.props.children}
         {actions.map((elt) => (
           <Action
             key={elt.name}
-            callback={elt.callback(url)}
+            callback={(e) => this.onActionClick(e, elt.callback(url))}
             faIcon={elt.faIcon}
             label={elt.label}
             shortcut={elt.shortcut}

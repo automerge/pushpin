@@ -300,6 +300,7 @@ input {
 
 .TitleEditor {
   font-size: 1.25em;
+  width: 100%;
 }
 
 .Omnibox {
@@ -871,8 +872,41 @@ div.card.image {
   margin-left: 8px;
 }
 
-.Actions__withDefault:hover {
+.OmniItem {
+  padding: 4px 8px;
+  color: var(--colorBlueBlack);
+  line-height:16px;
+  min-height: 32px;
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.OmniItem--withDefaultAction:hover {
   background: var(--colorInputGrey);
+}
+
+.OmniItem--selected {
+  background: var(--colorInputGrey);
+}
+
+.OmniItem-thumbnail {
+  flex:none;
+  margin-right: 8px;
+}
+
+.OmniItem-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.OmniItem-actions {
+}
+
+.OmnitItem-actions > * {
+  margin-left: 8px;
 }
 
 .NothingFound .fa {
