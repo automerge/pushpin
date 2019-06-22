@@ -5,7 +5,7 @@ import withDocument from './with-document'
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
 class TitleEditor extends React.PureComponent {
-  static initilizeDocument = (doc) => {
+  static initializeDocument = (doc) => {
     doc.title = null
   }
 

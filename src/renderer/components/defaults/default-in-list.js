@@ -6,14 +6,30 @@ import ContentTypes from '../../content-types'
 export default class ListItem extends React.PureComponent {
   static propTypes = {
     url: PropTypes.string.isRequired,
+    hypermergeUrl: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
-    doc: PropTypes.shape({
-      title: PropTypes.string
-    })
   }
 
-  static defaultProps = {
-    doc: null
+  state = { doc: {} }
+
+  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
+  componentWillUnmount = () => this.handle.close()
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
+      this.refreshHandle(this.props.hypermergeUrl)
+    }
+  }
+
+  refreshHandle = (hypermergeUrl) => {
+    if (this.handle) {
+      this.handle.close()
+    }
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+  }
+
+
+  onChange = (doc) => {
+    this.setState({ doc })
   }
 
   onDragStart = (e) => {
@@ -22,12 +38,13 @@ export default class ListItem extends React.PureComponent {
   }
 
   render = () => {
-    const { doc, type } = this.props
-    const contentType = ContentTypes.lookup(type)
+    const { type } = this.props
+    const { doc } = this.state
 
-    // TODO: this should be handled by the content system.
-    const icon = contentType ? contentType.icon : 'question'
-    const name = contentType ? contentType.name : 'Unknown'
+    // this context: default business is wrong wrong wrong
+    const contentType = ContentTypes.lookup({ type })
+    console.log(contentType)
+    const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
     // TODO: pick background color based on url
     return (

@@ -45,7 +45,14 @@ function lookup({ type, context = 'workspace' } = {}) {
   }
   // synthesize a result
   if (defaultRegistry[context]) {
-    return { ...registry[type], component: defaultRegistry[context] }
+    const component = defaultRegistry[context]
+
+    if (!component) { return null }
+
+    const { name = 'Unknown', icon = 'question' } = (registry[type] || {})
+    const result = { type, name, icon, component }
+
+    return result
   }
 
   return null
