@@ -34,7 +34,6 @@ export default class ListItem extends React.PureComponent {
 
   onDragStart = (e) => {
     e.dataTransfer.setData('application/pushpin-url', this.props.url)
-    e.dataTransfer.setDragImage(this.badgeRef, 0, 0)
   }
 
   render = () => {
@@ -48,8 +47,8 @@ export default class ListItem extends React.PureComponent {
 
     // TODO: pick background color based on url
     return (
-      <div style={css.listItem} draggable="true" onDragStart={this.onDragStart} className="DocLink" onClick={this.handleClick}>
-        <i ref={(ref) => { this.badgeRef = ref }} className={`Badge fa fa-${icon}`} />
+      <div className="DocLink" style={css.listItem}>
+        <i draggable="true" onDragStart={this.onDragStart} className={`Badge fa fa-${icon}`} />
         <div className="DocLink__title">{(doc && doc.title) ? doc.title : name}</div>
       </div>
     )

@@ -555,7 +555,6 @@ button[disabled].TitleBar__menuItem .fa {
 .DocLink {
   display: flex;
   align-items: center;
-  cursor: pointer;
   width: 100%;
 }
 
@@ -566,6 +565,7 @@ button[disabled].TitleBar__menuItem .fa {
 }
 
 .Badge {
+  cursor: pointer;
   padding: 8px;
   font-size: 24px;
   border-radius: 50%;
