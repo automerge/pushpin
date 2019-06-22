@@ -6,7 +6,7 @@ import Actions from './actions'
 
 
 // TODO: item highlighting
-export default class ListItem extends React.PureComponent {
+export default class ListMenuItem extends React.PureComponent {
   static propTypes = {
     contentUrl: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.any),
@@ -32,16 +32,16 @@ export default class ListItem extends React.PureComponent {
   render = () => {
     const { contentUrl, actions, selected } = this.props
     const classes = [
-      'OmniItem',
-      this.defaultAction ? 'OmniItem--withDefaultAction' : '',
-      selected ? 'OmniItem--selected' : ''
+      'ListMenuItem',
+      this.defaultAction ? 'ListMenuItem--withDefaultAction' : '',
+      selected ? 'ListMenuItem--selected' : ''
     ].join(' ')
     return (
       <div className={classes} onClick={this.onClick}>
-        <div className="OmniItem-content">
+        <div className="ListMenuItem-content">
           <Content context="list" url={contentUrl} />
         </div>
-        <div className="OmniItem-actions">
+        <div className="ListMenuItem-actions">
           <Actions url={contentUrl} actions={actions} />
         </div>
       </div>

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import Content from '../content'
-import Actions from './actions'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import ListMenuItem from './list-menu-item'
 
 const log = Debug('pushpin:share')
 
@@ -129,7 +129,7 @@ export default class Share extends React.PureComponent {
     const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
     const noneFound = (
       <div className="ListMenu__item">
-        <div className="ContactListItem">
+        <div className="ContactListMenuItem">
           <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
           <div className="Label">
             <p className="Type--primary">None found</p>
@@ -143,7 +143,8 @@ export default class Share extends React.PureComponent {
       name: 'share',
       callback: (url) => (e) => this.offerDocumentToIdentity(url),
       faIcon: 'fa-share-alt',
-      label: 'Share' }
+      label: 'Share'
+    }
 
     /* This doesn't make sense in a Pushpin world, I think.
        Once you've written a share offer into your history,
@@ -159,23 +160,13 @@ export default class Share extends React.PureComponent {
     */
 
     const contacts = uniqueContactIds.map(id => (
-      <div key={id} className="ListMenu__item">
-        <Actions
-          url={createDocumentLink('contact', id)}
-          actions={[share]}
-        >
-          <Content
-            context="list"
-            url={createDocumentLink('contact', id)}
-          />
-        </Actions>
-      </div>
+      <ListMenuItem key={id} contentUrl={createDocumentLink('contact', id)} actions={[share]} />
     ))
 
     return (
       <div>
         <div className="ListMenu__section">
-          { uniqueContactIds.length !== 0 ? contacts : noneFound}
+          {uniqueContactIds.length !== 0 ? contacts : noneFound}
         </div>
       </div>
     )
@@ -186,7 +177,7 @@ export default class Share extends React.PureComponent {
     const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
     const noneFound = (
       <div className="ListMenu__item">
-        <div className="ContactListItem">
+        <div className="ContactListMenuItem">
           <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
           <div className="Label">
             <p className="Type--primary">None found</p>
@@ -207,7 +198,7 @@ export default class Share extends React.PureComponent {
     return (
       <div>
         <div className="ListMenu__section">
-          { uniqueAuthorIds.length !== 0 ? authors : noneFound}
+          {uniqueAuthorIds.length !== 0 ? authors : noneFound}
         </div>
       </div>
     )
@@ -248,7 +239,7 @@ export default class Share extends React.PureComponent {
               <i className="fa fa-group" /> All Contacts
             </div>
           </div>
-          { body }
+          {body}
         </div>
       </div>
     )

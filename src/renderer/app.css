@@ -872,7 +872,7 @@ div.card.image {
   margin-left: 8px;
 }
 
-.OmniItem {
+.ListMenuItem {
   padding: 4px 8px;
   color: var(--colorBlueBlack);
   line-height:16px;
@@ -884,25 +884,25 @@ div.card.image {
   align-items: center;
 }
 
-.OmniItem--withDefaultAction:hover {
+.ListMenuItem--withDefaultAction:hover {
   background: var(--colorInputGrey);
 }
 
-.OmniItem--selected {
+.ListMenuItem--selected {
   background: var(--colorInputGrey);
 }
 
-.OmniItem-thumbnail {
+.ListMenuItem-thumbnail {
   flex:none;
   margin-right: 8px;
 }
 
-.OmniItem-content {
+.ListMenuItem-content {
   flex: 1;
   overflow: hidden;
 }
 
-.OmniItem-actions {
+.ListMenuItem-actions {
 }
 
 .OmnitItem-actions > * {

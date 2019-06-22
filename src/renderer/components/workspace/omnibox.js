@@ -2,7 +2,7 @@ import React from 'react'
 import Debug from 'debug'
 import PropTypes from 'prop-types'
 
-import OmniItem from './list-item'
+import ListMenuItem from './list-menu-item'
 
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
@@ -330,7 +330,7 @@ export default class Omnibox extends React.PureComponent {
   renderContentSection = ({ name, label, actions }) => {
     const items = this.sectionItems(name).map((item) => {
       const { url, selected } = item
-      return <OmniItem key={url} contentUrl={url} actions={actions} selected={selected} />
+      return <ListMenuItem key={url} contentUrl={url} actions={actions} selected={selected} />
     })
 
     if (items.length > 0) {
