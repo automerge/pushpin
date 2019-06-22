@@ -25,12 +25,12 @@ module.exports = {
   plugins: [
 
     new HtmlWebpackPlugin({
-      template: '!!html-loader?minimize=false&url=false!dist\\.renderer-index-template.html',
+      template: '!!html-loader?minimize=false&url=false!dist/.renderer-index-template.html',
       excludeChunks: ['background'],
       filename: 'foreground.html'
     }),
     new HtmlWebpackPlugin({
-      template: '!!html-loader?minimize=false&url=false!dist\\.renderer-index-template.html',
+      template: '!!html-loader?minimize=false&url=false!dist/.renderer-index-template.html',
       excludeChunks: ['renderer'],
       filename: 'background.html'
     })
