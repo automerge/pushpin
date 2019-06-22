@@ -394,6 +394,7 @@ input {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(24px, 24px));
   grid-gap: 8px;
+  width: 100%;
 }
 
 .ColorPicker__swatch {
