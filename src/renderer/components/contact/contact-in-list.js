@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../../content-types'
 import Content from '../content'
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
@@ -9,16 +8,7 @@ import { DEFAULT_AVATAR_PATH } from '../../constants'
 export default class ContactInList extends React.PureComponent {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired,
-    selfId: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.string),
-    onShare: PropTypes.func,
-    onUnshare: PropTypes.func
-  }
-
-  static defaultProps = {
-    actions: [],
-    onShare: () => {},
-    onUnshare: () => {}
+    selfId: PropTypes.string.isRequired
   }
 
   state = {}
@@ -73,27 +63,6 @@ export default class ContactInList extends React.PureComponent {
   }
 
   render = () => {
-    const actions = []
-    if (this.props.actions.includes('share')) {
-      actions.push((
-        <div role="button" key="share" onClick={this.props.onShare} className="ButtonAction ButtonAction--primary">
-          <i className="fa fa-share-alt" />
-        </div>
-      ))
-    }
-
-    if (this.props.actions.includes('unshare')) {
-      actions.push((
-        <div role="button" key="unshare" onClick={this.props.onUnshare} className="ButtonAction ButtonAction--destructive">
-          <i className="fa fa-ban" />
-        </div>
-      ))
-    }
-
-    if (this.props.actions.includes('invite')) {
-      actions.push(<span key="invite" className="Type--secondary">⏎ Invite</span>)
-    }
-
     let avatar
     if (this.state.avatarDocId) {
       avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
@@ -102,7 +71,7 @@ export default class ContactInList extends React.PureComponent {
     }
 
     return (
-      <div draggable="true" onDragStart={this.onDragStart} className="ContactListItem">
+      <div draggable="true" onDragStart={this.onDragStart} className="DocLink">
         <div className="ListMenu__thumbnail">
           <div
             className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
@@ -116,18 +85,7 @@ export default class ContactInList extends React.PureComponent {
             { this.state.name }
           </p>
         </div>
-
-        <div className="Actions"> { actions } </div>
       </div>
     )
   }
 }
-
-ContentTypes.register({
-  component: ContactInList,
-  type: 'contact',
-  context: 'list',
-  name: 'Contact',
-  icon: 'sticky-note',
-  unlisted: true,
-})

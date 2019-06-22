@@ -2,19 +2,21 @@ import React from 'react'
 import Debug from 'debug'
 import PropTypes from 'prop-types'
 
-import Content from '../content'
+import ListMenuItem from './list-menu-item'
+
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:omnibox')
 
 export default class Omnibox extends React.PureComponent {
   static propTypes = {
+    // this seems silly, but the omnibox maintains a lot of in-memory state
+    // so we keep it around even when it isn't visible
     visible: PropTypes.bool.isRequired,
     search: PropTypes.string,
-    getKeyController: PropTypes.func.isRequired,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     hypermergeUrl: PropTypes.string.isRequired,
-    onSelectChange: PropTypes.func.isRequired
+    omniboxFinished: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -31,12 +33,14 @@ export default class Omnibox extends React.PureComponent {
   componentDidMount = () => {
     log('componentDidMount')
     this.refreshHandle(this.props.hypermergeUrl)
-    this.props.getKeyController({ moveUp: this.moveUp, moveDown: this.moveDown })
+    document.addEventListener('keydown', this.handleCommandKeys)
   }
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
     this.handle.close()
+    document.removeEventListener('keydown', this.handleCommandKeys)
+
     Object.values(this.viewedDocHandles).forEach(handle => handle.close())
     Object.values(this.contactHandles).forEach(handle => handle.close())
   }
@@ -48,7 +52,7 @@ export default class Omnibox extends React.PureComponent {
     }
 
     if ((this.props.visible && !prevProps.visible)
-        || (this.props.search !== prevProps.search)) {
+      || (this.props.search !== prevProps.search)) {
       this.setSelectedIndex(0)
     }
   }
@@ -98,13 +102,60 @@ export default class Omnibox extends React.PureComponent {
     })
   }
 
-  setSelectedIndex = (newIndex) => {
-    this.setState({ selectedIndex: newIndex }, () => {
-      const { items } = this.menuSections()
-      const { selectedIndex } = this.state
 
-      this.props.onSelectChange(items[selectedIndex])
-    })
+  handleCommandKeys = (e) => {
+    // XXX: this is left-over mess that used to be in omni-prompt
+    const { selectedIndex } = this.state
+    const { items } = this.menuSections()
+    const selected = items[selectedIndex]
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      this.moveDown()
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      this.moveUp()
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault()
+
+      if (selected) {
+        this.resolveDocumentSelection(selected)
+      }
+
+      this.props.omniboxFinished()
+    }
+
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
+      e.preventDefault()
+
+      if (!selected) {
+        return
+      }
+      const { url, type } = selected
+      if (type === 'viewedDocUrl') {
+        this.archiveDocument(url)
+      }
+    }
+  }
+
+  resolveDocumentSelection = (selected) => {
+    switch (selected.type) {
+      case 'contact':
+        this.offerDocumentToIdentity(this.state.selected.id)
+        break
+      default:
+        if (selected.url) {
+          this.navigate(selected.url)
+        }
+    }
+  }
+
+  setSelectedIndex = (newIndex) => {
+    this.setState({ selectedIndex: newIndex })
   }
 
   moveUp = () => {
@@ -250,8 +301,8 @@ export default class Omnibox extends React.PureComponent {
           <div className="Invitation">
             <i className="Badge fa fa-envelope" style={{ background: invitation.doc && invitation.doc.backgroundColor }} />
             <div className="Invitation__body">
-              <h4 className="Type--primary">{ invitation.doc.title || 'Untitled' }</h4>
-              <p className="Type--secondary">From { invitation.sender.name }</p>
+              <h4 className="Type--primary">{invitation.doc.title || 'Untitled'}</h4>
+              <p className="Type--secondary">From {invitation.sender.name}</p>
             </div>
           </div>
 
@@ -267,7 +318,7 @@ export default class Omnibox extends React.PureComponent {
         <div>
           <div className="ListMenu__segment">Invitations</div>
           <div className="ListMenu__section">
-            { invitations }
+            {invitations}
           </div>
         </div>
       )
@@ -278,14 +329,8 @@ export default class Omnibox extends React.PureComponent {
 
   renderContentSection = ({ name, label, actions }) => {
     const items = this.sectionItems(name).map((item) => {
-      const { url } = item
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
-
-      return (
-        <div key={url} className={classes}>
-          <Content context="list" url={url} actions={actions} />
-        </div>
-      )
+      const { url, selected } = item
+      return <ListMenuItem key={url} contentUrl={url} actions={actions} selected={selected} />
     })
 
     if (items.length > 0) {
@@ -293,15 +338,123 @@ export default class Omnibox extends React.PureComponent {
 
       return (
         <div>
-          { labelPartial }
+          {labelPartial}
           <div className="ListMenu__section">
-            { items }
+            {items}
           </div>
         </div>
       )
     }
 
     return null
+  }
+
+  /* begin actions */
+  view = {
+    name: 'view',
+    callback: (url) => () => this.navigate(url),
+    faIcon: 'fa-compass',
+    label: 'View',
+    shortcut: '⏎'
+  }
+
+  invite = {
+    name: 'invite',
+    callback: (url) => (e) => this.offerDocumentToIdentity(url),
+    faIcon: 'fa-compass',
+    label: 'Invite',
+    shortcut: '⏎'
+  }
+
+  archive = {
+    name: 'archive',
+    destructive: true,
+    callback: (url) => () => this.archiveDocument(url),
+    faIcon: 'fa-trash',
+    label: 'Archive',
+    shortcut: '⌘+⌫'
+  }
+
+  unarchive = {
+    name: 'unarchive',
+    callback: (url) => (e) => this.unarchiveDocument(url),
+    faIcon: 'fa-trash-restore',
+    label: 'Unarchive',
+    shortcut: '⌘+⌫'
+  }
+  /* end actions */
+
+  /* sections begin */
+  sectionDefinitions = [
+    {
+      name: 'viewedDocUrls',
+      label: 'Boards',
+      actions: [this.view, this.archive]
+    },
+    {
+      name: 'archivedDocUrls',
+      label: 'Archived',
+      actions: [this.view, this.unarchive]
+    },
+    {
+      name: 'docUrls',
+      actions: [this.view]
+    },
+    {
+      name: 'contacts',
+      label: 'Contacts',
+      actions: [this.invite]
+    }
+  ]
+
+  /* end sections */
+
+  navigate = (url) => {
+    window.location = url
+  }
+
+  offerDocumentToIdentity = (contactUrl) => {
+    // XXX out of scope RN but consider if we should change the key for consistency?
+    const { type, id } = parseDocumentLink(contactUrl)
+    if (type !== 'contact') {
+      throw (new Error('Offer the current document to a contact by passing in the contact id document.'))
+    }
+
+    if (!this.state.selfId) {
+      return
+    }
+
+    window.repo.change(this.state.selfId, (s) => {
+      if (!s.offeredUrls) {
+        s.offeredUrls = {}
+      }
+
+      // XXX right now this code leaks identity documents and document URLs to
+      //     every single person who knows you
+      if (!s.offeredUrls[id]) {
+        s.offeredUrls[id] = []
+      }
+
+      if (!s.offeredUrls[id].includes(this.state.currentDocUrl)) {
+        s.offeredUrls[id].push(this.state.currentDocUrl)
+      }
+    })
+  }
+
+  archiveDocument = (url) => {
+    this.handle.change((doc) => {
+      if (!doc.archivedDocUrls) {
+        doc.archivedDocUrls = []
+      }
+
+      if (!doc.archivedDocUrls.includes(url)) {
+        doc.archivedDocUrls.push(url)
+      }
+    })
+  }
+
+  unarchiveDocument = (url) => {
+
   }
 
   render = () => {
@@ -315,15 +468,15 @@ export default class Omnibox extends React.PureComponent {
       return null
     }
 
+
     return (
       <div className="Omnibox">
         <div className="ListMenu">
-          { this.renderInvitationsSection() }
-          { this.renderContentSection({ name: 'viewedDocUrls', label: 'Boards', actions: ['view', 'archive'] }) }
-          { this.renderContentSection({ name: 'archivedDocUrls', label: 'Archived', actions: ['view'] }) }
-          { this.renderContentSection({ name: 'docUrls', actions: ['view'] }) }
-          { this.renderContentSection({ name: 'contacts', label: 'Contacts', actions: ['invite'] }) }
-          { this.renderNothingFound() }
+          {this.renderInvitationsSection()}
+          {this.sectionDefinitions.map(
+            (sectionDefinition) => this.renderContentSection(sectionDefinition)
+          )}
+          {this.renderNothingFound()}
         </div>
       </div>
     )

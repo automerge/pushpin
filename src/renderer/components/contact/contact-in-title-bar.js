@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentTypes from '../../content-types'
 import Content from '../content'
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
-class ContactInTitlebar extends React.PureComponent {
+export default class ContactInTitlebar extends React.PureComponent {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired,
     selfId: PropTypes.string.isRequired
@@ -87,12 +86,3 @@ class ContactInTitlebar extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  component: ContactInTitlebar,
-  type: 'contact',
-  context: 'title-bar',
-  name: 'Avatar',
-  icon: 'user',
-  unlisted: true,
-})

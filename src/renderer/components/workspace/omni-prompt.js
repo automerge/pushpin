@@ -3,22 +3,19 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import InvitationsView from '../../invitations-view'
-import { parseDocumentLink } from '../../share-link'
 import Omnibox from './omnibox'
 
 const log = Debug('pushpin:board-title')
 
 export default class OmniPrompt extends React.PureComponent {
   static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    openDoc: PropTypes.func.isRequired
+    hypermergeUrl: PropTypes.string.isRequired
   }
 
   state = {
     invitations: [],
     activeOmnibox: false,
-    search: '',
-    selected: null
+    search: ''
   }
 
   omniboxInput = React.createRef()
@@ -44,6 +41,19 @@ export default class OmniPrompt extends React.PureComponent {
     }
   }
 
+  refreshHandle = (hypermergeUrl) => {
+    if (this.handle) {
+      this.handle.close()
+    }
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+  }
+
+  onChange = (doc) => {
+    this.setState({ ...doc })
+  }
+
+  /* end... slightly modified boilerplate */
+
   onInvitationsChange = (invitations) => {
     log('invitations change')
     this.setState({ invitations }, () => this.forceUpdate())
@@ -62,35 +72,6 @@ export default class OmniPrompt extends React.PureComponent {
     }
   }
 
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  }
-
-  refreshBoardHandle = (boardId) => {
-    if (this.boardHandle) {
-      this.boardHandle.close()
-    }
-
-    this.boardHandle = window.repo.watch(boardId, (doc) => {
-      this.setState({ board: doc })
-    })
-  }
-
-  onChange = (doc) => {
-    this.setState({ ...doc }, () => {
-      if (this.state.currentDocUrl) {
-        const { hypermergeUrl } = parseDocumentLink(this.state.currentDocUrl)
-
-        if (!this.state.board || this.state.board.hypermergeUrl !== hypermergeUrl) {
-          this.refreshBoardHandle(hypermergeUrl)
-        }
-      }
-    })
-  }
-
   activateOmnibox = () => {
     this.setState({ activeOmnibox: true }, () => {
       this.omniboxInput.current.focus()
@@ -107,62 +88,6 @@ export default class OmniPrompt extends React.PureComponent {
     this.setState({ search: e.target.value })
   }
 
-  handleCommandKeys = (e) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      this.omniboxControl.moveDown()
-    }
-
-    if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      this.omniboxControl.moveUp()
-    }
-
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      const { selected } = this.state
-
-      if (selected) {
-        this.resolveDocumentSelection(selected)
-      }
-
-      this.deactivateOmnibox()
-    }
-
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
-      e.preventDefault()
-      const { selected } = this.state
-
-      if (selected && selected.type === 'viewedDocUrl') {
-        this.handle.change((doc) => {
-          if (!doc.archivedDocUrls) {
-            doc.archivedDocUrls = []
-          }
-
-          if (!doc.archivedDocUrls.includes(selected.url)) {
-            doc.archivedDocUrls.push(selected.url)
-          }
-        })
-      }
-    }
-  }
-
-  resolveDocumentSelection = (selected) => {
-    switch (selected.type) {
-      case 'contact':
-        this.offerDocumentToIdentity(this.state.selected.id)
-        break
-      default:
-        if (selected.url) {
-          this.props.openDoc(selected.url)
-        }
-    }
-  }
-
-  handleSelectChange = (selected) => {
-    this.setState({ selected })
-  }
-
   handleClickOutside = (e) => {
     if (!e.path.includes(this.omniboxInput.current)) {
       this.deactivateOmnibox()
@@ -172,30 +97,6 @@ export default class OmniPrompt extends React.PureComponent {
   handleTitleClick = (e) => {
     this.activateOmnibox()
     e.stopPropagation()
-  }
-
-  setOmniboxControl = (controller) => {
-    this.omniboxControl = controller
-  }
-
-  offerDocumentToIdentity = (contactId) => {
-    if (!this.state.selfId) {
-      return
-    }
-
-    window.repo.change(this.state.selfId, (s) => {
-      if (!s.offeredUrls) {
-        s.offeredUrls = {}
-      }
-
-      if (!s.offeredUrls[contactId]) {
-        s.offeredUrls[contactId] = []
-      }
-
-      if (!s.offeredUrls[contactId].includes(this.state.currentDocUrl)) {
-        s.offeredUrls[contactId].push(this.state.currentDocUrl)
-      }
-    })
   }
 
   render = () => {
@@ -211,23 +112,22 @@ export default class OmniPrompt extends React.PureComponent {
     ))
 
     return (
-      <div ref={(ref) => { this.omniboxRef = ref }} style={css.omniboxInput}>
+      <div style={css.omniboxInput}>
         <input
           ref={this.omniboxInput}
           type="text"
           style={css.omniboxInputElt}
           onClick={this.handleTitleClick}
           onChange={this.handleChange}
-          onKeyDown={this.handleCommandKeys}
           placeholder="Search..."
         />
+
         <Omnibox
           hypermergeUrl={this.props.hypermergeUrl}
           visible={this.state.activeOmnibox}
           search={this.state.search}
-          getKeyController={this.setOmniboxControl}
           invitations={invitations}
-          onSelectChange={this.handleSelectChange}
+          omniboxFinished={this.deactivateOmnibox}
         />
       </div>
     )

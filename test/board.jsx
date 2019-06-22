@@ -1,9 +1,9 @@
 import assert from 'assert'
 import { configure, mount } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-15'
+import Adapter from 'enzyme-adapter-react-16'
 import * as React from 'react'
 
-import Board from '../src/components/board/board'
+import Board from '../src/renderer/components/board/board'
 
 configure({ adapter: new Adapter() })
 
