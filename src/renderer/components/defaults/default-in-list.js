@@ -43,7 +43,7 @@ export default class ListItem extends React.PureComponent {
 
     // this context: default business is wrong wrong wrong
     const contentType = ContentTypes.lookup({ type })
-    console.log(contentType)
+
     const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
     // TODO: pick background color based on url

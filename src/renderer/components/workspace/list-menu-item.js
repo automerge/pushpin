@@ -23,7 +23,6 @@ export default class ListMenuItem extends React.PureComponent {
   }
 
   onClick = () => {
-    console.log('on click') //eslint-disable-line
     if (this.defaultAction) {
       this.defaultAction(this.props.contentUrl)()
     }

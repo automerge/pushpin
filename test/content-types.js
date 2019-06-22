@@ -29,7 +29,6 @@ describe('ContentTypes', () => {
         context: 'list'
       })
       const type = ContentTypes.lookup({ type: 'url', context: 'list' })
-      console.log('should default', type)
       assert.strictEqual(type.component, DefaultListContent)
     })
 
