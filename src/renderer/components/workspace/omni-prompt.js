@@ -74,13 +74,11 @@ export default class OmniPrompt extends React.PureComponent {
 
   activateOmnibox = () => {
     this.setState({ activeOmnibox: true }, () => {
-      this.omniboxInput.current.focus()
     })
   }
 
   deactivateOmnibox = () => {
     this.setState({ activeOmnibox: false, search: '' }, () => {
-      this.omniboxInput.current.blur()
     })
   }
 
@@ -112,50 +110,13 @@ export default class OmniPrompt extends React.PureComponent {
     ))
 
     return (
-      <div style={css.omniboxInput}>
-        <input
-          ref={this.omniboxInput}
-          type="text"
-          style={css.omniboxInputElt}
-          onClick={this.handleTitleClick}
-          onChange={this.handleChange}
-          value={this.state.search}
-          placeholder="Search..."
-        />
-
-        <Omnibox
-          hypermergeUrl={this.props.hypermergeUrl}
-          visible={this.state.activeOmnibox}
-          search={this.state.search}
-          invitations={invitations}
-          omniboxFinished={this.deactivateOmnibox}
-        />
-      </div>
+      <Omnibox
+        hypermergeUrl={this.props.hypermergeUrl}
+        visible={this.state.activeOmnibox}
+        search={this.state.search}
+        invitations={invitations}
+        omniboxFinished={this.deactivateOmnibox}
+      />
     )
   }
-}
-
-const css = {
-  omniboxInput: {
-    marginLeft: '8px',
-    flex: '0 1 200px',
-    padding: '0px 8px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  },
-
-  omniboxInputElt: {
-    width: '336px',
-    fontSize: '14px',
-    color: 'var(--colorBlueBlack)',
-    fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
-    background: 'var(--colorInputGrey)',
-    border: '0px',
-    outline: 'none',
-    borderRadius: '4px',
-    height: '24px',
-    lineHeight: '24px'
-  }
-
 }

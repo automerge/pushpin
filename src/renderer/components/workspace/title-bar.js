@@ -4,7 +4,7 @@ import Debug from 'debug'
 
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
 
-import OmniPrompt from './omni-prompt'
+import Omnibox from './omnibox'
 import Content from '../content'
 import Authors from './authors'
 import Share from './share'
@@ -92,14 +92,28 @@ export default class TitleBar extends React.PureComponent {
         <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
           <i className="fa fa-angle-left" />
         </button>
+        <Dropdown className="TitleBar__menuItem TitleBar__right">
+          <DropdownTrigger>
+            <i className="fa fa-map" />
+          </DropdownTrigger>
+          <DropdownContent>
+            <Omnibox
+              hypermergeUrl={this.props.hypermergeUrl}
+              visible
+              invitations={[]}
+              omniboxFinished={this.deactivateOmnibox}
+            />
+          </DropdownContent>
+        </Dropdown>
+
         <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
           <i className="fa fa-angle-right" />
         </button>
+
         <Content url={this.state.currentDocUrl} context="list" editable />
         <Authors
           hypermergeUrl={this.props.hypermergeUrl}
         />
-        <OmniPrompt hypermergeUrl={this.props.hypermergeUrl} />
 
         <Dropdown className="TitleBar__menuItem TitleBar__right">
           <DropdownTrigger>

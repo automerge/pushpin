@@ -13,14 +13,8 @@ export default class Omnibox extends React.PureComponent {
     // this seems silly, but the omnibox maintains a lot of in-memory state
     // so we keep it around even when it isn't visible
     visible: PropTypes.bool.isRequired,
-    search: PropTypes.string,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     hypermergeUrl: PropTypes.string.isRequired,
-    omniboxFinished: PropTypes.func.isRequired,
-  }
-
-  static defaultProps = {
-    search: ''
   }
 
   constructor(props) {
@@ -52,7 +46,7 @@ export default class Omnibox extends React.PureComponent {
     }
 
     if ((this.props.visible && !prevProps.visible)
-      || (this.props.search !== prevProps.search)) {
+      || (this.state.search)) {
       this.setSelectedIndex(0)
     }
   }
@@ -125,8 +119,6 @@ export default class Omnibox extends React.PureComponent {
       if (selected) {
         this.resolveDocumentSelection(selected)
       }
-
-      this.props.omniboxFinished()
     }
 
     if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
@@ -178,8 +170,7 @@ export default class Omnibox extends React.PureComponent {
   menuSections = () => {
     let items = []
     const sectionIndices = {}
-    const { search } = this.props
-    const { archivedDocUrls = [] } = this.state
+    const { search = '', archivedDocUrls = [] } = this.state
 
     try {
       parseDocumentLink(search)
@@ -471,6 +462,15 @@ export default class Omnibox extends React.PureComponent {
 
     return (
       <div className="Omnibox">
+        <input
+          ref={this.omniboxInput}
+          type="text"
+          style={css.omniboxInputElt}
+          onClick={this.handleTitleClick}
+          onChange={this.handleChange}
+          value={this.state.search}
+          placeholder="Search..."
+        />
         <div className="ListMenu">
           {this.renderInvitationsSection()}
           {this.sectionDefinitions.map(
@@ -480,5 +480,29 @@ export default class Omnibox extends React.PureComponent {
         </div>
       </div>
     )
+  }
+}
+
+const css = {
+  omniboxInput: {
+    marginLeft: '8px',
+    flex: '0 1 200px',
+    padding: '0px 8px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+
+  omniboxInputElt: {
+    width: '336px',
+    fontSize: '14px',
+    color: 'var(--colorBlueBlack)',
+    fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
+    background: 'var(--colorInputGrey)',
+    border: '0px',
+    outline: 'none',
+    borderRadius: '4px',
+    height: '24px',
+    lineHeight: '24px'
   }
 }
