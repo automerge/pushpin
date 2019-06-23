@@ -6,10 +6,8 @@ import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-drop
 
 import OmniPrompt from './omni-prompt'
 import Content from '../content'
-import ContactEditor from '../contact/contact-editor'
-import PresentContacts from './present-contacts'
+import Authors from './authors'
 import Share from './share'
-import { createDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:title-bar')
 
@@ -91,14 +89,6 @@ export default class TitleBar extends React.PureComponent {
 
     return (
       <div className="TitleBar">
-        <Dropdown className="TitleBar__menuItem TitleBar__left">
-          <DropdownTrigger>
-            <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
-          </DropdownTrigger>
-          <DropdownContent>
-            <ContactEditor hypermergeUrl={this.state.selfId} />
-          </DropdownContent>
-        </Dropdown>
         <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
           <i className="fa fa-angle-left" />
         </button>
@@ -106,8 +96,8 @@ export default class TitleBar extends React.PureComponent {
           <i className="fa fa-angle-right" />
         </button>
         <Content url={this.state.currentDocUrl} context="list" editable />
-        <PresentContacts
-          currentDocUrl={this.state.currentDocUrl}
+        <Authors
+          hypermergeUrl={this.props.hypermergeUrl}
         />
         <OmniPrompt hypermergeUrl={this.props.hypermergeUrl} />
 

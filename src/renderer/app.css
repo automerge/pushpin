@@ -493,20 +493,20 @@ button[disabled].TitleBar__menuItem .fa {
   margin-right: 8px;
 }
 
-.PresentContacts {
+.Authors {
   display: flex;
   align-items: center;
   padding: 0 4px;
 }
 
-.PresentContacts > * {
+.Authors > * {
   padding-right: 4px;
 }
-.PresentContacts > * > .Avatar {
+.Authors > * > .Avatar {
   width: 28px; height: 28px;
   position: relative;
 }
-.PresentContacts > * > .Avatar:hover:after {
+.Authors > * > .Avatar:hover:after {
   display: block;
   position: absolute;
   /* border: 2px solid var(--highlight-color, var(--colorOnline)); */
@@ -524,7 +524,7 @@ button[disabled].TitleBar__menuItem .fa {
   font-size: 12px;
   line-height: 16px;
 }
-.PresentContacts > * > div > img {
+.Authors > * > div > img {
   width: 24px; height: 24px;
 }
 
