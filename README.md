@@ -2,6 +2,8 @@
 
 [A collaborative corkboard app.](http://inkandswitch.github.io/pushpin)
 
+[Join our Slack to ask questions, share ideas, or meet other users!](https://communityinviter.com/apps/automerge/automerge)
+
 Built with Electron, React, automerge and the Dat p2p stack.
 
 A project initiated by [Ink & Switch](https://inkandswitch.com/). 

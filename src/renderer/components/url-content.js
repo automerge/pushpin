@@ -174,11 +174,13 @@ export default class UrlContent extends React.PureComponent {
 }
 
 ContentTypes.register({
-  component: UrlContent,
   type: 'url',
   name: 'URL',
   icon: 'chain',
-  resizable: true
+  contexts: {
+    workspace: UrlContent,
+    board: UrlContent
+  }
 })
 
 const css = {

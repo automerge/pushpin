@@ -877,10 +877,3 @@ export default class Board extends React.PureComponent {
     )
   }
 }
-
-ContentTypes.register({
-  component: Board,
-  type: 'board',
-  name: 'Board',
-  icon: 'copy',
-})

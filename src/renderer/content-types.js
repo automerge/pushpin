@@ -3,51 +3,74 @@ import Debug from 'debug'
 const log = Debug('pushpin:content-types')
 
 const registry = {}
+const defaultRegistry = {}
 
 // list() is called in Board's render; we need to return the same JS object each time
 // to avoid expensive React re-renders of the nested BoardContextMenu component.
+// TODO: this should not be a concern of content-types.js
 let listedCache = null
 
 function register(contentType) {
-  const { component, type, name, icon } = contentType
-  const { context = 'default', unlisted = false, resizable = true } = contentType
+  const { type, name, icon } = contentType
+  const { unlisted = false, resizable = true } = contentType
+  const { contexts } = contentType
 
-  if (!component || !type || !name || !icon) {
-    throw new Error('Missing something in register')
+  if (!type || !name || !icon) {
+    throw new Error('Register a type, a name, and an icon.')
   }
 
-  log('register', component.name, type, name, icon, context, unlisted, resizable)
+  if (!contexts) {
+    throw new Error('Register requires a context... for now.')
+  }
+
+  log('register', type, name, icon, unlisted, resizable)
 
   if (!registry[type]) {
-    registry[type] = {}
+    registry[type] = { type, name, icon, unlisted, resizable }
   }
-  registry[type][context] = contentType
+
+  registry[type].contexts = { ...registry[type].contexts, ...contexts }
+
   listedCache = null
 }
 
-function lookup({ type, context = 'default' } = {}) {
-  if (!(type && registry[type])) {
-    return null
+function registerDefault(contentType) {
+  const { component, context } = contentType
+  defaultRegistry[context] = component
+}
+
+function lookup({ type, context = 'workspace' } = {}) {
+  if (registry[type] && registry[type].contexts[context]) {
+    return { ...registry[type], component: registry[type].contexts[context] }
   }
-  if (registry[type][context]) {
-    return registry[type][context]
+  // synthesize a result
+  if (defaultRegistry[context]) {
+    const component = defaultRegistry[context]
+
+    if (!component) { return null }
+
+    const { name = 'Unknown', icon = 'question' } = (registry[type] || {})
+    const result = { type, name, icon, component }
+
+    return result
   }
-  return registry[type].default
+
+  return null
 }
 
 function list({ withUnlisted = false } = {}) {
+  const allTypes = Object.keys(registry).map(type => lookup({ type })).filter(ct => !!ct)
   if (withUnlisted) {
-    return Object.values(registry).map(cts => cts.default)
+    return allTypes
   }
+
   if (!listedCache) {
-    listedCache = Object.values(registry)
-      .map(cts => cts.default || cts.board)
-      .filter(ct => ct && !ct.unlisted)
+    listedCache = allTypes.filter(contentType => !contentType.unlisted)
   }
   return listedCache
 }
 
-export default { register, lookup, list }
+export default { register, registerDefault, lookup, list }
 
 // Not yet included in / drive from the generic ContentTypes registry:
 //

@@ -10,16 +10,12 @@ import Content from './components/content'
 // We load these modules here so that the content registry will have them.
 import './components/workspace/workspace'
 
-// board in various contexts
-import './components/board/board'
-import './components/board/board-in-board'
-import './components/board/board-in-list'
+// default context components
+import './components/defaults/default-in-list'
 
-// contact in various contexts
-import './components/contact/contact-in-board'
-import './components/contact/contact-in-title-bar'
-import './components/contact/contact-in-list'
-import './components/contact/contact-in-thread'
+// board in various contexts
+import './components/board'
+import './components/contact'
 
 // other single-context components
 import './components/text-content'

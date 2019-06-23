@@ -144,11 +144,6 @@ input {
   padding-bottom: 0px;
 }
 
-.ContactListItem {
-  display: flex;
-  align-items: center;
-}
-
 .Avatar {
   display: flex;
   align-items: center;
@@ -303,11 +298,9 @@ input {
   position: relative;
 }
 
-.TitleBar__titleText {
-  flex: 1;
-  height: 1.25em;
+.TitleEditor {
   font-size: 1.25em;
-  font-weight: bold;
+  width: 100%;
 }
 
 .Omnibox {
@@ -401,6 +394,7 @@ input {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(24px, 24px));
   grid-gap: 8px;
+  width: 100%;
 }
 
 .ColorPicker__swatch {
@@ -543,15 +537,6 @@ button[disabled].TitleBar__menuItem .fa {
   to {
     font-size: 1.25em;
   }
-}
-
-.TitleBar__titleText--updated {
-  animation-duration: 1s;
-  animation-name: text-pop;
-}
-
-.TitleBar__titleText::selection {
-  background: rgba(0,0,0,.05);
 }
 
 .ViewedDocs {
@@ -744,15 +729,18 @@ div.card.image {
   border-radius: 4px;
   padding: 4px 8px;
 }
+
 .ListMenu button:focus {
   outline: none;
   background-color: var(--colorInputGrey);
 }
+
 .ButtonGroup {
   display: flex;
   padding: 4px 8px;
 }
 
+/* TODO: These should go into the CSS file for the Action component */
 .ButtonAction {
   box-sizing: border-box;
   color: var(--colorSecondaryGrey);
@@ -761,19 +749,36 @@ div.card.image {
   height: 32px;
   border-radius: 4px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: 1px solid transparent;
 }
+
 .ButtonAction--destructive {
   color: var(--colorDestructive);
 }
+
 .ButtonAction--primary {
   color: var(--colorLink);
 }
+
 .ButtonAction:hover {
   border: 1px solid;
+}
+
+.ButtonAction__label {
+  color: transparent;
+  background: rgba(0,0,0,0);
+  transition: color 0.25s linear, background 0.25s linear;
+  position: absolute;
+  text-align: center;
+}
+
+.ButtonAction__label:hover {
+  color: var(--colorLink);
+  background: var(--colorInputGrey);
 }
 
 .ButtonAction .fa {
@@ -843,6 +848,8 @@ div.card.image {
   box-sizing: border-box;
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .ListMenu__item--selected {
@@ -864,6 +871,39 @@ div.card.image {
 
 .ListMenu .Actions > * {
   margin-left: 8px;
+}
+
+.ListMenuItem {
+  padding: 4px 8px;
+  color: var(--colorBlueBlack);
+  line-height:16px;
+  min-height: 32px;
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.ListMenuItem--withDefaultAction:hover {
+  background: var(--colorInputGrey);
+}
+
+.ListMenuItem--selected {
+  background: var(--colorInputGrey);
+}
+
+.ListMenuItem-thumbnail {
+  flex:none;
+  margin-right: 8px;
+}
+
+.ListMenuItem-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.ListMenuItem-actions {
 }
 
 .NothingFound .fa {
