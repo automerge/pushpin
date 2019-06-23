@@ -119,6 +119,7 @@ export default class OmniPrompt extends React.PureComponent {
           style={css.omniboxInputElt}
           onClick={this.handleTitleClick}
           onChange={this.handleChange}
+          value={this.state.search}
           placeholder="Search..."
         />
 
