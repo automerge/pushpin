@@ -337,7 +337,7 @@ export default class Omnibox extends React.PureComponent {
       const labelPartial = label ? <div className="ListMenu__segment">{label}</div> : null
 
       return (
-        <div>
+        <div key={name}>
           {labelPartial}
           <div className="ListMenu__section">
             {items}
