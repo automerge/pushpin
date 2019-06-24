@@ -291,6 +291,7 @@ input {
 
 .BoardTitle__clipboard:hover:after {
   content: 'Copy link to this...';
+  right: 4px;
 }
 
 .BoardTitle {

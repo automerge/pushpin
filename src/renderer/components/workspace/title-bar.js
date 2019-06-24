@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
+import { clipboard } from 'electron'
 
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
-
 import Omnibox from './omnibox'
 import Content from '../content'
 import Authors from './authors'
@@ -91,7 +91,6 @@ export default class TitleBar extends React.PureComponent {
     })
   }
 
-
   onKeyDown = (e) => {
     if (e.key === '/' && document.activeElement === document.body) {
       if (!this.state.activeOmnibox) {
@@ -117,6 +116,14 @@ export default class TitleBar extends React.PureComponent {
     this.setState(() => ({ activeOmnibox: true }))
   }
 
+  onHide = () => {
+    this.setState(() => ({ activeOmnibox: false }))
+  }
+
+  copyLink = (e) => {
+    clipboard.writeText(this.state.currentDocUrl)
+  }
+
   render = () => {
     log('render')
     if (!this.state.currentDocUrl) {
@@ -132,6 +139,7 @@ export default class TitleBar extends React.PureComponent {
           ref={this.dropdownRef}
           className="TitleBar__menuItem TitleBar__right"
           onShow={this.onShow}
+          onHide={this.onHide}
         >
           <DropdownTrigger>
             <i className="fa fa-map" />
@@ -145,7 +153,12 @@ export default class TitleBar extends React.PureComponent {
           </DropdownContent>
         </Dropdown>
 
-        <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
+        <button
+          disabled={this.disableForward()}
+          type="button"
+          onClick={this.forward}
+          className="TitleBar__menuItem"
+        >
           <i className="fa fa-angle-right" />
         </button>
 
@@ -154,7 +167,9 @@ export default class TitleBar extends React.PureComponent {
           hypermergeUrl={this.props.hypermergeUrl}
         />
 
-        <Dropdown className="TitleBar__menuItem TitleBar__right">
+        <Dropdown className="TitleBar__menuItem
+          TitleBar__right"
+        >
           <DropdownTrigger>
             <i className="fa fa-group" />
           </DropdownTrigger>
@@ -162,6 +177,14 @@ export default class TitleBar extends React.PureComponent {
             <Share hypermergeUrl={this.props.hypermergeUrl} />
           </DropdownContent>
         </Dropdown>
+
+        <button
+          className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
+          type="button"
+          onClick={this.copyLink}
+        >
+          <i className="fa fa-clipboard" />
+        </button>
       </div>
     )
   }
