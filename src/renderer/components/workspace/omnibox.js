@@ -15,7 +15,10 @@ export default class Omnibox extends React.PureComponent {
     visible: PropTypes.bool.isRequired,
     invitations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     hypermergeUrl: PropTypes.string.isRequired,
+    omniboxFinished: PropTypes.func.isRequired
   }
+
+  omniboxInput = React.createRef()
 
   constructor(props) {
     super(props)
@@ -95,6 +98,11 @@ export default class Omnibox extends React.PureComponent {
     })
   }
 
+  endSession = () => {
+    // xxx fx this wheh you have wifi
+    this.omniboxInput.current.value = ''
+    this.props.omniboxFinished()
+  }
 
   handleCommandKeys = (e) => {
     if (e.key === 'ArrowDown') {
@@ -105,6 +113,11 @@ export default class Omnibox extends React.PureComponent {
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       this.moveUp()
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      this.endSession()
     }
 
     const { selectedIndex } = this.state
@@ -119,7 +132,7 @@ export default class Omnibox extends React.PureComponent {
     selected.actions.forEach((action) => {
       if (action.keysForActionPressed(e)) {
         action.callback(selected.url)()
-        // XXX close
+        this.endSession()
       }
     })
   }
@@ -145,6 +158,10 @@ export default class Omnibox extends React.PureComponent {
     }
   }
 
+  onInputChange = (e) => {
+    this.setState({ search: e.target.value })
+  }
+
   menuSections = () => {
     let items = []
     const sectionIndices = {}
@@ -155,7 +172,7 @@ export default class Omnibox extends React.PureComponent {
     try {
       searchRegEx = new RegExp(search, 'i')
     } catch (e) {
-      items.push({ type: 'nothingFound' })
+      items.push({ type: 'nothingFound', actions: [] })
       sectionIndices.nothingFound = { start: 0, end: 1 }
       return { items, sectionIndices }
     }
@@ -187,7 +204,7 @@ export default class Omnibox extends React.PureComponent {
     // just put in an "empty results" pseudosection
     // we could, uh, do better here too
     if (items.length === 0) {
-      items.push({ type: 'nothingFound' })
+      items.push({ type: 'nothingFound', actions: [] })
       sectionIndices.nothingFound = { start: 0, end: 1 }
     }
 
@@ -279,6 +296,7 @@ export default class Omnibox extends React.PureComponent {
     }
     return (
       <ContentSection
+        key={name}
         name={name}
         label={label}
         actions={actions}
@@ -336,18 +354,18 @@ export default class Omnibox extends React.PureComponent {
       items: (state, props) => Object.entries(this.state.viewedDocs)
         .filter(([url, doc]) => !state.archivedDocUrls.includes(url))
         .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
-        .filter(([url, doc]) => doc.title.match(props.searchRegEx))
+        .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
         .map(([url, doc]) => ({ url }))
     },
     {
       name: 'archivedDocUrls',
       label: 'Archived',
       actions: [this.view, this.unarchive],
-      items: (state, props) => ((props.search === '')
+      items: (state, props) => ((state.search === '')
         ? [] // don't show archived URLs unless there's a current search term
         : state.archivedDocUrls.map(url => [url, this.state.viewedDocs[url]])
           .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
-          .filter(([url, doc]) => doc.title.match(new RegExp(props.search, 'i')))
+          .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
           .map(([url, doc]) => ({ url })))
 
     },
@@ -370,7 +388,7 @@ export default class Omnibox extends React.PureComponent {
       actions: [this.invite],
       items: (state, props) => Object.entries(this.state.contacts)
         .filter(([id, doc]) => doc.name)
-        .filter(([id, doc]) => doc.name.match(new RegExp(props.search, 'i')))
+        .filter(([id, doc]) => doc.name.match(new RegExp(state.search, 'i')))
         .map(([id, doc]) => ({ url: createDocumentLink('contact', id) }))
     }
   ]
@@ -449,9 +467,7 @@ export default class Omnibox extends React.PureComponent {
           ref={this.omniboxInput}
           type="text"
           style={css.omniboxInputElt}
-          onClick={this.handleTitleClick}
-          onChange={this.handleChange}
-          value={this.state.search}
+          onChange={this.onInputChange}
           placeholder="Search..."
         />
         <div className="ListMenu">

@@ -22,6 +22,6 @@ export default function ContentSection({ name, label, actions, items }) {
 ContentSection.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  actions: PropTypes.arrayOf(PropTypes.func).isRequired,
+  actions: PropTypes.arrayOf(PropTypes.any).isRequired,
   items: PropTypes.arrayOf(PropTypes.any).isRequired
 }

@@ -16,7 +16,7 @@ export default class TitleBar extends React.PureComponent {
     hypermergeUrl: PropTypes.string.isRequired,
     openDoc: PropTypes.func.isRequired,
   }
-
+  dropdownRef = React.createRef()
   state = { sessionHistory: [], historyIndex: 0 }
 
   // This is the New Boilerplate
@@ -81,6 +81,10 @@ export default class TitleBar extends React.PureComponent {
     })
   }
 
+  deactivateOmnibox = () => {
+    this.dropdownRef.current.hide()
+  }
+
   render = () => {
     log('render')
     if (!this.state.currentDocUrl) {
@@ -92,14 +96,13 @@ export default class TitleBar extends React.PureComponent {
         <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
           <i className="fa fa-angle-left" />
         </button>
-        <Dropdown className="TitleBar__menuItem TitleBar__right">
+        <Dropdown ref={this.dropdownRef} className="TitleBar__menuItem TitleBar__right">
           <DropdownTrigger>
             <i className="fa fa-map" />
           </DropdownTrigger>
           <DropdownContent>
             <Omnibox
               hypermergeUrl={this.props.hypermergeUrl}
-              visible
               invitations={[]}
               omniboxFinished={this.deactivateOmnibox}
             />
