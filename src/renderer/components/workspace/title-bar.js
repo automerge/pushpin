@@ -17,7 +17,11 @@ export default class TitleBar extends React.PureComponent {
     openDoc: PropTypes.func.isRequired,
   }
   dropdownRef = React.createRef()
-  state = { sessionHistory: [], historyIndex: 0 }
+  state = {
+    activeOmnibox: false,
+    sessionHistory: [],
+    historyIndex: 0
+  }
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
@@ -26,6 +30,12 @@ export default class TitleBar extends React.PureComponent {
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
       this.refreshHandle(this.props.hypermergeUrl)
     }
+  }
+  componentDidMount = () => {
+    document.addEventListener('keydown', this.onKeyDown)
+  }
+  componentWillUnmount = () => {
+    document.removeEventListener('keydown', this.onKeyDown)
   }
 
   refreshHandle = (hypermergeUrl) => {
@@ -81,8 +91,30 @@ export default class TitleBar extends React.PureComponent {
     })
   }
 
+
+  onKeyDown = (e) => {
+    if (e.key === '/' && document.activeElement === document.body) {
+      if (!this.state.activeOmnibox) {
+        this.activateOmnibox()
+        e.preventDefault()
+      }
+    }
+    if (e.key === 'Escape' && this.state.activeOmnibox) {
+      this.deactivateOmnibox()
+      e.preventDefault()
+    }
+  }
+
+  activateOmnibox = () => {
+    this.dropdownRef.current.show()
+  }
+
   deactivateOmnibox = () => {
     this.dropdownRef.current.hide()
+  }
+
+  onShow = () => {
+    this.setState(() => ({ activeOmnibox: true }))
   }
 
   render = () => {
@@ -96,14 +128,18 @@ export default class TitleBar extends React.PureComponent {
         <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
           <i className="fa fa-angle-left" />
         </button>
-        <Dropdown ref={this.dropdownRef} className="TitleBar__menuItem TitleBar__right">
+        <Dropdown
+          ref={this.dropdownRef}
+          className="TitleBar__menuItem TitleBar__right"
+          onShow={this.onShow}
+        >
           <DropdownTrigger>
             <i className="fa fa-map" />
           </DropdownTrigger>
           <DropdownContent>
             <Omnibox
+              active={this.state.activeOmnibox}
               hypermergeUrl={this.props.hypermergeUrl}
-              invitations={[]}
               omniboxFinished={this.deactivateOmnibox}
             />
           </DropdownContent>
