@@ -20,6 +20,7 @@ export default class Omnibox extends React.PureComponent {
   omniboxInput = React.createRef()
 
   state = {
+    search: '',
     selectedIndex: 0,
     invitations: [],
     viewedDocs: {},
@@ -473,11 +474,11 @@ export default class Omnibox extends React.PureComponent {
     return (
       <div className="Omnibox">
         <input
-          ref={this.omniboxInput}
           type="text"
+          ref={this.omniboxInput}
           style={css.omniboxInput}
           onChange={this.onInputChange}
-          value={this.state.value}
+          value={this.state.search}
           placeholder="Search..."
         />
         <div className="ListMenu">
