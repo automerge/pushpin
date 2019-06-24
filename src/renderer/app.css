@@ -294,6 +294,21 @@ input {
   right: 4px;
 }
 
+.BoardTitle__clipboard:focus {
+  animation-duration: 0.5s;
+  animation-name: color-flash;
+}
+
+@keyframes color-flash {
+  from {
+    color: transparent;
+  }
+
+  to {
+    color: var(--colorSecondaryGrey);
+  }
+}
+
 .BoardTitle {
   flex: 1;
   position: relative;
