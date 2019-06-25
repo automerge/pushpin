@@ -66,7 +66,7 @@ export default class ContactInTitlebar extends React.PureComponent {
   render = () => {
     let avatar
     if (this.state.avatarDocId) {
-      avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
+      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
@@ -80,7 +80,7 @@ export default class ContactInTitlebar extends React.PureComponent {
           style={{ '--highlight-color': this.state.color }}
           data-name={this.state.name}
         >
-          { avatar }
+          {avatar}
         </div>
       </div>
     )

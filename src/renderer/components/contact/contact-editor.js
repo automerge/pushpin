@@ -108,7 +108,7 @@ export default class ContactEditor extends React.PureComponent {
     log('render')
     let avatar
     if (this.state.avatarDocId) {
-      avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
+      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
@@ -128,7 +128,7 @@ export default class ContactEditor extends React.PureComponent {
             <div className="ListMenu__item ContactListItem">
               <div className="ListMenu__thumbnail">
                 <div className="Avatar">
-                  { avatar }
+                  {avatar}
                 </div>
               </div>
               <div className="Label">

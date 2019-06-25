@@ -72,7 +72,7 @@ export default class ContactInBoard extends React.PureComponent {
   render = () => {
     let avatar
     if (this.state.avatarDocId) {
-      avatar = <Content url={createDocumentLink('image', this.state.avatarDocId)} />
+      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
@@ -83,10 +83,10 @@ export default class ContactInBoard extends React.PureComponent {
           className={`Avatar Avatar--board ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
           style={{ '--highlight-color': this.state.color }}
         >
-          { avatar }
+          {avatar}
         </div>
         <div className="Label">
-          { this.state.name }
+          {this.state.name}
         </div>
       </div>
     )

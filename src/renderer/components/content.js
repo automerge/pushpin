@@ -12,16 +12,12 @@ const FILTERED_PROPS = ['type', 'hypermergeUrl']
 export default class Content extends React.PureComponent {
   static propTypes = {
     url: PropTypes.string.isRequired,
-    context: PropTypes.string
-  }
-
-  static defaultProps = {
-    context: 'default'
+    context: PropTypes.string.isRequired
   }
 
   static initializeContentDoc = (type, typeAttrs = {}) => {
     const { repo } = window // still not a great idea
-    const contentType = ContentTypes.lookup({ type })
+    const contentType = ContentTypes.lookup({ type, context: 'workspace' })
 
     const initializeDocumentWithAttrs = (doc) => {
       contentType.component.initializeDocument(doc, typeAttrs)

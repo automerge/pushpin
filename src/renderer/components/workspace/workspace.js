@@ -200,7 +200,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
       <SelfContext.Provider value={this.state.selfId}>
         <div className="Workspace">
           <TitleBar hypermergeUrl={this.props.hypermergeUrl} openDoc={this.openDoc} />
-          { content }
+          {content}
         </div>
       </SelfContext.Provider>
     )
@@ -211,7 +211,7 @@ ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
-  contexts: { default: Workspace },
+  contexts: { workspace: Workspace },
   resizable: false,
   unlisted: true
 })

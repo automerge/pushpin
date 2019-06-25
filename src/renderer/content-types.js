@@ -39,10 +39,12 @@ function registerDefault(contentType) {
   defaultRegistry[context] = component
 }
 
-function lookup({ type, context = 'workspace' } = {}) {
-  if (registry[type] && registry[type].contexts[context]) {
-    return { ...registry[type], component: registry[type].contexts[context] }
+function lookup({ type, context } = {}) {
+  const component = registry[type] && registry[type].contexts[context]
+  if (component) {
+    return { ...registry[type], component }
   }
+
   // synthesize a result
   if (defaultRegistry[context]) {
     const component = defaultRegistry[context]
