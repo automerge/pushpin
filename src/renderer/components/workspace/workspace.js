@@ -211,7 +211,7 @@ ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
-  contexts: { workspace: Workspace },
+  contexts: { root: Workspace },
   resizable: false,
   unlisted: true
 })
