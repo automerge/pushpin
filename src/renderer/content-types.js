@@ -40,28 +40,23 @@ function registerDefault(contentType) {
 }
 
 function lookup({ type, context } = {}) {
-  const component = registry[type] && registry[type].contexts[context]
-  if (component) {
-    return { ...registry[type], component }
+  const entry = registry[type]
+  const component = entry
+    && entry.contexts[context]
+    || defaultRegistry[context]
+
+
+  if (!component) {
+    return null
   }
 
-  // synthesize a result
-  if (defaultRegistry[context]) {
-    const component = defaultRegistry[context]
+  const { name = 'Unknown', icon = 'question' } = entry || {}
 
-    if (!component) { return null }
-
-    const { name = 'Unknown', icon = 'question' } = (registry[type] || {})
-    const result = { type, name, icon, component }
-
-    return result
-  }
-
-  return null
+  return { type, name, icon, component }
 }
 
-function list({ withUnlisted = false } = {}) {
-  const allTypes = Object.keys(registry).map(type => lookup({ type })).filter(ct => !!ct)
+function list({ context, withUnlisted = false } = {}) {
+  const allTypes = Object.keys(registry).map(type => lookup({ type, context })).filter(ct => !!ct)
   if (withUnlisted) {
     return allTypes
   }
