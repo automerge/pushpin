@@ -74,7 +74,6 @@ ContentTypes.register({
   name: 'Image',
   icon: 'image',
   contexts: {
-    default: ImageContent,
     workspace: ImageContent,
     board: ImageContent
   }

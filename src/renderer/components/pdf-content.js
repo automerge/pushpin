@@ -57,8 +57,10 @@ export default class PDFCard extends React.PureComponent {
 
   loadPDF = (hyperfileUrl) => {
     Hyperfile.fetch(hyperfileUrl, (hyperfileContents) => {
-      this.setState({ currentHyperfileUrl: hyperfileUrl,
-        reactPDFData: { data: hyperfileContents } })
+      this.setState({
+        currentHyperfileUrl: hyperfileUrl,
+        reactPDFData: { data: hyperfileContents }
+      })
     })
   }
 
@@ -172,8 +174,8 @@ export default class PDFCard extends React.PureComponent {
 
     return (
       <div className="PDFCard">
-        { header }
-        { reactPDFData
+        {header}
+        {reactPDFData
           ? (
             <Document
               file={reactPDFData}
@@ -198,7 +200,6 @@ ContentTypes.register({
   name: 'PDF',
   icon: 'book',
   contexts: {
-    default: PDFCard,
     workspace: PDFCard,
     board: PDFCard
   }

@@ -5,11 +5,6 @@ const log = Debug('pushpin:content-types')
 const registry = {}
 const defaultRegistry = {}
 
-// list() is called in Board's render; we need to return the same JS object each time
-// to avoid expensive React re-renders of the nested BoardContextMenu component.
-// TODO: this should not be a concern of content-types.js
-let listedCache = null
-
 function register(contentType) {
   const { type, name, icon } = contentType
   const { unlisted = false, resizable = true } = contentType
@@ -30,8 +25,6 @@ function register(contentType) {
   }
 
   registry[type].contexts = { ...registry[type].contexts, ...contexts }
-
-  listedCache = null
 }
 
 function registerDefault(contentType) {
@@ -39,35 +32,32 @@ function registerDefault(contentType) {
   defaultRegistry[context] = component
 }
 
-function lookup({ type, context = 'workspace' } = {}) {
-  if (registry[type] && registry[type].contexts[context]) {
-    return { ...registry[type], component: registry[type].contexts[context] }
-  }
-  // synthesize a result
-  if (defaultRegistry[context]) {
-    const component = defaultRegistry[context]
+function lookup({ type, context } = {}) {
+  const entry = registry[type]
+  const component = entry
+    && entry.contexts[context]
+    || defaultRegistry[context]
 
-    if (!component) { return null }
 
-    const { name = 'Unknown', icon = 'question' } = (registry[type] || {})
-    const result = { type, name, icon, component }
-
-    return result
+  if (!component) {
+    return null
   }
 
-  return null
+  const { name = 'Unknown', icon = 'question', unlisted, resizable } = entry || {}
+
+  return { type, name, icon, component, unlisted, resizable }
 }
 
-function list({ withUnlisted = false } = {}) {
-  const allTypes = Object.keys(registry).map(type => lookup({ type })).filter(ct => !!ct)
+function list({ context, withUnlisted = false } = {}) {
+  const allTypes = Object.keys(registry)
+    .map(type => lookup({ type, context }))
+    .filter(ct => !!ct)
+
   if (withUnlisted) {
     return allTypes
   }
 
-  if (!listedCache) {
-    listedCache = allTypes.filter(contentType => !contentType.unlisted)
-  }
-  return listedCache
+  return allTypes.filter(type => !type.unlisted)
 }
 
 export default { register, registerDefault, lookup, list }
