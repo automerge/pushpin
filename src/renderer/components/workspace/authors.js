@@ -111,7 +111,7 @@ export default class Authors extends React.PureComponent {
     ))
     return (
       <div className="Authors">
-        {uniqueAuthorIds.length !== 0 ? authors : null}
+        {authors}
       </div>
     )
   }
