@@ -1,4 +1,5 @@
 {
   "editor.tabSize": 2,
-  "eslint.autoFixOnSave": true
+  "eslint.autoFixOnSave": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

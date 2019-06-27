@@ -75,6 +75,7 @@
     "electron-mocha": "^8.0.2",
     "electron-webpack": "^2.6.2",
     "electron-webpack-eslint": "^4.0.2",
+    "electron-webpack-ts": "^3.2.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.2",
     "eslint": "^5.16.0",
@@ -85,6 +86,7 @@
     "mocha": "^6.1.4",
     "parcel-bundler": ">=1.12.3",
     "react-test-renderer": "^16.8.6",
+    "typescript": "^3.5.2",
     "webpack": "4.28.4"
   },
   "resolutions": {
