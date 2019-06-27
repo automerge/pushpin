@@ -11,6 +11,7 @@ import Content, { ContentProps } from '../Content'
 import { ContactDoc } from '.'
 
 import ColorPicker from '../ColorPicker'
+import Label from '../Label'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -122,9 +123,9 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
                   {avatar}
                 </div>
               </div>
-              <div className="Label">
+              <Label>
                 <button className="Type--action" type="button" onClick={this.chooseAvatar}>Choose from file...</button>
-              </div>
+              </Label>
             </div>
             <div className="ListMenu__label">Presence Color</div>
             <div className="ListMenu__item">

@@ -8,6 +8,7 @@ import ListMenuItem from './ListMenuItem'
 import { Doc as WorkspaceDoc } from "./Workspace"
 import { Handle } from 'hypermerge';
 import { ContactDoc } from '../contact';
+import Label from '../Label'
 // TODO: once board is converted use this import and remove the type definition below
 // import { Doc as BoardDoc } from "../board"
 type BoardDoc = any
@@ -112,10 +113,10 @@ export default class Share extends React.PureComponent<Props, State> {
       <div className="ListMenu__item">
         <div className="ContactListMenuItem">
           <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
-          <div className="Label">
+          <Label>
             <p className="Type--primary">None found</p>
             <p className="Type--secondary">Copy a link to your board and start making friends</p>
-          </div>
+          </Label>
         </div>
       </div>
     )
