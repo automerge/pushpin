@@ -102,39 +102,8 @@ input {
   outline: none;
 }
 
-#workspace, .Workspace, .Workspace__container {
-  height: 100%;
-}
+/* End globals */
 
-.Workspace__container {
-  margin-top: 40px;
-}
-.Workspace__container.Workspace__container--image {
-  background: var(--colorInputGrey);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.Workspace__container.Workspace__container--image > * {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, .45);
-}
-
-.Workspace__container.Workspace__container--text {
-  box-sizing: border-box;
-  padding: 40px;
-  background: var(--colorInputGrey);
-  display: flex;
-  justify-content: center;
-}
-.Workspace__container.Workspace__container--text > * {
-  padding: 40px;
-  height: auto;
-  max-width: 720px;
-  background-color: white;
-}
-.Workspace__container.Workspace__container--text > *::-webkit-scrollbar-track {
-  margin: 0;
-}
 
 .Notification {
   margin: 8px;
