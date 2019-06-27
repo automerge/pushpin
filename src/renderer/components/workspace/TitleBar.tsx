@@ -10,6 +10,8 @@ import Share from './Share'
 import { HypermergeUrl, PushpinUrl } from '../../ShareLink';
 import { Handle } from 'hypermerge';
 
+import "./TitleBar.css"
+
 const log = Debug('pushpin:title-bar')
 
 export interface Props {
