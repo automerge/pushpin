@@ -72,7 +72,7 @@ export default class Content extends React.PureComponent {
       <SelfContext.Consumer>
         {selfId => (
           <contentType.component
-            key={hypermergeUrl}
+            key={url}
             ref={this.component}
             context={context}
             url={url}

@@ -36,34 +36,24 @@ export default class ImageContent extends React.PureComponent<Props, State> {
   private handle?: Handle<any>
   state: State = {}
 
-  onChange(doc: any) {
-    this.setState({ doc })
-  }
-
-  refreshHandle(hypermergeUrl: string) {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  }
-
 
   componentDidMount() {
     log('componentDidMount')
-    this.refreshHandle(this.props.hypermergeUrl)
+    const { hypermergeUrl } = this.props
+    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
-  // If an ImageCard changes hypermergeUrl, React will re-use this component
-  // and update the props instead of instantiating a new one and calling
-  // componentDidMount. We have to check for prop updates here and
-  // update our doc handle
-  componentDidUpdate(prevProps: Props) {
-    log('componentWillReceiveProps')
-
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
+  onChange(doc: any) {
+    this.setState({ doc })
+  }
+  
+  componentWillUnmount() {
+    if (!this.handle) {
+      return
     }
+    this.handle.close()
   }
+  
 
   render() {
     log('render')
