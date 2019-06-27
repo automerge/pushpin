@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import ContentTypes from '../content-types'
@@ -9,12 +8,26 @@ import SelfContext from './self-context'
 const log = Debug('pushpin:content')
 const FILTERED_PROPS = ['type', 'hypermergeUrl']
 
-export default class Content extends React.PureComponent {
-  static propTypes = {
-    url: PropTypes.string.isRequired,
-    context: PropTypes.string.isRequired
-  }
+// this is the interface imported by Content types
+export interface ContentProps {
+  context: string
+  url: string 
+  type: string
+  hypermergeUrl: string
+  selfId: string
+}
 
+// These are the props the generic Content wrapper receives
+interface Props {
+  url: string
+  context: string
+}
+
+interface State {
+  contentCrashed: boolean
+}
+
+export default class Content extends React.PureComponent<Props, State> {
   static initializeContentDoc = (type, typeAttrs = {}) => {
     const { repo } = window // still not a great idea
     const contentType = ContentTypes.lookup({ type, context: 'workspace' })
@@ -29,13 +42,14 @@ export default class Content extends React.PureComponent {
     return url
   }
 
-  // This is the New Boilerplate, adapted slightly for content
-  state = {}
+  component = React.createRef()
+  state = { contentCrashed: false }
 
   componentDidCatch = (e) => {
     this.setState({ contentCrashed: e })
   }
 
+  // XXX this will make a child type very angry/sad later when we reach it
   filterProps = (props) => {
     const filtered = {}
     Object.keys(props)

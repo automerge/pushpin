@@ -2,24 +2,21 @@ import React from 'react'
 import Debug from 'debug'
 import { Handle } from 'hypermerge'
 
+import { ContentProps } from './content'
 import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:image-card')
 
-interface Props {
-  hypermergeUrl: string
-}
-
-interface Doc {
+interface ImageDoc {
   hyperfileUrl: string
 }
 
 interface State {
-  doc?: Doc
+  doc?: ImageDoc
 }
 
-export default class ImageContent extends React.PureComponent<Props, State> {
-  static initializeDocument(image: Doc, { hyperfileUrl }) {
+export default class ImageContent extends React.PureComponent<ContentProps, State> {
+  static initializeDocument(image: ImageDoc, { hyperfileUrl }) {
     image.hyperfileUrl = hyperfileUrl
   }
 
