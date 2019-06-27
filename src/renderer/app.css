@@ -113,31 +113,6 @@ input {
   padding-bottom: 0px;
 }
 
-
-
-@keyframes text-pop {
-  from {
-    font-size: 1.35em;
-  }
-
-  to {
-    font-size: 1.25em;
-  }
-}
-
-.ViewedDocs {
-  background: white;
-}
-
-.Invitation {
-  display: flex;
-  align-items: center;
-}
-
-.Invitation__body {
-  margin-left: 10px;
-}
-
 .DocLink {
   display: flex;
   align-items: center;
