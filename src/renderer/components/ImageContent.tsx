@@ -1,17 +1,26 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
+import { Handle } from 'hypermerge'
 
 import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:image-card')
 
-export default class ImageContent extends React.PureComponent {
+interface Props {
+  hypermergeUrl: string
+}
+
+interface State {
+  hyperfileUrl?: string
+}
+
+export default class ImageContent extends React.PureComponent<Props, State> {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired
   }
 
-  static initializeDocument = (image, { hyperfileUrl }) => {
+  static initializeDocument(image: any, { hyperfileUrl }) {
     image.hyperfileUrl = hyperfileUrl
   }
 
@@ -25,13 +34,14 @@ export default class ImageContent extends React.PureComponent {
   // static maxWidth = 36
   // static maxHeight = 36
 
-  state = {}
+  private handle?: Handle<any>
+  state: State = {}
 
-  onChange = (doc) => {
+  onChange(doc: any) {
     this.setState({ ...doc })
   }
 
-  refreshHandle = (hypermergeUrl) => {
+  refreshHandle(hypermergeUrl: string) {
     if (this.handle) {
       this.handle.close()
     }
@@ -39,7 +49,7 @@ export default class ImageContent extends React.PureComponent {
   }
 
 
-  componentDidMount = () => {
+  componentDidMount() {
     log('componentDidMount')
     this.refreshHandle(this.props.hypermergeUrl)
   }
@@ -48,7 +58,7 @@ export default class ImageContent extends React.PureComponent {
   // and update the props instead of instantiating a new one and calling
   // componentDidMount. We have to check for prop updates here and
   // update our doc handle
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate(prevProps: Props) {
     log('componentWillReceiveProps')
 
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
@@ -56,7 +66,7 @@ export default class ImageContent extends React.PureComponent {
     }
   }
 
-  render = () => {
+  render() {
     log('render')
 
     if (!this.state.hyperfileUrl) {

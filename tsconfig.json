@@ -2,7 +2,7 @@
   "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
     "strict": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     // "sourceMap": true,
     "noFallthroughCasesInSwitch": true,
     "lib": [
