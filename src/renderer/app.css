@@ -113,45 +113,6 @@ input {
   padding-bottom: 0px;
 }
 
-.Avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
-  padding:2px;
-}
-
-.Avatar img {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.Avatar--title-bar {
-  width: 32px;
-  height: 32px;
-}
-
-.Avatar--title-bar img {
-  width: 28px;
-  height: 28px;
-}
-
-.Avatar--board {
-  flex: none;
-  width: 60px;
-  height: 60px;
-}
-.Avatar--board > img {
-  width: 58px;
-  height: 58px;
-}
 .Contact--board {
   display: flex;
   flex-direction: column;
@@ -174,11 +135,6 @@ input {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.Avatar--online {
-  border: 2px solid var(--highlight-color, var(--colorOnline));
-  box-shadow: 0 0 4px 0 var(--highlight-color, var(--colorOnline));
 }
 
 .BoardTitle .dropdown {
