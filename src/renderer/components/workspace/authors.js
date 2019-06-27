@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import Content from '../content'
+import Content from '../Content'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:authors')

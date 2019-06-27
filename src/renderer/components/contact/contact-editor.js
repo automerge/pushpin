@@ -7,7 +7,7 @@ import { createDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
 
 import { USER, IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
-import Content from '../content'
+import Content from '../Content'
 import ColorPicker from '../color-picker'
 
 const { dialog } = remote

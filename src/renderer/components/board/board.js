@@ -6,7 +6,7 @@ import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import uuid from 'uuid/v4'
 
-import Content from '../content'
+import Content from '../Content'
 import ContentTypes from '../../content-types'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'

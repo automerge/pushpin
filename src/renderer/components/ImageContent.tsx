@@ -2,7 +2,7 @@ import React from 'react'
 import Debug from 'debug'
 import { Handle } from 'hypermerge'
 
-import { ContentProps } from './content'
+import { ContentProps } from './Content'
 import ContentTypes from '../content-types'
 
 const log = Debug('pushpin:image-card')

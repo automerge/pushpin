@@ -4,7 +4,7 @@ import Debug from 'debug'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
 
-import Content from '../content'
+import Content from '../Content'
 import ContentTypes from '../../content-types'
 import { parseDocumentLink } from '../../share-link'
 

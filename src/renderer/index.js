@@ -9,7 +9,7 @@ import raf from 'random-access-file'
 import DiscoverySwarm from 'discovery-cloud-client'
 
 import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
-import Content from './components/content'
+import Content from './components/Content'
 
 // We load these modules here so that the content registry will have them.
 import './components/workspace/workspace'
@@ -26,7 +26,7 @@ import './components/text-content'
 import './components/ImageContent'
 import './components/thread-content'
 import './components/url-content'
-import './components/pdf-content'
+import './components/PdfContent'
 
 import { createDocumentLink } from './share-link'
 

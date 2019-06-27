@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Content from '../content'
+import Content from '../Content'
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 

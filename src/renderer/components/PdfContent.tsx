@@ -1,17 +1,26 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
+import { Handle } from 'hypermerge'
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../content-types'
+import { ContentProps } from './Content'
 
-export default class PDFCard extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    context: PropTypes.string.isRequired
-  }
+interface PdfDoc {
+  hyperfileUrl: string
+}
 
+interface State {
+  currentHyperfileUrl: string
+  reactPDFData?: object
+  pageInputValue: string | number
+  pageNum: number
+  numPages: number
+  doc?: PdfDoc
+}
+
+export default class PDFCard extends React.PureComponent<ContentProps, State> {
   static initializeDocument = (pdf, { hyperfileUrl }) => {
     pdf.hyperfileUrl = hyperfileUrl
   }
@@ -25,34 +34,27 @@ export default class PDFCard extends React.PureComponent {
   //
   static maxWidth = 72
 
+  private handle?: Handle<PdfDoc>
   state = {
     currentHyperfileUrl: '',
-    pageInputValue: 1,
+    reactPDFData: {},
+    pageInputValue: '1',
     pageNum: 1,
     numPages: 0
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
-  componentWillUnmount = () => this.handle.close()
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
+  componentWillMount = () => window.repo.watch<PdfDoc>(
+    this.props.hypermergeUrl, 
+    (doc) => this.onChange(doc)
+  )
+  componentWillUnmount = () => this.handle && this.handle.close()
 
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  }
-
-  onChange = (doc) => {
+  onChange = (doc: PdfDoc) => {
     if (doc.hyperfileUrl && doc.hyperfileUrl !== this.state.currentHyperfileUrl) {
       this.loadPDF(doc.hyperfileUrl)
     }
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   loadPDF = (hyperfileUrl) => {
@@ -64,7 +66,7 @@ export default class PDFCard extends React.PureComponent {
     })
   }
 
-  disableForward = () => this.pageNum >= this.state.numPages
+  disableForward = () => this.state.pageNum >= this.state.numPages
   forward = () => {
     let { pageNum } = this.state
     if (pageNum < this.state.numPages) {
@@ -74,7 +76,7 @@ export default class PDFCard extends React.PureComponent {
     this.setState({ pageNum, pageInputValue: pageNum })
   }
 
-  disableBack = () => this.pageNum <= 1
+  disableBack = () => this.state.pageNum <= 1
   back = () => {
     let { pageNum } = this.state
     if (pageNum > 1) {
@@ -86,10 +88,10 @@ export default class PDFCard extends React.PureComponent {
 
   onKeyDown = (e) => {
     if (e.key === 'ArrowLeft') {
-      this.prevPage()
+      this.back()
       e.stopPropagation()
     } else if (e.key === 'ArrowRight') {
-      this.nextPage()
+      this.forward()
       e.stopPropagation()
     }
   }
@@ -133,7 +135,7 @@ export default class PDFCard extends React.PureComponent {
     const { info = {} } = metadata
     const { Title } = info
 
-    if (Title) {
+    if (Title && this.handle) {
       this.handle.change((doc) => {
         doc.title = Title
       })

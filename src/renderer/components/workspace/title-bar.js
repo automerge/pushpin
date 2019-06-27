@@ -5,7 +5,7 @@ import { clipboard } from 'electron'
 
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
 import Omnibox from './omnibox'
-import Content from '../content'
+import Content from '../Content'
 import Authors from './authors'
 import Share from './share'
 

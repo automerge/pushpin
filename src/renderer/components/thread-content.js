@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
-import Content from './content'
+import Content from './Content'
 import { createDocumentLink } from '../share-link'
 
 export default class ThreadContent extends React.PureComponent {
