@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import Content from '../content'
+import ContactEditor from '../contact/contact-editor'
+
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import ListMenuItem from './list-menu-item'
 
@@ -13,7 +14,7 @@ export default class Share extends React.PureComponent {
     hypermergeUrl: PropTypes.string.isRequired // Workspace
   }
 
-  state = { tab: 'authors' }
+  state = { tab: 'contacts' }
 
   // This is the New Boilerplate
   componentWillMount = () => {
@@ -51,7 +52,6 @@ export default class Share extends React.PureComponent {
 
   onBoardChange = (doc) => {
     log('onBoardChange')
-    this.updateIdentityReferences(this.workspaceHandle, this.boardHandle)
     this.setState({ board: doc })
   }
 
@@ -66,40 +66,6 @@ export default class Share extends React.PureComponent {
         }
       }
     })
-  }
-
-  updateIdentityReferences = (workspaceHandle, boardHandle) => {
-    log('updateIdentityReferences')
-    if (!workspaceHandle || !boardHandle) {
-      log('update called without both handles')
-      return
-    }
-    const { authorIds = [] } = boardHandle.state || {}
-    const { selfId, contactIds = [] } = workspaceHandle.state || {}
-
-    // no work required if there's no board...
-    if (!boardHandle.state) {
-      return
-    }
-
-    // Add any never-before seen authors to our contacts.
-    const newContactIds = authorIds.filter((a) => !contactIds.includes(a) && !(selfId === a))
-    if (newContactIds.length > 0) {
-      workspaceHandle.change((workspace) => {
-        workspace.contactIds.push(...newContactIds)
-      })
-    }
-
-    // Add ourselves to the authors if we haven't yet.
-    if (selfId && !authorIds.includes(selfId)) {
-      log('updateIdentityReferences.addSelf')
-      boardHandle.change((board) => {
-        if (!board.authorIds) {
-          board.authorIds = []
-        }
-        board.authorIds.push(selfId)
-      })
-    }
   }
 
   offerDocumentToIdentity = (e, contactId) => {
@@ -172,37 +138,11 @@ export default class Share extends React.PureComponent {
     )
   }
 
-  renderAuthors = () => {
-    const { authorIds = [] } = (this.state.board || {})
-    const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
-    const noneFound = (
-      <div className="ListMenu__item">
-        <div className="ContactListMenuItem">
-          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
-          <div className="Label">
-            <p className="Type--primary">None found</p>
-            <p className="Type--secondary">Nobody has access to this but you</p>
-          </div>
-        </div>
-      </div>
-    )
-    const authors = uniqueAuthorIds.map(id => (
-      <div key={id} className="ListMenu__item">
-        <Content
-          key={id}
-          context="list"
-          url={createDocumentLink('contact', id)}
-        />
-      </div>
-    ))
-    return (
-      <div>
-        <div className="ListMenu__section">
-          {uniqueAuthorIds.length !== 0 ? authors : noneFound}
-        </div>
-      </div>
-    )
-  }
+
+  renderProfile = () => (
+
+    <ContactEditor hypermergeUrl={this.state.workspace.selfId} />
+  )
 
   tabClasses = (name) => {
     if (this.state.tab === name) { return 'Tabs__tab Tabs__tab--active' }
@@ -211,13 +151,10 @@ export default class Share extends React.PureComponent {
 
   render = () => {
     let body
-
-    // XXX if notifications is empty, let's default to contacts.
-    // NB: i have not implemented this, i'm just leaving a note to myself
-    if (this.state.tab === 'contacts') {
+    if (this.state.tab === 'profile') {
+      body = this.renderProfile()
+    } else if (this.state.tab === 'contacts') {
       body = this.renderContacts()
-    } else if (this.state.tab === 'authors') {
-      body = this.renderAuthors()
     }
 
     return (
@@ -226,17 +163,17 @@ export default class Share extends React.PureComponent {
           <div className="Tabs">
             <div
               role="button"
-              className={this.tabClasses('authors')}
-              onClick={() => this.setState({ tab: 'authors' })}
-            >
-              <i className="fa fa-pencil" /> Authors
-            </div>
-            <div
-              role="button"
               className={this.tabClasses('contacts')}
               onClick={() => this.setState({ tab: 'contacts' })}
             >
               <i className="fa fa-group" /> All Contacts
+            </div>
+            <div
+              role="button"
+              className={this.tabClasses('profile')}
+              onClick={() => this.setState({ tab: 'profile' })}
+            >
+              <i className="fa fa-pencil" /> Profile
             </div>
           </div>
           {body}

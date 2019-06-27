@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
+import { clipboard } from 'electron'
 
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
-
-import OmniPrompt from './omni-prompt'
+import Omnibox from './omnibox'
 import Content from '../content'
-import ContactEditor from '../contact/contact-editor'
-import PresentContacts from './present-contacts'
+import Authors from './authors'
 import Share from './share'
-import { createDocumentLink } from '../../share-link'
 
 const log = Debug('pushpin:title-bar')
 
@@ -18,8 +16,12 @@ export default class TitleBar extends React.PureComponent {
     hypermergeUrl: PropTypes.string.isRequired,
     openDoc: PropTypes.func.isRequired,
   }
-
-  state = { sessionHistory: [], historyIndex: 0 }
+  dropdownRef = React.createRef()
+  state = {
+    activeOmnibox: false,
+    sessionHistory: [],
+    historyIndex: 0
+  }
 
   // This is the New Boilerplate
   componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
@@ -28,6 +30,12 @@ export default class TitleBar extends React.PureComponent {
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
       this.refreshHandle(this.props.hypermergeUrl)
     }
+  }
+  componentDidMount = () => {
+    document.addEventListener('keydown', this.onKeyDown)
+  }
+  componentWillUnmount = () => {
+    document.removeEventListener('keydown', this.onKeyDown)
   }
 
   refreshHandle = (hypermergeUrl) => {
@@ -83,6 +91,39 @@ export default class TitleBar extends React.PureComponent {
     })
   }
 
+  onKeyDown = (e) => {
+    if (e.key === '/' && document.activeElement === document.body) {
+      if (!this.state.activeOmnibox) {
+        this.activateOmnibox()
+        e.preventDefault()
+      }
+    }
+    if (e.key === 'Escape' && this.state.activeOmnibox) {
+      this.deactivateOmnibox()
+      e.preventDefault()
+    }
+  }
+
+  activateOmnibox = () => {
+    this.dropdownRef.current.show()
+  }
+
+  deactivateOmnibox = () => {
+    this.dropdownRef.current.hide()
+  }
+
+  onShow = () => {
+    this.setState(() => ({ activeOmnibox: true }))
+  }
+
+  onHide = () => {
+    this.setState(() => ({ activeOmnibox: false }))
+  }
+
+  copyLink = (e) => {
+    clipboard.writeText(this.state.currentDocUrl)
+  }
+
   render = () => {
     log('render')
     if (!this.state.currentDocUrl) {
@@ -91,27 +132,44 @@ export default class TitleBar extends React.PureComponent {
 
     return (
       <div className="TitleBar">
-        <Dropdown className="TitleBar__menuItem TitleBar__left">
-          <DropdownTrigger>
-            <Content context="title-bar" url={createDocumentLink('contact', this.state.selfId)} />
-          </DropdownTrigger>
-          <DropdownContent>
-            <ContactEditor hypermergeUrl={this.state.selfId} />
-          </DropdownContent>
-        </Dropdown>
         <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
           <i className="fa fa-angle-left" />
         </button>
-        <button disabled={this.disableForward()} type="button" onClick={this.forward} className="TitleBar__menuItem">
+        <Dropdown
+          ref={this.dropdownRef}
+          className="TitleBar__menuItem TitleBar__right"
+          onShow={this.onShow}
+          onHide={this.onHide}
+        >
+          <DropdownTrigger>
+            <i className="fa fa-map" />
+          </DropdownTrigger>
+          <DropdownContent>
+            <Omnibox
+              active={this.state.activeOmnibox}
+              hypermergeUrl={this.props.hypermergeUrl}
+              omniboxFinished={this.deactivateOmnibox}
+            />
+          </DropdownContent>
+        </Dropdown>
+
+        <button
+          disabled={this.disableForward()}
+          type="button"
+          onClick={this.forward}
+          className="TitleBar__menuItem"
+        >
           <i className="fa fa-angle-right" />
         </button>
-        <Content url={this.state.currentDocUrl} context="list" editable />
-        <PresentContacts
-          currentDocUrl={this.state.currentDocUrl}
-        />
-        <OmniPrompt hypermergeUrl={this.props.hypermergeUrl} />
 
-        <Dropdown className="TitleBar__menuItem TitleBar__right">
+        <Content url={this.state.currentDocUrl} context="list" editable />
+        <Authors
+          hypermergeUrl={this.props.hypermergeUrl}
+        />
+
+        <Dropdown className="TitleBar__menuItem
+          TitleBar__right"
+        >
           <DropdownTrigger>
             <i className="fa fa-group" />
           </DropdownTrigger>
@@ -119,6 +177,14 @@ export default class TitleBar extends React.PureComponent {
             <Share hypermergeUrl={this.props.hypermergeUrl} />
           </DropdownContent>
         </Dropdown>
+
+        <button
+          className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
+          type="button"
+          onClick={this.copyLink}
+        >
+          <i className="fa fa-clipboard" />
+        </button>
       </div>
     )
   }
