@@ -46,12 +46,11 @@ export default class ImageContent extends React.PureComponent<Props, State> {
   onChange(doc: any) {
     this.setState({ doc })
   }
-  
+
   componentWillUnmount() {
-    if (!this.handle) {
-      return
+    if (this.handle) {
+      this.handle.close()
     }
-    this.handle.close()
   }
   
 
