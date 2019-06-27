@@ -1,8 +1,8 @@
 {
   "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
-    "strict": false,
-    "noImplicitAny": false,
+    "strict": true,
+    "noImplicitAny": true,
     // "sourceMap": true,
     "noFallthroughCasesInSwitch": true,
     "lib": [
@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     // "module": "commonjs",
     // "target": "es2015",
-    // "jsx": "react",
+    "jsx": "react",
     "pretty": true
   }
 }
