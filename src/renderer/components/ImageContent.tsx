@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { Handle } from 'hypermerge'
 
@@ -11,16 +10,16 @@ interface Props {
   hypermergeUrl: string
 }
 
+interface Doc {
+  hyperfileUrl: string
+}
+
 interface State {
-  hyperfileUrl?: string
+  doc?: Doc
 }
 
 export default class ImageContent extends React.PureComponent<Props, State> {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired
-  }
-
-  static initializeDocument(image: any, { hyperfileUrl }) {
+  static initializeDocument(image: Doc, { hyperfileUrl }) {
     image.hyperfileUrl = hyperfileUrl
   }
 
@@ -38,7 +37,7 @@ export default class ImageContent extends React.PureComponent<Props, State> {
   state: State = {}
 
   onChange(doc: any) {
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   refreshHandle(hypermergeUrl: string) {
@@ -69,13 +68,15 @@ export default class ImageContent extends React.PureComponent<Props, State> {
   render() {
     log('render')
 
-    if (!this.state.hyperfileUrl) {
+    const { doc } = this.state
+
+    if (!doc || !doc.hyperfileUrl) {
       // we used to show some kind of stand-in value but we don't have a design
       // for one that works everywhere the image works, so for now: nothing.
       return null
     }
 
-    return <img className="image" alt="" src={this.state.hyperfileUrl} />
+    return <img className="image" alt="" src={doc.hyperfileUrl} />
   }
 }
 
