@@ -113,24 +113,6 @@ input {
   padding-bottom: 0px;
 }
 
-.ColorPicker {
-  background: #fff;
-  border: 0 solid rgba(0,0,0,0.25);
-  border-radius: 2px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(24px, 24px));
-  grid-gap: 8px;
-  width: 100%;
-}
-
-.ColorPicker__swatch {
-  width: 24px;
-  height: 24px;
-}
-.ColorPicker__swatch > span > div {
-  border-radius: 4px
-}
-
 .Authors {
   display: flex;
   align-items: center;
