@@ -25,7 +25,7 @@ import './components/contact'
 import './components/TextContent'
 import './components/ImageContent'
 import './components/ThreadContent'
-import './components/url-content'
+import './components/UrlContent'
 import './components/PdfContent'
 
 import { createDocumentLink } from './share-link'
