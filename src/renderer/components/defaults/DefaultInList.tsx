@@ -1,54 +1,52 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-
 import ContentTypes from '../../content-types'
+import { ContentProps } from '../Content';
+import { Handle } from 'hypermerge';
 
-export default class ListItem extends React.PureComponent {
-  static propTypes = {
-    url: PropTypes.string.isRequired,
-    hypermergeUrl: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
+
+interface Doc {
+  title?: string
+}
+
+interface State {
+  doc?: Doc
+}
+
+export default class ListItem extends React.PureComponent<ContentProps, State> {
+  handle?: Handle<Doc>
+  state: State = {}
+
+  componentDidMount() {
+    this.handle = window.repo.watch(this.props.hypermergeUrl, this.onChange)
   }
 
-  state = { doc: {} }
-
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
-  componentWillUnmount = () => this.handle.close()
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
+  componentWillUnmount() {
+    this.handle && this.handle.close()
+    delete this.handle
   }
 
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  }
-
-
-  onChange = (doc) => {
+  onChange = (doc: Doc) => {
     this.setState({ doc })
   }
 
-  onDragStart = (e) => {
+  onDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('application/pushpin-url', this.props.url)
   }
 
-  render = () => {
+  render() {
     const { type } = this.props
     const { doc } = this.state
+    if (!doc) return null
 
     // this context: default business is wrong wrong wrong
-    const contentType = ContentTypes.lookup({ type })
+    const contentType = ContentTypes.lookup({ type, context: "list" })
 
     const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
     // TODO: pick background color based on url
     return (
       <div className="DocLink" style={css.listItem}>
-        <i draggable="true" onDragStart={this.onDragStart} className={`Badge fa fa-${icon}`} />
+        <i draggable onDragStart={this.onDragStart} className={`Badge fa fa-${icon}`} />
         <div className="DocLink__title">{(doc && doc.title) ? doc.title : name}</div>
       </div>
     )
