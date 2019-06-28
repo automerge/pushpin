@@ -496,7 +496,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const id = uuid()
 
     const { type } = parseDocumentLink(url)
-    const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
+    const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) as any
 
     width = width ? this.snapMeasureToGrid(width) : null
     width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : null
@@ -724,7 +724,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         }
 
         const { type } = parseDocumentLink(card.url)
-        const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
+        const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) as any
         const minWidth = (component.minWidth * GRID_SIZE) || CARD_MIN_WIDTH
         const minHeight = (component.minHeight * GRID_SIZE) || CARD_MIN_HEIGHT
         const maxWidth = (component.maxWidth * GRID_SIZE) || Infinity
