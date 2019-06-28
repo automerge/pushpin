@@ -7,7 +7,7 @@ import uuid from 'uuid'
 import ContentTypes from '../../content-types'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import Content from '../Content'
-import SelfContext from '../self-context'
+import SelfContext from '../SelfContext'
 import TitleBar from './title-bar'
 
 const log = Debug('pushpin:workspace')
