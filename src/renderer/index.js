@@ -15,7 +15,7 @@ import Content from './components/Content'
 import './components/workspace/workspace'
 
 // default context components
-import './components/defaults/default-in-list'
+import './components/defaults/DefaultInList'
 
 // board in various contexts
 import './components/board'
