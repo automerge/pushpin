@@ -1,6 +1,6 @@
 import Path from 'path'
 import Url from 'url'
-import electron from 'electron'
+import electron, { OpenDialogOptions } from 'electron'
 
 /* we need to resolve static assets differently in local HMR development mode */
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -12,12 +12,12 @@ function getStatic(val: string) {
   return Path.resolve(__static, val)
 }
 
-export const IMAGE_DIALOG_OPTIONS = {
+export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
 }
 
-export const PDF_DIALOG_OPTIONS = {
+export const PDF_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
   filters: [{ name: 'PDF files', extensions: ['pdf'] }]
 }
