@@ -71,7 +71,7 @@ export default class Board extends React.PureComponent {
     this.tracking = {}
     this.cardRefs = {}
     this.contactHeartbeatTimerId = {}
-    this.state = { doc: {}, cards: {}, selected: [] }
+    this.state = { doc: {}, tracking: {}, selected: [] }
   }
 
   static initializeDocument(board, { title, backgroundColor }) {
@@ -541,17 +541,12 @@ export default class Board extends React.PureComponent {
   }
 
   // Copy view-relevant move/resize state over to React.
-  setDragState = (card, tracking) => {
+  setDragState = (card, { moveX, moveY, resizeWidth, resizeHeight }) => {
     this.setState((prevState) => {
-      const cards = { ...prevState.cards,
-        [card.id]: {
-          moveX: tracking.moveX,
-          moveY: tracking.moveY,
-          resizeWidth: tracking.resizeWidth,
-          resizeHeight: tracking.resizeHeight
-        }
+      const tracking = { ...prevState.tracking,
+        [card.id]: { moveX, moveY, resizeWidth, resizeHeight }
       }
-      return ({ cards })
+      return ({ tracking })
     })
   }
 
@@ -833,7 +828,7 @@ export default class Board extends React.PureComponent {
           selected={selected}
           remoteSelected={cardsSelected[id] || []}
           uniquelySelected={uniquelySelected}
-          dragState={this.state.cards[id]}
+          dragState={this.state.tracking[id]}
           onDrag={this.onDrag}
           onStop={this.onStop}
           onCardClicked={this.onCardClicked}
