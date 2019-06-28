@@ -1,10 +1,15 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
-import { ContentProps } from './components/Content';
+// import { ContentProps } from './components/Content';
 
 const log = Debug('pushpin:content-types')
 
-type Component = ComponentType<ContentProps>
+// type Component = ComponentType<ContentProps>
+// TODO: This should be ComponentType<ContentProps>, but it breaks with
+// Content's "pass-through" props when React casts them with Readonly<P>.
+// The fix is likely to put "pass-through" props inside a single 'options: any' prop
+// that allows for pass-through.
+type Component = ComponentType<any>
 
 export type Context =
   | 'root'

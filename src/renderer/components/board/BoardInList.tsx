@@ -3,8 +3,8 @@ import TitleEditor from '../TitleEditor'
 import { BoardDoc } from '.'
 import { ContentProps } from '../Content'
 import { Handle } from 'hypermerge'
- 
-interface EditableContentProps extends ContentProps {
+
+interface Props extends ContentProps {
   editable: boolean
 }
 
@@ -12,7 +12,7 @@ interface State {
   doc?: BoardDoc
 }
 
-export default class BoardInList extends React.PureComponent<EditableContentProps, State> {
+export default class BoardInList extends React.PureComponent<Props, State> {
   state: State = {}
 
   private handle?: Handle<BoardDoc>
@@ -43,10 +43,10 @@ export default class BoardInList extends React.PureComponent<EditableContentProp
     return (
       <div draggable onDragStart={this.onDragStart} className="DocLink">
         <i ref={this.badgeRef} className="Badge fa fa-files-o" style={{ background: backgroundColor }} />
-    {this.props.editable ? (
-      <TitleEditor url={this.props.hypermergeUrl} />
-    ) : (
-      <div className="DocLink__title">{title}</div>)}
-    </div>)
+        {this.props.editable ? (
+          <TitleEditor url={this.props.hypermergeUrl} />
+        ) : (
+            <div className="DocLink__title">{title}</div>)}
+      </div>)
   }
 }
