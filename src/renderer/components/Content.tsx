@@ -21,6 +21,7 @@ export interface ContentProps {
 interface Props {
   url: string
   context: string
+  [arbitraryProp: string]: any
 }
 
 interface State {

@@ -7,7 +7,7 @@ import ContentTypes from '../../content-types'
 import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
 import Content from '../Content'
 import SelfContext from '../SelfContext'
-import TitleBar from './title-bar'
+import TitleBar from './TitleBar'
 import { Handle } from 'hypermerge';
 import { ContactDoc } from '../contact';
 

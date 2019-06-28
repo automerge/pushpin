@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { clipboard } from 'electron'
 
@@ -8,41 +7,46 @@ import Omnibox from './omnibox'
 import Content from '../Content'
 import Authors from './authors'
 import Share from './share'
+import { HypermergeUrl, PushpinUrl } from '../../ShareLink';
+import { Handle } from 'hypermerge';
 
 const log = Debug('pushpin:title-bar')
 
-export default class TitleBar extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    openDoc: PropTypes.func.isRequired,
-  }
-  dropdownRef = React.createRef()
-  state = {
+export interface Props {
+  hypermergeUrl: HypermergeUrl
+  openDoc: Function
+}
+
+interface Doc {
+  currentDocUrl: PushpinUrl
+}
+
+interface State {
+    activeOmnibox: boolean
+    sessionHistory: PushpinUrl[]
+    historyIndex: number
+    doc?: Doc
+}
+
+export default class TitleBar extends React.PureComponent<Props, State> {
+  dropdownRef = React.createRef<Dropdown>()
+  handle?: Handle<Doc>
+  state: State = {
     activeOmnibox: false,
     sessionHistory: [],
     historyIndex: 0
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
-  componentWillUnmount = () => this.handle.close()
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
+  componentWillMount = () => {
+    this.handle = window.repo.watch(this.props.hypermergeUrl, (doc) => this.onChange(doc))
   }
   componentDidMount = () => {
     document.addEventListener('keydown', this.onKeyDown)
   }
   componentWillUnmount = () => {
+    this.handle && this.handle.close()
     document.removeEventListener('keydown', this.onKeyDown)
-  }
-
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
   disableBack = () => this.state.historyIndex === (this.state.sessionHistory.length - 1)
@@ -73,7 +77,7 @@ export default class TitleBar extends React.PureComponent {
     })
   }
 
-  onChange = (doc) => {
+  onChange = (doc: Doc) => {
     this.setState((prevState) => {
       let { historyIndex, sessionHistory } = prevState
 
@@ -87,11 +91,11 @@ export default class TitleBar extends React.PureComponent {
         historyIndex = 0
       }
 
-      return { ...doc, sessionHistory, historyIndex }
+      return { doc, sessionHistory, historyIndex }
     })
   }
 
-  onKeyDown = (e) => {
+  onKeyDown = (e: KeyboardEvent) => {
     if (e.key === '/' && document.activeElement === document.body) {
       if (!this.state.activeOmnibox) {
         this.activateOmnibox()
@@ -105,7 +109,7 @@ export default class TitleBar extends React.PureComponent {
   }
 
   activateOmnibox = () => {
-    this.dropdownRef.current.show()
+    this.dropdownRef && this.dropdownRef.current && this.dropdownRef.current.show()
   }
 
   deactivateOmnibox = () => {
@@ -120,13 +124,15 @@ export default class TitleBar extends React.PureComponent {
     this.setState(() => ({ activeOmnibox: false }))
   }
 
-  copyLink = (e) => {
-    clipboard.writeText(this.state.currentDocUrl)
+  copyLink = (e: React.MouseEvent) => {
+    if (this.state.doc) {
+      clipboard.writeText(this.state.doc.currentDocUrl)
+    }
   }
 
   render = () => {
     log('render')
-    if (!this.state.currentDocUrl) {
+    if (!this.state.doc || !this.state.doc.currentDocUrl) {
       return null
     }
 
@@ -162,7 +168,7 @@ export default class TitleBar extends React.PureComponent {
           <i className="fa fa-angle-right" />
         </button>
 
-        <Content url={this.state.currentDocUrl} context="list" editable />
+        <Content url={this.state.doc.currentDocUrl} context="list" editable />
         <Authors
           hypermergeUrl={this.props.hypermergeUrl}
         />
