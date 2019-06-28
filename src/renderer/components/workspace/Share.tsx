@@ -155,7 +155,7 @@ export default class Share extends React.PureComponent<Props, State> {
 
   renderProfile = () => {
     if (!this.state.workspace) return null
-    return <Content url={this.state.workspace.selfId} context="workspace"></Content>
+    return <Content url={createDocumentLink('contact', this.state.workspace.selfId)} context="workspace"></Content>
   }
 
   tabClasses = (name: TabName) => {
