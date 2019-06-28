@@ -1,4 +1,4 @@
-import { parseDocumentLink } from './share-link'
+import { parseDocumentLink } from './ShareLink'
 
 //
 // Example:

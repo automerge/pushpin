@@ -2,7 +2,7 @@ import React from 'react'
 import Debug from 'debug'
 
 import ContentTypes from '../content-types'
-import { parseDocumentLink } from '../share-link'
+import { parseDocumentLink } from '../ShareLink'
 import SelfContext from './SelfContext'
 
 const log = Debug('pushpin:content')
@@ -11,7 +11,7 @@ const FILTERED_PROPS = ['type', 'hypermergeUrl']
 // this is the interface imported by Content types
 export interface ContentProps {
   context: string
-  url: string 
+  url: string
   type: string
   hypermergeUrl: string
   selfId: string

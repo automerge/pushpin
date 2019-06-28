@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import Content from '../Content'
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 
 const log = Debug('pushpin:authors')
 

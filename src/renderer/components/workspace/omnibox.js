@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 import ContentSection from './content-section'
 
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 
 import InvitationsView from '../../invitations-view'
 

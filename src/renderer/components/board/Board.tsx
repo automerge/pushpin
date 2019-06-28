@@ -8,7 +8,7 @@ import uuid from 'uuid/v4'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../content-types'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
@@ -581,7 +581,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const snapWidth = this.snapMeasureToGrid(width)
     const snapHeight = this.snapMeasureToGrid(height)
     if (snapWidth === this.state.doc.cards[id].width
-        && snapHeight === this.state.doc.cards[id].height) {
+      && snapHeight === this.state.doc.cards[id].height) {
       return
     }
     this.handle && this.handle.change((b) => {
@@ -785,9 +785,12 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     if (contact && selected) {
       this.setState((prevState) =>
-        ({ remoteSelection: {
-          ...prevState.remoteSelection,
-          [contact]: selected } }
+        ({
+          remoteSelection: {
+            ...prevState.remoteSelection,
+            [contact]: selected
+          }
+        }
         ))
     }
 
@@ -803,9 +806,12 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
   clearRemoteSelection = (contact) => {
     this.setState((prevState) =>
-      ({ remoteSelection: {
-        ...prevState.remoteSelection,
-        [contact]: undefined } }))
+      ({
+        remoteSelection: {
+          ...prevState.remoteSelection,
+          [contact]: undefined
+        }
+      }))
   }
 
   updateSelection = (selected) => {

@@ -4,7 +4,7 @@ import Debug from 'debug'
 
 import ContactEditor from '../contact/ContactEditor'
 
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 import ListMenuItem from './list-menu-item'
 
 const log = Debug('pushpin:share')

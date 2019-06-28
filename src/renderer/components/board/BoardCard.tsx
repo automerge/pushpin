@@ -5,7 +5,7 @@ import classNames from 'classnames'
 
 import Content from '../Content'
 import ContentTypes from '../../content-types'
-import { parseDocumentLink } from '../../share-link'
+import { parseDocumentLink } from '../../ShareLink'
 
 import { BoardDocCard } from '.'
 import { TrackingEntry, DragType, isResizing, isMoving } from './Board'

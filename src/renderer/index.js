@@ -12,10 +12,10 @@ import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
 import Content from './components/Content'
 
 // We load these modules here so that the content registry will have them.
-import './components/workspace/workspace'
+import './components/workspace/Workspace'
 
 // default context components
-import './components/defaults/default-in-list'
+import './components/defaults/DefaultInList'
 
 // board in various contexts
 import './components/board'
@@ -28,7 +28,7 @@ import './components/ThreadContent'
 import './components/UrlContent'
 import './components/PdfContent'
 
-import { createDocumentLink } from './share-link'
+import { createDocumentLink } from './ShareLink'
 
 require('./app.css')
 require('./components/react-simple-dropdown/dropdown.css')

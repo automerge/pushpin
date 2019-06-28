@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Handle } from 'hypermerge'
 import { ContentProps } from '../content'
-import { createDocumentLink } from '../../share-link'
 import { BoardDoc } from '.'
+import { createDocumentLink } from '../../ShareLink'
 
 import Board from './Board'
 
@@ -58,9 +58,9 @@ export default class BoardInBoard extends React.PureComponent<ContentProps, Stat
       >
         <i className="fa fa-files-o" style={{ ...css.icon, background: backgroundColor }} />
         <div style={css.caption}>
-          <span style={css.title}>{ title }</span>
+          <span style={css.title}>{title}</span>
           <br />
-          { `${childCardCount} card${childCardCount === 1 ? '' : 's'}` }
+          {`${childCardCount} card${childCardCount === 1 ? '' : 's'}`}
         </div>
       </div>
     )

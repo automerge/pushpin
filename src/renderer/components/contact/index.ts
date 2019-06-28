@@ -7,6 +7,7 @@ export interface ContactDoc {
   name: string
   color: string
   avatarDocId: string
+  hypermergeUrl: any //Used by workspace
 }
 
 ContentTypes.register({
@@ -20,5 +21,6 @@ ContentTypes.register({
     board: ContactInVarious,
     list: ContactInVarious,
     thread: ContactInVarious,
-    'title-bar': ContactInVarious }
+    'title-bar': ContactInVarious
+  }
 })

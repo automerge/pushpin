@@ -1,29 +1,44 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
 import ContentTypes from '../../content-types'
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
 import Content from '../Content'
 import SelfContext from '../SelfContext'
 import TitleBar from './title-bar'
+import { Handle } from 'hypermerge';
+import { ContactDoc } from '../contact';
 
 const log = Debug('pushpin:workspace')
 
-export default class Workspace extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-  }
+interface Props {
+  hypermergeUrl: HypermergeUrl
+}
 
-  static initializeDocument = (workspace) => {
+interface Doc {
+  selfId: string
+  contactIds: PushpinUrl[]
+  currentDocUrl: PushpinUrl
+  viewedDocUrls: PushpinUrl[]
+  archivedDocUrls: PushpinUrl[]
+}
+
+
+interface State {
+  doc?: Doc
+  selfId?: string
+}
+
+export default class Workspace extends React.PureComponent<Props, State> {
+  static initializeDocument = (workspace: Doc) => {
     const selfId = Content.initializeContentDoc('contact')
 
     // this is, uh, a nasty hack.
     // we should refactor not to require the hypermergeUrl on the contact
     // but i don't want to pull that in scope right now
-    window.repo.change(selfId, (doc) => {
+    window.repo.change(selfId, (doc: ContactDoc) => {
       doc.hypermergeUrl = selfId
     })
 
@@ -50,7 +65,9 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     const textDocUrl = createDocumentLink('text', textDocId)
 
     const id = uuid()
-    window.repo.change(boardId, doc => {
+    // TODO: this is a board doc. Should update this type after converting
+    // board to typescript.
+    window.repo.change(boardId, (doc: any) => {
       doc.cards[id] = {
         id,
         url: textDocUrl,
@@ -68,13 +85,19 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     workspace.viewedDocUrls = [docUrl]
   }
 
-  state = {}
+  state: State = {}
+  handle?: Handle<Doc>
+  timerId?: NodeJS.Timeout // Technically, these timeout types are the wrong type :shrugging-man:
+  selfTimerId?: NodeJS.Timeout
+  // The current document which is fullscreen/filling the workspace
+  currentDocHandle?: Handle<any>
+  currentDocTimerId?: NodeJS.Timeout
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     log('constructor')
 
-    ipcRenderer.on('loadDocumentUrl', (event, url) => {
+    ipcRenderer.on('loadDocumentUrl', (event: any, url: string) => {
       this.openDoc(url)
     })
 
@@ -85,31 +108,20 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
-  componentWillUnmount = () => {
-    this.handle.close()
-    if (this.state.selfId) {
-      this.heartbeatNotifyDeparture(this.state.selfId)
-    }
-    clearInterval(this.timerId)
-  }
-
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
-
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.open(hypermergeUrl)
+  componentWillMount = () => {
+    this.handle = window.repo.open(this.props.hypermergeUrl)
     this.handle.subscribe((doc) => this.onChange(doc))
   }
 
-  onChange = (doc) => {
-    this.setState({ ...doc })
+  componentWillUnmount = () => {
+    this.handle && this.handle.close()
+    this.state.selfId && this.heartbeatNotifyDeparture(this.state.selfId)
+    this.timerId && clearInterval(this.timerId)
+  }
+
+
+  onChange = (doc: Doc) => {
+    this.setState({ doc })
     this.refreshSelfHeartbeat(doc)
     this.refreshCurrentDocHandle(doc)
   }
@@ -118,7 +130,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   // First, it posts on the self-contact ID that we're online.
   // This means any avatar anywhere will have a colored ring around it
   // if that user is online.
-  refreshSelfHeartbeat = (doc) => {
+  refreshSelfHeartbeat = (doc: Doc) => {
     const selfHandle = window.repo.open(doc.selfId)
 
     if (!this.selfTimerId) {
@@ -149,17 +161,17 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     if (!this.currentDocTimerId) {
       this.currentDocHandle.message({ contact: selfId, heartbeat: true })
       this.currentDocTimerId = setInterval(() => {
-        this.currentDocHandle.message({ contact: selfId, heartbeat: true })
+        this.currentDocHandle && this.currentDocHandle.message({ contact: selfId, heartbeat: true })
       }, 1000) // send a heartbeat every 5s
     }
   }
 
-  heartbeatNotifyDeparture = (selfId) => {
+  heartbeatNotifyDeparture = (selfId: PushpinUrl) => {
     // notify peers on the current board that we're departing
-    this.currentDocHandle.message({ contact: selfId, departing: true })
+    this.currentDocHandle && this.currentDocHandle.message({ contact: selfId, departing: true })
   }
 
-  openDoc = (docUrl) => {
+  openDoc = (docUrl: PushpinUrl) => {
     try {
       parseDocumentLink(docUrl)
     } catch (e) {
@@ -167,7 +179,12 @@ To create links to boards or contacts, drag them from the title bar or the omnib
       return
     }
 
-    this.handle.change((ws) => {
+    if (!this.handle) {
+      log("Trying to navigate to a document before the workspace doc is loaded!")
+      return
+    }
+
+    this.handle.change((ws: Doc) => {
       ws.currentDocUrl = docUrl
 
       ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
@@ -179,7 +196,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     })
   }
 
-  renderContent = (currentDocUrl) => {
+  renderContent = (currentDocUrl?: PushpinUrl) => {
     if (!currentDocUrl) {
       return null
     }
@@ -187,17 +204,18 @@ To create links to boards or contacts, drag them from the title bar or the omnib
     const { type } = parseDocumentLink(currentDocUrl)
     return (
       <div className={`Workspace__container Workspace__container--${type}`}>
-        <Content context="workspace" url={this.state.currentDocUrl} />
+        <Content context="workspace" url={currentDocUrl} />
       </div>
     )
   }
 
   render = () => {
     log('render')
+    if (!this.state.doc) return null
 
-    const content = this.renderContent(this.state.currentDocUrl)
+    const content = this.renderContent(this.state.doc.currentDocUrl)
     return (
-      <SelfContext.Provider value={this.state.selfId}>
+      <SelfContext.Provider value={this.state.doc.selfId}>
         <div className="Workspace">
           <TitleBar hypermergeUrl={this.props.hypermergeUrl} openDoc={this.openDoc} />
           {content}
