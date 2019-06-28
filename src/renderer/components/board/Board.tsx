@@ -128,7 +128,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   private handle?: Handle<BoardDoc>
 
   private boardRef = React.createRef<HTMLDivElement>()
-  private cardRefs: Map<string, BoardCard> = new Map<string, BoardCard>()
+  private cardRefs: Map<string, HTMLDivElement> = new Map<string, HTMLDivElement>()
   private finishedDrag: boolean = false
   private tracking: { [cardId: string]: TrackingEntry } = {}
   
