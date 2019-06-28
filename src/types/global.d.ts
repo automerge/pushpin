@@ -4,4 +4,6 @@ declare global {
   interface Window {
     repo: Repo
   }
+
+  const __static: string
 }
