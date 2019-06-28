@@ -6,7 +6,7 @@ import Debug from 'debug'
 import Automerge from 'automerge'
 import { Handle } from 'hypermerge'
 
-import ContentTypes from '../content-types'
+import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
 
 const log = Debug('pushpin:code-mirror-editor')

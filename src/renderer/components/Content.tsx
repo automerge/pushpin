@@ -1,7 +1,7 @@
 import React from 'react'
 import Debug from 'debug'
 
-import ContentTypes from '../content-types'
+import ContentTypes, { Context } from '../ContentTypes'
 import { parseDocumentLink } from '../ShareLink'
 import SelfContext from './SelfContext'
 
@@ -20,7 +20,7 @@ export interface ContentProps {
 // These are the props the generic Content wrapper receives
 interface Props {
   url: string
-  context: string
+  context: Context
   [arbitraryProp: string]: any
 }
 
@@ -33,8 +33,11 @@ export default class Content extends React.PureComponent<Props, State> {
     const { repo } = window // still not a great idea
     const contentType = ContentTypes.lookup({ type, context: 'workspace' })
 
+    if (!contentType) throw new Error(`Type not found in registry: ${type}`)
+    const { component } = contentType as any
+
     const initializeDocumentWithAttrs = (doc) => {
-      contentType.component.initializeDocument(doc, typeAttrs)
+      component.initializeDocument(doc, typeAttrs)
     }
 
     const url = repo.create()
@@ -43,7 +46,6 @@ export default class Content extends React.PureComponent<Props, State> {
     return url
   }
 
-  component = React.createRef()
   state = { contentCrashed: false }
 
   componentDidCatch = (e) => {
@@ -60,7 +62,7 @@ export default class Content extends React.PureComponent<Props, State> {
     return filtered
   }
 
-  render = () => {
+  render() {
     log('render')
     const { context, url } = this.props
 
@@ -87,7 +89,6 @@ export default class Content extends React.PureComponent<Props, State> {
         {selfId => (
           <contentType.component
             key={url}
-            ref={this.component}
             context={context}
             url={url}
             type={type}

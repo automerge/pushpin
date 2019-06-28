@@ -3,9 +3,9 @@ import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
-import ContentTypes from '../../content-types'
 import { createDocumentLink, parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../ShareLink'
 import Content, { ContentProps } from '../Content'
+import ContentTypes from '../../ContentTypes'
 import SelfContext from '../SelfContext'
 import TitleBar from './TitleBar'
 import { Handle } from 'hypermerge';

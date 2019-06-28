@@ -1,4 +1,4 @@
-import ContentTypes from '../../content-types'
+import ContentTypes from '../../ContentTypes'
 
 // board in various contexts
 import Board from './Board'
@@ -26,7 +26,8 @@ ContentTypes.register({
   contexts: {
     workspace: Board,
     board: BoardInBoard,
-    list: BoardInList },
+    list: BoardInList
+  },
   name: 'Board',
   icon: 'copy',
 })

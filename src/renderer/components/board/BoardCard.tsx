@@ -4,7 +4,7 @@ import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
 
 import Content from '../Content'
-import ContentTypes from '../../content-types'
+import ContentTypes from '../../ContentTypes'
 import { parseDocumentLink } from '../../ShareLink'
 
 import { BoardDocCard } from '.'
@@ -22,7 +22,7 @@ interface BoardCardProps {
   selected: boolean,
   uniquelySelected: boolean,
   remoteSelected: string[],
-    
+
   onDrag: (card, event, dragData) => void,
   onStop: (card, event, dragData) => void,
   onCardClicked: (card, event) => void,
@@ -37,7 +37,7 @@ export default class BoardCard extends React.PureComponent<BoardCardProps> {
   onCardClicked = (e) => { this.props.onCardClicked(e, this.props.card) }
   onCardDoubleClicked = (e) => { this.props.onCardDoubleClicked(e, this.props.card) }
   setCardRef = (node) => { this.props.setCardRef(this.props.id, node) }
-  
+
   stopPropagation = (e) => {
     e.stopPropagation()
   }
@@ -93,7 +93,7 @@ export default class BoardCard extends React.PureComponent<BoardCardProps> {
             url={this.props.card.url}
             uniquelySelected={this.props.uniquelySelected}
           />
-          { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }
+          {contentType && contentType.resizable !== false && <span className="cardResizeHandle" />}
         </div>
       </DraggableCore>
     )

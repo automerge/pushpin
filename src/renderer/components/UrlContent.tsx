@@ -3,7 +3,7 @@ import Unfluff from 'unfluff'
 import Debug from 'debug'
 
 import * as Hyperfile from '../hyperfile'
-import ContentTypes from '../content-types'
+import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content';
 import { Handle } from 'hypermerge';
 

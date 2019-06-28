@@ -6,7 +6,7 @@ import { ContextMenuTrigger } from 'react-contextmenu'
 import uuid from 'uuid/v4'
 
 import Content, { ContentProps } from '../Content'
-import ContentTypes from '../../content-types'
+import ContentTypes from '../../ContentTypes'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
@@ -66,7 +66,7 @@ interface State {
   }
   tracking: { [cardId: string]: TrackingEntry }
   doc?: BoardDoc
-} 
+}
 
 export enum DragType {
   MOVING,
@@ -131,10 +131,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   private cardRefs: Map<string, HTMLDivElement> = new Map<string, HTMLDivElement>()
   private finishedDrag: boolean = false
   private tracking: { [cardId: string]: TrackingEntry } = {}
-  
+
   private heartbeatTimerId?: NodeJS.Timer
   private contactHeartbeatTimerId: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
-  
+
   state: State = {
     remoteSelection: {},
     selected: [],
@@ -161,7 +161,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     this.handle && this.handle.close()
     this.heartbeatTimerId && clearInterval(this.heartbeatTimerId)
   }
-  
+
   onChange = (doc) => {
     this.setState({ doc })
   }
@@ -204,14 +204,15 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   onDoubleClick = (e) => {
     log('onDoubleClick')
     console.log("WTF", (this.boardRef as any).offsetLeft, (this.boardRef as any).offsetTop)
-    
+
     // guard against a missing boardRef
     if (!this.boardRef.current) return
 
     const cardId = this.createCard({
       x: e.pageX - this.boardRef.current.offsetLeft,
       y: e.pageY - this.boardRef.current.offsetTop,
-      type: 'text' })
+      type: 'text'
+    })
     this.selectOnly(cardId)
   }
 
@@ -314,7 +315,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     const dataTransfer = e.clipboardData
     if (!dataTransfer) return
-    
+
     // Note that the X/Y coordinates will all be the same for these cards,
     // and the chromium code supports that... but I can't think of it could happen,
     // so if you're reading this because it did, sorry!
@@ -395,8 +396,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         })
         break
       case 'board':
-        const title = (this.state.doc && this.state.doc.title) 
-          ? this.state.doc.title 
+        const title = (this.state.doc && this.state.doc.title)
+          ? this.state.doc.title
           : 'Untitled'
         cardId = this.createCard({
           x,
@@ -752,7 +753,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         this.effectDrag(card, t, d)
 
         this.setState((prevState) =>
-          ({ tracking: {
+          ({
+            tracking: {
               ...prevState.tracking,
               [card.id]: t
             }
@@ -763,9 +765,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     if (tracking.dragType === DragType.RESIZING) {
       this.effectDrag(card, tracking, d)
-      
+
       this.setState((prevState) =>
-        ({ tracking: {
+        ({
+          tracking: {
             ...prevState.tracking,
             [card.id]: tracking
           }
@@ -849,7 +852,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id] as MoveTracking
-        
+
         this.cardMoved({ id: card.id, x: t.moveX, y: t.moveY })
       })
       this.tracking = {}

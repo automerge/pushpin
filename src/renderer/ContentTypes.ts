@@ -1,38 +1,70 @@
 import Debug from 'debug'
+import { ComponentType } from 'react'
+import { ContentProps } from './components/Content';
 
 const log = Debug('pushpin:content-types')
 
-const registry = {}
-const defaultRegistry = {}
+type Component = ComponentType<ContentProps>
 
-function register(contentType) {
-  const { type, name, icon } = contentType
-  const { unlisted = false, resizable = true } = contentType
-  const { contexts } = contentType
+export type Context =
+  | 'root'
+  | 'workspace'
+  | 'list'
+  | 'board'
+  | 'thread'
+  | 'title-bar'
 
-  if (!type || !name || !icon) {
-    throw new Error('Register a type, a name, and an icon.')
-  }
-
-  if (!contexts) {
-    throw new Error('Register requires a context... for now.')
-  }
-
-  log('register', type, name, icon, unlisted, resizable)
-
-  if (!registry[type]) {
-    registry[type] = { type, name, icon, unlisted, resizable }
-  }
-
-  registry[type].contexts = { ...registry[type].contexts, ...contexts }
+type Contexts = {
+  [K in Context]?: Component
 }
 
-function registerDefault(contentType) {
+
+interface ContentType {
+  type: string
+  name: string
+  icon: string
+  unlisted?: boolean
+  resizable?: boolean
+  contexts: Contexts
+}
+
+const registry: { [type: string]: ContentType } = {}
+const defaultRegistry = {}
+
+
+function register(contentType: ContentType) {
+  const { type } = contentType
+  const entry = { unlisted: false, resiable: true, ...contentType }
+
+  log('register', entry)
+
+  if (registry[type]) {
+    throw new Error(`Type already registered: ${type}`)
+  }
+
+  registry[type] = entry
+}
+
+function registerDefault(contentType: { component: Component, context: Context }) {
   const { component, context } = contentType
   defaultRegistry[context] = component
 }
 
-function lookup({ type, context } = {}) {
+interface LookupQuery {
+  type: string
+  context: string
+}
+
+interface LookupResult {
+  type: string
+  name: string
+  icon: string
+  unlisted: boolean
+  resizable: boolean
+  component: Component
+}
+
+function lookup({ type, context }: LookupQuery): LookupResult | null {
   const entry = registry[type]
   const component = entry
     && entry.contexts[context]
@@ -43,12 +75,22 @@ function lookup({ type, context } = {}) {
     return null
   }
 
-  const { name = 'Unknown', icon = 'question', unlisted, resizable } = entry || {}
+  const {
+    name = 'Unknown',
+    icon = 'question',
+    unlisted = false,
+    resizable = true
+  } = entry || {}
 
   return { type, name, icon, component, unlisted, resizable }
 }
 
-function list({ context, withUnlisted = false } = {}) {
+interface ListQuery {
+  context: Context
+  withUnlisted?: boolean
+}
+
+function list({ context, withUnlisted = false }: ListQuery) {
   const allTypes = Object.keys(registry)
     .map(type => lookup({ type, context }))
     .filter(ct => !!ct)
@@ -57,7 +99,7 @@ function list({ context, withUnlisted = false } = {}) {
     return allTypes
   }
 
-  return allTypes.filter(type => !type.unlisted)
+  return allTypes.filter(ct => ct && !ct.unlisted)
 }
 
 export default { register, registerDefault, lookup, list }

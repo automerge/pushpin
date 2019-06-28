@@ -1,4 +1,4 @@
-import ContentTypes from '../../content-types'
+import ContentTypes from '../../ContentTypes'
 
 import ContactEditor from './ContactEditor'
 import ContactInVarious from './ContactInVarious'

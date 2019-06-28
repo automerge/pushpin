@@ -1,5 +1,5 @@
 import React from 'react'
-import ContentTypes from '../../content-types'
+import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content';
 import { Handle } from 'hypermerge';
 

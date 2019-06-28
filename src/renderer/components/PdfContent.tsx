@@ -4,7 +4,7 @@ import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
 import { Handle } from 'hypermerge'
 import * as Hyperfile from '../hyperfile'
-import ContentTypes from '../content-types'
+import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
 
 interface PdfDoc {
@@ -45,7 +45,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
 
   // This is the New Boilerplate
   componentWillMount = () => window.repo.watch<PdfDoc>(
-    this.props.hypermergeUrl, 
+    this.props.hypermergeUrl,
     (doc) => this.onChange(doc)
   )
   componentWillUnmount = () => this.handle && this.handle.close()

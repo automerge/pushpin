@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import ContentTypes from '../src/renderer/content-types'
+import ContentTypes from '../src/renderer/ContentTypes'
 
 class UrlContent { }
 

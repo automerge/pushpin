@@ -3,7 +3,7 @@ import Debug from 'debug'
 import { Handle } from 'hypermerge'
 
 import { ContentProps } from './Content'
-import ContentTypes from '../content-types'
+import ContentTypes from '../ContentTypes'
 
 const log = Debug('pushpin:image-card')
 
@@ -49,7 +49,7 @@ export default class ImageContent extends React.PureComponent<ContentProps, Stat
       this.handle.close()
     }
   }
-  
+
 
   render() {
     log('render')
