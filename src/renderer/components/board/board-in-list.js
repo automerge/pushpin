@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import TitleEditor from '../title-editor'
+import TitleEditor from '../TitleEditor'
 
 export default class BoardInList extends React.PureComponent {
   static propTypes = {
@@ -46,8 +46,8 @@ export default class BoardInList extends React.PureComponent {
       {this.props.editable ? (
         <TitleEditor url={this.props.hypermergeUrl} preventDrag />
       ) : (
-        <div className="DocLink__title">{this.state.title}</div>
-      )}
+          <div className="DocLink__title">{this.state.title}</div>
+        )}
     </div>
   )
 }
