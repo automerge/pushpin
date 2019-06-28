@@ -5,7 +5,7 @@ import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import uuid from 'uuid/v4'
 
-import Content from '../Content'
+import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../content-types'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
@@ -13,7 +13,6 @@ import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
 import BoardContextMenu from './board-context-menu'
-import { ContentProps } from '../Content'
 import { Handle } from 'hypermerge'
 
 const { dialog } = remote
@@ -74,13 +73,13 @@ export interface TrackingBase {
   dragType: DragType,
 }
 
-enum DragType {
-  NOT_DRAGGING,
+export enum DragType {
   MOVING,
-  RESIZING
+  RESIZING,
+  NOT_DRAGGING
 }
 
-interface MoveTracking extends TrackingBase {
+export interface MoveTracking extends TrackingBase {
   dragType: DragType.MOVING
   moveX: number,
   moveY: number,
@@ -88,23 +87,31 @@ interface MoveTracking extends TrackingBase {
   slackY: number
 }
 
-interface ResizeTracking extends TrackingBase {
+export interface ResizeTracking extends TrackingBase {
   dragType: DragType.RESIZING
-  slackWidth: 0,
-  slackHeight: 0,
+  slackWidth: number,
+  slackHeight: number,
   resizeWidth: number,
   resizeHeight: number,
-  minWidth?: number,
-  minHeight?: number,
-  maxWidth?: number,
-  maxHeight?: number
+  minWidth: number,
+  minHeight: number,
+  maxWidth: number,
+  maxHeight: number
 }
 
-interface NotTracking extends TrackingBase {
+export interface NotDraggingTracking extends TrackingBase {
   dragType: DragType.NOT_DRAGGING
 }
 
-type TrackingEntry = MoveTracking | ResizeTracking | NotTracking
+export function isMoving(tracking): tracking is MoveTracking {
+  return (tracking.dragType == DragType.MOVING)
+}
+
+export function isResizing(tracking): tracking is ResizeTracking {
+  return (tracking.dragType == DragType.RESIZING)
+}
+
+export type TrackingEntry = MoveTracking | ResizeTracking | NotDraggingTracking
 
 interface CardArgs {
   x: number
@@ -617,19 +624,12 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     return snapped + GRID_SIZE
   }
 
-  effectDrag = (card, tracking, { deltaX, deltaY }) => {
-    if (!tracking.resizing && !tracking.moving) {
-      throw new Error('Did not expect drag without resize or move')
-    }
-    if (tracking.resizing && tracking.moving) {
-      throw new Error('Did not expect drag with both resize and move')
-    }
-
+  effectDrag = (card, tracking: TrackingEntry, { deltaX, deltaY }) => {
     if ((deltaX === 0) && (deltaY === 0)) {
       return
     }
 
-    if (tracking.moving) {
+    if (isMoving(tracking)) {
       // First guess at change in location given mouse movements.
       const preClampX = tracking.moveX + deltaX
       const preClampY = tracking.moveY + deltaY
@@ -654,7 +654,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       tracking.slackY = tracking.slackY + preClampY - newY
     }
 
-    if (tracking.resizing) {
+    if (isResizing(tracking)) {
       // First guess at change in dimensions given mouse movements.
       const preClampWidth = tracking.resizeWidth + deltaX
       const preClampHeight = tracking.resizeHeight + deltaY
@@ -696,7 +696,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const tracking = this.tracking[card.id]
 
     // If we haven't started tracking this drag, initialize tracking
-    if (!(tracking && (tracking.dragType != DragType.NOT_DRAGGING))) {
+    if (!tracking) {
       const resizing = e.target.className === 'cardResizeHandle'
       const moving = !resizing
 
@@ -756,31 +756,27 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       cards.forEach(card => {
         const t = this.tracking[card.id]
         this.effectDrag(card, t, d)
-        
-        const { moveX, moveY } = t as MoveTracking
 
-        this.setState((prevState) => {
+        this.setState((prevState) =>
           ({ tracking: {
               ...prevState.tracking,
-              [card.id]: { moveX, moveY }
+              [card.id]: t
             }
           })
-        })
+        )
       })
     }
 
     if (tracking.dragType === DragType.RESIZING) {
       this.effectDrag(card, tracking, d)
-
-      const { resizeWidth, resizeHeight } = tracking as ResizeTracking
       
-      this.setState((prevState) => {
+      this.setState((prevState) =>
         ({ tracking: {
             ...prevState.tracking,
-            [card.id]: { resizeWidth, resizeHeight }
+            [card.id]: tracking
           }
         })
-      })
+      )
     }
   }
 
@@ -845,7 +841,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const tracking = this.tracking[id]
 
     // If tracking is not initialized, treat this as a click
-    if (!(tracking && (tracking.dragType !== DragType.NOT_DRAGGING))) {
+    if (!tracking) {
       return
     }
 
@@ -855,10 +851,9 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         const t = this.tracking[card.id] as MoveTracking
         
         this.cardMoved({ id: card.id, x: t.moveX, y: t.moveY })
-
-        this.tracking = {}
-        this.setState({ tracking: {} })
       })
+      this.tracking = {}
+      this.setState({ tracking: {} })
     }
 
     if (tracking.dragType === DragType.RESIZING) {
@@ -879,7 +874,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
   render = () => {
     log('render')
-    if (!(this.state.doc && this.state.doc.cards)) return
+    if (!(this.state.doc && this.state.doc.cards)) return null
 
     // invert the client->cards to a cards->client mapping
     const { remoteSelection } = this.state

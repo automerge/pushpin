@@ -6,6 +6,7 @@ import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
 
 export interface BoardDocCard {
+  type: string
   id: string
   url: string
   x: number

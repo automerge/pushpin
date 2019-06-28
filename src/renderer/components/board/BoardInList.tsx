@@ -31,16 +31,14 @@ export default class BoardInList extends React.PureComponent<EditableContentProp
   componentWillUnmount = () => this.handle && this.handle.close()
 
   onChange = (doc) => {
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   render = () => {
     if (!this.state || !this.state.doc) {
-      return
+      return null
     }
-    const { title, backgroundColor, cards } = this.state.doc
-
-    const childCardCount = Object.keys(cards || {}).length
+    const { title, backgroundColor } = this.state.doc
 
     return (
       <div draggable onDragStart={this.onDragStart} className="DocLink">
@@ -49,8 +47,6 @@ export default class BoardInList extends React.PureComponent<EditableContentProp
       <TitleEditor url={this.props.hypermergeUrl} />
     ) : (
       <div className="DocLink__title">{title}</div>)}
-    <br />
-    { `${childCardCount} card${childCardCount === 1 ? '' : 's'}` }
     </div>)
   }
 }

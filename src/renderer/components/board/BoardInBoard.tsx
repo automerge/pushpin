@@ -5,7 +5,7 @@ import { ContentProps } from '../content'
 import { createDocumentLink } from '../../share-link'
 import { BoardDoc } from '.'
 
-import Board from './board'
+import Board from './Board'
 
 interface State {
   doc?: BoardDoc
@@ -45,7 +45,7 @@ export default class BoardInBoard extends React.PureComponent<ContentProps, Stat
 
   render = () => {
     if (!this.state || !this.state.doc) {
-      return
+      return null
     }
     const { title, backgroundColor, cards } = this.state.doc
 

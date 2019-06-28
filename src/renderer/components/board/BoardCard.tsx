@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { DraggableCore } from 'react-draggable'
 import classNames from 'classnames'
@@ -9,7 +8,7 @@ import ContentTypes from '../../content-types'
 import { parseDocumentLink } from '../../share-link'
 
 import { BoardDocCard } from '.'
-import { TrackingEntry } from './Board'
+import { TrackingEntry, DragType, isResizing, isMoving } from './Board'
 import { ContactDoc } from '../contact'
 
 const log = Debug('pushpin:board-card')
@@ -32,27 +31,13 @@ interface BoardCardProps {
 
 }
 
-export default class BoardCard extends React.PureComponent<BoardCardProps, State> {
-  constructor(props) {
-    super(props)
-    log('constructor')
-    this.onDrag = (e, d) => { this.props.onDrag(this.props.card, e, d) }
-    this.onStop = (e, d) => { this.props.onStop(this.props.card, e, d) }
-    this.onCardClicked = (e) => { this.props.onCardClicked(e, this.props.card) }
-    this.onCardDoubleClicked = (e) => { this.props.onCardDoubleClicked(e, this.props.card) }
-    this.setCardRef = (node) => { this.props.setCardRef(this.props.id, node) }
-  }
-
-  static propTypes = {
-    dragState: PropTypes.shape({
-      
-    }),
-  }
-
-  static defaultProps = {
-    dragState: {}
-  }
-
+export default class BoardCard extends React.PureComponent<BoardCardProps> {
+  onDrag = (e, d) => { this.props.onDrag(this.props.card, e, d) }
+  onStop = (e, d) => { this.props.onStop(this.props.card, e, d) }
+  onCardClicked = (e) => { this.props.onCardClicked(e, this.props.card) }
+  onCardDoubleClicked = (e) => { this.props.onCardDoubleClicked(e, this.props.card) }
+  setCardRef = (node) => { this.props.setCardRef(this.props.id, node) }
+  
   stopPropagation = (e) => {
     e.stopPropagation()
   }
@@ -60,15 +45,16 @@ export default class BoardCard extends React.PureComponent<BoardCardProps, State
   render = () => {
     log('render')
 
-    const { card, dragState } = this.props
+    const { card, dragState = { dragState: DragType.NOT_DRAGGING } } = this.props
 
     const style = {
-      width: Number.isInteger(dragState.resizeWidth) ? dragState.resizeWidth : card.width,
-      height: Number.isInteger(dragState.resizeHeight) ? dragState.resizeHeight : card.height,
-      position: 'absolute',
-      left: Number.isInteger(dragState.moveX) ? dragState.moveX : card.x,
-      top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y,
+      position: 'absolute' as 'absolute',
+      width: (isResizing(dragState)) ? dragState.resizeWidth : card.width,
+      height: (isResizing(dragState)) ? dragState.resizeHeight : card.height,
+      left: (isMoving(dragState)) ? dragState.moveX : card.x,
+      top: (isMoving(dragState)) ? dragState.moveY : card.y,
     }
+
     if (this.props.remoteSelected.length > 0) {
       window.repo.watch<ContactDoc>(this.props.remoteSelected[0], (doc) => {
         if (doc) {
