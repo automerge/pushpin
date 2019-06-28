@@ -5,7 +5,7 @@ import electron from 'electron'
 /* we need to resolve static assets differently in local HMR development mode */
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-function getStatic(val) {
+function getStatic(val: string) {
   if ((typeof window !== 'undefined') && isDevelopment) {
     return Url.resolve(window.location.origin, val)
   }
@@ -25,8 +25,9 @@ export const PDF_DIALOG_OPTIONS = {
 // Prefer NAME if explicitly set.
 // Otherwise look for OS-level USER (Mac / Linux) or USERNAME (Windows.)
 export const USER = process.env.NAME
-                    || process.env.USER
-                    || process.env.USERNAME
+  || process.env.USER
+  || process.env.USERNAME
+
 if (!USER) {
   throw new Error('No user name found')
 }
@@ -38,5 +39,4 @@ export const USER_PATH = Path.join(app.getPath('userData'), 'pushpin-v10', USER)
 export const WORKSPACE_URL_PATH = Path.join(USER_PATH, 'workspace-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
-// eslint
 export const DEFAULT_AVATAR_PATH = getStatic('default-avatar.png')
