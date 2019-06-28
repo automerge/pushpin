@@ -1,38 +1,45 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Content from '../Content'
+import { ContactDoc } from './index'
+import Content, { ContentProps } from '../Content'
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
+import { Handle } from 'hypermerge';
 
-export default class ContactInList extends React.PureComponent {
+interface State {
+  online: boolean
+  doc?: ContactDoc
+}
+
+export default class ContactInBoard extends React.PureComponent<ContentProps, State> {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired,
     selfId: PropTypes.string.isRequired
   }
 
-  state = {}
+  static minWidth = 4
+  static minHeight = 5
+  static defaultWidth = 6
+  static defaultHeight = 6
+  static maxWidth = 9
+  static maxHeight = 9
+
+  private handle?: Handle<ContactDoc>
+  private timerId?: NodeJS.Timer
+  state: State = { online: false }
 
   // This is the New Boilerplate
   componentWillMount = () => {
-    this.refreshHandle(this.props.hypermergeUrl)
+    this.openHandle(this.props.hypermergeUrl)
   }
 
   componentWillUnmount = () => {
-    this.handle.close()
-    clearTimeout(this.timerId)
+    this.handle && this.handle.close()
+    this.timerId != null && clearTimeout(this.timerId)
   }
 
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
-
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
+  openHandle = (hypermergeUrl) => {
     this.handle = window.repo.open(hypermergeUrl)
     this.handle.subscribe((doc) => this.onChange(doc))
     this.handle.subscribeMessage((msg) => this.onMessage(msg))
@@ -43,11 +50,11 @@ export default class ContactInList extends React.PureComponent {
     if (this.props.selfId === this.props.hypermergeUrl) {
       this.setState({ online: true })
     }
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   onMessage = (msg) => {
-    clearTimeout(this.timerId)
+    this.timerId != null && clearTimeout(this.timerId)
     // if we miss two heartbeats (11s), assume they've gone offline
     this.timerId = setTimeout(() => {
       this.setState({ online: false })
@@ -63,27 +70,28 @@ export default class ContactInList extends React.PureComponent {
   }
 
   render = () => {
+    const { doc, online } = this.state
+    if (!doc) return null
+
+    const { avatarDocId, name, color } = doc
+
     let avatar
-    if (this.state.avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
+    if (avatarDocId) {
+      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
 
     return (
-      <div draggable="true" onDragStart={this.onDragStart} className="DocLink">
-        <div className="ListMenu__thumbnail">
-          <div
-            className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
-            style={{ '--highlight-color': this.state.color }}
-          >
-            {avatar}
-          </div>
+      <div className="Contact--board">
+        <div
+          className={`Avatar Avatar--board ${online ? 'Avatar--online' : 'Avatar--offline'}`}
+          style={{ '--highlight-color': color } as any}
+        >
+          {avatar}
         </div>
         <div className="Label">
-          <p className="Type--primary">
-            {this.state.name}
-          </p>
+          {name}
         </div>
       </div>
     )

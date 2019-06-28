@@ -1,27 +1,32 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
-import Content from '../Content'
+import Content, { ContentProps } from '../Content'
+import { ContactDoc } from '.'
+import { Handle } from 'hypermerge'
+
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
-export default class ContactInThread extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    selfId: PropTypes.string.isRequired
-  }
+interface State {
+  online: boolean
+  doc?: ContactDoc
+}
 
-  state = {}
+export default class ContactInTitlebar extends React.PureComponent<ContentProps, State> {
+  state: State = { online: false }
+
+  private handle?: Handle<ContactDoc>
+  private timerId?: NodeJS.Timeout
 
   // This is the New Boilerplate
   componentWillMount = () => {
     this.refreshHandle(this.props.hypermergeUrl)
-    this.timerId = null
+    delete this.timerId
   }
 
   componentWillUnmount = () => {
-    this.handle.close()
-    clearTimeout(this.timerId)
+    this.handle && this.handle.close()
+    this.timerId && clearTimeout(this.timerId)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -44,11 +49,11 @@ export default class ContactInThread extends React.PureComponent {
     if (this.props.selfId === this.props.hypermergeUrl) {
       this.setState({ online: true })
     }
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   onMessage = (msg) => {
-    clearTimeout(this.timerId)
+    this.timerId != null && clearTimeout(this.timerId)
     // if we miss two heartbeats (11s), assume they've gone offline
     this.timerId = setTimeout(() => {
       this.setState({ online: false })
@@ -56,30 +61,42 @@ export default class ContactInThread extends React.PureComponent {
     this.setState({ online: true })
   }
 
-  render = () => {
+  onDragStart = (e) => {
+    e.dataTransfer.setData(
+      'application/pushpin-url',
+      createDocumentLink('contact', this.props.hypermergeUrl)
+    )
+  }
+
+  render() {
+    const { doc, online } = this.state
+    if (!doc) return null
+
+    const { avatarDocId, name, color } = doc
+
     let avatar
-    if (this.state.avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
+    if (avatarDocId) {
+      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
 
     const avatarStyle = { ...css.avatar }
-    if (this.state.color) {
-      avatarStyle['--highlight-color'] = this.state.color
+    if (color) {
+      avatarStyle['--highlight-color'] = color
     }
 
     return (
       <div style={css.user}>
         <div
-          className={`Avatar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
+          className={`Avatar ${online ? 'Avatar--online' : 'Avatar--offline'}`}
           style={avatarStyle}
-          title={this.state.name}
+          title={name}
         >
           {avatar}
         </div>
         <div className="username" style={css.username}>
-          {this.state.name}
+          {name}
         </div>
       </div>
     )

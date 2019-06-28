@@ -1,13 +1,15 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 
 import { createDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
+import { Handle } from 'hypermerge'
 
 import { USER, IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
-import Content from '../Content'
+import Content, { ContentProps } from '../Content'
+import { ContactDoc } from './index'
+
 import ColorPicker from '../color-picker'
 
 const { dialog } = remote
@@ -34,11 +36,11 @@ const USER_COLORS = {
   GRAU: '#626262'
 }
 
-export default class ContactEditor extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired
-  }
+interface State {
+  doc?: ContactDoc
+}
 
+export default class ContactEditor extends React.PureComponent<ContentProps, State> {
   static initializeDocument = (doc, typeAttrs) => {
     doc.name = USER
     const USER_COLOR_VALUES = Object.values(USER_COLORS)
@@ -46,26 +48,17 @@ export default class ContactEditor extends React.PureComponent {
     doc.color = color
   }
 
-  state = {}
+  private handle?: Handle<ContactDoc>
+  state: State = {}
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
-  componentWillUnmount = () => this.handle.close()
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  }
-
+  componentWillMount = () => this.handle = window.repo.watch(
+    this.props.hypermergeUrl,
+    (doc) => this.onChange(doc))
+  componentWillUnmount = () => this.handle && this.handle.close()
 
   onChange = (doc) => {
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   chooseAvatar = () => {
@@ -85,7 +78,7 @@ export default class ContactEditor extends React.PureComponent {
         }
 
         const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-        this.handle.change((d) => {
+        this.handle && this.handle.change((d) => {
           d.avatarDocId = hypermergeUrl
         })
       })
@@ -93,22 +86,27 @@ export default class ContactEditor extends React.PureComponent {
   }
 
   setName = (e) => {
-    this.handle.change((d) => {
+    this.handle && this.handle.change((d) => {
       d.name = e.target.value
     })
   }
 
   setColor = (color) => {
-    this.handle.change((d) => {
+    this.handle && this.handle.change((d) => {
       d.color = color.hex
     })
   }
 
   render = () => {
     log('render')
+    const { doc } = this.state
+    if (!doc) return null
+
+    const { avatarDocId, name, color } = doc
+
     let avatar
-    if (this.state.avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
+    if (avatarDocId) {
+      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
@@ -122,7 +120,7 @@ export default class ContactEditor extends React.PureComponent {
           <div className="ListMenu__section">
             <div className="ListMenu__label">Display Name</div>
             <div className="ListMenu__item">
-              <input type="text" onChange={this.setName} value={this.state.name || ''} />
+              <input type="text" onChange={this.setName} value={name || ''} />
             </div>
             <div className="ListMenu__label">Avatar</div>
             <div className="ListMenu__item ContactListItem">
@@ -138,7 +136,7 @@ export default class ContactEditor extends React.PureComponent {
             <div className="ListMenu__label">Presence Color</div>
             <div className="ListMenu__item">
               <ColorPicker
-                color={this.state.color}
+                color={color}
                 colors={Object.values(USER_COLORS)}
                 onChangeComplete={this.setColor}
               />

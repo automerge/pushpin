@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import ContactEditor from '../contact/contact-editor'
+import ContactEditor from '../contact/ContactEditor'
 
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import ListMenuItem from './list-menu-item'

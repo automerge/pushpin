@@ -1,33 +1,32 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
-import Content from '../Content'
+import Content, { ContentProps } from '../Content'
+import { ContactDoc } from '.'
+import { Handle } from 'hypermerge'
+
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
-export default class ContactInBoard extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    selfId: PropTypes.string.isRequired
-  }
+interface State {
+  online: boolean
+  doc?: ContactDoc
+}
 
-  static minWidth = 4
-  static minHeight = 5
-  static defaultWidth = 6
-  static defaultHeight = 6
-  static maxWidth = 9
-  static maxHeight = 9
+export default class ContactInTitlebar extends React.PureComponent<ContentProps, State> {
+  state: State = { online: false }
 
-  state = {}
+  private handle?: Handle<ContactDoc>
+  private timerId?: NodeJS.Timeout
 
   // This is the New Boilerplate
   componentWillMount = () => {
     this.refreshHandle(this.props.hypermergeUrl)
+    delete this.timerId
   }
 
   componentWillUnmount = () => {
-    this.handle.close()
-    clearTimeout(this.timerId)
+    this.handle && this.handle.close()
+    this.timerId && clearTimeout(this.timerId)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -50,11 +49,11 @@ export default class ContactInBoard extends React.PureComponent {
     if (this.props.selfId === this.props.hypermergeUrl) {
       this.setState({ online: true })
     }
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   onMessage = (msg) => {
-    clearTimeout(this.timerId)
+    this.timerId != null && clearTimeout(this.timerId)
     // if we miss two heartbeats (11s), assume they've gone offline
     this.timerId = setTimeout(() => {
       this.setState({ online: false })
@@ -69,24 +68,33 @@ export default class ContactInBoard extends React.PureComponent {
     )
   }
 
-  render = () => {
+  render() {
+    const { doc, online } = this.state
+    if (!doc) return null
+
+    const { avatarDocId, name, color } = doc
+
     let avatar
-    if (this.state.avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
+    if (avatarDocId) {
+      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
 
     return (
-      <div className="Contact--board">
-        <div
-          className={`Avatar Avatar--board ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
-          style={{ '--highlight-color': this.state.color }}
-        >
-          {avatar}
+      <div draggable onDragStart={this.onDragStart} className="DocLink">
+        <div className="ListMenu__thumbnail">
+          <div
+            className={`Avatar ${online ? 'Avatar--online' : 'Avatar--offline'}`}
+            style={{ '--highlight-color': color } as any}
+          >
+            {avatar}
+          </div>
         </div>
         <div className="Label">
-          {this.state.name}
+          <p className="Type--primary">
+            { name }
+          </p>
         </div>
       </div>
     )

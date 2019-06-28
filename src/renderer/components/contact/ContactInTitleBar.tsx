@@ -1,27 +1,32 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
-import Content from '../Content'
+import Content, { ContentProps } from '../Content'
+import { ContactDoc } from '.'
+import { Handle } from 'hypermerge'
+
 import { createDocumentLink } from '../../share-link'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
-export default class ContactInTitlebar extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    selfId: PropTypes.string.isRequired
-  }
+interface State {
+  online: boolean
+  doc?: ContactDoc
+}
 
-  state = {}
+export default class ContactInTitlebar extends React.PureComponent<ContentProps, State> {
+  state: State = { online: false }
+
+  private handle?: Handle<ContactDoc>
+  private timerId?: NodeJS.Timeout
 
   // This is the New Boilerplate
   componentWillMount = () => {
     this.refreshHandle(this.props.hypermergeUrl)
-    this.timerId = null
+    delete this.timerId
   }
 
   componentWillUnmount = () => {
-    this.handle.close()
-    clearTimeout(this.timerId)
+    this.handle && this.handle.close()
+    this.timerId && clearTimeout(this.timerId)
   }
 
   componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -44,11 +49,11 @@ export default class ContactInTitlebar extends React.PureComponent {
     if (this.props.selfId === this.props.hypermergeUrl) {
       this.setState({ online: true })
     }
-    this.setState({ ...doc })
+    this.setState({ doc })
   }
 
   onMessage = (msg) => {
-    clearTimeout(this.timerId)
+    this.timerId != null && clearTimeout(this.timerId)
     // if we miss two heartbeats (11s), assume they've gone offline
     this.timerId = setTimeout(() => {
       this.setState({ online: false })
@@ -63,10 +68,15 @@ export default class ContactInTitlebar extends React.PureComponent {
     )
   }
 
-  render = () => {
+  render() {
     let avatar
-    if (this.state.avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', this.state.avatarDocId)} />
+    const {doc} = this.state
+    if (!doc) return null
+
+    const { avatarDocId, name, color } = doc
+
+    if (avatarDocId) {
+      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
     } else {
       avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
     }
@@ -74,11 +84,11 @@ export default class ContactInTitlebar extends React.PureComponent {
     return (
       <div>
         <div
-          draggable="true"
+          draggable
           onDragStart={this.onDragStart}
           className={`Avatar Avatar--title-bar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
-          style={{ '--highlight-color': this.state.color }}
-          data-name={this.state.name}
+          style={{ '--highlight-color': color } as any}
+          data-name={name}
         >
           {avatar}
         </div>

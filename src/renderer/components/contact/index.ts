@@ -1,10 +1,16 @@
 import ContentTypes from '../../content-types'
 
-import ContactEditor from './contact-editor'
-import ContactInBoard from './contact-in-board'
-import ContactInTitleBar from './contact-in-title-bar'
-import ContactInList from './contact-in-list'
-import ContactInThread from './contact-in-thread'
+import ContactEditor from './ContactEditor'
+import ContactInBoard from './ContactInBoard'
+import ContactInTitleBar from './ContactInTitleBar'
+import ContactInList from './ContactInList'
+import ContactInThread from './ContactInThread'
+
+export interface ContactDoc {
+  name: string
+  color: string
+  avatarDocId: string
+}
 
 ContentTypes.register({
   type: 'contact',
