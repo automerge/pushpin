@@ -111,8 +111,8 @@ export type TrackingEntry = MoveTracking | ResizeTracking | NotDraggingTracking
 interface CardArgs {
   x: number
   y: number
-  width: number | null | undefined
-  height: number | null | undefined
+  width?: number | null
+  height?: number | null
 }
 
 interface LinkCardArgs extends CardArgs {
