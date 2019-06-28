@@ -77,6 +77,7 @@ export default class TextContent extends React.PureComponent<UniquelySelectedCon
   private handle?: Handle<TextDoc>
   private codeMirror: CodeMirror
   private editorRef = React.createRef()
+  state: State = {}
 
   // When the components mounts, and we therefore have refs to the DOM,
   // set up the editor.
