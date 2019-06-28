@@ -1,27 +1,34 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../content-types'
+import { ContentProps } from './Content';
+import { Handle } from 'hypermerge';
 
 const log = Debug('pushpin:url')
 
-const removeEmpty = (obj) => Object.entries(obj).forEach(([key, val]) => {
-  if (val && typeof val === 'object') {
-    removeEmpty(val)
-  } else if (val == null) {
-    delete obj[key]
-  }
-})
+interface UrlData {
+  title?: string
+  image?: string
+  description?: string
+  canonicalLink?: string
+}
 
-export default class UrlContent extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired
-  }
+interface UrlDoc {
+  url?: string
+  data?: UrlData | { error: string }
+  imageHyperfileUrl?: string
+}
 
-  static initializeDocument = (urlDoc, { url = '' }) => {
+interface State {
+  urlInput: string
+  doc?: UrlDoc
+}
+
+export default class UrlContent extends React.PureComponent<ContentProps, State> {
+  static initializeDocument(urlDoc: UrlDoc, { url = '' }) {
     urlDoc.url = url
   }
 
@@ -32,29 +39,28 @@ export default class UrlContent extends React.PureComponent {
   static maxWidth = 24
   static maxHeight = 32
 
-  state = { urlInput: '' }
+  private handle?: Handle<UrlDoc>
+  state: State = { urlInput: '' }
 
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
-  componentWillUnmount = () => this.handle.close()
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
-
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
+  componentDidMount() {
+    log('componentDidMount')
+    const { hypermergeUrl } = this.props
     this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
+  componentWillUnmount() {
+    if (!this.handle) return
 
-  onChange = (doc) => {
+    this.handle.close()
+    delete this.handle
+  }
+
+  onChange(doc: UrlDoc) {
     if (doc.url && !doc.data) {
       this.refreshContent(doc)
     }
-    this.setState({ ...doc })
+
+    this.setState({ doc })
   }
 
   onInputChange = (e) => {
@@ -68,58 +74,69 @@ export default class UrlContent extends React.PureComponent {
 
     if (e.key === 'Enter') {
       e.preventDefault()
-      this.handle.change((doc) => {
-        const input = this.state.urlInput
-        const url = (input.indexOf('://') === -1) ? `http://${input}` : input
+
+      const input = this.state.urlInput
+      const url = (input.indexOf('://') === -1) ? `http://${input}` : input
+
+      this.handle && this.handle.change((doc: UrlDoc) => {
         doc.url = url
       })
     }
   }
 
-  onPaste = (e) => {
+  onPaste = (e: React.ClipboardEvent) => {
     e.stopPropagation()
   }
 
   refreshContent = (doc) => {
-    fetch(doc.url).then((response) => {
-      response.text().then((text) => {
+    fetch(doc.url)
+      .then((response) => response.text())
+      .then((text) => {
         const data = Unfluff(text)
-        this.handle.change((doc) => {
+        this.handle && this.handle.change((doc: UrlDoc) => {
           if (data.image) {
             this.uploadImage(data)
           }
           removeEmpty(data)
           doc.data = data
         })
+      }).catch((reason) => {
+        log('refreshContent.caught', reason)
+        this.handle && this.handle.change((doc: UrlDoc) => {
+          doc.data = { error: reason }
+        })
       })
-    }).catch((reason) => {
-      log('refreshContent.caught', reason)
-      this.handle.change((doc) => {
-        doc.data = { error: reason }
-      })
-    })
   }
 
-  uploadImage = (data) => {
-    const imageCanonicalUrl = new URL(data.image, this.state.url)
-    fetch(imageCanonicalUrl).then((response => {
-      response.arrayBuffer().then((buffer) => {
+  uploadImage = (data: UrlData) => {
+    const { doc } = this.state
+    if (!doc || !data.image) return
+
+    const imageCanonicalUrl = new URL(data.image, doc.url).toString()
+
+    fetch(imageCanonicalUrl)
+      .then(response => response.arrayBuffer())
+      .then(buffer => {
         // we need to convert the ArrayBuffer into a Uint8Buffer
-        Hyperfile.writeBuffer(Buffer.from(buffer), (err, hyperfileUrl) => {
+        Hyperfile.writeBuffer(Buffer.from(buffer), (err: any, hyperfileUrl: string) => {
           if (err) {
             throw new Error(err)
           }
 
-          this.handle.change((doc) => {
+          this.handle && this.handle.change((doc: UrlDoc) => {
             doc.imageHyperfileUrl = hyperfileUrl
           })
         })
       })
-    }))
   }
 
   render = () => {
-    const { data, url } = this.state
+    const { doc } = this.state
+
+    if (!doc) return null
+
+    const { data, url } = doc
+
     if (!url) {
       return (
         <div style={css.urlCard}>
@@ -139,6 +156,7 @@ export default class UrlContent extends React.PureComponent {
         </div>
       )
     }
+
     if (!data) {
       return (
         <div style={css.urlCard}>
@@ -147,21 +165,32 @@ export default class UrlContent extends React.PureComponent {
         </div>
       )
     }
+
+    if ('error' in data) {
+      return (
+
+        <div style={css.urlCard}>
+          <p style={css.error}>(URL did not load.)</p>
+        </div>
+      )
+    }
+
     return (
       <div style={css.urlCard}>
-        {this.state.imageHyperfileUrl
+        {doc.imageHyperfileUrl
           ? (
             <img
               style={css.img}
-              src={this.state.imageHyperfileUrl}
+              src={doc.imageHyperfileUrl}
               alt={data.description}
             />
           )
-          : null }
+          : null}
+
         <p style={css.title}>
           <a style={css.titleAnchor} href={url}>{data.title}</a>
         </p>
-        { data.error ? <p style={css.error}>(URL did not load.)</p> : null }
+
         <p style={css.text}>{data.description}</p>
         <p style={css.link}>
           <a style={css.titleAnchor} href={data.canonicalLink || url}>
@@ -173,6 +202,17 @@ export default class UrlContent extends React.PureComponent {
   }
 }
 
+function removeEmpty(obj: object) {
+  Object.entries(obj).forEach(([key, val]) => {
+    if (val && typeof val === 'object') {
+      removeEmpty(val)
+    } else if (val == null) {
+      delete obj[key]
+    }
+  })
+}
+
+
 ContentTypes.register({
   type: 'url',
   name: 'URL',
@@ -183,7 +223,8 @@ ContentTypes.register({
   }
 })
 
-const css = {
+// Should be { [name: string]: React.CSSProperties }
+const css: any = {
   urlCard: {
     display: 'flex',
     flexDirection: 'column',

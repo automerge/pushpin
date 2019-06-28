@@ -1,5 +1,5 @@
 import React from 'react'
-import withDocument from './with-document'
+import withDocument from './withDocument'
 
 interface Doc {
   title?: string
@@ -8,13 +8,13 @@ interface Doc {
 interface Props {
   placeholder: string,
   doc: Doc
-  change: (cb: (doc: Doc) => void) => {}
+  change: (cb: (doc: Doc) => void) => void
   preventDrag: boolean
 }
 
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
-class TitleEditor extends React.PureComponent<Props> {
+class TitleEditor extends React.Component<Props> {
   static initializeDocument = (doc: Doc) => {
     doc.title = undefined
   }
@@ -25,6 +25,10 @@ class TitleEditor extends React.PureComponent<Props> {
   }
 
   input: React.RefObject<HTMLInputElement> = React.createRef()
+
+  shouldComponentUpdate(nextProps: Props) {
+    return nextProps.doc.title !== this.props.doc.title
+  }
 
   onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === 'Escape') {
