@@ -3,7 +3,7 @@ import Debug from 'debug'
 import { clipboard } from 'electron'
 
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
-import Omnibox from './omnibox'
+import Omnibox from './Omnibox'
 import Content from '../Content'
 import Authors from './authors'
 import Share from './share'

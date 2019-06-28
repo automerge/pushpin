@@ -1,7 +1,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Action from './action'
+import Action from './Action'
 
 /* This class is adapted from the react-color TwitterPicker
    by stripping out most of the functionality and just leaving swatches */

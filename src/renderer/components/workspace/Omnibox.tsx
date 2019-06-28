@@ -1,31 +1,86 @@
 import React from 'react'
 import Debug from 'debug'
-import PropTypes from 'prop-types'
 
 import ContentSection from './content-section'
 
-import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
+import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
 import InvitationsView from '../../invitations-view'
+import { ContactDoc } from '../contact';
+import { Handle } from 'hypermerge';
 
 const log = Debug('pushpin:omnibox')
 
-export default class Omnibox extends React.PureComponent {
-  static propTypes = {
-    active: PropTypes.bool.isRequired,
-    hypermergeUrl: PropTypes.string.isRequired,
-    omniboxFinished: PropTypes.func.isRequired
-  }
+export interface Props {
+  active: boolean
+  hypermergeUrl: HypermergeUrl
+  omniboxFinished: Function
+}
 
-  omniboxInput = React.createRef()
+interface Doc {
+  selfId: HypermergeUrl
+  contactIds: PushpinUrl[]
+  currentDocUrl: PushpinUrl
+  viewedDocUrls: PushpinUrl[]
+  archivedDocUrls: PushpinUrl[]
+}
 
-  state = {
+interface State {
+  search: string
+  selectedIndex: number
+  invitations: any[]
+  viewedDocs: { [docUrl: string]: any }, // PushpinUrl
+  contacts: { [contactId: string]: ContactDoc }, // HypermergeUrl
+  doc?: Doc
+}
+
+interface SectionIndex {
+  [sectionName: string]: SectionRange
+}
+
+interface SectionRange {
+  start: number
+  end: number
+}
+
+interface Section {
+  name: string
+  label?: string
+  actions: Action[]
+  items: (state: State, props: Props) => Item[];
+}
+
+interface Item {
+  type?: string,
+  object?: any;
+  url?: string;
+  selected?: boolean
+  actions?: Action[]
+}
+
+interface Action {
+  name: string;
+  callback: (url: any) => Function
+  faIcon: string;
+  label: string;
+  shortcut: string;
+  keysForActionPressed: (e: any) => boolean;
+}
+
+
+export default class Omnibox extends React.PureComponent<Props, State> {
+  omniboxInput = React.createRef<HTMLInputElement>()
+  handle?: Handle<any>
+  viewedDocHandles: { [docUrl: string]: Handle<any> }
+  contactHandles: { [contactId: string]: Handle<ContactDoc> }
+  invitationsView: any
+
+  state: State = {
     search: '',
     selectedIndex: 0,
     invitations: [],
     viewedDocs: {},
     contacts: {},
-    archivedDocUrls: []
   }
 
   constructor(props) {
@@ -44,14 +99,14 @@ export default class Omnibox extends React.PureComponent {
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    this.handle.close()
+    this.handle && this.handle.close()
     document.removeEventListener('keydown', this.handleCommandKeys)
 
     Object.values(this.viewedDocHandles).forEach(handle => handle.close())
     Object.values(this.contactHandles).forEach(handle => handle.close())
   }
 
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
+  componentDidUpdate = (prevProps: Props) => {
     log('componentDidUpdate')
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
       this.refreshHandle(this.props.hypermergeUrl)
@@ -59,34 +114,36 @@ export default class Omnibox extends React.PureComponent {
 
     if (!prevProps.active && this.props.active) {
       this.setState({ search: '' }, () => {
-        setTimeout(() => this.omniboxInput.current.focus(), 0)
+        setTimeout(() => {
+          this.omniboxInput && this.omniboxInput.current && this.omniboxInput.current.focus()
+        }, 0)
       })
     }
   }
 
-  refreshHandle = (hypermergeUrl) => {
+  refreshHandle = (hypermergeUrl: HypermergeUrl) => {
     if (this.handle) {
       this.handle.close()
     }
     this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
-  onInvitationsChange = (invitations) => {
+  onInvitationsChange = (invitations: any) => {
     log('invitations change')
     this.setState({ invitations }, () => this.forceUpdate())
   }
 
-  onChange = (doc) => {
+  onChange = (doc: Doc) => {
     log('onChange', doc)
-    this.setState({ ...doc }, () => {
-      this.state.viewedDocUrls.forEach(url => {
+    this.setState({ doc }, () => {
+      this.state.doc && this.state.doc.viewedDocUrls.forEach(url => {
         // create a handle for this document
         if (!this.viewedDocHandles[url]) {
           const { hypermergeUrl } = parseDocumentLink(url)
           // when it changes, stick the contents of the document
           // into this.state.viewedDocs[url]
           const handle = window.repo.watch(hypermergeUrl, (doc) => {
-            this.setState((state, props) => {
+            this.setState(state => {
               const { viewedDocs } = state
               viewedDocs[url] = doc
               return { viewedDocs }
@@ -96,12 +153,12 @@ export default class Omnibox extends React.PureComponent {
         }
       })
 
-      this.state.contactIds.forEach(contactId => {
+      this.state.doc && this.state.doc.contactIds.forEach(contactId => {
         // create a handle for each contact
         if (!this.contactHandles[contactId]) {
           // when it changes, put it into this.state.contacts[contactId]
-          const handle = window.repo.watch(contactId, (doc) => {
-            this.setState((state, props) => {
+          const handle = window.repo.watch(contactId, (doc: ContactDoc) => {
+            this.setState(state => {
               const { contacts } = state
               contacts[contactId] = doc
               return { contacts }
@@ -117,7 +174,7 @@ export default class Omnibox extends React.PureComponent {
     this.props.omniboxFinished()
   }
 
-  handleCommandKeys = (e) => {
+  handleCommandKeys = (e: KeyboardEvent) => {
     // XXX hmmmmm, this could be cleaner
     if (!this.props.active) {
       return
@@ -142,12 +199,14 @@ export default class Omnibox extends React.PureComponent {
 
     // see if any of the actions for the currently selected item are triggered by the keypress
     // XXX: we might want to use the mousetrap library for this
-    selected.actions.forEach((action) => {
-      if (action.keysForActionPressed(e)) {
-        action.callback(selected.url)()
-        this.endSession()
-      }
-    })
+    if (selected.actions) {
+      selected.actions.forEach((action) => {
+        if (action.keysForActionPressed(e)) {
+          action.callback(selected.url)()
+          this.endSession()
+        }
+      })
+    }
   }
 
   setSelection = (newIndex) => {
@@ -175,9 +234,12 @@ export default class Omnibox extends React.PureComponent {
     this.setState({ search: e.target.value, selectedIndex: 0 })
   }
 
-  menuSections = () => {
-    let items = []
-    const sectionIndices = {}
+  menuSections = (): { items: Item[], sectionIndices: SectionIndex } => {
+    const doc = this.state.doc
+    if (!doc) return { items: [], sectionIndices: {} }
+
+    let items: Item[] = []
+    const sectionIndices: { [section: string]: SectionRange } = {}
     const { search } = this.state
 
     let searchRegEx
@@ -192,7 +254,7 @@ export default class Omnibox extends React.PureComponent {
 
     // invitations are sort of a pseudo-section right now with lots of weird behaviour
     const invitationItems = (this.state.invitations || [])
-      .filter((i) => (!this.state.viewedDocUrls.some(url => url === i.documentUrl)))
+      .filter((i) => (!doc.viewedDocUrls.some(url => url === i.documentUrl)))
       .filter(invitation => (invitation.doc.title || 'Loading...').match(searchRegEx))
       .map(invitation => ({ type: 'invitation', object: invitation, url: invitation.documentUrl, actions: [this.view] }))
 
@@ -231,10 +293,10 @@ export default class Omnibox extends React.PureComponent {
 
   sectionItems = (name) => {
     const { items, sectionIndices } = this.menuSections()
-    const { start, end } = sectionIndices[name] || {}
+    const sectionRange = sectionIndices[name]
 
-    if (Number.isInteger(start)) {
-      return items.slice(start, end)
+    if (sectionRange) {
+      return items.slice(sectionRange.start, sectionRange.end)
     }
 
     return []
@@ -281,13 +343,13 @@ export default class Omnibox extends React.PureComponent {
   /* end actions */
 
   /* sections begin */
-  sectionDefinitions = [
+  sectionDefinitions: Section[] = [
     {
       name: 'viewedDocUrls',
       label: 'Boards',
       actions: [this.view, this.archive],
       items: (state, props) => Object.entries(this.state.viewedDocs)
-        .filter(([url, doc]) => !state.archivedDocUrls.includes(url))
+        .filter(([url, doc]) => !state.doc || !state.doc.archivedDocUrls.includes(url))
         .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
         .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
         .map(([url, doc]) => ({ url }))
@@ -296,9 +358,9 @@ export default class Omnibox extends React.PureComponent {
       name: 'archivedDocUrls',
       label: 'Archived',
       actions: [this.view, this.unarchive],
-      items: (state, props) => ((state.search === '')
+      items: (state, props) => ((state.search === '' || !state.doc)
         ? [] // don't show archived URLs unless there's a current search term
-        : state.archivedDocUrls.map(url => [url, this.state.viewedDocs[url]])
+        : state.doc.archivedDocUrls.map(url => [url, this.state.viewedDocs[url]])
           .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
           .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
           .map(([url, doc]) => ({ url })))
@@ -335,34 +397,36 @@ export default class Omnibox extends React.PureComponent {
 
   offerDocumentToIdentity = (contactUrl) => {
     // XXX out of scope RN but consider if we should change the key for consistency?
-    const { type, id } = parseDocumentLink(contactUrl)
+    const { type, hypermergeUrl } = parseDocumentLink(contactUrl)
+    const doc = this.state.doc
+
+    if (!doc || !doc.selfId) {
+      return
+    }
+
     if (type !== 'contact') {
       throw (new Error('Offer the current document to a contact by passing in the contact id document.'))
     }
 
-    if (!this.state.selfId) {
-      return
-    }
-
-    window.repo.change(this.state.selfId, (s) => {
+    window.repo.change(doc.selfId, (s: ContactDoc) => {
       if (!s.offeredUrls) {
         s.offeredUrls = {}
       }
 
       // XXX right now this code leaks identity documents and document URLs to
       //     every single person who knows you
-      if (!s.offeredUrls[id]) {
-        s.offeredUrls[id] = []
+      if (!s.offeredUrls[hypermergeUrl]) {
+        s.offeredUrls[hypermergeUrl] = []
       }
 
-      if (!s.offeredUrls[id].includes(this.state.currentDocUrl)) {
-        s.offeredUrls[id].push(this.state.currentDocUrl)
+      if (!s.offeredUrls[hypermergeUrl].includes(doc.currentDocUrl)) {
+        s.offeredUrls[hypermergeUrl].push(doc.currentDocUrl)
       }
     })
   }
 
   archiveDocument = (url) => {
-    this.handle.change((doc) => {
+    this.handle && this.handle.change((doc: Doc) => {
       if (!doc.archivedDocUrls) {
         doc.archivedDocUrls = []
       }
@@ -374,7 +438,7 @@ export default class Omnibox extends React.PureComponent {
   }
 
   unarchiveDocument = (url) => {
-    this.handle.change((doc) => {
+    this.handle && this.handle.change((doc: Doc) => {
       if (!doc.archivedDocUrls) {
         return
       }
@@ -447,7 +511,7 @@ export default class Omnibox extends React.PureComponent {
     return null
   }
 
-  renderContentSection = ({ name, label, actions }) => {
+  renderContentSection = ({ name, label, actions }: Section) => {
     const items = this.sectionItems(name)
 
     if (items.length === 0) {
@@ -467,7 +531,7 @@ export default class Omnibox extends React.PureComponent {
   render = () => {
     log('render')
 
-    if (!this.state.currentDocUrl) {
+    if (!this.state.doc || !this.state.doc.currentDocUrl) {
       return null
     }
 
