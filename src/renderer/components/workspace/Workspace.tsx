@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
 import ContentTypes from '../../content-types'
-import { createDocumentLink, parseDocumentLink, PushpinUrl } from '../../ShareLink'
+import { createDocumentLink, parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../ShareLink'
 import Content, { ContentProps } from '../Content'
 import SelfContext from '../SelfContext'
 import TitleBar from './TitleBar'
@@ -13,8 +13,8 @@ import { ContactDoc } from '../contact';
 
 const log = Debug('pushpin:workspace')
 
-interface Doc {
-  selfId: string
+export interface Doc {
+  selfId: HypermergeUrl
   contactIds: PushpinUrl[]
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
@@ -89,7 +89,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   currentDocHandle?: Handle<any>
   currentDocTimerId?: NodeJS.Timeout
 
-  constructor(props: Props) {
+  constructor(props: ContentProps) {
     super(props)
     log('constructor')
 

@@ -1,63 +1,76 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 
-import ContactEditor from '../contact/ContactEditor'
+import Content from "../Content"
 
-import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
+import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../ShareLink'
 import ListMenuItem from './list-menu-item'
+import { Doc as WorkspaceDoc } from "./Workspace"
+import { Handle } from 'hypermerge';
+import { ContactDoc } from '../contact';
+// TODO: once board is converted use this import and remove the type definition below
+// import { Doc as BoardDoc } from "../board"
+type BoardDoc = any
 
 const log = Debug('pushpin:share')
 
-export default class Share extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired // Workspace
-  }
+export interface Props {
+  hypermergeUrl: HypermergeUrl
+}
 
-  state = { tab: 'contacts' }
+type TabName = 'contacts' | 'profile'
+
+interface State {
+  tab: TabName
+  board?: BoardDoc
+  workspace?: WorkspaceDoc
+}
+
+export default class Share extends React.PureComponent<Props, State> {
+  state: State = { tab: 'contacts' }
+  workspaceHandle?: Handle<WorkspaceDoc>
+  boardHandle?: Handle<any>
 
   // This is the New Boilerplate
   componentWillMount = () => {
-    log('componentWillMount')
     this.refreshWorkspaceHandle(this.props.hypermergeUrl)
   }
 
   componentWillUnmount = () => {
-    log('componentWillUnmount')
-    this.workspaceHandle.close()
-    this.boardHandle.close()
+    this.workspaceHandle && this.workspaceHandle.close()
+    this.boardHandle && this.boardHandle.close()
   }
 
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
+  componentDidUpdate = (prevProps: Props) => {
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
+      this.refreshWorkspaceHandle(this.props.hypermergeUrl)
     }
   }
 
-  refreshWorkspaceHandle = (hypermergeUrl) => {
-    log('refreshWorkspaceHandle')
+  refreshWorkspaceHandle = (hypermergeUrl: HypermergeUrl) => {
     if (this.workspaceHandle) {
       this.workspaceHandle.close()
     }
     this.workspaceHandle = window.repo.watch(hypermergeUrl, (doc) => this.onWorkspaceChange(doc))
   }
 
-  refreshBoardHandle = (boardId) => {
+  refreshBoardHandle = (boardUrl: HypermergeUrl) => {
     log('refreshBoardHandle')
     if (this.boardHandle) {
       this.boardHandle.close()
     }
-    this.boardHandle = window.repo.watch(boardId, (doc) => this.onBoardChange(doc))
+    this.boardHandle = window.repo.watch(boardUrl, (doc) => this.onBoardChange(doc))
   }
 
-  onBoardChange = (doc) => {
+  onBoardChange = (doc: BoardDoc) => {
     log('onBoardChange')
     this.setState({ board: doc })
   }
 
-  onWorkspaceChange = (doc) => {
+  onWorkspaceChange = (doc: WorkspaceDoc) => {
     log('onWorkspaceChange')
     this.setState({ workspace: doc }, () => {
+      if (!this.state.workspace) return
       if (this.state.workspace.currentDocUrl) {
         const { hypermergeUrl } = parseDocumentLink(this.state.workspace.currentDocUrl)
 
@@ -68,14 +81,16 @@ export default class Share extends React.PureComponent {
     })
   }
 
-  offerDocumentToIdentity = (e, contactId) => {
-    if (!this.state.workspace.selfId) {
+  offerDocumentToIdentity = (e: Event, contactId: string) => {
+    if (!this.state.workspace || !this.state.workspace.selfId || !this.state.workspace.currentDocUrl) {
       return
     }
 
+
     log('offerDocumentToIdentity')
 
-    window.repo.change(this.state.workspace.selfId, (s) => {
+    const currentDocUrl = this.state.workspace.currentDocUrl
+    window.repo.change(this.state.workspace.selfId, (s: ContactDoc) => {
       if (!s.offeredUrls) {
         s.offeredUrls = {}
       }
@@ -84,8 +99,8 @@ export default class Share extends React.PureComponent {
         s.offeredUrls[contactId] = []
       }
 
-      if (!s.offeredUrls[contactId].includes(this.state.workspace.currentDocUrl)) {
-        s.offeredUrls[contactId].push(this.state.workspace.currentDocUrl)
+      if (!s.offeredUrls[contactId].includes(currentDocUrl)) {
+        s.offeredUrls[contactId].push(currentDocUrl)
       }
     })
   }
@@ -107,7 +122,7 @@ export default class Share extends React.PureComponent {
 
     const share = {
       name: 'share',
-      callback: (url) => (e) => this.offerDocumentToIdentity(url),
+      callback: (url: string) => (e: Event) => this.offerDocumentToIdentity(e, url),
       faIcon: 'fa-share-alt',
       label: 'Share'
     }
@@ -138,19 +153,18 @@ export default class Share extends React.PureComponent {
     )
   }
 
+  renderProfile = () => {
+    if (!this.state.workspace) return null
+    return <Content url={this.state.workspace.selfId} context="workspace"></Content>
+  }
 
-  renderProfile = () => (
-
-    <ContactEditor hypermergeUrl={this.state.workspace.selfId} />
-  )
-
-  tabClasses = (name) => {
+  tabClasses = (name: TabName) => {
     if (this.state.tab === name) { return 'Tabs__tab Tabs__tab--active' }
     return 'Tabs__tab'
   }
 
   render = () => {
-    let body
+    let body: JSX.Element | null = null
     if (this.state.tab === 'profile') {
       body = this.renderProfile()
     } else if (this.state.tab === 'contacts') {

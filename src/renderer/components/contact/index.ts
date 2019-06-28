@@ -8,6 +8,7 @@ export interface ContactDoc {
   color: string
   avatarDocId: string
   hypermergeUrl: any //Used by workspace
+  offeredUrls?: { [url: string]: string[] } // Used by share, a map of contact id to documents offered.
 }
 
 ContentTypes.register({

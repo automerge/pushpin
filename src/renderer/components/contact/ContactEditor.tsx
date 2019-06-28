@@ -8,7 +8,7 @@ import { Handle } from 'hypermerge'
 
 import { USER, IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
 import Content, { ContentProps } from '../Content'
-import { ContactDoc } from './index'
+import { ContactDoc } from '.'
 
 import ColorPicker from '../color-picker'
 
@@ -57,7 +57,7 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
     (doc) => this.onChange(doc))
   componentWillUnmount = () => this.handle && this.handle.close()
 
-  onChange = (doc) => {
+  onChange = (doc: ContactDoc) => {
     this.setState({ doc })
   }
 
