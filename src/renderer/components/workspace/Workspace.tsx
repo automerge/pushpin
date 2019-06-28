@@ -4,18 +4,14 @@ import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
 import ContentTypes from '../../content-types'
-import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
-import Content from '../Content'
+import { createDocumentLink, parseDocumentLink, PushpinUrl } from '../../ShareLink'
+import Content, { ContentProps } from '../Content'
 import SelfContext from '../SelfContext'
-import TitleBar from './title-bar'
+import TitleBar from './TitleBar'
 import { Handle } from 'hypermerge';
 import { ContactDoc } from '../contact';
 
 const log = Debug('pushpin:workspace')
-
-interface Props {
-  hypermergeUrl: HypermergeUrl
-}
 
 interface Doc {
   selfId: string
@@ -31,7 +27,7 @@ interface State {
   selfId?: string
 }
 
-export default class Workspace extends React.PureComponent<Props, State> {
+export default class Workspace extends React.PureComponent<ContentProps, State> {
   static initializeDocument = (workspace: Doc) => {
     const selfId = Content.initializeContentDoc('contact')
 
