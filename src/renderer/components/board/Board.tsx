@@ -111,8 +111,8 @@ export type TrackingEntry = MoveTracking | ResizeTracking | NotDraggingTracking
 interface CardArgs {
   x: number
   y: number
-  width?: number
-  height?: number
+  width: number | null | undefined
+  height: number | null | undefined
 }
 
 interface LinkCardArgs extends CardArgs {
@@ -497,10 +497,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const { type } = parseDocumentLink(url)
     const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
 
-    width = width ? this.snapMeasureToGrid(width) : undefined
-    width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : undefined
-    height = height ? this.snapMeasureToGrid(height) : undefined
-    height = component.defaultHeight ? component.defaultHeight * GRID_SIZE : undefined
+    width = width ? this.snapMeasureToGrid(width) : null
+    width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : null
+    height = height ? this.snapMeasureToGrid(height) : null
+    height = component.defaultHeight ? component.defaultHeight * GRID_SIZE : null
 
     this.handle && this.handle.change((b) => {
       const snapX = this.snapCoordinateToGrid(x)
