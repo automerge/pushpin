@@ -8,16 +8,16 @@ import ColorPicker from '../color-picker'
 
 const log = Debug('pushpin:board-context-menu')
 
-export default class BoardContextMenu extends React.PureComponent {
-  static propTypes = {
-    contentTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    addContent: PropTypes.func.isRequired,
-    onShowContextMenu: PropTypes.func.isRequired,
-    backgroundColor: PropTypes.string.isRequired,
-    backgroundColors: PropTypes.arrayOf(PropTypes.string).isRequired,
-    changeBackgroundColor: PropTypes.func.isRequired
-  }
+interface Props {
+  contentTypes: any[], // content-types isn't upgraded on my current branch
+  addContent: (e, any) => void,
+  onShowContextMenu: (e: Event) => void,
+  backgroundColor: string,
+  backgroundColors: string[],
+  changeBackgroundColor: (color: string) => void
+}
 
+export default class BoardContextMenu extends React.PureComponent<Props> {
   render = () => {
     log('render')
 
