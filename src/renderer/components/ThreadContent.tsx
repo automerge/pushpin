@@ -1,17 +1,28 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import ContentTypes from '../content-types'
 import Content from './Content'
 import { createDocumentLink } from '../share-link'
+import { Handle } from 'hypermerge';
+import { ContentProps } from './Content'
 
-export default class ThreadContent extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    selfId: PropTypes.string.isRequired
-  }
+interface Message {
+  authorId: string,
+  content: string,
+  time: number //Unix timestamp
+}
 
-  static initializeDocument(threadDoc) {
+interface Doc {
+  messages: Message[]
+}
+
+interface State {
+  doc?: Doc
+  message: string
+}
+
+export default class ThreadContent extends React.PureComponent<ContentProps, State> {
+  static initializeDocument(threadDoc: Doc) {
     threadDoc.messages = []
   }
 
@@ -22,41 +33,35 @@ export default class ThreadContent extends React.PureComponent {
   static maxWidth = 24
   static maxHeight = 36
 
-  state = { message: '', messages: null }
+  handle?: Handle<Doc>
+  state: State = { message: '' }
 
   // This is the New Boilerplate
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
-  componentWillUnmount = () => this.handle.close()
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
+  componentWillMount = () => {
+    this.handle = window.repo.watch(this.props.hypermergeUrl, (doc: Doc) => this.onChange(doc))
   }
-
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
-  }
+  componentWillUnmount = () => this.handle && this.handle.close()
 
 
-  onChange = (doc) => {
-    this.setState({ ...doc })
+  onChange = (doc: Doc) => {
+    this.setState({ doc })
   }
 
   render = () => {
-    const messages = (this.state.messages || [])
-    const groupedMessages = []
-    let currentGroup = null
+    const { doc } = this.state
+    if (!doc) return null
+
+    const messages = doc.messages || []
+    const groupedMessages: Message[][] = []
+    let currentGroup: Message[]
     messages.forEach((message) => {
-      if (!currentGroup
-        || (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)) {
+      if (!currentGroup || (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)) {
         currentGroup = []
         groupedMessages.push(currentGroup)
       }
       currentGroup.push(message)
     })
+
     return (
       <div style={css.threadWrapper}>
         <div style={css.messageWrapper}>
@@ -78,16 +83,16 @@ export default class ThreadContent extends React.PureComponent {
     )
   }
 
-  renderGroupedMessages = (groupOfMessages, idx) => (
+  renderGroupedMessages = (groupOfMessages: Message[], idx: number) => (
     <div style={css.messageGroup} key={idx}>
       <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
       <div style={css.groupedMessages}>
-        { groupOfMessages.map(this.renderMessage) }
+        {groupOfMessages.map(this.renderMessage)}
       </div>
     </div>
   )
 
-  renderMessage = ({ authorId, content, time }, idx) => {
+  renderMessage = ({ content, time }: Message, idx: number) => {
     const date = new Date()
     date.setTime(time)
     const options = {
@@ -101,34 +106,37 @@ export default class ThreadContent extends React.PureComponent {
     return (
       <div style={css.message} key={idx}>
         <div style={css.content}>{content}</div>
-        { idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div> : null}
+        {idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div> : null}
       </div>
     )
   }
 
-  onScroll= (e) => {
+  onScroll = (e: React.UIEvent) => {
     e.stopPropagation()
   }
 
-  onInput = (e) => {
-    this.setState({
-      message: e.target.value
-    })
+  onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target) {
+      this.setState({
+        message: e.target.value
+      })
+    }
   }
 
-  onPaste = (e) => {
+  onPaste = (e: React.ClipboardEvent) => {
     e.stopPropagation()
   }
 
-  onKeyDown = (e) => {
+  onKeyDown = (e: React.KeyboardEvent) => {
     e.stopPropagation()
 
-    if (e.key === 'Enter' && !e.shiftKey) {
+    const message = this.state.message
+    if (e.key === 'Enter' && !e.shiftKey && message) {
       e.preventDefault()
-      this.handle.change((threadDoc) => {
+      this.handle && this.handle.change((threadDoc: Doc) => {
         threadDoc.messages.push({
           authorId: this.props.selfId,
-          content: this.state.message,
+          content: message,
           time: new Date().getTime()
         })
       })
@@ -142,19 +150,19 @@ export default class ThreadContent extends React.PureComponent {
 
 const css = {
   threadWrapper: {
-    display: 'flex',
+    display: 'flex' as 'flex',
     backgroundColor: 'white',
     width: '100%',
-    overflow: 'auto',
+    overflow: 'auto' as 'auto',
     height: '100%',
     padding: '1px 1px 0px 1px'
   },
   messageWrapper: {
     padding: 12,
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    overflowY: 'scroll',
+    position: 'relative' as 'relative',
+    display: 'flex' as 'flex',
+    flexDirection: 'column-reverse' as 'column-reverse',
+    overflowY: 'scroll' as 'scroll',
     marginBottom: 49,
     flexGrow: 1,
   },
@@ -163,24 +171,24 @@ const css = {
     paddingTop: 12
   },
   groupedMessages: {
-    position: 'relative',
+    position: 'relative' as 'relative',
     top: -20,
     paddingLeft: 40 + 8
   },
   messages: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    flexGrow: '1',
+    display: 'flex' as 'flex',
+    flexDirection: 'column' as 'column',
+    justifyContent: 'flex-end' as 'flex-end',
+    flexGrow: 1,
   },
   message: {
     color: 'black',
-    display: 'flex',
+    display: 'flex' as 'flex',
     lineHeight: '20px',
     padding: '2px 0'
   },
   user: {
-    display: 'flex'
+    display: 'flex' as 'flex'
   },
   username: {
     paddingLeft: 8,
@@ -191,8 +199,8 @@ const css = {
 
   },
   time: {
-    flex: 'none',
-    position: 'absolute',
+    flex: 'none' as 'none',
+    position: 'absolute' as 'absolute',
     right: 0,
     fontSize: 12,
     color: 'var(--colorSecondaryGrey)',
@@ -201,10 +209,10 @@ const css = {
   content: {
   },
   inputWrapper: {
-    boxSizing: 'border-box',
+    boxSizing: 'border-box' as 'border-box',
     width: 'calc(100% - 2px)',
     borderTop: '1px solid var(--colorInputGrey)',
-    position: 'absolute',
+    position: 'absolute' as 'absolute',
     bottom: 1,
     backgroundColor: 'white',
     padding: 8,
