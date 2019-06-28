@@ -12,7 +12,7 @@ import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
-import BoardContextMenu from './board-context-menu'
+import BoardContextMenu from './BoardContextMenu'
 import { Handle } from 'hypermerge'
 
 const { dialog } = remote

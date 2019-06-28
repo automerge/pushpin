@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 import classNames from 'classnames'
