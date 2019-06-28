@@ -65,20 +65,46 @@ interface State {
     x: number
     y: number
   }
+  tracking: { [cardId: string]: TrackingEntry }
   doc?: BoardDoc
 } 
 
 // This is confusing
-export interface TrackingEntry {
+export interface TrackingBase {
+  dragType: DragType,
+}
+
+enum DragType {
+  NOT_DRAGGING,
+  MOVING,
+  RESIZING
+}
+
+interface MoveTracking extends TrackingBase {
+  dragType: DragType.MOVING
   moveX: number,
   moveY: number,
+  slackX: number,
+  slackY: number
+}
+
+interface ResizeTracking extends TrackingBase {
+  dragType: DragType.RESIZING
+  slackWidth: 0,
+  slackHeight: 0,
   resizeWidth: number,
   resizeHeight: number,
-  slackX: number,
-  slackY: number,
-  moving: boolean,
-  resizing: boolean
+  minWidth?: number,
+  minHeight?: number,
+  maxWidth?: number,
+  maxHeight?: number
 }
+
+interface NotTracking extends TrackingBase {
+  dragType: DragType.NOT_DRAGGING
+}
+
+type TrackingEntry = MoveTracking | ResizeTracking | NotTracking
 
 interface CardArgs {
   x: number
@@ -102,14 +128,15 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   boardRef = React.createRef<HTMLDivElement>()
   private cardRefs: Map<string, BoardCard> = new Map<string, BoardCard>()
   private finishedDrag: boolean = false
-  private tracking: Map<string, TrackingEntry> = new Map<string, TrackingEntry>()
+  private tracking: { [cardId: string]: TrackingEntry } = {}
   
   private heartbeatTimerId?: NodeJS.Timer
   private contactHeartbeatTimerId: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
   
   state: State = {
     remoteSelection: {},
-    selected: []
+    selected: [],
+    tracking: {}
   }
 
   static initializeDocument(board, { title, backgroundColor }) {
@@ -590,21 +617,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     return snapped + GRID_SIZE
   }
 
-  // Copy view-relevant move/resize state over to React.
-  setDragState = (card, tracking) => {
-    this.setState((prevState) => {
-      const cards = { ...prevState.cards,
-        [card.id]: {
-          moveX: tracking.moveX,
-          moveY: tracking.moveY,
-          resizeWidth: tracking.resizeWidth,
-          resizeHeight: tracking.resizeHeight
-        }
-      }
-      return ({ cards })
-    })
-  }
-
   effectDrag = (card, tracking, { deltaX, deltaY }) => {
     if (!tracking.resizing && !tracking.moving) {
       throw new Error('Did not expect drag without resize or move')
@@ -681,10 +693,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   onDrag = (card, e, d) => {
     if (!(this.state.doc && this.state.doc.cards)) return
     log('onDrag')
-    const tracking = this.tracking.get(card.id)
+    const tracking = this.tracking[card.id]
 
     // If we haven't started tracking this drag, initialize tracking
-    if (!(tracking && (tracking.moving || tracking.resizing))) {
+    if (!(tracking && (tracking.dragType != DragType.NOT_DRAGGING))) {
       const resizing = e.target.className === 'cardResizeHandle'
       const moving = !resizing
 
@@ -693,11 +705,11 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
         cards.forEach(c => {
           this.tracking[c.id] = {
+            dragType: DragType.MOVING,
             moveX: c.x,
             moveY: c.y,
             slackX: 0,
             slackY: 0,
-            moving: true
           }
         })
       }
@@ -724,7 +736,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         const maxHeight = (component.maxWidth * GRID_SIZE) || Infinity
 
         this.tracking[card.id] = {
-          resizing: true,
+          dragType: DragType.RESIZING,
           slackWidth: 0,
           slackHeight: 0,
           resizeWidth: card.width,
@@ -739,18 +751,36 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       return
     }
 
-    if (tracking.moving) {
+    if (tracking.dragType === DragType.MOVING) {
       const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
       cards.forEach(card => {
         const t = this.tracking[card.id]
         this.effectDrag(card, t, d)
-        this.setDragState(card, t)
+        
+        const { moveX, moveY } = t as MoveTracking
+
+        this.setState((prevState) => {
+          ({ tracking: {
+              ...prevState.tracking,
+              [card.id]: { moveX, moveY }
+            }
+          })
+        })
       })
     }
 
-    if (tracking.resizing) {
+    if (tracking.dragType === DragType.RESIZING) {
       this.effectDrag(card, tracking, d)
-      this.setDragState(card, tracking)
+
+      const { resizeWidth, resizeHeight } = tracking as ResizeTracking
+      
+      this.setState((prevState) => {
+        ({ tracking: {
+            ...prevState.tracking,
+            [card.id]: { resizeWidth, resizeHeight }
+          }
+        })
+      })
     }
   }
 
@@ -815,40 +845,29 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const tracking = this.tracking[id]
 
     // If tracking is not initialized, treat this as a click
-    if (!(tracking && (tracking.moving || tracking.resizing))) {
+    if (!(tracking && (tracking.dragType !== DragType.NOT_DRAGGING))) {
       return
     }
 
-    if (tracking.moving) {
+    if (tracking.dragType === DragType.MOVING) {
       const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
       cards.forEach(card => {
-        const t = this.tracking[card.id]
-        const x = t.moveX
-        const y = t.moveY
+        const t = this.tracking[card.id] as MoveTracking
+        
+        this.cardMoved({ id: card.id, x: t.moveX, y: t.moveY })
 
-        t.moveX = null
-        t.moveY = null
-        t.slackX = null
-        t.slackY = null
-        t.moving = false
-
-        this.cardMoved({ id: card.id, x, y })
-        this.setDragState(card, t)
+        this.tracking = {}
+        this.setState({ tracking: {} })
       })
     }
 
-    if (tracking.resizing) {
+    if (tracking.dragType === DragType.RESIZING) {
       const width = tracking.resizeWidth
       const height = tracking.resizeHeight
 
-      tracking.resizeWidth = null
-      tracking.resizeHeight = null
-      tracking.slackWidth = null
-      tracking.slackHeight = null
-      tracking.resizing = false
-
       this.cardResized({ id: card.id, width, height })
-      this.setDragState(card, tracking)
+      this.tracking = {}
+      this.setState({ tracking: {} })
     }
 
     this.finishedDrag = true
@@ -886,7 +905,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
           selected={selected}
           remoteSelected={cardsSelected[id] || []}
           uniquelySelected={uniquelySelected}
-          dragState={this.state.cards[id]}
+          dragState={this.state.tracking[id]}
           onDrag={this.onDrag}
           onStop={this.onStop}
           onCardClicked={this.onCardClicked}

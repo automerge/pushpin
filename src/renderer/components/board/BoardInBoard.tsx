@@ -13,8 +13,8 @@ interface State {
 
 export default class BoardInBoard extends React.PureComponent<ContentProps, State> {
   // this isn't great
-  static initializeDocument(board) {
-    Board.initializeDocument(board)
+  static initializeDocument(board, typeAttrs) {
+    Board.initializeDocument(board, typeAttrs)
   }
 
   static minWidth = 4
