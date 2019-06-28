@@ -13,37 +13,21 @@ interface State {
 }
 
 export default class ContactInVarious extends React.PureComponent<ContentProps, State> {
-  state: State = { online: false }
-
   private handle?: Handle<ContactDoc>
   private timerId?: NodeJS.Timeout
+  state: State = { online: false }
 
   // This is the New Boilerplate
   componentWillMount = () => {
-    this.refreshHandle(this.props.hypermergeUrl)
-    delete this.timerId
+    this.handle = window.repo.open(this.props.hypermergeUrl)
+    this.handle.subscribe((doc) => this.onChange(doc))
+    this.handle.subscribeMessage((msg) => this.onMessage(msg))
   }
 
   componentWillUnmount = () => {
     this.handle && this.handle.close()
     this.timerId && clearTimeout(this.timerId)
   }
-
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
-
-  refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
-    this.handle = window.repo.open(hypermergeUrl)
-    this.handle.subscribe((doc) => this.onChange(doc))
-    this.handle.subscribeMessage((msg) => this.onMessage(msg))
-  }
-
 
   onChange = (doc) => {
     if (this.props.selfId === this.props.hypermergeUrl) {
