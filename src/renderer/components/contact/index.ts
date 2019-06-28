@@ -1,10 +1,7 @@
 import ContentTypes from '../../content-types'
 
 import ContactEditor from './ContactEditor'
-import ContactInBoard from './ContactInBoard'
-import ContactInTitleBar from './ContactInTitleBar'
-import ContactInList from './ContactInList'
-import ContactInThread from './ContactInThread'
+import ContactInVarious from './ContactInVarious'
 
 export interface ContactDoc {
   name: string
@@ -20,8 +17,8 @@ ContentTypes.register({
   unlisted: true,
   contexts: {
     workspace: ContactEditor,
-    board: ContactInBoard,
-    list: ContactInList,
-    thread: ContactInThread,
-    'title-bar': ContactInTitleBar }
+    board: ContactInVarious,
+    list: ContactInVarious,
+    thread: ContactInVarious,
+    'title-bar': ContactInVarious }
 })
