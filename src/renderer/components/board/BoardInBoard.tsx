@@ -3,14 +3,9 @@ import React from 'react'
 import { Handle } from 'hypermerge'
 import { ContentProps } from '../content'
 import { createDocumentLink } from '../../share-link'
+import { BoardDoc } from '.'
 
 import Board from './board'
-
-interface BoardDoc {
-  title: string
-  backgroundColor: string
-  cards: any[]
-}
 
 interface State {
   doc?: BoardDoc

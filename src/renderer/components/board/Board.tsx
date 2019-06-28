@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
 import { remote } from 'electron'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
@@ -11,8 +10,11 @@ import ContentTypes from '../../content-types'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
+import { BoardDoc, BoardDocCard } from '.'
 import BoardCard from './board-card'
 import BoardContextMenu from './board-context-menu'
+import { ContentProps } from '../Content'
+import { Handle } from 'hypermerge'
 
 const { dialog } = remote
 
@@ -56,22 +58,55 @@ const draggableCards = (cards, selected, card) => {
   return [card]
 }
 
-export default class Board extends React.PureComponent {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    // temporary hack during upgrade
-    // eslint-disable-next-line react/no-unused-prop-types
-    selfId: PropTypes.string.isRequired,
+interface State {
+  selected: any[]
+  remoteSelection: { [contact: string]: string[] },
+  contextMenuPosition?: {
+    x: number
+    y: number
   }
+  doc?: BoardDoc
+} 
 
-  constructor(props) {
-    super(props)
-    log('constructor')
+interface TrackingEntry {
+  moveX: number,
+  moveY: number,
+  slackX: number,
+  slackY: number,
+  moving: boolean,
+  resizing: boolean
+}
 
-    this.tracking = {}
-    this.cardRefs = {}
-    this.contactHeartbeatTimerId = {}
-    this.state = { doc: {}, cards: {}, selected: [] }
+interface CardArgs {
+  x: number
+  y: number
+  width?: number
+  height?: number
+}
+
+interface LinkCardArgs extends CardArgs {
+  url: string
+}
+
+interface CreateCardArgs extends CardArgs {
+  type: string
+  typeAttrs?: any
+}
+
+export default class Board extends React.PureComponent<ContentProps, State> {
+  private handle?: Handle<BoardDoc>
+
+  boardRef = React.createRef<HTMLDivElement>()
+  private cardRefs: Map<string, BoardCard> = new Map<string, BoardCard>()
+  private finishedDrag: boolean = false
+  private tracking: Map<string, TrackingEntry> = new Map<string, TrackingEntry>()
+  
+  private heartbeatTimerId?: NodeJS.Timer
+  private contactHeartbeatTimerId: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
+  
+  state: State = {
+    remoteSelection: {},
+    selected: []
   }
 
   static initializeDocument(board, { title, backgroundColor }) {
@@ -87,19 +122,10 @@ export default class Board extends React.PureComponent {
 
   componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
   componentWillUnmount = () => {
-    this.handle.close()
-    clearInterval(this.heartbeatTimerId)
+    this.handle && this.handle.close()
+    this.heartbeatTimerId && clearInterval(this.heartbeatTimerId)
   }
-  componentDidUpdate = (prevProps, prevState, snapshot) => {
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
-
   refreshHandle = (hypermergeUrl) => {
-    if (this.handle) {
-      this.handle.close()
-    }
     this.handle = window.repo.open(hypermergeUrl)
     this.handle.subscribe((doc) => this.onChange(doc))
     this.handle.subscribeMessage((msg) => this.onMessage(msg))
@@ -147,9 +173,14 @@ export default class Board extends React.PureComponent {
 
   onDoubleClick = (e) => {
     log('onDoubleClick')
+    console.log("WTF", (this.boardRef as any).offsetLeft, (this.boardRef as any).offsetTop)
+    
+    // guard against a missing boardRef
+    if (!this.boardRef.current) return
+
     const cardId = this.createCard({
-      x: e.pageX - this.boardRef.offsetLeft,
-      y: e.pageY - this.boardRef.offsetTop,
+      x: e.pageX - this.boardRef.current.offsetLeft,
+      y: e.pageY - this.boardRef.current.offsetTop,
       type: 'text' })
     this.selectOnly(cardId)
   }
@@ -160,7 +191,8 @@ export default class Board extends React.PureComponent {
   }
 
   getFiles = (dataTransfer) => {
-    const files = []
+    const files: any[] = []
+    // XXX: if i recall correctly, this is a weird array that can't be iterated over
     for (let i = 0; i < dataTransfer.files.length; i += 1) {
       const item = dataTransfer.items[i]
       if (item.kind === 'file') {
@@ -179,8 +211,9 @@ export default class Board extends React.PureComponent {
     e.stopPropagation()
     const { pageX, pageY } = e
 
-    const localX = pageX - this.boardRef.offsetLeft
-    const localY = pageY - this.boardRef.offsetTop
+    if (!this.boardRef.current) return
+    const localX = pageX - this.boardRef.current.offsetLeft
+    const localY = pageY - this.boardRef.current.offsetTop
 
     const url = e.dataTransfer.getData('application/pushpin-url')
     if (url) {
@@ -199,12 +232,12 @@ export default class Board extends React.PureComponent {
 
       if (entry.type.match('image/')) {
         reader.onload = () => {
-          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result))
+          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result as ArrayBuffer))
         }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('application/pdf')) {
         reader.onload = () => {
-          this.createPdfCardFromBuffer({ x, y }, Buffer.from(reader.result))
+          this.createPdfCardFromBuffer({ x, y }, Buffer.from(reader.result as ArrayBuffer))
         }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
@@ -240,7 +273,7 @@ export default class Board extends React.PureComponent {
   /* We can't get the mouse position on a paste event,
      so we ask the window for the current pageX/Y offsets and just stick the new card
      100px in from there. (The new React might support this through pointer events.) */
-  onPaste = (e) => {
+  onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     log('onPaste')
     e.preventDefault()
     e.stopPropagation()
@@ -249,6 +282,8 @@ export default class Board extends React.PureComponent {
     const y = window.pageYOffset + 100
 
     const dataTransfer = e.clipboardData
+    if (!dataTransfer) return
+    
     // Note that the X/Y coordinates will all be the same for these cards,
     // and the chromium code supports that... but I can't think of it could happen,
     // so if you're reading this because it did, sorry!
@@ -262,7 +297,8 @@ export default class Board extends React.PureComponent {
 
         const reader = new FileReader()
         reader.onload = () => {
-          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result))
+          // xxx: talk to jeff on this one
+          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result as ArrayBuffer))
         }
         reader.readAsArrayBuffer(file)
       })
@@ -287,8 +323,11 @@ export default class Board extends React.PureComponent {
   addContent = (e, contentType) => {
     e.stopPropagation()
 
-    const x = this.state.contextMenuPosition.x - this.boardRef.getBoundingClientRect().left
-    const y = this.state.contextMenuPosition.y - this.boardRef.getBoundingClientRect().top
+    if (!this.boardRef.current) { return }
+    if (!this.state.contextMenuPosition) { return }
+
+    const x = this.state.contextMenuPosition.x - this.boardRef.current.getBoundingClientRect().left
+    const y = this.state.contextMenuPosition.y - this.boardRef.current.getBoundingClientRect().top
 
     let cardId
     /* the contents of this switch statement
@@ -325,11 +364,14 @@ export default class Board extends React.PureComponent {
         })
         break
       case 'board':
+        const title = (this.state.doc && this.state.doc.title) 
+          ? this.state.doc.title 
+          : 'Untitled'
         cardId = this.createCard({
           x,
           y,
           type: contentType.type,
-          typeAttrs: { title: `Sub-board of ${this.state.doc.title}` }
+          typeAttrs: { title: `Sub-board of ${title}` }
         })
         this.selectOnly(cardId)
         break
@@ -412,23 +454,24 @@ export default class Board extends React.PureComponent {
     })
   }
 
-  createCard = ({ x, y, width, height, type, typeAttrs }) => {
+
+  createCard = ({ x, y, width, height, type, typeAttrs }: CreateCardArgs) => {
     const hypermergeUrl = Content.initializeContentDoc(type, typeAttrs)
     return this.linkCard({ x, y, width, height, url: createDocumentLink(type, hypermergeUrl) })
   }
 
-  linkCard = ({ x, y, width, height, url }) => {
+  linkCard = ({ x, y, width, height, url }: LinkCardArgs) => {
     const id = uuid()
 
     const { type } = parseDocumentLink(url)
     const { component = {} } = ContentTypes.lookup({ type, context: 'board' })
 
-    width = width ? this.snapMeasureToGrid(width) : null
-    width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : null
-    height = height ? this.snapMeasureToGrid(height) : null
-    height = component.defaultHeight ? component.defaultHeight * GRID_SIZE : null
+    width = width ? this.snapMeasureToGrid(width) : undefined
+    width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : undefined
+    height = height ? this.snapMeasureToGrid(height) : undefined
+    height = component.defaultHeight ? component.defaultHeight * GRID_SIZE : undefined
 
-    this.handle.change((b) => {
+    this.handle && this.handle.change((b) => {
       const snapX = this.snapCoordinateToGrid(x)
       const snapY = this.snapCoordinateToGrid(y)
       const newCard = {
@@ -451,21 +494,21 @@ export default class Board extends React.PureComponent {
       id = [id]
     }
 
-    this.handle.change((b) => {
+    this.handle && this.handle.change((b) => {
       id.forEach((id) => delete b.cards[id])
     })
   }
 
   changeTitle = (title) => {
     log('changeTitle')
-    this.handle.change((b) => {
+    this.handle && this.handle.change((b) => {
       b.title = title
     })
   }
 
   changeBackgroundColor = (color) => {
     log('changeBackgroundColor')
-    this.handle.change((b) => {
+    this.handle && this.handle.change((b) => {
       b.backgroundColor = color.hex
     })
   }
@@ -477,6 +520,8 @@ export default class Board extends React.PureComponent {
    */
 
   cardMoved = ({ id, x, y }) => {
+    if (!(this.state.doc && this.state.doc.cards)) return
+
     // This gets called when uniquely selecting a card, so avoid a document
     // change if in fact the card hasn't moved mod snapping.
     const snapX = this.snapCoordinateToGrid(x)
@@ -484,7 +529,7 @@ export default class Board extends React.PureComponent {
     if (snapX === this.state.doc.cards[id].x && snapY === this.state.doc.cards[id].y) {
       return
     }
-    this.handle.change((b) => {
+    this.handle && this.handle.change((b) => {
       const card = b.cards[id]
       card.x = snapX
       card.y = snapY
@@ -492,6 +537,8 @@ export default class Board extends React.PureComponent {
   }
 
   cardResized = ({ id, width, height }) => {
+    if (!(this.state.doc && this.state.doc.cards)) return
+
     // This gets called when we click the drag corner of a card, so avoid a
     // document change if in fact the card won't resize mod snapping.
     const snapWidth = this.snapMeasureToGrid(width)
@@ -500,7 +547,7 @@ export default class Board extends React.PureComponent {
         && snapHeight === this.state.doc.cards[id].height) {
       return
     }
-    this.handle.change((b) => {
+    this.handle && this.handle.change((b) => {
       const card = b.cards[id]
       card.width = snapWidth
       card.height = snapHeight
@@ -629,8 +676,9 @@ export default class Board extends React.PureComponent {
   }
 
   onDrag = (card, e, d) => {
+    if (!(this.state.doc && this.state.doc.cards)) return
     log('onDrag')
-    const tracking = this.tracking[card.id]
+    const tracking = this.tracking.get(card.id)
 
     // If we haven't started tracking this drag, initialize tracking
     if (!(tracking && (tracking.moving || tracking.resizing))) {
@@ -654,7 +702,7 @@ export default class Board extends React.PureComponent {
       if (resizing) {
         // If the card has no fixed dimensions yet, get its current rendered dimensions
         if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
-          this.handle.change(b => {
+          this.handle && this.handle.change(b => {
             // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
             // this prevents visual changes like scrollbar from triggering on drag
             /* eslint react/no-find-dom-node: "off" */
@@ -733,7 +781,7 @@ export default class Board extends React.PureComponent {
 
   updateSelection = (selected) => {
     this.setState({ selected })
-    this.handle.message({ contact: this.props.selfId, selected })
+    this.handle && this.handle.message({ contact: this.props.selfId, selected })
   }
 
   selectToggle = (cardId) => {
@@ -758,6 +806,7 @@ export default class Board extends React.PureComponent {
 
   onStop = (card, e, d) => {
     log('onStop')
+    if (!(this.state.doc && this.state.doc.cards)) return
 
     const { id } = card
     const tracking = this.tracking[id]
@@ -808,12 +857,13 @@ export default class Board extends React.PureComponent {
 
   render = () => {
     log('render')
+    if (!(this.state.doc && this.state.doc.cards)) return
 
     // invert the client->cards to a cards->client mapping
-    const { remoteSelection = {} } = this.state
+    const { remoteSelection } = this.state
     const cardsSelected = {}
     Object.entries(remoteSelection).forEach(([contact, cards]) => {
-      (cards || []).forEach((card) => {
+      cards.forEach((card) => {
         if (!cardsSelected[card]) {
           cardsSelected[card] = []
         }
@@ -846,7 +896,7 @@ export default class Board extends React.PureComponent {
     return (
       <div
         className="board"
-        ref={(e) => { this.boardRef = e }}
+        ref={this.boardRef}
         style={{
           backgroundColor: this.state.doc.backgroundColor,
           width: BOARD_WIDTH,
