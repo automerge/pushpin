@@ -68,18 +68,13 @@ interface State {
   doc?: BoardDoc
 } 
 
-// This is confusing
-export interface TrackingBase {
-  dragType: DragType,
-}
-
 export enum DragType {
   MOVING,
   RESIZING,
   NOT_DRAGGING
 }
 
-export interface MoveTracking extends TrackingBase {
+export interface MoveTracking {
   dragType: DragType.MOVING
   moveX: number,
   moveY: number,
@@ -87,7 +82,7 @@ export interface MoveTracking extends TrackingBase {
   slackY: number
 }
 
-export interface ResizeTracking extends TrackingBase {
+export interface ResizeTracking {
   dragType: DragType.RESIZING
   slackWidth: number,
   slackHeight: number,
@@ -99,7 +94,7 @@ export interface ResizeTracking extends TrackingBase {
   maxHeight: number
 }
 
-export interface NotDraggingTracking extends TrackingBase {
+export interface NotDraggingTracking {
   dragType: DragType.NOT_DRAGGING
 }
 
