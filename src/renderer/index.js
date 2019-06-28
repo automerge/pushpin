@@ -24,7 +24,7 @@ import './components/contact'
 // other single-context components
 import './components/text-content'
 import './components/ImageContent'
-import './components/thread-content'
+import './components/ThreadContent'
 import './components/url-content'
 import './components/PdfContent'
 
