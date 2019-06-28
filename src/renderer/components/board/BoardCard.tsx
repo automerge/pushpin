@@ -8,9 +8,31 @@ import Content from '../Content'
 import ContentTypes from '../../content-types'
 import { parseDocumentLink } from '../../share-link'
 
+import { BoardDocCard } from '.'
+import { TrackingEntry } from './Board'
+import { ContactDoc } from '../contact'
+
 const log = Debug('pushpin:board-card')
 
-export default class BoardCard extends React.PureComponent {
+interface BoardCardProps {
+  id: string,
+  card: BoardDocCard,
+
+  dragState: TrackingEntry,
+
+  selected: boolean,
+  uniquelySelected: boolean,
+  remoteSelected: string[],
+    
+  onDrag: (card, event, dragData) => void,
+  onStop: (card, event, dragData) => void,
+  onCardClicked: (card, event) => void,
+  onCardDoubleClicked: (card, event) => void,
+  setCardRef: (card, ref) => void
+
+}
+
+export default class BoardCard extends React.PureComponent<BoardCardProps, State> {
   constructor(props) {
     super(props)
     log('constructor')
@@ -22,29 +44,9 @@ export default class BoardCard extends React.PureComponent {
   }
 
   static propTypes = {
-    selected: PropTypes.bool.isRequired,
-    uniquelySelected: PropTypes.bool.isRequired,
-    onDrag: PropTypes.func.isRequired,
-    onStop: PropTypes.func.isRequired,
-    onCardClicked: PropTypes.func.isRequired,
-    onCardDoubleClicked: PropTypes.func.isRequired,
-    setCardRef: PropTypes.func.isRequired,
-    remoteSelected: PropTypes.arrayOf(PropTypes.string).isRequired,
     dragState: PropTypes.shape({
-      moveX: PropTypes.number,
-      moveY: PropTypes.number,
-      resizeWidth: PropTypes.number,
-      resizeHeight: PropTypes.number,
+      
     }),
-    id: PropTypes.string.isRequired,
-    card: PropTypes.shape({
-      id: PropTypes.string,
-      url: PropTypes.string,
-      x: PropTypes.number,
-      y: PropTypes.number,
-      height: PropTypes.number,
-      width: PropTypes.number
-    }).isRequired
   }
 
   static defaultProps = {
@@ -68,7 +70,7 @@ export default class BoardCard extends React.PureComponent {
       top: Number.isInteger(dragState.moveY) ? dragState.moveY : card.y,
     }
     if (this.props.remoteSelected.length > 0) {
-      window.repo.watch(this.props.remoteSelected[0], (doc) => {
+      window.repo.watch<ContactDoc>(this.props.remoteSelected[0], (doc) => {
         if (doc) {
           style['--highlight-color'] = doc.color
         }
@@ -92,7 +94,7 @@ export default class BoardCard extends React.PureComponent {
       >
         <div
           ref={this.setCardRef}
-          tabIndex="-1"
+          tabIndex={-1}
           id={`card-${card.id}`}
           className={classNames('card', card.type, selected ? 'selected' : 'unselected')}
           style={style}

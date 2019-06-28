@@ -10,8 +10,8 @@ import ContentTypes from '../../content-types'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink } from '../../share-link'
 import * as Hyperfile from '../../hyperfile'
-import { BoardDoc, BoardDocCard } from '.'
-import BoardCard from './board-card'
+import { BoardDoc } from '.'
+import BoardCard from './BoardCard'
 import BoardContextMenu from './board-context-menu'
 import { ContentProps } from '../Content'
 import { Handle } from 'hypermerge'
@@ -68,9 +68,12 @@ interface State {
   doc?: BoardDoc
 } 
 
-interface TrackingEntry {
+// This is confusing
+export interface TrackingEntry {
   moveX: number,
   moveY: number,
+  resizeWidth: number,
+  resizeHeight: number,
   slackX: number,
   slackY: number,
   moving: boolean,
