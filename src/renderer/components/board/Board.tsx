@@ -222,7 +222,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
   getFiles = (dataTransfer) => {
     const files: any[] = []
-    // XXX: if i recall correctly, this is a weird array that can't be iterated over
+    // NB: if i recall correctly, this is a weird array
+    //  that can't be iterated over for C++ reasons
     for (let i = 0; i < dataTransfer.files.length; i += 1) {
       const item = dataTransfer.items[i]
       if (item.kind === 'file') {

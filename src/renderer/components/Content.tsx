@@ -50,7 +50,6 @@ export default class Content extends React.PureComponent<Props, State> {
     this.setState({ contentCrashed: e })
   }
 
-  // XXX this will make a child type very angry/sad later when we reach it
   filterProps = (props) => {
     const filtered = {}
     Object.keys(props)
