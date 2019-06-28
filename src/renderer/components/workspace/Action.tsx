@@ -1,7 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function Action(props) {
+interface Props {
+  callback(e: React.MouseEvent): void
+  destructive?: boolean
+  faIcon: string
+  label: string
+  shortcut?: string
+}
+
+export default function Action(props: Props) {
   return (
     <div
       role="button"
@@ -10,7 +18,7 @@ export default function Action(props) {
         (props.destructive
           ? 'ButtonAction-destructive'
           : 'ButtonAction--primary')
-      }`}
+        }`}
     >
       <i className={`fa ${props.faIcon}`} />
       <div
@@ -22,14 +30,6 @@ export default function Action(props) {
       </div>
     </div>
   )
-}
-
-Action.propTypes = {
-  callback: PropTypes.func.isRequired,
-  destructive: PropTypes.bool,
-  faIcon: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  shortcut: PropTypes.string
 }
 
 Action.defaultProps = {
