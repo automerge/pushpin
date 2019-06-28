@@ -2,7 +2,7 @@ import ContentTypes from '../../content-types'
 
 // board in various contexts
 import Board from './board'
-import BoardInBoard from './board-in-board'
+import BoardInBoard from './BoardInBoard'
 import BoardInList from './board-in-list'
 
 
