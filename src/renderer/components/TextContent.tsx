@@ -4,8 +4,10 @@ import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 import Automerge from 'automerge'
+import { Handle } from 'hypermerge'
 
 import ContentTypes from '../content-types'
+import { ContentProps } from './Content'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -32,7 +34,21 @@ const log = Debug('pushpin:code-mirror-editor')
 //
 // This component is not "pure" in the literal sense. But PureComponent still
 // seems to give the right caching behaviour, so for now we'll extend from it.
-export default class TextContent extends React.PureComponent {
+
+interface TextDoc {
+  text?: Automerge.Text
+}
+
+interface State {
+  text?: Automerge.Text
+  doc?: TextDoc
+}
+
+interface UniquelySelectedContentProps extends ContentProps {
+  uniquelySelected: boolean
+}
+
+export default class TextContent extends React.PureComponent<UniquelySelectedContentProps, State> {
   static propTypes = {
     hypermergeUrl: PropTypes.string.isRequired,
     uniquelySelected: PropTypes.bool,
@@ -42,7 +58,7 @@ export default class TextContent extends React.PureComponent {
     uniquelySelected: false
   }
 
-  static initializeDocument(editor, { text }) {
+  static initializeDocument(editor: TextDoc, { text }) {
     editor.text = new Automerge.Text()
     if (text) {
       editor.text.insertAt(0, ...text.split(''))
@@ -56,15 +72,11 @@ export default class TextContent extends React.PureComponent {
   static maxWidth = 24
   static maxHeight = 36
 
-  constructor(props) {
-    super(props)
-    log('constructor')
 
-    this.editorRef = null
-    this.handle = null
-
-    this.state = { text: null }
-  }
+  private stallDelete: boolean = false // this should be on state?
+  private handle?: Handle<TextDoc>
+  private codeMirror: CodeMirror
+  private editorRef = React.createRef()
 
   // When the components mounts, and we therefore have refs to the DOM,
   // set up the editor.
@@ -87,10 +99,7 @@ export default class TextContent extends React.PureComponent {
   }
 
   componentWillUnmount = () => {
-    log('componentDidUnmount')
-
-    this.handle.close()
-    this.handle = null
+    this.handle && this.handle.close()
   }
 
   // Transform declarative React selection prop into imperative focus changes
@@ -125,7 +134,7 @@ export default class TextContent extends React.PureComponent {
     const removedLength = change.removed.join('\n').length
     const addedText = change.text.join('\n')
 
-    this.handle.change((doc) => {
+    this.handle && this.handle.change((doc) => {
       if (removedLength > 0) {
         doc.text.splice(at, removedLength)
       }
@@ -200,6 +209,7 @@ export default class TextContent extends React.PureComponent {
   }
 
   onKeyDown = (e) => {
+    // XXX: this stallDelete thing should probably be on state?
     if (e.key !== 'Backspace') {
       this.stallDelete = true
     }

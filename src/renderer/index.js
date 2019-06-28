@@ -22,7 +22,7 @@ import './components/board'
 import './components/contact'
 
 // other single-context components
-import './components/text-content'
+import './components/TextContent'
 import './components/ImageContent'
 import './components/thread-content'
 import './components/url-content'

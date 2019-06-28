@@ -14,7 +14,7 @@ interface PdfDoc {
 interface State {
   currentHyperfileUrl: string
   reactPDFData?: object
-  pageInputValue: string | number
+  pageInputValue: string
   pageNum: number
   numPages: number
   doc?: PdfDoc
@@ -35,7 +35,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
   static maxWidth = 72
 
   private handle?: Handle<PdfDoc>
-  state = {
+  state: State = {
     currentHyperfileUrl: '',
     reactPDFData: {},
     pageInputValue: '1',
@@ -73,7 +73,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
       pageNum += 1
     }
 
-    this.setState({ pageNum, pageInputValue: pageNum })
+    this.setState({ pageNum, pageInputValue: String(pageNum) })
   }
 
   disableBack = () => this.state.pageNum <= 1
@@ -83,7 +83,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
       pageNum -= 1
     }
 
-    this.setState({ pageNum, pageInputValue: pageNum })
+    this.setState({ pageNum, pageInputValue: String(pageNum) })
   }
 
   onKeyDown = (e) => {
@@ -104,7 +104,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
       if (nextPageNum > 0 && nextPageNum <= numPages) {
         this.setState({ pageNum: nextPageNum })
       } else {
-        this.setState({ pageInputValue: pageNum })
+        this.setState({ pageInputValue: String(pageNum) })
       }
       e.target.blur()
     }
@@ -115,7 +115,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
 
     if (e.key === 'Escape') {
       e.target.blur()
-      this.setState({ pageInputValue: pageNum })
+      this.setState({ pageInputValue: String(pageNum) })
     }
   }
 
