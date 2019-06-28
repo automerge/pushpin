@@ -127,7 +127,7 @@ interface CreateCardArgs extends CardArgs {
 export default class Board extends React.PureComponent<ContentProps, State> {
   private handle?: Handle<BoardDoc>
 
-  boardRef = React.createRef<HTMLDivElement>()
+  private boardRef = React.createRef<HTMLDivElement>()
   private cardRefs: Map<string, BoardCard> = new Map<string, BoardCard>()
   private finishedDrag: boolean = false
   private tracking: { [cardId: string]: TrackingEntry } = {}
@@ -152,18 +152,16 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     board.authorIds = []
   }
 
-  componentWillMount = () => this.refreshHandle(this.props.hypermergeUrl)
+  componentWillMount = () => {
+    this.handle = window.repo.open(this.props.hypermergeUrl)
+    this.handle.subscribe((doc) => this.onChange(doc))
+    this.handle.subscribeMessage((msg) => this.onMessage(msg))
+  }
   componentWillUnmount = () => {
     this.handle && this.handle.close()
     this.heartbeatTimerId && clearInterval(this.heartbeatTimerId)
   }
-  refreshHandle = (hypermergeUrl) => {
-    this.handle = window.repo.open(hypermergeUrl)
-    this.handle.subscribe((doc) => this.onChange(doc))
-    this.handle.subscribeMessage((msg) => this.onMessage(msg))
-  }
-
-
+  
   onChange = (doc) => {
     this.setState({ doc })
   }
