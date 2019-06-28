@@ -12,7 +12,7 @@ import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
 import Content from './components/Content'
 
 // We load these modules here so that the content registry will have them.
-import './components/workspace/workspace'
+import './components/workspace/Workspace'
 
 // default context components
 import './components/defaults/DefaultInList'
