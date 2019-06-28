@@ -29,7 +29,7 @@ export default class BoardInBoard extends React.PureComponent<ContentProps, Stat
 
   handleDoubleClick = (e) => {
     e.stopPropagation()
-    window.location = createDocumentLink('board', this.props.hypermergeUrl)
+    window.location.href = createDocumentLink('board', this.props.hypermergeUrl)
   }
 
   // This is the New Boilerplate
