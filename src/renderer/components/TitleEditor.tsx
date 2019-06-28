@@ -1,21 +1,22 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import withDocument from './with-document'
+
+interface Doc {
+  title?: string
+}
+
+interface Props {
+  placeholder: string,
+  doc: Doc
+  change: (cb: (doc: Doc) => void) => {}
+  preventDrag: boolean
+}
 
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
-class TitleEditor extends React.PureComponent {
-  static initializeDocument = (doc) => {
-    doc.title = null
-  }
-
-  static propTypes = {
-    placeholder: PropTypes.string,
-    doc: PropTypes.shape({
-      title: PropTypes.string
-    }).isRequired,
-    change: PropTypes.func.isRequired,
-    preventDrag: PropTypes.bool
+class TitleEditor extends React.PureComponent<Props> {
+  static initializeDocument = (doc: Doc) => {
+    doc.title = undefined
   }
 
   static defaultProps = {
@@ -23,22 +24,22 @@ class TitleEditor extends React.PureComponent {
     preventDrag: false
   }
 
-  input = React.createRef()
+  input: React.RefObject<HTMLInputElement> = React.createRef()
 
-  onKeyDown = (e) => {
+  onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === 'Escape') {
-      this.input.current.blur()
+      this.input && this.input.current && this.input.current.blur()
     }
   }
 
-  onChange = (e) => {
-    this.props.change((doc) => {
+  onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.change((doc: Doc) => {
       doc.title = e.target.value
     })
   }
 
   // Required to prevent draggable parent elements from blowing away edit capability.
-  onDragStart = (e) => {
+  onDragStart = (e: React.DragEvent) => {
     if (this.props.preventDrag) {
       e.preventDefault()
       e.stopPropagation()
