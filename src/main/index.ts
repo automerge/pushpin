@@ -1,4 +1,4 @@
-import { app, protocol, BrowserWindow, Menu, shell } from 'electron'
+import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
 import * as path from 'path'
@@ -34,7 +34,7 @@ const createWindow = async () => {
   protocol.registerBufferProtocol('hyperfile', (request, callback) => {
     try {
       Hyperfile.fetch(request.url, (data) => {
-        callback({ data })
+        callback(data)
       })
     } catch (e) {
       log(e)
@@ -102,7 +102,7 @@ const createWindow = async () => {
   })
 
   // Menubar template
-  const template = [
+  const template: MenuItemConstructorOptions[] = [
     {
       label: 'File',
       submenu: [
@@ -118,10 +118,10 @@ const createWindow = async () => {
     {
       label: 'Edit',
       submenu: [
-        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
-        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
-        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
-        { label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' }
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'selectAll' }
       ]
     },
     {
