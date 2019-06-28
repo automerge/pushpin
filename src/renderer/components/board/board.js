@@ -9,7 +9,7 @@ import uuid from 'uuid/v4'
 import Content from '../Content'
 import ContentTypes from '../../content-types'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import BoardCard from './board-card'
 import BoardContextMenu from './board-context-menu'
@@ -150,7 +150,8 @@ export default class Board extends React.PureComponent {
     const cardId = this.createCard({
       x: e.pageX - this.boardRef.offsetLeft,
       y: e.pageY - this.boardRef.offsetTop,
-      type: 'text' })
+      type: 'text'
+    })
     this.selectOnly(cardId)
   }
 
@@ -497,7 +498,7 @@ export default class Board extends React.PureComponent {
     const snapWidth = this.snapMeasureToGrid(width)
     const snapHeight = this.snapMeasureToGrid(height)
     if (snapWidth === this.state.doc.cards[id].width
-        && snapHeight === this.state.doc.cards[id].height) {
+      && snapHeight === this.state.doc.cards[id].height) {
       return
     }
     this.handle.change((b) => {
@@ -543,7 +544,8 @@ export default class Board extends React.PureComponent {
   // Copy view-relevant move/resize state over to React.
   setDragState = (card, { moveX, moveY, resizeWidth, resizeHeight }) => {
     this.setState((prevState) => {
-      const tracking = { ...prevState.tracking,
+      const tracking = {
+        ...prevState.tracking,
         [card.id]: { moveX, moveY, resizeWidth, resizeHeight }
       }
       return ({ tracking })
@@ -703,9 +705,12 @@ export default class Board extends React.PureComponent {
 
     if (contact && selected) {
       this.setState((prevState) =>
-        ({ remoteSelection: {
-          ...prevState.remoteSelection,
-          [contact]: selected } }
+        ({
+          remoteSelection: {
+            ...prevState.remoteSelection,
+            [contact]: selected
+          }
+        }
         ))
     }
 
@@ -721,9 +726,12 @@ export default class Board extends React.PureComponent {
 
   clearRemoteSelection = (contact) => {
     this.setState((prevState) =>
-      ({ remoteSelection: {
-        ...prevState.remoteSelection,
-        [contact]: undefined } }))
+      ({
+        remoteSelection: {
+          ...prevState.remoteSelection,
+          [contact]: undefined
+        }
+      }))
   }
 
   updateSelection = (selected) => {

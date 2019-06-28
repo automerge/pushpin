@@ -2,7 +2,7 @@ import React from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import { createDocumentLink } from '../../share-link'
+import { createDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { Handle } from 'hypermerge'
 

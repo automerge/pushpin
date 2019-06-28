@@ -4,7 +4,7 @@ import Content, { ContentProps } from '../Content'
 import { ContactDoc } from '.'
 import { Handle } from 'hypermerge'
 
-import { createDocumentLink } from '../../share-link'
+import { createDocumentLink } from '../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
 interface State {
@@ -70,11 +70,11 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
 
   render() {
     switch (this.props.context) {
-      case "list": 
+      case "list":
         return this.renderList();
         break;
       case "thread":
-        return this.renderThread() 
+        return this.renderThread()
         break
       case "title-bar":
         return this.renderTitleBar()
@@ -111,7 +111,7 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
         </div>
         <div className="Label">
           <p className="Type--primary">
-            { name }
+            {name}
           </p>
         </div>
       </div>
@@ -151,10 +151,10 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
       </div>
     )
   }
-  
+
   renderTitleBar() {
     let avatar
-    const {doc} = this.state
+    const { doc } = this.state
     if (!doc) return null
 
     const { avatarDocId, name, color } = doc
@@ -179,7 +179,7 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
       </div>
     )
   }
-  
+
   renderBoard() {
     const { doc, online } = this.state
     if (!doc) return null
@@ -210,73 +210,73 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
 }
 
 const css = {
-threadWrapper: {
-  display: 'flex',
-  backgroundColor: 'white',
-  width: '100%',
-  overflow: 'auto',
-  height: '100%',
-},
-messageWrapper: {
-  padding: 12,
-  position: 'relative',
-  display: 'flex',
-  flexDirection: 'column-reverse',
-  overflowY: 'scroll',
-  marginBottom: 49,
-  flexGrow: 1,
-},
-messageGroup: {
-  marginBottom: -24,
-  paddingTop: 12
-},
-groupedMessages: {
-  position: 'relative',
-  top: -20,
-  paddingLeft: 40 + 8
-},
-messages: {
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'flex-end',
-  flexGrow: '1',
-},
-message: {
-  color: 'black',
-  display: 'flex',
-  lineHeight: '20px',
-  padding: '2px 0'
-},
-user: {
-  display: 'flex'
-},
-username: {
-  paddingLeft: 8,
-  fontSize: 12,
-  color: 'var(--colorBlueBlack)'
-},
-avatar: {
+  threadWrapper: {
+    display: 'flex',
+    backgroundColor: 'white',
+    width: '100%',
+    overflow: 'auto',
+    height: '100%',
+  },
+  messageWrapper: {
+    padding: 12,
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    overflowY: 'scroll',
+    marginBottom: 49,
+    flexGrow: 1,
+  },
+  messageGroup: {
+    marginBottom: -24,
+    paddingTop: 12
+  },
+  groupedMessages: {
+    position: 'relative',
+    top: -20,
+    paddingLeft: 40 + 8
+  },
+  messages: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    flexGrow: '1',
+  },
+  message: {
+    color: 'black',
+    display: 'flex',
+    lineHeight: '20px',
+    padding: '2px 0'
+  },
+  user: {
+    display: 'flex'
+  },
+  username: {
+    paddingLeft: 8,
+    fontSize: 12,
+    color: 'var(--colorBlueBlack)'
+  },
+  avatar: {
 
-},
-time: {
-  flex: 'none',
-  marginLeft: 'auto',
-  fontSize: 12,
-  color: 'var(--colorSecondaryGrey)',
-  marginTop: -22
-},
-content: {
-},
-inputWrapper: {
-  boxSizing: 'border-box',
-  width: 'calc(100% - 1px)',
-  borderTop: '1px solid var(--colorInputGrey)',
-  position: 'absolute',
-  bottom: 0,
-  backgroundColor: 'white',
-  padding: 8,
-},
-input: {
-  width: '100%'
-},
+  },
+  time: {
+    flex: 'none',
+    marginLeft: 'auto',
+    fontSize: 12,
+    color: 'var(--colorSecondaryGrey)',
+    marginTop: -22
+  },
+  content: {
+  },
+  inputWrapper: {
+    boxSizing: 'border-box',
+    width: 'calc(100% - 1px)',
+    borderTop: '1px solid var(--colorInputGrey)',
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'white',
+    padding: 8,
+  },
+  input: {
+    width: '100%'
+  },
 }

@@ -5,7 +5,7 @@ import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
 import ContentTypes from '../../content-types'
-import { createDocumentLink, parseDocumentLink } from '../../share-link'
+import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
 import Content from '../Content'
 import SelfContext from '../SelfContext'
 import TitleBar from './title-bar'

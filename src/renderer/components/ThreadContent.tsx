@@ -2,7 +2,7 @@ import React from 'react'
 
 import ContentTypes from '../content-types'
 import Content from './Content'
-import { createDocumentLink } from '../share-link'
+import { createDocumentLink } from '../ShareLink'
 import { Handle } from 'hypermerge';
 import { ContentProps } from './Content'
 

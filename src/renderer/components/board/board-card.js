@@ -6,7 +6,7 @@ import classNames from 'classnames'
 
 import Content from '../Content'
 import ContentTypes from '../../content-types'
-import { parseDocumentLink } from '../../share-link'
+import { parseDocumentLink } from '../../ShareLink'
 
 const log = Debug('pushpin:board-card')
 
@@ -105,7 +105,7 @@ export default class BoardCard extends React.PureComponent {
             url={this.props.card.url}
             uniquelySelected={this.props.uniquelySelected}
           />
-          { contentType && contentType.resizable !== false && <span className="cardResizeHandle" /> }
+          {contentType && contentType.resizable !== false && <span className="cardResizeHandle" />}
         </div>
       </DraggableCore>
     )

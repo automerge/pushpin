@@ -28,7 +28,7 @@ import './components/ThreadContent'
 import './components/UrlContent'
 import './components/PdfContent'
 
-import { createDocumentLink } from './share-link'
+import { createDocumentLink } from './ShareLink'
 
 require('./app.css')
 require('./components/react-simple-dropdown/dropdown.css')
