@@ -4,7 +4,7 @@ import ListMenuItem from './ListMenuItem'
 
 interface Props {
   name: string,
-  label: string,
+  label?: string,
   actions: any[],
   items: any[]
 }
