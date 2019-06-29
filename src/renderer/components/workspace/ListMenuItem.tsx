@@ -1,18 +1,18 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import Content from '../Content'
 import Actions from './actions'
+import { PushpinUrl } from '../../ShareLink';
 
+
+export interface Props {
+  contentUrl: PushpinUrl
+  actions: any[]
+  selected: boolean
+}
 
 // TODO: item highlighting
-export default class ListMenuItem extends React.PureComponent {
-  static propTypes = {
-    contentUrl: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.any),
-    selected: PropTypes.bool
-  }
-
+export default class ListMenuItem extends React.PureComponent<Props> {
   static defaultProps = {
     actions: [],
     selected: false

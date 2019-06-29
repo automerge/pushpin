@@ -4,7 +4,7 @@ import Debug from 'debug'
 import Content from "../Content"
 
 import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../ShareLink'
-import ListMenuItem from './list-menu-item'
+import ListMenuItem from './ListMenuItem'
 import { Doc as WorkspaceDoc } from "./Workspace"
 import { Handle } from 'hypermerge';
 import { ContactDoc } from '../contact';

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ListMenuItem from './list-menu-item'
+import ListMenuItem from './ListMenuItem'
 
 export default function ContentSection({ name, label, actions, items }) {
   const renderedItems = items.map(({ url, selected }) =>
@@ -11,9 +11,9 @@ export default function ContentSection({ name, label, actions, items }) {
 
   return (
     <div>
-      { labelPartial }
+      {labelPartial}
       <div className="ListMenu__section">
-        { renderedItems }
+        {renderedItems}
       </div>
     </div>
   )
