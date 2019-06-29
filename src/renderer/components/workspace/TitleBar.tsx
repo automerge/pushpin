@@ -5,8 +5,8 @@ import { clipboard } from 'electron'
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
 import Omnibox from './Omnibox'
 import Content from '../Content'
-import Authors from './authors'
-import Share from './share'
+import Authors from './Authors'
+import Share from './Share'
 import { HypermergeUrl, PushpinUrl } from '../../ShareLink';
 import { Handle } from 'hypermerge';
 
@@ -169,9 +169,7 @@ export default class TitleBar extends React.PureComponent<Props, State> {
         </button>
 
         <Content url={this.state.doc.currentDocUrl} context="list" editable />
-        <Authors
-          hypermergeUrl={this.props.hypermergeUrl}
-        />
+        <Authors hypermergeUrl={this.props.hypermergeUrl} />
 
         <Dropdown className="TitleBar__menuItem
           TitleBar__right"

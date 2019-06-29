@@ -4,6 +4,7 @@ import ContentTypes from '../../ContentTypes'
 import Board, { BOARD_COLORS } from './Board'
 import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
+import { HypermergeUrl } from '../../ShareLink';
 
 export interface BoardDocCard {
   type: string
@@ -19,6 +20,7 @@ export interface BoardDoc {
   title: string
   backgroundColor: string
   cards: BoardDocCard[]
+  hypermergeUrl: HypermergeUrl // added by workspace
 }
 
 function initializeBoard(board, { title, backgroundColor }) {
