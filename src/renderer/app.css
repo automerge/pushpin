@@ -616,7 +616,7 @@ button[disabled].TitleBar__menuItem .fa {
 div.board {
   position: relative;
   background-image: url(grid.svg);
-  background-blend-mode: color-burn;
+  background-blend-mode: exclusion;
 }
 
 .card {
