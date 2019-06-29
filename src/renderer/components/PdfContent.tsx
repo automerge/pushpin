@@ -21,10 +21,6 @@ interface State {
 }
 
 export default class PDFCard extends React.PureComponent<ContentProps, State> {
-  static initializeDocument = (pdf, { hyperfileUrl }) => {
-    pdf.hyperfileUrl = hyperfileUrl
-  }
-
   static minWidth = 3
   static minHeight = 3
   static defaultWidth = 18
@@ -197,6 +193,10 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
   }
 }
 
+function initializeDocument(pdf, { hyperfileUrl }) {
+  pdf.hyperfileUrl = hyperfileUrl
+}
+
 ContentTypes.register({
   type: 'pdf',
   name: 'PDF',
@@ -204,5 +204,6 @@ ContentTypes.register({
   contexts: {
     workspace: PDFCard,
     board: PDFCard
-  }
+  },
+  initializeDocument: initializeDocument
 })

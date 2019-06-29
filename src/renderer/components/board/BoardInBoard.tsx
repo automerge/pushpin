@@ -5,18 +5,11 @@ import { ContentProps } from '../content'
 import { BoardDoc } from '.'
 import { createDocumentLink } from '../../ShareLink'
 
-import Board from './Board'
-
 interface State {
   doc?: BoardDoc
 }
 
 export default class BoardInBoard extends React.PureComponent<ContentProps, State> {
-  // this isn't great
-  static initializeDocument(board, typeAttrs) {
-    Board.initializeDocument(board, typeAttrs)
-  }
-
   static minWidth = 4
   static minHeight = 6
   static defaultWidth = 6

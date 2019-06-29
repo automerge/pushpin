@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
@@ -49,22 +48,6 @@ interface UniquelySelectedContentProps extends ContentProps {
 }
 
 export default class TextContent extends React.PureComponent<UniquelySelectedContentProps, State> {
-  static propTypes = {
-    hypermergeUrl: PropTypes.string.isRequired,
-    uniquelySelected: PropTypes.bool,
-  }
-
-  static defaultProps = {
-    uniquelySelected: false
-  }
-
-  static initializeDocument(editor: TextDoc, { text }) {
-    editor.text = new Automerge.Text()
-    if (text) {
-      editor.text.insertAt(0, ...text.split(''))
-    }
-  }
-
   static minWidth = 6
   static minHeight = 2
   static defaultWidth = 12
@@ -246,6 +229,14 @@ export default class TextContent extends React.PureComponent<UniquelySelectedCon
   }
 }
 
+function initializeDocument(editor: TextDoc, { text }) {
+  editor.text = new Automerge.Text()
+  if (text) {
+    editor.text.insertAt(0, ...text.split(''))
+  }
+}
+
+
 ContentTypes.register({
   type: 'text',
   name: 'Text',
@@ -253,5 +244,6 @@ ContentTypes.register({
   contexts: {
     workspace: TextContent,
     board: TextContent
-  }
+  }, 
+  initializeDocument: initializeDocument
 })

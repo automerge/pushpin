@@ -28,6 +28,7 @@ interface ContentType {
   type: string
   name: string
   icon: string
+  initializeDocument: (document: any, typeAttrs: any) => void
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
@@ -107,7 +108,15 @@ function list({ context, withUnlisted = false }: ListQuery) {
   return allTypes.filter(ct => ct && !ct.unlisted)
 }
 
-export default { register, registerDefault, lookup, list }
+function initializeDocument(type, doc, typeAttrs) {
+  const entry = registry[type]
+  if (!entry) {
+    throw new Error("Attempted to initialize an unregistered type!")
+  }
+  entry.initializeDocument(doc, typeAttrs)
+}
+
+export default { register, registerDefault, lookup, list, initializeDocument }
 
 // Not yet included in / drive from the generic ContentTypes registry:
 //

@@ -19,7 +19,7 @@ const { dialog } = remote
 
 const log = Debug('pushpin:board')
 
-const BOARD_COLORS = {
+export const BOARD_COLORS = {
   DEFAULT: '#D5DFE5',
   SNOW: '#EBEDF4',
   BEIGE: '#f3f1ec',
@@ -139,17 +139,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     remoteSelection: {},
     selected: [],
     tracking: {}
-  }
-
-  static initializeDocument(board, { title, backgroundColor }) {
-    log('initializeDocument')
-    board.title = title || 'No Title'
-    const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
-    const color = backgroundColor
-      || BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
-    board.backgroundColor = color
-    board.cards = {}
-    board.authorIds = []
   }
 
   componentWillMount = () => {

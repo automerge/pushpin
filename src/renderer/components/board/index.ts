@@ -1,7 +1,7 @@
 import ContentTypes from '../../ContentTypes'
 
 // board in various contexts
-import Board from './Board'
+import Board, { BOARD_COLORS } from './Board'
 import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
 
@@ -21,6 +21,16 @@ export interface BoardDoc {
   cards: BoardDocCard[]
 }
 
+function initializeBoard(board, { title, backgroundColor }) {
+  board.title = title || 'No Title'
+  const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
+  const color = backgroundColor
+    || BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
+  board.backgroundColor = color
+  board.cards = {}
+  board.authorIds = []
+}
+
 ContentTypes.register({
   type: 'board',
   contexts: {
@@ -30,4 +40,5 @@ ContentTypes.register({
   },
   name: 'Board',
   icon: 'copy',
+  initializeDocument: initializeBoard
 })

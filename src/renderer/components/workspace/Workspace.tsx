@@ -28,59 +28,6 @@ interface State {
 }
 
 export default class Workspace extends React.PureComponent<ContentProps, State> {
-  static initializeDocument = (workspace: Doc) => {
-    const selfId = Content.initializeContentDoc('contact')
-
-    // this is, uh, a nasty hack.
-    // we should refactor not to require the hypermergeUrl on the contact
-    // but i don't want to pull that in scope right now
-    window.repo.change(selfId, (doc: ContactDoc) => {
-      doc.hypermergeUrl = selfId
-    })
-
-    const boardId = Content.initializeContentDoc('board', { title: 'Welcome to PushPin!', selfId })
-    const docUrl = createDocumentLink('board', boardId)
-
-    const text = `Welcome to PushPin!
-
-We've created your first text card for you.
-You can edit it, or make more by double-clicking the background.
-
-You can drag or paste images, text, and URLs onto the board. They'll be stored for offline usage.
-If you right-click, you can choose the kind of card to make.
-You can make new boards from the right-click menu or with Ctrl-N.
-
-To edit the title of a board, click the pencil.
-To share a board with another person, click the clipboard, then have them paste that value into the omnibox.
-
-Quick travel around by clicking the Omnibox. Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
-
-To create links to boards or contacts, drag them from the title bar or the omnibox.`
-
-    const textDocId = Content.initializeContentDoc('text', { text })
-    const textDocUrl = createDocumentLink('text', textDocId)
-
-    const id = uuid()
-    // TODO: this is a board doc. Should update this type after converting
-    // board to typescript.
-    window.repo.change(boardId, (doc: any) => {
-      doc.cards[id] = {
-        id,
-        url: textDocUrl,
-        x: 20,
-        y: 20,
-        width: 320,
-        height: 540
-      }
-    })
-
-    // Then make changes to workspace doc.
-    workspace.selfId = selfId
-    workspace.contactIds = []
-    workspace.currentDocUrl = docUrl
-    workspace.viewedDocUrls = [docUrl]
-  }
-
   state: State = {}
   handle?: Handle<Doc>
   timerId?: NodeJS.Timeout // Technically, these timeout types are the wrong type :shrugging-man:
@@ -221,11 +168,65 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   }
 }
 
+function initializeDocument(workspace: Doc) {
+  const selfId = Content.initializeContentDoc('contact')
+
+  // this is, uh, a nasty hack.
+  // we should refactor not to require the hypermergeUrl on the contact
+  // but i don't want to pull that in scope right now
+  window.repo.change(selfId, (doc: ContactDoc) => {
+    doc.hypermergeUrl = selfId
+  })
+
+  const boardId = Content.initializeContentDoc('board', { title: 'Welcome to PushPin!', selfId })
+  const docUrl = createDocumentLink('board', boardId)
+
+  const text = `Welcome to PushPin!
+
+We've created your first text card for you.
+You can edit it, or make more by double-clicking the background.
+
+You can drag or paste images, text, and URLs onto the board. They'll be stored for offline usage.
+If you right-click, you can choose the kind of card to make.
+You can make new boards from the right-click menu or with Ctrl-N.
+
+To edit the title of a board, click the pencil.
+To share a board with another person, click the clipboard, then have them paste that value into the omnibox.
+
+Quick travel around by clicking the Omnibox. Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
+
+To create links to boards or contacts, drag them from the title bar or the omnibox.`
+
+  const textDocId = Content.initializeContentDoc('text', { text })
+  const textDocUrl = createDocumentLink('text', textDocId)
+
+  const id = uuid()
+  // TODO: this is a board doc. Should update this type after converting
+  // board to typescript.
+  window.repo.change(boardId, (doc: any) => {
+    doc.cards[id] = {
+      id,
+      url: textDocUrl,
+      x: 20,
+      y: 20,
+      width: 320,
+      height: 540
+    }
+  })
+
+  // Then make changes to workspace doc.
+  workspace.selfId = selfId
+  workspace.contactIds = []
+  workspace.currentDocUrl = docUrl
+  workspace.viewedDocUrls = [docUrl]
+}
+
 ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
   contexts: { root: Workspace },
   resizable: false,
-  unlisted: true
+  unlisted: true,
+  initializeDocument: initializeDocument
 })

@@ -22,10 +22,6 @@ interface State {
 }
 
 export default class ThreadContent extends React.PureComponent<ContentProps, State> {
-  static initializeDocument(threadDoc: Doc) {
-    threadDoc.messages = []
-  }
-
   static minWidth = 9
   static minHeight = 6
   static defaultWidth = 16
@@ -222,6 +218,10 @@ const css = {
   },
 }
 
+function initializeDocument(threadDoc: Doc) {
+  threadDoc.messages = []
+}
+
 ContentTypes.register({
   type: 'thread',
   name: 'Thread',
@@ -229,5 +229,6 @@ ContentTypes.register({
   contexts: {
     workspace: ThreadContent,
     board: ThreadContent
-  }
+  },
+  initializeDocument: initializeDocument
 })
