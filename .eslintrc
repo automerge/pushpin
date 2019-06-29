@@ -44,6 +44,10 @@
     "jsx-a11y/interactive-supports-focus": "off",
     "jsx-a11y/no-noninteractive-tabindex": "off",
     "jsx-a11y/click-events-have-key-events": "off",
-    "jsx-a11y/no-autofocus": "off"
+    "jsx-a11y/no-autofocus": "off",
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }
