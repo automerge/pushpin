@@ -1,7 +1,7 @@
 import React from 'react'
 import Debug from 'debug'
 
-import ContentSection from './content-section'
+import ContentSection from './ContentSection'
 
 import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
 

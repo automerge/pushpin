@@ -1,9 +1,15 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import ListMenuItem from './ListMenuItem'
 
-export default function ContentSection({ name, label, actions, items }) {
+interface Props {
+  name: string,
+  label: string,
+  actions: any[],
+  items: any[]
+}
+
+export default function ContentSection({ name, label, actions, items }: Props) {
   const renderedItems = items.map(({ url, selected }) =>
     <ListMenuItem key={url} contentUrl={url} actions={actions} selected={selected} />)
 
@@ -17,11 +23,4 @@ export default function ContentSection({ name, label, actions, items }) {
       </div>
     </div>
   )
-}
-
-ContentSection.propTypes = {
-  name: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  actions: PropTypes.arrayOf(PropTypes.any).isRequired,
-  items: PropTypes.arrayOf(PropTypes.any).isRequired
 }
