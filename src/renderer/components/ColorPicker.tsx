@@ -1,23 +1,22 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Debug from 'debug'
 
 import { CustomPicker } from 'react-color'
 import { Swatch } from 'react-color/lib/components/common'
 
-const log = Debug('pushpin:color-picker')
+const log = Debug('pushpin:ColorPicker')
+
+interface Props {
+  colors: string[]
+  onChange(color: { hex: string; source: 'hex' }, e: React.MouseEvent): void
+}
 
 /* This class is adapted from the react-color TwitterPicker
    by stripping out most of the functionality and just leaving swatches */
-class ColorPicker extends React.PureComponent {
+class ColorPicker extends React.PureComponent<Props> {
   static defaultProps = {
     colors: [],
-    onChange: () => {}
-  }
-
-  static propTypes = {
-    colors: PropTypes.arrayOf(PropTypes.string),
-    onChange: PropTypes.func
+    onChange: () => { }
   }
 
   handleChange = (hexcode, e) => {
@@ -43,7 +42,7 @@ class ColorPicker extends React.PureComponent {
 
     return (
       <div className="ColorPicker">
-        { swatches }
+        {swatches}
       </div>
     )
   }

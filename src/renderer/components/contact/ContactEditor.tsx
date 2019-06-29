@@ -10,7 +10,7 @@ import { IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
 import Content, { ContentProps } from '../Content'
 import { ContactDoc } from '.'
 
-import ColorPicker from '../color-picker'
+import ColorPicker from '../ColorPicker'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
