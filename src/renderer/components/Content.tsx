@@ -29,23 +29,23 @@ interface State {
 }
 
 export default class Content extends React.PureComponent<Props, State> {
-  static initializeContentDoc = (type, typeAttrs = {}) => {
+  static initializeContentDoc(type: string, typeAttrs = {}) {
     const { repo } = window // still not a great idea
-    
+
     const url = repo.create()
-    repo.change(url, (doc) => ContentTypes.initializeDocument(type, doc, typeAttrs))
+    repo.change(url, doc => ContentTypes.initializeDocument(type, doc, typeAttrs))
 
     return url
   }
 
   state = { contentCrashed: false }
 
-  componentDidCatch = (e) => {
-    this.setState({ contentCrashed: e })
+  componentDidCatch(_err: Error) {
+    this.setState({ contentCrashed: true })
   }
 
-  filterProps = (props) => {
-    const filtered = {}
+  filterProps(props: Props) {
+    const filtered: any = {}
     Object.keys(props)
       .filter(key => !FILTERED_PROPS.includes(key))
       .forEach(key => {
@@ -95,14 +95,14 @@ export default class Content extends React.PureComponent<Props, State> {
   }
 }
 
-const renderError = (type, error) => (
+const renderError = (type: string, _error: any) => (
   <div>
     <i className="fa fa-exclamation-triangle" />
     A &quot;{type}&quot; threw an error during render.
   </div>
 )
 
-const renderMissingType = (type, context) => (
+const renderMissingType = (type: string, context: Context) => (
   <div>
     <i className="fa fa-exclamation-triangle" />
     Component of type &quot;{type}&quot; in context &quot;{context}&quot; not found.
