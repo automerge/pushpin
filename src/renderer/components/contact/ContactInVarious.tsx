@@ -1,8 +1,8 @@
 import React from 'react'
 
+import { Handle } from 'hypermerge'
 import Content, { ContentProps } from '../Content'
 import { ContactDoc } from '.'
-import { Handle } from 'hypermerge'
 
 import { createDocumentLink } from '../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
@@ -54,25 +54,27 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
 
   render() {
     switch (this.props.context) {
-      case "list":
-        return this.renderList();
-        break;
-      case "thread":
+      case 'list':
+        return this.renderList()
+        break
+      case 'thread':
         return this.renderThread()
         break
-      case "title-bar":
+      case 'title-bar':
         return this.renderTitleBar()
-        break;
-      case "board":
+        break
+      case 'board':
         return this.renderBoard()
-        break;
+        break
     }
     return null
   }
 
   renderList() {
     const { doc, online } = this.state
-    if (!doc) return null
+    if (!doc) {
+      return null
+    }
 
     const { avatarDocId, name, color } = doc
 
@@ -94,9 +96,7 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
           </div>
         </div>
         <div className="Label">
-          <p className="Type--primary">
-            {name}
-          </p>
+          <p className="Type--primary">{name}</p>
         </div>
       </div>
     )
@@ -104,7 +104,9 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
 
   renderThread() {
     const { doc, online } = this.state
-    if (!doc) return null
+    if (!doc) {
+      return null
+    }
 
     const { avatarDocId, name, color } = doc
 
@@ -139,7 +141,9 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
   renderTitleBar() {
     let avatar
     const { doc } = this.state
-    if (!doc) return null
+    if (!doc) {
+      return null
+    }
 
     const { avatarDocId, name, color } = doc
 
@@ -154,7 +158,9 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
         <div
           draggable
           onDragStart={this.onDragStart}
-          className={`Avatar Avatar--title-bar ${this.state.online ? 'Avatar--online' : 'Avatar--offline'}`}
+          className={`Avatar Avatar--title-bar ${
+            this.state.online ? 'Avatar--online' : 'Avatar--offline'
+          }`}
           style={{ '--highlight-color': color } as any}
           data-name={name}
         >
@@ -166,7 +172,9 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
 
   renderBoard() {
     const { doc, online } = this.state
-    if (!doc) return null
+    if (!doc) {
+      return null
+    }
 
     const { avatarDocId, name, color } = doc
 
@@ -185,9 +193,7 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
         >
           {avatar}
         </div>
-        <div className="Label">
-          {name}
-        </div>
+        <div className="Label">{name}</div>
       </div>
     )
   }
@@ -212,12 +218,12 @@ const css = {
   },
   messageGroup: {
     marginBottom: -24,
-    paddingTop: 12
+    paddingTop: 12,
   },
   groupedMessages: {
     position: 'relative',
     top: -20,
-    paddingLeft: 40 + 8
+    paddingLeft: 40 + 8,
   },
   messages: {
     display: 'flex',
@@ -229,28 +235,25 @@ const css = {
     color: 'black',
     display: 'flex',
     lineHeight: '20px',
-    padding: '2px 0'
+    padding: '2px 0',
   },
   user: {
-    display: 'flex'
+    display: 'flex',
   },
   username: {
     paddingLeft: 8,
     fontSize: 12,
-    color: 'var(--colorBlueBlack)'
+    color: 'var(--colorBlueBlack)',
   },
-  avatar: {
-
-  },
+  avatar: {},
   time: {
     flex: 'none',
     marginLeft: 'auto',
     fontSize: 12,
     color: 'var(--colorSecondaryGrey)',
-    marginTop: -22
+    marginTop: -22,
   },
-  content: {
-  },
+  content: {},
   inputWrapper: {
     boxSizing: 'border-box',
     width: 'calc(100% - 1px)',
@@ -261,6 +264,6 @@ const css = {
     padding: 8,
   },
   input: {
-    width: '100%'
+    width: '100%',
   },
 }

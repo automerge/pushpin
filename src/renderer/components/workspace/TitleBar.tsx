@@ -2,13 +2,13 @@ import React from 'react'
 import Debug from 'debug'
 import { clipboard } from 'electron'
 
+import { Handle } from 'hypermerge'
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
 import Omnibox from './Omnibox'
 import Content from '../Content'
 import Authors from './Authors'
 import Share from './Share'
-import { HypermergeUrl, PushpinUrl } from '../../ShareLink';
-import { Handle } from 'hypermerge';
+import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
 const log = Debug('pushpin:title-bar')
 
@@ -22,10 +22,10 @@ interface Doc {
 }
 
 interface State {
-    activeOmnibox: boolean
-    sessionHistory: PushpinUrl[]
-    historyIndex: number
-    doc?: Doc
+  activeOmnibox: boolean
+  sessionHistory: PushpinUrl[]
+  historyIndex: number
+  doc?: Doc
 }
 
 export default class TitleBar extends React.PureComponent<Props, State> {
@@ -34,7 +34,7 @@ export default class TitleBar extends React.PureComponent<Props, State> {
   state: State = {
     activeOmnibox: false,
     sessionHistory: [],
-    historyIndex: 0
+    historyIndex: 0,
   }
 
   // This is the New Boilerplate
@@ -49,7 +49,7 @@ export default class TitleBar extends React.PureComponent<Props, State> {
     document.removeEventListener('keydown', this.onKeyDown)
   }
 
-  disableBack = () => this.state.historyIndex === (this.state.sessionHistory.length - 1)
+  disableBack = () => this.state.historyIndex === this.state.sessionHistory.length - 1
 
   disableForward = () => this.state.historyIndex === 0
 
@@ -87,7 +87,7 @@ export default class TitleBar extends React.PureComponent<Props, State> {
         // If we're opening a new document (as opposed to going back or forward),
         // add it to our sessionHistory and remove all docs 'forward' of the current index
       } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
-        sessionHistory = [doc.currentDocUrl, ...(sessionHistory.slice(historyIndex))]
+        sessionHistory = [doc.currentDocUrl, ...sessionHistory.slice(historyIndex)]
         historyIndex = 0
       }
 
@@ -138,7 +138,12 @@ export default class TitleBar extends React.PureComponent<Props, State> {
 
     return (
       <div className="TitleBar">
-        <button disabled={this.disableBack()} type="button" onClick={this.back} className="TitleBar__menuItem">
+        <button
+          disabled={this.disableBack()}
+          type="button"
+          onClick={this.back}
+          className="TitleBar__menuItem"
+        >
           <i className="fa fa-angle-left" />
         </button>
         <Dropdown
@@ -171,7 +176,8 @@ export default class TitleBar extends React.PureComponent<Props, State> {
         <Content url={this.state.doc.currentDocUrl} context="list" editable />
         <Authors hypermergeUrl={this.props.hypermergeUrl} />
 
-        <Dropdown className="TitleBar__menuItem
+        <Dropdown
+          className="TitleBar__menuItem
           TitleBar__right"
         >
           <DropdownTrigger>

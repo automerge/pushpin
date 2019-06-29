@@ -1,4 +1,4 @@
-import { Repo, RepoFrontend } from "hypermerge";
+import { Repo, RepoFrontend } from 'hypermerge'
 
 declare global {
   interface Window {

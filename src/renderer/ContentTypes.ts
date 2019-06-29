@@ -11,18 +11,11 @@ const log = Debug('pushpin:content-types')
 // that allows for pass-through.
 type Component = ComponentType<any>
 
-export type Context =
-  | 'root'
-  | 'workspace'
-  | 'list'
-  | 'board'
-  | 'thread'
-  | 'title-bar'
+export type Context = 'root' | 'workspace' | 'list' | 'board' | 'thread' | 'title-bar'
 
 type Contexts = {
   [K in Context]?: Component
 }
-
 
 interface ContentType {
   type: string
@@ -37,7 +30,6 @@ interface ContentType {
 const registry: { [type: string]: ContentType } = {}
 const defaultRegistry = {}
 
-
 function register(contentType: ContentType) {
   const { type } = contentType
   const entry = { unlisted: false, resiable: true, ...contentType }
@@ -51,7 +43,7 @@ function register(contentType: ContentType) {
   registry[type] = entry
 }
 
-function registerDefault(contentType: { component: Component, context: Context }) {
+function registerDefault(contentType: { component: Component; context: Context }) {
   const { component, context } = contentType
   defaultRegistry[context] = component
 }
@@ -72,21 +64,13 @@ interface LookupResult {
 
 function lookup({ type, context }: LookupQuery): LookupResult | null {
   const entry = registry[type]
-  const component = entry
-    && entry.contexts[context]
-    || defaultRegistry[context]
-
+  const component = (entry && entry.contexts[context]) || defaultRegistry[context]
 
   if (!component) {
     return null
   }
 
-  const {
-    name = 'Unknown',
-    icon = 'question',
-    unlisted = false,
-    resizable = true
-  } = entry || {}
+  const { name = 'Unknown', icon = 'question', unlisted = false, resizable = true } = entry || {}
 
   return { type, name, icon, component, unlisted, resizable }
 }
@@ -98,20 +82,20 @@ interface ListQuery {
 
 function list({ context, withUnlisted = false }: ListQuery) {
   const allTypes = Object.keys(registry)
-    .map(type => lookup({ type, context }))
-    .filter(ct => !!ct)
+    .map((type) => lookup({ type, context }))
+    .filter((ct) => !!ct)
 
   if (withUnlisted) {
     return allTypes
   }
 
-  return allTypes.filter(ct => ct && !ct.unlisted)
+  return allTypes.filter((ct) => ct && !ct.unlisted)
 }
 
 function initializeDocument(type, doc, typeAttrs) {
   const entry = registry[type]
   if (!entry) {
-    throw new Error("Attempted to initialize an unregistered type!")
+    throw new Error('Attempted to initialize an unregistered type!')
   }
   entry.initializeDocument(doc, typeAttrs)
 }

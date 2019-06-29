@@ -5,7 +5,6 @@ import { crc16 } from 'js-crc'
  * lifted and adapted from pixelpusher
  */
 
-
 export type HypermergeUrl = string
 export type PushpinUrl = string
 
@@ -66,25 +65,20 @@ export const parts = (str: PushpinUrl) => {
 
 export const encodedParts = (str: PushpinUrl) => {
   // ugly
-  const [/* whole match */, nonCrc, scheme, type, docId, crc] = str.match(/^((\w+):\/\/(.+)\/(\w+))\/(\w{1,4})$/) || [undefined, undefined, undefined, undefined, undefined, undefined]
+  const [, /* whole match */ nonCrc, scheme, type, docId, crc] = str.match(
+    /^((\w+):\/\/(.+)\/(\w+))\/(\w{1,4})$/
+  ) || [undefined, undefined, undefined, undefined, undefined, undefined]
   return { nonCrc, scheme, type, docId, crc }
 }
 
-export const withCrc = (str: string) =>
-  `${str}/${encode(crc16(str))}`
+export const withCrc = (str: string) => `${str}/${encode(crc16(str))}`
 
-export const encode = (str: string) =>
-  Base58.encode(hexToBuffer(str))
+export const encode = (str: string) => Base58.encode(hexToBuffer(str))
 
-export const decode = (str: string) =>
-  bufferToHex(Base58.decode(str))
+export const decode = (str: string) => bufferToHex(Base58.decode(str))
 
 export const hexToBuffer = (key: string | Buffer) =>
-  (Buffer.isBuffer(key)
-    ? key
-    : Buffer.from(key, 'hex'))
+  Buffer.isBuffer(key) ? key : Buffer.from(key, 'hex')
 
 export const bufferToHex = (key: Buffer | string) =>
-  (Buffer.isBuffer(key)
-    ? key.toString('hex')
-    : key)
+  Buffer.isBuffer(key) ? key.toString('hex') : key

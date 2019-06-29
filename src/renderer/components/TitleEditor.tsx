@@ -6,7 +6,7 @@ interface Doc {
 }
 
 interface Props {
-  placeholder: string,
+  placeholder: string
   doc: Doc
   change: (cb: (doc: Doc) => void) => void
   preventDrag: boolean
@@ -21,7 +21,7 @@ class TitleEditor extends React.Component<Props> {
 
   static defaultProps = {
     placeholder: '',
-    preventDrag: false
+    preventDrag: false,
   }
 
   input: React.RefObject<HTMLInputElement> = React.createRef()

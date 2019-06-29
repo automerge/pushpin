@@ -103,7 +103,7 @@ function initWorkspace() {
     saveWorkspaceUrl(newWorkspaceUrl)
     workspaceUrl = newWorkspaceUrl
   }
-  
+
   const workspace = <Content context="root" url={workspaceUrl} />
   const element = document.getElementById('app')
   ReactDOM.render(workspace, element)

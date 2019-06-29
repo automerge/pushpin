@@ -21,8 +21,8 @@ const createWindow = async () => {
     height: 1000,
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: false
-    }
+      webSecurity: false,
+    },
   })
 
   protocol.registerHttpProtocol('pushpin', (req, cb) => {
@@ -31,19 +31,23 @@ const createWindow = async () => {
     mainWindow.webContents.send('loadDocumentUrl', req.url)
   })
 
-  protocol.registerBufferProtocol('hyperfile', (request, callback) => {
-    try {
-      Hyperfile.fetch(request.url, (data) => {
-        callback(data)
-      })
-    } catch (e) {
-      log(e)
+  protocol.registerBufferProtocol(
+    'hyperfile',
+    (request, callback) => {
+      try {
+        Hyperfile.fetch(request.url, (data) => {
+          callback(data)
+        })
+      } catch (e) {
+        log(e)
+      }
+    },
+    (error) => {
+      if (error) {
+        log('Failed to register protocol')
+      }
     }
-  }, (error) => {
-    if (error) {
-      log('Failed to register protocol')
-    }
-  })
+  )
   const isDevelopment = process.env.NODE_ENV !== 'production'
 
   if (isDevelopment) {
@@ -53,11 +57,13 @@ const createWindow = async () => {
   if (isDevelopment) {
     mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
   } else {
-    mainWindow.loadURL(formatUrl({
-      pathname: path.join(__dirname, 'index.html'),
-      protocol: 'file',
-      slashes: true
-    }))
+    mainWindow.loadURL(
+      formatUrl({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file',
+        slashes: true,
+      })
+    )
   }
 
   mainWindow.on('closed', () => {
@@ -111,18 +117,13 @@ const createWindow = async () => {
           accelerator: 'CmdOrCtrl+N',
           click: (item, focusedWindow) => {
             focusedWindow.webContents.send('newDocument')
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: 'Edit',
-      submenu: [
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'selectAll' }
-      ]
+      submenu: [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }],
     },
     {
       label: 'Develop',
@@ -132,27 +133,24 @@ const createWindow = async () => {
           accelerator: 'CmdOrCtrl+R',
           click: (item, focusedWindow) => {
             focusedWindow.webContents.reload()
-          }
+          },
         },
         {
           label: 'Open Inspector',
           accelerator: 'CmdOrCtrl+Option+I',
           click: (item, focusedWindow) => {
             focusedWindow.webContents.toggleDevTools()
-          }
-        }
-      ]
-    }
+          },
+        },
+      ],
+    },
   ]
 
   // macOS requires first menu item be name of the app
   if (process.platform === 'darwin') {
     template.unshift({
       label: app.getName(),
-      submenu: [
-        { role: 'about' },
-        { role: 'quit' }
-      ]
+      submenu: [{ role: 'about' }, { role: 'quit' }],
     })
   }
 

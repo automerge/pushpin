@@ -2,9 +2,9 @@ import React from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
 
+import { Handle } from 'hypermerge'
 import { createDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
-import { Handle } from 'hypermerge'
 
 import { IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
 import Content, { ContentProps } from '../Content'
@@ -33,7 +33,7 @@ export const USER_COLORS = {
   CHILBLAU: '#004098',
   OPTIROYA: '#4700D8',
   MAGEGENTA: '#E80FA7',
-  GRAU: '#626262'
+  GRAU: '#626262',
 }
 
 interface State {
@@ -45,9 +45,8 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
   state: State = {}
 
   // This is the New Boilerplate
-  componentWillMount = () => this.handle = window.repo.watch(
-    this.props.hypermergeUrl,
-    (doc) => this.onChange(doc))
+  componentWillMount = () =>
+    (this.handle = window.repo.watch(this.props.hypermergeUrl, (doc) => this.onChange(doc)))
   componentWillUnmount = () => this.handle && this.handle.close()
 
   onChange = (doc: ContactDoc) => {
@@ -71,29 +70,34 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
         }
 
         const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-        this.handle && this.handle.change((d) => {
-          d.avatarDocId = hypermergeUrl
-        })
+        this.handle &&
+          this.handle.change((d) => {
+            d.avatarDocId = hypermergeUrl
+          })
       })
     })
   }
 
   setName = (e) => {
-    this.handle && this.handle.change((d) => {
-      d.name = e.target.value
-    })
+    this.handle &&
+      this.handle.change((d) => {
+        d.name = e.target.value
+      })
   }
 
   setColor = (color) => {
-    this.handle && this.handle.change((d) => {
-      d.color = color.hex
-    })
+    this.handle &&
+      this.handle.change((d) => {
+        d.color = color.hex
+      })
   }
 
   render = () => {
     log('render')
     const { doc } = this.state
-    if (!doc) return null
+    if (!doc) {
+      return null
+    }
 
     const { avatarDocId, name, color } = doc
 
@@ -118,12 +122,12 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
             <div className="ListMenu__label">Avatar</div>
             <div className="ListMenu__item ContactListItem">
               <div className="ListMenu__thumbnail">
-                <div className="Avatar">
-                  {avatar}
-                </div>
+                <div className="Avatar">{avatar}</div>
               </div>
               <div className="Label">
-                <button className="Type--action" type="button" onClick={this.chooseAvatar}>Choose from file...</button>
+                <button className="Type--action" type="button" onClick={this.chooseAvatar}>
+                  Choose from file...
+                </button>
               </div>
             </div>
             <div className="ListMenu__label">Presence Color</div>
@@ -135,7 +139,10 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
               />
             </div>
             <div className="ListMenu__label">
-              <p className="Type--secondary">Your presence colour will be used to by other authors identify you when you are active on a board.</p>
+              <p className="Type--secondary">
+                Your presence colour will be used to by other authors identify you when you are
+                active on a board.
+              </p>
             </div>
           </div>
         </div>

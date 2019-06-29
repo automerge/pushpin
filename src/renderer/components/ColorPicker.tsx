@@ -16,14 +16,17 @@ interface Props {
 class ColorPicker extends React.PureComponent<Props> {
   static defaultProps = {
     colors: [],
-    onChange: () => { }
+    onChange: () => {},
   }
 
   handleChange = (hexcode: string, e: React.MouseEvent) => {
-    this.props.onChange({
-      hex: hexcode,
-      source: 'hex',
-    }, e)
+    this.props.onChange(
+      {
+        hex: hexcode,
+        source: 'hex',
+      },
+      e
+    )
   }
 
   render = () => {
@@ -40,11 +43,7 @@ class ColorPicker extends React.PureComponent<Props> {
       </div>
     ))
 
-    return (
-      <div className="ColorPicker">
-        {swatches}
-      </div>
-    )
+    return <div className="ColorPicker">{swatches}</div>
   }
 }
 

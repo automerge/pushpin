@@ -36,14 +36,12 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
     reactPDFData: {},
     pageInputValue: '1',
     pageNum: 1,
-    numPages: 0
+    numPages: 0,
   }
 
   // This is the New Boilerplate
-  componentWillMount = () => window.repo.watch<PdfDoc>(
-    this.props.hypermergeUrl,
-    (doc) => this.onChange(doc)
-  )
+  componentWillMount = () =>
+    window.repo.watch<PdfDoc>(this.props.hypermergeUrl, (doc) => this.onChange(doc))
   componentWillUnmount = () => this.handle && this.handle.close()
 
   onChange = (doc: PdfDoc) => {
@@ -57,7 +55,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
     Hyperfile.fetch(hyperfileUrl, (hyperfileContents) => {
       this.setState({
         currentHyperfileUrl: hyperfileUrl,
-        reactPDFData: { data: hyperfileContents }
+        reactPDFData: { data: hyperfileContents },
       })
     })
   }
@@ -122,7 +120,7 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
   onDocumentLoadSuccess = (result) => {
     const { numPages } = result
 
-    result.getMetadata().then(metadata => this.onDocumentMetadata(metadata))
+    result.getMetadata().then((metadata) => this.onDocumentMetadata(metadata))
 
     this.setState({ numPages })
   }
@@ -142,8 +140,8 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
     const { reactPDFData, numPages, pageInputValue } = this.state
     const { context } = this.props
 
-    const header = (context === 'workspace')
-      ? (
+    const header =
+      context === 'workspace' ? (
         <div className="PDFCardHeader">
           <button
             disabled={this.disableBack()}
@@ -163,31 +161,30 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
             onKeyDown={this.handleInputKey}
           />
           <div className="PDFCardHeader__numPages">/ {numPages}</div>
-          <button disabled={this.disableForward()} type="button" onClick={this.forward} className="ButtonAction">
+          <button
+            disabled={this.disableForward()}
+            type="button"
+            onClick={this.forward}
+            className="ButtonAction"
+          >
             <i className="fa fa-angle-right" />
           </button>
         </div>
-      )
-      : null
+      ) : null
 
     return (
       <div className="PDFCard">
         {header}
-        {reactPDFData
-          ? (
-            <Document
-              file={reactPDFData}
-              onLoadSuccess={this.onDocumentLoadSuccess}
-            >
-              <Page
-                pageNumber={this.state.pageNum}
-                className="PDFCard__page"
-                width={1600}
-                renderTextLayer={false}
-              />
-            </Document>
-          ) : null
-        }
+        {reactPDFData ? (
+          <Document file={reactPDFData} onLoadSuccess={this.onDocumentLoadSuccess}>
+            <Page
+              pageNumber={this.state.pageNum}
+              className="PDFCard__page"
+              width={1600}
+              renderTextLayer={false}
+            />
+          </Document>
+        ) : null}
       </div>
     )
   }
@@ -203,7 +200,7 @@ ContentTypes.register({
   icon: 'book',
   contexts: {
     workspace: PDFCard,
-    board: PDFCard
+    board: PDFCard,
   },
-  initializeDocument: initializeDocument
+  initializeDocument,
 })
