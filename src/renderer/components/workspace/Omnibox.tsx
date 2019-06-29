@@ -5,7 +5,7 @@ import ContentSection from './ContentSection'
 
 import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
-import InvitationsView from '../../invitations-view'
+import InvitationsView from '../../InvitationsView'
 import { ContactDoc } from '../contact';
 import { Handle } from 'hypermerge';
 
@@ -93,8 +93,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     log('componentDidMount')
     this.refreshHandle(this.props.hypermergeUrl)
     document.addEventListener('keydown', this.handleCommandKeys)
-    this.invitationsView = new InvitationsView(this.props.hypermergeUrl)
-    this.invitationsView.onChange(this.onInvitationsChange)
+    this.invitationsView = new InvitationsView(this.props.hypermergeUrl, this.onInvitationsChange)
   }
 
   componentWillUnmount = () => {

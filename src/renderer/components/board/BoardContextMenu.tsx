@@ -3,7 +3,7 @@ import Debug from 'debug'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 import classNames from 'classnames'
 
-import ColorPicker from '../color-picker'
+import ColorPicker from '../ColorPicker'
 
 const log = Debug('pushpin:board-context-menu')
 
@@ -39,7 +39,7 @@ export default class BoardContextMenu extends React.PureComponent<Props> {
         className="ContextMenu"
       >
         <div className="ContextMenu__section">
-          { createMenuItems }
+          {createMenuItems}
         </div>
         <div className="ContextMenu__section">
           <h6>Board Color</h6>
