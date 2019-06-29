@@ -1,4 +1,7 @@
-import { parseDocumentLink } from './ShareLink'
+import { parseDocumentLink, HypermergeUrl } from './ShareLink'
+import { Handle } from 'hypermerge';
+import { ContactDoc } from './components/contact';
+import { Doc } from './components/workspace/Workspace';
 
 //
 // Example:
@@ -8,12 +11,21 @@ import { parseDocumentLink } from './ShareLink'
 //   })
 //
 export default class InvitationsView {
-  constructor(workspaceId) {
+  selfId?: HypermergeUrl
+  workspaceHandle: Handle<Doc>
+  contactHandles: { [contactId: string]: Handle<ContactDoc> }
+  docHandles: { [docId: string]: Handle<any> }
+  invitations: any[]
+  pendingInvitations: any[]
+  onChangeCb?: Function
+
+  constructor(workspaceId: HypermergeUrl, onChange: Function) {
     this.contactHandles = {}
     this.docHandles = {}
     this.invitations = []
     this.pendingInvitations = []
-    this.selfId = null
+
+    this.onChangeCb = onChange
 
     this.workspaceHandle = window.repo.watch(workspaceId, (doc) => {
       this.selfId = doc.selfId
@@ -21,12 +33,7 @@ export default class InvitationsView {
     })
   }
 
-  onChange = (callback) => {
-    this.onChangeCb = callback
-    this.onChangeCb(this.invitations)
-  }
-
-  watchDoc = (hypermergeUrl) => {
+  watchDoc = (hypermergeUrl: HypermergeUrl) => {
     if (this.docHandles[hypermergeUrl]) {
       return
     }
@@ -59,7 +66,7 @@ export default class InvitationsView {
       }
 
       const offererId = contactId
-      const offersForUs = contact.offeredUrls[this.selfId] || []
+      const offersForUs = (this.selfId && contact.offeredUrls[this.selfId]) || []
 
       offersForUs.forEach((documentUrl) => {
         const { hypermergeUrl } = parseDocumentLink(documentUrl)
