@@ -31,17 +31,9 @@ interface State {
 export default class Content extends React.PureComponent<Props, State> {
   static initializeContentDoc = (type, typeAttrs = {}) => {
     const { repo } = window // still not a great idea
-    const contentType = ContentTypes.lookup({ type, context: 'workspace' })
-
-    if (!contentType) throw new Error(`Type not found in registry: ${type}`)
-    const { component } = contentType as any
-
-    const initializeDocumentWithAttrs = (doc) => {
-      component.initializeDocument(doc, typeAttrs)
-    }
-
+    
     const url = repo.create()
-    repo.change(url, initializeDocumentWithAttrs)
+    repo.change(url, (doc) => ContentTypes.initializeDocument(type, doc, typeAttrs))
 
     return url
   }

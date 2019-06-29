@@ -16,10 +16,6 @@ interface State {
 }
 
 export default class ImageContent extends React.PureComponent<ContentProps, State> {
-  static initializeDocument(image: ImageDoc, { hyperfileUrl }) {
-    image.hyperfileUrl = hyperfileUrl
-  }
-
   static minWidth = 3
   static minHeight = 3
   static defaultWidth = 18
@@ -66,6 +62,10 @@ export default class ImageContent extends React.PureComponent<ContentProps, Stat
   }
 }
 
+function initializeDocument(image: ImageDoc, { hyperfileUrl }) {
+  image.hyperfileUrl = hyperfileUrl
+}
+
 ContentTypes.register({
   type: 'image',
   name: 'Image',
@@ -73,5 +73,6 @@ ContentTypes.register({
   contexts: {
     workspace: ImageContent,
     board: ImageContent
-  }
+  },
+  initializeDocument: initializeDocument
 })

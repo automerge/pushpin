@@ -28,10 +28,6 @@ interface State {
 }
 
 export default class UrlContent extends React.PureComponent<ContentProps, State> {
-  static initializeDocument(urlDoc: UrlDoc, { url = '' }) {
-    urlDoc.url = url
-  }
-
   static minWidth = 9
   static minHeight = 9
   static defaultWidth = 12
@@ -212,6 +208,9 @@ function removeEmpty(obj: object) {
   })
 }
 
+function initializeDocument(urlDoc: UrlDoc, { url = '' }) {
+  urlDoc.url = url
+}
 
 ContentTypes.register({
   type: 'url',
@@ -220,7 +219,8 @@ ContentTypes.register({
   contexts: {
     workspace: UrlContent,
     board: UrlContent
-  }
+  }, 
+  initializeDocument: initializeDocument
 })
 
 // Should be { [name: string]: React.CSSProperties }

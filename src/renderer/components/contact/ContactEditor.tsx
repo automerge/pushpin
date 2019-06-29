@@ -6,7 +6,7 @@ import { createDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { Handle } from 'hypermerge'
 
-import { USER, IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
+import { IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
 import Content, { ContentProps } from '../Content'
 import { ContactDoc } from '.'
 
@@ -15,7 +15,7 @@ import ColorPicker from '../color-picker'
 const { dialog } = remote
 const log = Debug('pushpin:settings')
 
-const USER_COLORS = {
+export const USER_COLORS = {
   // RUST: '#D96767',
   // ENGINEER: '#FFE283',
   // KEYLIME: '#A1E991',
@@ -41,13 +41,6 @@ interface State {
 }
 
 export default class ContactEditor extends React.PureComponent<ContentProps, State> {
-  static initializeDocument = (doc, typeAttrs) => {
-    doc.name = USER
-    const USER_COLOR_VALUES = Object.values(USER_COLORS)
-    const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
-    doc.color = color
-  }
-
   private handle?: Handle<ContactDoc>
   state: State = {}
 
