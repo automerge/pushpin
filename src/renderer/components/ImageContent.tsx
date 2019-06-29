@@ -9,7 +9,7 @@ interface ImageDoc {
 }
 
 export default function ImageContent({ hypermergeUrl }: ContentProps) {
-  const doc = useDocument<ImageDoc>(hypermergeUrl)
+  const [doc] = useDocument<ImageDoc>(hypermergeUrl)
 
   if (!doc) return null
   if (!doc.hyperfileUrl) return null

@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
-export function useDocument<T>(url) {
+type ChangeFn<T> = (cb: (doc: T) => void) => void
+
+export function useDocument<T>(url: string): [T | null, ChangeFn<T>] {
   const [doc, setDoc] = useState<T | null>(null)
 
   useEffect(() => {
@@ -9,7 +11,11 @@ export function useDocument<T>(url) {
     return () => {
       handle.close()
     }
-  })
+  }, [url])
 
-  return doc
+  function change(cb: (doc: T) => void): void {
+    window.repo.change(url, cb)
+  }
+
+  return [doc, change]
 }
