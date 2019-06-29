@@ -6,15 +6,8 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "noFallthroughCasesInSwitch": true,
-    "lib": [
-      "es2015",
-      "es2017",
-      "dom",
-      "webworker"
-    ],
+    "lib": ["es2015", "es2017", "dom", "webworker"],
     "esModuleInterop": true,
-    // "module": "commonjs", // Handled by tsconfig-base
-    // "target": "es2015", // Handled by tsconfig-base
     "jsx": "react",
     "pretty": true
   }
