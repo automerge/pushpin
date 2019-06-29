@@ -1,8 +1,8 @@
-import { Repo } from "hypermerge";
+import { Repo, RepoFrontend } from "hypermerge";
 
 declare global {
   interface Window {
-    repo: Repo
+    repo: RepoFrontend
   }
 
   const __static: string

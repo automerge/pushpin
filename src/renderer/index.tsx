@@ -50,7 +50,7 @@ localStorage.removeItem('debug')
 EventEmitter.defaultMaxListeners = 500
 
 function initBackend(front) {
-  const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH, port: 0 })
+  const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
 
   back.subscribe((msg) => front.receive(JSON.parse(JSON.stringify(msg))))
   front.subscribe((msg) => back.receive(JSON.parse(JSON.stringify(msg))))
@@ -72,7 +72,7 @@ function initHypermerge(cb) {
 
 function loadWorkspaceUrl() {
   if (Fs.existsSync(WORKSPACE_URL_PATH)) {
-    const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH))
+    const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
     // the next four lines are to cover a migration for existing accounts to URLs
     // if you're reading this long after 6/11/18 go ahead and delete this bit
     if (json.workspaceDocId) {
@@ -103,6 +103,7 @@ function initWorkspace() {
     saveWorkspaceUrl(newWorkspaceUrl)
     workspaceUrl = newWorkspaceUrl
   }
+  
   const workspace = <Content context="root" url={workspaceUrl} />
   const element = document.getElementById('app')
   ReactDOM.render(workspace, element)
