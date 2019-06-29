@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 interface Props {
   callback(e: React.MouseEvent): void

@@ -81,7 +81,7 @@ export default class Share extends React.PureComponent<Props, State> {
     })
   }
 
-  offerDocumentToIdentity = (e: Event, contactId: string) => {
+  offerDocumentToIdentity = (contactId: string) => {
     if (!this.state.workspace || !this.state.workspace.selfId || !this.state.workspace.currentDocUrl) {
       return
     }
@@ -122,7 +122,7 @@ export default class Share extends React.PureComponent<Props, State> {
 
     const share = {
       name: 'share',
-      callback: (url: string) => (e: Event) => this.offerDocumentToIdentity(e, url),
+      callback: (url: string) => () => this.offerDocumentToIdentity(url),
       faIcon: 'fa-share-alt',
       label: 'Share'
     }
