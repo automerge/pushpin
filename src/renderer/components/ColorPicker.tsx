@@ -19,7 +19,7 @@ class ColorPicker extends React.PureComponent<Props> {
     onChange: () => { }
   }
 
-  handleChange = (hexcode, e) => {
+  handleChange = (hexcode: string, e: React.MouseEvent) => {
     this.props.onChange({
       hex: hexcode,
       source: 'hex',
