@@ -1,0 +1,23 @@
+.Contact--board {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width:100%;
+  box-sizing: border-box;
+  padding:10px;
+  background-color: white;
+  border: 1px solid var(--colorPaleGrey);
+}
+.Contact--board .Label {
+  width: 100%;
+  margin-top: 2px;
+  color: var(--colorBlueBlack);
+  line-height: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

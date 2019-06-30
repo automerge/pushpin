@@ -4,6 +4,8 @@ import { USER } from '../../constants'
 import ContactEditor, { USER_COLORS } from './ContactEditor'
 import ContactInVarious from './ContactInVarious'
 
+import './Avatar.css'
+
 export interface ContactDoc {
   name: string
   color: string

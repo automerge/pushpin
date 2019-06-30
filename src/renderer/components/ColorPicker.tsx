@@ -3,6 +3,7 @@ import Debug from 'debug'
 
 import { CustomPicker } from 'react-color'
 import { Swatch } from 'react-color/lib/components/common'
+import './ColorPicker.css'
 
 const log = Debug('pushpin:ColorPicker')
 

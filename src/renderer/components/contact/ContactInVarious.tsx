@@ -7,6 +7,8 @@ import { Handle } from 'hypermerge'
 import { createDocumentLink } from '../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
+import './ContactInVarious.css'
+
 interface State {
   online: boolean
   doc?: ContactDoc

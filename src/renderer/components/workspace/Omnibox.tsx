@@ -8,6 +8,7 @@ import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from
 import InvitationsView from '../../InvitationsView'
 import { ContactDoc } from '../contact';
 import { Handle } from 'hypermerge';
+import './Omnibox.css'
 
 const log = Debug('pushpin:omnibox')
 

@@ -12,6 +12,8 @@ interface Props {
   preventDrag: boolean
 }
 
+import './TitleEditor.css'
+
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
 class TitleEditor extends React.Component<Props> {
