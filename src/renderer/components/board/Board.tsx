@@ -99,11 +99,11 @@ export interface NotDraggingTracking {
 }
 
 export function isMoving(tracking): tracking is MoveTracking {
-  return tracking.dragType == DragType.MOVING
+  return tracking.dragType === DragType.MOVING
 }
 
 export function isResizing(tracking): tracking is ResizeTracking {
-  return tracking.dragType == DragType.RESIZING
+  return tracking.dragType === DragType.RESIZING
 }
 
 export type TrackingEntry = MoveTracking | ResizeTracking | NotDraggingTracking

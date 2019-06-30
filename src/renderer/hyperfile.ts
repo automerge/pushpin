@@ -4,8 +4,7 @@ import mime from 'mime-types'
 import { Repo } from 'hypermerge'
 import DiscoverySwarm from 'discovery-cloud-client'
 import { HYPERFILE_PATH } from './constants'
-
-const storage = require('random-access-file')
+import storage from 'random-access-file'
 
 const repo = new Repo({ storage, path: HYPERFILE_PATH })
 
