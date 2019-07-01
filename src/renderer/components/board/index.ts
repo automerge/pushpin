@@ -4,7 +4,7 @@ import ContentTypes from '../../ContentTypes'
 import Board, { BOARD_COLORS } from './Board'
 import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
-import { HypermergeUrl } from '../../ShareLink';
+import { HypermergeUrl } from '../../ShareLink'
 
 export interface BoardDocCard {
   type: string
@@ -19,16 +19,30 @@ export interface BoardDocCard {
 export interface BoardDoc {
   title: string
   backgroundColor: string
-  cards: BoardDocCard[]
+  cards: { [id: string]: BoardDocCard }
   hypermergeUrl: HypermergeUrl // added by workspace
+  authorIds: HypermergeUrl[]
 }
 
-function initializeBoard(board, { title, backgroundColor }) {
-  board.title = title || 'No Title'
-  const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
-  const color = backgroundColor
-    || BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
-  board.backgroundColor = color
+interface Attrs {
+  title?: string
+  backgroundColor?: string
+}
+
+const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
+
+function randomColor(): string {
+  return BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
+}
+
+function initializeBoard(
+  board: BoardDoc,
+  { title = 'No Title',
+    backgroundColor = randomColor(),
+  }: Attrs
+) {
+  board.title = title
+  board.backgroundColor = backgroundColor
   board.cards = {}
   board.authorIds = []
 }
