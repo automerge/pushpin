@@ -72,6 +72,7 @@
     "@types/bs58": "^4.0.0",
     "@types/classnames": "^2.2.8",
     "@types/debug": "^4.1.4",
+    "@types/mime-types": "^2.1.0",
     "@types/prop-types": "^15.7.1",
     "@types/react": "^16.8.22",
     "@types/uuid": "^3.4.4",
