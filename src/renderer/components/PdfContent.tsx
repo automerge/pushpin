@@ -53,8 +53,8 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
     this.setState({ doc })
   }
 
-  loadPDF = (hyperfileUrl) => {
-    Hyperfile.fetch(hyperfileUrl, (hyperfileContents) => {
+  loadPDF = (hyperfileUrl: Hyperfile.HyperfileUrl) => {
+    Hyperfile.fetch(hyperfileUrl).then(hyperfileContents => {
       this.setState({
         currentHyperfileUrl: hyperfileUrl,
         reactPDFData: { data: hyperfileContents }

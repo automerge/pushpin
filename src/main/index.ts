@@ -12,7 +12,7 @@ protocol.registerStandardSchemes(['pushpin'])
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow: BrowserWindow | null = null
 
 const createWindow = async () => {
   // Create the browser window.
@@ -28,14 +28,13 @@ const createWindow = async () => {
   protocol.registerHttpProtocol('pushpin', (req, cb) => {
     // we don't want to use loadURL because we don't want to reset the whole app state
     // so we use the workspace manipulation function here
-    mainWindow.webContents.send('loadDocumentUrl', req.url)
+    mainWindow && mainWindow.webContents.send('loadDocumentUrl', req.url)
   })
 
-  protocol.registerBufferProtocol('hyperfile', (request, callback) => {
+  protocol.registerBufferProtocol('hyperfile', async (request, callback) => {
     try {
-      Hyperfile.fetch(request.url, (data) => {
-        callback(data)
-      })
+      const data = await Hyperfile.fetch(request.url)
+      callback(Buffer.from(data))
     } catch (e) {
       log(e)
     }
@@ -65,13 +64,13 @@ const createWindow = async () => {
   })
 
   mainWindow.webContents.on('devtools-opened', () => {
-    mainWindow.focus()
+    mainWindow && mainWindow.focus()
     setImmediate(() => {
-      mainWindow.focus()
+      mainWindow && mainWindow.focus()
     })
   })
 
-  function isSafeishURL(url) {
+  function isSafeishURL(url: string) {
     return url.startsWith('http:') || url.startsWith('https:')
   }
 
@@ -109,7 +108,7 @@ const createWindow = async () => {
         {
           label: 'New',
           accelerator: 'CmdOrCtrl+N',
-          click: (item, focusedWindow) => {
+          click: (_item, focusedWindow) => {
             focusedWindow.webContents.send('newDocument')
           }
         }
@@ -130,14 +129,14 @@ const createWindow = async () => {
         {
           label: 'Refresh',
           accelerator: 'CmdOrCtrl+R',
-          click: (item, focusedWindow) => {
+          click: (_item, focusedWindow) => {
             focusedWindow.webContents.reload()
           }
         },
         {
           label: 'Open Inspector',
           accelerator: 'CmdOrCtrl+Option+I',
-          click: (item, focusedWindow) => {
+          click: (_item, focusedWindow) => {
             focusedWindow.webContents.toggleDevTools()
           }
         }

@@ -96,10 +96,10 @@ export interface ListQuery {
   withUnlisted?: boolean
 }
 
-function list({ context, withUnlisted = false }: ListQuery) {
+function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
   const allTypes = Object.keys(registry)
     .map(type => lookup({ type, context }))
-    .filter(ct => !!ct)
+    .filter(ct => ct) as LookupResult[]
 
   if (withUnlisted) {
     return allTypes

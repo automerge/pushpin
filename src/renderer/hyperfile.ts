@@ -4,8 +4,7 @@ import mime from 'mime-types'
 import { Repo } from 'hypermerge'
 import DiscoverySwarm from 'discovery-cloud-client'
 import { HYPERFILE_PATH } from './constants'
-
-const storage = require('random-access-file')
+import storage from 'random-access-file'
 
 const repo = new Repo({ storage, path: HYPERFILE_PATH, })
 
@@ -20,33 +19,34 @@ const discovery = new DiscoverySwarm({ url, id: repo.id, stream: repo.stream })
 
 repo.replicate(discovery)
 
-// callback = (err, hyperfileId)
-export function write(filePath, callback) {
-  Fs.readFile(filePath, (error, buffer) => {
-    if (error) {
-      callback(error)
-      return
-    }
+export type HyperfileUrl = string
 
-    const mimeType = mime.lookup(filePath) || 'application/octet-stream'
-    const hyperfileUrl = repo.writeFile(buffer, mimeType)
-    callback(null, hyperfileUrl)
+export function write(filePath: string): Promise<HyperfileUrl> {
+  return new Promise((res, rej) => {
+    Fs.readFile(filePath, (error, buffer) => {
+      if (error) {
+        return rej(error)
+      }
+
+      const mimeType = mime.lookup(filePath) || 'application/octet-stream'
+      const hyperfileUrl = repo.writeFile(buffer, mimeType)
+      res(hyperfileUrl)
+    })
   })
 }
 
-export function writeBuffer(buffer, callback) {
-  const hyperfileUrl = repo.writeFile(buffer, 'application/octet-stream') // TODO: mime type
-  callback(null, hyperfileUrl)
+export function writeBuffer(buffer: Uint8Array): Promise<HyperfileUrl> {
+  return new Promise(res => {
+    const hyperfileUrl = repo.writeFile(buffer, 'application/octet-stream') // TODO: mime type
+    res(hyperfileUrl)
+  })
 }
 
-// callback = (err, blob)
-export function fetch(hyperfileId, callback) {
-  repo.readFile(hyperfileId, (error, data) => {
-    if (error) {
-      callback(error)
-      return
-    }
+export function fetch(hyperfileUrl: HyperfileUrl): Promise<Uint8Array> {
+  return new Promise(res => {
 
-    callback(null, data)
+    repo.readFile(hyperfileUrl, (data, _mimeType) => {
+      res(data)
+    })
   })
 }

@@ -6,4 +6,9 @@ declare global {
   }
 
   const __static: string
+
+  interface Callback<T> {
+    (error: null, value: T): void
+    (error: Error): void
+  }
 }
