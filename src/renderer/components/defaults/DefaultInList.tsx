@@ -1,56 +1,35 @@
 import React from 'react'
 import ContentTypes from '../../ContentTypes'
-import { ContentProps } from '../Content';
-import { Handle } from 'hypermerge';
+import { ContentProps } from '../Content'
+import { useDocument } from '../../Hooks'
 
 
 interface Doc {
   title?: string
 }
 
-interface State {
-  doc?: Doc
-}
+export default function ListItem(props: ContentProps) {
+  const [doc] = useDocument<Doc>(props.hypermergeUrl)
 
-export default class ListItem extends React.PureComponent<ContentProps, State> {
-  handle?: Handle<Doc>
-  state: State = {}
+  if (!doc) return null
 
-  componentDidMount() {
-    this.handle = window.repo.watch(this.props.hypermergeUrl, this.onChange)
+  function onDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('application/pushpin-url', props.url)
   }
 
-  componentWillUnmount() {
-    this.handle && this.handle.close()
-    delete this.handle
-  }
+  const { type } = props
 
-  onChange = (doc: Doc) => {
-    this.setState({ doc })
-  }
+  const contentType = ContentTypes.lookup({ type, context: "list" })
 
-  onDragStart = (e: React.DragEvent) => {
-    e.dataTransfer.setData('application/pushpin-url', this.props.url)
-  }
+  const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
-  render() {
-    const { type } = this.props
-    const { doc } = this.state
-    if (!doc) return null
-
-    // this context: default business is wrong wrong wrong
-    const contentType = ContentTypes.lookup({ type, context: "list" })
-
-    const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
-
-    // TODO: pick background color based on url
-    return (
-      <div className="DocLink" style={css.listItem}>
-        <i draggable onDragStart={this.onDragStart} className={`Badge fa fa-${icon}`} />
-        <div className="DocLink__title">{(doc && doc.title) ? doc.title : name}</div>
-      </div>
-    )
-  }
+  // TODO: pick background color based on url
+  return (
+    <div className="DocLink" style={css.listItem}>
+      <i draggable onDragStart={onDragStart} className={`Badge fa fa-${icon}`} />
+      <div className="DocLink__title">{doc.title || name}</div>
+    </div>
+  )
 }
 
 const css = {
