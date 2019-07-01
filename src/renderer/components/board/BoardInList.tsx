@@ -1,52 +1,35 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import TitleEditor from '../TitleEditor'
 import { BoardDoc } from '.'
 import { ContentProps } from '../Content'
-import { Handle } from 'hypermerge'
+import { useDocument } from '../../Hooks'
 
 interface Props extends ContentProps {
   editable: boolean
 }
 
-interface State {
-  doc?: BoardDoc
-}
+export default function BoardInList(props: Props) {
+  const [doc] = useDocument<BoardDoc>(props.hypermergeUrl)
+  const badgeRef = useRef<HTMLElement>(null)
 
-export default class BoardInList extends React.PureComponent<Props, State> {
-  state: State = {}
+  if (!doc) return null
 
-  private handle?: Handle<BoardDoc>
-  private badgeRef = React.createRef<HTMLElement>()
+  function onDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('application/pushpin-url', props.url)
 
-  onDragStart = (e) => {
-    e.dataTransfer.setData('application/pushpin-url', this.props.url)
-    e.dataTransfer.setDragImage(this.badgeRef, 0, 0)
-  }
-
-  // This is the New Boilerplate
-  componentWillMount = () => this.handle = window.repo.watch(
-    this.props.hypermergeUrl,
-    (doc) => this.onChange(doc)
-  )
-  componentWillUnmount = () => this.handle && this.handle.close()
-
-  onChange = (doc) => {
-    this.setState({ doc })
-  }
-
-  render = () => {
-    if (!this.state || !this.state.doc) {
-      return null
+    if (badgeRef.current) {
+      e.dataTransfer.setDragImage(badgeRef.current, 0, 0)
     }
-    const { title, backgroundColor } = this.state.doc
-
-    return (
-      <div draggable onDragStart={this.onDragStart} className="DocLink">
-        <i ref={this.badgeRef} className="Badge fa fa-files-o" style={{ background: backgroundColor }} />
-        {this.props.editable ? (
-          <TitleEditor url={this.props.hypermergeUrl} />
-        ) : (
-            <div className="DocLink__title">{title}</div>)}
-      </div>)
   }
+
+  const { title, backgroundColor } = doc
+
+  return (
+    <div draggable onDragStart={onDragStart} className="DocLink">
+      <i ref={badgeRef} className="Badge fa fa-files-o" style={{ background: backgroundColor }} />
+      {props.editable ? (
+        <TitleEditor url={props.hypermergeUrl} />
+      ) : (
+          <div className="DocLink__title">{title}</div>)}
+    </div>)
 }
