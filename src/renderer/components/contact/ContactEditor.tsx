@@ -4,7 +4,6 @@ import Debug from 'debug'
 
 import { createDocumentLink } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
-import { Handle } from 'hypermerge'
 
 import { IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
 import Content, { ContentProps } from '../Content'
@@ -12,6 +11,7 @@ import { ContactDoc } from '.'
 
 import ColorPicker from '../ColorPicker'
 import Label from '../Label'
+import { useDocument } from '../../Hooks'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -37,25 +37,12 @@ export const USER_COLORS = {
   GRAU: '#626262'
 }
 
-interface State {
-  doc?: ContactDoc
-}
+export default function ContactEditor(props: ContentProps) {
+  const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
 
-export default class ContactEditor extends React.PureComponent<ContentProps, State> {
-  private handle?: Handle<ContactDoc>
-  state: State = {}
+  if (!doc) return null
 
-  // This is the New Boilerplate
-  componentWillMount = () => this.handle = window.repo.watch(
-    this.props.hypermergeUrl,
-    (doc) => this.onChange(doc))
-  componentWillUnmount = () => this.handle && this.handle.close()
-
-  onChange = (doc: ContactDoc) => {
-    this.setState({ doc })
-  }
-
-  chooseAvatar = () => {
+  function chooseAvatar() {
     dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
       // User aborted.
       if (!paths) {
@@ -68,7 +55,7 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
       Hyperfile.write(paths[0])
         .then(hyperfileUrl => {
           const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-          this.handle && this.handle.change((d) => {
+          changeDoc(d => {
             d.avatarDocId = hypermergeUrl
           })
         }).catch(err => {
@@ -77,68 +64,62 @@ export default class ContactEditor extends React.PureComponent<ContentProps, Sta
     })
   }
 
-  setName = (e) => {
-    this.handle && this.handle.change((d) => {
+  function setName(e: React.ChangeEvent<HTMLInputElement>) {
+    changeDoc(d => {
       d.name = e.target.value
     })
   }
 
-  setColor = (color) => {
-    this.handle && this.handle.change((d) => {
+  function setColor(color: { hex: string }) {
+    changeDoc(d => {
       d.color = color.hex
     })
   }
 
-  render = () => {
-    log('render')
-    const { doc } = this.state
-    if (!doc) return null
+  const { avatarDocId, name, color } = doc
 
-    const { avatarDocId, name, color } = doc
+  let avatar
+  if (avatarDocId) {
+    avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
+  } else {
+    avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+  }
 
-    let avatar
-    if (avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
-    } else {
-      avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-    }
-
-    return (
-      <div className="PopOverWrapper">
-        <div className="ListMenu">
-          <div className="ListMenu__header">
-            <p className="Type--header">Your Profile</p>
+  return (
+    <div className="PopOverWrapper">
+      <div className="ListMenu">
+        <div className="ListMenu__header">
+          <p className="Type--header">Your Profile</p>
+        </div>
+        <div className="ListMenu__section">
+          <div className="ListMenu__label">Display Name</div>
+          <div className="ListMenu__item">
+            <input type="text" onChange={setName} value={name || ''} />
           </div>
-          <div className="ListMenu__section">
-            <div className="ListMenu__label">Display Name</div>
-            <div className="ListMenu__item">
-              <input type="text" onChange={this.setName} value={name || ''} />
-            </div>
-            <div className="ListMenu__label">Avatar</div>
-            <div className="ListMenu__item ContactListItem">
-              <div className="ListMenu__thumbnail">
-                <div className="Avatar">
-                  {avatar}
-                </div>
+          <div className="ListMenu__label">Avatar</div>
+          <div className="ListMenu__item ContactListItem">
+            <div className="ListMenu__thumbnail">
+              <div className="Avatar">
+                {avatar}
               </div>
-              <Label>
-                <button className="Type--action" type="button" onClick={this.chooseAvatar}>Choose from file...</button>
-              </Label>
             </div>
-            <div className="ListMenu__label">Presence Color</div>
-            <div className="ListMenu__item">
-              <ColorPicker
-                color={color}
-                colors={Object.values(USER_COLORS)}
-                onChangeComplete={this.setColor}
-              />
-            </div>
-            <div className="ListMenu__label">
-              <p className="Type--secondary">Your presence colour will be used to by other authors identify you when you are active on a board.</p>
-            </div>
+            <Label>
+              <button className="Type--action" type="button" onClick={chooseAvatar}>Choose from file...</button>
+            </Label>
+          </div>
+          <div className="ListMenu__label">Presence Color</div>
+          <div className="ListMenu__item">
+            <ColorPicker
+              color={color}
+              colors={Object.values(USER_COLORS)}
+              onChangeComplete={setColor}
+            />
+          </div>
+          <div className="ListMenu__label">
+            <p className="Type--secondary">Your presence colour will be used to by other authors identify you when you are active on a board.</p>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 }
