@@ -56,12 +56,12 @@ function registerDefault(contentType: { component: Component, context: Context }
   defaultRegistry[context] = component
 }
 
-interface LookupQuery {
+export interface LookupQuery {
   type: string
   context: string
 }
 
-interface LookupResult {
+export interface LookupResult {
   type: string
   name: string
   icon: string
@@ -91,7 +91,7 @@ function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
-interface ListQuery {
+export interface ListQuery {
   context: Context
   withUnlisted?: boolean
 }
