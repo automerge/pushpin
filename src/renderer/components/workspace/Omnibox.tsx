@@ -8,6 +8,7 @@ import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from
 import InvitationsView from '../../InvitationsView'
 import { ContactDoc } from '../contact';
 import { Handle } from 'hypermerge';
+import './Omnibox.css'
 
 const log = Debug('pushpin:omnibox')
 
@@ -348,7 +349,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       label: 'Boards',
       actions: [this.view, this.archive],
       items: (state, props) => Object.entries(this.state.viewedDocs)
-        .filter(([url, doc]) => !state.doc || !state.doc.archivedDocUrls.includes(url))
+        .filter(([url, doc]) => !state.doc || !state.doc.archivedDocUrls || !state.doc.archivedDocUrls.includes(url))
         .filter(([url, doc]) => (parseDocumentLink(url).type === 'board'))
         .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
         .map(([url, doc]) => ({ url }))

@@ -6,6 +6,8 @@ import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../Shar
 import { Doc as WorkspaceDoc } from './Workspace';
 import { Handle } from 'hypermerge';
 
+import './Authors.css'
+
 const log = Debug('pushpin:authors')
 
 interface Props {

@@ -1,63 +1,45 @@
 import React from 'react'
 
-import { Handle } from 'hypermerge'
 import { ContentProps } from '../content'
 import { BoardDoc } from '.'
 import { createDocumentLink } from '../../ShareLink'
+import { useDocument } from '../../Hooks';
 
-interface State {
-  doc?: BoardDoc
-}
+BoardInBoard.minWidth = 4
+BoardInBoard.minHeight = 6
+BoardInBoard.defaultWidth = 6
+BoardInBoard.defaultHeight = 6
+BoardInBoard.maxWidth = 9
+BoardInBoard.maxHeight = 9
 
-export default class BoardInBoard extends React.PureComponent<ContentProps, State> {
-  static minWidth = 4
-  static minHeight = 6
-  static defaultWidth = 6
-  static defaultHeight = 6
-  static maxWidth = 9
-  static maxHeight = 9
+export default function BoardInBoard(props: ContentProps) {
+  const [doc] = useDocument<BoardDoc>(props.hypermergeUrl)
 
-  private handle?: Handle<BoardDoc>
-  state: State = {}
+  if (!doc) return null
 
-  handleDoubleClick = (e) => {
+  const { title, backgroundColor, cards } = doc
+
+  const childCardCount = Object.keys(cards || {}).length
+
+  function handleDoubleClick(e: React.MouseEvent) {
     e.stopPropagation()
-    window.location.href = createDocumentLink('board', this.props.hypermergeUrl)
+    window.location.href = createDocumentLink('board', props.hypermergeUrl)
   }
 
-  // This is the New Boilerplate
-  componentWillMount = () => this.handle = window.repo.watch(
-    this.props.hypermergeUrl,
-    (doc) => this.onChange(doc)
-  )
-  componentWillUnmount = () => this.handle && this.handle.close()
-
-  onChange = (doc) => {
-    this.setState({ doc })
-  }
-
-  render = () => {
-    if (!this.state || !this.state.doc) {
-      return null
-    }
-    const { title, backgroundColor, cards } = this.state.doc
-
-    const childCardCount = Object.keys(cards || {}).length
-    return (
-      <div
-        className="BoardLink"
-        onDoubleClick={this.handleDoubleClick}
-        style={css.wrapper}
-      >
-        <i className="fa fa-files-o" style={{ ...css.icon, background: backgroundColor }} />
-        <div style={css.caption}>
-          <span style={css.title}>{title}</span>
-          <br />
-          {`${childCardCount} card${childCardCount === 1 ? '' : 's'}`}
-        </div>
+  return (
+    <div
+      className="BoardLink"
+      onDoubleClick={handleDoubleClick}
+      style={css.wrapper}
+    >
+      <i className="fa fa-files-o" style={{ ...css.icon, background: backgroundColor }} />
+      <div style={css.caption}>
+        <span style={css.title}>{title}</span>
+        <br />
+        {`${childCardCount} card${childCardCount === 1 ? '' : 's'}`}
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 const css = {

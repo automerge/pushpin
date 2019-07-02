@@ -35,7 +35,9 @@ interface ContentType {
 }
 
 const registry: { [type: string]: ContentType } = {}
-const defaultRegistry = {}
+const defaultRegistry: {
+  [K in Context]?: Component
+} = {}
 
 
 function register(contentType: ContentType) {
@@ -56,12 +58,12 @@ function registerDefault(contentType: { component: Component, context: Context }
   defaultRegistry[context] = component
 }
 
-interface LookupQuery {
+export interface LookupQuery {
   type: string
-  context: string
+  context: Context
 }
 
-interface LookupResult {
+export interface LookupResult {
   type: string
   name: string
   icon: string
@@ -91,15 +93,15 @@ function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
-interface ListQuery {
+export interface ListQuery {
   context: Context
   withUnlisted?: boolean
 }
 
-function list({ context, withUnlisted = false }: ListQuery) {
+function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
   const allTypes = Object.keys(registry)
     .map(type => lookup({ type, context }))
-    .filter(ct => !!ct)
+    .filter(ct => ct) as LookupResult[]
 
   if (withUnlisted) {
     return allTypes
@@ -108,7 +110,7 @@ function list({ context, withUnlisted = false }: ListQuery) {
   return allTypes.filter(ct => ct && !ct.unlisted)
 }
 
-function initializeDocument(type, doc, typeAttrs) {
+function initializeDocument(type: string, doc: any, typeAttrs: any) {
   const entry = registry[type]
   if (!entry) {
     throw new Error("Attempted to initialize an unregistered type!")

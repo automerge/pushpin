@@ -408,71 +408,63 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   }
 
   createPdfCardFromPath = ({ x, y }, path) => {
-    Hyperfile.write(path, (err, hyperfileUrl) => {
-      if (err) {
+    Hyperfile.write(path)
+      .then(hyperfileUrl => {
+        const cardId = this.createCard({
+          x,
+          y,
+          type: 'pdf',
+          typeAttrs: { hyperfileUrl }
+        })
+        this.selectOnly(cardId)
+      }).catch(err => {
         log(err)
-        return
-      }
-
-      const cardId = this.createCard({
-        x,
-        y,
-        type: 'pdf',
-        typeAttrs: { hyperfileUrl }
       })
-      this.selectOnly(cardId)
-    })
   }
 
   createPdfCardFromBuffer = ({ x, y }, buffer) => {
-    Hyperfile.writeBuffer(buffer, (err, hyperfileUrl) => {
-      if (err) {
+    Hyperfile.writeBuffer(buffer)
+      .then(hyperfileUrl => {
+        const cardId = this.createCard({
+          x,
+          y,
+          type: 'pdf',
+          typeAttrs: { hyperfileUrl }
+        })
+        this.selectOnly(cardId)
+      }).catch(err => {
         log(err)
-        return
-      }
-
-      const cardId = this.createCard({
-        x,
-        y,
-        type: 'pdf',
-        typeAttrs: { hyperfileUrl }
       })
-      this.selectOnly(cardId)
-    })
   }
 
   createImageCardFromPath = ({ x, y }, path) => {
-    Hyperfile.write(path, (err, hyperfileUrl) => {
-      if (err) {
+    Hyperfile.write(path)
+      .then(hyperfileUrl => {
+        const cardId = this.createCard({
+          x,
+          y,
+          type: 'image',
+          typeAttrs: { hyperfileUrl }
+        })
+        this.selectOnly(cardId)
+      }).catch(err => {
         log(err)
-        return
-      }
-
-      const cardId = this.createCard({
-        x,
-        y,
-        type: 'image',
-        typeAttrs: { hyperfileUrl }
       })
-      this.selectOnly(cardId)
-    })
   }
 
   createImageCardFromBuffer = ({ x, y }, buffer) => {
-    Hyperfile.writeBuffer(buffer, (err, hyperfileUrl) => {
-      if (err) {
+    Hyperfile.writeBuffer(buffer)
+      .then(hyperfileUrl => {
+        const cardId = this.createCard({
+          x,
+          y,
+          type: 'image',
+          typeAttrs: { hyperfileUrl }
+        })
+        this.selectOnly(cardId)
+      }).catch(err => {
         log(err)
-        return
-      }
-
-      const cardId = this.createCard({
-        x,
-        y,
-        type: 'image',
-        typeAttrs: { hyperfileUrl }
       })
-      this.selectOnly(cardId)
-    })
   }
 
 

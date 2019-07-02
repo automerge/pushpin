@@ -21,7 +21,11 @@ ImageContent.minWidth = 3
 ImageContent.minHeight = 3
 ImageContent.defaultWidth = 18
 
-function initializeDocument(image: ImageDoc, { hyperfileUrl }) {
+interface Attrs {
+  hyperfileUrl: string
+}
+
+function initializeDocument(image: ImageDoc, { hyperfileUrl }: Attrs) {
   image.hyperfileUrl = hyperfileUrl
 }
 

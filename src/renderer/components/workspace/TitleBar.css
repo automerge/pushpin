@@ -1,0 +1,126 @@
+.TitleBar {
+  display: flex;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0px;
+  height: 40px;
+  padding: 0px 8px 0px 8px;
+  width: 100%;
+  align-items: center;
+  align-content: space-between;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  z-index: 3;
+  user-select: none;
+}
+
+.TitleBar__menuItem .fa {
+  font-size: 24px;
+  text-align: center;
+}
+
+button[disabled].TitleBar__menuItem .fa {
+  color: #CCC;
+}
+
+.TitleBar__center {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.TitleBar .TitleBar__right, .TitleBar .TitleBar__left {
+  align-items: center;
+  display: flex;
+  height: 40px;
+}
+
+.TitleBar .TitleBar__menuItem {
+  color: var(--colorSecondaryGrey);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width:40px;
+  height:40px;
+  padding:0;
+  background: none;
+  margin: none;
+  border: none;
+  outline: none;
+}
+
+.TitleBar .TitleBar__menuItem:active,
+.TitleBar .TitleBar__menuItem:focus {
+  outline: none;
+}
+
+.TitleBar .TitleBar__menuItem:hover {
+  color: var(--colorBlueBlack);
+}
+
+.TitleBar .TitleBar__right .dropdown__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.TitleBar .TitleBar__right .dropdown.dropdown--active {
+  background-color: var(--colorInputGrey);
+}
+
+
+.TitleBar .TitleBar__right .dropdown__content {
+  top: 48px;
+  right: 0px;
+}
+
+.TitleBar .TitleBar__left .dropdown__content {
+  left: 0px;
+  top: 48px;
+}
+
+.TitleBar__logo {
+  margin-right: 8px;
+}
+
+
+.BoardTitle__clipboard:hover:after {
+  content: 'Copy link to this...';
+  right: 4px;
+}
+
+.BoardTitle__clipboard:focus {
+  animation-duration: 0.5s;
+  animation-name: color-flash;
+}
+
+.BoardTitle__labeledIcon:hover:after {
+  display: block;
+  position: absolute;
+  white-space: nowrap;
+  max-width: 104px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  box-shadow: 0 0 4px rgba(0,0,0,.25);
+  padding: 2px 4px;
+  background-color: white;
+  border-radius: 4px;
+  top: 36px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+@keyframes color-flash {
+  from {
+    color: transparent;
+  }
+
+  to {
+    color: var(--colorSecondaryGrey);
+  }
+}

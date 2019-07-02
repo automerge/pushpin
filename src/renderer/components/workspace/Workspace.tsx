@@ -11,6 +11,8 @@ import TitleBar from './TitleBar'
 import { Handle } from 'hypermerge';
 import { ContactDoc } from '../contact';
 
+import './Workspace.css'
+
 const log = Debug('pushpin:workspace')
 
 export interface Doc {

@@ -112,16 +112,11 @@ export default class UrlContent extends React.PureComponent<ContentProps, State>
 
     fetch(imageCanonicalUrl)
       .then(response => response.arrayBuffer())
-      .then(buffer => {
-        // we need to convert the ArrayBuffer into a Uint8Buffer
-        Hyperfile.writeBuffer(Buffer.from(buffer), (err: any, hyperfileUrl: string) => {
-          if (err) {
-            throw new Error(err)
-          }
-
-          this.handle && this.handle.change((doc: UrlDoc) => {
-            doc.imageHyperfileUrl = hyperfileUrl
-          })
+      // we need to convert the ArrayBuffer into a Uint8Buffer
+      .then(buffer => Hyperfile.writeBuffer(Buffer.from(buffer)))
+      .then(hyperfileUrl => {
+        this.handle && this.handle.change((doc: UrlDoc) => {
+          doc.imageHyperfileUrl = hyperfileUrl
         })
       })
   }
@@ -219,7 +214,7 @@ ContentTypes.register({
   contexts: {
     workspace: UrlContent,
     board: UrlContent
-  }, 
+  },
   initializeDocument: initializeDocument
 })
 
