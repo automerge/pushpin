@@ -37,9 +37,7 @@ function randomColor(): string {
 
 function initializeBoard(
   board: BoardDoc,
-  { title = 'No Title',
-    backgroundColor = randomColor(),
-  }: Attrs
+  { title = 'No Title', backgroundColor = randomColor() }: Attrs
 ) {
   board.title = title
   board.backgroundColor = backgroundColor
@@ -52,9 +50,9 @@ ContentTypes.register({
   contexts: {
     workspace: Board,
     board: BoardInBoard,
-    list: BoardInList
+    list: BoardInList,
   },
   name: 'Board',
   icon: 'copy',
-  initializeDocument: initializeBoard
+  initializeDocument: initializeBoard,
 })

@@ -3,7 +3,6 @@ import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument } from '../../Hooks'
 
-
 interface Doc {
   title?: string
 }
@@ -11,7 +10,9 @@ interface Doc {
 export default function ListItem(props: ContentProps) {
   const [doc] = useDocument<Doc>(props.hypermergeUrl)
 
-  if (!doc) return null
+  if (!doc) {
+    return null
+  }
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData('application/pushpin-url', props.url)
@@ -19,7 +20,7 @@ export default function ListItem(props: ContentProps) {
 
   const { type } = props
 
-  const contentType = ContentTypes.lookup({ type, context: "list" })
+  const contentType = ContentTypes.lookup({ type, context: 'list' })
 
   const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
@@ -36,12 +37,11 @@ const css = {
   listItem: {
     padding: '5px',
     border: '1px solid #eaeaea',
-    borderRadius: '4px'
-  }
+    borderRadius: '4px',
+  },
 }
-
 
 ContentTypes.registerDefault({
   component: ListItem,
-  context: 'list'
+  context: 'list',
 })

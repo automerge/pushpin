@@ -1,13 +1,13 @@
 import React from 'react'
 import Debug from 'debug'
 
-import Content from "../Content"
+import { Handle } from 'hypermerge'
+import Content from '../Content'
 
 import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../ShareLink'
 import ListMenuItem from './ListMenuItem'
-import { Doc as WorkspaceDoc } from "./Workspace"
-import { Handle } from 'hypermerge';
-import { ContactDoc } from '../contact';
+import { Doc as WorkspaceDoc } from './Workspace'
+import { ContactDoc } from '../contact'
 import Label from '../Label'
 // TODO: once board is converted use this import and remove the type definition below
 // import { Doc as BoardDoc } from "../board"
@@ -71,7 +71,9 @@ export default class Share extends React.PureComponent<Props, State> {
   onWorkspaceChange = (doc: WorkspaceDoc) => {
     log('onWorkspaceChange')
     this.setState({ workspace: doc }, () => {
-      if (!this.state.workspace) return
+      if (!this.state.workspace) {
+        return
+      }
       if (this.state.workspace.currentDocUrl) {
         const { hypermergeUrl } = parseDocumentLink(this.state.workspace.currentDocUrl)
 
@@ -83,14 +85,17 @@ export default class Share extends React.PureComponent<Props, State> {
   }
 
   offerDocumentToIdentity = (contactId: string) => {
-    if (!this.state.workspace || !this.state.workspace.selfId || !this.state.workspace.currentDocUrl) {
+    if (
+      !this.state.workspace ||
+      !this.state.workspace.selfId ||
+      !this.state.workspace.currentDocUrl
+    ) {
       return
     }
 
-
     log('offerDocumentToIdentity')
 
-    const currentDocUrl = this.state.workspace.currentDocUrl
+    const { currentDocUrl } = this.state.workspace
     window.repo.change(this.state.workspace.selfId, (s: ContactDoc) => {
       if (!s.offeredUrls) {
         s.offeredUrls = {}
@@ -107,12 +112,15 @@ export default class Share extends React.PureComponent<Props, State> {
   }
 
   renderContacts = () => {
-    const { contactIds = [] } = (this.state.workspace || {})
-    const uniqueContactIds = contactIds.filter((id, i, a) => (a.indexOf(id) === i))
+    const { contactIds = [] } = this.state.workspace || {}
+    const uniqueContactIds = contactIds.filter((id, i, a) => a.indexOf(id) === i)
     const noneFound = (
       <div className="ListMenu__item">
         <div className="ContactListMenuItem">
-          <i className="Badge ListMenu__thumbnail fa fa-question-circle" style={{ backgroundColor: 'var(--colorPaleGrey)' }} />
+          <i
+            className="Badge ListMenu__thumbnail fa fa-question-circle"
+            style={{ backgroundColor: 'var(--colorPaleGrey)' }}
+          />
           <Label>
             <p className="Type--primary">None found</p>
             <p className="Type--secondary">Copy a link to your board and start making friends</p>
@@ -125,7 +133,7 @@ export default class Share extends React.PureComponent<Props, State> {
       name: 'share',
       callback: (url: string) => () => this.offerDocumentToIdentity(url),
       faIcon: 'fa-share-alt',
-      label: 'Share'
+      label: 'Share',
     }
 
     /* This doesn't make sense in a Pushpin world, I think.
@@ -141,7 +149,7 @@ export default class Share extends React.PureComponent<Props, State> {
     }
     */
 
-    const contacts = uniqueContactIds.map(id => (
+    const contacts = uniqueContactIds.map((id) => (
       <ListMenuItem key={id} contentUrl={createDocumentLink('contact', id)} actions={[share]} />
     ))
 
@@ -155,12 +163,21 @@ export default class Share extends React.PureComponent<Props, State> {
   }
 
   renderProfile = () => {
-    if (!this.state.workspace) return null
-    return <Content url={createDocumentLink('contact', this.state.workspace.selfId)} context="workspace"></Content>
+    if (!this.state.workspace) {
+      return null
+    }
+    return (
+      <Content
+        url={createDocumentLink('contact', this.state.workspace.selfId)}
+        context="workspace"
+      />
+    )
   }
 
   tabClasses = (name: TabName) => {
-    if (this.state.tab === name) { return 'Tabs__tab Tabs__tab--active' }
+    if (this.state.tab === name) {
+      return 'Tabs__tab Tabs__tab--active'
+    }
     return 'Tabs__tab'
   }
 

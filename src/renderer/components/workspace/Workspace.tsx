@@ -3,13 +3,13 @@ import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
+import { Handle } from 'hypermerge'
 import { createDocumentLink, parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../ShareLink'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import SelfContext from '../SelfContext'
 import TitleBar from './TitleBar'
-import { Handle } from 'hypermerge';
-import { ContactDoc } from '../contact';
+import { ContactDoc } from '../contact'
 
 import './Workspace.css'
 
@@ -22,7 +22,6 @@ export interface Doc {
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
 }
-
 
 interface State {
   doc?: Doc
@@ -63,7 +62,6 @@ export default class Workspace extends React.PureComponent<ContentProps, State> 
     this.state.selfId && this.heartbeatNotifyDeparture(this.state.selfId)
     this.timerId && clearInterval(this.timerId)
   }
-
 
   onChange = (doc: Doc) => {
     this.setState({ doc })
@@ -125,18 +123,18 @@ export default class Workspace extends React.PureComponent<ContentProps, State> 
     }
 
     if (!this.handle) {
-      log("Trying to navigate to a document before the workspace doc is loaded!")
+      log('Trying to navigate to a document before the workspace doc is loaded!')
       return
     }
 
     this.handle.change((ws: Doc) => {
       ws.currentDocUrl = docUrl
 
-      ws.viewedDocUrls = ws.viewedDocUrls.filter(url => url !== docUrl)
+      ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== docUrl)
       ws.viewedDocUrls.unshift(docUrl)
 
       if (ws.archivedDocUrls) {
-        ws.archivedDocUrls = ws.archivedDocUrls.filter(url => url !== docUrl)
+        ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== docUrl)
       }
     })
   }
@@ -156,7 +154,9 @@ export default class Workspace extends React.PureComponent<ContentProps, State> 
 
   render = () => {
     log('render')
-    if (!this.state.doc) return null
+    if (!this.state.doc) {
+      return null
+    }
 
     const content = this.renderContent(this.state.doc.currentDocUrl)
     return (
@@ -212,7 +212,7 @@ To create links to boards or contacts, drag them from the title bar or the omnib
       x: 20,
       y: 20,
       width: 320,
-      height: 540
+      height: 540,
     }
   })
 
@@ -230,5 +230,5 @@ ContentTypes.register({
   contexts: { root: Workspace },
   resizable: false,
   unlisted: true,
-  initializeDocument: initializeDocument
+  initializeDocument,
 })

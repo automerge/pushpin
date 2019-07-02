@@ -1,18 +1,18 @@
 import React from 'react'
 import withDocument from './withDocument'
 
+import './TitleEditor.css'
+
 interface Doc {
   title?: string
 }
 
 interface Props {
-  placeholder: string,
+  placeholder: string
   doc: Doc
   change: (cb: (doc: Doc) => void) => void
   preventDrag: boolean
 }
-
-import './TitleEditor.css'
 
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
@@ -23,7 +23,7 @@ class TitleEditor extends React.Component<Props> {
 
   static defaultProps = {
     placeholder: '',
-    preventDrag: false
+    preventDrag: false,
   }
 
   input: React.RefObject<HTMLInputElement> = React.createRef()

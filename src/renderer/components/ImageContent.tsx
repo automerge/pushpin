@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ContentProps } from './Content'
 import ContentTypes from '../ContentTypes'
-import { useDocument } from '../Hooks';
+import { useDocument } from '../Hooks'
 
 interface ImageDoc {
   hyperfileUrl: string
@@ -11,8 +11,12 @@ interface ImageDoc {
 export default function ImageContent({ hypermergeUrl }: ContentProps) {
   const [doc] = useDocument<ImageDoc>(hypermergeUrl)
 
-  if (!doc) return null
-  if (!doc.hyperfileUrl) return null
+  if (!doc) {
+    return null
+  }
+  if (!doc.hyperfileUrl) {
+    return null
+  }
 
   return <img className="image" alt="" src={doc.hyperfileUrl} />
 }
@@ -35,7 +39,7 @@ ContentTypes.register({
   icon: 'image',
   contexts: {
     workspace: ImageContent,
-    board: ImageContent
+    board: ImageContent,
   },
-  initializeDocument: initializeDocument
+  initializeDocument,
 })

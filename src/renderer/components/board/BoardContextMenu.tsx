@@ -7,20 +7,17 @@ import './ContextMenu.css'
 import { LookupResult } from '../../ContentTypes'
 
 interface Props {
-  contentTypes: LookupResult[],
-  backgroundColor: string,
-  backgroundColors: string[],
-  addContent(e: React.MouseEvent | React.TouchEvent, contentType: LookupResult): void,
-  onShowContextMenu(e: Event): void,
+  contentTypes: LookupResult[]
+  backgroundColor: string
+  backgroundColors: string[]
+  addContent(e: React.MouseEvent | React.TouchEvent, contentType: LookupResult): void
+  onShowContextMenu(e: Event): void
   changeBackgroundColor(color: string): void
 }
 
 export default function BoardContextMenu(props: Props) {
   const createMenuItems = props.contentTypes.map((contentType) => (
-    <ContextMenuItem
-      key={contentType.type}
-      onClick={(e) => props.addContent(e, contentType)}
-    >
+    <ContextMenuItem key={contentType.type} onClick={(e) => props.addContent(e, contentType)}>
       <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
         <i className={classNames('fa', `fa-${contentType.icon}`)} />
       </div>
@@ -29,14 +26,8 @@ export default function BoardContextMenu(props: Props) {
   ))
 
   return (
-    <ContextMenu
-      id="BoardMenu"
-      onShow={props.onShowContextMenu}
-      className="ContextMenu"
-    >
-      <div className="ContextMenu__section">
-        {createMenuItems}
-      </div>
+    <ContextMenu id="BoardMenu" onShow={props.onShowContextMenu} className="ContextMenu">
+      <div className="ContextMenu__section">{createMenuItems}</div>
 
       <div className="ContextMenu__section">
         <h6>Board Color</h6>

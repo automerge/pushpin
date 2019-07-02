@@ -34,13 +34,15 @@ export const USER_COLORS = {
   CHILBLAU: '#004098',
   OPTIROYA: '#4700D8',
   MAGEGENTA: '#E80FA7',
-  GRAU: '#626262'
+  GRAU: '#626262',
 }
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
 
-  if (!doc) return null
+  if (!doc) {
+    return null
+  }
 
   function chooseAvatar() {
     dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
@@ -53,25 +55,26 @@ export default function ContactEditor(props: ContentProps) {
       }
 
       Hyperfile.write(paths[0])
-        .then(hyperfileUrl => {
+        .then((hyperfileUrl) => {
           const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-          changeDoc(d => {
+          changeDoc((d) => {
             d.avatarDocId = hypermergeUrl
           })
-        }).catch(err => {
+        })
+        .catch((err) => {
           log(err)
         })
     })
   }
 
   function setName(e: React.ChangeEvent<HTMLInputElement>) {
-    changeDoc(d => {
+    changeDoc((d) => {
       d.name = e.target.value
     })
   }
 
   function setColor(color: { hex: string }) {
-    changeDoc(d => {
+    changeDoc((d) => {
       d.color = color.hex
     })
   }
@@ -99,12 +102,12 @@ export default function ContactEditor(props: ContentProps) {
           <div className="ListMenu__label">Avatar</div>
           <div className="ListMenu__item ContactListItem">
             <div className="ListMenu__thumbnail">
-              <div className="Avatar">
-                {avatar}
-              </div>
+              <div className="Avatar">{avatar}</div>
             </div>
             <Label>
-              <button className="Type--action" type="button" onClick={chooseAvatar}>Choose from file...</button>
+              <button className="Type--action" type="button" onClick={chooseAvatar}>
+                Choose from file...
+              </button>
             </Label>
           </div>
           <div className="ListMenu__label">Presence Color</div>
@@ -116,7 +119,10 @@ export default function ContactEditor(props: ContentProps) {
             />
           </div>
           <div className="ListMenu__label">
-            <p className="Type--secondary">Your presence colour will be used to by other authors identify you when you are active on a board.</p>
+            <p className="Type--secondary">
+              Your presence colour will be used to by other authors identify you when you are active
+              on a board.
+            </p>
           </div>
         </div>
       </div>

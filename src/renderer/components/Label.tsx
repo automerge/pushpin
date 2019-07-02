@@ -7,7 +7,5 @@ export interface Props {
 }
 
 export default function Label(props: Props) {
-  return (
-    <div className="Label">{props.children}</div>
-  )
+  return <div className="Label">{props.children}</div>
 }

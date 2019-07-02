@@ -3,7 +3,7 @@ import React from 'react'
 import { ContentProps } from '../content'
 import { BoardDoc } from '.'
 import { createDocumentLink } from '../../ShareLink'
-import { useDocument } from '../../Hooks';
+import { useDocument } from '../../Hooks'
 
 BoardInBoard.minWidth = 4
 BoardInBoard.minHeight = 6
@@ -15,7 +15,9 @@ BoardInBoard.maxHeight = 9
 export default function BoardInBoard(props: ContentProps) {
   const [doc] = useDocument<BoardDoc>(props.hypermergeUrl)
 
-  if (!doc) return null
+  if (!doc) {
+    return null
+  }
 
   const { title, backgroundColor, cards } = doc
 
@@ -27,11 +29,7 @@ export default function BoardInBoard(props: ContentProps) {
   }
 
   return (
-    <div
-      className="BoardLink"
-      onDoubleClick={handleDoubleClick}
-      style={css.wrapper}
-    >
+    <div className="BoardLink" onDoubleClick={handleDoubleClick} style={css.wrapper}>
       <i className="fa fa-files-o" style={{ ...css.icon, background: backgroundColor }} />
       <div style={css.caption}>
         <span style={css.title}>{title}</span>
@@ -51,7 +49,7 @@ const css = {
     borderRadius: '50%',
     width: 60,
     height: 60,
-    flex: 'none' as 'none'
+    flex: 'none' as 'none',
   },
   caption: {
     color: 'var(--colorSecondaryGrey)',
@@ -66,7 +64,7 @@ const css = {
   },
   title: {
     color: 'var(--colorBlueBlack)',
-    fontWeight: '600' as 'bold' // errrrrr
+    fontWeight: '600' as 'bold', // errrrrr
   },
   wrapper: {
     boxSizing: 'border-box' as 'border-box',

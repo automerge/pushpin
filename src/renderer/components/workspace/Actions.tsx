@@ -1,4 +1,3 @@
-
 import React from 'react'
 import Action from './Action'
 
@@ -31,10 +30,10 @@ export default class Actions extends React.PureComponent<Props> {
       <div className="actions" style={css.actions}>
         {this.props.children}
 
-        {actions.map(action => (
+        {actions.map((action) => (
           <Action
             key={action.name}
-            callback={e => this.onActionClick(e, action.callback(url))}
+            callback={(e) => this.onActionClick(e, action.callback(url))}
             faIcon={action.faIcon}
             label={action.label}
             shortcut={action.shortcut}
@@ -51,6 +50,6 @@ const css: { [name: string]: React.CSSProperties } = {
   actions: {
     width: '100%',
     display: 'flex',
-    flexDirection: 'row'
-  }
+    flexDirection: 'row',
+  },
 }

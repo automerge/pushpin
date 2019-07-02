@@ -1,10 +1,10 @@
 import React from 'react'
 import Debug from 'debug'
 
+import { Handle } from 'hypermerge'
 import Content from '../Content'
 import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../ShareLink'
-import { Doc as WorkspaceDoc } from './Workspace';
-import { Handle } from 'hypermerge';
+import { Doc as WorkspaceDoc } from './Workspace'
 
 import './Authors.css'
 
@@ -20,7 +20,7 @@ interface DocWithAuthors {
 }
 
 interface State {
-  board?: DocWithAuthors,
+  board?: DocWithAuthors
   workspace?: WorkspaceDoc
 }
 
@@ -31,7 +31,9 @@ export default class Authors extends React.PureComponent<Props, State> {
   // This is the New Boilerplate
   componentWillMount = () => {
     log('componentWillMount')
-    this.workspaceHandle = window.repo.watch(this.props.hypermergeUrl, (doc) => this.onWorkspaceChange(doc))
+    this.workspaceHandle = window.repo.watch(this.props.hypermergeUrl, (doc) =>
+      this.onWorkspaceChange(doc)
+    )
   }
 
   componentWillUnmount = () => {
@@ -69,22 +71,29 @@ export default class Authors extends React.PureComponent<Props, State> {
     this.setState({ board: doc })
   }
 
-  updateIdentityReferences = (workspaceHandle: Handle<WorkspaceDoc>, boardHandle: Handle<DocWithAuthors>) => {
+  updateIdentityReferences = (
+    workspaceHandle: Handle<WorkspaceDoc>,
+    boardHandle: Handle<DocWithAuthors>
+  ) => {
     log('updateIdentityReferences')
     if (!workspaceHandle || !boardHandle) {
       log('update called without both handles')
       return
     }
-    const board = (boardHandle.state as DocWithAuthors)
-    const workspace = (workspaceHandle.state as WorkspaceDoc)
+    const board = boardHandle.state as DocWithAuthors
+    const workspace = workspaceHandle.state as WorkspaceDoc
 
-    if (!board || !workspace) return
+    if (!board || !workspace) {
+      return
+    }
 
     const authorIds = board.authorIds || []
     const { selfId, contactIds = [] } = workspace
 
     // Add any never-before seen authors to our contacts.
-    const newContactIds = authorIds.filter((a: HypermergeUrl) => !contactIds.includes(a) && !(selfId === a))
+    const newContactIds = authorIds.filter(
+      (a: HypermergeUrl) => !contactIds.includes(a) && !(selfId === a)
+    )
     if (newContactIds.length > 0) {
       workspaceHandle.change((workspace: WorkspaceDoc) => {
         workspace.contactIds.push(...newContactIds)
@@ -105,18 +114,10 @@ export default class Authors extends React.PureComponent<Props, State> {
 
   render = () => {
     const authorIds = (this.state.board && this.state.board.authorIds) || []
-    const uniqueAuthorIds = authorIds.filter((id, i, a) => (a.indexOf(id) === i))
+    const uniqueAuthorIds = authorIds.filter((id, i, a) => a.indexOf(id) === i)
     const authors = uniqueAuthorIds.map((id: string) => (
-      <Content
-        key={id}
-        context="title-bar"
-        url={createDocumentLink('contact', id)}
-      />
+      <Content key={id} context="title-bar" url={createDocumentLink('contact', id)} />
     ))
-    return (
-      <div className="Authors">
-        {authors}
-      </div>
-    )
+    return <div className="Authors">{authors}</div>
   }
 }

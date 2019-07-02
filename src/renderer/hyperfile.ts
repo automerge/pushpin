@@ -3,10 +3,10 @@ import mime from 'mime-types'
 
 import { Repo } from 'hypermerge'
 import DiscoverySwarm from 'discovery-cloud-client'
-import { HYPERFILE_PATH } from './constants'
 import storage from 'random-access-file'
+import { HYPERFILE_PATH } from './constants'
 
-const repo = new Repo({ storage, path: HYPERFILE_PATH, })
+const repo = new Repo({ storage, path: HYPERFILE_PATH })
 
 // DAT's discovery swarm or truly serverless discovery
 // const DiscoverySwarm = require('discovery-swarm')
@@ -36,15 +36,14 @@ export function write(filePath: string): Promise<HyperfileUrl> {
 }
 
 export function writeBuffer(buffer: Uint8Array): Promise<HyperfileUrl> {
-  return new Promise(res => {
+  return new Promise((res) => {
     const hyperfileUrl = repo.writeFile(buffer, 'application/octet-stream') // TODO: mime type
     res(hyperfileUrl)
   })
 }
 
 export function fetch(hyperfileUrl: HyperfileUrl): Promise<Uint8Array> {
-  return new Promise(res => {
-
+  return new Promise((res) => {
     repo.readFile(hyperfileUrl, (data, _mimeType) => {
       res(data)
     })

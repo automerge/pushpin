@@ -1,1 +1,1 @@
-declare module "*.js"
+declare module '*.js'

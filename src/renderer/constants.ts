@@ -6,7 +6,7 @@ import electron, { OpenDialogOptions } from 'electron'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 function getStatic(val: string) {
-  if ((typeof window !== 'undefined') && isDevelopment) {
+  if (typeof window !== 'undefined' && isDevelopment) {
     return Url.resolve(window.location.origin, val)
   }
   return Path.resolve(__static, val)
@@ -14,19 +14,17 @@ function getStatic(val: string) {
 
 export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
-  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }]
+  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
 }
 
 export const PDF_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
-  filters: [{ name: 'PDF files', extensions: ['pdf'] }]
+  filters: [{ name: 'PDF files', extensions: ['pdf'] }],
 }
 
 // Prefer NAME if explicitly set.
 // Otherwise look for OS-level USER (Mac / Linux) or USERNAME (Windows.)
-export const USER = process.env.NAME
-  || process.env.USER
-  || process.env.USERNAME
+export const USER = process.env.NAME || process.env.USER || process.env.USERNAME
 
 if (!USER) {
   throw new Error('No user name found')

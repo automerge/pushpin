@@ -1,15 +1,15 @@
 import React from 'react'
 
+import { Handle } from 'hypermerge'
 import ContentTypes from '../ContentTypes'
-import Content from './Content'
+import { ContentProps } from Content from './Content'
 import { createDocumentLink } from '../ShareLink'
-import { Handle } from 'hypermerge';
-import { ContentProps } from './Content'
+
 
 interface Message {
-  authorId: string,
-  content: string,
-  time: number //Unix timestamp
+  authorId: string
+  content: string
+  time: number // Unix timestamp
 }
 
 interface Doc {
@@ -38,20 +38,24 @@ export default class ThreadContent extends React.PureComponent<ContentProps, Sta
   }
   componentWillUnmount = () => this.handle && this.handle.close()
 
-
   onChange = (doc: Doc) => {
     this.setState({ doc })
   }
 
   render = () => {
     const { doc } = this.state
-    if (!doc) return null
+    if (!doc) {
+      return null
+    }
 
     const messages = doc.messages || []
     const groupedMessages: Message[][] = []
     let currentGroup: Message[]
     messages.forEach((message) => {
-      if (!currentGroup || (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)) {
+      if (
+        !currentGroup ||
+        (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)
+      ) {
         currentGroup = []
         groupedMessages.push(currentGroup)
       }
@@ -82,9 +86,7 @@ export default class ThreadContent extends React.PureComponent<ContentProps, Sta
   renderGroupedMessages = (groupOfMessages: Message[], idx: number) => (
     <div style={css.messageGroup} key={idx}>
       <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
-      <div style={css.groupedMessages}>
-        {groupOfMessages.map(this.renderMessage)}
-      </div>
+      <div style={css.groupedMessages}>{groupOfMessages.map(this.renderMessage)}</div>
     </div>
   )
 
@@ -97,12 +99,14 @@ export default class ThreadContent extends React.PureComponent<ContentProps, Sta
       hour: '2-digit',
       minute: '2-digit',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     }
     return (
       <div style={css.message} key={idx}>
         <div style={css.content}>{content}</div>
-        {idx === 0 ? <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div> : null}
+        {idx === 0 ? (
+          <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div>
+        ) : null}
       </div>
     )
   }
@@ -114,7 +118,7 @@ export default class ThreadContent extends React.PureComponent<ContentProps, Sta
   onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target) {
       this.setState({
-        message: e.target.value
+        message: e.target.value,
       })
     }
   }
@@ -126,19 +130,20 @@ export default class ThreadContent extends React.PureComponent<ContentProps, Sta
   onKeyDown = (e: React.KeyboardEvent) => {
     e.stopPropagation()
 
-    const message = this.state.message
+    const { message } = this.state
     if (e.key === 'Enter' && !e.shiftKey && message) {
       e.preventDefault()
-      this.handle && this.handle.change((threadDoc: Doc) => {
-        threadDoc.messages.push({
-          authorId: this.props.selfId,
-          content: message,
-          time: new Date().getTime()
+      this.handle &&
+        this.handle.change((threadDoc: Doc) => {
+          threadDoc.messages.push({
+            authorId: this.props.selfId,
+            content: message,
+            time: new Date().getTime(),
+          })
         })
-      })
 
       this.setState({
-        message: ''
+        message: '',
       })
     }
   }
@@ -151,7 +156,7 @@ const css = {
     width: '100%',
     overflow: 'auto' as 'auto',
     height: '100%',
-    padding: '1px 1px 0px 1px'
+    padding: '1px 1px 0px 1px',
   },
   messageWrapper: {
     padding: 12,
@@ -164,12 +169,12 @@ const css = {
   },
   messageGroup: {
     marginBottom: -24,
-    paddingTop: 12
+    paddingTop: 12,
   },
   groupedMessages: {
     position: 'relative' as 'relative',
     top: -20,
-    paddingLeft: 40 + 8
+    paddingLeft: 40 + 8,
   },
   messages: {
     display: 'flex' as 'flex',
@@ -181,29 +186,26 @@ const css = {
     color: 'black',
     display: 'flex' as 'flex',
     lineHeight: '20px',
-    padding: '2px 0'
+    padding: '2px 0',
   },
   user: {
-    display: 'flex' as 'flex'
+    display: 'flex' as 'flex',
   },
   username: {
     paddingLeft: 8,
     fontSize: 12,
-    color: 'var(--colorBlueBlack)'
+    color: 'var(--colorBlueBlack)',
   },
-  avatar: {
-
-  },
+  avatar: {},
   time: {
     flex: 'none' as 'none',
     position: 'absolute' as 'absolute',
     right: 0,
     fontSize: 12,
     color: 'var(--colorSecondaryGrey)',
-    marginTop: -22
+    marginTop: -22,
   },
-  content: {
-  },
+  content: {},
   inputWrapper: {
     boxSizing: 'border-box' as 'border-box',
     width: 'calc(100% - 2px)',
@@ -214,7 +216,7 @@ const css = {
     padding: 8,
   },
   input: {
-    width: '100%'
+    width: '100%',
   },
 }
 
@@ -228,7 +230,7 @@ ContentTypes.register({
   icon: 'comments',
   contexts: {
     workspace: ThreadContent,
-    board: ThreadContent
+    board: ThreadContent,
   },
-  initializeDocument: initializeDocument
+  initializeDocument,
 })

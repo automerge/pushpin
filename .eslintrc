@@ -15,14 +15,29 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
-    "semi": ["error", "never"],
+    "semi": [
+      "error",
+      "never"
+    ],
     "no-mixed-operators": "off",
     "class-methods-use-this": "off",
-    "no-unused-vars": ["error", { "args": "none" }],
+    "no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
     "comma-dangle": "off",
     "import/extensions": 0,
     "import/no-extraneous-dependencies": 0,
-    "import/no-unresolved": [2, { "ignore": ["electron"] }],
+    "import/no-unresolved": [
+      2,
+      {
+        "ignore": [
+          "electron"
+        ]
+      }
+    ],
     "linebreak-style": 0,
     "lines-between-class-members": "off",
     "react/prefer-stateless-function": 0,
@@ -37,7 +52,10 @@
     "react/jsx-one-expression-per-line": "off",
     "no-param-reassign": "off",
     "object-curly-newline": "off",
-    "curly": ["error", "all"],
+    "curly": [
+      "error",
+      "all"
+    ],
     "no-underscore-dangle": "off",
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-a11y/anchor-is-valid": "off",
@@ -45,6 +63,12 @@
     "jsx-a11y/no-noninteractive-tabindex": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-autofocus": "off",
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true
+      }
+    ],
     "@typescript-eslint/explicit-member-accessibility": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-use-before-define": "off",

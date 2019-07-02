@@ -12,7 +12,9 @@ export default function BoardInList(props: Props) {
   const [doc] = useDocument<BoardDoc>(props.hypermergeUrl)
   const badgeRef = useRef<HTMLElement>(null)
 
-  if (!doc) return null
+  if (!doc) {
+    return null
+  }
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData('application/pushpin-url', props.url)
@@ -30,6 +32,8 @@ export default function BoardInList(props: Props) {
       {props.editable ? (
         <TitleEditor url={props.hypermergeUrl} />
       ) : (
-          <div className="DocLink__title">{title}</div>)}
-    </div>)
+        <div className="DocLink__title">{title}</div>
+      )}
+    </div>
+  )
 }
