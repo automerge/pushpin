@@ -1,4 +1,5 @@
 import React from 'react'
+import Debug from 'debug'
 
 import { Handle } from 'hypermerge'
 import Content, { ContentProps } from '../Content'
@@ -8,6 +9,8 @@ import { createDocumentLink } from '../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
 import './ContactInVarious.css'
+
+const log = Debug('pushpin:settings')
 
 interface State {
   online: boolean
@@ -58,18 +61,16 @@ export default class ContactInVarious extends React.PureComponent<ContentProps, 
     switch (this.props.context) {
       case 'list':
         return this.renderList()
-        break
       case 'thread':
         return this.renderThread()
-        break
       case 'title-bar':
         return this.renderTitleBar()
-        break
       case 'board':
         return this.renderBoard()
-        break
+      default:
+        log('contact render called in an unexpected context')
+        return null
     }
-    return null
   }
 
   renderList() {

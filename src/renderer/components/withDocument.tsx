@@ -9,6 +9,8 @@ interface WrappedComponentProps {
   [k: string]: any
 }
 
+// it's true this is an empty interface, but it's a nice human shorthand for what's happening
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface WrappedComponent extends React.Component<WrappedComponentProps, any> {}
 interface WrappedComponentClass {
   new (...k: any[]): WrappedComponent

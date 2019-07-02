@@ -2,9 +2,8 @@ import React from 'react'
 
 import { Handle } from 'hypermerge'
 import ContentTypes from '../ContentTypes'
-import { ContentProps } from Content from './Content'
+import Content, { ContentProps } from './Content'
 import { createDocumentLink } from '../ShareLink'
-
 
 interface Message {
   authorId: string

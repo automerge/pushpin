@@ -30,7 +30,7 @@ export function write(filePath: string): Promise<HyperfileUrl> {
 
       const mimeType = mime.lookup(filePath) || 'application/octet-stream'
       const hyperfileUrl = repo.writeFile(buffer, mimeType)
-      res(hyperfileUrl)
+      return res(hyperfileUrl)
     })
   })
 }

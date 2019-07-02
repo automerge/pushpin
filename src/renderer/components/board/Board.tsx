@@ -396,12 +396,15 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         })
         break
       case 'board':
-        const title = this.state.doc && this.state.doc.title ? this.state.doc.title : 'Untitled'
         cardId = this.createCard({
           x,
           y,
           type: contentType.type,
-          typeAttrs: { title: `Sub-board of ${title}` },
+          typeAttrs: {
+            title: `Sub-board of ${
+              this.state.doc && this.state.doc.title ? this.state.doc.title : 'Untitled'
+            }`,
+          },
         })
         this.selectOnly(cardId)
         break

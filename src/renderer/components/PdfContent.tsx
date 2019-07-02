@@ -48,6 +48,9 @@ export default class PDFCard extends React.PureComponent<ContentProps, State> {
     if (doc.hyperfileUrl && doc.hyperfileUrl !== this.state.currentHyperfileUrl) {
       this.loadPDF(doc.hyperfileUrl)
     }
+    // we disable eslint here so that if we want to inspect what the doc has from the console
+    // it's in the place where you'd expect it, even though we aren't using it right now
+    // eslint-disable-next-line react/no-unused-state
     this.setState({ doc })
   }
 

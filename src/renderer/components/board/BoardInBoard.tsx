@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ContentProps } from '../content'
+import { ContentProps } from '../Content'
 import { BoardDoc } from '.'
 import { createDocumentLink } from '../../ShareLink'
 import { useDocument } from '../../Hooks'
