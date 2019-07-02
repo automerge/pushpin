@@ -192,7 +192,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
   onDoubleClick = (e) => {
     log('onDoubleClick')
-    console.log('WTF', (this.boardRef as any).offsetLeft, (this.boardRef as any).offsetTop)
 
     // guard against a missing boardRef
     if (!this.boardRef.current) {
