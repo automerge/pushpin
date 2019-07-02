@@ -31,7 +31,7 @@ interface State {
 export default class Content extends React.PureComponent<Props, State> {
   static initializeContentDoc = (type, typeAttrs = {}) => {
     const { repo } = window // still not a great idea
-
+    
     const url = repo.create()
     repo.change(url, (doc) => ContentTypes.initializeDocument(type, doc, typeAttrs))
 
@@ -47,8 +47,8 @@ export default class Content extends React.PureComponent<Props, State> {
   filterProps = (props) => {
     const filtered = {}
     Object.keys(props)
-      .filter((key) => !FILTERED_PROPS.includes(key))
-      .forEach((key) => {
+      .filter(key => !FILTERED_PROPS.includes(key))
+      .forEach(key => {
         filtered[key] = props[key]
       })
     return filtered
@@ -78,7 +78,7 @@ export default class Content extends React.PureComponent<Props, State> {
 
     return (
       <SelfContext.Consumer>
-        {(selfId) => (
+        {selfId => (
           <contentType.component
             key={url}
             context={context}
@@ -88,7 +88,8 @@ export default class Content extends React.PureComponent<Props, State> {
             selfId={selfId}
             {...filteredProps}
           />
-        )}
+        )
+        }
       </SelfContext.Consumer>
     )
   }
@@ -96,7 +97,8 @@ export default class Content extends React.PureComponent<Props, State> {
 
 const renderError = (type, error) => (
   <div>
-    <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an error during render.
+    <i className="fa fa-exclamation-triangle" />
+    A &quot;{type}&quot; threw an error during render.
   </div>
 )
 

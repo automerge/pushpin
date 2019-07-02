@@ -1,7 +1,7 @@
-import { Handle } from 'hypermerge'
 import { parseDocumentLink, HypermergeUrl } from './ShareLink'
-import { ContactDoc } from './components/contact'
-import { Doc } from './components/workspace/Workspace'
+import { Handle } from 'hypermerge';
+import { ContactDoc } from './components/contact';
+import { Doc } from './components/workspace/Workspace';
 
 //
 // Example:
@@ -29,7 +29,7 @@ export default class InvitationsView {
 
     this.workspaceHandle = window.repo.watch(workspaceId, (doc) => {
       this.selfId = doc.selfId
-      doc.contactIds.forEach((id) => this.watchContact(id))
+      doc.contactIds.forEach(id => this.watchContact(id))
     })
   }
 
@@ -39,7 +39,7 @@ export default class InvitationsView {
     }
 
     const handle = window.repo.watch(hypermergeUrl, (doc) => {
-      const index = this.pendingInvitations.findIndex((i) => i.hypermergeUrl === hypermergeUrl)
+      const index = this.pendingInvitations.findIndex(i => i.hypermergeUrl === hypermergeUrl)
       if (index !== -1) {
         const invite = this.pendingInvitations[index]
         this.pendingInvitations.splice(index, 1)
@@ -70,8 +70,9 @@ export default class InvitationsView {
 
       offersForUs.forEach((documentUrl) => {
         const { hypermergeUrl } = parseDocumentLink(documentUrl)
-        const matchOffer = (offer) =>
+        const matchOffer = (offer) => (
           offer.documentUrl === documentUrl && offer.offererId === offererId
+        )
 
         if (!this.pendingInvitations.some(matchOffer)) {
           this.pendingInvitations.push({ documentUrl, offererId, sender: contact, hypermergeUrl })

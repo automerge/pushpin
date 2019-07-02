@@ -1,8 +1,8 @@
 import React from 'react'
-import { Handle } from 'hypermerge'
 import TitleEditor from '../TitleEditor'
 import { BoardDoc } from '.'
 import { ContentProps } from '../Content'
+import { Handle } from 'hypermerge'
 
 interface Props extends ContentProps {
   editable: boolean
@@ -24,8 +24,10 @@ export default class BoardInList extends React.PureComponent<Props, State> {
   }
 
   // This is the New Boilerplate
-  componentWillMount = () =>
-    (this.handle = window.repo.watch(this.props.hypermergeUrl, (doc) => this.onChange(doc)))
+  componentWillMount = () => this.handle = window.repo.watch(
+    this.props.hypermergeUrl,
+    (doc) => this.onChange(doc)
+  )
   componentWillUnmount = () => this.handle && this.handle.close()
 
   onChange = (doc) => {
@@ -40,17 +42,11 @@ export default class BoardInList extends React.PureComponent<Props, State> {
 
     return (
       <div draggable onDragStart={this.onDragStart} className="DocLink">
-        <i
-          ref={this.badgeRef}
-          className="Badge fa fa-files-o"
-          style={{ background: backgroundColor }}
-        />
+        <i ref={this.badgeRef} className="Badge fa fa-files-o" style={{ background: backgroundColor }} />
         {this.props.editable ? (
           <TitleEditor url={this.props.hypermergeUrl} />
         ) : (
-          <div className="DocLink__title">{title}</div>
-        )}
-      </div>
-    )
+            <div className="DocLink__title">{title}</div>)}
+      </div>)
   }
 }

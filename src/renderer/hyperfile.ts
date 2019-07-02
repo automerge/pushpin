@@ -6,7 +6,7 @@ import DiscoverySwarm from 'discovery-cloud-client'
 import { HYPERFILE_PATH } from './constants'
 import storage from 'random-access-file'
 
-const repo = new Repo({ storage, path: HYPERFILE_PATH })
+const repo = new Repo({ storage, path: HYPERFILE_PATH, })
 
 // DAT's discovery swarm or truly serverless discovery
 // const DiscoverySwarm = require('discovery-swarm')

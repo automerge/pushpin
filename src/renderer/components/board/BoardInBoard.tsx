@@ -26,8 +26,10 @@ export default class BoardInBoard extends React.PureComponent<ContentProps, Stat
   }
 
   // This is the New Boilerplate
-  componentWillMount = () =>
-    (this.handle = window.repo.watch(this.props.hypermergeUrl, (doc) => this.onChange(doc)))
+  componentWillMount = () => this.handle = window.repo.watch(
+    this.props.hypermergeUrl,
+    (doc) => this.onChange(doc)
+  )
   componentWillUnmount = () => this.handle && this.handle.close()
 
   onChange = (doc) => {
@@ -42,7 +44,11 @@ export default class BoardInBoard extends React.PureComponent<ContentProps, Stat
 
     const childCardCount = Object.keys(cards || {}).length
     return (
-      <div className="BoardLink" onDoubleClick={this.handleDoubleClick} style={css.wrapper}>
+      <div
+        className="BoardLink"
+        onDoubleClick={this.handleDoubleClick}
+        style={css.wrapper}
+      >
         <i className="fa fa-files-o" style={{ ...css.icon, background: backgroundColor }} />
         <div style={css.caption}>
           <span style={css.title}>{title}</span>
@@ -63,7 +69,7 @@ const css = {
     borderRadius: '50%',
     width: 60,
     height: 60,
-    flex: 'none' as 'none',
+    flex: 'none' as 'none'
   },
   caption: {
     color: 'var(--colorSecondaryGrey)',
@@ -78,7 +84,7 @@ const css = {
   },
   title: {
     color: 'var(--colorBlueBlack)',
-    fontWeight: '600' as 'bold', // errrrrr
+    fontWeight: '600' as 'bold' // errrrrr
   },
   wrapper: {
     boxSizing: 'border-box' as 'border-box',

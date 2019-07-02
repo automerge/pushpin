@@ -14,11 +14,15 @@ export default function Action(props: Props) {
       role="button"
       onClick={props.callback}
       className={`ButtonAction ${
-        props.destructive ? 'ButtonAction-destructive' : 'ButtonAction--primary'
-      }`}
+        (props.destructive
+          ? 'ButtonAction-destructive'
+          : 'ButtonAction--primary')
+        }`}
     >
       <i className={`fa ${props.faIcon}`} />
-      <div className="ButtonAction__label Type--secondary">
+      <div
+        className="ButtonAction__label Type--secondary"
+      >
         {props.label}
         <br />
         {props.shortcut}
@@ -29,5 +33,5 @@ export default function Action(props: Props) {
 
 Action.defaultProps = {
   destructive: false,
-  shortcut: '',
+  shortcut: ''
 }

@@ -14,38 +14,29 @@ import { ContactDoc } from '../contact'
 const log = Debug('pushpin:board-card')
 
 interface BoardCardProps {
-  id: string
-  card: BoardDocCard
+  id: string,
+  card: BoardDocCard,
 
-  dragState: TrackingEntry
+  dragState: TrackingEntry,
 
-  selected: boolean
-  uniquelySelected: boolean
-  remoteSelected: string[]
+  selected: boolean,
+  uniquelySelected: boolean,
+  remoteSelected: string[],
 
-  onDrag: (card, event, dragData) => void
-  onStop: (card, event, dragData) => void
-  onCardClicked: (card, event) => void
-  onCardDoubleClicked: (card, event) => void
+  onDrag: (card, event, dragData) => void,
+  onStop: (card, event, dragData) => void,
+  onCardClicked: (card, event) => void,
+  onCardDoubleClicked: (card, event) => void,
   setCardRef: (card, ref) => void
+
 }
 
 export default class BoardCard extends React.PureComponent<BoardCardProps> {
-  onDrag = (e, d) => {
-    this.props.onDrag(this.props.card, e, d)
-  }
-  onStop = (e, d) => {
-    this.props.onStop(this.props.card, e, d)
-  }
-  onCardClicked = (e) => {
-    this.props.onCardClicked(e, this.props.card)
-  }
-  onCardDoubleClicked = (e) => {
-    this.props.onCardDoubleClicked(e, this.props.card)
-  }
-  setCardRef = (node) => {
-    this.props.setCardRef(this.props.id, node)
-  }
+  onDrag = (e, d) => { this.props.onDrag(this.props.card, e, d) }
+  onStop = (e, d) => { this.props.onStop(this.props.card, e, d) }
+  onCardClicked = (e) => { this.props.onCardClicked(e, this.props.card) }
+  onCardDoubleClicked = (e) => { this.props.onCardDoubleClicked(e, this.props.card) }
+  setCardRef = (node) => { this.props.setCardRef(this.props.id, node) }
 
   stopPropagation = (e) => {
     e.stopPropagation()
@@ -58,10 +49,10 @@ export default class BoardCard extends React.PureComponent<BoardCardProps> {
 
     const style = {
       position: 'absolute' as 'absolute',
-      width: isResizing(dragState) ? dragState.resizeWidth : card.width,
-      height: isResizing(dragState) ? dragState.resizeHeight : card.height,
-      left: isMoving(dragState) ? dragState.moveX : card.x,
-      top: isMoving(dragState) ? dragState.moveY : card.y,
+      width: (isResizing(dragState)) ? dragState.resizeWidth : card.width,
+      height: (isResizing(dragState)) ? dragState.resizeHeight : card.height,
+      left: (isMoving(dragState)) ? dragState.moveX : card.x,
+      top: (isMoving(dragState)) ? dragState.moveY : card.y,
     }
 
     if (this.props.remoteSelected.length > 0) {

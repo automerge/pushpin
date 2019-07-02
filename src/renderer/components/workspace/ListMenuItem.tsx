@@ -14,7 +14,7 @@ export interface Props {
 export default class ListMenuItem extends React.PureComponent<Props> {
   static defaultProps = {
     actions: [],
-    selected: false,
+    selected: false
   }
 
   get defaultAction() {
@@ -32,7 +32,7 @@ export default class ListMenuItem extends React.PureComponent<Props> {
     const classes = [
       'ListMenuItem',
       this.defaultAction ? 'ListMenuItem--withDefaultAction' : '',
-      selected ? 'ListMenuItem--selected' : '',
+      selected ? 'ListMenuItem--selected' : ''
     ].join(' ')
     return (
       <div className={classes} onClick={this.onClick}>

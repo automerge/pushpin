@@ -1,7 +1,8 @@
 import React from 'react'
-import { Handle } from 'hypermerge'
 import ContentTypes from '../../ContentTypes'
-import { ContentProps } from '../Content'
+import { ContentProps } from '../Content';
+import { Handle } from 'hypermerge';
+
 
 interface Doc {
   title?: string
@@ -35,12 +36,10 @@ export default class ListItem extends React.PureComponent<ContentProps, State> {
   render() {
     const { type } = this.props
     const { doc } = this.state
-    if (!doc) {
-      return null
-    }
+    if (!doc) return null
 
     // this context: default business is wrong wrong wrong
-    const contentType = ContentTypes.lookup({ type, context: 'list' })
+    const contentType = ContentTypes.lookup({ type, context: "list" })
 
     const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
@@ -48,7 +47,7 @@ export default class ListItem extends React.PureComponent<ContentProps, State> {
     return (
       <div className="DocLink" style={css.listItem}>
         <i draggable onDragStart={this.onDragStart} className={`Badge fa fa-${icon}`} />
-        <div className="DocLink__title">{doc && doc.title ? doc.title : name}</div>
+        <div className="DocLink__title">{(doc && doc.title) ? doc.title : name}</div>
       </div>
     )
   }
@@ -58,11 +57,12 @@ const css = {
   listItem: {
     padding: '5px',
     border: '1px solid #eaeaea',
-    borderRadius: '4px',
-  },
+    borderRadius: '4px'
+  }
 }
+
 
 ContentTypes.registerDefault({
   component: ListItem,
-  context: 'list',
+  context: 'list'
 })

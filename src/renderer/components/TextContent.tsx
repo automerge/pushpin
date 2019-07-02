@@ -55,6 +55,7 @@ export default class TextContent extends React.PureComponent<UniquelySelectedCon
   static maxWidth = 24
   static maxHeight = 36
 
+
   private stallDelete: boolean = false // this should be on state?
   private handle?: Handle<TextDoc>
   private codeMirror: CodeMirror
@@ -117,16 +118,15 @@ export default class TextContent extends React.PureComponent<UniquelySelectedCon
     const removedLength = change.removed.join('\n').length
     const addedText = change.text.join('\n')
 
-    this.handle &&
-      this.handle.change((doc) => {
-        if (removedLength > 0) {
-          doc.text.splice(at, removedLength)
-        }
+    this.handle && this.handle.change((doc) => {
+      if (removedLength > 0) {
+        doc.text.splice(at, removedLength)
+      }
 
-        if (addedText.length > 0) {
-          doc.text.insertAt(at, ...addedText.split(''))
-        }
-      })
+      if (addedText.length > 0) {
+        doc.text.insertAt(at, ...addedText.split(''))
+      }
+    })
   }
 
   // Transform updates from the Automerge text into imperative text changes
@@ -236,13 +236,14 @@ function initializeDocument(editor: TextDoc, { text }) {
   }
 }
 
+
 ContentTypes.register({
   type: 'text',
   name: 'Text',
   icon: 'sticky-note',
   contexts: {
     workspace: TextContent,
-    board: TextContent,
-  },
-  initializeDocument,
+    board: TextContent
+  }, 
+  initializeDocument: initializeDocument
 })
