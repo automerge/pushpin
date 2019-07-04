@@ -110,8 +110,11 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
       this.refreshHandle(this.props.hypermergeUrl)
     }
+  }
 
-    if (!prevProps.active && this.props.active) {
+  // TODO: remove the need for this
+  componentWillReceiveProps(newProps: Props) {
+    if (!this.props.active && newProps.active) {
       this.setState({ search: '' }, () => {
         setTimeout(() => {
           this.omniboxInput && this.omniboxInput.current && this.omniboxInput.current.focus()
