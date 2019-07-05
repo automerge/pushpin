@@ -1,7 +1,6 @@
 import * as path from 'path'
 import webpack from 'webpack'
 import HtmlPlugin from 'html-webpack-plugin'
-// import CopyPlugin from 'copy-webpack-plugin'
 import nodeExternals from 'webpack-node-externals'
 import HardSourcePlugin from 'hard-source-webpack-plugin'
 import ForkTsCheckerPlugin from 'fork-ts-checker-webpack-plugin'
@@ -108,8 +107,16 @@ export default [
     entry: ['./src/main'],
     target: 'electron-main',
     plugins: [
-      new ForkTsCheckerPlugin(),
-      // new HardSourcePlugin({ cacheDirectory })
+      new ForkTsCheckerPlugin({
+        formatter: 'codeframe',
+      }),
+      new HardSourcePlugin({
+        cacheDirectory,
+        info: {
+          level: 'warn',
+          mode: 'none',
+        },
+      }),
     ],
   }),
 
@@ -118,9 +125,17 @@ export default [
     entry: ['./src/renderer'],
     target: 'electron-renderer',
     plugins: [
-      new ForkTsCheckerPlugin(),
+      new ForkTsCheckerPlugin({
+        formatter: 'codeframe',
+      }),
       new HtmlPlugin({ title: 'PushPin' }),
-      // new HardSourcePlugin({ cacheDirectory }),
+      new HardSourcePlugin({
+        cacheDirectory,
+        info: {
+          level: 'warn',
+          mode: 'none',
+        },
+      }),
     ],
   }),
 ]
