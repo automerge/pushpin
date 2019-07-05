@@ -1,16 +1,8 @@
 import Path from 'path'
-import Url from 'url'
 import electron, { OpenDialogOptions } from 'electron'
 
 /* we need to resolve static assets differently in local HMR development mode */
 const isDevelopment = process.env.NODE_ENV !== 'production'
-
-function getStatic(val: string) {
-  if (typeof window !== 'undefined' && isDevelopment) {
-    return Url.resolve(window.location.origin, val)
-  }
-  return Path.resolve(__static, val)
-}
 
 export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
@@ -37,4 +29,4 @@ export const USER_PATH = Path.join(app.getPath('userData'), 'pushpin-v10', USER)
 export const WORKSPACE_URL_PATH = Path.join(USER_PATH, 'workspace-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
-export const DEFAULT_AVATAR_PATH = getStatic('default-avatar.png')
+export const DEFAULT_AVATAR_PATH = require('../../static/default-avatar.png')

@@ -30,14 +30,14 @@ import './components/PdfContent'
 
 import { createDocumentLink } from './ShareLink'
 
-require('./app.css')
-require('./components/react-simple-dropdown/dropdown.css')
-require('../../node_modules/@ibm/plex/css/ibm-plex.css')
-require('../../node_modules/codemirror/lib/codemirror.css')
-require('./line-awesome/fonts/line-awesome.ttf')
-require('./line-awesome/fonts/line-awesome.woff')
-require('./line-awesome/fonts/line-awesome.woff2')
-require('./line-awesome/css/line-awesome.min.css')
+import './app.css'
+import './components/react-simple-dropdown/dropdown.css'
+import '../../node_modules/@ibm/plex/css/ibm-plex.css'
+import '../../node_modules/codemirror/lib/codemirror.css'
+import './line-awesome/fonts/line-awesome.ttf'
+import './line-awesome/fonts/line-awesome.woff'
+import './line-awesome/fonts/line-awesome.woff2'
+import './line-awesome/css/line-awesome.min.css'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
@@ -105,7 +105,9 @@ function initWorkspace() {
   }
 
   const workspace = <Content context="root" url={workspaceUrl} />
-  const element = document.getElementById('app')
+  const element = document.createElement('div')
+  element.id = 'app'
+  document.body.appendChild(element)
   ReactDOM.render(workspace, element)
 }
 

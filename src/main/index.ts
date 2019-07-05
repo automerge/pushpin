@@ -54,7 +54,7 @@ const createWindow = async () => {
   }
 
   if (isDevelopment) {
-    mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+    mainWindow.loadURL(`http://localhost:8080`)
   } else {
     mainWindow.loadURL(
       formatUrl({

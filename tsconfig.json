@@ -1,5 +1,4 @@
 {
-  "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
     "skipLibCheck": true,
     "strict": true,
@@ -8,6 +7,7 @@
     "noFallthroughCasesInSwitch": true,
     "lib": ["es2015", "es2017", "dom", "webworker"],
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "pretty": true
   }
