@@ -1,9 +1,6 @@
 import Path from 'path'
 import electron, { OpenDialogOptions } from 'electron'
 
-/* we need to resolve static assets differently in local HMR development mode */
-const isDevelopment = process.env.NODE_ENV !== 'production'
-
 export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],

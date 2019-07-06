@@ -4,6 +4,7 @@ import Debug from 'debug'
 import ContentTypes, { Context } from '../ContentTypes'
 import { parseDocumentLink } from '../ShareLink'
 import SelfContext from './SelfContext'
+
 const log = Debug('pushpin:content')
 const FILTERED_PROPS = ['type', 'hypermergeUrl']
 

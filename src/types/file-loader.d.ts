@@ -1,15 +1,19 @@
 declare module '*.png' {
-  export = string
+  const Path: string
+  export = Path
 }
 
 declare module '*.svg' {
-  export = string
+  const Path: string
+  export = Path
 }
 
 declare module '*.jpg' {
-  export = string
+  const Path: string
+  export = Path
 }
 
 declare module '*.gif' {
-  export = string
+  const Path: string
+  export = Path
 }
