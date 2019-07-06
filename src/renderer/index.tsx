@@ -9,24 +9,8 @@ import raf from 'random-access-file'
 import DiscoverySwarm from 'discovery-cloud-client'
 
 import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
+import Root from './components/Root'
 import Content from './components/Content'
-
-// We load these modules here so that the content registry will have them.
-import './components/workspace/Workspace'
-
-// default context components
-import './components/defaults/DefaultInList'
-
-// board in various contexts
-import './components/board'
-import './components/contact'
-
-// other single-context components
-import './components/TextContent'
-import './components/ImageContent'
-import './components/ThreadContent'
-import './components/UrlContent'
-import './components/PdfContent'
 
 import { createDocumentLink } from './ShareLink'
 
@@ -104,11 +88,17 @@ function initWorkspace() {
     workspaceUrl = newWorkspaceUrl
   }
 
-  const workspace = <Content context="root" url={workspaceUrl} />
+  const workspace = <Root url={workspaceUrl} />
   const element = document.createElement('div')
   element.id = 'app'
   document.body.appendChild(element)
   ReactDOM.render(workspace, element)
+
+  // HMR
+  ;(module as any).hot.accept('./components/Root.tsx', () => {
+    const NextRoot = require('./components/Root').default
+    ReactDOM.render(<NextRoot url={workspaceUrl} />, element)
+  })
 }
 
 initHypermerge(() => {

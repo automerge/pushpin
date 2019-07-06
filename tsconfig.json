@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "pretty": true
+    "pretty": true,
+    "experimentalDecorators": true
   }
 }

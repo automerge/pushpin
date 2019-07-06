@@ -9,11 +9,15 @@ const cacheDirectory = undefined // path.resolve(__dirname, ".cache")
 
 const tsRule: webpack.Rule = {
   test: /\.[tj]sx?$/,
-  loader: 'ts-loader',
+  use: [
+    {
+      loader: 'ts-loader',
+      options: {
+        transpileOnly: true,
+      },
+    },
+  ],
   exclude: [/node_modules/],
-  options: {
-    transpileOnly: true,
-  },
 }
 
 const cssRule: webpack.Rule = {
@@ -74,6 +78,7 @@ const shared: webpack.Configuration = {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     alias: {
       static: path.resolve(__dirname, 'static'),
+      // 'react-dom': '@hot-loader/react-dom',
     },
   },
   externals: [
@@ -136,6 +141,7 @@ export default [
           mode: 'none',
         },
       }),
+      new webpack.HotModuleReplacementPlugin(),
     ],
   }),
 ]

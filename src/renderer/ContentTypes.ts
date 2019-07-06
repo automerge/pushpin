@@ -39,7 +39,9 @@ function register(contentType: ContentType) {
   log('register', entry)
 
   if (registry[type]) {
-    throw new Error(`Type already registered: ${type}`)
+    // Allow re-registration to support HMR
+    // throw new Error(`Type already registered: ${type}`)
+    console.log(`Replacing '${type}' content type.`)
   }
 
   registry[type] = entry
