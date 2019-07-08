@@ -13,37 +13,33 @@ export interface ActionItem {
 interface Props {
   url: string
   actions: ActionItem[]
+  children: React.ReactNode
 }
 
 /* This class is adapted from the react-color TwitterPicker
    by stripping out most of the functionality and just leaving swatches */
-export default class Actions extends React.PureComponent<Props> {
-  onActionClick = (e: React.MouseEvent, callback: () => void) => {
+export default function Actions(props: Props) {
+  function onActionClick(e: React.MouseEvent, callback: () => void) {
     e.stopPropagation()
     callback()
   }
 
-  render() {
-    const { url, actions } = this.props
+  return (
+    <div className="actions" style={css.actions}>
+      {props.children}
 
-    const result = (
-      <div className="actions" style={css.actions}>
-        {this.props.children}
-
-        {actions.map((action) => (
-          <Action
-            key={action.name}
-            callback={(e) => this.onActionClick(e, action.callback(url))}
-            faIcon={action.faIcon}
-            label={action.label}
-            shortcut={action.shortcut}
-            destructive={action.destructive}
-          />
-        ))}
-      </div>
-    )
-    return result
-  }
+      {props.actions.map((action) => (
+        <Action
+          key={action.name}
+          callback={(e) => onActionClick(e, action.callback(props.url))}
+          faIcon={action.faIcon}
+          label={action.label}
+          shortcut={action.shortcut}
+          destructive={action.destructive}
+        />
+      ))}
+    </div>
+  )
 }
 
 const css: { [name: string]: React.CSSProperties } = {
