@@ -5,8 +5,8 @@ export interface ActionItem {
   name: string
   label: string
   faIcon: string
-  shortcut: string
-  destructive: boolean
+  shortcut?: string
+  destructive?: boolean
   callback(url: string): () => void
 }
 
