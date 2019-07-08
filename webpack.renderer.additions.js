@@ -5,6 +5,10 @@
    see: https://github.com/webpack/webpack/issues/6642 */
 module.exports = {
   output: {
-    globalObject: 'this'
-  }
+    globalObject: 'this',
+  },
+  stats: {
+    assets: false,
+    maxModules: 3,
+  },
 }
