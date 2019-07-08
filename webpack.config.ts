@@ -5,6 +5,10 @@ import nodeExternals from 'webpack-node-externals'
 import HardSourcePlugin from 'hard-source-webpack-plugin'
 import ForkTsCheckerPlugin from 'fork-ts-checker-webpack-plugin'
 
+interface Options {
+  isDev: boolean
+}
+
 const cacheDirectory = undefined // path.resolve(__dirname, ".cache")
 
 const tsRule: webpack.Rule = {
@@ -62,52 +66,60 @@ const fontRule: webpack.Rule = {
   },
 }
 
-const shared: webpack.Configuration = {
-  mode: 'development',
-  context: path.resolve(__dirname),
-  devtool: 'inline-source-map',
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    hotOnly: true,
-  },
-  stats: {
-    assets: false,
-    maxModules: 3,
-  },
-  resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
-    alias: {
-      static: path.resolve(__dirname, 'static'),
-      // 'react-dom': '@hot-loader/react-dom',
+function shared({ isDev }: Options): webpack.Configuration {
+  return {
+    context: path.resolve(__dirname),
+    devtool: isDev ? 'inline-source-map' : 'source-map',
+    devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+      hotOnly: true,
     },
-  },
-  externals: [
-    nodeExternals({
-      whitelist: [/webpack/, '@ibm/plex', 'codemirror'],
-    }),
-  ],
-  module: {
-    rules: [tsRule, cssRule, imageRule, fontRule],
-  },
+    stats: {
+      assets: false,
+      maxModules: 3,
+    },
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      alias: {
+        static: path.resolve(__dirname, 'static'),
+        // 'react-dom': '@hot-loader/react-dom',
+      },
+    },
+    externals: [
+      nodeExternals({
+        whitelist: [/webpack/, '@ibm/plex', 'codemirror'],
+      }),
+    ],
+    module: {
+      rules: [tsRule, cssRule, imageRule, fontRule],
+    },
+  }
 }
 
-function config(opts: webpack.Configuration) {
-  return Object.assign(
-    {},
-    shared,
-    {
-      output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: `${opts.name}.js`,
-        globalObject: 'this',
-      },
-    } as webpack.Configuration,
-    opts
-  )
+function config(cb: (opts: Options) => webpack.Configuration) {
+  return (env: any, args: any) => {
+    const { mode = 'development' } = args
+    const opts = { isDev: mode === 'development' }
+    const conf = cb(opts)
+
+    return Object.assign(
+      {},
+      shared(opts),
+      {
+        mode,
+        output: {
+          path: path.resolve(__dirname, 'dist'),
+          filename: `${conf.name}.js`,
+          globalObject: 'this',
+        },
+      } as webpack.Configuration,
+      conf
+    )
+  }
 }
 
 export default [
-  config({
+  config(({ isDev }) => ({
     name: 'main',
     entry: ['./src/main'],
     target: 'electron-main',
@@ -115,17 +127,21 @@ export default [
       new ForkTsCheckerPlugin({
         formatter: 'codeframe',
       }),
-      new HardSourcePlugin({
-        cacheDirectory,
-        info: {
-          level: 'warn',
-          mode: 'none',
-        },
-      }),
+      ...(isDev
+        ? [
+            new HardSourcePlugin({
+              cacheDirectory,
+              info: {
+                level: 'warn',
+                mode: 'none',
+              },
+            }),
+          ]
+        : []),
     ],
-  }),
+  })),
 
-  config({
+  config(({ isDev }) => ({
     name: 'renderer',
     entry: ['./src/renderer'],
     target: 'electron-renderer',
@@ -134,14 +150,18 @@ export default [
         formatter: 'codeframe',
       }),
       new HtmlPlugin({ title: 'PushPin' }),
-      new HardSourcePlugin({
-        cacheDirectory,
-        info: {
-          level: 'warn',
-          mode: 'none',
-        },
-      }),
-      new webpack.HotModuleReplacementPlugin(),
+      ...(isDev
+        ? [
+            new HardSourcePlugin({
+              cacheDirectory,
+              info: {
+                level: 'warn',
+                mode: 'none',
+              },
+            }),
+            new webpack.HotModuleReplacementPlugin(),
+          ]
+        : []),
     ],
-  }),
+  })),
 ]

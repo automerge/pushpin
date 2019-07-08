@@ -12,7 +12,7 @@
     "start": "yarn compile --config-name=main && concurrently -k 'yarn:dev:*'",
     "start2": "NAME=userA yarn start & NAME=userB yarn start",
     "start3": "NAME=userA yarn start & NAME=userB yarn start & NAME=userC yarn start",
-    "dist": "yarn compile && electron-builder",
+    "dist": "yarn compile --mode=production && electron-builder",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "lint": "eslint --cache --color --ext .jsx,.js,.tsx,.ts src",
     "test": "electron-mocha --renderer test/**/*.{js,jsx,ts,tsx}",
