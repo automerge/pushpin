@@ -13,7 +13,7 @@ export interface ActionItem {
 interface Props {
   url: string
   actions: ActionItem[]
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 /* This class is adapted from the react-color TwitterPicker
