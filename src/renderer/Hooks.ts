@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
-export function useDocument<T>(url: string | null): [T | null, ChangeFn<T>] {
-  const [doc, setDoc] = useState<T | null>(null)
+export function useDocument<D>(url: string | null): [D | null, ChangeFn<D>] {
+  const [doc, setDoc] = useState<D | null>(null)
 
   useEffect(() => {
     if (!url) {
@@ -11,15 +11,17 @@ export function useDocument<T>(url: string | null): [T | null, ChangeFn<T>] {
       return () => {}
     }
 
-    const handle = window.repo.watch(url, (doc: T) => setDoc(doc))
+    const handle = window.repo.watch(url, (doc: D) => setDoc(doc))
 
     return () => {
       handle.close()
     }
   }, [url])
 
-  function change(cb: (doc: T) => void): void {
-    if (url) window.repo.change(url, cb)
+  function change(cb: (doc: D) => void): void {
+    if (url) {
+      window.repo.change(url, cb)
+    }
   }
 
   return [doc, change]
