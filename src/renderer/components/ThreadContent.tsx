@@ -148,21 +148,21 @@ export default class ThreadContent extends React.PureComponent<ContentProps, Sta
   }
 }
 
-const css = {
+const css: { [k: string]: React.CSSProperties } = {
   threadWrapper: {
-    display: 'flex' as 'flex',
+    display: 'flex',
     backgroundColor: 'white',
     width: '100%',
-    overflow: 'auto' as 'auto',
+    overflow: 'auto',
     height: '100%',
     padding: '1px 1px 0px 1px',
   },
   messageWrapper: {
     padding: 12,
-    position: 'relative' as 'relative',
-    display: 'flex' as 'flex',
-    flexDirection: 'column-reverse' as 'column-reverse',
-    overflowY: 'scroll' as 'scroll',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    overflowY: 'scroll',
     marginBottom: 49,
     flexGrow: 1,
   },
@@ -171,24 +171,24 @@ const css = {
     paddingTop: 12,
   },
   groupedMessages: {
-    position: 'relative' as 'relative',
+    position: 'relative',
     top: -20,
     paddingLeft: 40 + 8,
   },
   messages: {
-    display: 'flex' as 'flex',
-    flexDirection: 'column' as 'column',
-    justifyContent: 'flex-end' as 'flex-end',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
     flexGrow: 1,
   },
   message: {
     color: 'black',
-    display: 'flex' as 'flex',
+    display: 'flex',
     lineHeight: '20px',
     padding: '2px 0',
   },
   user: {
-    display: 'flex' as 'flex',
+    display: 'flex',
   },
   username: {
     paddingLeft: 8,
@@ -197,8 +197,8 @@ const css = {
   },
   avatar: {},
   time: {
-    flex: 'none' as 'none',
-    position: 'absolute' as 'absolute',
+    flex: 'none',
+    position: 'absolute',
     right: 0,
     fontSize: 12,
     color: 'var(--colorSecondaryGrey)',
@@ -206,10 +206,10 @@ const css = {
   },
   content: {},
   inputWrapper: {
-    boxSizing: 'border-box' as 'border-box',
+    boxSizing: 'border-box',
     width: 'calc(100% - 2px)',
     borderTop: '1px solid var(--colorInputGrey)',
-    position: 'absolute' as 'absolute',
+    position: 'absolute',
     bottom: 1,
     backgroundColor: 'white',
     padding: 8,
