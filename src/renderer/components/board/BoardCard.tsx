@@ -1,6 +1,5 @@
 import React from 'react'
-import Debug from 'debug'
-import { DraggableCore } from 'react-draggable'
+import { DraggableCore, DraggableData } from 'react-draggable'
 import classNames from 'classnames'
 
 import Content from '../Content'
@@ -10,8 +9,13 @@ import { parseDocumentLink } from '../../ShareLink'
 import { BoardDocCard } from '.'
 import { TrackingEntry, DragType, isResizing, isMoving } from './Board'
 import { ContactDoc } from '../contact'
+import { useDocument } from '../../Hooks'
 
-const log = Debug('pushpin:board-card')
+type DraggableEvent =
+  | React.MouseEvent<HTMLElement | SVGElement>
+  | React.TouchEvent<HTMLElement | SVGElement>
+  | MouseEvent
+  | TouchEvent
 
 interface BoardCardProps {
   id: string
@@ -23,88 +27,84 @@ interface BoardCardProps {
   uniquelySelected: boolean
   remoteSelected: string[]
 
-  onDrag: (card, event, dragData) => void
-  onStop: (card, event, dragData) => void
-  onCardClicked: (card, event) => void
-  onCardDoubleClicked: (card, event) => void
-  setCardRef: (card, ref) => void
+  onDrag(card: BoardDocCard, event: DraggableEvent, dragData: DraggableData): void
+  onStop(card: BoardDocCard, event: DraggableEvent, dragData: DraggableData): void
+  onCardClicked(card: BoardDocCard, event: React.MouseEvent): void
+  onCardDoubleClicked(card: BoardDocCard, event: React.MouseEvent): void
+  setCardRef(id: string, ref: HTMLElement | null): void
 }
 
-export default class BoardCard extends React.PureComponent<BoardCardProps> {
-  onDrag = (e, d) => {
-    this.props.onDrag(this.props.card, e, d)
-  }
-  onStop = (e, d) => {
-    this.props.onStop(this.props.card, e, d)
-  }
-  onCardClicked = (e) => {
-    this.props.onCardClicked(e, this.props.card)
-  }
-  onCardDoubleClicked = (e) => {
-    this.props.onCardDoubleClicked(e, this.props.card)
-  }
-  setCardRef = (node) => {
-    this.props.setCardRef(this.props.id, node)
+export default function BoardCard(props: BoardCardProps) {
+  const {
+    card,
+    dragState = { dragState: DragType.NOT_DRAGGING },
+    remoteSelected: [remoteSelection],
+  } = props
+
+  const [doc] = useDocument<ContactDoc>(remoteSelection || null)
+  const highlightColor = doc && doc.color
+
+  function onDrag(e: DraggableEvent, d: DraggableData) {
+    props.onDrag(card, e, d)
   }
 
-  stopPropagation = (e) => {
+  function onStop(e: DraggableEvent, d: DraggableData) {
+    props.onStop(card, e, d)
+  }
+
+  function onCardClicked(e: React.MouseEvent) {
+    props.onCardClicked(card, e)
+  }
+
+  function onCardDoubleClicked(e: React.MouseEvent) {
+    props.onCardDoubleClicked(card, e)
+  }
+
+  function setCardRef(node: HTMLElement | null) {
+    props.setCardRef(props.id, node)
+  }
+
+  function stopPropagation(e: React.SyntheticEvent) {
     e.stopPropagation()
   }
 
-  render = () => {
-    log('render')
-
-    const { card, dragState = { dragState: DragType.NOT_DRAGGING } } = this.props
-
-    const style = {
-      position: 'absolute' as 'absolute',
-      width: isResizing(dragState) ? dragState.resizeWidth : card.width,
-      height: isResizing(dragState) ? dragState.resizeHeight : card.height,
-      left: isMoving(dragState) ? dragState.moveX : card.x,
-      top: isMoving(dragState) ? dragState.moveY : card.y,
-    }
-
-    if (this.props.remoteSelected.length > 0) {
-      window.repo.watch<ContactDoc>(this.props.remoteSelected[0], (doc) => {
-        if (doc) {
-          style['--highlight-color'] = doc.color
-        }
-      })
-    }
-
-    const { type } = parseDocumentLink(card.url)
-    const context = 'board'
-    const contentType = ContentTypes.lookup({ type, context })
-
-    const selected = this.props.selected || this.props.remoteSelected.length > 0
-
-    return (
-      <DraggableCore
-        key={this.props.id}
-        allowAnyClick={false}
-        disabled={false}
-        enableUserSelectHack={false}
-        onDrag={this.onDrag}
-        onStop={this.onStop}
-      >
-        <div
-          ref={this.setCardRef}
-          tabIndex={-1}
-          id={`card-${card.id}`}
-          className={classNames('card', card.type, selected ? 'selected' : 'unselected')}
-          style={style}
-          onClick={this.onCardClicked}
-          onDoubleClick={this.onCardDoubleClicked}
-          onContextMenu={this.stopPropagation}
-        >
-          <Content
-            context="board"
-            url={this.props.card.url}
-            uniquelySelected={this.props.uniquelySelected}
-          />
-          {contentType && contentType.resizable !== false && <span className="cardResizeHandle" />}
-        </div>
-      </DraggableCore>
-    )
+  const style: React.CSSProperties = {
+    ['--highlight-color' as any]: highlightColor,
+    position: 'absolute',
+    width: isResizing(dragState) ? dragState.resizeWidth : card.width,
+    height: isResizing(dragState) ? dragState.resizeHeight : card.height,
+    left: isMoving(dragState) ? dragState.moveX : card.x,
+    top: isMoving(dragState) ? dragState.moveY : card.y,
   }
+
+  const { type } = parseDocumentLink(card.url)
+  const context = 'board'
+  const contentType = ContentTypes.lookup({ type, context })
+
+  const selected = props.selected || props.remoteSelected.length > 0
+
+  return (
+    <DraggableCore
+      key={props.id}
+      allowAnyClick={false}
+      disabled={false}
+      enableUserSelectHack={false}
+      onDrag={onDrag}
+      onStop={onStop}
+    >
+      <div
+        ref={setCardRef}
+        tabIndex={-1}
+        id={`card-${card.id}`}
+        className={classNames('card', card.type, selected ? 'selected' : 'unselected')}
+        style={style}
+        onClick={onCardClicked}
+        onDoubleClick={onCardDoubleClicked}
+        onContextMenu={stopPropagation}
+      >
+        <Content context="board" url={card.url} uniquelySelected={props.uniquelySelected} />
+        {contentType && contentType.resizable !== false && <span className="cardResizeHandle" />}
+      </div>
+    </DraggableCore>
+  )
 }

@@ -168,7 +168,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     this.selectNone()
   }
 
-  onCardClicked = (e, card) => {
+  onCardClicked = (card, e) => {
     if (this.finishedDrag) {
       // this is the end of a resize / move event, don't change selection
       this.finishedDrag = false
@@ -185,7 +185,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.stopPropagation()
   }
 
-  onCardDoubleClicked = (e, card) => {
+  onCardDoubleClicked = (card, e) => {
     window.location = card.url
     e.stopPropagation()
   }
