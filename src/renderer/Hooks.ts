@@ -26,3 +26,27 @@ export function useDocument<D>(url: string | null): [D | null, ChangeFn<D>] {
 
   return [doc, change]
 }
+
+export function useEvent<K extends keyof HTMLElementEventMap>(
+  target: HTMLElement,
+  type: K,
+  cb: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any
+): void
+export function useEvent<K extends keyof DocumentEventMap>(
+  target: Document,
+  type: K,
+  cb: (this: Document, ev: DocumentEventMap[K]) => any
+): void
+export function useEvent<K extends string>(
+  target: Node,
+  type: K,
+  cb: (this: Node, ev: Event) => void
+): void {
+  useEffect(() => {
+    target.addEventListener(type, cb)
+
+    return () => {
+      target.removeEventListener(type, cb)
+    }
+  }, [target, type, cb])
+}
