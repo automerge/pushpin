@@ -15,10 +15,7 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
-    "semi": [
-      "error",
-      "never"
-    ],
+    "semi": ["error", "never"],
     "no-mixed-operators": "off",
     "class-methods-use-this": "off",
     "@typescript-eslint/no-unused-vars": [
@@ -31,12 +28,11 @@
     "import/extensions": 0,
     "import/no-extraneous-dependencies": 0,
     "import/prefer-default-export": "off",
+    "import/export": "off",
     "import/no-unresolved": [
       2,
       {
-        "ignore": [
-          "electron"
-        ]
+        "ignore": ["electron"]
       }
     ],
     "linebreak-style": 0,
@@ -53,10 +49,7 @@
     "react/jsx-one-expression-per-line": "off",
     "no-param-reassign": "off",
     "object-curly-newline": "off",
-    "curly": [
-      "error",
-      "all"
-    ],
+    "curly": ["error", "all"],
     "no-underscore-dangle": "off",
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-a11y/anchor-is-valid": "off",
