@@ -23,7 +23,7 @@ interface Doc {
   contactIds: PushpinUrl[]
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
-  archivedDocUrls: PushpinUrl[]
+  archivedDocUrls?: PushpinUrl[]
 }
 
 interface State {
@@ -377,7 +377,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       items: (state, props) =>
         state.search === '' || !state.doc
           ? [] // don't show archived URLs unless there's a current search term
-          : state.doc.archivedDocUrls
+          : (state.doc.archivedDocUrls || [])
               .map((url) => [url, this.state.viewedDocs[url]])
               .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
               .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
