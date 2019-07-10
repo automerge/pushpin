@@ -52,6 +52,10 @@ export function useDocument<D>(url: string | null): [D | null, ChangeFn<D>] {
 
 export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (msg: M) => void {
   const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
+
+  // Without this ref, we'd close over the `onMsg` passed during the very first render.
+  // Instead, we close over the ref object and can be sure we're always reading
+  // the latest onMsg callback.
   const onMsgRef = useRef(onMsg)
   onMsgRef.current = onMsg
 
