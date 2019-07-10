@@ -8,19 +8,20 @@
   padding-right: 4px;
 }
 .Authors > * > .Avatar {
-  width: 28px; height: 28px;
-  position: relative;
+  width: 28px;
+  height: 28px;
 }
-.Authors > * > .Avatar:hover:after {
+
+.Authors > * > .Avatar:hover::after {
   display: block;
   position: absolute;
   /* border: 2px solid var(--highlight-color, var(--colorOnline)); */
   white-space: nowrap;
-  max-width: 104px;
+  max-width: 204px;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
-  box-shadow: 0 0 4px rgba(0,0,0,.25);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   padding: 2px 4px;
   background-color: white;
   border-radius: 4px;
@@ -28,7 +29,4 @@
   top: 36px;
   font-size: 12px;
   line-height: 16px;
-}
-.Authors > * > div > img {
-  width: 24px; height: 24px;
 }
