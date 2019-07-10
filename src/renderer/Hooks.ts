@@ -18,6 +18,7 @@ export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Clea
       return () => {}
     }
 
+    // TODO: add useRepo and Repo react context
     const handle = window.repo.open(url)
 
     const cleanup = cb(handle)
@@ -50,21 +51,20 @@ export function useDocument<D>(url: string | null): [D | null, ChangeFn<D>] {
 }
 
 export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (msg: M) => void {
-  const [send, setSend] = useState<(msg: M) => void>(() => {})
+  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
   const onMsgRef = useRef(onMsg)
   onMsgRef.current = onMsg
 
   useHandle(url, (handle) => {
     handle.subscribeMessage((msg: M) => onMsgRef.current(msg))
-    setSend(handle.message)
+    setSend({ send: handle.message })
 
     return () => {
       onMsgRef.current = () => {}
-      setSend(() => {})
+      setSend({ send() {} })
     }
   })
-
-  return send
+  return sendObj.send
 }
 
 export function useInterval(ms: number, cb: () => void, deps?: any[]) {
