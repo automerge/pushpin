@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { useRef, useLayoutEffect, useEffect } from 'react'
 import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 import Automerge from 'automerge'
-import { Handle } from 'hypermerge'
 
 import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
+import { useDocument } from '../Hooks'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -38,117 +38,128 @@ interface TextDoc {
   text?: Automerge.Text
 }
 
-interface State {
-  text?: Automerge.Text
-  doc?: TextDoc
-}
-
-interface UniquelySelectedContentProps extends ContentProps {
+interface Props extends ContentProps {
   uniquelySelected: boolean
 }
 
-export default class TextContent extends React.PureComponent<UniquelySelectedContentProps, State> {
-  static minWidth = 6
-  static minHeight = 2
-  static defaultWidth = 12
-  // no default height to allow it to grow
-  static maxWidth = 24
-  static maxHeight = 36
+TextContent.minWidth = 6
+TextContent.minHeight = 2
+TextContent.defaultWidth = 12
+// no default height to allow it to grow
+TextContent.maxWidth = 24
+TextContent.maxHeight = 36
 
-  private stallDelete: boolean = false // this should be on state?
-  private handle?: Handle<TextDoc>
-  private codeMirror: CodeMirror
-  private editorRef = React.createRef()
-  state: State = {}
+export default function TextContent(props: Props) {
+  const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
-  // When the components mounts, and we therefore have refs to the DOM,
-  // set up the editor.
-  componentDidMount = () => {
-    log('componentDidMount')
+  const editorRef = useCodeMirror({
+    text: doc && doc.text,
+    selected: props.uniquelySelected,
+    change(cb) {
+      changeDoc((doc) => {
+        doc.text && cb(doc.text)
+      })
+    },
+  })
+
+  return (
+    <div className="CodeMirrorEditor">
+      <div
+        id={`editor-${props.hypermergeUrl}`}
+        className="CodeMirrorEditor__editor"
+        ref={editorRef}
+        onPaste={stopPropagation}
+      />
+    </div>
+  )
+}
+
+interface CodeMirrorProps {
+  text?: Automerge.Text
+  selected: boolean
+  change(cb: (text: Automerge.Text) => void): void
+}
+
+function useCodeMirror(props: CodeMirrorProps) {
+  const editorRef = useRef<HTMLDivElement>(null)
+  const codeMirrorRef = useRef<CodeMirror | null>(null)
+
+  useLayoutEffect(() => {
+    // Observe changes to the editor and make corresponding updates to the
+    // Automerge text.
+    function onCodeMirrorChange(codeMirror: CodeMirror, change: any) {
+      // We don't want to re-apply changes we already applied because of updates
+      // from Automerge.
+      if (change.origin === 'automerge') {
+        return
+      }
+      log('onCodeMirrorChange')
+
+      // Convert from CodeMirror coordinate space to Automerge text/array API.
+      const at = codeMirror.indexFromPos(change.from)
+      const removedLength = change.removed.join('\n').length
+      const addedText = change.text.join('\n')
+
+      props.change((text) => {
+        if (removedLength > 0) {
+          text.splice(at, removedLength)
+        }
+
+        if (addedText.length > 0) {
+          text.insertAt(at, ...addedText.split(''))
+        }
+      })
+    }
+
+    function onKeyDown(codeMirror: CodeMirror, e: React.KeyboardEvent) {
+      if (e.key !== 'Backspace') {
+        e.stopPropagation()
+        return
+      }
+
+      // we normally prevent deletion by stopping event propagation
+      // but if the card is already empty and we hit delete, allow it
+      const text = codeMirror.getValue()
+      if (text.length !== 0) {
+        e.stopPropagation()
+      }
+    }
 
     // The props after `autofocus` are needed to get an editor that resizes
     // according to the size of the text, without scrollbars or wrapping.
-    this.codeMirror = CodeMirror(this.editorRef, {
-      autofocus: this.props.uniquelySelected,
+    const codeMirror = CodeMirror(editorRef.current, {
+      autofocus: props.selected,
       lineNumbers: false,
       lineWrapping: true,
       scrollbarStyle: 'null',
       viewportMargin: Infinity,
     })
-    this.codeMirror.on('change', this.onCodeMirrorChange)
 
-    const { hypermergeUrl } = this.props
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onDocChange(doc))
-  }
+    codeMirrorRef.current = codeMirror
 
-  componentWillUnmount = () => {
-    this.handle && this.handle.close()
-  }
+    codeMirror.on('change', onCodeMirrorChange)
+    codeMirror.on('keydown', onKeyDown)
 
-  // Transform declarative React selection prop into imperative focus changes
-  // in the editor.
-  componentWillReceiveProps = (props) => {
-    if (!this.codeMirror) {
-      return
+    return () => {
+      codeMirror.off('change', onCodeMirrorChange)
+      codeMirror.off('keydown', onKeyDown)
     }
-    this.ensureFocus(props.uniquelySelected)
-  }
-
-  // Ensure the CodeMirror editor is focused if we expect it to be.
-  ensureFocus = (uniquelySelected) => {
-    if (uniquelySelected && !this.codeMirror.hasFocus()) {
-      log('ensureFocus.forceFocus')
-      this.codeMirror.focus()
-    }
-  }
-
-  // Observe changes to the editor and make corresponding updates to the
-  // Automerge text.
-  onCodeMirrorChange = (codeMirror, change) => {
-    // We don't want to re-apply changes we already applied because of updates
-    // from Automerge.
-    if (change.origin === 'automerge') {
-      return
-    }
-    log('onCodeMirrorChange')
-
-    // Convert from CodeMirror coordinate space to Automerge text/array API.
-    const at = codeMirror.indexFromPos(change.from)
-    const removedLength = change.removed.join('\n').length
-    const addedText = change.text.join('\n')
-
-    this.handle &&
-      this.handle.change((doc) => {
-        if (removedLength > 0) {
-          doc.text.splice(at, removedLength)
-        }
-
-        if (addedText.length > 0) {
-          doc.text.insertAt(at, ...addedText.split(''))
-        }
-      })
-  }
+  }, [])
 
   // Transform updates from the Automerge text into imperative text changes
   // in the editor.
-  onDocChange = (doc) => {
-    const { text } = doc
+  useEffect(() => {
+    const { text } = props
+    const codeMirror = codeMirrorRef.current
 
-    // Short circuit if the text didn't change. This happens when a prop
-    // besides text changed.
-    if (this.state.text === text) {
-      return
-    }
     // Short circuit if the text has not loaded yet.
-    if (!text) {
+    if (!text || !codeMirror) {
       return
     }
-
-    this.setState({ text })
 
     // Short circuit if we don't need to apply any changes to the editor. This
     // happens when we get a text update based on our own local edits.
-    const oldStr = this.codeMirror.getValue()
+    const oldStr = codeMirror.getValue()
     const newStr = text.join('')
     if (oldStr === newStr) {
       return
@@ -159,74 +170,60 @@ export default class TextContent extends React.PureComponent<UniquelySelectedCon
     log('forceContents')
     const dmp = new DiffMatchPatch()
     const diff = dmp.diff_main(oldStr, newStr)
-    // The diff lib doesn't give indicies so we need to compute them ourself as
-    // we go along.
-    let at = 0
-    for (let i = 0; i < diff.length; i += 1) {
-      const [type, str] = diff[i]
-      switch (type) {
-        case DiffMatchPatch.DIFF_EQUAL: {
-          at += str.length
-          break
-        }
-        case DiffMatchPatch.DIFF_INSERT: {
-          const fromPos = this.codeMirror.posFromIndex(at)
-          this.codeMirror.replaceRange(str, fromPos, null, 'automerge')
-          at += str.length
-          break
-        }
-        case DiffMatchPatch.DIFF_DELETE: {
-          const fromPos = this.codeMirror.posFromIndex(at)
-          const toPos = this.codeMirror.posFromIndex(at + str.length)
-          this.codeMirror.replaceRange('', fromPos, toPos, 'automerge')
-          break
-        }
-        default: {
-          throw new Error(`Did not expect diff type ${type}`)
+
+    // Buffer CM's dom updates
+    codeMirror.operation(() => {
+      // The diff lib doesn't give indicies so we need to compute them ourself as
+      // we go along.
+      for (let i = 0, at = 0; i < diff.length; i += 1) {
+        const [type, str] = diff[i]
+
+        switch (type) {
+          case DiffMatchPatch.DIFF_EQUAL: {
+            at += str.length
+            break
+          }
+
+          case DiffMatchPatch.DIFF_INSERT: {
+            const fromPos = codeMirror.posFromIndex(at)
+            codeMirror.replaceRange(str, fromPos, null, 'automerge')
+            at += str.length
+            break
+          }
+
+          case DiffMatchPatch.DIFF_DELETE: {
+            const fromPos = codeMirror.posFromIndex(at)
+            const toPos = codeMirror.posFromIndex(at + str.length)
+            codeMirror.replaceRange('', fromPos, toPos, 'automerge')
+            break
+          }
+
+          default: {
+            throw new Error(`Did not expect diff type ${type}`)
+          }
         }
       }
-    }
-  }
+    })
+  }, [props.text])
 
-  setEditorRef = (e) => {
-    this.editorRef = e
-  }
-
-  onKeyDown = (e) => {
-    // XXX: this stallDelete thing should probably be on state?
-    if (e.key !== 'Backspace') {
-      this.stallDelete = true
-    }
-    if (!this.stallDelete) {
-      // we normally prevent deletion by stopping event propagation
-      // but if the card is already empty and we hit delete, allow it
+  // Ensure the CodeMirror editor is focused if we expect it to be.
+  useLayoutEffect(() => {
+    const codeMirror = codeMirrorRef.current
+    if (!codeMirror) {
       return
     }
-    if (e.key === 'Backspace' && this.state.text.length === 0) {
-      this.stallDelete = false
+
+    if (props.selected && !codeMirror.hasFocus()) {
+      log('ensureFocus.forceFocus')
+      codeMirror.focus()
     }
+  }, [props.selected])
 
-    e.stopPropagation()
-  }
+  return editorRef
+}
 
-  handlePaste = (e) => {
-    e.stopPropagation()
-  }
-
-  render = () => {
-    log('render')
-
-    return (
-      <div className="CodeMirrorEditor" onKeyDown={this.onKeyDown}>
-        <div
-          id={`editor-${this.props.hypermergeUrl}`}
-          className="CodeMirrorEditor__editor"
-          ref={this.setEditorRef}
-          onPaste={this.handlePaste}
-        />
-      </div>
-    )
-  }
+function stopPropagation(e: React.SyntheticEvent) {
+  e.stopPropagation()
 }
 
 function initializeDocument(editor: TextDoc, { text }) {
