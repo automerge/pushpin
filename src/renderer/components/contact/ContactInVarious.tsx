@@ -42,6 +42,7 @@ export default function ContactInVarious(props: ContentProps) {
     <div
       className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
       style={{ ['--highlight-color' as any]: color }}
+      data-name={name}
     >
       {avatarImage}
     </div>
@@ -70,18 +71,8 @@ export default function ContactInVarious(props: ContentProps) {
 
     case 'title-bar':
       return (
-        <div>
-          <div
-            draggable
-            onDragStart={onDragStart}
-            className={`Avatar Avatar--title-bar ${
-              isOnline ? 'Avatar--online' : 'Avatar--offline'
-            }`}
-            style={{ '--highlight-color': color } as any}
-            data-name={name}
-          >
-            {avatarImage}
-          </div>
+        <div draggable onDragStart={onDragStart}>
+          {avatar}
         </div>
       )
 
