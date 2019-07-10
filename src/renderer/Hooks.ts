@@ -1,22 +1,44 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { Handle } from 'hypermerge'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
+
+type Cleanup = void | (() => void)
+
+/**
+ * Provides direct use of a handle inside a callback.
+ *
+ * @remarks
+ * Only acquires a new handle when the given url changes,
+ * and ensures all handles are properly closed.
+ */
+export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Cleanup): void {
+  useEffect(() => {
+    if (!url) {
+      return () => {}
+    }
+
+    const handle = window.repo.open(url)
+
+    const cleanup = cb(handle)
+
+    return () => {
+      handle.close()
+      cleanup && cleanup()
+    }
+  }, [url])
+}
 
 export function useDocument<D>(url: string | null): [D | null, ChangeFn<D>] {
   const [doc, setDoc] = useState<D | null>(null)
 
-  useEffect(() => {
-    if (!url) {
-      setDoc(null)
-      return () => {}
-    }
-
-    const handle = window.repo.watch(url, (doc: D) => setDoc(doc))
+  useHandle<D>(url, (handle) => {
+    handle.subscribe((doc) => setDoc(doc))
 
     return () => {
-      handle.close()
+      setDoc(null)
     }
-  }, [url])
+  })
 
   function change(cb: (doc: D) => void): void {
     if (url) {
@@ -25,6 +47,34 @@ export function useDocument<D>(url: string | null): [D | null, ChangeFn<D>] {
   }
 
   return [doc, change]
+}
+
+export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (msg: M) => void {
+  const [send, setSend] = useState<(msg: M) => void>(() => {})
+  const onMsgRef = useRef(onMsg)
+  onMsgRef.current = onMsg
+
+  useHandle(url, (handle) => {
+    handle.subscribeMessage((msg: M) => onMsgRef.current(msg))
+    setSend(handle.message)
+
+    return () => {
+      onMsgRef.current = () => {}
+      setSend(() => {})
+    }
+  })
+
+  return send
+}
+
+export function useInterval(ms: number, cb: () => void, deps?: any[]) {
+  useEffect(() => {
+    const id = setInterval(cb, ms)
+
+    return () => {
+      clearInterval(id)
+    }
+  }, deps)
 }
 
 export function useEvent<K extends keyof HTMLElementEventMap>(
