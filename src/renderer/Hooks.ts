@@ -30,7 +30,7 @@ export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Clea
   }, [url])
 }
 
-export function useDocument<D>(url: string | null): [D | null, ChangeFn<D>] {
+export function useDocument<D>(url: string | null): [Readonly<D> | null, ChangeFn<D>] {
   const [doc, setDoc] = useState<D | null>(null)
 
   useHandle<D>(url, (handle) => {
