@@ -71,7 +71,7 @@ export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (m
   return sendObj.send
 }
 
-export function useInterval(ms: number, cb: () => void, deps?: any[]) {
+export function useInterval(ms: number, cb: () => void, deps: any[]) {
   useEffect(() => {
     const id = setInterval(cb, ms)
 
@@ -79,6 +79,39 @@ export function useInterval(ms: number, cb: () => void, deps?: any[]) {
       clearInterval(id)
     }
   }, deps)
+}
+
+/**
+ * Starts a timeout when `cond` is first set to true.
+ * The timeout can be restarted by calling the returned `reset` function.
+ *
+ * @remarks
+ * The timeout is cancelled when `cond` is set to false.
+ */
+export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
+  const reset = useRef(() => {})
+
+  useEffect(() => {
+    if (!cond) {
+      reset.current = () => {}
+      return () => {}
+    }
+
+    let id: NodeJS.Timeout
+
+    reset.current = () => {
+      id != null && clearTimeout(id)
+      id = setTimeout(cb, ms)
+    }
+
+    reset.current()
+
+    return () => {
+      clearTimeout(id)
+    }
+  }, [cond])
+
+  return () => reset.current()
 }
 
 export function useEvent<K extends keyof HTMLElementEventMap>(
