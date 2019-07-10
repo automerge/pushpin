@@ -1,205 +1,117 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Debug from 'debug'
 
-import { Handle } from 'hypermerge'
 import Content, { ContentProps } from '../Content'
 import { ContactDoc } from '.'
 
-import { createDocumentLink } from '../../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 
 import './ContactInVarious.css'
+import { useDocument, useMessaging, useTimeoutWhen } from '../../Hooks'
 
 const log = Debug('pushpin:settings')
 
-interface State {
-  online: boolean
-  doc?: ContactDoc
-}
+export default function ContactInVarious(props: ContentProps) {
+  const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
+  const isPresent = usePresence(props.hypermergeUrl)
+  const isOnline = isPresent || props.selfId === props.hypermergeUrl
 
-export default class ContactInVarious extends React.PureComponent<ContentProps, State> {
-  private handle?: Handle<ContactDoc>
-  private timerId?: NodeJS.Timeout
-  state: State = { online: false }
-
-  // This is the New Boilerplate
-  componentWillMount = () => {
-    this.handle = window.repo.open(this.props.hypermergeUrl)
-    this.handle.subscribe((doc) => this.onChange(doc))
-    this.handle.subscribeMessage((msg) => this.onMessage(msg))
-  }
-
-  componentWillUnmount = () => {
-    this.handle && this.handle.close()
-    this.timerId && clearTimeout(this.timerId)
-  }
-
-  onChange = (doc) => {
-    if (this.props.selfId === this.props.hypermergeUrl) {
-      this.setState({ online: true })
-    }
-    this.setState({ doc })
-  }
-
-  onMessage = (msg) => {
-    this.timerId != null && clearTimeout(this.timerId)
-    // if we miss two heartbeats (11s), assume they've gone offline
-    this.timerId = setTimeout(() => {
-      this.setState({ online: false })
-    }, 11000)
-    this.setState({ online: true })
-  }
-
-  onDragStart = (e) => {
+  function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData(
       'application/pushpin-url',
-      createDocumentLink('contact', this.props.hypermergeUrl)
+      createDocumentLink('contact', props.hypermergeUrl)
     )
   }
 
-  render() {
-    switch (this.props.context) {
-      case 'list':
-        return this.renderList()
-      case 'thread':
-        return this.renderThread()
-      case 'title-bar':
-        return this.renderTitleBar()
-      case 'board':
-        return this.renderBoard()
-      default:
-        log('contact render called in an unexpected context')
-        return null
-    }
+  const { context } = props
+
+  if (!contact) {
+    return null
   }
 
-  renderList() {
-    const { doc, online } = this.state
-    if (!doc) {
-      return null
-    }
+  const { avatarDocId, name, color } = contact
 
-    const { avatarDocId, name, color } = doc
+  const avatarImage = avatarDocId ? (
+    <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
+  ) : (
+    <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+  )
 
-    let avatar
-    if (avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
-    } else {
-      avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-    }
+  const avatar = (
+    <div
+      className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
+      style={{ ['--highlight-color' as any]: color }}
+    >
+      {avatarImage}
+    </div>
+  )
 
-    return (
-      <div draggable onDragStart={this.onDragStart} className="DocLink">
-        <div className="ListMenu__thumbnail">
-          <div
-            className={`Avatar ${online ? 'Avatar--online' : 'Avatar--offline'}`}
-            style={{ '--highlight-color': color } as any}
-          >
-            {avatar}
+  switch (context) {
+    case 'list':
+      return (
+        <div draggable onDragStart={onDragStart} className="DocLink">
+          <div className="ListMenu__thumbnail">{avatar}</div>
+          <div className="Label">
+            <p className="Type--primary">{name}</p>
           </div>
         </div>
-        <div className="Label">
-          <p className="Type--primary">{name}</p>
-        </div>
-      </div>
-    )
-  }
+      )
 
-  renderThread() {
-    const { doc, online } = this.state
-    if (!doc) {
-      return null
-    }
-
-    const { avatarDocId, name, color } = doc
-
-    let avatar
-    if (avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
-    } else {
-      avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-    }
-
-    const avatarStyle = { ...css.avatar }
-    if (color) {
-      avatarStyle['--highlight-color'] = color
-    }
-
-    return (
-      <div style={css.user}>
-        <div
-          className={`Avatar ${online ? 'Avatar--online' : 'Avatar--offline'}`}
-          style={avatarStyle}
-          title={name}
-        >
+    case 'thread':
+      return (
+        <div style={css.user}>
           {avatar}
+          <div className="username" style={css.username}>
+            {name}
+          </div>
         </div>
-        <div className="username" style={css.username}>
-          {name}
+      )
+
+    case 'title-bar':
+      return (
+        <div>
+          <div
+            draggable
+            onDragStart={onDragStart}
+            className={`Avatar Avatar--title-bar ${
+              isOnline ? 'Avatar--online' : 'Avatar--offline'
+            }`}
+            style={{ '--highlight-color': color } as any}
+            data-name={name}
+          >
+            {avatarImage}
+          </div>
         </div>
-      </div>
-    )
-  }
+      )
 
-  renderTitleBar() {
-    let avatar
-    const { doc } = this.state
-    if (!doc) {
-      return null
-    }
-
-    const { avatarDocId, name, color } = doc
-
-    if (avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
-    } else {
-      avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-    }
-
-    return (
-      <div>
-        <div
-          draggable
-          onDragStart={this.onDragStart}
-          className={`Avatar Avatar--title-bar ${
-            this.state.online ? 'Avatar--online' : 'Avatar--offline'
-          }`}
-          style={{ '--highlight-color': color } as any}
-          data-name={name}
-        >
+    case 'board':
+      return (
+        <div className="Contact--board">
           {avatar}
+          <div className="Label">{name}</div>
         </div>
-      </div>
-    )
-  }
+      )
 
-  renderBoard() {
-    const { doc, online } = this.state
-    if (!doc) {
+    default:
+      log('contact render called in an unexpected context')
       return null
-    }
-
-    const { avatarDocId, name, color } = doc
-
-    let avatar
-    if (avatarDocId) {
-      avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
-    } else {
-      avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-    }
-
-    return (
-      <div className="Contact--board">
-        <div
-          className={`Avatar Avatar--board ${online ? 'Avatar--online' : 'Avatar--offline'}`}
-          style={{ '--highlight-color': color } as any}
-        >
-          {avatar}
-        </div>
-        <div className="Label">{name}</div>
-      </div>
-    )
   }
+}
+
+function usePresence(url: HypermergeUrl): boolean {
+  const [isPresent, set] = useState(false)
+
+  const reset = useTimeoutWhen(isPresent, 5000, () => {
+    set(false)
+  })
+
+  useMessaging(url, () => {
+    reset()
+    isPresent || set(true)
+  })
+
+  return isPresent
 }
 
 const css = {
