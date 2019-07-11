@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { Handle } from 'hypermerge'
+import * as Hyperfile from './hyperfile'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -69,6 +70,17 @@ export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (m
     }
   })
   return sendObj.send
+}
+
+export function useHyperfile(url: Hyperfile.HyperfileUrl | null): Uint8Array | null {
+  const [data, setData] = useState<Uint8Array | null>(null)
+
+  useEffect(() => {
+    data && setData(null)
+    url && Hyperfile.fetch(url).then(setData)
+  }, [url])
+
+  return data
 }
 
 export function useInterval(ms: number, cb: () => void, deps: any[]) {
