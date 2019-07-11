@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
@@ -22,18 +22,14 @@ PdfContent.maxWidth = 72
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.hypermergeUrl)
   const pdfData = useHyperfile(pdf && pdf.hyperfileUrl)
+  const fileData = useMemo(() => ({ data: pdfData }), [pdfData])
   const [pageNum, setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
 
-  const [pageInputValue, onInput] = useConfirmableInput(String(pageNum), (str) => {
+  const [pageInputValue, onPageInput] = useConfirmableInput(String(pageNum), (str) => {
     const nextPageNum = Number.parseInt(str, 10)
 
-    if (nextPageNum > 0 && nextPageNum <= numPages) {
-      setPageNum(nextPageNum)
-      return String(nextPageNum)
-    }
-
-    return String(pageNum)
+    setPageNum(Math.min(numPages, Math.max(1, nextPageNum)))
   })
 
   function goForward() {
@@ -48,24 +44,25 @@ export default function PdfContent(props: ContentProps) {
     }
   }
 
-  function onDocumentLoadSuccess(result: any) {
-    const { numPages } = result
+  const onDocumentLoadSuccess = useCallback(
+    (result: any) => {
+      const { numPages } = result
 
-    result.getMetadata().then(onDocumentMetadata)
+      setNumPages(numPages)
 
-    setNumPages(numPages)
-  }
+      result.getMetadata().then((metadata: any) => {
+        const { info = {} } = metadata
+        const { Title } = info
 
-  function onDocumentMetadata(metadata: any) {
-    const { info = {} } = metadata
-    const { Title } = info
-
-    if (Title && pdf && !pdf.title) {
-      changePdf((doc) => {
-        doc.title = Title
+        if (Title && pdf && !pdf.title) {
+          changePdf((doc) => {
+            doc.title = Title
+          })
+        }
       })
-    }
-  }
+    },
+    [changePdf]
+  )
 
   if (!pdf) {
     return null
@@ -86,10 +83,10 @@ export default function PdfContent(props: ContentProps) {
           className="PDFCardHeader__input"
           value={pageInputValue}
           type="number"
-          min="1"
+          min={1}
           max={numPages}
-          onChange={onInput}
-          onKeyDown={onInput}
+          onChange={onPageInput}
+          onKeyDown={onPageInput}
         />
         <div className="PDFCardHeader__numPages">/ {numPages}</div>
         <button
@@ -107,8 +104,9 @@ export default function PdfContent(props: ContentProps) {
     <div className="PDFCard">
       {header}
       {pdfData ? (
-        <Document file={{ data: pdfData }} onLoadSuccess={onDocumentLoadSuccess}>
+        <Document file={fileData} onLoadSuccess={onDocumentLoadSuccess}>
           <Page
+            loading=""
             pageNumber={pageNum}
             className="PDFCard__page"
             width={1600}
