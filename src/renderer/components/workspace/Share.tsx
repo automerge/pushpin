@@ -10,6 +10,7 @@ import { Doc as WorkspaceDoc } from './Workspace'
 import { ContactDoc } from '../contact'
 import Label from '../Label'
 import { useDocument } from '../../Hooks'
+import Badge from '../Badge'
 
 const log = Debug('pushpin:share')
 
@@ -108,10 +109,9 @@ function renderContacts(
   const noneFound = (
     <div className="ListMenu__item">
       <div className="ContactListMenuItem">
-        <i
-          className="Badge ListMenu__thumbnail fa fa-question-circle"
-          style={{ backgroundColor: 'var(--colorPaleGrey)' }}
-        />
+        <span className="ListMenu__thumbnail">
+          <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
+        </span>
         <Label>
           <p className="Type--primary">None found</p>
           <p className="Type--secondary">Copy a link to your board and start making friends</p>

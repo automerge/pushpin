@@ -3,6 +3,7 @@ import TitleEditor from '../TitleEditor'
 import { BoardDoc } from '.'
 import { ContentProps } from '../Content'
 import { useDocument } from '../../Hooks'
+import Badge from '../Badge'
 
 interface Props extends ContentProps {
   editable: boolean
@@ -28,7 +29,7 @@ export default function BoardInList(props: Props) {
 
   return (
     <div draggable onDragStart={onDragStart} className="DocLink">
-      <i ref={badgeRef} className="Badge fa fa-files-o" style={{ background: backgroundColor }} />
+      <Badge ref={badgeRef} icon="files-o" backgroundColor={backgroundColor} />
       {props.editable ? (
         <TitleEditor url={props.hypermergeUrl} />
       ) : (

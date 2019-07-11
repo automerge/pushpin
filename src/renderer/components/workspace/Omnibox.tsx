@@ -8,6 +8,7 @@ import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from
 
 import InvitationsView from '../../InvitationsView'
 import { ContactDoc } from '../contact'
+import Badge from '../Badge'
 import './Omnibox.css'
 
 const log = Debug('pushpin:omnibox')
@@ -484,10 +485,9 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           <div className="ListMenu__segment">Oops…</div>
           <div className="ListMenu__section">
             <div className={classes} key="nothingFound">
-              <i
-                className="Badge ListMenu__thumbnail fa fa-question-circle"
-                style={{ backgroundColor: 'var(--colorPaleGrey)' }}
-              />
+              <span className="ListMenu__thumbnail">
+                <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
+              </span>
               <p className="Type--primary">Nothing Found</p>
             </div>
           </div>
@@ -511,9 +511,9 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           className={classes}
         >
           <div className="Invitation">
-            <i
-              className="Badge fa fa-envelope"
-              style={{ background: invitation.doc && invitation.doc.backgroundColor }}
+            <Badge
+              icon="envelope"
+              backgroundColor={invitation.doc && invitation.doc.backgroundColor}
             />
             <div className="Invitation__body">
               <h4 className="Type--primary">{invitation.doc.title || 'Untitled'}</h4>
