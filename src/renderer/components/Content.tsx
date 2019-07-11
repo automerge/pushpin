@@ -10,7 +10,7 @@ const FILTERED_PROPS = ['type', 'hypermergeUrl']
 
 // this is the interface imported by Content types
 export interface ContentProps {
-  context: string
+  context: Context
   url: string
   type: string
   hypermergeUrl: string
