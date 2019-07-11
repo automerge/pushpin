@@ -104,15 +104,6 @@ input {
 
 /* End globals */
 
-
-.Notification {
-  margin: 8px;
-  border: 1px solid #e9edf0;
-  border-radius: 4px;
-  padding: 8px;
-  padding-bottom: 0px;
-}
-
 .DocLink {
   display: flex;
   align-items: center;
