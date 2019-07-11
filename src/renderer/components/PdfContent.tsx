@@ -118,7 +118,7 @@ export default function PdfContent(props: ContentProps) {
   )
 }
 
-function initializeDocument(pdf, { hyperfileUrl }) {
+function initializeDocument(pdf: PdfDoc, { hyperfileUrl }: any) {
   pdf.hyperfileUrl = hyperfileUrl
 }
 
