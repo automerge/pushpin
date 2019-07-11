@@ -1,196 +1,123 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
-import { Handle } from 'hypermerge'
-import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
+import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
 
 interface PdfDoc {
+  title?: string
   hyperfileUrl: string
 }
 
-interface State {
-  currentHyperfileUrl: string
-  reactPDFData?: object
-  pageInputValue: string
-  pageNum: number
-  numPages: number
-  doc?: PdfDoc
-}
+PdfContent.minWidth = 3
+PdfContent.minHeight = 3
+PdfContent.defaultWidth = 18
+// no default height to allow it to grow
+// suggestion: no max/min width on images, we dont
+// know what aspect ratios people will be using day to day
+PdfContent.maxWidth = 72
 
-export default class PDFCard extends React.PureComponent<ContentProps, State> {
-  static minWidth = 3
-  static minHeight = 3
-  static defaultWidth = 18
-  // no default height to allow it to grow
-  // suggestion: no max/min width on images, we dont
-  // know what aspect ratios people will be using day to day
-  //
-  static maxWidth = 72
+export default function PdfContent(props: ContentProps) {
+  const [pdf, changePdf] = useDocument<PdfDoc>(props.hypermergeUrl)
+  const pdfData = useHyperfile(pdf && pdf.hyperfileUrl)
+  const [pageNum, setPageNum] = useState(1)
+  const [numPages, setNumPages] = useState(0)
 
-  private handle?: Handle<PdfDoc>
-  state: State = {
-    currentHyperfileUrl: '',
-    reactPDFData: {},
-    pageInputValue: '1',
-    pageNum: 1,
-    numPages: 0,
-  }
+  const [pageInputValue, onInput] = useConfirmableInput(String(pageNum), (str) => {
+    const nextPageNum = Number.parseInt(str, 10)
 
-  // This is the New Boilerplate
-  componentWillMount = () =>
-    window.repo.watch<PdfDoc>(this.props.hypermergeUrl, (doc) => this.onChange(doc))
-  componentWillUnmount = () => this.handle && this.handle.close()
-
-  onChange = (doc: PdfDoc) => {
-    if (doc.hyperfileUrl && doc.hyperfileUrl !== this.state.currentHyperfileUrl) {
-      this.loadPDF(doc.hyperfileUrl)
-    }
-    // we disable eslint here so that if we want to inspect what the doc has from the console
-    // it's in the place where you'd expect it, even though we aren't using it right now
-    // eslint-disable-next-line react/no-unused-state
-    this.setState({ doc })
-  }
-
-  loadPDF = (hyperfileUrl: Hyperfile.HyperfileUrl) => {
-    Hyperfile.fetch(hyperfileUrl).then((hyperfileContents) => {
-      this.setState({
-        currentHyperfileUrl: hyperfileUrl,
-        reactPDFData: { data: hyperfileContents },
-      })
-    })
-  }
-
-  disableForward = () => this.state.pageNum >= this.state.numPages
-  forward = () => {
-    let { pageNum } = this.state
-    if (pageNum < this.state.numPages) {
-      pageNum += 1
+    if (nextPageNum > 0 && nextPageNum <= numPages) {
+      setPageNum(nextPageNum)
+      return String(nextPageNum)
     }
 
-    this.setState({ pageNum, pageInputValue: String(pageNum) })
+    return String(pageNum)
+  })
+
+  function goForward() {
+    if (pageNum < numPages) {
+      setPageNum(pageNum + 1)
+    }
   }
 
-  disableBack = () => this.state.pageNum <= 1
-  back = () => {
-    let { pageNum } = this.state
+  function goBack() {
     if (pageNum > 1) {
-      pageNum -= 1
-    }
-
-    this.setState({ pageNum, pageInputValue: String(pageNum) })
-  }
-
-  onKeyDown = (e) => {
-    if (e.key === 'ArrowLeft') {
-      this.back()
-      e.stopPropagation()
-    } else if (e.key === 'ArrowRight') {
-      this.forward()
-      e.stopPropagation()
+      setPageNum(pageNum - 1)
     }
   }
 
-  handleInputKey = (e) => {
-    const { pageInputValue, pageNum, numPages } = this.state
-
-    if (e.key === 'Enter') {
-      const nextPageNum = Number.parseInt(pageInputValue, 10)
-      if (nextPageNum > 0 && nextPageNum <= numPages) {
-        this.setState({ pageNum: nextPageNum })
-      } else {
-        this.setState({ pageInputValue: String(pageNum) })
-      }
-      e.target.blur()
-    }
-
-    if (e.key === 'Backspace') {
-      e.stopPropagation()
-    }
-
-    if (e.key === 'Escape') {
-      e.target.blur()
-      this.setState({ pageInputValue: String(pageNum) })
-    }
-  }
-
-  handleInputChange = (e) => {
-    this.setState({ pageInputValue: e.target.value })
-  }
-
-  onDocumentLoadSuccess = (result) => {
+  function onDocumentLoadSuccess(result: any) {
     const { numPages } = result
 
-    result.getMetadata().then((metadata) => this.onDocumentMetadata(metadata))
+    result.getMetadata().then(onDocumentMetadata)
 
-    this.setState({ numPages })
+    setNumPages(numPages)
   }
 
-  onDocumentMetadata = (metadata) => {
+  function onDocumentMetadata(metadata: any) {
     const { info = {} } = metadata
     const { Title } = info
 
-    if (Title && this.handle) {
-      this.handle.change((doc) => {
+    if (Title && pdf && !pdf.title) {
+      changePdf((doc) => {
         doc.title = Title
       })
     }
   }
 
-  render = () => {
-    const { reactPDFData, numPages, pageInputValue } = this.state
-    const { context } = this.props
-
-    const header =
-      context === 'workspace' ? (
-        <div className="PDFCardHeader">
-          <button
-            disabled={this.disableBack()}
-            type="button"
-            onClick={this.back}
-            className="ButtonAction"
-          >
-            <i className="fa fa-angle-left" />
-          </button>
-          <input
-            className="PDFCardHeader__input"
-            value={pageInputValue}
-            type="number"
-            min="1"
-            max={this.state.numPages}
-            onChange={this.handleInputChange}
-            onKeyDown={this.handleInputKey}
-          />
-          <div className="PDFCardHeader__numPages">/ {numPages}</div>
-          <button
-            disabled={this.disableForward()}
-            type="button"
-            onClick={this.forward}
-            className="ButtonAction"
-          >
-            <i className="fa fa-angle-right" />
-          </button>
-        </div>
-      ) : null
-
-    return (
-      <div className="PDFCard">
-        {header}
-        {reactPDFData ? (
-          <Document file={reactPDFData} onLoadSuccess={this.onDocumentLoadSuccess}>
-            <Page
-              pageNumber={this.state.pageNum}
-              className="PDFCard__page"
-              width={1600}
-              renderTextLayer={false}
-            />
-          </Document>
-        ) : null}
-      </div>
-    )
+  if (!pdf) {
+    return null
   }
+
+  const { context } = props
+
+  const forwardDisabled = pageNum >= numPages
+  const backDisabled = pageNum <= 1
+
+  const header =
+    context === 'workspace' ? (
+      <div className="PDFCardHeader">
+        <button disabled={backDisabled} type="button" onClick={goBack} className="ButtonAction">
+          <i className="fa fa-angle-left" />
+        </button>
+        <input
+          className="PDFCardHeader__input"
+          value={pageInputValue}
+          type="number"
+          min="1"
+          max={numPages}
+          onChange={onInput}
+          onKeyDown={onInput}
+        />
+        <div className="PDFCardHeader__numPages">/ {numPages}</div>
+        <button
+          disabled={forwardDisabled}
+          type="button"
+          onClick={goForward}
+          className="ButtonAction"
+        >
+          <i className="fa fa-angle-right" />
+        </button>
+      </div>
+    ) : null
+
+  return (
+    <div className="PDFCard">
+      {header}
+      {pdfData ? (
+        <Document file={{ data: pdfData }} onLoadSuccess={onDocumentLoadSuccess}>
+          <Page
+            pageNumber={pageNum}
+            className="PDFCard__page"
+            width={1600}
+            renderTextLayer={false}
+          />
+        </Document>
+      ) : null}
+    </div>
+  )
 }
 
 function initializeDocument(pdf, { hyperfileUrl }) {
@@ -202,8 +129,8 @@ ContentTypes.register({
   name: 'PDF',
   icon: 'book',
   contexts: {
-    workspace: PDFCard,
-    board: PDFCard,
+    workspace: PdfContent,
+    board: PdfContent,
   },
   initializeDocument,
 })
