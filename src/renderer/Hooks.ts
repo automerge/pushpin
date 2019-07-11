@@ -126,6 +126,63 @@ export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
   return () => reset.current()
 }
 
+type InputEvent = React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>
+
+/**
+ * Manages the state and events for an input element for which the input
+ *
+ * @remarks
+ * Returns `[value, onEvent]`.
+ * Pass `value` to the input's `value` prop, and
+ * pass `onEvent` to both `onChange` and `onKeyDown`.
+ */
+export function useConfirmableInput(
+  value: string,
+  onConfirm: (val: string) => string | null
+): [string, (e: InputEvent) => void] {
+  const [str, setStr] = useState<string | null>(value)
+
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setStr(e.target.value)
+  }
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    switch (e.key) {
+      case 'Enter': {
+        const result = onConfirm(str || value)
+
+        if (typeof result === 'string') {
+          setStr(null)
+          e.currentTarget.blur()
+        }
+        break
+      }
+
+      case 'Backspace':
+        e.stopPropagation()
+        break
+
+      case 'Escape':
+        e.currentTarget.blur()
+        setStr(null)
+        break
+    }
+  }
+
+  function onEvent(e: InputEvent) {
+    switch (e.type) {
+      case 'change':
+        onChange(e as React.ChangeEvent<HTMLInputElement>)
+        break
+      case 'keydown':
+        onKeyDown(e as React.KeyboardEvent<HTMLInputElement>)
+        break
+    }
+  }
+
+  return [str || value, onEvent]
+}
+
 export function useEvent<K extends keyof HTMLElementEventMap>(
   target: HTMLElement,
   type: K,
