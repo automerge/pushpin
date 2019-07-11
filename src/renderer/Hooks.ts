@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { Handle } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 
@@ -42,11 +42,14 @@ export function useDocument<D>(url: string | null): [Readonly<D> | null, ChangeF
     }
   })
 
-  function change(cb: (doc: D) => void): void {
-    if (url) {
-      window.repo.change(url, cb)
-    }
-  }
+  const change = useCallback(
+    (cb: (doc: D) => void) => {
+      if (url) {
+        window.repo.change(url, cb)
+      }
+    },
+    [url]
+  )
 
   return [doc, change]
 }
@@ -138,9 +141,9 @@ type InputEvent = React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTML
  */
 export function useConfirmableInput(
   value: string,
-  onConfirm: (val: string) => string | null
+  onConfirm: (val: string) => void
 ): [string, (e: InputEvent) => void] {
-  const [str, setStr] = useState<string | null>(value)
+  const [str, setStr] = useState<string | null>(null)
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     setStr(e.target.value)
@@ -148,15 +151,13 @@ export function useConfirmableInput(
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     switch (e.key) {
-      case 'Enter': {
-        const result = onConfirm(str || value)
-
-        if (typeof result === 'string') {
+      case 'Enter':
+        if (str !== null) {
+          onConfirm(str)
           setStr(null)
-          e.currentTarget.blur()
         }
+        e.currentTarget.blur()
         break
-      }
 
       case 'Backspace':
         e.stopPropagation()
@@ -180,7 +181,7 @@ export function useConfirmableInput(
     }
   }
 
-  return [str || value, onEvent]
+  return [str != null ? str : value, onEvent]
 }
 
 export function useEvent<K extends keyof HTMLElementEventMap>(
