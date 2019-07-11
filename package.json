@@ -78,6 +78,7 @@
     "@types/mime-types": "^2.1.0",
     "@types/prop-types": "^15.7.1",
     "@types/react": "^16.8.22",
+    "@types/react-pdf": "^4.0.0",
     "@types/uuid": "^3.4.4",
     "chai": "^4.2.0",
     "electron": "4.0.0",
