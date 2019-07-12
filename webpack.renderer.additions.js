@@ -13,9 +13,4 @@ module.exports = {
     assets: false,
     maxModules: 3,
   },
-  resolve: {
-    alias: {
-      '@static': path.resolve(__dirname, 'static'), // Use in css like so: "~@static/asset.jpg"
-    },
-  },
 }
