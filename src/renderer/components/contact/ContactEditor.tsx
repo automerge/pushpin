@@ -12,6 +12,7 @@ import { ContactDoc } from '.'
 import ColorPicker from '../ColorPicker'
 import Label from '../Label'
 import { useDocument } from '../../Hooks'
+import Popover from '../Popover'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -89,7 +90,7 @@ export default function ContactEditor(props: ContentProps) {
   }
 
   return (
-    <div className="PopOverWrapper">
+    <Popover>
       <div className="ListMenu">
         <div className="ListMenu__header">
           <p className="Type--header">Your Profile</p>
@@ -126,6 +127,6 @@ export default function ContactEditor(props: ContentProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Popover>
   )
 }

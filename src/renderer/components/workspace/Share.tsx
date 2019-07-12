@@ -3,6 +3,7 @@ import Debug from 'debug'
 import classnames from 'classnames'
 
 import Content from '../Content'
+import Popover from '../Popover'
 
 import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
 import ListMenuItem from './ListMenuItem'
@@ -67,7 +68,7 @@ export default function Share(props: Props) {
   }
 
   return (
-    <div className="PopOverWrapper">
+    <Popover>
       <div className="ListMenu">
         <div className="Tabs">
           <div
@@ -87,7 +88,7 @@ export default function Share(props: Props) {
         </div>
         {renderBody()}
       </div>
-    </div>
+    </Popover>
   )
 }
 

@@ -139,17 +139,6 @@ input {
   text-overflow: ellipsis;
 }
 
-/* Popover Menus */
-.PopOverWrapper {
-  background-color: #fff;
-  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  min-height: 8px;
-  border-radius: 4px;
-  width: 296px;
-  max-height: 480px;
-  overflow-y: auto;
-}
-
 /* Buttons */
 
 .ListMenu button {
