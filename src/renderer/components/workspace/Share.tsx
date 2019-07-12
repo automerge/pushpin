@@ -10,8 +10,8 @@ import ListMenuItem from './ListMenuItem'
 import { Doc as WorkspaceDoc } from './Workspace'
 import { ContactDoc } from '../contact'
 import Label from '../Label'
-import { useDocument } from '../../Hooks'
 import Badge from '../Badge'
+import { useDocument, useRepo } from '../../Hooks'
 
 const log = Debug('pushpin:share')
 
@@ -22,6 +22,7 @@ export interface Props {
 type TabName = 'contacts' | 'profile'
 
 export default function Share(props: Props) {
+  const repo = useRepo()
   const [tab, setTab] = useState<TabName>('contacts')
   const [workspace] = useDocument<WorkspaceDoc>(props.hypermergeUrl)
 
@@ -37,7 +38,7 @@ export default function Share(props: Props) {
     log('offerDocumentToIdentity')
 
     const { currentDocUrl } = workspace
-    window.repo.change(workspace.selfId, (s: ContactDoc) => {
+    repo.change(workspace.selfId, (s: ContactDoc) => {
       if (!s.offeredUrls) {
         s.offeredUrls = {}
       }

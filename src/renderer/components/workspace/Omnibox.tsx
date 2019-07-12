@@ -94,7 +94,11 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     log('componentDidMount')
     this.refreshHandle(this.props.hypermergeUrl)
     document.addEventListener('keydown', this.handleCommandKeys)
-    this.invitationsView = new InvitationsView(this.props.hypermergeUrl, this.onInvitationsChange)
+    this.invitationsView = new InvitationsView(
+      window.repo,
+      this.props.hypermergeUrl,
+      this.onInvitationsChange
+    )
   }
 
   componentWillUnmount = () => {

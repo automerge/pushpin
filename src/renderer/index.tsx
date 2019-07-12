@@ -52,7 +52,7 @@ function initHypermerge(cb) {
 
   window.repo = front
 
-  cb() // no need to wait for .ready?
+  cb(front) // no need to wait for .ready?
 }
 
 function loadWorkspaceUrl() {
@@ -77,7 +77,7 @@ function saveWorkspaceUrl(workspaceUrl) {
   Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
 }
 
-function initWorkspace() {
+function initWorkspace(repo: RepoFrontend) {
   let workspaceUrl
   const existingWorkspaceUrl = loadWorkspaceUrl()
   if (existingWorkspaceUrl !== '') {
@@ -89,7 +89,7 @@ function initWorkspace() {
     workspaceUrl = newWorkspaceUrl
   }
 
-  const workspace = <Root url={workspaceUrl} />
+  const workspace = <Root repo={repo} url={workspaceUrl} />
   const element = document.getElementById('app')
   ReactDOM.render(workspace, element)
 
@@ -97,11 +97,11 @@ function initWorkspace() {
   if (module && module.hot) {
     module.hot.accept('./components/Root.tsx', () => {
       const NextRoot = require('./components/Root').default // eslint-disable-line global-require
-      ReactDOM.render(<NextRoot url={workspaceUrl} />, element)
+      ReactDOM.render(<NextRoot repo={repo} url={workspaceUrl} />, element)
     })
   }
 }
 
-initHypermerge(() => {
-  initWorkspace()
+initHypermerge((repo: RepoFrontend) => {
+  initWorkspace(repo)
 })

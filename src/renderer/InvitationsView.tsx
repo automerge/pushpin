@@ -1,16 +1,16 @@
-import { Handle } from 'hypermerge'
+import { Handle, RepoFrontend } from 'hypermerge'
 import { parseDocumentLink, HypermergeUrl } from './ShareLink'
 import { ContactDoc } from './components/contact'
 import { Doc } from './components/workspace/Workspace'
 
 //
 // Example:
-//   this.invitationsView = new InvitationsView(this.props.hypermergeUrl)
-//   this.invitationsView.onChange((invitations) => {
+//   this.invitationsView = new InvitationsView(repo, this.props.hypermergeUrl, (invitations) => {
 //     debugger
 //   })
 //
 export default class InvitationsView {
+  repo: RepoFrontend
   selfId?: HypermergeUrl
   workspaceHandle: Handle<Doc>
   contactHandles: { [contactId: string]: Handle<ContactDoc> }
@@ -19,7 +19,8 @@ export default class InvitationsView {
   pendingInvitations: any[]
   onChangeCb?: Function
 
-  constructor(workspaceId: HypermergeUrl, onChange: Function) {
+  constructor(repo: RepoFrontend, workspaceId: HypermergeUrl, onChange: Function) {
+    this.repo = repo
     this.contactHandles = {}
     this.docHandles = {}
     this.invitations = []
@@ -27,7 +28,7 @@ export default class InvitationsView {
 
     this.onChangeCb = onChange
 
-    this.workspaceHandle = window.repo.watch(workspaceId, (doc) => {
+    this.workspaceHandle = this.repo.watch(workspaceId, (doc) => {
       this.selfId = doc.selfId
       doc.contactIds.forEach((id) => this.watchContact(id))
     })
@@ -38,7 +39,7 @@ export default class InvitationsView {
       return
     }
 
-    const handle = window.repo.watch(hypermergeUrl, (doc) => {
+    const handle = this.repo.watch(hypermergeUrl, (doc) => {
       const index = this.pendingInvitations.findIndex((i) => i.hypermergeUrl === hypermergeUrl)
       if (index !== -1) {
         const invite = this.pendingInvitations[index]
@@ -60,7 +61,7 @@ export default class InvitationsView {
       return
     }
 
-    this.contactHandles[contactId] = window.repo.watch(contactId, (contact) => {
+    this.contactHandles[contactId] = this.repo.watch(contactId, (contact) => {
       if (!contact.offeredUrls) {
         return
       }

@@ -12,6 +12,7 @@ import { ContactDoc } from '../contact'
 
 import './Workspace.css'
 import { useDocument, useInterval, useMessaging } from '../../Hooks'
+import { BoardDoc } from '../board'
 
 const log = Debug('pushpin:workspace')
 
@@ -174,10 +175,9 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   const textDocUrl = createDocumentLink('text', textDocId)
 
   const id = uuid()
-  // TODO: this is a board doc. Should update this type after converting
-  // board to typescript.
-  window.repo.change(boardId, (doc: any) => {
+  window.repo.change(boardId, (doc: BoardDoc) => {
     doc.cards[id] = {
+      type: 'text',
       id,
       url: textDocUrl,
       x: 20,
