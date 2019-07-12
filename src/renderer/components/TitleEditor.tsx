@@ -1,73 +1,61 @@
-import React from 'react'
-import withDocument from './withDocument'
+import React, { useRef } from 'react'
 
 import './TitleEditor.css'
+import { HypermergeUrl } from '../ShareLink'
+import { useDocument } from '../Hooks'
 
 interface Doc {
   title?: string
 }
 
 interface Props {
-  placeholder: string
-  doc: Doc
-  change: (cb: (doc: Doc) => void) => void
-  preventDrag: boolean
+  url: HypermergeUrl
+  placeholder?: string
+  preventDrag?: boolean
 }
 
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
-class TitleEditor extends React.Component<Props> {
-  static initializeDocument = (doc: Doc) => {
-    doc.title = undefined
-  }
+export default function TitleEditor(props: Props) {
+  const [doc, changeDoc] = useDocument<Doc>(props.url)
+  const input = useRef<HTMLInputElement>(null)
+  const { preventDrag = false, placeholder = '' } = props
 
-  static defaultProps = {
-    placeholder: '',
-    preventDrag: false,
-  }
-
-  input: React.RefObject<HTMLInputElement> = React.createRef()
-
-  shouldComponentUpdate(nextProps: Props) {
-    return nextProps.doc.title !== this.props.doc.title
-  }
-
-  onKeyDown = (e: React.KeyboardEvent) => {
+  function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === 'Escape') {
-      this.input && this.input.current && this.input.current.blur()
+      input.current && input.current.blur()
     }
   }
 
-  onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.change((doc: Doc) => {
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    changeDoc((doc: Doc) => {
       doc.title = e.target.value
     })
   }
 
   // Required to prevent draggable parent elements from blowing away edit capability.
-  onDragStart = (e: React.DragEvent) => {
-    if (this.props.preventDrag) {
+  function onDragStart(e: React.DragEvent) {
+    if (preventDrag) {
       e.preventDefault()
       e.stopPropagation()
     }
   }
 
-  render = () => {
-    const { doc, preventDrag } = this.props
-    return (
-      <input
-        ref={this.input}
-        draggable={preventDrag}
-        onDragStart={this.onDragStart}
-        type="text"
-        className="TitleEditor"
-        value={doc.title}
-        placeholder={this.props.placeholder}
-        onKeyDown={this.onKeyDown}
-        onChange={this.onChange}
-      />
-    )
+  if (!doc) {
+    return null
   }
-}
 
-export default withDocument(TitleEditor, TitleEditor.initializeDocument)
+  return (
+    <input
+      ref={input}
+      draggable={preventDrag}
+      onDragStart={onDragStart}
+      type="text"
+      className="TitleEditor"
+      value={doc.title}
+      placeholder={placeholder}
+      onKeyDown={onKeyDown}
+      onChange={onChange}
+    />
+  )
+}

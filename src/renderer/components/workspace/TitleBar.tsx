@@ -1,8 +1,6 @@
-import React from 'react'
-import Debug from 'debug'
+import React, { useRef, useState, useEffect } from 'react'
 import { clipboard } from 'electron'
 
-import { Handle } from 'hypermerge'
 import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
 import Omnibox from './Omnibox'
 import Content from '../Content'
@@ -11,8 +9,7 @@ import Share from './Share'
 import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
 import './TitleBar.css'
-
-const log = Debug('pushpin:title-bar')
+import { useDocument, useEvent } from '../../Hooks'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl
@@ -20,184 +17,148 @@ export interface Props {
 }
 
 interface Doc {
-  currentDocUrl: PushpinUrl
+  currentDocUrl?: PushpinUrl
 }
 
-interface State {
-  activeOmnibox: boolean
-  sessionHistory: PushpinUrl[]
-  historyIndex: number
-  doc?: Doc
-}
+export default function TitleBar(props: Props) {
+  const [sessionHistory, setHistory] = useState<PushpinUrl[]>([])
+  const [historyIndex, setIndex] = useState(0)
+  const [activeOmnibox, setActive] = useState(false)
+  const [doc] = useDocument<Doc>(props.hypermergeUrl)
 
-export default class TitleBar extends React.PureComponent<Props, State> {
-  dropdownRef = React.createRef<Dropdown>()
-  handle?: Handle<Doc>
-  state: State = {
-    activeOmnibox: false,
-    sessionHistory: [],
-    historyIndex: 0,
-  }
+  const dropdownRef = useRef<Dropdown>(null)
 
-  // This is the New Boilerplate
-  componentWillMount = () => {
-    this.handle = window.repo.watch(this.props.hypermergeUrl, (doc) => this.onChange(doc))
-  }
-  componentDidMount = () => {
-    document.addEventListener('keydown', this.onKeyDown)
-  }
-  componentWillUnmount = () => {
-    this.handle && this.handle.close()
-    document.removeEventListener('keydown', this.onKeyDown)
-  }
-
-  disableBack = () => this.state.historyIndex === this.state.sessionHistory.length - 1
-
-  disableForward = () => this.state.historyIndex === 0
-
-  back = () => {
-    if (this.disableBack()) {
-      throw new Error('Can not go back further than session history')
-    }
-
-    this.setState((prevState) => {
-      const historyIndex = prevState.historyIndex + 1
-      this.props.openDoc(prevState.sessionHistory[historyIndex])
-      return { historyIndex }
-    })
-  }
-
-  forward = () => {
-    if (this.disableForward()) {
-      throw new Error('Can not go forward past session history')
-    }
-
-    this.setState((prevState) => {
-      const historyIndex = prevState.historyIndex - 1
-      this.props.openDoc(prevState.sessionHistory[historyIndex])
-      return { historyIndex }
-    })
-  }
-
-  onChange = (doc: Doc) => {
-    this.setState((prevState) => {
-      let { historyIndex, sessionHistory } = prevState
-
-      // Init sessionHistory
-      if (sessionHistory.length === 0) {
-        sessionHistory = [doc.currentDocUrl]
-        // If we're opening a new document (as opposed to going back or forward),
-        // add it to our sessionHistory and remove all docs 'forward' of the current index
-      } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
-        sessionHistory = [doc.currentDocUrl, ...sessionHistory.slice(historyIndex)]
-        historyIndex = 0
-      }
-
-      return { doc, sessionHistory, historyIndex }
-    })
-  }
-
-  onKeyDown = (e: KeyboardEvent) => {
+  useEvent(document, 'keydown', (e) => {
     if (e.key === '/' && document.activeElement === document.body) {
-      if (!this.state.activeOmnibox) {
-        this.activateOmnibox()
+      if (!activeOmnibox) {
+        activateOmnibox()
         e.preventDefault()
       }
     }
-    if (e.key === 'Escape' && this.state.activeOmnibox) {
-      this.deactivateOmnibox()
+
+    if (e.key === 'Escape' && activeOmnibox) {
+      deactivateOmnibox()
       e.preventDefault()
     }
+  })
+
+  const backDisabled = historyIndex === sessionHistory.length - 1
+  const forwardDisabled = historyIndex === 0
+
+  useEffect(() => {
+    if (!doc || !doc.currentDocUrl) {
+      return
+    }
+
+    // Init sessionHistory
+    if (sessionHistory.length === 0) {
+      setHistory([doc.currentDocUrl])
+      // If we're opening a new document (as opposed to going back or forward),
+      // add it to our sessionHistory and remove all docs 'forward' of the current index
+    } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
+      setHistory([doc.currentDocUrl, ...sessionHistory.slice(historyIndex)])
+      setIndex(0)
+    }
+  }, [doc && doc.currentDocUrl])
+
+  function activateOmnibox() {
+    dropdownRef.current && dropdownRef.current.show()
   }
 
-  activateOmnibox = () => {
-    this.dropdownRef && this.dropdownRef.current && this.dropdownRef.current.show()
+  function deactivateOmnibox() {
+    dropdownRef.current && dropdownRef.current.hide()
   }
 
-  deactivateOmnibox = () => {
-    this.dropdownRef.current.hide()
+  function goBack() {
+    if (backDisabled) {
+      throw new Error('Can not go back further than session history')
+    }
+    const newIndex = historyIndex + 1
+    props.openDoc(sessionHistory[newIndex])
+    setIndex(newIndex)
   }
 
-  onShow = () => {
-    this.setState(() => ({ activeOmnibox: true }))
+  function goForward() {
+    if (forwardDisabled) {
+      throw new Error('Can not go forward past session history')
+    }
+    const newIndex = historyIndex - 1
+    props.openDoc(sessionHistory[newIndex])
+    setIndex(newIndex)
   }
 
-  onHide = () => {
-    this.setState(() => ({ activeOmnibox: false }))
-  }
-
-  copyLink = (e: React.MouseEvent) => {
-    if (this.state.doc) {
-      clipboard.writeText(this.state.doc.currentDocUrl)
+  function copyLink(e: React.MouseEvent) {
+    if (doc && doc.currentDocUrl) {
+      clipboard.writeText(doc.currentDocUrl)
     }
   }
 
-  render = () => {
-    log('render')
-    if (!this.state.doc || !this.state.doc.currentDocUrl) {
-      return null
-    }
-
-    return (
-      <div className="TitleBar">
-        <button
-          disabled={this.disableBack()}
-          type="button"
-          onClick={this.back}
-          className="TitleBar__menuItem"
-        >
-          <i className="fa fa-angle-left" />
-        </button>
-        <Dropdown
-          ref={this.dropdownRef}
-          className="TitleBar__menuItem TitleBar__right"
-          onShow={this.onShow}
-          onHide={this.onHide}
-        >
-          <DropdownTrigger>
-            <i className="fa fa-map" />
-          </DropdownTrigger>
-          <DropdownContent>
-            <Omnibox
-              active={this.state.activeOmnibox}
-              hypermergeUrl={this.props.hypermergeUrl}
-              omniboxFinished={this.deactivateOmnibox}
-            />
-          </DropdownContent>
-        </Dropdown>
-
-        <button
-          disabled={this.disableForward()}
-          type="button"
-          onClick={this.forward}
-          className="TitleBar__menuItem"
-        >
-          <i className="fa fa-angle-right" />
-        </button>
-
-        <Content url={this.state.doc.currentDocUrl} context="list" editable />
-        <Authors hypermergeUrl={this.props.hypermergeUrl} />
-
-        <Dropdown
-          className="TitleBar__menuItem
-          TitleBar__right"
-        >
-          <DropdownTrigger>
-            <i className="fa fa-group" />
-          </DropdownTrigger>
-          <DropdownContent>
-            <Share hypermergeUrl={this.props.hypermergeUrl} />
-          </DropdownContent>
-        </Dropdown>
-
-        <button
-          className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
-          type="button"
-          onClick={this.copyLink}
-        >
-          <i className="fa fa-clipboard" />
-        </button>
-      </div>
-    )
+  function onShow() {
+    setActive(true)
   }
+
+  function onHide() {
+    setActive(false)
+  }
+
+  if (!doc || !doc.currentDocUrl) {
+    return null
+  }
+
+  return (
+    <div className="TitleBar">
+      <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar__menuItem">
+        <i className="fa fa-angle-left" />
+      </button>
+      <Dropdown
+        ref={dropdownRef}
+        className="TitleBar__menuItem TitleBar__right"
+        onShow={onShow}
+        onHide={onHide}
+      >
+        <DropdownTrigger>
+          <i className="fa fa-map" />
+        </DropdownTrigger>
+        <DropdownContent>
+          <Omnibox
+            active={activeOmnibox}
+            hypermergeUrl={props.hypermergeUrl}
+            omniboxFinished={deactivateOmnibox}
+          />
+        </DropdownContent>
+      </Dropdown>
+
+      <button
+        disabled={forwardDisabled}
+        type="button"
+        onClick={goForward}
+        className="TitleBar__menuItem"
+      >
+        <i className="fa fa-angle-right" />
+      </button>
+
+      <Content url={doc.currentDocUrl} context="list" editable />
+      <Authors hypermergeUrl={props.hypermergeUrl} />
+
+      <Dropdown
+        className="TitleBar__menuItem
+        TitleBar__right"
+      >
+        <DropdownTrigger>
+          <i className="fa fa-group" />
+        </DropdownTrigger>
+        <DropdownContent>
+          <Share hypermergeUrl={props.hypermergeUrl} />
+        </DropdownContent>
+      </Dropdown>
+
+      <button
+        className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
+        type="button"
+        onClick={copyLink}
+      >
+        <i className="fa fa-clipboard" />
+      </button>
+    </div>
+  )
 }

@@ -6,7 +6,7 @@
 
 Built with Electron, React, automerge and the Dat p2p stack.
 
-A project initiated by [Ink & Switch](https://inkandswitch.com/). 
+A project initiated by [Ink & Switch](https://inkandswitch.com/).
 
 ## Running from Source
 
@@ -53,7 +53,7 @@ You can remove a user directory to reset a user's data, or remove the entire dat
 
 ## Using PushPin
 
-PushPin is an offline-first collaborative cork board. You can make new text notes by double-clicking, and drag-and-drop or paste in text, images, and URLs to a board. 
+PushPin is an offline-first collaborative cork board. You can make new text notes by double-clicking, and drag-and-drop or paste in text, images, and URLs to a board.
 
 You can also drag boards and contacts from the search bar onto a board, right click to create new elements like conversation threads or change the background color of a board.
 
@@ -67,9 +67,9 @@ You can also see who's online in the top right corner of your workspace.
 
 ## Hacking on PushPin
 
-PushPin is built to be easily extended. You could add new kinds of cards like movies or music, a fancier text editor, a PDF viewer, a deck of cards, or a drum machine. You could replace our card layout with your own code, or build a 3d game using WebGL. The sky's the limit. 
+PushPin is built to be easily extended. You could add new kinds of cards like movies or music, a fancier text editor, a PDF viewer, a deck of cards, or a drum machine. You could replace our card layout with your own code, or build a 3d game using WebGL. The sky's the limit.
 
-See [HACKING](hacking.md) for a getting started guide.
+See [HACKING](HACKING.md) for a getting started guide.
 
 ## Packaging
 

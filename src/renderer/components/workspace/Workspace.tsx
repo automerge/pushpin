@@ -1,9 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
-import { Handle } from 'hypermerge'
 import { createDocumentLink, parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../ShareLink'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
@@ -12,6 +11,7 @@ import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
 
 import './Workspace.css'
+import { useDocument, useInterval, useMessaging } from '../../Hooks'
 
 const log = Debug('pushpin:workspace')
 
@@ -23,98 +23,15 @@ export interface Doc {
   archivedDocUrls: PushpinUrl[]
 }
 
-interface State {
-  doc?: Doc
-  selfId?: string
-}
+export default function Workspace(props: ContentProps) {
+  const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
 
-export default class Workspace extends React.PureComponent<ContentProps, State> {
-  state: State = {}
-  handle?: Handle<Doc>
-  timerId?: NodeJS.Timeout // Technically, these timeout types are the wrong type :shrugging-man:
-  selfTimerId?: NodeJS.Timeout
-  // The current document which is fullscreen/filling the workspace
-  currentDocHandle?: Handle<any>
-  currentDocTimerId?: NodeJS.Timeout
+  const selfId = workspace && workspace.selfId
+  const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
-  constructor(props: ContentProps) {
-    super(props)
-    log('constructor')
+  useHeartbeat(selfId, currentDocUrl)
 
-    ipcRenderer.on('loadDocumentUrl', (event: any, url: string) => {
-      this.openDoc(url)
-    })
-
-    ipcRenderer.on('newDocument', () => {
-      const hypermergeUrl = Content.initializeContentDoc('board', { selfId: this.state.selfId })
-      this.openDoc(createDocumentLink('board', hypermergeUrl))
-    })
-  }
-
-  // This is the New Boilerplate
-  componentWillMount = () => {
-    this.handle = window.repo.open(this.props.hypermergeUrl)
-    this.handle.subscribe((doc) => this.onChange(doc))
-  }
-
-  componentWillUnmount = () => {
-    this.handle && this.handle.close()
-    this.state.selfId && this.heartbeatNotifyDeparture(this.state.selfId)
-    this.timerId && clearInterval(this.timerId)
-  }
-
-  onChange = (doc: Doc) => {
-    this.setState({ doc })
-    this.refreshSelfHeartbeat(doc)
-    this.refreshCurrentDocHandle(doc)
-  }
-
-  // The workspace takes on two responsibilities around presence.
-  // First, it posts on the self-contact ID that we're online.
-  // This means any avatar anywhere will have a colored ring around it
-  // if that user is online.
-  refreshSelfHeartbeat = (doc: Doc) => {
-    const selfHandle = window.repo.open(doc.selfId)
-
-    if (!this.selfTimerId) {
-      selfHandle.message('heartbeat')
-      this.selfTimerId = setInterval(() => {
-        selfHandle.message('heartbeat')
-      }, 1000) // send a heartbeat every 5s
-    }
-  }
-
-  // Second, it posts a presence heartbeat on the document currently
-  // considered to be open, allowing any kind of card to render a list of
-  // "present" folks.
-  // Any time the document changes, we throw away the old handle and
-  // make a new one for the new document.
-  // NB: The current implementation doesn't have any caching of messages,
-  //     so "present" avatars will have to wait for a second heartbeat to arrive
-  //     before appearing present since the first one will have passed in causing
-  //     them to render...
-  refreshCurrentDocHandle = ({ selfId, currentDocUrl }) => {
-    if (this.currentDocHandle) {
-      this.currentDocHandle.close()
-      this.heartbeatNotifyDeparture(selfId)
-    }
-    const { hypermergeUrl } = parseDocumentLink(currentDocUrl)
-    this.currentDocHandle = window.repo.open(hypermergeUrl)
-
-    if (!this.currentDocTimerId) {
-      this.currentDocHandle.message({ contact: selfId, heartbeat: true })
-      this.currentDocTimerId = setInterval(() => {
-        this.currentDocHandle && this.currentDocHandle.message({ contact: selfId, heartbeat: true })
-      }, 1000) // send a heartbeat every 5s
-    }
-  }
-
-  heartbeatNotifyDeparture = (selfId: PushpinUrl) => {
-    // notify peers on the current board that we're departing
-    this.currentDocHandle && this.currentDocHandle.message({ contact: selfId, departing: true })
-  }
-
-  openDoc = (docUrl: PushpinUrl) => {
+  function openDoc(docUrl: PushpinUrl) {
     try {
       parseDocumentLink(docUrl)
     } catch (e) {
@@ -122,12 +39,12 @@ export default class Workspace extends React.PureComponent<ContentProps, State> 
       return
     }
 
-    if (!this.handle) {
+    if (!workspace) {
       log('Trying to navigate to a document before the workspace doc is loaded!')
       return
     }
 
-    this.handle.change((ws: Doc) => {
+    changeWorkspace((ws: Doc) => {
       ws.currentDocUrl = docUrl
 
       ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== docUrl)
@@ -139,35 +56,89 @@ export default class Workspace extends React.PureComponent<ContentProps, State> 
     })
   }
 
-  renderContent = (currentDocUrl?: PushpinUrl) => {
-    if (!currentDocUrl) {
-      return null
+  useEffect(() => {
+    if (!selfId) {
+      return () => {}
     }
 
-    const { type } = parseDocumentLink(currentDocUrl)
-    return (
-      <div className={`Workspace__container Workspace__container--${type}`}>
-        <Content context="workspace" url={currentDocUrl} />
+    function onLoad(event: any, url: string) {
+      openDoc(url)
+    }
+
+    function onNew() {
+      const hypermergeUrl = Content.initializeContentDoc('board', { selfId })
+      openDoc(createDocumentLink('board', hypermergeUrl))
+    }
+
+    ipcRenderer.on('loadDocumentUrl', onLoad)
+    ipcRenderer.on('newDocument', onNew)
+
+    return () => {
+      ipcRenderer.removeListener('loadDocumentUrl', onLoad)
+      ipcRenderer.removeListener('newDocument', onNew)
+    }
+  }, [selfId])
+
+  log('render')
+  if (!workspace) {
+    return null
+  }
+
+  const content = renderContent(workspace.currentDocUrl)
+  return (
+    <SelfContext.Provider value={workspace.selfId}>
+      <div className="Workspace">
+        <TitleBar hypermergeUrl={props.hypermergeUrl} openDoc={openDoc} />
+        {content}
       </div>
-    )
+    </SelfContext.Provider>
+  )
+}
+
+function renderContent(currentDocUrl?: PushpinUrl) {
+  if (!currentDocUrl) {
+    return null
   }
 
-  render = () => {
-    log('render')
-    if (!this.state.doc) {
-      return null
+  const { type } = parseDocumentLink(currentDocUrl)
+  return (
+    <div className={`Workspace__container Workspace__container--${type}`}>
+      <Content context="workspace" url={currentDocUrl} />
+    </div>
+  )
+}
+
+function useHeartbeat(selfId: string | null, docUrl: string | null) {
+  const sendSelf = useMessaging(selfId, () => {})
+  const sendCurrent = useMessaging(docUrl, () => {})
+
+  useInterval(
+    1000,
+    () => {
+      // The workspace takes on two responsibilities around presence.
+      // First, it posts on the self-contact ID that we're online.
+      // This means any avatar anywhere will have a colored ring around it
+      // if that user is online.
+      sendSelf('heartbeat')
+
+      // Second, it posts a presence heartbeat on the document currently
+      // considered to be open, allowing any kind of card to render a list of
+      // "present" folks.
+      // NB: The current implementation doesn't have any caching of messages,
+      //     so "present" avatars will have to wait for a second heartbeat to arrive
+      //     before appearing present since the first one will have passed in causing
+      //     them to render...
+      sendCurrent({ contact: selfId, heartbeat: true })
+    },
+    [sendSelf, sendCurrent]
+  )
+
+  // Send departure when current doc changes
+  useEffect(() => {
+    return () => {
+      sendCurrent({ contact: selfId, departing: true })
     }
-
-    const content = this.renderContent(this.state.doc.currentDocUrl)
-    return (
-      <SelfContext.Provider value={this.state.doc.selfId}>
-        <div className="Workspace">
-          <TitleBar hypermergeUrl={this.props.hypermergeUrl} openDoc={this.openDoc} />
-          {content}
-        </div>
-      </SelfContext.Provider>
-    )
-  }
+  }, [sendCurrent])
 }
 
 function initializeDocument(workspace: Doc) {

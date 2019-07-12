@@ -313,6 +313,11 @@ div.card.image {
   border: 1px solid transparent;
 }
 
+.ButtonAction[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .ButtonAction--destructive {
   color: var(--colorDestructive);
 }
@@ -321,7 +326,7 @@ div.card.image {
   color: var(--colorLink);
 }
 
-.ButtonAction:hover {
+.ButtonAction:not([disabled]):hover {
   border: 1px solid;
 }
 
@@ -934,8 +939,8 @@ div.card.image {
 
 .PDFCardHeader__input::-webkit-inner-spin-button,
 .PDFCardHeader__input::-webkit-outer-spin-button {
-  -webkit-appearance: none; 
-  margin: 0; 
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .PDFCardHeader__numPages {

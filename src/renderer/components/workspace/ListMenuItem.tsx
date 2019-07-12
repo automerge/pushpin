@@ -1,48 +1,48 @@
 import React from 'react'
+import classnames from 'classnames'
 
 import Content from '../Content'
-import Actions from './Actions'
+import Actions, { ActionItem } from './Actions'
 import { PushpinUrl } from '../../ShareLink'
 
 export interface Props {
   contentUrl: PushpinUrl
-  actions: any[]
+  actions: ActionItem[]
   selected: boolean
 }
 
+ListMenuItem.defaultProps = {
+  actions: [],
+  selected: false,
+}
+
 // TODO: item highlighting
-export default class ListMenuItem extends React.PureComponent<Props> {
-  static defaultProps = {
-    actions: [],
-    selected: false,
-  }
+export default function ListMenuItem(props: Props) {
+  const { contentUrl, actions, selected } = props
+  const [defaultAction] = actions
 
-  get defaultAction() {
-    return this.props.actions[0] && this.props.actions[0].callback
-  }
-
-  onClick = () => {
-    if (this.defaultAction) {
-      this.defaultAction(this.props.contentUrl)()
+  function onClick() {
+    if (defaultAction) {
+      defaultAction.callback(contentUrl)
     }
   }
 
-  render = () => {
-    const { contentUrl, actions, selected } = this.props
-    const classes = [
-      'ListMenuItem',
-      this.defaultAction ? 'ListMenuItem--withDefaultAction' : '',
-      selected ? 'ListMenuItem--selected' : '',
-    ].join(' ')
-    return (
-      <div className={classes} onClick={this.onClick}>
-        <div className="ListMenuItem-content">
-          <Content context="list" url={contentUrl} />
-        </div>
-        <div className="ListMenuItem-actions">
-          <Actions url={contentUrl} actions={actions} />
-        </div>
+  const className = classnames([
+    'ListMenuItem',
+    {
+      'ListMenuItem--withDefaultAction': !!defaultAction,
+      'ListMenuItem--selected': selected,
+    },
+  ])
+
+  return (
+    <div className={className} onClick={onClick}>
+      <div className="ListMenuItem-content">
+        <Content context="list" url={contentUrl} />
       </div>
-    )
-  }
+      <div className="ListMenuItem-actions">
+        <Actions url={contentUrl} actions={actions} />
+      </div>
+    </div>
+  )
 }

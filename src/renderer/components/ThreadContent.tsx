@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Handle } from 'hypermerge'
 import ContentTypes from '../ContentTypes'
 import Content, { ContentProps } from './Content'
 import { createDocumentLink } from '../ShareLink'
+import { useDocument } from '../Hooks'
 
 interface Message {
   authorId: string
@@ -15,154 +15,132 @@ interface Doc {
   messages: Message[]
 }
 
-interface State {
-  doc?: Doc
-  message: string
-}
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  localeMatcher: 'best fit',
+  weekday: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  month: 'short',
+  day: 'numeric',
+})
 
-export default class ThreadContent extends React.PureComponent<ContentProps, State> {
-  static minWidth = 9
-  static minHeight = 6
-  static defaultWidth = 16
-  static defaultHeight = 18
-  static maxWidth = 24
-  static maxHeight = 36
+ThreadContent.minWidth = 9
+ThreadContent.minHeight = 6
+ThreadContent.defaultWidth = 16
+ThreadContent.defaultHeight = 18
+ThreadContent.maxWidth = 24
+ThreadContent.maxHeight = 36
 
-  handle?: Handle<Doc>
-  state: State = { message: '' }
+export default function ThreadContent(props: ContentProps) {
+  const [message, setMessage] = useState('')
+  const [doc, changeDoc] = useDocument<Doc>(props.hypermergeUrl)
 
-  // This is the New Boilerplate
-  componentWillMount = () => {
-    this.handle = window.repo.watch(this.props.hypermergeUrl, (doc: Doc) => this.onChange(doc))
-  }
-  componentWillUnmount = () => this.handle && this.handle.close()
-
-  onChange = (doc: Doc) => {
-    this.setState({ doc })
+  if (!doc) {
+    return null
   }
 
-  render = () => {
-    const { doc } = this.state
-    if (!doc) {
-      return null
-    }
+  const { messages } = doc
+  const groupedMessages = groupBy(messages, 'authorId')
 
-    const messages = doc.messages || []
-    const groupedMessages: Message[][] = []
-    let currentGroup: Message[]
-    messages.forEach((message) => {
-      if (
-        !currentGroup ||
-        (currentGroup.length > 0 && currentGroup[0].authorId !== message.authorId)
-      ) {
-        currentGroup = []
-        groupedMessages.push(currentGroup)
-      }
-      currentGroup.push(message)
-    })
-
-    return (
-      <div style={css.threadWrapper}>
-        <div style={css.messageWrapper}>
-          <div style={css.messages} onScroll={this.onScroll}>
-            {groupedMessages.map(this.renderGroupedMessages, this)}
-          </div>
-        </div>
-        <div style={css.inputWrapper}>
-          <input
-            style={css.input}
-            value={this.state.message}
-            onKeyDown={this.onKeyDown}
-            onChange={this.onInput}
-            onPaste={this.onPaste}
-            placeholder="Enter your message..."
-          />
-        </div>
-      </div>
-    )
+  function onInput(e: React.ChangeEvent<HTMLInputElement>) {
+    setMessage(e.target.value)
   }
 
-  renderGroupedMessages = (groupOfMessages: Message[], idx: number) => (
-    <div style={css.messageGroup} key={idx}>
-      <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
-      <div style={css.groupedMessages}>{groupOfMessages.map(this.renderMessage)}</div>
-    </div>
-  )
-
-  renderMessage = ({ content, time }: Message, idx: number) => {
-    const date = new Date()
-    date.setTime(time)
-    const options = {
-      localeMatcher: 'best fit',
-      weekday: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      month: 'short',
-      day: 'numeric',
-    }
-    return (
-      <div style={css.message} key={idx}>
-        <div style={css.content}>{content}</div>
-        {idx === 0 ? (
-          <div style={css.time}>{new Intl.DateTimeFormat('en-US', options).format(date)}</div>
-        ) : null}
-      </div>
-    )
-  }
-
-  onScroll = (e: React.UIEvent) => {
-    e.stopPropagation()
-  }
-
-  onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target) {
-      this.setState({
-        message: e.target.value,
-      })
-    }
-  }
-
-  onPaste = (e: React.ClipboardEvent) => {
-    e.stopPropagation()
-  }
-
-  onKeyDown = (e: React.KeyboardEvent) => {
+  function onKeyDown(e: React.KeyboardEvent) {
     e.stopPropagation()
 
-    const { message } = this.state
     if (e.key === 'Enter' && !e.shiftKey && message) {
       e.preventDefault()
-      this.handle &&
-        this.handle.change((threadDoc: Doc) => {
-          threadDoc.messages.push({
-            authorId: this.props.selfId,
-            content: message,
-            time: new Date().getTime(),
-          })
-        })
 
-      this.setState({
-        message: '',
+      changeDoc((threadDoc: Doc) => {
+        threadDoc.messages.push({
+          authorId: props.selfId,
+          content: message,
+          time: new Date().getTime(),
+        })
       })
+
+      setMessage('')
     }
   }
+
+  return (
+    <div style={css.threadWrapper}>
+      <div style={css.messageWrapper}>
+        <div style={css.messages} onScroll={stopPropagation}>
+          {groupedMessages.map(renderGroupedMessages)}
+        </div>
+      </div>
+      <div style={css.inputWrapper}>
+        <input
+          style={css.input}
+          value={message}
+          onKeyDown={onKeyDown}
+          onChange={onInput}
+          onPaste={stopPropagation}
+          placeholder="Enter your message..."
+        />
+      </div>
+    </div>
+  )
 }
 
-const css = {
+function stopPropagation(e: React.SyntheticEvent) {
+  e.stopPropagation()
+}
+
+function renderMessage({ content, time }: Message, idx: number) {
+  const date = new Date()
+  date.setTime(time)
+
+  return (
+    <div style={css.message} key={idx}>
+      <div style={css.content}>{content}</div>
+      {idx === 0 ? <div style={css.time}>{dateFormatter.format(date)}</div> : null}
+    </div>
+  )
+}
+
+function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
+  return (
+    <div style={css.messageGroup} key={idx}>
+      <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
+      <div style={css.groupedMessages}>{groupOfMessages.map(renderMessage)}</div>
+    </div>
+  )
+}
+
+function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
+  const grouped: T[][] = []
+  let currentGroup: T[]
+
+  items.forEach((item) => {
+    if (!currentGroup || (currentGroup.length > 0 && currentGroup[0][key] !== item[key])) {
+      currentGroup = []
+      grouped.push(currentGroup)
+    }
+
+    currentGroup.push(item)
+  })
+
+  return grouped
+}
+
+const css: { [k: string]: React.CSSProperties } = {
   threadWrapper: {
-    display: 'flex' as 'flex',
+    display: 'flex',
     backgroundColor: 'white',
     width: '100%',
-    overflow: 'auto' as 'auto',
+    overflow: 'auto',
     height: '100%',
     padding: '1px 1px 0px 1px',
   },
   messageWrapper: {
     padding: 12,
-    position: 'relative' as 'relative',
-    display: 'flex' as 'flex',
-    flexDirection: 'column-reverse' as 'column-reverse',
-    overflowY: 'scroll' as 'scroll',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    overflowY: 'scroll',
     marginBottom: 49,
     flexGrow: 1,
   },
@@ -171,24 +149,24 @@ const css = {
     paddingTop: 12,
   },
   groupedMessages: {
-    position: 'relative' as 'relative',
+    position: 'relative',
     top: -20,
     paddingLeft: 40 + 8,
   },
   messages: {
-    display: 'flex' as 'flex',
-    flexDirection: 'column' as 'column',
-    justifyContent: 'flex-end' as 'flex-end',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
     flexGrow: 1,
   },
   message: {
     color: 'black',
-    display: 'flex' as 'flex',
+    display: 'flex',
     lineHeight: '20px',
     padding: '2px 0',
   },
   user: {
-    display: 'flex' as 'flex',
+    display: 'flex',
   },
   username: {
     paddingLeft: 8,
@@ -197,8 +175,8 @@ const css = {
   },
   avatar: {},
   time: {
-    flex: 'none' as 'none',
-    position: 'absolute' as 'absolute',
+    flex: 'none',
+    position: 'absolute',
     right: 0,
     fontSize: 12,
     color: 'var(--colorSecondaryGrey)',
@@ -206,10 +184,10 @@ const css = {
   },
   content: {},
   inputWrapper: {
-    boxSizing: 'border-box' as 'border-box',
+    boxSizing: 'border-box',
     width: 'calc(100% - 2px)',
     borderTop: '1px solid var(--colorInputGrey)',
-    position: 'absolute' as 'absolute',
+    position: 'absolute',
     bottom: 1,
     backgroundColor: 'white',
     padding: 8,
