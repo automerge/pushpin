@@ -6,7 +6,6 @@ import Content from '../Content'
 import Popover from '../Popover'
 
 import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
-import ListMenuItem from './ListMenuItem'
 import { Doc as WorkspaceDoc } from './Workspace'
 import { ContactDoc } from '../contact'
 import Label from '../Label'
@@ -14,6 +13,7 @@ import Badge from '../Badge'
 import { useDocument, useRepo } from '../../Hooks'
 import Text from '../Text'
 import SecondaryText from '../SecondaryText'
+import ActionListItem from './ActionListItem'
 
 const log = Debug('pushpin:share')
 
@@ -145,7 +145,7 @@ function renderContacts(
   */
 
   const contacts = uniqueContactIds.map((id) => (
-    <ListMenuItem key={id} contentUrl={createDocumentLink('contact', id)} actions={[share]} />
+    <ActionListItem key={id} contentUrl={createDocumentLink('contact', id)} actions={[share]} />
   ))
 
   return (
