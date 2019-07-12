@@ -893,12 +893,13 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const { remoteSelection } = this.state
     const cardsSelected = {}
     Object.entries(remoteSelection).forEach(([contact, cards]) => {
-      cards.forEach((card) => {
-        if (!cardsSelected[card]) {
-          cardsSelected[card] = []
-        }
-        cardsSelected[card].push(contact)
-      })
+      cards &&
+        cards.forEach((card) => {
+          if (!cardsSelected[card]) {
+            cardsSelected[card] = []
+          }
+          cardsSelected[card].push(contact)
+        })
     })
 
     const cards = this.state.doc.cards || {}
