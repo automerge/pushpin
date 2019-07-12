@@ -84,6 +84,13 @@ const createWindow = async () => {
     // we only allow pushpin links to navigate
     // to avoid ever being in a position where we're loading rando files
     // or URLs within the app and getting stranded there
+    if (
+      isDevelopment &&
+      url.startsWith(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+    ) {
+      return
+    }
+
     if (!url.startsWith('pushpin://')) {
       event.preventDefault()
     }

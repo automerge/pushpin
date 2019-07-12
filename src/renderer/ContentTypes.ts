@@ -38,10 +38,6 @@ function register(contentType: ContentType) {
 
   log('register', entry)
 
-  if (registry[type]) {
-    throw new Error(`Type already registered: ${type}`)
-  }
-
   registry[type] = entry
 }
 
