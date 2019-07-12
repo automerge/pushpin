@@ -31,6 +31,7 @@ import './components/PdfContent'
 import { createDocumentLink } from './ShareLink'
 
 require('./app.css')
+require('./react-toggle-override.css')
 require('./components/react-simple-dropdown/dropdown.css')
 require('../../node_modules/@ibm/plex/css/ibm-plex.css')
 require('../../node_modules/codemirror/lib/codemirror.css')

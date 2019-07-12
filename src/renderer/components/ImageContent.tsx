@@ -18,7 +18,7 @@ export default function ImageContent({ hypermergeUrl }: ContentProps) {
     return null
   }
 
-  return <img className="image" alt="" src={doc.hyperfileUrl} />
+  return <img className="Image" alt="" src={doc.hyperfileUrl} />
 }
 
 ImageContent.minWidth = 3

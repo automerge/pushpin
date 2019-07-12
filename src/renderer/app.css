@@ -61,7 +61,6 @@ table {
   --colorOnline: rgb(113, 227, 65);
   --colorLink: #0645ad;
   --colorDestructive: #F87060;
-  --zIndexCard: 1;
 }
 
 /* Global */
@@ -116,77 +115,6 @@ input {
   user-select: none;
 }
 
-
-div.board {
-  position: relative;
-  background-image: url(grid.svg);
-  background-blend-mode: exclusion;
-}
-
-.card {
-  border-top: 0;
-  max-height: 100%;
-  max-width: 100%;
-  min-width: 20px;
-  z-index: var(--zIndexCard);
-}
-
-div.card.text {
-  /* use an inset box-shadow to avoid the mitering of corners with normal borders */
-  min-width: 48px;
-  max-width: 481px;
-}
-
-div.card.selected {
-  box-shadow: 4px 4px 24px 0px rgba(0,0,0,.25);
-  outline: solid 2px var(--highlight-color, var(--colorBlueBlack));
-  z-index: 2;
-}
-
-div.card span.cardResizeHandle {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  bottom: 1px;
-  right: 1px;
-  background: url('corner.svg');
-  background-position: bottom right;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  cursor: se-resize;
-  visibility: hidden;
-}
-
-.card:hover .cardResizeHandle {
-  visibility: visible;
-}
-
-.card {
-  box-sizing: border-box;
-  display: flex;
-}
-
-.card:focus, .card:active {
-  outline: none;
-}
-
-div.card {
-  user-select: none;
-}
-
-div.card img.image {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}
-
-div.card.image {
-  padding: 12px;
-  box-sizing: border-box;
-  background: white;
-  border: solid 1px var(--colorPaleGrey);
-}
 
 .react-toggle {
   margin: auto;

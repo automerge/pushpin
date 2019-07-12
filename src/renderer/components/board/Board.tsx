@@ -14,6 +14,7 @@ import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
+import './Board.css'
 
 const { dialog } = remote
 
@@ -702,7 +703,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     // If we haven't started tracking this drag, initialize tracking
     if (!tracking) {
-      const resizing = e.target.className === 'cardResizeHandle'
+      const resizing = e.target.className === 'BoardCard-resizeHandle'
       const moving = !resizing
 
       if (moving) {
@@ -924,7 +925,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     return (
       <div
-        className="board"
+        className="Board"
         ref={this.boardRef}
         style={{
           backgroundColor: this.state.doc.backgroundColor,
