@@ -139,62 +139,6 @@ input {
   padding: 4px 8px;
 }
 
-/* TODO: These should go into the CSS file for the Action component */
-.ButtonAction {
-  box-sizing: border-box;
-  color: var(--colorSecondaryGrey);
-  min-width: 32px;
-  padding: 0px 4px;
-  height: 32px;
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 1px solid transparent;
-}
-
-.ButtonAction[disabled] {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.ButtonAction--destructive {
-  color: var(--colorDestructive);
-}
-
-.ButtonAction--primary {
-  color: var(--colorLink);
-}
-
-.ButtonAction:not([disabled]):hover {
-  border: 1px solid;
-}
-
-.ButtonAction__label {
-  color: transparent;
-  background: rgba(0,0,0,0);
-  transition: color 0.25s linear, background 0.25s linear;
-  position: absolute;
-  text-align: center;
-}
-
-.ButtonAction__label:hover {
-  color: var(--colorLink);
-  background: var(--colorInputGrey);
-}
-
-.ButtonAction .fa {
-  color: inherit;
-  font-size: 24px;
-}
-.ButtonAction .ButtonAction__label {
-  padding-left:4px;
-  padding-right:4px;
-}
-
-
 /* List Menus */
 
 .ListMenu {
@@ -753,43 +697,4 @@ input {
 
 .Footer {
   margin: 40px 0 60px;
-}
-
-.PDFCard {
-  width: 100%;
-  overflow: hidden;
-  background: white;
-}
-
-.PDFCard__loading {
-  /* probably want to eliminate this state eventually */
-  text-align: center;
-}
-
-.PDFCardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-}
-
-.PDFCardHeader__input {
-  width: 5ch;
-  text-align: right;
-  margin-left: 4px;
-}
-
-.PDFCardHeader__input::-webkit-inner-spin-button,
-.PDFCardHeader__input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.PDFCardHeader__numPages {
-  margin-right: 4px;
-}
-
-.react-pdf__Page__canvas {
-  width: 100% !important;
-  height: unset !important;
 }

@@ -5,6 +5,7 @@ import { Document, Page } from 'react-pdf/dist/entry.webpack'
 import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
+import './PdfContent.css'
 
 interface PdfDoc {
   title?: string
@@ -75,12 +76,17 @@ export default function PdfContent(props: ContentProps) {
 
   const header =
     context === 'workspace' ? (
-      <div className="PDFCardHeader">
-        <button disabled={backDisabled} type="button" onClick={goBack} className="ButtonAction">
+      <div className="PdfContent-header">
+        <button
+          disabled={backDisabled}
+          type="button"
+          onClick={goBack}
+          className="PdfContent-navButton"
+        >
           <i className="fa fa-angle-left" />
         </button>
         <input
-          className="PDFCardHeader__input"
+          className="PdfContent-headerInput"
           value={pageInputValue}
           type="number"
           min={1}
@@ -88,12 +94,12 @@ export default function PdfContent(props: ContentProps) {
           onChange={onPageInput}
           onKeyDown={onPageInput}
         />
-        <div className="PDFCardHeader__numPages">/ {numPages}</div>
+        <div className="PdfContent-headerNumPages">/ {numPages}</div>
         <button
           disabled={forwardDisabled}
           type="button"
           onClick={goForward}
-          className="ButtonAction"
+          className="PdfContent-navButton"
         >
           <i className="fa fa-angle-right" />
         </button>
@@ -101,14 +107,14 @@ export default function PdfContent(props: ContentProps) {
     ) : null
 
   return (
-    <div className="PDFCard">
+    <div className="PdfContent">
       {header}
       {pdfData ? (
         <Document file={fileData} onLoadSuccess={onDocumentLoadSuccess}>
           <Page
             loading=""
             pageNumber={pageNum}
-            className="PDFCard__page"
+            className="PdfContent-page"
             width={1600}
             renderTextLayer={false}
           />
