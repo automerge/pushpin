@@ -12,6 +12,8 @@ import { ContactDoc } from '../contact'
 import Label from '../Label'
 import Badge from '../Badge'
 import { useDocument, useRepo } from '../../Hooks'
+import Text from '../Text'
+import SecondaryText from '../SecondaryText'
 
 const log = Debug('pushpin:share')
 
@@ -115,8 +117,8 @@ function renderContacts(
           <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
         </span>
         <Label>
-          <p className="Type--primary">None found</p>
-          <p className="Type--secondary">Copy a link to your board and start making friends</p>
+          <Text>None found</Text>
+          <SecondaryText>Copy a link to your board and start making friends</SecondaryText>
         </Label>
       </div>
     </div>

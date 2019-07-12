@@ -1,0 +1,7 @@
+.SecondaryText {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--colorSecondaryGrey);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

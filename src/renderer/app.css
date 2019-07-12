@@ -115,30 +115,6 @@ input {
   user-select: none;
 }
 
-/* Typography */
-.Type--header {
-  font-size: 14px;
-  font-weight: 400;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.Type--action {
-  color: var(--colorLink);
-}
-.Type--primary {
-  font-size: 14px;
-  font-weight: 400;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.Type--secondary {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--colorSecondaryGrey);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* Buttons */
 
 .ListMenu button {

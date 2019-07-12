@@ -13,6 +13,8 @@ import ColorPicker from '../ColorPicker'
 import Label from '../Label'
 import { useDocument } from '../../Hooks'
 import Popover from '../Popover'
+import Heading from '../Heading'
+import SecondaryText from '../SecondaryText'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -93,7 +95,7 @@ export default function ContactEditor(props: ContentProps) {
     <Popover>
       <div className="ListMenu">
         <div className="ListMenu__header">
-          <p className="Type--header">Your Profile</p>
+          <Heading>Your Profile</Heading>
         </div>
         <div className="ListMenu__section">
           <div className="ListMenu__label">Display Name</div>
@@ -106,7 +108,7 @@ export default function ContactEditor(props: ContentProps) {
               <div className="Avatar">{avatar}</div>
             </div>
             <Label>
-              <button className="Type--action" type="button" onClick={chooseAvatar}>
+              <button type="button" onClick={chooseAvatar}>
                 Choose from file...
               </button>
             </Label>
@@ -120,10 +122,10 @@ export default function ContactEditor(props: ContentProps) {
             />
           </div>
           <div className="ListMenu__label">
-            <p className="Type--secondary">
+            <SecondaryText>
               Your presence colour will be used to by other authors identify you when you are active
               on a board.
-            </p>
+            </SecondaryText>
           </div>
         </div>
       </div>
