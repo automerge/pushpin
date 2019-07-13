@@ -2,7 +2,6 @@ import React from 'react'
 import Debug from 'debug'
 
 import { Handle } from 'hypermerge'
-import ContentSection from './ContentSection'
 
 import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
@@ -10,8 +9,12 @@ import InvitationsView from '../../InvitationsView'
 import { ContactDoc } from '../contact'
 import Badge from '../Badge'
 import Text from '../Text'
-import SecondaryText from '../SecondaryText'
 import './Omnibox.css'
+import InvitationListItem from './InvitationListItem'
+import ListMenuSection from '../ListMenuSection'
+import ListMenuItem from '../ListMenuItem'
+import ListMenu from '../ListMenu'
+import ActionListItem from './ActionListItem'
 
 const log = Debug('pushpin:omnibox')
 
@@ -64,7 +67,7 @@ interface Item {
 
 interface Action {
   name: string
-  callback: (url: any) => Function
+  callback: (url: any) => () => void
   faIcon: string
   label: string
   shortcut: string
@@ -334,7 +337,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
   invite = {
     name: 'invite',
-    callback: (url) => (e) => this.offerDocumentToIdentity(url),
+    callback: (url) => () => this.offerDocumentToIdentity(url),
     faIcon: 'fa-share-alt',
     label: 'Invite',
     shortcut: '⏎',
@@ -353,7 +356,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
   unarchive = {
     name: 'unarchive',
-    callback: (url) => (e) => this.unarchiveDocument(url),
+    callback: (url) => () => this.unarchiveDocument(url),
     faIcon: 'fa-trash-restore',
     label: 'Unarchive',
     shortcut: '⌘+⌫',
@@ -482,22 +485,17 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     const item = this.sectionItems('nothingFound')[0]
 
     if (item) {
-      const classes = item.selected
-        ? 'ListMenu__item DocLink ListMenu__item--selected NothingFound'
-        : 'NothingFound ListMenu__item'
-
       return (
-        <div>
-          <div className="ListMenu__segment">Oops…</div>
-          <div className="ListMenu__section">
-            <div className={classes} key="nothingFound">
-              <span className="ListMenu__thumbnail">
+        <ListMenuSection title="Oops..." key="nothingFound">
+          <ListMenuItem>
+            <div className="Omnibox-nothingFound">
+              <span className="Omnibox-nothingFoundBadge">
                 <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
               </span>
               <Text>Nothing Found</Text>
             </div>
-          </div>
-        </div>
+          </ListMenuItem>
+        </ListMenuSection>
       )
     }
     return null
@@ -506,40 +504,24 @@ export default class Omnibox extends React.PureComponent<Props, State> {
   renderInvitationsSection = () => {
     const invitations = this.sectionItems('invitations').map((item) => {
       const invitation = item.object
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
       // XXX: it seems to me that we should register an invitation as a kind of unlisted "type"
       //      and make this a list context renderer for that type
       // ... i'm not really sure how we ought approach that
       return (
-        <div
+        <InvitationListItem
+          invitation={invitation}
           key={`${invitation.sender.hypermergeUrl}-${invitation.documentUrl}`}
-          className={classes}
-        >
-          <div className="Invitation">
-            <Badge
-              icon="envelope"
-              backgroundColor={invitation.doc && invitation.doc.backgroundColor}
-            />
-            <div className="Invitation__body">
-              <Text>{invitation.doc.title || 'Untitled'}</Text>
-              <SecondaryText>From {invitation.sender.name}</SecondaryText>
-            </div>
-          </div>
-
-          <div className="ListMenu Actions">
-            <SecondaryText>⏎ View</SecondaryText>
-          </div>
-        </div>
+          selected={item.selected}
+        />
       )
     })
 
     if (invitations.length > 0) {
       return (
-        <div>
-          <div className="ListMenu__segment">Invitations</div>
-          <div className="ListMenu__section">{invitations}</div>
-        </div>
+        <ListMenuSection title="Invitations" key="invitations">
+          {invitations}
+        </ListMenuSection>
       )
     }
 
@@ -552,7 +534,16 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     if (items.length === 0) {
       return null
     }
-    return <ContentSection key={name} name={name} label={label} actions={actions} items={items} />
+    return (
+      <ListMenuSection title={label}>
+        {items.map(
+          ({ url, selected }) =>
+            url && (
+              <ActionListItem key={url} contentUrl={url} actions={actions} selected={selected} />
+            )
+        )}
+      </ListMenuSection>
+    )
   }
 
   render = () => {
@@ -572,13 +563,13 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           value={this.state.search}
           placeholder="Search..."
         />
-        <div className="ListMenu">
+        <ListMenu>
           {this.renderInvitationsSection()}
           {this.sectionDefinitions.map((sectionDefinition) =>
             this.renderContentSection(sectionDefinition)
           )}
           {this.renderNothingFound()}
-        </div>
+        </ListMenu>
       </div>
     )
   }

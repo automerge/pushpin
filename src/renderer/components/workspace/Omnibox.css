@@ -28,3 +28,15 @@
 .Invitation__body {
   margin-left: 10px;
 }
+
+.Omnibox-nothingFound {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-size: 24px;
+}
+
+.Omnibox-nothingFoundBadge {
+  flex:none;
+  margin-right: 8px;
+}
