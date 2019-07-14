@@ -2,7 +2,7 @@ import React from 'react'
 import Debug from 'debug'
 
 import ContentTypes, { Context } from '../ContentTypes'
-import { parseDocumentLink } from '../ShareLink'
+import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
 import SelfContext from './SelfContext'
 
 const log = Debug('pushpin:content')
@@ -11,15 +11,15 @@ const FILTERED_PROPS = ['type', 'hypermergeUrl']
 // this is the interface imported by Content types
 export interface ContentProps {
   context: Context
-  url: string
+  url: PushpinUrl
   type: string
-  hypermergeUrl: string
-  selfId: string
+  hypermergeUrl: HypermergeUrl
+  selfId: HypermergeUrl
 }
 
 // These are the props the generic Content wrapper receives
 interface Props {
-  url: string
+  url: PushpinUrl
   context: Context
   [arbitraryProp: string]: any
 }
@@ -29,10 +29,10 @@ interface State {
 }
 
 export default class Content extends React.PureComponent<Props, State> {
-  static initializeContentDoc(type: string, typeAttrs = {}) {
+  static initializeContentDoc(type: string, typeAttrs = {}): HypermergeUrl {
     const { repo } = window // still not a great idea
 
-    const url = repo.create()
+    const url = repo.create() as HypermergeUrl
     repo.change(url, (doc) => ContentTypes.initializeDocument(type, doc, typeAttrs))
 
     return url

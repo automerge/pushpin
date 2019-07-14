@@ -5,10 +5,18 @@ import { crc16 } from 'js-crc'
  * lifted and adapted from pixelpusher
  */
 
-export type HypermergeUrl = string
-export type PushpinUrl = string
+export type HypermergeUrl = string & { hypermerge: true }
+export type PushpinUrl = string & { pushpin: true }
 
-export const createDocumentLink = (type: string, url: HypermergeUrl): PushpinUrl => {
+export function isHypermergeUrl(str: string): str is HypermergeUrl {
+  return /^hypermerge:\/\/\w+$/.test(str)
+}
+
+export function isPushpinUrl(str: string): str is PushpinUrl {
+  return /^pushpin:\/\/.+\/\w+\/\w{1,4}$/.test(str)
+}
+
+export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl {
   if (!url.match('hypermerge:/')) {
     throw new Error('expecting a hypermerge URL as input')
   }
@@ -21,10 +29,17 @@ export const createDocumentLink = (type: string, url: HypermergeUrl): PushpinUrl
   if (!type) {
     throw new Error('no type when creating URL')
   }
-  return withCrc(`pushpin://${type}/${id}`)
+  return withCrc(`pushpin://${type}/${id}`) as PushpinUrl
 }
 
-export const parseDocumentLink = (link: PushpinUrl) => {
+interface Parts {
+  scheme: string
+  type: string
+  docId: string
+  hypermergeUrl: HypermergeUrl
+}
+
+export function parseDocumentLink(link: string): Parts {
   if (!link) {
     throw new Error('Cannot parse an empty value as a link.')
   }
@@ -43,7 +58,11 @@ export const parseDocumentLink = (link: PushpinUrl) => {
     throw new Error(`Missing type in ${link}`)
   }
 
-  const hypermergeUrl = `hypermerge:/${docId}`
+  if (!docId) {
+    throw new Error(`Missing docId in ${link}`)
+  }
+
+  const hypermergeUrl = `hypermerge:/${docId}` as HypermergeUrl
 
   return { scheme, type, docId, hypermergeUrl }
 }
@@ -51,7 +70,7 @@ export const parseDocumentLink = (link: PushpinUrl) => {
 export const isValidCRCShareLink = (nonCrc: string, crc: string) =>
   Boolean(nonCrc) && Boolean(crc) && crc16(nonCrc) === crc
 
-export const parts = (str: PushpinUrl) => {
+export function parts(str: string) {
   const p = encodedParts(str)
 
   return {
@@ -63,7 +82,7 @@ export const parts = (str: PushpinUrl) => {
   }
 }
 
-export const encodedParts = (str: PushpinUrl) => {
+export const encodedParts = (str: string) => {
   // ugly
   const [, /* whole match */ nonCrc, scheme, type, docId, crc] = str.match(
     /^((\w+):\/\/(.+)\/(\w+))\/(\w{1,4})$/

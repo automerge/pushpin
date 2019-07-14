@@ -9,7 +9,7 @@ import { Handle } from 'hypermerge'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
-import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
+import { createDocumentLink, parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
@@ -117,7 +117,7 @@ interface CardArgs {
 }
 
 interface LinkCardArgs extends CardArgs {
-  url: string
+  url: PushpinUrl
 }
 
 interface CreateCardArgs extends CardArgs {
@@ -285,8 +285,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     if (plainText) {
       try {
         const url = new URL(plainText)
-        if (url.protocol === 'pushpin:') {
-          this.linkCard({ x: pageX, y: pageY, url: url.toString() })
+        if (isPushpinUrl(plainText)) {
+          this.linkCard({ x: pageX, y: pageY, url: plainText })
         } else {
           this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
         }
@@ -337,8 +337,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     if (plainTextData) {
       try {
         const url = new URL(plainTextData)
-        if (url.protocol === 'pushpin:') {
-          this.linkCard({ x, y, url: url.toString() })
+        if (isPushpinUrl(plainTextData)) {
+          this.linkCard({ x, y, url: plainTextData })
         } else {
           this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
         }

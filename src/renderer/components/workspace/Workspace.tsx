@@ -3,7 +3,13 @@ import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
-import { createDocumentLink, parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../ShareLink'
+import {
+  createDocumentLink,
+  parseDocumentLink,
+  PushpinUrl,
+  HypermergeUrl,
+  isPushpinUrl,
+} from '../../ShareLink'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import SelfContext from '../SelfContext'
@@ -18,7 +24,7 @@ const log = Debug('pushpin:workspace')
 
 export interface Doc {
   selfId: HypermergeUrl
-  contactIds: PushpinUrl[]
+  contactIds: HypermergeUrl[]
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
@@ -32,7 +38,11 @@ export default function Workspace(props: ContentProps) {
 
   useHeartbeat(selfId, currentDocUrl)
 
-  function openDoc(docUrl: PushpinUrl) {
+  function openDoc(docUrl: string) {
+    if (!isPushpinUrl(docUrl)) {
+      return
+    }
+
     try {
       parseDocumentLink(docUrl)
     } catch (e) {

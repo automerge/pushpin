@@ -32,7 +32,7 @@ export default function Share(props: Props) {
     return null
   }
 
-  function offerDocumentToIdentity(contactId: string) {
+  function offerDocumentToIdentity(contactId: HypermergeUrl) {
     if (!workspace || !workspace.selfId || !workspace.currentDocUrl) {
       return
     }
@@ -126,7 +126,7 @@ function renderContacts(
 
   const share = {
     name: 'share',
-    callback: (url: string) => () => offer(url),
+    callback: (url: HypermergeUrl) => () => offer(url),
     faIcon: 'fa-share-alt',
     label: 'Share',
   }

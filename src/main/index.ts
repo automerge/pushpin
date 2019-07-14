@@ -35,8 +35,10 @@ const createWindow = async () => {
     'hyperfile',
     async (request, callback) => {
       try {
-        const data = await Hyperfile.fetch(request.url)
-        callback(Buffer.from(data))
+        if (Hyperfile.isHyperfileUrl(request.url)) {
+          const data = await Hyperfile.fetch(request.url)
+          callback(Buffer.from(data))
+        }
       } catch (e) {
         log(e)
       }

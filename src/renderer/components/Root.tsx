@@ -2,6 +2,7 @@ import React from 'react'
 import { RepoFrontend } from 'hypermerge'
 import Content from './Content'
 import { RepoContext } from '../Hooks'
+import { PushpinUrl } from '../ShareLink'
 
 // We load these modules here so that the content registry will have them.
 import './workspace/Workspace'
@@ -21,7 +22,7 @@ import './UrlContent'
 import './PdfContent'
 
 interface Props {
-  url: string
+  url: PushpinUrl
   repo: RepoFrontend
 }
 

@@ -6,10 +6,11 @@ import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
 import './PdfContent.css'
+import { HyperfileUrl } from '../hyperfile'
 
 interface PdfDoc {
   title?: string
-  hyperfileUrl: string
+  hyperfileUrl: HyperfileUrl
 }
 
 PdfContent.minWidth = 3
@@ -124,7 +125,11 @@ export default function PdfContent(props: ContentProps) {
   )
 }
 
-function initializeDocument(pdf: PdfDoc, { hyperfileUrl }: any) {
+interface Attrs {
+  hyperfileUrl: HyperfileUrl
+}
+
+function initializeDocument(pdf: PdfDoc, { hyperfileUrl }: Attrs) {
   pdf.hyperfileUrl = hyperfileUrl
 }
 

@@ -19,7 +19,11 @@ const discovery = new DiscoverySwarm({ url, id: repo.id, stream: repo.stream })
 
 repo.replicate(discovery)
 
-export type HyperfileUrl = string
+export type HyperfileUrl = string & { hyperfile: true }
+
+export function isHyperfileUrl(str: string): str is HyperfileUrl {
+  return str.startsWith('hyperfile:/')
+}
 
 export function write(filePath: string): Promise<HyperfileUrl> {
   return new Promise((res, rej) => {
@@ -29,7 +33,7 @@ export function write(filePath: string): Promise<HyperfileUrl> {
       }
 
       const mimeType = mime.lookup(filePath) || 'application/octet-stream'
-      const hyperfileUrl = repo.writeFile(buffer, mimeType)
+      const hyperfileUrl = repo.writeFile(buffer, mimeType) as HyperfileUrl
       return res(hyperfileUrl)
     })
   })
@@ -37,7 +41,7 @@ export function write(filePath: string): Promise<HyperfileUrl> {
 
 export function writeBuffer(buffer: Uint8Array): Promise<HyperfileUrl> {
   return new Promise((res) => {
-    const hyperfileUrl = repo.writeFile(buffer, 'application/octet-stream') // TODO: mime type
+    const hyperfileUrl = repo.writeFile(buffer, 'application/octet-stream') as HyperfileUrl // TODO: mime type
     res(hyperfileUrl)
   })
 }

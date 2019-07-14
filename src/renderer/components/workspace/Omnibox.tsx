@@ -60,7 +60,7 @@ interface Section {
 interface Item {
   type?: string
   object?: any
-  url?: string
+  url?: PushpinUrl
   selected?: boolean
   actions?: Action[]
 }
@@ -373,12 +373,14 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       items: (state, props) =>
         Object.entries(this.state.viewedDocs)
           .filter(
-            ([url, doc]) =>
-              !state.doc || !state.doc.archivedDocUrls || !state.doc.archivedDocUrls.includes(url)
+            ([url, _doc]) =>
+              !state.doc ||
+              !state.doc.archivedDocUrls ||
+              !state.doc.archivedDocUrls.includes(url as PushpinUrl)
           )
-          .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
-          .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
-          .map(([url, doc]) => ({ url })),
+          .filter(([url, _doc]) => parseDocumentLink(url).type === 'board')
+          .filter(([_url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
+          .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {
       name: 'archivedDocUrls',
@@ -400,7 +402,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
         // try parsing the "search" to see if it is a valid document URL
         try {
           parseDocumentLink(state.search)
-          return [{ url: state.search }]
+          return [{ url: state.search as PushpinUrl }]
         } catch {
           return []
         }
@@ -414,7 +416,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
         Object.entries(this.state.contacts)
           .filter(([id, doc]) => doc.name)
           .filter(([id, doc]) => doc.name.match(new RegExp(state.search, 'i')))
-          .map(([id, doc]) => ({ url: createDocumentLink('contact', id) })),
+          .map(([id, doc]) => ({ url: createDocumentLink('contact', id as HypermergeUrl) })),
     },
   ]
   /* end sections */

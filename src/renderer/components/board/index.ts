@@ -4,12 +4,12 @@ import ContentTypes from '../../ContentTypes'
 import Board, { BOARD_COLORS } from './Board'
 import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
-import { HypermergeUrl } from '../../ShareLink'
+import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
 export interface BoardDocCard {
   type: string
   id: string
-  url: string
+  url: PushpinUrl
   x: number
   y: number
   height: number
