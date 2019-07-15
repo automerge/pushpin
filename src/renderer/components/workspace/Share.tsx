@@ -3,13 +3,17 @@ import Debug from 'debug'
 import classnames from 'classnames'
 
 import Content from '../Content'
+import Popover from '../Popover'
 
 import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
-import ListMenuItem from './ListMenuItem'
 import { Doc as WorkspaceDoc } from './Workspace'
 import { ContactDoc } from '../contact'
 import Label from '../Label'
-import { useDocument } from '../../Hooks'
+import Badge from '../Badge'
+import { useDocument, useRepo } from '../../Hooks'
+import Text from '../Text'
+import SecondaryText from '../SecondaryText'
+import ActionListItem from './ActionListItem'
 
 const log = Debug('pushpin:share')
 
@@ -20,6 +24,7 @@ export interface Props {
 type TabName = 'contacts' | 'profile'
 
 export default function Share(props: Props) {
+  const repo = useRepo()
   const [tab, setTab] = useState<TabName>('contacts')
   const [workspace] = useDocument<WorkspaceDoc>(props.hypermergeUrl)
 
@@ -27,7 +32,7 @@ export default function Share(props: Props) {
     return null
   }
 
-  function offerDocumentToIdentity(contactId: string) {
+  function offerDocumentToIdentity(contactId: HypermergeUrl) {
     if (!workspace || !workspace.selfId || !workspace.currentDocUrl) {
       return
     }
@@ -35,7 +40,7 @@ export default function Share(props: Props) {
     log('offerDocumentToIdentity')
 
     const { currentDocUrl } = workspace
-    window.repo.change(workspace.selfId, (s: ContactDoc) => {
+    repo.change(workspace.selfId, (s: ContactDoc) => {
       if (!s.offeredUrls) {
         s.offeredUrls = {}
       }
@@ -66,7 +71,7 @@ export default function Share(props: Props) {
   }
 
   return (
-    <div className="PopOverWrapper">
+    <Popover>
       <div className="ListMenu">
         <div className="Tabs">
           <div
@@ -86,7 +91,7 @@ export default function Share(props: Props) {
         </div>
         {renderBody()}
       </div>
-    </div>
+    </Popover>
   )
 }
 
@@ -108,13 +113,12 @@ function renderContacts(
   const noneFound = (
     <div className="ListMenu__item">
       <div className="ContactListMenuItem">
-        <i
-          className="Badge ListMenu__thumbnail fa fa-question-circle"
-          style={{ backgroundColor: 'var(--colorPaleGrey)' }}
-        />
+        <span className="ListMenu__thumbnail">
+          <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
+        </span>
         <Label>
-          <p className="Type--primary">None found</p>
-          <p className="Type--secondary">Copy a link to your board and start making friends</p>
+          <Text>None found</Text>
+          <SecondaryText>Copy a link to your board and start making friends</SecondaryText>
         </Label>
       </div>
     </div>
@@ -122,7 +126,7 @@ function renderContacts(
 
   const share = {
     name: 'share',
-    callback: (url: string) => () => offer(url),
+    callback: (url: HypermergeUrl) => () => offer(url),
     faIcon: 'fa-share-alt',
     label: 'Share',
   }
@@ -141,7 +145,7 @@ function renderContacts(
   */
 
   const contacts = uniqueContactIds.map((id) => (
-    <ListMenuItem key={id} contentUrl={createDocumentLink('contact', id)} actions={[share]} />
+    <ActionListItem key={id} contentUrl={createDocumentLink('contact', id)} actions={[share]} />
   ))
 
   return (

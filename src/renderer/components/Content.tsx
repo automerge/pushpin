@@ -1,108 +1,92 @@
-import React from 'react'
-import Debug from 'debug'
+import React, { useState, useCallback, useContext, useEffect } from 'react'
 
 import ContentTypes, { Context } from '../ContentTypes'
-import { parseDocumentLink } from '../ShareLink'
+import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
 import SelfContext from './SelfContext'
-
-const log = Debug('pushpin:content')
-const FILTERED_PROPS = ['type', 'hypermergeUrl']
+import Crashable from './Crashable'
 
 // this is the interface imported by Content types
 export interface ContentProps {
   context: Context
-  url: string
+  url: PushpinUrl
   type: string
-  hypermergeUrl: string
-  selfId: string
+  hypermergeUrl: HypermergeUrl
+  selfId: HypermergeUrl
 }
 
 // These are the props the generic Content wrapper receives
 interface Props {
-  url: string
+  url: PushpinUrl
   context: Context
   [arbitraryProp: string]: any
 }
 
-interface State {
-  contentCrashed: boolean
+export function initializeContentDoc(type: string, typeAttrs = {}): HypermergeUrl {
+  const { repo } = window // still not a great idea
+
+  const url = repo.create() as HypermergeUrl
+  repo.change(url, (doc) => ContentTypes.initializeDocument(type, doc, typeAttrs))
+
+  return url
 }
 
-export default class Content extends React.PureComponent<Props, State> {
-  static initializeContentDoc(type: string, typeAttrs = {}) {
-    const { repo } = window // still not a great idea
+export default Object.assign(React.memo(Content), {
+  initializeContentDoc,
+})
 
-    const url = repo.create()
-    repo.change(url, (doc) => ContentTypes.initializeDocument(type, doc, typeAttrs))
+function Content(props: Props) {
+  const { context, url } = props
 
-    return url
+  const [isCrashed, setCrashed] = useState(false)
+  const selfId = useContext(SelfContext)
+  const onCatch = useCallback(() => setCrashed(true), [])
+
+  useEffect(() => {
+    setCrashed(false)
+  }, [url])
+
+  if (!url) {
+    return null
   }
 
-  state = { contentCrashed: false }
+  const { type, hypermergeUrl } = parseDocumentLink(url)
 
-  componentDidCatch(_err: Error) {
-    this.setState({ contentCrashed: true })
+  const contentType = ContentTypes.lookup({ type, context })
+
+  if (!contentType) {
+    return renderMissingType(type, context)
   }
 
-  filterProps(props: Props) {
-    const filtered: any = {}
-    Object.keys(props)
-      .filter((key) => !FILTERED_PROPS.includes(key))
-      .forEach((key) => {
-        filtered[key] = props[key]
-      })
-    return filtered
+  if (isCrashed) {
+    return renderError(type)
   }
 
-  render() {
-    log('render')
-    const { context, url } = this.props
-
-    if (!url) {
-      return null
-    }
-
-    const { type, hypermergeUrl } = parseDocumentLink(url)
-
-    const contentType = ContentTypes.lookup({ type, context })
-
-    if (!contentType) {
-      return renderMissingType(type, context)
-    }
-
-    if (this.state.contentCrashed) {
-      return renderError(type, this.state.contentCrashed)
-    }
-
-    const filteredProps = this.filterProps(this.props)
-
-    return (
-      <SelfContext.Consumer>
-        {(selfId) => (
-          <contentType.component
-            key={url}
-            context={context}
-            url={url}
-            type={type}
-            hypermergeUrl={hypermergeUrl}
-            selfId={selfId}
-            {...filteredProps}
-          />
-        )}
-      </SelfContext.Consumer>
-    )
-  }
+  return (
+    <Crashable onCatch={onCatch}>
+      <contentType.component
+        {...props}
+        key={url}
+        type={type}
+        hypermergeUrl={hypermergeUrl}
+        selfId={selfId}
+      />
+    </Crashable>
+  )
 }
 
-const renderError = (type: string, _error: any) => (
-  <div>
-    <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an error during render.
-  </div>
-)
+function renderError(type: string) {
+  return (
+    <div>
+      <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an error during render.
+    </div>
+  )
+}
 
-const renderMissingType = (type: string, context: Context) => (
-  <div>
-    <i className="fa fa-exclamation-triangle" />
-    Component of type &quot;{type}&quot; in context &quot;{context}&quot; not found.
-  </div>
-)
+function renderMissingType(type: string, context: Context) {
+  return (
+    <div>
+      <i className="fa fa-exclamation-triangle" />
+      Component of type &quot;{type}&quot; in context &quot;{context}&quot; not found.
+    </div>
+  )
+}

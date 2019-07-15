@@ -61,7 +61,6 @@ table {
   --colorOnline: rgb(113, 227, 65);
   --colorLink: #0645ad;
   --colorDestructive: #F87060;
-  --zIndexCard: 1;
 }
 
 /* Global */
@@ -104,15 +103,6 @@ input {
 
 /* End globals */
 
-
-.Notification {
-  margin: 8px;
-  border: 1px solid #e9edf0;
-  border-radius: 4px;
-  padding: 8px;
-  padding-bottom: 0px;
-}
-
 .DocLink {
   display: flex;
   align-items: center;
@@ -123,154 +113,6 @@ input {
   margin-left: 10px;
   -webkit-user-drag: none;
   user-select: none;
-}
-
-.Badge {
-  cursor: pointer;
-  padding: 8px;
-  font-size: 24px;
-  border-radius: 50%;
-  background-color: #D5DFE5;
-}
-
-.Badge--blue {
-  background: #8edce6;
-}
-
-.Badge--red {
-  background: #f87060;
-}
-
-.Badge--purple {
-  background: #c7abff;
-}
-
-.Badge--yellow {
-  background: #ffe17e;
-}
-
-.Badge--green {
-  background: #b5e6a1;
-}
-
-.Badge--pink {
-  background: #ff84cd;
-}
-
-div.board {
-  position: relative;
-  background-image: url(grid.svg);
-  background-blend-mode: exclusion;
-}
-
-.card {
-  border-top: 0;
-  max-height: 100%;
-  max-width: 100%;
-  min-width: 20px;
-  z-index: var(--zIndexCard);
-}
-
-div.card.text {
-  /* use an inset box-shadow to avoid the mitering of corners with normal borders */
-  min-width: 48px;
-  max-width: 481px;
-}
-
-div.card.selected {
-  box-shadow: 4px 4px 24px 0px rgba(0,0,0,.25);
-  outline: solid 2px var(--highlight-color, var(--colorBlueBlack));
-  z-index: 2;
-}
-
-div.card span.cardResizeHandle {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  bottom: 1px;
-  right: 1px;
-  background: url('corner.svg');
-  background-position: bottom right;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  cursor: se-resize;
-  visibility: hidden;
-}
-
-.card:hover .cardResizeHandle {
-  visibility: visible;
-}
-
-.card {
-  box-sizing: border-box;
-  display: flex;
-}
-
-.card:focus, .card:active {
-  outline: none;
-}
-
-div.card {
-  user-select: none;
-}
-
-div.card img.image {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}
-
-div.card.image {
-  padding: 12px;
-  box-sizing: border-box;
-  background: white;
-  border: solid 1px var(--colorPaleGrey);
-}
-
-.react-toggle {
-  margin: auto;
-}
-
-.react-toggle-track-check, .react-toggle-track-x {
-  margin-top: 0;
-  margin-bottom: 0;
-  top: 7px;
-}
-
-/* Typography */
-.Type--header {
-  font-size: 14px;
-  font-weight: 400;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.Type--action {
-  color: var(--colorLink);
-}
-.Type--primary {
-  font-size: 14px;
-  font-weight: 400;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.Type--secondary {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--colorSecondaryGrey);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Popover Menus */
-.PopOverWrapper {
-  background-color: #fff;
-  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
-  min-height: 8px;
-  border-radius: 4px;
-  width: 296px;
-  max-height: 480px;
-  overflow-y: auto;
 }
 
 /* Buttons */
@@ -296,62 +138,6 @@ div.card.image {
   display: flex;
   padding: 4px 8px;
 }
-
-/* TODO: These should go into the CSS file for the Action component */
-.ButtonAction {
-  box-sizing: border-box;
-  color: var(--colorSecondaryGrey);
-  min-width: 32px;
-  padding: 0px 4px;
-  height: 32px;
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 1px solid transparent;
-}
-
-.ButtonAction[disabled] {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.ButtonAction--destructive {
-  color: var(--colorDestructive);
-}
-
-.ButtonAction--primary {
-  color: var(--colorLink);
-}
-
-.ButtonAction:not([disabled]):hover {
-  border: 1px solid;
-}
-
-.ButtonAction__label {
-  color: transparent;
-  background: rgba(0,0,0,0);
-  transition: color 0.25s linear, background 0.25s linear;
-  position: absolute;
-  text-align: center;
-}
-
-.ButtonAction__label:hover {
-  color: var(--colorLink);
-  background: var(--colorInputGrey);
-}
-
-.ButtonAction .fa {
-  color: inherit;
-  font-size: 24px;
-}
-.ButtonAction .ButtonAction__label {
-  padding-left:4px;
-  padding-right:4px;
-}
-
 
 /* List Menus */
 
@@ -911,43 +697,4 @@ div.card.image {
 
 .Footer {
   margin: 40px 0 60px;
-}
-
-.PDFCard {
-  width: 100%;
-  overflow: hidden;
-  background: white;
-}
-
-.PDFCard__loading {
-  /* probably want to eliminate this state eventually */
-  text-align: center;
-}
-
-.PDFCardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-}
-
-.PDFCardHeader__input {
-  width: 5ch;
-  text-align: right;
-  margin-left: 4px;
-}
-
-.PDFCardHeader__input::-webkit-inner-spin-button,
-.PDFCardHeader__input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.PDFCardHeader__numPages {
-  margin-right: 4px;
-}
-
-.react-pdf__Page__canvas {
-  width: 100% !important;
-  height: unset !important;
 }

@@ -9,11 +9,12 @@ import { Handle } from 'hypermerge'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
-import { createDocumentLink, parseDocumentLink } from '../../ShareLink'
+import { createDocumentLink, parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
+import './Board.css'
 
 const { dialog } = remote
 
@@ -116,7 +117,7 @@ interface CardArgs {
 }
 
 interface LinkCardArgs extends CardArgs {
-  url: string
+  url: PushpinUrl
 }
 
 interface CreateCardArgs extends CardArgs {
@@ -284,8 +285,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     if (plainText) {
       try {
         const url = new URL(plainText)
-        if (url.protocol === 'pushpin:') {
-          this.linkCard({ x: pageX, y: pageY, url: url.toString() })
+        if (isPushpinUrl(plainText)) {
+          this.linkCard({ x: pageX, y: pageY, url: plainText })
         } else {
           this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
         }
@@ -336,8 +337,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     if (plainTextData) {
       try {
         const url = new URL(plainTextData)
-        if (url.protocol === 'pushpin:') {
-          this.linkCard({ x, y, url: url.toString() })
+        if (isPushpinUrl(plainTextData)) {
+          this.linkCard({ x, y, url: plainTextData })
         } else {
           this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
         }
@@ -702,7 +703,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     // If we haven't started tracking this drag, initialize tracking
     if (!tracking) {
-      const resizing = e.target.className === 'cardResizeHandle'
+      const resizing = e.target.className === 'BoardCard-resizeHandle'
       const moving = !resizing
 
       if (moving) {
@@ -892,12 +893,13 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const { remoteSelection } = this.state
     const cardsSelected = {}
     Object.entries(remoteSelection).forEach(([contact, cards]) => {
-      cards.forEach((card) => {
-        if (!cardsSelected[card]) {
-          cardsSelected[card] = []
-        }
-        cardsSelected[card].push(contact)
-      })
+      cards &&
+        cards.forEach((card) => {
+          if (!cardsSelected[card]) {
+            cardsSelected[card] = []
+          }
+          cardsSelected[card].push(contact)
+        })
     })
 
     const cards = this.state.doc.cards || {}
@@ -924,7 +926,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     return (
       <div
-        className="board"
+        className="Board"
         ref={this.boardRef}
         style={{
           backgroundColor: this.state.doc.backgroundColor,

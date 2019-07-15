@@ -3,7 +3,13 @@ import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
-import { createDocumentLink, parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../ShareLink'
+import {
+  createDocumentLink,
+  parseDocumentLink,
+  PushpinUrl,
+  HypermergeUrl,
+  isPushpinUrl,
+} from '../../ShareLink'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import SelfContext from '../SelfContext'
@@ -12,12 +18,13 @@ import { ContactDoc } from '../contact'
 
 import './Workspace.css'
 import { useDocument, useInterval, useMessaging } from '../../Hooks'
+import { BoardDoc } from '../board'
 
 const log = Debug('pushpin:workspace')
 
 export interface Doc {
   selfId: HypermergeUrl
-  contactIds: PushpinUrl[]
+  contactIds: HypermergeUrl[]
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
@@ -31,7 +38,11 @@ export default function Workspace(props: ContentProps) {
 
   useHeartbeat(selfId, currentDocUrl)
 
-  function openDoc(docUrl: PushpinUrl) {
+  function openDoc(docUrl: string) {
+    if (!isPushpinUrl(docUrl)) {
+      return
+    }
+
     try {
       parseDocumentLink(docUrl)
     } catch (e) {
@@ -174,10 +185,9 @@ To create links to boards or contacts, drag them from the title bar or the omnib
   const textDocUrl = createDocumentLink('text', textDocId)
 
   const id = uuid()
-  // TODO: this is a board doc. Should update this type after converting
-  // board to typescript.
-  window.repo.change(boardId, (doc: any) => {
+  window.repo.change(boardId, (doc: BoardDoc) => {
     doc.cards[id] = {
+      type: 'text',
       id,
       url: textDocUrl,
       x: 20,

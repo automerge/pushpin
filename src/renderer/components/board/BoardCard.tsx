@@ -10,6 +10,7 @@ import { BoardDocCard } from '.'
 import { TrackingEntry, DragType, isResizing, isMoving } from './Board'
 import { ContactDoc } from '../contact'
 import { useDocument } from '../../Hooks'
+import './BoardCard.css'
 
 type DraggableEvent =
   | React.MouseEvent<HTMLElement | SVGElement>
@@ -96,14 +97,20 @@ export default function BoardCard(props: BoardCardProps) {
         ref={setCardRef}
         tabIndex={-1}
         id={`card-${card.id}`}
-        className={classNames('card', card.type, selected ? 'selected' : 'unselected')}
+        className={classNames(
+          'BoardCard',
+          `BoardCard-${card.type}`,
+          selected && 'BoardCard--selected'
+        )}
         style={style}
         onClick={onCardClicked}
         onDoubleClick={onCardDoubleClicked}
         onContextMenu={stopPropagation}
       >
         <Content context="board" url={card.url} uniquelySelected={props.uniquelySelected} />
-        {contentType && contentType.resizable !== false && <span className="cardResizeHandle" />}
+        {contentType && contentType.resizable !== false && (
+          <span className="BoardCard-resizeHandle" />
+        )}
       </div>
     </DraggableCore>
   )

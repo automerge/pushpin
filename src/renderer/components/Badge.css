@@ -1,0 +1,31 @@
+.Badge {
+  cursor: pointer;
+  padding: 8px;
+  font-size: 24px;
+  border-radius: 50%;
+  background-color: #D5DFE5;
+}
+
+.Badge--blue {
+  background: #8edce6;
+}
+
+.Badge--red {
+  background: #f87060;
+}
+
+.Badge--purple {
+  background: #c7abff;
+}
+
+.Badge--yellow {
+  background: #ffe17e;
+}
+
+.Badge--green {
+  background: #b5e6a1;
+}
+
+.Badge--pink {
+  background: #ff84cd;
+}

@@ -1,10 +1,22 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { Handle } from 'hypermerge'
+import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
+import { Handle, RepoFrontend } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
 type Cleanup = void | (() => void)
+
+export const RepoContext = createContext<RepoFrontend | null>(null)
+
+export function useRepo(): RepoFrontend {
+  const repo = useContext(RepoContext)
+
+  if (!repo) {
+    throw new Error('Repo not available on RepoContext.')
+  }
+
+  return repo
+}
 
 /**
  * Provides direct use of a handle inside a callback.
@@ -13,14 +25,15 @@ type Cleanup = void | (() => void)
  * Only acquires a new handle when the given url changes,
  * and ensures all handles are properly closed.
  */
-export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Cleanup): void {
+export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Cleanup): RepoFrontend {
+  const repo = useRepo()
+
   useEffect(() => {
     if (!url) {
       return () => {}
     }
 
-    // TODO: add useRepo and Repo react context
-    const handle = window.repo.open(url)
+    const handle = repo.open(url)
 
     const cleanup = cb(handle)
 
@@ -29,12 +42,14 @@ export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Clea
       cleanup && cleanup()
     }
   }, [url])
+
+  return repo
 }
 
 export function useDocument<D>(url: string | null): [Readonly<D> | null, ChangeFn<D>] {
   const [doc, setDoc] = useState<D | null>(null)
 
-  useHandle<D>(url, (handle) => {
+  const repo = useHandle<D>(url, (handle) => {
     handle.subscribe((doc) => setDoc(doc))
 
     return () => {
@@ -45,7 +60,7 @@ export function useDocument<D>(url: string | null): [Readonly<D> | null, ChangeF
   const change = useCallback(
     (cb: (doc: D) => void) => {
       if (url) {
-        window.repo.change(url, cb)
+        repo.change(url, cb)
       }
     },
     [url]

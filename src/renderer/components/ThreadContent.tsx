@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 
 import ContentTypes from '../ContentTypes'
 import Content, { ContentProps } from './Content'
-import { createDocumentLink } from '../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../ShareLink'
 import { useDocument } from '../Hooks'
 
 interface Message {
-  authorId: string
+  authorId: HypermergeUrl
   content: string
   time: number // Unix timestamp
 }

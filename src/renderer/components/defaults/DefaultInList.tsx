@@ -2,6 +2,7 @@ import React from 'react'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument } from '../../Hooks'
+import Badge from '../Badge'
 
 interface Doc {
   title?: string
@@ -27,7 +28,9 @@ export default function ListItem(props: ContentProps) {
   // TODO: pick background color based on url
   return (
     <div className="DocLink" style={css.listItem}>
-      <i draggable onDragStart={onDragStart} className={`Badge fa fa-${icon}`} />
+      <span draggable onDragStart={onDragStart}>
+        <Badge icon={icon} />
+      </span>
       <div className="DocLink__title">{doc.title || name}</div>
     </div>
   )

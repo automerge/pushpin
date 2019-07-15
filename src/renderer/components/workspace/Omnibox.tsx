@@ -2,13 +2,19 @@ import React from 'react'
 import Debug from 'debug'
 
 import { Handle } from 'hypermerge'
-import ContentSection from './ContentSection'
 
 import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
 import InvitationsView from '../../InvitationsView'
 import { ContactDoc } from '../contact'
+import Badge from '../Badge'
+import Text from '../Text'
 import './Omnibox.css'
+import InvitationListItem from './InvitationListItem'
+import ListMenuSection from '../ListMenuSection'
+import ListMenuItem from '../ListMenuItem'
+import ListMenu from '../ListMenu'
+import ActionListItem from './ActionListItem'
 
 const log = Debug('pushpin:omnibox')
 
@@ -54,14 +60,14 @@ interface Section {
 interface Item {
   type?: string
   object?: any
-  url?: string
+  url?: PushpinUrl
   selected?: boolean
   actions?: Action[]
 }
 
 interface Action {
   name: string
-  callback: (url: any) => Function
+  callback: (url: any) => () => void
   faIcon: string
   label: string
   shortcut: string
@@ -93,7 +99,11 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     log('componentDidMount')
     this.refreshHandle(this.props.hypermergeUrl)
     document.addEventListener('keydown', this.handleCommandKeys)
-    this.invitationsView = new InvitationsView(this.props.hypermergeUrl, this.onInvitationsChange)
+    this.invitationsView = new InvitationsView(
+      window.repo,
+      this.props.hypermergeUrl,
+      this.onInvitationsChange
+    )
   }
 
   componentWillUnmount = () => {
@@ -327,7 +337,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
   invite = {
     name: 'invite',
-    callback: (url) => (e) => this.offerDocumentToIdentity(url),
+    callback: (url) => () => this.offerDocumentToIdentity(url),
     faIcon: 'fa-share-alt',
     label: 'Invite',
     shortcut: '⏎',
@@ -346,7 +356,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
   unarchive = {
     name: 'unarchive',
-    callback: (url) => (e) => this.unarchiveDocument(url),
+    callback: (url) => () => this.unarchiveDocument(url),
     faIcon: 'fa-trash-restore',
     label: 'Unarchive',
     shortcut: '⌘+⌫',
@@ -363,12 +373,14 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       items: (state, props) =>
         Object.entries(this.state.viewedDocs)
           .filter(
-            ([url, doc]) =>
-              !state.doc || !state.doc.archivedDocUrls || !state.doc.archivedDocUrls.includes(url)
+            ([url, _doc]) =>
+              !state.doc ||
+              !state.doc.archivedDocUrls ||
+              !state.doc.archivedDocUrls.includes(url as PushpinUrl)
           )
-          .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
-          .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
-          .map(([url, doc]) => ({ url })),
+          .filter(([url, _doc]) => parseDocumentLink(url).type === 'board')
+          .filter(([_url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
+          .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {
       name: 'archivedDocUrls',
@@ -390,7 +402,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
         // try parsing the "search" to see if it is a valid document URL
         try {
           parseDocumentLink(state.search)
-          return [{ url: state.search }]
+          return [{ url: state.search as PushpinUrl }]
         } catch {
           return []
         }
@@ -404,7 +416,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
         Object.entries(this.state.contacts)
           .filter(([id, doc]) => doc.name)
           .filter(([id, doc]) => doc.name.match(new RegExp(state.search, 'i')))
-          .map(([id, doc]) => ({ url: createDocumentLink('contact', id) })),
+          .map(([id, doc]) => ({ url: createDocumentLink('contact', id as HypermergeUrl) })),
     },
   ]
   /* end sections */
@@ -475,23 +487,17 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     const item = this.sectionItems('nothingFound')[0]
 
     if (item) {
-      const classes = item.selected
-        ? 'ListMenu__item DocLink ListMenu__item--selected NothingFound'
-        : 'NothingFound ListMenu__item'
-
       return (
-        <div>
-          <div className="ListMenu__segment">Oops…</div>
-          <div className="ListMenu__section">
-            <div className={classes} key="nothingFound">
-              <i
-                className="Badge ListMenu__thumbnail fa fa-question-circle"
-                style={{ backgroundColor: 'var(--colorPaleGrey)' }}
-              />
-              <p className="Type--primary">Nothing Found</p>
+        <ListMenuSection title="Oops..." key="nothingFound">
+          <ListMenuItem>
+            <div className="Omnibox-nothingFound">
+              <span className="Omnibox-nothingFoundBadge">
+                <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
+              </span>
+              <Text>Nothing Found</Text>
             </div>
-          </div>
-        </div>
+          </ListMenuItem>
+        </ListMenuSection>
       )
     }
     return null
@@ -500,40 +506,24 @@ export default class Omnibox extends React.PureComponent<Props, State> {
   renderInvitationsSection = () => {
     const invitations = this.sectionItems('invitations').map((item) => {
       const invitation = item.object
-      const classes = item.selected ? 'ListMenu__item ListMenu__item--selected' : 'ListMenu__item'
 
       // XXX: it seems to me that we should register an invitation as a kind of unlisted "type"
       //      and make this a list context renderer for that type
       // ... i'm not really sure how we ought approach that
       return (
-        <div
+        <InvitationListItem
+          invitation={invitation}
           key={`${invitation.sender.hypermergeUrl}-${invitation.documentUrl}`}
-          className={classes}
-        >
-          <div className="Invitation">
-            <i
-              className="Badge fa fa-envelope"
-              style={{ background: invitation.doc && invitation.doc.backgroundColor }}
-            />
-            <div className="Invitation__body">
-              <h4 className="Type--primary">{invitation.doc.title || 'Untitled'}</h4>
-              <p className="Type--secondary">From {invitation.sender.name}</p>
-            </div>
-          </div>
-
-          <div className="ListMenu Actions">
-            <span className="Type--secondary">⏎ View</span>
-          </div>
-        </div>
+          selected={item.selected}
+        />
       )
     })
 
     if (invitations.length > 0) {
       return (
-        <div>
-          <div className="ListMenu__segment">Invitations</div>
-          <div className="ListMenu__section">{invitations}</div>
-        </div>
+        <ListMenuSection title="Invitations" key="invitations">
+          {invitations}
+        </ListMenuSection>
       )
     }
 
@@ -546,7 +536,16 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     if (items.length === 0) {
       return null
     }
-    return <ContentSection key={name} name={name} label={label} actions={actions} items={items} />
+    return (
+      <ListMenuSection title={label}>
+        {items.map(
+          ({ url, selected }) =>
+            url && (
+              <ActionListItem key={url} contentUrl={url} actions={actions} selected={selected} />
+            )
+        )}
+      </ListMenuSection>
+    )
   }
 
   render = () => {
@@ -566,13 +565,13 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           value={this.state.search}
           placeholder="Search..."
         />
-        <div className="ListMenu">
+        <ListMenu>
           {this.renderInvitationsSection()}
           {this.sectionDefinitions.map((sectionDefinition) =>
             this.renderContentSection(sectionDefinition)
           )}
           {this.renderNothingFound()}
-        </div>
+        </ListMenu>
       </div>
     )
   }

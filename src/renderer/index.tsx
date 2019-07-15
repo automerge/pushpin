@@ -15,6 +15,7 @@ import Content from './components/Content'
 import { createDocumentLink } from './ShareLink'
 
 import './app.css'
+import './react-toggle-override.css'
 import './components/react-simple-dropdown/dropdown.css'
 import '../../node_modules/@ibm/plex/css/ibm-plex.css'
 import '../../node_modules/codemirror/lib/codemirror.css'
@@ -51,7 +52,7 @@ function initHypermerge(cb) {
 
   window.repo = front
 
-  cb() // no need to wait for .ready?
+  cb(front) // no need to wait for .ready?
 }
 
 function loadWorkspaceUrl() {
@@ -76,7 +77,7 @@ function saveWorkspaceUrl(workspaceUrl) {
   Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
 }
 
-function initWorkspace() {
+function initWorkspace(repo: RepoFrontend) {
   let workspaceUrl
   const existingWorkspaceUrl = loadWorkspaceUrl()
   if (existingWorkspaceUrl !== '') {
@@ -88,19 +89,21 @@ function initWorkspace() {
     workspaceUrl = newWorkspaceUrl
   }
 
-  const workspace = <Root url={workspaceUrl} />
+  const workspace = <Root repo={repo} url={workspaceUrl} />
   const element = document.createElement('div')
   element.id = 'app'
   document.body.appendChild(element)
   ReactDOM.render(workspace, element)
 
   // HMR
-  ;(module as any).hot.accept('./components/Root.tsx', () => {
-    const NextRoot = require('./components/Root').default
-    ReactDOM.render(<NextRoot url={workspaceUrl} />, element)
-  })
+  if (module && module.hot) {
+    module.hot.accept('./components/Root.tsx', () => {
+      const NextRoot = require('./components/Root').default // eslint-disable-line global-require
+      ReactDOM.render(<NextRoot repo={repo} url={workspaceUrl} />, element)
+    })
+  }
 }
 
-initHypermerge(() => {
-  initWorkspace()
+initHypermerge((repo: RepoFrontend) => {
+  initWorkspace(repo)
 })

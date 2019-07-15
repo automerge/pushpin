@@ -1,5 +1,6 @@
 import ContentTypes from '../../ContentTypes'
 import { USER } from '../../constants'
+import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
 
 import ContactEditor, { USER_COLORS } from './ContactEditor'
 import ContactInVarious from './ContactInVarious'
@@ -9,9 +10,9 @@ import './Avatar.css'
 export interface ContactDoc {
   name: string
   color: string
-  avatarDocId: string
-  hypermergeUrl: any // Used by workspace
-  offeredUrls?: { [url: string]: string[] } // Used by share, a map of contact id to documents offered.
+  avatarDocId: HypermergeUrl
+  hypermergeUrl: HypermergeUrl // Used by workspace
+  offeredUrls?: { [url: string]: PushpinUrl[] } // Used by share, a map of contact id to documents offered.
 }
 
 function initializeDocument(doc, typeAttrs) {
