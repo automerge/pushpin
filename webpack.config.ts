@@ -77,7 +77,7 @@ function shared({ isDev }: Options): webpack.Configuration {
     },
     stats: {
       assets: false,
-      maxModules: 300,
+      maxModules: 3,
     },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
