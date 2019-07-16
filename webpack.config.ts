@@ -13,15 +13,16 @@ const cacheDirectory = undefined // path.resolve(__dirname, ".cache")
 
 const tsRule: webpack.Rule = {
   test: /\.[tj]sx?$/,
+  include: path.resolve(__dirname, 'src'),
   use: [
     {
       loader: 'ts-loader',
       options: {
+        experimentalWatchApi: true,
         transpileOnly: true,
       },
     },
   ],
-  exclude: [/node_modules/],
 }
 
 const cssRule: webpack.Rule = {
@@ -69,21 +70,17 @@ const fontRule: webpack.Rule = {
 function shared({ isDev }: Options): webpack.Configuration {
   return {
     context: path.resolve(__dirname),
-    devtool: isDev ? 'inline-source-map' : 'source-map',
+    devtool: isDev ? undefined : 'source-map',
     devServer: {
       contentBase: path.join(__dirname, 'dist'),
       hotOnly: true,
     },
     stats: {
       assets: false,
-      maxModules: 3,
+      maxModules: 300,
     },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
-      alias: {
-        static: path.resolve(__dirname, 'static'),
-        // 'react-dom': '@hot-loader/react-dom',
-      },
     },
     externals: [
       nodeExternals({
