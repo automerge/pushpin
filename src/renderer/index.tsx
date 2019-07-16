@@ -96,7 +96,7 @@ function initWorkspace(repo: RepoFrontend) {
   ReactDOM.render(workspace, element)
 
   // HMR
-  if (module && module.hot) {
+  if (module.hot) {
     module.hot.accept('./components/Root.tsx', () => {
       const NextRoot = require('./components/Root').default // eslint-disable-line global-require
       ReactDOM.render(<NextRoot repo={repo} url={workspaceUrl} />, element)
