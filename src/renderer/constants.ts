@@ -1,5 +1,8 @@
 import Path from 'path'
 import electron, { OpenDialogOptions } from 'electron'
+import DEFAULT_AVATAR_PATH from './images/default-avatar.png'
+
+export { DEFAULT_AVATAR_PATH }
 
 export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
@@ -26,4 +29,3 @@ export const USER_PATH = Path.join(app.getPath('userData'), 'pushpin-v10', USER)
 export const WORKSPACE_URL_PATH = Path.join(USER_PATH, 'workspace-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
-export { default as DEFAULT_AVATAR_PATH } from './images/default-avatar.png'
