@@ -1931,8 +1931,9 @@ atomic-batcher@^1.0.2:
   integrity sha1-0WkB0QzOxZUWwZe5zNiTBom4E7Q=
 
 automerge@^0.10.1, "automerge@https://github.com/automerge/automerge#text-hack":
-  version "0.10.3"
-  resolved "https://github.com/automerge/automerge#5674263647ebd1e736862fd029060548c7fbaa0b"
+  version "0.11.1"
+  uid a0369ffc6883101c401f6a00d50a4ad8135c2a1c
+  resolved "https://github.com/automerge/automerge#a0369ffc6883101c401f6a00d50a4ad8135c2a1c"
   dependencies:
     immutable "^3.8.2"
     transit-immutable-js "^0.7.0"
