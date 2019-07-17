@@ -26,9 +26,9 @@
     ],
     "comma-dangle": "off",
     "default-case": "off",
-    "import/extensions": 0,
-    "import/no-extraneous-dependencies": 0,
-    "import/no-named-as-default-member": 0,
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/no-named-as-default-member": "off",
     "import/prefer-default-export": "off",
     "import/export": "off",
     "import/no-unresolved": [
@@ -37,9 +37,9 @@
         "ignore": ["electron"]
       }
     ],
-    "linebreak-style": 0,
+    "linebreak-style": "off",
     "lines-between-class-members": "off",
-    "react/prefer-stateless-function": 0,
+    "react/prefer-stateless-function": "off",
     "react/sort-comp": "off",
     "arrow-parens": "off",
     "implicit-arrow-linebreak": "off",
