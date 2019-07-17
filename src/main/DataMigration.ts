@@ -6,6 +6,8 @@ import { DATA_PATH } from '../renderer/constants'
 
 const log = Debug('DataMigration')
 
+// TODO: Remove this file if found after Aug 1st, 2019.
+// Added on Jul 17th, 2019.
 migrateUserData()
 
 function migrateUserData() {
