@@ -1,3 +1,4 @@
+import './DataMigration'
 import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
