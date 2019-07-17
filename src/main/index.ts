@@ -1,8 +1,6 @@
 import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
-import * as path from 'path'
-import { format as formatUrl } from 'url'
 
 import * as Hyperfile from '../renderer/hyperfile'
 
@@ -58,13 +56,7 @@ const createWindow = async () => {
   if (isDevelopment) {
     mainWindow.loadURL(`http://localhost:8080`)
   } else {
-    mainWindow.loadURL(
-      formatUrl({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file',
-        slashes: true,
-      })
-    )
+    mainWindow.loadFile('dist/index.html')
   }
 
   mainWindow.on('closed', () => {
