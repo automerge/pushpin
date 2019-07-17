@@ -36,6 +36,7 @@ $ NAME=userA yarn start & NAME=userB yarn start
 ```
 
 To start with the dev tools open, set OPEN_DEV_TOOLS on your CLI as follows:
+
 ```console
 $ OPEN_DEV_TOOLS=true yarn start
 ```
@@ -46,7 +47,7 @@ console:
 
 ```javascript
 > require('./constants').USER_PATH
-"/Users/mmcgrana/Library/Application Support/Electron/pushpin-v01/mark"
+"/Users/mmcgrana/Library/Application Support/pushpin/pushpin-v10/mark"
 ```
 
 You can remove a user directory to reset a user's data, or remove the entire data directory to reset all user data.
@@ -88,19 +89,22 @@ Please do! Bug reports and pull requests are welcome.
 ## Credits
 
 This project was written by
- * Roshan Choxi
- * Ignatius Gilfedder
- * Mark McGranaghan
- * Jeff Peterson
- * Peter van Hardenberg
-and was produced under the auspices of [Ink & Switch](inkandswitch.com).
+
+- Roshan Choxi
+- Ignatius Gilfedder
+- Mark McGranaghan
+- Jeff Peterson
+- Peter van Hardenberg
+  and was produced under the auspices of [Ink & Switch](inkandswitch.com).
 
 Special thanks to Martin Kleppmann (automerge) and Mathias Buus (hypercore) for their advice and contributions.
 
 ## Upgrade Hackage Notes
 
 ### sodium-native
+
 Compiling sodium-native is a pain. Go into node_modules/sodium-native and run `node preinstall` if you have trouble.
 
 ### automerge
+
 There's a regression in Automerge where types are being wrapped in a proxy preventing instanceof Text from working correctly. Until a fix arrives, edit node_modules/hypermerge/node_modules/automerge/frontend/context.js#69 and change value instanceof Text to value.constructor.name === "Text".

@@ -1,8 +1,7 @@
+import './DataMigration'
 import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
-import * as path from 'path'
-import { format as formatUrl } from 'url'
 
 import * as Hyperfile from '../renderer/hyperfile'
 
@@ -56,15 +55,9 @@ const createWindow = async () => {
   }
 
   if (isDevelopment) {
-    mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+    mainWindow.loadURL(`http://localhost:8080`)
   } else {
-    mainWindow.loadURL(
-      formatUrl({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file',
-        slashes: true,
-      })
-    )
+    mainWindow.loadFile('dist/index.html')
   }
 
   mainWindow.on('closed', () => {
@@ -86,10 +79,7 @@ const createWindow = async () => {
     // we only allow pushpin links to navigate
     // to avoid ever being in a position where we're loading rando files
     // or URLs within the app and getting stranded there
-    if (
-      isDevelopment &&
-      url.startsWith(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
-    ) {
+    if (isDevelopment && url.startsWith(`http://localhost:8080`)) {
       return
     }
 

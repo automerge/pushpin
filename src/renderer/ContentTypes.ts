@@ -38,6 +38,11 @@ function register(contentType: ContentType) {
 
   log('register', entry)
 
+  if (registry[type]) {
+    // Allow re-registration to support HMR
+    log(`Replacing '${type}' content type.`)
+  }
+
   registry[type] = entry
 }
 
