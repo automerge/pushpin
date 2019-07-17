@@ -1,3 +1,10 @@
+/*
+The default css file from @ibm/plex imports dozens of font files.
+This file only imports the ones we're actually using.
+
+TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.json
+*/
+
 @font-face {
   font-family: 'IBM Plex Mono';
   font-style: normal;
