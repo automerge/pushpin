@@ -1,5 +1,6 @@
 import * as path from 'path'
 import webpack from 'webpack'
+import { Configuration as DevServerConfig } from 'webpack-dev-server'
 import HtmlPlugin from 'html-webpack-plugin'
 import nodeExternals from 'webpack-node-externals'
 import HardSourcePlugin from 'hard-source-webpack-plugin'
@@ -67,14 +68,20 @@ const fontRule: webpack.Rule = {
   },
 }
 
+const devServer: DevServerConfig = {
+  contentBase: path.join(__dirname, 'dist'),
+  hotOnly: true,
+  overlay: {
+    warnings: false,
+    errors: true,
+  },
+}
+
 function shared({ isDev }: Options): webpack.Configuration {
   return {
     context: path.resolve(__dirname),
     devtool: isDev ? undefined : 'source-map',
-    devServer: {
-      contentBase: path.join(__dirname, 'dist'),
-      hotOnly: true,
-    },
+    devServer,
     stats: {
       assets: false,
       maxModules: 3,
