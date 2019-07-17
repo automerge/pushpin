@@ -1,3 +1,6 @@
+/* eslint-disable react/sort-comp */
+// this component has a bunch of weird pseudo-members that make eslint sad
+
 import React from 'react'
 import Debug from 'debug'
 

@@ -15,60 +15,83 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    // we agreed we don't like semicolons
     "semi": ["error", "never"],
-    "no-mixed-operators": "off",
+
+    // we agreed class methods don't have to use "this".
     "class-methods-use-this": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        "args": "none"
-      }
-    ],
+
+    // we like dangling commas
     "comma-dangle": "off",
+
+    // we agreed we don't require default cases
     "default-case": "off",
-    "import/extensions": "off",
-    "import/no-extraneous-dependencies": "off",
-    "import/no-named-as-default-member": "off",
-    "import/prefer-default-export": "off",
-    "import/export": "off",
-    "import/no-unresolved": [
-      2,
-      {
-        "ignore": ["electron"]
-      }
-    ],
-    "linebreak-style": "off",
-    "lines-between-class-members": "off",
-    "react/prefer-stateless-function": "off",
-    "react/sort-comp": "off",
-    "arrow-parens": "off",
-    "implicit-arrow-linebreak": "off",
-    "no-use-before-define": "off",
-    "no-shadow": "off",
-    "react/no-did-mount-set-state": "off",
-    "react/destructuring-assignment": "off",
-    "react/jsx-filename-extension": "off",
-    "react/jsx-one-expression-per-line": "off",
-    "no-param-reassign": "off",
-    "object-curly-newline": "off",
-    "curly": ["error", "all"],
-    "no-underscore-dangle": "off",
-    "jsx-a11y/no-static-element-interactions": "off",
-    "jsx-a11y/anchor-is-valid": "off",
-    "jsx-a11y/interactive-supports-focus": "off",
-    "jsx-a11y/no-noninteractive-tabindex": "off",
-    "jsx-a11y/click-events-have-key-events": "off",
-    "jsx-a11y/no-autofocus": "off",
+
+    // we agreed that we're okay with idiomatic short-circuits
     "no-unused-expressions": [
       "error",
       {
         "allowShortCircuit": true
       }
     ],
+
+    // we agreed this feels unnecessarily opinionated
+    "lines-between-class-members": "off",
+
+    // arguably we should not do this, but we do, 18 times
+    "no-shadow": "off",
+    // arguably we should not do this, but there are 70 cases where we do
+    "no-param-reassign": "off",
+
+    // we agreed this is a bad rule
+    "react/destructuring-assignment": "off",
+
+    // we agreed this is gratuitous
+    "react/jsx-one-expression-per-line": "off",
+
+    // pushpin is inherently visual, so we've disabled quite a few accessibility rules
+    // it would be reasonable to re-enable these but would take some work
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/interactive-supports-focus": "off",
+    "jsx-a11y/no-noninteractive-tabindex": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-autofocus": "off",
+
+    // we might want to do this, but there are 97 cases where we don't
     "@typescript-eslint/explicit-member-accessibility": "off",
+
+    // we might want to this, but there are 424 places we don't
     "@typescript-eslint/explicit-function-return-type": "off",
+
+    // we agreed this rule is gratuitious
     "@typescript-eslint/no-use-before-define": "off",
+
+    // someday, we should turn this back on, but we use it 44 times
     "@typescript-eslint/no-explicit-any": "off",
+
+    // we agreed unused arguments should be left in-place and not removed
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
+
+    // import-specific rulings
+    // we probably want to enable this, and it's violated 23 times
+    "import/no-extraneous-dependencies": "off",
+
+    // we probably don't like this rule, but only Content violates it, so we could have it
+    "import/no-named-as-default-member": "off",
+
+    // we agreed it's better to be consistent in how you export than follow this rule
+    "import/prefer-default-export": "off",
+
+    // tsc handles this better, and allows for multiple typed exports of the same name
+    "import/export": "off",
+
+    // we agreed we don't really care about this rule
     "import/no-cycle": "off"
   }
 }
