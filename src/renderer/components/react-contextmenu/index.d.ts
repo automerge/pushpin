@@ -9,7 +9,13 @@ declare module 'react-contextmenu' {
     rtl?: boolean
     onHide?: { (event: any): void }
     onMouseLeave?:
-      | { (event: React.MouseEvent<HTMLElement>, data: Object, target: HTMLElement): void }
+      | {
+          (
+            event: React.MouseEvent<HTMLElement>,
+            data: Record<strict, any>,
+            target: HTMLElement
+          ): void
+        }
       | Function
     onShow?: { (event: any): void }
   }
@@ -25,7 +31,7 @@ declare module 'react-contextmenu' {
 
   interface MenuItemProps {
     attributes?: React.HTMLAttributes<HTMLDivElement>
-    data?: Object
+    data?: Record<string, any>
     disabled?: boolean
     divider?: boolean
     preventClose?: boolean
@@ -33,7 +39,7 @@ declare module 'react-contextmenu' {
       | {
           (
             event: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
-            data: Object,
+            data: Record<string, any>,
             target: HTMLElement
           ): void
         }
@@ -48,7 +54,7 @@ declare module 'react-contextmenu' {
     rtl?: boolean
   }
 
-  module ReactContextmenu {
+  namespace ReactContextmenu {
     export const ContextMenu: React.ComponentClass<ContextMenuProps>
     export const ContextMenuTrigger: React.ComponentClass<ContextMenuTriggerProps>
     export const MenuItem: React.ComponentClass<MenuItemProps>
@@ -62,7 +68,7 @@ declare module 'react-contextmenu' {
 }
 
 declare module 'react-contextmenu/modules/actions' {
-  module ReactContextmenuActions {
+  namespace ReactContextmenuActions {
     export function showMenu(opts?: any, target?: HTMLElement): void
     export function hideMenu(opts?: any, target?: HTMLElement): void
   }
