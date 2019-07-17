@@ -8,6 +8,7 @@
     "__static": true
   },
   "parser": "@typescript-eslint/parser",
+  "plugins": ["react-hooks"],
   "extends": [
     "airbnb-typescript",
     "plugin:@typescript-eslint/recommended",
@@ -48,6 +49,10 @@
 
     // we agreed this is gratuitous
     "react/jsx-one-expression-per-line": "off",
+
+    // react hooks are dark and full of terror
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
 
     // pushpin is inherently visual, so we've disabled quite a few accessibility rules
     // it would be reasonable to re-enable these but would take some work

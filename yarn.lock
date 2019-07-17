@@ -1149,7 +1149,6 @@ atomic-batcher@^1.0.2:
 
 automerge@^0.10.1, "automerge@https://github.com/automerge/automerge#text-hack":
   version "0.11.1"
-  uid a0369ffc6883101c401f6a00d50a4ad8135c2a1c
   resolved "https://github.com/automerge/automerge#a0369ffc6883101c401f6a00d50a4ad8135c2a1c"
   dependencies:
     immutable "^3.8.2"
@@ -3096,6 +3095,11 @@ eslint-plugin-prettier@^3.1.0:
   integrity sha512-XWX2yVuwVNLOUhQijAkXz+rMPPoCr7WFiAl8ig6I7Xn+pPVhDhzg4DxHpmbeb0iqjO9UronEA3Tb09ChnFVHHA==
   dependencies:
     prettier-linter-helpers "^1.0.0"
+
+eslint-plugin-react-hooks@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-1.6.1.tgz#3c66a5515ea3e0a221ffc5d4e75c971c217b1a4c"
+  integrity sha512-wHhmGJyVuijnYIJXZJHDUF2WM+rJYTjulUTqF9k61d3BTk8etydz+M4dXUVH7M76ZRS85rqBTCx0Es/lLsrjnA==
 
 eslint-plugin-react@^7.14.2:
   version "7.14.2"
