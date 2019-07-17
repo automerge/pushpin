@@ -1,4 +1,4 @@
-declare module 'react-contextmenu' {
+declare module 'src/renderer/components/react-contextmenu' {
   import * as React from 'react'
 
   interface ContextMenuProps {
@@ -12,7 +12,7 @@ declare module 'react-contextmenu' {
       | {
           (
             event: React.MouseEvent<HTMLElement>,
-            data: Record<strict, any>,
+            data: Record<string, any>,
             target: HTMLElement
           ): void
         }
