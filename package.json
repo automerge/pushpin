@@ -55,7 +55,8 @@
     "source-map-support": "^0.5.12",
     "tmp": "0.1.0",
     "to-buffer": "^1.1.1",
-    "unfluff": "^3.2.0"
+    "unfluff": "^3.2.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@ibm/plex": "^1.4.1",
