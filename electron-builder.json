@@ -1,0 +1,6 @@
+{
+  "files": ["dist/**/*"],
+  "directories": {
+    "output": "out"
+  }
+}

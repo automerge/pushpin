@@ -17,11 +17,8 @@ import { createDocumentLink } from './ShareLink'
 import './app.css'
 import './react-toggle-override.css'
 import './components/react-simple-dropdown/dropdown.css'
-import '../../node_modules/@ibm/plex/css/ibm-plex.css'
+import './ibm-plex.css'
 import '../../node_modules/codemirror/lib/codemirror.css'
-import './line-awesome/fonts/line-awesome.ttf'
-import './line-awesome/fonts/line-awesome.woff'
-import './line-awesome/fonts/line-awesome.woff2'
 import './line-awesome/css/line-awesome.min.css'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
@@ -90,11 +87,13 @@ function initWorkspace(repo: RepoFrontend) {
   }
 
   const workspace = <Root repo={repo} url={workspaceUrl} />
-  const element = document.getElementById('app')
+  const element = document.createElement('div')
+  element.id = 'app'
+  document.body.appendChild(element)
   ReactDOM.render(workspace, element)
 
   // HMR
-  if (module && module.hot) {
+  if (module.hot) {
     module.hot.accept('./components/Root.tsx', () => {
       const NextRoot = require('./components/Root').default // eslint-disable-line global-require
       ReactDOM.render(<NextRoot repo={repo} url={workspaceUrl} />, element)
