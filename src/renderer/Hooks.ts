@@ -69,6 +69,21 @@ export function useDocument<D>(url: string | null): [Readonly<D> | null, ChangeF
   return [doc, change]
 }
 
+export function useDocumentReducer<D, A>(
+  url: string | null,
+  reducer: (doc: D, action: A) => void
+): [D | null, (action: A) => void] {
+  const [doc, changeDoc] = useDocument<D>(url)
+
+  const dispatch = useCallback((action: A) => {
+    changeDoc((doc) => {
+      reducer(doc, action)
+    })
+  }, [])
+
+  return [doc, dispatch]
+}
+
 export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (msg: M) => void {
   const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
 
