@@ -1,9 +1,9 @@
 import assert from 'assert'
-import { configure, shallow, mount, render } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-15'
+import { configure, shallow/* , mount, render */ } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
 import * as React from 'react'
 
-import Card from '../src/components/card'
+import Card from '../src/renderer/components/board/board-card'
 
 configure({ adapter: new Adapter() })
 

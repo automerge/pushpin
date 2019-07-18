@@ -1,0 +1,42 @@
+.Omnibox {
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.2);
+  width: 478px;
+  z-index: 10;
+  position: fixed;
+  top: 52px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.Omnibox .ListMenu__item .Actions {
+  visibility: hidden;
+}
+
+.Omnibox .ListMenu__item--selected .Actions {
+  visibility: visible;
+}
+
+.Invitation {
+  display: flex;
+  align-items: center;
+}
+
+.Invitation__body {
+  margin-left: 10px;
+}
+
+.Omnibox-nothingFound {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-size: 24px;
+}
+
+.Omnibox-nothingFoundBadge {
+  flex:none;
+  margin-right: 8px;
+}

@@ -1,0 +1,62 @@
+.ContextMenu {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  width: 200px;
+  z-index: 10;
+}
+
+.ContextMenu__divider {
+  height: 1px;
+  border-top: 1px solid var(--colorInputGrey);
+}
+
+.ContextMenu__section {
+  padding: 4px 0;
+}
+
+.ContextMenu__iconBounding {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.ContextMenu .react-contextmenu-item {
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.ContextMenu .react-contextmenu-item:last-child {
+  margin-bottom: 0px;
+}
+
+.ContextMenu__iconBounding--note {
+  background-image: linear-gradient(135deg, #d2e5f7, #f1dce4);
+  color: var(--colorBlueBlack);
+}
+
+.ContextMenu__iconBounding--file {
+  background-image: linear-gradient(135deg, #85e2f8, #c7d7e3);
+  color: #006476;
+}
+
+.ContextMenu__iconBounding .fa {
+  font-size: 22px;
+}
+
+.ContextMenu__label {
+  vertical-align: middle;
+}
+
+.ContextMenu h6 {
+  padding-left: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 8px;
+  color: var(--colorBlueBlack);
+}
