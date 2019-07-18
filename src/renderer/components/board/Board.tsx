@@ -910,6 +910,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         <BoardCard
           key={id}
           id={id}
+          boardUrl={this.props.hypermergeUrl}
           card={card}
           selected={selected}
           remoteSelected={cardsSelected[id] || []}

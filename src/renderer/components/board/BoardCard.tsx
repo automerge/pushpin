@@ -20,6 +20,7 @@ type DraggableEvent =
 
 interface BoardCardProps {
   id: string
+  boardUrl: HypermergeUrl
   card: BoardDocCard
 
   dragState: TrackingEntry
