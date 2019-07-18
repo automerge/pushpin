@@ -9,7 +9,7 @@ import { parseDocumentLink, HypermergeUrl } from '../../ShareLink'
 import { BoardDocCard } from '.'
 import { TrackingEntry, DragType, isResizing, isMoving } from './Board'
 import { ContactDoc } from '../contact'
-import { useDocument, useHeartbeat } from '../../Hooks'
+import { useDocument } from '../../Hooks'
 import './BoardCard.css'
 
 type DraggableEvent =
@@ -43,7 +43,6 @@ export default function BoardCard(props: BoardCardProps) {
     remoteSelected: [remoteSelection],
   } = props
 
-  useHeartbeat(card.url)
   const [doc] = useDocument<ContactDoc>(remoteSelection || null)
   const highlightColor = doc && doc.color
 

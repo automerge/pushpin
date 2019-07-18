@@ -3,7 +3,6 @@ import { Handle, RepoFrontend } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 import SelfContext from './components/SelfContext'
-import { Context } from './ContentTypes'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -147,9 +146,9 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
   }, [selfId])
 }
 
-export function useHeartbeat(docUrl: string | null, context: Context) {
+export function useHeartbeat(docUrl: HypermergeUrl | null) {
   useEffect(() => {
-    if (!docUrl || !['workspace', 'board'].includes(context)) {
+    if (!docUrl) {
       return () => {}
     }
 

@@ -4,6 +4,7 @@ import ContentTypes, { Context } from '../ContentTypes'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
 import SelfContext from './SelfContext'
 import Crashable from './Crashable'
+import { useHeartbeat } from '../Hooks'
 
 // this is the interface imported by Content types
 export interface ContentProps {
@@ -41,6 +42,10 @@ function Content(props: Props) {
   const selfId = useContext(SelfContext)
   const onCatch = useCallback(() => setCrashed(true), [])
 
+  const { type, hypermergeUrl } = parseDocumentLink(url)
+
+  useHeartbeat(['workspace', 'board'].includes(context) ? hypermergeUrl : null)
+
   useEffect(() => {
     setCrashed(false)
   }, [url])
@@ -48,8 +53,6 @@ function Content(props: Props) {
   if (!url) {
     return null
   }
-
-  const { type, hypermergeUrl } = parseDocumentLink(url)
 
   const contentType = ContentTypes.lookup({ type, context })
 
