@@ -1,10 +1,10 @@
-node_modules
-out
-dist
+/node_modules
+/out
+/dist
 .eslintcache
 *.log
 *.swp
 *.swo
-data/
+/data
 *.DS_Store
 .cache
