@@ -204,6 +204,13 @@ function createMenu() {
           },
         },
         {
+          label: 'Toggle Background Window',
+          accelerator: 'CmdOrCtrl+Option+B',
+          click: (_item, _focusedWindow) => {
+            backgroundWindow && toggleWindow(backgroundWindow)
+          },
+        },
+        {
           label: 'Open Inspector',
           accelerator: 'CmdOrCtrl+Option+I',
           click: (_item, focusedWindow) => {
@@ -252,6 +259,16 @@ function registerProtocolHandlers() {
       }
     }
   )
+}
+
+function toggleWindow(win: BrowserWindow): boolean {
+  if (win.isVisible()) {
+    win.hide()
+    return false
+  }
+
+  win.show()
+  return true
 }
 
 function isSafeishURL(url: string) {
