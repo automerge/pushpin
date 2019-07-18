@@ -113,7 +113,7 @@ function config(cb: (opts: Options) => webpack.Configuration) {
         mode,
         output: {
           path: path.resolve(__dirname, 'dist'),
-          filename: `${conf.name}.js`,
+          filename: `[name].js`,
           globalObject: 'this',
         },
       } as webpack.Configuration,
