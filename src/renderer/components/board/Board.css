@@ -1,0 +1,5 @@
+.Board {
+  position: relative;
+  background-image: url('../../images/grid.svg');
+  background-blend-mode: exclusion;
+}

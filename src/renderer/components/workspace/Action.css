@@ -1,0 +1,47 @@
+/* TODO: These should go into the CSS file for the Action component */
+.Action {
+  box-sizing: border-box;
+  color: var(--colorSecondaryGrey);
+  min-width: 32px;
+  padding: 0px 4px;
+  height: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.Action[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.Action--destructive {
+  color: var(--colorDestructive);
+}
+
+.Action--primary {
+  color: var(--colorLink);
+}
+
+.Action-label {
+  color: transparent;
+  transition: color 0.25s linear;
+  position: absolute;
+  text-align: center;
+}
+
+.Action:hover .Action-label {
+  color: var(--colorLink);
+}
+
+.Action-icon {
+  color: inherit;
+  font-size: 24px;
+  transition: color 0.25s linear;
+}
+
+.Action:hover .Action-icon {
+  color: transparent;
+}

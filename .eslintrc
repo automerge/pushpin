@@ -1,5 +1,4 @@
 {
-  "extends": "eslint-config-airbnb",
   "env": {
     "browser": true,
     "node": true,
@@ -8,16 +7,36 @@
   "globals": {
     "__static": true
   },
-  "parser": "babel-eslint",
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "airbnb-typescript",
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
   "rules": {
     "semi": ["error", "never"],
     "no-mixed-operators": "off",
     "class-methods-use-this": "off",
-    "no-unused-vars": ["error", { "args": "none"} ],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
     "comma-dangle": "off",
+    "default-case": "off",
     "import/extensions": 0,
     "import/no-extraneous-dependencies": 0,
-    "import/no-unresolved": [2, { "ignore": ["electron"] }],
+    "import/no-named-as-default-member": 0,
+    "import/prefer-default-export": "off",
+    "import/export": "off",
+    "import/no-unresolved": [
+      2,
+      {
+        "ignore": ["electron"]
+      }
+    ],
     "linebreak-style": 0,
     "lines-between-class-members": "off",
     "react/prefer-stateless-function": 0,
@@ -26,7 +45,6 @@
     "implicit-arrow-linebreak": "off",
     "no-use-before-define": "off",
     "no-shadow": "off",
-    "react/prop-types": [2, {"ignore": "style"}],
     "react/no-did-mount-set-state": "off",
     "react/destructuring-assignment": "off",
     "react/jsx-filename-extension": "off",
@@ -40,6 +58,17 @@
     "jsx-a11y/interactive-supports-focus": "off",
     "jsx-a11y/no-noninteractive-tabindex": "off",
     "jsx-a11y/click-events-have-key-events": "off",
-    "jsx-a11y/no-autofocus": "off"
+    "jsx-a11y/no-autofocus": "off",
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true
+      }
+    ],
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "import/no-cycle": "off"
   }
 }

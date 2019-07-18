@@ -6,11 +6,7 @@ class DropdownTrigger extends Component {
     const { children, className, ...dropdownTriggerProps } = this.props
     dropdownTriggerProps.className = `dropdown__trigger ${className}`
 
-    return (
-      <a {...dropdownTriggerProps}>
-        {children}
-      </a>
-    )
+    return <a {...dropdownTriggerProps}>{children}</a>
   }
 }
 
@@ -18,11 +14,11 @@ DropdownTrigger.displayName = 'DropdownTrigger'
 
 DropdownTrigger.propTypes = {
   children: PropTypes.node.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 DropdownTrigger.defaultProps = {
-  className: ''
+  className: '',
 }
 
 export default DropdownTrigger

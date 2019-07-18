@@ -1,0 +1,10 @@
+.ListMenuSection {
+}
+
+.ListMenuSection-title {
+  font-size: 12px;
+  padding: 4px 8px;
+  color: var(--colorSecondaryGrey);
+  line-height: 16px;
+  border-bottom:1px solid var(--colorPaleGrey);
+}

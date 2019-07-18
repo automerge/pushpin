@@ -1,0 +1,66 @@
+/* React PDF overrides */
+.react-pdf__Page__canvas {
+  width: 100% !important;
+  height: unset !important;
+}
+
+.PdfContent {
+  width: 100%;
+  overflow: hidden;
+  background: white;
+}
+
+.PdfContent--loading {
+  /* probably want to eliminate this state eventually */
+  text-align: center;
+}
+
+.PdfContent-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.PdfContent-headerInput {
+  width: 5ch;
+  text-align: right;
+  margin-left: 4px;
+}
+
+.PdfContent-headerInput::-webkit-inner-spin-button,
+.PdfContent-headerInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.PdfContent-headerNumPages {
+  margin-right: 4px;
+}
+
+.PdfContent-navButton {
+  box-sizing: border-box;
+  color: var(--colorSecondaryGrey);
+  min-width: 32px;
+  padding: 0px 4px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  font-size: 24px;
+}
+
+.PdfContent-navButton[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.PdfContent-navButton:not([disabled]):hover {
+  color: var(--colorGrey);
+  border: 1px solid;
+}
