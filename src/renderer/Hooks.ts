@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
 import { Handle, RepoFrontend } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
+import { HypermergeUrl } from './ShareLink'
+import SelfContext from './components/SelfContext'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -16,6 +18,10 @@ export function useRepo(): RepoFrontend {
   }
 
   return repo
+}
+
+export function useSelf(): HypermergeUrl {
+  return useContext(SelfContext)
 }
 
 /**
