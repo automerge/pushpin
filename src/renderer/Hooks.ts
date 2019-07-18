@@ -3,6 +3,7 @@ import { Handle, RepoFrontend } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 import SelfContext from './components/SelfContext'
+import { Context } from './ContentTypes'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -109,6 +110,59 @@ export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (m
     }
   })
   return sendObj.send
+}
+
+const heartbeats: { [url: string]: number } = {} // url: HypermergeUrl
+const HEARTBEAT_INTERVAL = 1000 // ms
+
+export function useAllHeartbeats(selfId: HypermergeUrl | null) {
+  const repo = useRepo()
+
+  useEffect(() => {
+    if (!selfId) {
+      return () => {}
+    }
+
+    const interval = setInterval(() => {
+      // Post on the self-contact ID that we're online.
+      // This means any avatar anywhere will have a colored ring around it
+      // if that user is online.
+      repo.message(selfId, 'heartbeat')
+
+      // Post a presence heartbeat on documents currently considered
+      // to be open, allowing any kind of card to render a list of "present" folks.
+      Object.entries(heartbeats).forEach(([url, count]) => {
+        if (count > 0) {
+          repo.message(url, { contact: selfId, heartbeat: true })
+        } else {
+          repo.message(url, { contact: selfId, departing: true })
+          delete heartbeats[url]
+        }
+      })
+    }, HEARTBEAT_INTERVAL)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [selfId])
+}
+
+export function useHeartbeat(docUrl: string | null, context: Context) {
+  useEffect(() => {
+    if (!docUrl || !['workspace', 'board'].includes(context)) {
+      return () => {}
+    }
+
+    if (heartbeats[docUrl]) {
+      heartbeats[docUrl] += 1
+    } else {
+      heartbeats[docUrl] = 1
+    }
+
+    return () => {
+      heartbeats[docUrl] && (heartbeats[docUrl] -= 1)
+    }
+  }, [])
 }
 
 export function useHyperfile(url: Hyperfile.HyperfileUrl | null): Uint8Array | null {

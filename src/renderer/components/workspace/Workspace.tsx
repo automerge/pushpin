@@ -17,7 +17,7 @@ import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
 
 import './Workspace.css'
-import { useDocument, useInterval, useMessaging } from '../../Hooks'
+import { useDocument, useAllHeartbeats, useHeartbeat } from '../../Hooks'
 import { BoardDoc } from '../board'
 
 const log = Debug('pushpin:workspace')
@@ -36,7 +36,8 @@ export default function Workspace(props: ContentProps) {
   const selfId = workspace && workspace.selfId
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
-  useHeartbeat(selfId, currentDocUrl)
+  useAllHeartbeats(selfId)
+  useHeartbeat(currentDocUrl, 'workspace')
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
@@ -117,39 +118,6 @@ function renderContent(currentDocUrl?: PushpinUrl) {
       <Content context="workspace" url={currentDocUrl} />
     </div>
   )
-}
-
-function useHeartbeat(selfId: string | null, docUrl: string | null) {
-  const sendSelf = useMessaging(selfId, () => {})
-  const sendCurrent = useMessaging(docUrl, () => {})
-
-  useInterval(
-    1000,
-    () => {
-      // The workspace takes on two responsibilities around presence.
-      // First, it posts on the self-contact ID that we're online.
-      // This means any avatar anywhere will have a colored ring around it
-      // if that user is online.
-      sendSelf('heartbeat')
-
-      // Second, it posts a presence heartbeat on the document currently
-      // considered to be open, allowing any kind of card to render a list of
-      // "present" folks.
-      // NB: The current implementation doesn't have any caching of messages,
-      //     so "present" avatars will have to wait for a second heartbeat to arrive
-      //     before appearing present since the first one will have passed in causing
-      //     them to render...
-      sendCurrent({ contact: selfId, heartbeat: true })
-    },
-    [sendSelf, sendCurrent]
-  )
-
-  // Send departure when current doc changes
-  useEffect(() => {
-    return () => {
-      sendCurrent({ contact: selfId, departing: true })
-    }
-  }, [sendCurrent])
 }
 
 function initializeDocument(workspace: Doc) {
