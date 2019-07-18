@@ -540,7 +540,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       return null
     }
     return (
-      <ListMenuSection title={label}>
+      <ListMenuSection key={name} title={label}>
         {items.map(
           ({ url, selected }) =>
             url && (
