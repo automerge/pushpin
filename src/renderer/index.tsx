@@ -27,22 +27,20 @@ localStorage.removeItem('debug')
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 500
 
-function initBackend(front) {
-  ipcRenderer.on('hypermerge', (event, msg) => {
-    front.receive(JSON.parse(msg))
+function initHypermerge(cb: (repo: RepoFrontend) => void) {
+  const front = new RepoFrontend()
+
+  front.subscribe((msg) => ipcRenderer.send('to-backend', msg))
+
+  ipcRenderer.on('hypermerge', (_event: never, msg: any) => {
+    front.receive(msg)
   })
 
-  front.subscribe((msg) => ipcRenderer.send('to-backend', JSON.stringify(msg)))
-}
-
-function initHypermerge(cb) {
-  const front = new RepoFrontend()
-  initBackend(front)
   // const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
 
   window.repo = front
 
-  cb(front) // no need to wait for .ready?
+  cb(front)
 }
 
 function loadWorkspaceUrl() {

@@ -10,17 +10,42 @@ import {
 } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
+import Queue from 'hypermerge/dist/Queue'
 import * as Hyperfile from '../renderer/hyperfile'
 
 const log = Debug('pushpin:electron')
 
-protocol.registerStandardSchemes(['pushpin'])
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: BrowserWindow | null = null
+let backgroundWindow: BrowserWindow | null = null
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const createWindow = async () => {
+const toBackendQ = new Queue<any>('to-backend')
+const toFrontendQ = new Queue<any>('to-frontend')
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', () => {
+  installExtension(REACT_DEVELOPER_TOOLS)
+  registerProtocolHandlers()
+  createMenu()
+  createWindow()
+  createBackgroundWindow()
+})
+
+protocol.registerStandardSchemes(['pushpin'])
+
+ipcMain
+  .on('to-frontend', (_event: never, msg: string) => {
+    toFrontendQ.push(msg)
+  })
+  .on('to-backend', (_event: never, msg: string) => {
+    toBackendQ.push(msg)
+  })
+
+async function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -31,43 +56,23 @@ const createWindow = async () => {
     },
   })
 
-  protocol.registerHttpProtocol('pushpin', (req, cb) => {
-    // we don't want to use loadURL because we don't want to reset the whole app state
-    // so we use the workspace manipulation function here
-    mainWindow && mainWindow.webContents.send('loadDocumentUrl', req.url)
-  })
-
-  protocol.registerBufferProtocol(
-    'hyperfile',
-    async (request, callback) => {
-      try {
-        if (Hyperfile.isHyperfileUrl(request.url)) {
-          const data = await Hyperfile.fetch(request.url)
-          callback(Buffer.from(data))
-        }
-      } catch (e) {
-        log(e)
-      }
-    },
-    (error) => {
-      if (error) {
-        log('Failed to register protocol')
-      }
-    }
-  )
-  const isDevelopment = process.env.NODE_ENV !== 'production'
-
   if (isDevelopment) {
     mainWindow.webContents.openDevTools()
-  }
-
-  if (isDevelopment) {
     mainWindow.loadURL(`http://localhost:8080`)
   } else {
     mainWindow.loadFile('dist/index.html')
   }
 
-  mainWindow.on('closed', () => {
+  toFrontendQ.subscribe((msg) => {
+    mainWindow && mainWindow.webContents.send('hypermerge', msg)
+  })
+
+  mainWindow.once('closed', () => {
+    toFrontendQ.unsubscribe()
+
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
     mainWindow = null
   })
 
@@ -78,9 +83,9 @@ const createWindow = async () => {
     })
   })
 
-  function isSafeishURL(url: string) {
-    return url.startsWith('http:') || url.startsWith('https:')
-  }
+  mainWindow.webContents.on('devtools-reload-page', () => {
+    backgroundWindow && backgroundWindow.reload()
+  })
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
     // we only allow pushpin links to navigate
@@ -111,7 +116,58 @@ const createWindow = async () => {
       shell.openExternal(url)
     }
   })
+}
 
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+  // On OS X it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
+
+app.on('activate', () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (mainWindow === null) {
+    createWindow()
+  }
+})
+
+function createBackgroundWindow() {
+  if (backgroundWindow) {
+    backgroundWindow.close()
+  }
+
+  // Create the browser window.
+  backgroundWindow = new BrowserWindow({
+    width: 1400,
+    height: 1000,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+  })
+  const isDevelopment = process.env.NODE_ENV !== 'production'
+
+  if (isDevelopment) {
+    backgroundWindow.loadURL(`http://localhost:8080/background.html`)
+  } else {
+    backgroundWindow.loadFile('dist/background.html')
+  }
+
+  toBackendQ.subscribe((msg) => {
+    backgroundWindow && backgroundWindow.webContents.send('hypermerge', msg)
+  })
+
+  backgroundWindow.once('closed', () => {
+    toBackendQ.unsubscribe()
+    backgroundWindow = null
+  })
+}
+
+function createMenu() {
   // Menubar template
   const template: MenuItemConstructorOptions[] = [
     {
@@ -136,8 +192,9 @@ const createWindow = async () => {
         {
           label: 'Refresh',
           accelerator: 'CmdOrCtrl+R',
-          click: (_item, focusedWindow) => {
-            focusedWindow.webContents.reload()
+          click: (_item, _focusedWindow) => {
+            mainWindow && mainWindow.reload()
+            backgroundWindow && backgroundWindow.reload()
           },
         },
         {
@@ -162,79 +219,35 @@ const createWindow = async () => {
   // Create the menubar
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
-
-  // Install DevTools if in dev mode. Open dev tools if indicated by env.
-  const isDevMode = process.execPath.match(/[\\/]electron/)
-  const openDevTools = process.env.OPEN_DEV_TOOLS
-  if (isDevMode) {
-    await installExtension(REACT_DEVELOPER_TOOLS)
-    if (openDevTools) {
-      mainWindow.webContents.openDevTools()
-    }
-  }
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', () => {
-  createWindow()
-  createBackgroundWindow()
-})
+function registerProtocolHandlers() {
+  protocol.registerHttpProtocol('pushpin', (req, _cb) => {
+    // we don't want to use loadURL because we don't want to reset the whole app state
+    // so we use the workspace manipulation function here
+    mainWindow && mainWindow.webContents.send('loadDocumentUrl', req.url)
+  })
 
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
-  }
-})
-
-let backgroundWindow: BrowserWindow | null = null
-const createBackgroundWindow = async () => {
-  // Create the browser window.
-  backgroundWindow = new BrowserWindow({
-    width: 1400,
-    height: 1000,
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
+  protocol.registerBufferProtocol(
+    'hyperfile',
+    async (request, callback) => {
+      try {
+        if (Hyperfile.isHyperfileUrl(request.url)) {
+          const data = await Hyperfile.fetch(request.url)
+          callback(Buffer.from(data))
+        }
+      } catch (e) {
+        log(e)
+      }
     },
-  })
-  const isDevelopment = process.env.NODE_ENV !== 'production'
+    (error) => {
+      if (error) {
+        log('Failed to register protocol')
+      }
+    }
+  )
+}
 
-  if (isDevelopment) {
-    backgroundWindow.loadURL(`http://localhost:8080/background.html`)
-  } else {
-    backgroundWindow.loadFile('dist/background.html')
-  }
-
-  ipcMain
-    .on('to-frontend', (_event: never, msg: string) => {
-      mainWindow && mainWindow.webContents.send('hypermerge', msg)
-    })
-    .on('to-backend', (_event: never, msg: string) => {
-      backgroundWindow && backgroundWindow.webContents.send('hypermerge', msg)
-    })
-
-  backgroundWindow.on('closed', () => {
-    backgroundWindow = null
-  })
+function isSafeishURL(url: string) {
+  return url.startsWith('http:') || url.startsWith('https:')
 }
