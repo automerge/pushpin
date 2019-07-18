@@ -28,11 +28,11 @@ localStorage.removeItem('debug')
 EventEmitter.defaultMaxListeners = 500
 
 function initBackend(front) {
-  ipcRenderer.on('frontend', (event, message) => {
-    front.receive(JSON.parse(message))
+  ipcRenderer.on('hypermerge', (event, msg) => {
+    front.receive(JSON.parse(msg))
   })
 
-  front.subscribe((msg) => ipcRenderer.send('frontend', JSON.stringify(msg)))
+  front.subscribe((msg) => ipcRenderer.send('to-backend', JSON.stringify(msg)))
 }
 
 function initHypermerge(cb) {

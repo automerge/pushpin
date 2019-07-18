@@ -227,11 +227,11 @@ const createBackgroundWindow = async () => {
   }
 
   ipcMain
-    .on('backend', (event, msg) => {
-      mainWindow && mainWindow.webContents.send('frontend', msg)
+    .on('to-frontend', (_event: never, msg: string) => {
+      mainWindow && mainWindow.webContents.send('hypermerge', msg)
     })
-    .on('frontend', (event, msg) => {
-      backgroundWindow && backgroundWindow.webContents.send('backend', msg)
+    .on('to-backend', (_event: never, msg: string) => {
+      backgroundWindow && backgroundWindow.webContents.send('hypermerge', msg)
     })
 
   backgroundWindow.on('closed', () => {

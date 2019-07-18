@@ -18,10 +18,10 @@ const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
 
 back.replicate(discovery)
 
-ipcRenderer.on('backend', (event, message) => {
+ipcRenderer.on('hypermerge', (event, message) => {
   // console.log('heard', message)
   back.receive(JSON.parse(message))
 })
-back.subscribe((msg) => ipcRenderer.send('frontend', JSON.stringify(msg)))
+back.subscribe((msg) => ipcRenderer.send('to-frontend', JSON.stringify(msg)))
 
 // console.log('Background process begun.')
