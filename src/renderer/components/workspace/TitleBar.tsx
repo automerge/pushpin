@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { clipboard } from 'electron'
 
-import Dropdown, { DropdownContent, DropdownTrigger } from '../react-simple-dropdown/dropdown'
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown/dropdown'
 import Omnibox from './Omnibox'
 import Content from '../Content'
 import Authors from './Authors'
