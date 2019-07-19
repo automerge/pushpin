@@ -1,6 +1,6 @@
 import React from 'react'
 import classNames from 'classnames'
-import { ContextMenu, MenuItem as ContextMenuItem } from '../react-contextmenu'
+import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
 import ColorPicker from '../ColorPicker'
 import './ContextMenu.css'

@@ -5,7 +5,7 @@ import Debug from 'debug'
 import uuid from 'uuid/v4'
 
 import { Handle } from 'hypermerge'
-import { ContextMenuTrigger } from '../react-contextmenu'
+import { ContextMenuTrigger } from 'react-contextmenu'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
