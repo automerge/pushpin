@@ -10,8 +10,6 @@ interface Options {
   isDev: boolean
 }
 
-const cacheDirectory = undefined // path.resolve(__dirname, ".cache")
-
 const tsRule: webpack.Rule = {
   test: /\.[tj]sx?$/,
   include: path.resolve(__dirname, 'src'),
@@ -121,6 +119,8 @@ function config(cb: (opts: Options) => webpack.Configuration) {
     )
   }
 }
+
+const cacheDirectory = path.resolve(__dirname, '.cache/hard-source/[confighash]')
 
 export default [
   config(({ isDev }) => ({
