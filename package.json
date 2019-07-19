@@ -41,7 +41,6 @@
     "immutable": "^3.8.2",
     "jimp": "^0.6.4",
     "js-crc": "^0.2.0",
-    "line-awesome": "git+https://github.com/choxi/line-awesome.git",
     "mime-types": "^2.1.24",
     "mkdirp": "0.5.1",
     "react": "16.8.6",
