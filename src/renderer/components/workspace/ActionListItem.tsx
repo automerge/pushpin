@@ -3,7 +3,7 @@ import React from 'react'
 import Content from '../Content'
 import Actions, { ActionItem } from './Actions'
 import { PushpinUrl } from '../../ShareLink'
-import ListMenuItem from '../ListMenuItem'
+import ListMenuItem, { Stretch } from '../ListMenuItem'
 
 export interface Props {
   contentUrl: PushpinUrl
@@ -23,7 +23,9 @@ export default function ActionListItem(props: Props) {
   const onClick = defaultAction ? () => defaultAction.callback(contentUrl) : undefined
   return (
     <ListMenuItem selected={selected} onClick={onClick}>
-      <Content context="list" url={contentUrl} />
+      <Stretch>
+        <Content context="list" url={contentUrl} />
+      </Stretch>
       <Actions url={contentUrl} actions={actions} />
     </ListMenuItem>
   )

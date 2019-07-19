@@ -7,6 +7,7 @@ import { ContactDoc } from '.'
 import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 import Text from '../Text'
+import Label from '../Label'
 
 import './ContactInVarious.css'
 import { useDocument, useMessaging, useTimeoutWhen } from '../../Hooks'
@@ -53,10 +54,10 @@ export default function ContactInVarious(props: ContentProps) {
     case 'list':
       return (
         <div draggable onDragStart={onDragStart} className="DocLink">
-          <div className="ListMenu__thumbnail">{avatar}</div>
-          <div className="Label">
+          <div className="Contact-avatar">{avatar}</div>
+          <Label>
             <Text>{name}</Text>
-          </div>
+          </Label>
         </div>
       )
 
@@ -81,7 +82,7 @@ export default function ContactInVarious(props: ContentProps) {
       return (
         <div className="Contact--board">
           {avatar}
-          <div className="Label">{name}</div>
+          <div className="Contact-boardLabel">{name}</div>
         </div>
       )
 
