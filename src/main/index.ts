@@ -32,7 +32,6 @@ app.on('ready', () => {
   registerProtocolHandlers()
   createMenu()
   createWindow()
-  createBackgroundWindow()
 })
 
 protocol.registerStandardSchemes(['pushpin'])
@@ -55,6 +54,8 @@ async function createWindow() {
       webSecurity: false,
     },
   })
+
+  createBackgroundWindow()
 
   if (isDevelopment) {
     mainWindow.webContents.openDevTools()
@@ -137,7 +138,12 @@ app.on('activate', () => {
 
 function createBackgroundWindow() {
   if (backgroundWindow) {
+    // Ensure that we wait for the 'closed' event before continuing:
+    backgroundWindow.once('closed', () => {
+      createBackgroundWindow()
+    })
     backgroundWindow.close()
+    return
   }
 
   // Create the browser window.
@@ -198,6 +204,13 @@ function createMenu() {
           },
         },
         {
+          label: 'Toggle Background Window',
+          accelerator: 'CmdOrCtrl+Option+B',
+          click: (_item, _focusedWindow) => {
+            backgroundWindow && toggleWindow(backgroundWindow)
+          },
+        },
+        {
           label: 'Open Inspector',
           accelerator: 'CmdOrCtrl+Option+I',
           click: (_item, focusedWindow) => {
@@ -246,6 +259,16 @@ function registerProtocolHandlers() {
       }
     }
   )
+}
+
+function toggleWindow(win: BrowserWindow): boolean {
+  if (win.isVisible()) {
+    win.hide()
+    return false
+  }
+
+  win.show()
+  return true
 }
 
 function isSafeishURL(url: string) {
