@@ -4,6 +4,7 @@ import { EventEmitter } from 'events'
 import { ipcRenderer } from 'electron'
 import Fs from 'fs'
 import { RepoFrontend } from 'hypermerge'
+import { ToFrontendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { WORKSPACE_URL_PATH } from './constants'
 import Root from './components/Root'
 import Content from './components/Content'
@@ -32,7 +33,7 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
 
   front.subscribe((msg) => ipcRenderer.send('to-backend', msg))
 
-  ipcRenderer.on('hypermerge', (_event: never, msg: any) => {
+  ipcRenderer.on('hypermerge', (_event: never, msg: ToFrontendRepoMsg) => {
     front.receive(msg)
   })
 

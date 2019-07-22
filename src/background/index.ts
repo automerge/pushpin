@@ -5,10 +5,10 @@ import raf from 'random-access-file'
 import DiscoverySwarm from 'discovery-cloud-client'
 
 import { RepoBackend } from 'hypermerge'
+import { ToBackendRepoMsg } from 'hypermerge/dist/RepoBackend'
 import { ipcRenderer } from 'electron'
 
 import { HYPERMERGE_PATH } from '../renderer/constants'
-import { ToBackendRepoMsg } from 'hypermerge/dist/RepoBackend'
 
 const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
 const url = 'wss://discovery-cloud.herokuapp.com'

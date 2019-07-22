@@ -11,6 +11,7 @@ import {
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
 import Queue from 'hypermerge/dist/Queue'
+import { ToFrontendRepoMsg, ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import * as Hyperfile from '../renderer/hyperfile'
 
 const log = Debug('pushpin:electron')
@@ -37,10 +38,10 @@ app.on('ready', () => {
 protocol.registerStandardSchemes(['pushpin'])
 
 ipcMain
-  .on('to-frontend', (_event: never, msg: string) => {
+  .on('to-frontend', (event: never, msg: ToFrontendRepoMsg) => {
     toFrontendQ.push(msg)
   })
-  .on('to-backend', (_event: never, msg: string) => {
+  .on('to-backend', (event: never, msg: ToBackendRepoMsg) => {
     toBackendQ.push(msg)
   })
 
