@@ -111,7 +111,7 @@ function config(cb: (opts: Options) => webpack.Configuration) {
         mode,
         output: {
           path: path.resolve(__dirname, 'dist'),
-          filename: `${conf.name}.js`,
+          filename: `[name].js`,
           globalObject: 'this',
         },
       } as webpack.Configuration,
@@ -147,13 +147,21 @@ export default [
 
   config(({ isDev }) => ({
     name: 'renderer',
-    entry: ['./src/renderer'],
+    entry: {
+      renderer: './src/renderer',
+      background: './src/background',
+    },
     target: 'electron-renderer',
     plugins: [
       new ForkTsCheckerPlugin({
         formatter: 'codeframe',
       }),
-      new HtmlPlugin({ title: 'PushPin' }),
+      new HtmlPlugin({ title: 'PushPin', chunks: ['renderer'] }),
+      new HtmlPlugin({
+        title: 'PushPin: Background',
+        chunks: ['background'],
+        filename: 'background.html',
+      }),
       ...(isDev
         ? [
             new HardSourcePlugin({
