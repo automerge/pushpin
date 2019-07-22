@@ -8,6 +8,7 @@ import { RepoBackend } from 'hypermerge'
 import { ipcRenderer } from 'electron'
 
 import { HYPERMERGE_PATH } from '../renderer/constants'
+import { ToBackendRepoMsg } from 'hypermerge/dist/RepoBackend'
 
 const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
 const url = 'wss://discovery-cloud.herokuapp.com'
@@ -15,7 +16,7 @@ const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
 
 back.replicate(discovery)
 
-ipcRenderer.on('hypermerge', (_event: never, msg: any) => {
+ipcRenderer.on('hypermerge', (event: never, msg: ToBackendRepoMsg) => {
   back.receive(msg)
 })
 back.subscribe((msg) => ipcRenderer.send('to-frontend', msg))
