@@ -152,11 +152,7 @@ export function useHeartbeat(docUrl: HypermergeUrl | null) {
       return () => {}
     }
 
-    if (heartbeats[docUrl]) {
-      heartbeats[docUrl] += 1
-    } else {
-      heartbeats[docUrl] = 1
-    }
+    heartbeats[docUrl] = (heartbeats[docUrl] || 0) + 1
 
     return () => {
       heartbeats[docUrl] && (heartbeats[docUrl] -= 1)
