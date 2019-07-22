@@ -9,9 +9,6 @@ import { ipcRenderer } from 'electron'
 
 import { HYPERMERGE_PATH } from '../renderer/constants'
 
-// console.log('Starting background process...')
-// console.log(process.argv)
-
 const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
 const url = 'wss://discovery-cloud.herokuapp.com'
 const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
@@ -22,5 +19,3 @@ ipcRenderer.on('hypermerge', (_event: never, msg: any) => {
   back.receive(msg)
 })
 back.subscribe((msg) => ipcRenderer.send('to-frontend', msg))
-
-// console.log('Background process begun.')
