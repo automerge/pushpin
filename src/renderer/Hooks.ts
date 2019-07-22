@@ -217,7 +217,8 @@ export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
 type InputEvent = React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>
 
 /**
- * Manages the state and events for an input element for which the input
+ * Manages the state and events for an input element for which the input's value
+ * is only needed after a confirmation via the enter key.
  *
  * @remarks
  * Returns `[value, onEvent]`.
