@@ -4,4 +4,5 @@
   color: var(--colorSecondaryGrey);
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 12px;
 }

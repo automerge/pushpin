@@ -1,0 +1,32 @@
+.ListMenuItem {
+  padding: 4px 8px;
+  color: var(--colorBlueBlack);
+  line-height:16px;
+  min-height: 32px;
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.ListMenuItem--withDefaultAction:hover {
+  background: var(--colorInputGrey);
+}
+
+.ListMenuItem--selected {
+  background: var(--colorInputGrey);
+}
+
+.ListMenuItem-thumbnail {
+  flex:none;
+  margin-right: 8px;
+}
+
+.ListMenuItem-stretch {
+  flex: 1;
+  overflow: hidden;
+}
+
+.ListMenuItem-actions {
+}

@@ -9,7 +9,7 @@
   background-color: white;
   border: 1px solid var(--colorPaleGrey);
 }
-.Contact--board .Label {
+.Contact--boardLabel {
   width: 100%;
   margin-top: 2px;
   color: var(--colorBlueBlack);
@@ -20,4 +20,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.Contact-avatar {
+  flex: none;
+  margin-right: 8px;
 }

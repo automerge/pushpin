@@ -1149,7 +1149,6 @@ atomic-batcher@^1.0.2:
 
 automerge@^0.10.1, "automerge@https://github.com/automerge/automerge#text-hack":
   version "0.11.1"
-  uid a0369ffc6883101c401f6a00d50a4ad8135c2a1c
   resolved "https://github.com/automerge/automerge#a0369ffc6883101c401f6a00d50a4ad8135c2a1c"
   dependencies:
     immutable "^3.8.2"
@@ -5112,10 +5111,6 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-"line-awesome@git+https://github.com/choxi/line-awesome.git":
-  version "1.0.0"
-  resolved "git+https://github.com/choxi/line-awesome.git#534fb12476079e217d7217df751761736bb7f4cf"
-
 load-bmfont@^1.3.1, load-bmfont@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/load-bmfont/-/load-bmfont-1.4.0.tgz#75f17070b14a8c785fe7f5bee2e6fd4f98093b6b"
@@ -6972,14 +6967,6 @@ react-color@^2.17.3:
     prop-types "^15.5.10"
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
-
-react-contextmenu@2.11.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/react-contextmenu/-/react-contextmenu-2.11.0.tgz#ec57614e6d687ceaec5c0ba97d56a302c9551d17"
-  integrity sha512-vT9QV9p/9h1BSIvmajRVG3KsgjuBnISpEQp0F1QYsUPFMe3VOKV2l7IiD8yrNUyXYZKrWMqI0YKsaBwGSRVgJg==
-  dependencies:
-    classnames "^2.2.5"
-    object-assign "^4.1.0"
 
 react-dom@>=16.8.6:
   version "16.8.6"

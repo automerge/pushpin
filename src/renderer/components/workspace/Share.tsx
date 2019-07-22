@@ -14,6 +14,10 @@ import { useDocument, useRepo } from '../../Hooks'
 import Text from '../Text'
 import SecondaryText from '../SecondaryText'
 import ActionListItem from './ActionListItem'
+import ListMenuItem, { Stretch } from '../ListMenuItem'
+import ListMenuSection from '../ListMenuSection'
+import ListMenu from '../ListMenu'
+import './Share.css'
 
 const log = Debug('pushpin:share')
 
@@ -111,17 +115,17 @@ function renderContacts(
 ) {
   const uniqueContactIds = contactIds.filter((id, i, a) => a.indexOf(id) === i)
   const noneFound = (
-    <div className="ListMenu__item">
-      <div className="ContactListMenuItem">
-        <span className="ListMenu__thumbnail">
-          <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
-        </span>
+    <ListMenuItem>
+      <span className="Share-noContactFound">
+        <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
+      </span>
+      <Stretch>
         <Label>
           <Text>None found</Text>
           <SecondaryText>Copy a link to your board and start making friends</SecondaryText>
         </Label>
-      </div>
-    </div>
+      </Stretch>
+    </ListMenuItem>
   )
 
   const share = {
@@ -149,10 +153,8 @@ function renderContacts(
   ))
 
   return (
-    <div>
-      <div className="ListMenu__section">
-        {uniqueContactIds.length !== 0 ? contacts : noneFound}
-      </div>
-    </div>
+    <ListMenu>
+      <ListMenuSection>{uniqueContactIds.length !== 0 ? contacts : noneFound}</ListMenuSection>
+    </ListMenu>
   )
 }

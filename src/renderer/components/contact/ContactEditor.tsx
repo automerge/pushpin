@@ -16,6 +16,8 @@ import Popover from '../Popover'
 import Heading from '../Heading'
 import SecondaryText from '../SecondaryText'
 
+import './ContactEditor.css'
+
 const { dialog } = remote
 const log = Debug('pushpin:settings')
 
@@ -93,39 +95,50 @@ export default function ContactEditor(props: ContentProps) {
 
   return (
     <Popover>
-      <div className="ListMenu">
-        <div className="ListMenu__header">
+      <div className="ContactEditor">
+        <div className="ContactEditor-heading">
           <Heading>Your Profile</Heading>
         </div>
-        <div className="ListMenu__section">
-          <div className="ListMenu__label">Display Name</div>
-          <div className="ListMenu__item">
-            <input type="text" onChange={setName} value={name || ''} />
+        <div className="ContactEditor-section">
+          <div className="ContactEditor-sectionLabel">Display Name</div>
+          <div className="ContactEditor-sectionContent">
+            <input
+              className="ContactEditor-input"
+              type="text"
+              onChange={setName}
+              value={name || ''}
+            />
           </div>
-          <div className="ListMenu__label">Avatar</div>
-          <div className="ListMenu__item ContactListItem">
-            <div className="ListMenu__thumbnail">
-              <div className="Avatar">{avatar}</div>
+        </div>
+        <div className="ContactEditor-section">
+          <div className="ContactEditor-sectionLabel">Avatar</div>
+          <div className="ContactEditor-sectionContent">
+            <div className="ContactEditor-row">
+              <div className="ContactEditor-avatar">
+                <div className="Avatar">{avatar}</div>
+              </div>
+              <Label>
+                <button type="button" onClick={chooseAvatar}>
+                  Choose from file...
+                </button>
+              </Label>
             </div>
-            <Label>
-              <button type="button" onClick={chooseAvatar}>
-                Choose from file...
-              </button>
-            </Label>
           </div>
-          <div className="ListMenu__label">Presence Color</div>
-          <div className="ListMenu__item">
+        </div>
+        <div className="ContactEditor-section">
+          <div className="ContactEditor-sectionLabel">Presence Color</div>
+          <div className="ContactEditor-sectionContent">
             <ColorPicker
               color={color}
               colors={Object.values(USER_COLORS)}
               onChangeComplete={setColor}
             />
-          </div>
-          <div className="ListMenu__label">
-            <SecondaryText>
-              Your presence colour will be used to by other authors identify you when you are active
-              on a board.
-            </SecondaryText>
+            <div className="ContactEditor-colorCopy">
+              <SecondaryText>
+                Your presence colour will be used to by other authors identify you when you are
+                active on a board.
+              </SecondaryText>
+            </div>
           </div>
         </div>
       </div>

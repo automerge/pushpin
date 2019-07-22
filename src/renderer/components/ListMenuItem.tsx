@@ -1,5 +1,6 @@
 import React, { EventHandler } from 'react'
 import classnames from 'classnames'
+import './ListMenuItem.css'
 
 export interface Props {
   children: React.ReactNode
@@ -26,8 +27,16 @@ export default function ListMenuItem(props: Props) {
 
   return (
     <div className={className} onClick={onClick}>
-      <div className="ListMenuItem-content">{content}</div>
+      {content}
       {actions && <div className="ListMenuItem-actions">{actions}</div>}
     </div>
   )
+}
+
+export interface StretchProps {
+  children: React.ReactNode
+}
+
+export function Stretch(props: StretchProps) {
+  return <div className="ListMenuItem-stretch">{props.children}</div>
 }

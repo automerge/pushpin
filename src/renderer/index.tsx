@@ -1,14 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
+import { ipcRenderer } from 'electron'
 import Fs from 'fs'
-import { RepoFrontend, RepoBackend } from 'hypermerge'
-import raf from 'random-access-file'
-// const DiscoverySwarm = require('discovery-swarm')
-// const defaults = require('dat-swarm-defaults')
-import DiscoverySwarm from 'discovery-cloud-client'
-
-import { HYPERMERGE_PATH, WORKSPACE_URL_PATH } from './constants'
+import { RepoFrontend } from 'hypermerge'
+import { ToFrontendRepoMsg } from 'hypermerge/dist/RepoMsg'
+import { WORKSPACE_URL_PATH } from './constants'
 import Root from './components/Root'
 import Content from './components/Content'
 
@@ -16,10 +13,10 @@ import { createDocumentLink } from './ShareLink'
 
 import './app.css'
 import './react-toggle-override.css'
-import './components/react-simple-dropdown/dropdown.css'
+import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
 import '../../node_modules/codemirror/lib/codemirror.css'
-import './line-awesome/css/line-awesome.min.css'
+import 'line-awesome/css/line-awesome.min.css'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
@@ -31,37 +28,25 @@ localStorage.removeItem('debug')
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 500
 
-function initBackend(front) {
-  const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
-
-  back.subscribe((msg) => front.receive(JSON.parse(JSON.stringify(msg))))
-  front.subscribe((msg) => back.receive(JSON.parse(JSON.stringify(msg))))
-  const url = 'wss://discovery-cloud.herokuapp.com'
-  const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
-
-  back.replicate(discovery)
-}
-
-function initHypermerge(cb) {
+function initHypermerge(cb: (repo: RepoFrontend) => void) {
   const front = new RepoFrontend()
-  initBackend(front)
+
+  front.subscribe((msg) => ipcRenderer.send('to-backend', msg))
+
+  ipcRenderer.on('hypermerge', (_event: never, msg: ToFrontendRepoMsg) => {
+    front.receive(msg)
+  })
+
   // const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
 
   window.repo = front
 
-  cb(front) // no need to wait for .ready?
+  cb(front)
 }
 
 function loadWorkspaceUrl() {
   if (Fs.existsSync(WORKSPACE_URL_PATH)) {
     const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
-    // the next four lines are to cover a migration for existing accounts to URLs
-    // if you're reading this long after 6/11/18 go ahead and delete this bit
-    if (json.workspaceDocId) {
-      const workspaceUrl = createDocumentLink('workspace', json.workspaceDocId)
-      saveWorkspaceUrl(workspaceUrl) // upgrade to new format
-      return workspaceUrl
-    }
     if (json.workspaceUrl) {
       return json.workspaceUrl
     }

@@ -1,5 +1,5 @@
 import { Handle, RepoFrontend } from 'hypermerge'
-import { parseDocumentLink, HypermergeUrl } from './ShareLink'
+import { parseDocumentLink, HypermergeUrl, PushpinUrl } from './ShareLink'
 import { ContactDoc } from './components/contact'
 import { Doc } from './components/workspace/Workspace'
 
@@ -9,14 +9,23 @@ import { Doc } from './components/workspace/Workspace'
 //     debugger
 //   })
 //
+
+interface Invitation {
+  hypermergeUrl: HypermergeUrl
+  documentUrl: PushpinUrl
+  offererId: HypermergeUrl
+  doc?: any
+  sender: ContactDoc
+}
+
 export default class InvitationsView {
   repo: RepoFrontend
   selfId?: HypermergeUrl
   workspaceHandle: Handle<Doc>
   contactHandles: { [contactId: string]: Handle<ContactDoc> }
   docHandles: { [docId: string]: Handle<any> }
-  invitations: any[]
-  pendingInvitations: any[]
+  invitations: Invitation[]
+  pendingInvitations: Invitation[]
   onChangeCb?: Function
 
   constructor(repo: RepoFrontend, workspaceId: HypermergeUrl, onChange: Function) {
@@ -56,7 +65,7 @@ export default class InvitationsView {
     this.docHandles[hypermergeUrl] = handle
   }
 
-  watchContact = (contactId) => {
+  watchContact = (contactId: HypermergeUrl) => {
     if (this.contactHandles[contactId]) {
       return
     }
@@ -71,7 +80,7 @@ export default class InvitationsView {
 
       offersForUs.forEach((documentUrl) => {
         const { hypermergeUrl } = parseDocumentLink(documentUrl)
-        const matchOffer = (offer) =>
+        const matchOffer = (offer: Invitation) =>
           offer.documentUrl === documentUrl && offer.offererId === offererId
 
         if (!this.pendingInvitations.some(matchOffer)) {
