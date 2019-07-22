@@ -47,13 +47,6 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
 function loadWorkspaceUrl() {
   if (Fs.existsSync(WORKSPACE_URL_PATH)) {
     const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
-    // the next four lines are to cover a migration for existing accounts to URLs
-    // if you're reading this long after 6/11/18 go ahead and delete this bit
-    if (json.workspaceDocId) {
-      const workspaceUrl = createDocumentLink('workspace', json.workspaceDocId)
-      saveWorkspaceUrl(workspaceUrl) // upgrade to new format
-      return workspaceUrl
-    }
     if (json.workspaceUrl) {
       return json.workspaceUrl
     }
