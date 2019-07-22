@@ -5,9 +5,10 @@ import raf from 'random-access-file'
 import DiscoverySwarm from 'discovery-cloud-client'
 
 import { RepoBackend } from 'hypermerge'
-import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
-import { ipcRenderer } from 'electron'
+import ipc from 'node-ipc'
 
+import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
+import { Socket } from 'net'
 import { HYPERMERGE_PATH } from '../renderer/constants'
 
 const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
@@ -16,7 +17,19 @@ const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
 
 back.replicate(discovery)
 
-ipcRenderer.on('hypermerge', (event: never, msg: ToBackendRepoMsg) => {
-  back.receive(msg)
+ipc.config.silent = true
+ipc.config.appspace = 'pushpin.'
+ipc.config.id = 'background'
+ipc.config.maxConnections = 1
+
+ipc.serve(() => {
+  ipc.server.on('repo.msg', (msg: ToBackendRepoMsg) => {
+    back.receive(msg)
+  })
+
+  ipc.server.on('connect', (socket: Socket) => {
+    back.subscribe((msg) => ipc.server.emit(socket, 'repo.msg', msg))
+  })
 })
-back.subscribe((msg) => ipcRenderer.send('to-frontend', msg))
+
+ipc.server.start()

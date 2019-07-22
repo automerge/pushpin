@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
-import { ipcRenderer } from 'electron'
+import ipc from 'node-ipc'
 import Fs from 'fs'
 import { RepoFrontend } from 'hypermerge'
 import { ToFrontendRepoMsg } from 'hypermerge/dist/RepoMsg'
@@ -28,13 +28,20 @@ localStorage.removeItem('debug')
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 500
 
+ipc.config.silent = true
+ipc.config.appspace = 'pushpin.'
+ipc.config.id = 'renderer'
+ipc.config.maxRetries = 2 as any
+
 function initHypermerge(cb: (repo: RepoFrontend) => void) {
   const front = new RepoFrontend()
 
-  front.subscribe((msg) => ipcRenderer.send('to-backend', msg))
+  ipc.connectTo('background', () => {
+    ipc.of.background.on('repo.msg', (msg: ToFrontendRepoMsg) => {
+      front.receive(msg)
+    })
 
-  ipcRenderer.on('hypermerge', (_event: never, msg: ToFrontendRepoMsg) => {
-    front.receive(msg)
+    front.subscribe((msg) => ipc.of.background.emit('repo.msg', msg))
   })
 
   // const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))

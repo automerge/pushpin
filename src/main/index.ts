@@ -1,17 +1,7 @@
 import './DataMigration'
-import {
-  app,
-  protocol,
-  ipcMain,
-  BrowserWindow,
-  Menu,
-  shell,
-  MenuItemConstructorOptions,
-} from 'electron'
+import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
-import Queue from 'hypermerge/dist/Queue'
-import { ToFrontendRepoMsg, ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import * as Hyperfile from '../renderer/hyperfile'
 
 const log = Debug('pushpin:electron')
@@ -21,9 +11,6 @@ const log = Debug('pushpin:electron')
 let mainWindow: BrowserWindow | null = null
 let backgroundWindow: BrowserWindow | null = null
 const isDevelopment = process.env.NODE_ENV !== 'production'
-
-const toBackendQ = new Queue<any>('to-backend')
-const toFrontendQ = new Queue<any>('to-frontend')
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -36,14 +23,6 @@ app.on('ready', () => {
 })
 
 protocol.registerStandardSchemes(['pushpin'])
-
-ipcMain
-  .on('to-frontend', (event: never, msg: ToFrontendRepoMsg) => {
-    toFrontendQ.push(msg)
-  })
-  .on('to-backend', (event: never, msg: ToBackendRepoMsg) => {
-    toBackendQ.push(msg)
-  })
 
 async function createWindow() {
   // Create the browser window.
@@ -65,13 +44,7 @@ async function createWindow() {
     mainWindow.loadFile('dist/index.html')
   }
 
-  toFrontendQ.subscribe((msg) => {
-    mainWindow && mainWindow.webContents.send('hypermerge', msg)
-  })
-
   mainWindow.once('closed', () => {
-    toFrontendQ.unsubscribe()
-
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -164,12 +137,7 @@ function createBackgroundWindow() {
     backgroundWindow.loadFile('dist/background.html')
   }
 
-  toBackendQ.subscribe((msg) => {
-    backgroundWindow && backgroundWindow.webContents.send('hypermerge', msg)
-  })
-
   backgroundWindow.once('closed', () => {
-    toBackendQ.unsubscribe()
     backgroundWindow = null
   })
 }
