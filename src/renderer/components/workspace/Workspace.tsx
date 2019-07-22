@@ -37,7 +37,7 @@ export default function Workspace(props: ContentProps) {
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
   useAllHeartbeats(selfId)
-  useHeartbeat(currentDocUrl, 'workspace')
+  useHeartbeat(currentDocUrl)
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
