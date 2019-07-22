@@ -5,7 +5,7 @@ import raf from 'random-access-file'
 import DiscoverySwarm from 'discovery-cloud-client'
 
 import { RepoBackend } from 'hypermerge'
-import { ToBackendRepoMsg } from 'hypermerge/dist/RepoBackend'
+import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { ipcRenderer } from 'electron'
 
 import { HYPERMERGE_PATH } from '../renderer/constants'
