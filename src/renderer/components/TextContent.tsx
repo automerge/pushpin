@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react'
 import CodeMirror from 'codemirror'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
@@ -84,7 +84,7 @@ function useCodeMirror(props: CodeMirrorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const codeMirrorRef = useRef<CodeMirror | null>(null)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     // Observe changes to the editor and make corresponding updates to the
     // Automerge text.
     function onCodeMirrorChange(codeMirror: CodeMirror, change: any) {
@@ -207,7 +207,7 @@ function useCodeMirror(props: CodeMirrorProps) {
   }, [props.text])
 
   // Ensure the CodeMirror editor is focused if we expect it to be.
-  useLayoutEffect(() => {
+  useEffect(() => {
     const codeMirror = codeMirrorRef.current
     if (!codeMirror) {
       return
