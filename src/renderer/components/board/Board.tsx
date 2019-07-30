@@ -42,7 +42,7 @@ export const BOARD_COLORS = {
 }
 
 const BOARD_WIDTH = 3600
-const BOARD_HEIGHT = 1800
+const BOARD_HEIGHT = 3800
 const GRID_SIZE = 20
 
 const CARD_MIN_WIDTH = 81
