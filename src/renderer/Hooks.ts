@@ -140,14 +140,19 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
         if (count > 0) {
           repo.message(url, { contact: selfId, heartbeat: true, presence: myPresence[url] })
         } else {
-          repo.message(url, { contact: selfId, departing: true })
+          depart(url)
           delete heartbeats[url]
         }
       })
     }, HEARTBEAT_INTERVAL)
 
+    function depart(url: string) {
+      repo.message(url, { contact: selfId, departing: true })
+    }
+
     return () => {
       clearInterval(interval)
+      Object.entries(heartbeats).forEach(([url]) => depart(url))
     }
   }, [selfId])
 }
