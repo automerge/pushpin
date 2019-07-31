@@ -8,8 +8,7 @@ import { parseDocumentLink, HypermergeUrl } from '../../ShareLink'
 
 import { BoardDocCard } from '.'
 import { TrackingEntry, DragType, isResizing, isMoving } from './Board'
-import { ContactDoc } from '../contact'
-import { useDocument } from '../../Hooks'
+import { usePresence, useSelf } from '../../Hooks'
 import './BoardCard.css'
 
 type DraggableEvent =
@@ -27,7 +26,6 @@ interface BoardCardProps {
 
   selected: boolean
   uniquelySelected: boolean
-  remoteSelected: string[]
 
   onDrag(card: BoardDocCard, event: DraggableEvent, dragData: DraggableData): void
   onStop(card: BoardDocCard, event: DraggableEvent, dragData: DraggableData): void
@@ -36,15 +34,22 @@ interface BoardCardProps {
   setCardRef(id: string, ref: HTMLElement | null): void
 }
 
-export default function BoardCard(props: BoardCardProps) {
-  const {
-    card,
-    dragState = { dragState: DragType.NOT_DRAGGING },
-    remoteSelected: [remoteSelection],
-  } = props
+interface Presence {
+  color: string | null
+}
 
-  const [doc] = useDocument<ContactDoc>(remoteSelection || null)
-  const highlightColor = doc && doc.color
+export default function BoardCard(props: BoardCardProps) {
+  const { card, dragState = { dragState: DragType.NOT_DRAGGING } } = props
+  const [self] = useSelf()
+
+  const remotePresences = usePresence<Presence>(
+    props.boardUrl,
+    props.selected ? { color: self && self.color } : null,
+    card.id
+  )
+
+  const remotePresence = Object.values(remotePresences)[0]
+  const highlightColor = remotePresence && remotePresence.color
 
   function onDrag(e: DraggableEvent, d: DraggableData) {
     props.onDrag(card, e, d)
@@ -83,7 +88,7 @@ export default function BoardCard(props: BoardCardProps) {
   const context = 'board'
   const contentType = ContentTypes.lookup({ type, context })
 
-  const selected = props.selected || props.remoteSelected.length > 0
+  const selected = props.selected || !!highlightColor
 
   return (
     <DraggableCore

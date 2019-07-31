@@ -60,7 +60,6 @@ const draggableCards = (cards, selected, card) => {
 
 interface State {
   selected: any[]
-  remoteSelection: { [contact: string]: string[] }
   contextMenuPosition?: {
     x: number
     y: number
@@ -133,11 +132,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   private finishedDrag: boolean = false
   private tracking: { [cardId: string]: TrackingEntry } = {}
 
-  private heartbeatTimerId?: NodeJS.Timer
-  private contactHeartbeatTimerId: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
-
   state: State = {
-    remoteSelection: {},
     selected: [],
     tracking: {},
   }
@@ -145,11 +140,9 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   componentWillMount = () => {
     this.handle = window.repo.open(this.props.hypermergeUrl)
     this.handle.subscribe((doc) => this.onChange(doc))
-    this.handle.subscribeMessage((msg) => this.onMessage(msg))
   }
   componentWillUnmount = () => {
     this.handle && this.handle.close()
-    this.heartbeatTimerId && clearInterval(this.heartbeatTimerId)
   }
 
   onChange = (doc) => {
@@ -786,40 +779,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     }
   }
 
-  onMessage = (msg) => {
-    const { contact, selected } = msg
-
-    if (contact && selected) {
-      this.setState((prevState) => ({
-        remoteSelection: {
-          ...prevState.remoteSelection,
-          [contact]: selected,
-        },
-      }))
-    }
-
-    // if we don't hear from another user for a while, assume they've gone offline
-    if (contact) {
-      clearTimeout(this.contactHeartbeatTimerId[contact])
-      // if we miss two heartbeats (11s), assume they've gone offline
-      this.contactHeartbeatTimerId[contact] = setTimeout(() => {
-        this.clearRemoteSelection(contact)
-      }, 3000)
-    }
-  }
-
-  clearRemoteSelection = (contact) => {
-    this.setState((prevState) => ({
-      remoteSelection: {
-        ...prevState.remoteSelection,
-        [contact]: undefined,
-      },
-    }))
-  }
-
   updateSelection = (selected) => {
     this.setState({ selected })
-    this.handle && this.handle.message({ contact: this.props.selfId, selected })
   }
 
   selectToggle = (cardId) => {
@@ -889,19 +850,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       return null
     }
 
-    // invert the client->cards to a cards->client mapping
-    const { remoteSelection } = this.state
-    const cardsSelected = {}
-    Object.entries(remoteSelection).forEach(([contact, cards]) => {
-      cards &&
-        cards.forEach((card) => {
-          if (!cardsSelected[card]) {
-            cardsSelected[card] = []
-          }
-          cardsSelected[card].push(contact)
-        })
-    })
-
     const cards = this.state.doc.cards || {}
     const cardChildren = Object.entries(cards).map(([id, card]) => {
       const selected = this.state.selected.includes(id)
@@ -913,7 +861,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
           boardUrl={this.props.hypermergeUrl}
           card={card}
           selected={selected}
-          remoteSelected={cardsSelected[id] || []}
           uniquelySelected={uniquelySelected}
           dragState={this.state.tracking[id]}
           onDrag={this.onDrag}

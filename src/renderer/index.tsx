@@ -84,6 +84,10 @@ function initWorkspace(repo: RepoFrontend) {
   document.body.appendChild(element)
   ReactDOM.render(workspace, element)
 
+  window.addEventListener('beforeunload', () => {
+    ReactDOM.unmountComponentAtNode(element)
+  })
+
   // HMR
   if (module.hot) {
     module.hot.accept('./components/Root.tsx', () => {
