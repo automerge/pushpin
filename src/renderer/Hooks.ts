@@ -3,6 +3,7 @@ import { Handle, RepoFrontend } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 import SelfContext from './components/SelfContext'
+import { ContactDoc } from './components/contact'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -20,8 +21,13 @@ export function useRepo(): RepoFrontend {
   return repo
 }
 
-export function useSelf(): HypermergeUrl {
+export function useSelfId(): HypermergeUrl {
   return useContext(SelfContext)
+}
+
+export function useSelf(): [Readonly<ContactDoc> | null, ChangeFn<ContactDoc>] {
+  const selfId = useSelfId()
+  return useDocument<ContactDoc>(selfId)
 }
 
 /**
@@ -132,7 +138,7 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       // to be open, allowing any kind of card to render a list of "present" folks.
       Object.entries(heartbeats).forEach(([url, count]) => {
         if (count > 0) {
-          repo.message(url, { contact: selfId, heartbeat: true })
+          repo.message(url, { contact: selfId, heartbeat: true, presence: myPresence[url] })
         } else {
           repo.message(url, { contact: selfId, departing: true })
           delete heartbeats[url]
@@ -158,6 +164,44 @@ export function useHeartbeat(docUrl: HypermergeUrl | null) {
       heartbeats[docUrl] && (heartbeats[docUrl] -= 1)
     }
   }, [])
+}
+
+export interface RemotePresence<P> {
+  [contactUrl: string]: P | undefined
+}
+
+const myPresence: { [url: string]: { [key: string]: any } } = {}
+
+export function usePresence<P>(
+  url: HypermergeUrl | null,
+  presence: P | null,
+  key: string = '/'
+): RemotePresence<P> {
+  const [remote, setRemote] = useState<RemotePresence<P>>({})
+
+  useMessaging<any>(url, (msg: any) => {
+    if (msg.heartbeat && msg.presence) {
+      setRemote((rest) => ({ ...rest, [msg.contact]: msg.presence[key] }))
+    } else if (msg.departing) {
+      setRemote(({ [msg.contact]: _, ...rest }) => rest)
+    }
+  })
+
+  useEffect(() => {
+    if (!url || !key) return () => {}
+
+    if (!myPresence[url]) {
+      myPresence[url] = {}
+    }
+
+    myPresence[url][key] = presence
+
+    return () => {
+      delete myPresence[url][key]
+    }
+  }, [key, presence])
+
+  return remote
 }
 
 export function useHyperfile(url: Hyperfile.HyperfileUrl | null): Uint8Array | null {
