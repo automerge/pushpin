@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 
@@ -33,33 +33,41 @@ UrlContent.maxHeight = 32
 export default function UrlContent(props: ContentProps) {
   const [urlInput, setUrl] = useState('')
   const [doc, changeDoc] = useRefreshedDocument(props.hypermergeUrl)
+  const onDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      // TODO: we must stop propagation to prevent board from fullscreening :(
+      e.stopPropagation()
+      if (!doc) return
+      window.open(doc.url, '_blank') // todo extract
+    },
+    [doc]
+  )
+  const onInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setUrl(e.target.value)
+    },
+    [setUrl]
+  )
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      e.stopPropagation()
 
-  function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setUrl(e.target.value)
-  }
+      if (e.key === 'Enter') {
+        e.preventDefault()
 
-  function onKeyDown(e: React.KeyboardEvent) {
-    e.stopPropagation()
+        const url = urlInput.indexOf('://') === -1 ? `http://${urlInput}` : urlInput
 
-    if (e.key === 'Enter') {
-      e.preventDefault()
-
-      const url = urlInput.indexOf('://') === -1 ? `http://${urlInput}` : urlInput
-
-      changeDoc((doc: UrlDoc) => {
-        doc.url = url
-      })
-    }
-  }
-
-  function onPaste(e: React.ClipboardEvent) {
-    e.stopPropagation()
-  }
+        changeDoc((doc: UrlDoc) => {
+          doc.url = url
+        })
+      }
+    },
+    [urlInput, changeDoc]
+  )
 
   if (!doc) {
     return null
   }
-
   const { data, url } = doc
 
   if (!url) {
@@ -104,25 +112,25 @@ export default function UrlContent(props: ContentProps) {
   }
 
   return (
-    <div style={css.urlCard}>
+    <div style={css.urlCard} onDoubleClick={onDoubleClick}>
       {doc.imageHyperfileUrl ? (
         <img style={css.img} src={doc.imageHyperfileUrl} alt={data.description} />
       ) : null}
 
       <p style={css.title}>
-        <a style={css.titleAnchor} href={url}>
-          {data.title}
-        </a>
+        <span style={css.titleAnchor}>{data.title}</span>
       </p>
 
       <p style={css.text}>{data.description}</p>
       <p style={css.link}>
-        <a style={css.titleAnchor} href={data.canonicalLink || url}>
-          {data.canonicalLink || url}
-        </a>
+        <span style={css.titleAnchor}>{data.canonicalLink || url}</span>
       </p>
     </div>
   )
+}
+
+function onPaste(e: React.ClipboardEvent) {
+  e.stopPropagation()
 }
 
 function useRefreshedDocument(url: HypermergeUrl): [null | UrlDoc, ChangeFn<UrlDoc>] {
