@@ -176,4 +176,27 @@ export default [
         : []),
     ],
   })),
+  config(({ isDev }) => ({
+    name: 'cloud-peer',
+    entry: {
+      'cloud-peer': './src/cloud-peer',
+    },
+    target: 'node',
+    plugins: [
+      new ForkTsCheckerPlugin({
+        formatter: 'codeframe',
+      }),
+      ...(isDev
+        ? [
+            new HardSourcePlugin({
+              cacheDirectory,
+              info: {
+                level: 'warn',
+                mode: 'none',
+              },
+            }),
+          ]
+        : []),
+    ],
+  })),
 ]

@@ -16,7 +16,9 @@
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "lint": "eslint --cache --color --ext .jsx,.js,.tsx,.ts src",
     "test": "electron-mocha --renderer test/**/*.{js,jsx,ts,tsx}",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "cloud-peer": "yarn compile --config-name cloud-peer && node ./dist/cloud-peer.js",
+    "cloud-peer-inspect": "yarn compile --config-name cloud-peer && node --inspect-brk ./dist/cloud-peer.js"
   },
   "keywords": [],
   "author": "inkandswitch",
@@ -28,6 +30,7 @@
     "bs58": "^4.0.1",
     "classnames": "^2.2.6",
     "codemirror": "^5.47.0",
+    "commander": "^3.0.0",
     "diff-match-patch": "^1.0.4",
     "discovery-cloud-client": "^0.0.3",
     "discovery-swarm": "^5.1.4",

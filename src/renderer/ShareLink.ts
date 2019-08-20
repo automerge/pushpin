@@ -9,7 +9,7 @@ export type HypermergeUrl = string & { hypermerge: true }
 export type PushpinUrl = string & { pushpin: true }
 
 export function isHypermergeUrl(str: string): str is HypermergeUrl {
-  return /^hypermerge:\/\/\w+$/.test(str)
+  return /^hypermerge:\/\w+$/.test(str)
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
