@@ -14,8 +14,9 @@
     "start3": "NAME=userA yarn start & NAME=userB yarn dev:app & NAME=userC yarn dev:app",
     "dist": "yarn compile --mode=production && electron-builder",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
+    "format": "concurrently yarn:format:*",
     "format:css": "prettier --write src/**/*.css",
-    "lint": "eslint --cache --color --ext .jsx,.js,.tsx,.ts src",
+    "format:js": "eslint --cache --color --ext .jsx,.js,.tsx,.ts src",
     "test": "electron-mocha --renderer test/**/*.{js,jsx,ts,tsx}",
     "postinstall": "electron-builder install-app-deps"
   },
