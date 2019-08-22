@@ -2,7 +2,8 @@
   margin: auto;
 }
 
-.react-toggle-track-check, .react-toggle-track-x {
+.react-toggle-track-check,
+.react-toggle-track-x {
   margin-top: 0;
   margin-bottom: 0;
   top: 7px;

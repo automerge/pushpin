@@ -1,18 +1,86 @@
 /* Reset Styles: http://meyerweb.com/eric/tools/css/reset/ */
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
   margin: 0;
   padding: 0;
   border: 0;
@@ -20,21 +88,34 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline;
 }
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
   display: block;
 }
 body {
   line-height: 1;
 }
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
-blockquote, q {
+blockquote,
+q {
   quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
   content: '';
   content: none;
 }
@@ -42,7 +123,6 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-
 
 /* Line Awesome */
 
@@ -56,11 +136,11 @@ table {
   --colorBlueBlack: #102542;
   --colorBlack: var(--colorBlack);
   --colorSecondaryGrey: #637389;
-  --colorPaleGrey: #D5DFE5;
-  --colorInputGrey: #E9EDF0;
+  --colorPaleGrey: #d5dfe5;
+  --colorInputGrey: #e9edf0;
   --colorOnline: rgb(113, 227, 65);
   --colorLink: #0645ad;
-  --colorDestructive: #F87060;
+  --colorDestructive: #f87060;
 }
 
 /* Global */
@@ -75,7 +155,12 @@ a {
 
 /* App Styles */
 
-html, body, #app, [data-reactroot], .react-contextmenu-wrapper, .board {
+html,
+body,
+#app,
+[data-reactroot],
+.react-contextmenu-wrapper,
+.board {
   width: 100%;
   height: 100%;
 }
@@ -161,7 +246,8 @@ input {
   border: solid 1px var(--colorPaleGrey);
   overflow: auto;
 }
-.CodeMirrorEditor:focus, .CodeMirrorEditor:active {
+.CodeMirrorEditor:focus,
+.CodeMirrorEditor:active {
   outline: none;
 }
 .CodeMirrorEditor::-webkit-scrollbar {
@@ -172,7 +258,6 @@ input {
 .CodeMirrorEditor::-webkit-scrollbar-track {
   background-color: transparent;
   margin-bottom: 10px;
-
 }
 
 .CodeMirrorEditor::-webkit-scrollbar-thumb {
@@ -188,7 +273,7 @@ input {
 }
 
 .CodeMirrorEditor::-webkit-scrollbar-thumb:hover {
-  background-color: #CBD5DB;
+  background-color: #cbd5db;
 }
 .CodeMirrorEditor__editor {
   box-sizing: border-box;
@@ -203,7 +288,7 @@ input {
 .CodeMirrorEditor div.CodeMirror-lines {
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
-  line-height:20px;
+  line-height: 20px;
   padding: 0;
 }
 
@@ -238,7 +323,8 @@ input {
   outline: thin dotted;
 }
 
-.CodeMirrorEditor__renderer a:hover, .CodeMirrorEditor__renderer a:active {
+.CodeMirrorEditor__renderer a:hover,
+.CodeMirrorEditor__renderer a:active {
   outline: 0;
 }
 
@@ -250,14 +336,13 @@ input {
 .CodeMirrorEditor__renderer h6 {
   font-weight: 600;
   color: var(--colorBlueBlack);
-  margin-bottom:8px;
+  margin-bottom: 8px;
 }
 
 .CodeMirrorEditor__renderer h1 {
   font-size: 18px;
   line-height: 24px;
-  letter-spacing: -.5px;
-
+  letter-spacing: -0.5px;
 }
 
 .CodeMirrorEditor__renderer h2 {
@@ -276,23 +361,22 @@ input {
 .CodeMirrorEditor__renderer h4 {
   color: var(--colorSecondaryGrey);
 
-  font-weight:600;
+  font-weight: 600;
 }
 
 .CodeMirrorEditor__renderer h5 {
   font-size: 12px;
-  font-weight:600;
+  font-weight: 600;
   color: var(--colorSecondaryGrey);
 }
 
 .CodeMirrorEditor__renderer h6 {
-  font-weight:600;
-
+  font-weight: 600;
 }
 
 .CodeMirrorEditor__renderer p {
   font-size: 14px;
-  line-height:20px;
+  line-height: 20px;
   margin-bottom: 8px;
 }
 
@@ -312,11 +396,15 @@ input {
   padding: 0;
 }
 
-.CodeMirrorEditor__renderer pre, code, kbd, samp {
+.CodeMirrorEditor__renderer pre,
+code,
+kbd,
+samp {
   color: var(--colorBlack);
-  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier,
+    monospace;
   font-size: 12px;
-  line-height:16px;
+  line-height: 16px;
   margin-bottom: 8px;
 }
 
@@ -331,7 +419,8 @@ input {
   border-radius: 4px;
 }
 
-.CodeMirrorEditor__renderer b, strong {
+.CodeMirrorEditor__renderer b,
+strong {
   font-weight: bold;
 }
 
@@ -352,7 +441,8 @@ input {
   font-weight: bold;
 }
 
-.CodeMirrorEditor__renderer sub, sup {
+.CodeMirrorEditor__renderer sub,
+sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
@@ -367,9 +457,10 @@ input {
   bottom: -0.25em;
 }
 
-.CodeMirrorEditor__renderer ul, ol {
+.CodeMirrorEditor__renderer ul,
+ol {
   list-style-type: disc;
-  margin-left:12px;
+  margin-left: 12px;
   padding-left: 8px;
   margin-bottom: 8px;
 }
