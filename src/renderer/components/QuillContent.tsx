@@ -10,17 +10,17 @@ import './QuillContent.css'
 // import '../../../node_modules/quill/dist/quill.core.css'
 // import '../../../node_modules/quill/dist/quill.snow.css'
 
-interface QuillDoc {
+interface TextDoc {
   text: Automerge.Text
 }
 
-QuillContent.minWidth = 6
-QuillContent.minHeight = 2
-QuillContent.defaultWidth = 12
-QuillContent.defaultHeight = 8
+TextContent.minWidth = 6
+TextContent.minHeight = 2
+TextContent.defaultWidth = 12
+TextContent.defaultHeight = 8
 
-export default function QuillContent(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<QuillDoc>(props.hypermergeUrl)
+export default function TextContent(props: ContentProps) {
+  const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
   const ref = useQuill(
     doc && doc.text,
@@ -111,18 +111,18 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-function initializeDocument(doc: QuillDoc) {
+function initializeDocument(doc: TextDoc) {
   doc.text = new Automerge.Text()
-  doc.text.insertAt(0, '\n')
+  doc.text.insertAt(0, '\n') // Quill prefers an ending newline.
 }
 
 ContentTypes.register({
-  name: 'Quill Text',
-  type: 'quill',
-  icon: 'newspaper',
+  type: 'text',
+  name: 'Text',
+  icon: 'sticky-note',
   initializeDocument,
   contexts: {
-    board: QuillContent,
-    workspace: QuillContent,
+    board: TextContent,
+    workspace: TextContent,
   },
 })

@@ -16,12 +16,12 @@ import './board'
 import './contact'
 
 // other single-context components
-import './TextContent'
+// import './TextContent'
+import './QuillContent'
 import './ImageContent'
 import './ThreadContent'
 import './UrlContent'
 import './PdfContent'
-import './QuillContent'
 
 interface Props {
   url: PushpinUrl
