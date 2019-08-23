@@ -22,7 +22,7 @@ TextContent.defaultHeight = 8
 export default function TextContent(props: ContentProps) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
-  const ref = useQuill(
+  const [ref, quill] = useQuill(
     doc && doc.text,
     (fn) => {
       changeDoc((doc) => fn(doc.text))
@@ -37,14 +37,40 @@ export default function TextContent(props: ContentProps) {
     }
   )
 
-  return <div className="QuillContent" ref={ref} />
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== 'Backspace' || !doc) {
+        e.stopPropagation()
+        return
+      }
+      // const text = doc.text.join('')
+
+      if (!quill) return
+
+      const text = quill.getText()
+
+      console.log('text', JSON.stringify(text))
+
+      // we normally prevent deletion by stopping event propagation
+      // but if the card is already empty and we hit delete, allow it
+
+      // const text = quill.getText()
+
+      if (text !== '' && text !== '\n') {
+        e.stopPropagation()
+      }
+    },
+    [quill]
+  )
+
+  return <div className="QuillContent" ref={ref} onKeyDown={onKeyDown} />
 }
 
 function useQuill(
   text: Automerge.Text | null,
   changeFn: (cb: (text: Automerge.Text) => void) => void,
   options?: QuillOptionsStatic
-): React.Ref<HTMLDivElement> {
+): [React.Ref<HTMLDivElement>, Quill | null] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
   const textString = useMemo(() => text && text.join(''), [text])
@@ -84,7 +110,7 @@ function useQuill(
     quill.current.updateContents(diff)
   }, [textString])
 
-  return ref
+  return [ref, quill.current]
 }
 
 function useStaticCallback<T extends (...args: any[]) => any>(callback: T): T {
