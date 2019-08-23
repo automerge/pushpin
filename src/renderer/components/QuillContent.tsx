@@ -48,7 +48,6 @@ function useQuill(
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
   const textString = useMemo(() => text && text.join(''), [text])
-  // const delta = useMemo(() => text && textToDelta(text), [text])
   const makeChange = useStaticCallback(changeFn)
 
   useEffect(() => {
@@ -62,7 +61,6 @@ function useQuill(
     if (textString) q.setText(textString)
 
     const onChange: TextChangeHandler = (changeDelta, _oldContents, source) => {
-      // console.log('change', source, changeDelta)
       if (source !== 'user') return
 
       makeChange((content) => applyDeltaToText(content, changeDelta))
@@ -110,14 +108,6 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
     }
   })
 }
-
-// function textToDelta(text: Automerge.Text): Delta {
-//   const delta = new Delta()
-
-//   delta.insert(text.join(''))
-
-//   return delta
-// }
 
 function initializeDocument(doc: QuillDoc) {
   doc.text = new Automerge.Text()

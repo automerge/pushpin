@@ -6,11 +6,13 @@
   right: 0;
   bottom: 0;
   outline: 0;
+  padding: 10px;
 }
 
 .ql-editor {
   outline: 0;
   min-height: 100%;
+  cursor: text;
 }
 
 .ql-clipboard {
