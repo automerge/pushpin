@@ -71,15 +71,17 @@ function useQuill(
     return () => {
       quill.current = null
       q.off('text-change', onChange)
-      // TODO: destroy quill instance
+      // TODO: destroy quill instance?
     }
   }, [ref.current])
 
   useEffect(() => {
     if (!textString || !quill.current) return
-    if (textString === quill.current.getText()) return
 
-    quill.current.setText(textString)
+    const delta = new Delta().insert(textString)
+    const diff = quill.current.getContents().diff(delta)
+
+    quill.current.updateContents(diff)
   }, [textString])
 
   return ref
