@@ -7,8 +7,6 @@ import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
 import { useDocument } from '../Hooks'
 import './QuillContent.css'
-// import '../../../node_modules/quill/dist/quill.core.css'
-// import '../../../node_modules/quill/dist/quill.snow.css'
 
 interface TextDoc {
   text: Automerge.Text

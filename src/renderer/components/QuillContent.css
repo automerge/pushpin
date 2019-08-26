@@ -6,9 +6,10 @@
   width: 100%;
   min-height: 100%;
   outline: 0;
-  padding: 10px;
+  padding: calc(var(--cellSize) / 2);
   box-sizing: border-box;
   overflow: auto;
+  border: solid 1px var(--colorPaleGrey);
 }
 
 .ql-editor {
@@ -23,4 +24,32 @@
   overflow-y: hidden;
   position: absolute;
   top: 50%;
+}
+
+/* Scrollbar */
+
+.QuillContent::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.QuillContent::-webkit-scrollbar-track {
+  background-color: transparent;
+  margin-bottom: 10px;
+}
+
+.QuillContent::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.QuillContent:hover::-webkit-scrollbar-track {
+  background-color: #f3f3f3;
+}
+
+.QuillContent:hover::-webkit-scrollbar-thumb {
+  background-color: var(--colorPaleGrey);
+}
+
+.QuillContent::-webkit-scrollbar-thumb:hover {
+  background-color: #cbd5db;
 }
