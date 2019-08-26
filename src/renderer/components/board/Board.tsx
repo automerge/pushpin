@@ -15,6 +15,14 @@ import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
+import {
+  Position,
+  Dimension,
+  gridOffset,
+  gridCellsToPixels,
+  snapDimensionToGrid,
+  snapPositionToGrid,
+} from './BoardGrid'
 
 const { dialog } = remote
 
@@ -41,12 +49,11 @@ export const BOARD_COLORS = {
   BLACK: '#2b2b2b',
 }
 
-const BOARD_WIDTH = 3600
-const BOARD_HEIGHT = 1800
-const GRID_SIZE = 20
-
 const CARD_MIN_WIDTH = 81
 const CARD_MIN_HEIGHT = 41
+
+const BOARD_WIDTH = 3600
+const BOARD_HEIGHT = 1800
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
@@ -61,10 +68,7 @@ const draggableCards = (cards, selected, card) => {
 interface State {
   selected: any[]
   remoteSelection: { [contact: string]: string[] }
-  contextMenuPosition?: {
-    x: number
-    y: number
-  }
+  contextMenuPosition?: Position
   tracking: { [cardId: string]: TrackingEntry }
   doc?: BoardDoc
 }
@@ -110,10 +114,8 @@ export function isResizing(tracking): tracking is ResizeTracking {
 export type TrackingEntry = MoveTracking | ResizeTracking | NotDraggingTracking
 
 interface CardArgs {
-  x: number
-  y: number
-  width?: number | null
-  height?: number | null
+  position: Position
+  dimension?: Dimension
 }
 
 interface LinkCardArgs extends CardArgs {
@@ -200,8 +202,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     }
 
     const cardId = this.createCard({
-      x: e.pageX - this.boardRef.current.offsetLeft,
-      y: e.pageY - this.boardRef.current.offsetTop,
+      position: {
+        x: e.pageX - this.boardRef.current.offsetLeft,
+        y: e.pageY - this.boardRef.current.offsetTop,
+      },
       type: 'text',
     })
     this.selectOnly(cardId)
@@ -237,12 +241,14 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     if (!this.boardRef.current) {
       return
     }
-    const localX = pageX - this.boardRef.current.offsetLeft
-    const localY = pageY - this.boardRef.current.offsetTop
+    const position = {
+      x: pageX - this.boardRef.current.offsetLeft,
+      y: pageY - this.boardRef.current.offsetTop,
+    }
 
     const url = e.dataTransfer.getData('application/pushpin-url')
     if (url) {
-      this.linkCard({ x: localX, y: localY, url })
+      this.linkCard({ position, url })
       return
     }
 
@@ -251,25 +257,24 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     const { length } = e.dataTransfer.files
     for (let i = 0; i < length; i += 1) {
       const entry = e.dataTransfer.files[i]
+
       const reader = new FileReader()
-      const x = localX + i * (GRID_SIZE * 2)
-      const y = localY + i * (GRID_SIZE * 2)
+      const offsetPosition = gridOffset(position, i)
 
       if (entry.type.match('image/')) {
         reader.onload = () => {
-          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result as ArrayBuffer))
+          this.createImageCardFromBuffer(offsetPosition, Buffer.from(reader.result as ArrayBuffer))
         }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('application/pdf')) {
         reader.onload = () => {
-          this.createPdfCardFromBuffer({ x, y }, Buffer.from(reader.result as ArrayBuffer))
+          this.createPdfCardFromBuffer(offsetPosition, Buffer.from(reader.result as ArrayBuffer))
         }
         reader.readAsArrayBuffer(entry)
       } else if (entry.type.match('text/')) {
         reader.onload = () => {
           this.createCard({
-            x: localX + i * (GRID_SIZE * 2),
-            y: localY + i * (GRID_SIZE * 2),
+            position: offsetPosition,
             type: 'text',
             typeAttrs: { text: reader.readAsText(entry) },
           })
@@ -286,13 +291,13 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       try {
         const url = new URL(plainText)
         if (isPushpinUrl(plainText)) {
-          this.linkCard({ x: pageX, y: pageY, url: plainText })
+          this.linkCard({ position, url: plainText })
         } else {
-          this.createCard({ x: pageX, y: pageY, type: 'url', typeAttrs: { url: url.toString() } })
+          this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
         }
       } catch (e) {
         // i guess it's not a URL, just make a text card
-        this.createCard({ x: pageX, y: pageY, type: 'text', typeAttrs: { text: plainText } })
+        this.createCard({ position, type: 'text', typeAttrs: { text: plainText } })
       }
     }
   }
@@ -305,8 +310,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.preventDefault()
     e.stopPropagation()
 
-    const x = window.pageXOffset + 100
-    const y = window.pageYOffset + 100
+    const position = {
+      x: window.pageXOffset + 100,
+      y: window.pageYOffset + 100,
+    }
 
     const dataTransfer = e.clipboardData
     if (!dataTransfer) {
@@ -327,7 +334,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         const reader = new FileReader()
         reader.onload = () => {
           // xxx: talk to jeff on this one
-          this.createImageCardFromBuffer({ x, y }, Buffer.from(reader.result as ArrayBuffer))
+          this.createImageCardFromBuffer(position, Buffer.from(reader.result as ArrayBuffer))
         }
         reader.readAsArrayBuffer(file)
       })
@@ -338,13 +345,13 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       try {
         const url = new URL(plainTextData)
         if (isPushpinUrl(plainTextData)) {
-          this.linkCard({ x, y, url: plainTextData })
+          this.linkCard({ position, url: plainTextData })
         } else {
-          this.createCard({ x, y, type: 'url', typeAttrs: { url: url.toString() } })
+          this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
         }
       } catch (e) {
         // i guess it's not a URL, just make a text card
-        this.createCard({ x, y, type: 'text', typeAttrs: { text: plainTextData } })
+        this.createCard({ position, type: 'text', typeAttrs: { text: plainTextData } })
       }
     }
   }
@@ -359,8 +366,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       return
     }
 
-    const x = this.state.contextMenuPosition.x - this.boardRef.current.getBoundingClientRect().left
-    const y = this.state.contextMenuPosition.y - this.boardRef.current.getBoundingClientRect().top
+    const position = {
+      x: this.state.contextMenuPosition.x - this.boardRef.current.getBoundingClientRect().left,
+      y: this.state.contextMenuPosition.y - this.boardRef.current.getBoundingClientRect().top,
+    }
 
     let cardId
     /* the contents of this switch statement
@@ -376,7 +385,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
             throw new Error('Expected exactly one path?')
           }
 
-          cardId = this.createImageCardFromPath({ x, y }, paths[0])
+          cardId = this.createImageCardFromPath(position, paths[0])
           // this happens here because we're in a callback
           this.selectOnly(cardId)
         })
@@ -391,15 +400,14 @@ export default class Board extends React.PureComponent<ContentProps, State> {
             throw new Error('Expected exactly one path?')
           }
 
-          cardId = this.createPdfCardFromPath({ x, y }, paths[0])
+          cardId = this.createPdfCardFromPath(position, paths[0])
           // this happens here because we're in a callback
           this.selectOnly(cardId)
         })
         break
       case 'board':
         cardId = this.createCard({
-          x,
-          y,
+          position,
           type: contentType.type,
           typeAttrs: {
             title: `Sub-board of ${
@@ -411,8 +419,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         break
       default:
         cardId = this.createCard({
-          x,
-          y,
+          position,
           type: contentType.type,
           typeAttrs: { text: '' },
         })
@@ -420,12 +427,11 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     }
   }
 
-  createPdfCardFromPath = ({ x, y }, path) => {
+  createPdfCardFromPath = (position, path) => {
     Hyperfile.write(path)
       .then((hyperfileUrl) => {
         const cardId = this.createCard({
-          x,
-          y,
+          position,
           type: 'pdf',
           typeAttrs: { hyperfileUrl },
         })
@@ -436,12 +442,11 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       })
   }
 
-  createPdfCardFromBuffer = ({ x, y }, buffer) => {
+  createPdfCardFromBuffer = (position, buffer) => {
     Hyperfile.writeBuffer(buffer)
       .then((hyperfileUrl) => {
         const cardId = this.createCard({
-          x,
-          y,
+          position,
           type: 'pdf',
           typeAttrs: { hyperfileUrl },
         })
@@ -452,12 +457,11 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       })
   }
 
-  createImageCardFromPath = ({ x, y }, path) => {
+  createImageCardFromPath = (position, path) => {
     Hyperfile.write(path)
       .then((hyperfileUrl) => {
         const cardId = this.createCard({
-          x,
-          y,
+          position,
           type: 'image',
           typeAttrs: { hyperfileUrl },
         })
@@ -468,12 +472,11 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       })
   }
 
-  createImageCardFromBuffer = ({ x, y }, buffer) => {
+  createImageCardFromBuffer = (position, buffer) => {
     Hyperfile.writeBuffer(buffer)
       .then((hyperfileUrl) => {
         const cardId = this.createCard({
-          x,
-          y,
+          position,
           type: 'image',
           typeAttrs: { hyperfileUrl },
         })
@@ -484,31 +487,32 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       })
   }
 
-  createCard = ({ x, y, width, height, type, typeAttrs }: CreateCardArgs) => {
+  createCard = ({ position, dimension, type, typeAttrs }: CreateCardArgs) => {
     const hypermergeUrl = Content.initializeContentDoc(type, typeAttrs)
-    return this.linkCard({ x, y, width, height, url: createDocumentLink(type, hypermergeUrl) })
+    return this.linkCard({ position, dimension, url: createDocumentLink(type, hypermergeUrl) })
   }
 
-  linkCard = ({ x, y, width, height, url }: LinkCardArgs) => {
+  linkCard = ({ position, dimension, url }: LinkCardArgs) => {
     const id = uuid()
 
     const { type } = parseDocumentLink(url)
     const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) as any
 
-    width = width ? this.snapMeasureToGrid(width) : null
-    width = component.defaultWidth ? component.defaultWidth * GRID_SIZE : null
-    height = height ? this.snapMeasureToGrid(height) : null
-    height = component.defaultHeight ? component.defaultHeight * GRID_SIZE : null
+    if (!dimension)
+      dimension = {
+        width: gridCellsToPixels(component.defaultWidth),
+        height: gridCellsToPixels(component.defaultHeight),
+      }
 
     this.handle &&
       this.handle.change((b) => {
-        const snapX = this.snapCoordinateToGrid(x)
-        const snapY = this.snapCoordinateToGrid(y)
+        const { x, y } = snapPositionToGrid(position)
+        const { width, height } = snapDimensionToGrid(dimension)
         const newCard = {
           id,
           url,
-          x: snapX,
-          y: snapY,
+          x,
+          y,
           width,
           height,
         }
@@ -552,80 +556,50 @@ export default class Board extends React.PureComponent<ContentProps, State> {
    *
    */
 
-  cardMoved = ({ id, x, y }) => {
+  cardMoved = ({ id, position }) => {
     if (!(this.state.doc && this.state.doc.cards)) {
       return
     }
 
     // This gets called when uniquely selecting a card, so avoid a document
     // change if in fact the card hasn't moved mod snapping.
-    const snapX = this.snapCoordinateToGrid(x)
-    const snapY = this.snapCoordinateToGrid(y)
-    if (snapX === this.state.doc.cards[id].x && snapY === this.state.doc.cards[id].y) {
+    const snapPosition = snapPositionToGrid(position)
+    const cardPosition = { x: this.state.doc.cards[id].x, y: this.state.doc.cards[id].y }
+    if (snapPosition.x === cardPosition.x && snapPosition.y === cardPosition.y) {
       return
     }
     this.handle &&
       this.handle.change((b) => {
         const card = b.cards[id]
-        card.x = snapX
-        card.y = snapY
+        card.x = snapPosition.x
+        card.y = snapPosition.y
       })
   }
 
-  cardResized = ({ id, width, height }) => {
+  cardResized = ({ id, dimension }) => {
     if (!(this.state.doc && this.state.doc.cards)) {
       return
     }
 
     // This gets called when we click the drag corner of a card, so avoid a
     // document change if in fact the card won't resize mod snapping.
-    const snapWidth = this.snapMeasureToGrid(width)
-    const snapHeight = this.snapMeasureToGrid(height)
+    const snapDimension = snapDimensionToGrid(dimension)
+    const cardDimension = {
+      width: this.state.doc.cards[id].width,
+      height: this.state.doc.cards[id].height,
+    }
     if (
-      snapWidth === this.state.doc.cards[id].width &&
-      snapHeight === this.state.doc.cards[id].height
+      snapDimension.width === cardDimension.width &&
+      snapDimension.height === cardDimension.height
     ) {
       return
     }
     this.handle &&
       this.handle.change((b) => {
         const card = b.cards[id]
-        card.width = snapWidth
-        card.height = snapHeight
+        card.width = snapDimension.width
+        card.height = snapDimension.height
       })
-  }
-
-  /**
-   *
-   * Grid manipulation functions
-   *
-   */
-
-  // Snap given num to nearest multiple of our grid size.
-  snapToGrid = (num) => {
-    const resto = num % GRID_SIZE
-    if (resto <= GRID_SIZE / 2) {
-      return num - resto
-    }
-    return num + GRID_SIZE - resto
-  }
-
-  // We have slightly different snap functions for coordinates (x,y) and
-  // measures (height, width) because we want the latter to be a bit larger
-  // than the grid size to allow overlapping boarders of adjacent elements.
-  // We also have a special variant of the measure snap that ensures it only
-  // ever increases the measure, which are needed for some types of content
-  // (like text which shouldn't get cut off by snapping).
-
-  snapCoordinateToGrid = (coordinate) => this.snapToGrid(coordinate)
-  snapMeasureToGrid = (measure) => this.snapToGrid(measure) + 1
-
-  snapMeasureOutwardToGrid = (measure) => {
-    const snapped = this.snapMeasureToGrid(measure)
-    if (snapped >= measure) {
-      return snapped
-    }
-    return snapped + GRID_SIZE
   }
 
   effectDrag = (card, tracking: TrackingEntry, { deltaX, deltaY }) => {
@@ -738,10 +712,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
         const { type } = parseDocumentLink(card.url)
         const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) as any
-        const minWidth = component.minWidth * GRID_SIZE || CARD_MIN_WIDTH
-        const minHeight = component.minHeight * GRID_SIZE || CARD_MIN_HEIGHT
-        const maxWidth = component.maxWidth * GRID_SIZE || Infinity
-        const maxHeight = component.maxWidth * GRID_SIZE || Infinity
+        const minWidth = gridCellsToPixels(component.minWidth) || CARD_MIN_WIDTH
+        const minHeight = gridCellsToPixels(component.minHeight) || CARD_MIN_HEIGHT
+        const maxWidth = gridCellsToPixels(component.maxWidth) || Infinity
+        const maxHeight = gridCellsToPixels(component.maxWidth) || Infinity
 
         this.tracking[card.id] = {
           dragType: DragType.RESIZING,
@@ -861,17 +835,20 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       cards.forEach((card) => {
         const t = this.tracking[card.id] as MoveTracking
 
-        this.cardMoved({ id: card.id, x: t.moveX, y: t.moveY })
+        const position = { x: t.moveX, y: t.moveY }
+        this.cardMoved({ id: card.id, position })
       })
       this.tracking = {}
       this.setState({ tracking: {} })
     }
 
     if (tracking.dragType === DragType.RESIZING) {
-      const width = tracking.resizeWidth
-      const height = tracking.resizeHeight
+      const dimension = {
+        width: tracking.resizeWidth,
+        height: tracking.resizeHeight,
+      }
 
-      this.cardResized({ id: card.id, width, height })
+      this.cardResized({ id: card.id, dimension })
       this.tracking = {}
       this.setState({ tracking: {} })
     }
