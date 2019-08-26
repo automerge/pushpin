@@ -15,7 +15,6 @@ interface TextDoc {
 TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 12
-TextContent.defaultHeight = 8
 
 export default function TextContent(props: ContentProps) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
@@ -53,7 +52,7 @@ function useQuill(
       return () => {}
     }
     const container = ref.current
-    const q = new Quill(container, options)
+    const q = new Quill(container, { scrollingContainer: container, ...options })
     quill.current = q
 
     if (textString) q.setText(textString)
