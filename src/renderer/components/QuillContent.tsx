@@ -22,7 +22,7 @@ TextContent.defaultHeight = 8
 export default function TextContent(props: ContentProps) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
-  const [ref, quill] = useQuill(
+  const [ref] = useQuill(
     doc && doc.text,
     (fn) => {
       changeDoc((doc) => fn(doc.text))
@@ -37,33 +37,7 @@ export default function TextContent(props: ContentProps) {
     }
   )
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key !== 'Backspace' || !doc) {
-        e.stopPropagation()
-        return
-      }
-      // const text = doc.text.join('')
-
-      if (!quill) return
-
-      const text = quill.getText()
-
-      console.log('text', JSON.stringify(text))
-
-      // we normally prevent deletion by stopping event propagation
-      // but if the card is already empty and we hit delete, allow it
-
-      // const text = quill.getText()
-
-      if (text !== '' && text !== '\n') {
-        e.stopPropagation()
-      }
-    },
-    [quill]
-  )
-
-  return <div className="QuillContent" ref={ref} onKeyDown={onKeyDown} />
+  return <div className="QuillContent" ref={ref} onPaste={stopPropagation} />
 }
 
 function useQuill(
@@ -80,8 +54,8 @@ function useQuill(
     if (!ref.current) {
       return () => {}
     }
-
-    const q = new Quill(ref.current, options)
+    const container = ref.current
+    const q = new Quill(container, options)
     quill.current = q
 
     if (textString) q.setText(textString)
@@ -92,12 +66,33 @@ function useQuill(
       makeChange((content) => applyDeltaToText(content, changeDelta))
     }
 
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Backspace') {
+        e.stopPropagation()
+        return
+      }
+
+      const str = q.getText()
+      if (str !== '' && str !== '\n') {
+        e.stopPropagation()
+      }
+    }
+
     q.on('text-change', onChange)
+
+    /**
+     * We bind this as a native event because of React's event delegation.
+     * Quill will handle the keydown event and cause a react re-render before react has actually
+     * seen the event at all. This causes a race condition where the doc looks like it was already
+     * empty when Backspace is pressed, even though that very keypress made it empty.
+     */
+    container.addEventListener('keydown', onKeyDown, { capture: true })
 
     return () => {
       quill.current = null
+      container.removeEventListener('keydown', onKeyDown, { capture: true })
       q.off('text-change', onChange)
-      // TODO: destroy quill instance?
+      // Quill gets garbage collected automatically
     }
   }, [ref.current])
 
@@ -118,6 +113,11 @@ function useStaticCallback<T extends (...args: any[]) => any>(callback: T): T {
   cb.current = callback
 
   return useCallback((...args: any[]) => cb.current(...args), []) as T
+}
+
+function stopPropagation(e: React.SyntheticEvent) {
+  e.stopPropagation()
+  e.nativeEvent.stopImmediatePropagation()
 }
 
 function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
