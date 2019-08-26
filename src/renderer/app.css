@@ -145,6 +145,7 @@ table {
 
   /* Sizing */
   --cellSize: 20px;
+  --halfCellSize: 10px;
 }
 
 /* Global */
