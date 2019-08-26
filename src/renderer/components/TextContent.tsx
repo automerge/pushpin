@@ -19,40 +19,41 @@ TextContent.defaultWidth = 12
 export default function TextContent(props: ContentProps) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
-  const [ref] = useQuill(
-    doc && doc.text,
-    (fn) => {
+  const [ref] = useQuill({
+    text: doc && doc.text,
+    change(fn) {
       changeDoc((doc) => fn(doc.text))
     },
-    {
-      // theme: 'snow',
+    config: {
       placeholder: 'Type something...',
       formats: [],
       modules: {
         toolbar: false,
       },
-    }
-  )
+    },
+  })
 
   return <div className="TextContent" ref={ref} onPaste={stopPropagation} />
 }
 
-function useQuill(
-  text: Automerge.Text | null,
-  changeFn: (cb: (text: Automerge.Text) => void) => void,
-  options?: QuillOptionsStatic
-): [React.Ref<HTMLDivElement>, Quill | null] {
+interface QuillOpts {
+  text: Automerge.Text | null
+  change: (cb: (text: Automerge.Text) => void) => void
+  config?: QuillOptionsStatic
+}
+
+function useQuill({ text, change, config }: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
   const textString = useMemo(() => text && text.join(''), [text])
-  const makeChange = useStaticCallback(changeFn)
+  const makeChange = useStaticCallback(change)
 
   useEffect(() => {
     if (!ref.current) {
       return () => {}
     }
     const container = ref.current
-    const q = new Quill(container, { scrollingContainer: container, ...options })
+    const q = new Quill(container, { scrollingContainer: container, ...config })
     quill.current = q
 
     if (textString) q.setText(textString)
