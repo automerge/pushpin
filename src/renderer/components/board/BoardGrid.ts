@@ -6,8 +6,7 @@
  * There are two kinds of elements to the grid: positions and dimensions.
  * Positions (composed of coordinates) have an X/Y value, and are generally
  *    snapped to the nearest grid point.
- * Dimensions (composed) of width and height, are never rounded down, in order
- * to avoid squashing their contents. Dimensions also have +1 added to their snap
+ * Dimensions (composed) of width and height have +1 added to their snap
  * values to ensure that they sit on top of grid lines instead of just within them.
  *
  * It's also important to note that dimensions (width and height) might be "null".
@@ -73,30 +72,15 @@ export const snapToGrid = (num) => {
 // ever increases the measure, which are needed for some types of content
 // (like text which shouldn't get cut off by snapping).
 
-export const snapCoordinateToGrid = (coordinate) => snapToGrid(coordinate)
-export const snapMeasureToGrid = (measure: Measure): Measure => measure && snapToGrid(measure) + 1
-
 export const snapPositionToGrid = ({ x, y }: Position): Position => ({
-  x: snapCoordinateToGrid(x),
-  y: snapCoordinateToGrid(y),
+  x: snapToGrid(x),
+  y: snapToGrid(y),
 })
 
-// TODO: i'm probably handling "null" values incorrectly here somewhere
 export const snapDimensionToGrid = (
   { width, height }: Dimension = { width: null, height: null }
 ): Dimension => ({
-  width: snapMeasureToGrid(width),
-  height: snapMeasureToGrid(height),
+  // we don't snap falsey-values like null or zero because we don't want them to become 1
+  width: width ? snapToGrid(width) + 1 : width,
+  height: height ? snapToGrid(height) + 1 : height,
 })
-
-export const snapMeasureOutwardToGrid = (measure) => {
-  const snapped = snapMeasureToGrid(measure)
-  if (!snapped) {
-    // yikes... this is crazy logic. need to rethink the nulls
-    return snapped
-  }
-  if (snapped >= measure) {
-    return snapped
-  }
-  return snapped + GRID_SIZE
-}
