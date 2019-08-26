@@ -87,7 +87,7 @@ function shared({ isDev }: Options): webpack.Configuration {
     },
     externals: [
       nodeExternals({
-        whitelist: [/webpack/, '@ibm/plex', 'codemirror'],
+        whitelist: [/webpack/, '@ibm/plex'],
       }),
     ],
     module: {
