@@ -74,7 +74,7 @@ export const snapToGrid = (num) => {
 // (like text which shouldn't get cut off by snapping).
 
 export const snapCoordinateToGrid = (coordinate) => snapToGrid(coordinate)
-export const snapMeasureToGrid = (measure: Measure): Measure => snapToGrid(measure) + 1
+export const snapMeasureToGrid = (measure: Measure): Measure => measure && snapToGrid(measure) + 1
 
 export const snapPositionToGrid = ({ x, y }: Position): Position => ({
   x: snapCoordinateToGrid(x),
