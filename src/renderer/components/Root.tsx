@@ -16,7 +16,7 @@ import './board'
 import './contact'
 
 // other single-context components
-import './QuillContent'
+import './TextContent'
 import './ImageContent'
 import './ThreadContent'
 import './UrlContent'

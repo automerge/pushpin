@@ -1,4 +1,4 @@
-.QuillContent {
+.TextContent {
   background-color: white;
   position: relative;
   top: 0;
@@ -28,28 +28,28 @@
 
 /* Scrollbar */
 
-.QuillContent::-webkit-scrollbar {
+.TextContent::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.QuillContent::-webkit-scrollbar-track {
+.TextContent::-webkit-scrollbar-track {
   background-color: transparent;
   margin-bottom: 10px;
 }
 
-.QuillContent::-webkit-scrollbar-thumb {
+.TextContent::-webkit-scrollbar-thumb {
   background-color: transparent;
 }
 
-.QuillContent:hover::-webkit-scrollbar-track {
+.TextContent:hover::-webkit-scrollbar-track {
   background-color: #f3f3f3;
 }
 
-.QuillContent:hover::-webkit-scrollbar-thumb {
+.TextContent:hover::-webkit-scrollbar-thumb {
   background-color: var(--colorPaleGrey);
 }
 
-.QuillContent::-webkit-scrollbar-thumb:hover {
+.TextContent::-webkit-scrollbar-thumb:hover {
   background-color: #cbd5db;
 }

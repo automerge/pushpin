@@ -6,7 +6,7 @@ import Delta from 'quill-delta'
 import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
 import { useDocument } from '../Hooks'
-import './QuillContent.css'
+import './TextContent.css'
 
 interface TextDoc {
   text: Automerge.Text
@@ -35,7 +35,7 @@ export default function TextContent(props: ContentProps) {
     }
   )
 
-  return <div className="QuillContent" ref={ref} onPaste={stopPropagation} />
+  return <div className="TextContent" ref={ref} onPaste={stopPropagation} />
 }
 
 function useQuill(
