@@ -117,11 +117,6 @@ interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
-interface CreateCardArgs extends CardArgs {
-  type: string
-  typeAttrs?: any
-}
-
 export default class Board extends React.PureComponent<ContentProps, State> {
   private handle?: Handle<BoardDoc>
 
