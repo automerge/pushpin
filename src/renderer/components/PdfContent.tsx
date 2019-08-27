@@ -138,7 +138,7 @@ interface Attrs {
   hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
-const initializeContentNoAttrs = (handle, callback) => {
+const createNoAttrs = (handle, callback) => {
   dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
     // User aborted.
     if (!paths) {
@@ -161,7 +161,7 @@ const initializeContentNoAttrs = (handle, callback) => {
   })
 }
 
-function initializeContentFromFile(entry: File, handle: Handle<PdfDoc>, callback) {
+function createFromFile(entry: File, handle: Handle<PdfDoc>, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -181,11 +181,11 @@ function initializeContentFromFile(entry: File, handle: Handle<PdfDoc>, callback
   reader.readAsArrayBuffer(entry)
 }
 
-function initializeContent(attributes, handle, callback) {
+function create(attributes, handle, callback) {
   if (attributes.file) {
-    return initializeContentFromFile(attributes.file, handle, callback)
+    return createFromFile(attributes.file, handle, callback)
   }
-  return initializeContentNoAttrs(handle, callback)
+  return createNoAttrs(handle, callback)
 }
 
 ContentTypes.register({
@@ -196,5 +196,5 @@ ContentTypes.register({
     workspace: PdfContent,
     board: PdfContent,
   },
-  initializeContent,
+  create,
 })

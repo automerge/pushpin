@@ -48,7 +48,7 @@ function initializeBoard(
   })
 }
 
-function initializeContent(typeAttrs, handle, callback) {
+function create(typeAttrs, handle, callback) {
   initializeBoard(typeAttrs, handle)
   callback(createDocumentLink('board', `hypermerge:/${handle.id}` as HypermergeUrl))
 }
@@ -62,5 +62,5 @@ ContentTypes.register({
   },
   name: 'Board',
   icon: 'copy',
-  initializeContent,
+  create,
 })

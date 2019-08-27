@@ -227,7 +227,7 @@ function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
 }
 
-function initializeContentFromFile(entry, handle, callback) {
+function createFromFile(entry, handle, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -244,9 +244,9 @@ function initializeContentFromFile(entry, handle, callback) {
   reader.readAsText(entry)
 }
 
-function initializeContent({ text, file }, handle, callback) {
+function create({ text, file }, handle, callback) {
   if (file) {
-    initializeContentFromFile(file, handle, callback)
+    createFromFile(file, handle, callback)
     return
   }
 
@@ -268,5 +268,5 @@ ContentTypes.register({
     workspace: TextContent,
     board: TextContent,
   },
-  initializeContent,
+  create,
 })

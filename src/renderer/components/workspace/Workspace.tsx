@@ -137,7 +137,7 @@ Quick travel around by clicking the Omnibox. Typing part of a name will show you
 
 To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-function initializeContent(attrs, handle, callback) {
+function create(attrs, handle, callback) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
     const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
     // this is, uh, a nasty hack.
@@ -184,5 +184,5 @@ ContentTypes.register({
   contexts: { root: Workspace },
   resizable: false,
   unlisted: true,
-  initializeContent,
+  create,
 })

@@ -15,7 +15,7 @@ export interface ContactDoc {
   offeredUrls?: { [url: string]: PushpinUrl[] } // Used by share, a map of contact id to documents offered.
 }
 
-function initializeContent(typeAttrs, handle, callback) {
+function create(typeAttrs, handle, callback) {
   handle.change((doc) => {
     doc.name = USER
     const USER_COLOR_VALUES = Object.values(USER_COLORS)
@@ -31,7 +31,7 @@ ContentTypes.register({
   icon: 'sticky-note',
   resizable: true,
   unlisted: true,
-  initializeContent,
+  create,
   contexts: {
     workspace: ContactEditor,
     board: ContactInVarious,

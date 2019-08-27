@@ -197,7 +197,7 @@ const css: { [k: string]: React.CSSProperties } = {
   },
 }
 
-function initializeContent(unusedAttrs, handle, callback) {
+function create(unusedAttrs, handle, callback) {
   handle.change((doc) => {
     doc.messages = []
   })
@@ -212,5 +212,5 @@ ContentTypes.register({
     workspace: ThreadContent,
     board: ThreadContent,
   },
-  initializeContent,
+  create,
 })

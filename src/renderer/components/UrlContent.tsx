@@ -225,7 +225,7 @@ function removeEmpty(obj: object) {
   })
 }
 
-function initializeContent({ url }, handle: Handle<UrlDoc>, callback) {
+function create({ url }, handle: Handle<UrlDoc>, callback) {
   if (url) {
     handle.change((doc) => {
       doc.url = url
@@ -242,7 +242,7 @@ ContentTypes.register({
     workspace: UrlContent,
     board: UrlContent,
   },
-  initializeContent,
+  create,
 })
 
 // Should be { [name: string]: React.CSSProperties }

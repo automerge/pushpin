@@ -39,7 +39,7 @@ interface Attrs {
   hyperfileUrl: string
 }
 
-const initializeContentNoAttrs = (handle, callback) => {
+const createNoAttrs = (handle, callback) => {
   dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
     // User aborted.
     if (!paths) {
@@ -63,7 +63,7 @@ const initializeContentNoAttrs = (handle, callback) => {
   })
 }
 
-function initializeContentFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
+function createFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -84,11 +84,11 @@ function initializeContentFromFile(entry: File, handle: Handle<ImageDoc>, callba
   reader.readAsArrayBuffer(entry)
 }
 
-function initializeContent({ file }, handle: Handle<ImageDoc>, callback) {
+function create({ file }, handle: Handle<ImageDoc>, callback) {
   if (file) {
-    initializeContentFromFile(file, handle, callback)
+    createFromFile(file, handle, callback)
   } else {
-    initializeContentNoAttrs(handle, callback)
+    createNoAttrs(handle, callback)
   }
 }
 
@@ -100,5 +100,5 @@ ContentTypes.register({
     workspace: ImageContent,
     board: ImageContent,
   },
-  initializeContent,
+  create,
 })

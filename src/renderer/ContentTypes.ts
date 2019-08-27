@@ -26,11 +26,7 @@ interface ContentType {
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
-  initializeContent: (
-    typeAttrs: any,
-    handle: Handle<any>,
-    callback: (contentUrl: string) => void
-  ) => void
+  create: (typeAttrs: any, handle: Handle<any>, callback: (contentUrl: string) => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -93,7 +89,7 @@ function createFromFile(type, file, callback): void {
 
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.initializeContent({ file }, handle, callback)
+  entry.create({ file }, handle, callback)
 }
 
 function create(type, attrs = {}, callback): void {
@@ -105,7 +101,7 @@ function create(type, attrs = {}, callback): void {
 
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.initializeContent(attrs, handle, callback)
+  entry.create(attrs, handle, callback)
 }
 
 export interface ListQuery {
