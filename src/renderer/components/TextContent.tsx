@@ -28,7 +28,7 @@ export default function TextContent(props: Props) {
     change(fn) {
       changeDoc((doc) => fn(doc.text))
     },
-    selected: !!props.uniquelySelected,
+    selected: props.uniquelySelected,
     config: {
       placeholder: 'Type something...',
       formats: [],
@@ -44,7 +44,7 @@ export default function TextContent(props: Props) {
 interface QuillOpts {
   text: Automerge.Text | null
   change: (cb: (text: Automerge.Text) => void) => void
-  selected: boolean
+  selected?: boolean
   config?: QuillOptionsStatic
 }
 
