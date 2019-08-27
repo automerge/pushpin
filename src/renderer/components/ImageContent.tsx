@@ -63,7 +63,7 @@ const initializeContentNoAttrs = (callback) => {
   })
 }
 
-function initializeContent(entry, callback) {
+function initializeContentFromFile(entry, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -82,6 +82,14 @@ function initializeContent(entry, callback) {
   reader.readAsArrayBuffer(entry)
 }
 
+function initializeContent({ file }, callback) {
+  if (file) {
+    initializeContentFromFile(file, callback)
+    return
+  }
+  initializeContentNoAttrs(callback)
+}
+
 ContentTypes.register({
   type: 'image',
   name: 'Image',
@@ -92,5 +100,4 @@ ContentTypes.register({
   },
   initializeDocument,
   initializeContent,
-  initializeContentNoAttrs,
 })

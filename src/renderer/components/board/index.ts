@@ -46,7 +46,7 @@ function initializeBoard(
   board.authorIds = []
 }
 
-function initializeContentFromAttrs(typeAttrs, callback) {
+function initializeContent(typeAttrs, callback) {
   const contentUrl = Content.initializeContentDoc('board', typeAttrs)
   callback(createDocumentLink('board', contentUrl))
 }
@@ -61,5 +61,5 @@ ContentTypes.register({
   name: 'Board',
   icon: 'copy',
   initializeDocument: initializeBoard,
-  initializeContentFromAttrs,
+  initializeContent,
 })

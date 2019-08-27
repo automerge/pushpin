@@ -234,7 +234,7 @@ function initializeDocument(editor: TextDoc, { text }) {
   }
 }
 
-function initializeContent(entry, callback) {
+function initializeContentFromFile(entry, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -245,13 +245,15 @@ function initializeContent(entry, callback) {
   reader.readAsText(entry)
 }
 
-function initializeContentFromAttrs(typeAttrs, callback) {
+function initializeContent(typeAttrs, callback) {
+  if (typeAttrs.file) {
+    initializeContentFromFile(typeAttrs.file, callback)
+    return
+  }
+  if (!typeAttrs.text) {
+    typeAttrs.text = ''
+  }
   const contentUrl = Content.initializeContentDoc('text', typeAttrs)
-  callback(createDocumentLink('text', contentUrl))
-}
-
-function initializeContentNoAttrs(callback) {
-  const contentUrl = Content.initializeContentDoc('text', { text: '' })
   callback(createDocumentLink('text', contentUrl))
 }
 
@@ -265,6 +267,4 @@ ContentTypes.register({
   },
   initializeDocument,
   initializeContent,
-  initializeContentFromAttrs,
-  initializeContentNoAttrs,
 })

@@ -25,9 +25,7 @@ interface ContentType {
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
-  initializeContent?: (entry: File, callback: (contentUrl: string) => void) => void
-  initializeContentFromAttrs?: (typeAttrs: any, callback: (contentUrl: string) => void) => void
-  initializeContentNoAttrs?: (callback: (contentUrl: string) => void) => void
+  initializeContent: (typeAttrs: any, callback: (contentUrl: string) => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -87,12 +85,8 @@ function createFromFile(type, file, callback): void {
   if (!entry) {
     return
   }
-  // XXX TODO
-  if (!entry.initializeContent) {
-    return
-  }
 
-  entry.initializeContent(file, callback)
+  entry.initializeContent({ file }, callback)
 }
 
 function createFromAttrs(type, attrs, callback): void {
@@ -101,12 +95,8 @@ function createFromAttrs(type, attrs, callback): void {
   if (!entry) {
     return
   }
-  // XXX TODO
-  if (!entry.initializeContentFromAttrs) {
-    return
-  }
 
-  entry.initializeContentFromAttrs(attrs, callback)
+  entry.initializeContent(attrs, callback)
 }
 
 function createNoAttrs(type, callback): void {
@@ -115,12 +105,8 @@ function createNoAttrs(type, callback): void {
   if (!entry) {
     return
   }
-  // XXX TODO
-  if (!entry.initializeContentNoAttrs) {
-    return
-  }
 
-  entry.initializeContentNoAttrs(callback)
+  entry.initializeContent({}, callback)
 }
 export interface ListQuery {
   context: Context

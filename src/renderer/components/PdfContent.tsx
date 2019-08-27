@@ -162,7 +162,7 @@ const initializeContentNoAttrs = (callback) => {
   })
 }
 
-function initializeContent(entry, callback) {
+function initializeContentFromFile(entry: File, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -181,6 +181,13 @@ function initializeContent(entry, callback) {
   reader.readAsArrayBuffer(entry)
 }
 
+function initializeContent(attributes, callback) {
+  if (attributes.file) {
+    return initializeContentFromFile(attributes.file, callback)
+  }
+  return initializeContentNoAttrs(callback)
+}
+
 ContentTypes.register({
   type: 'pdf',
   name: 'PDF',
@@ -191,5 +198,4 @@ ContentTypes.register({
   },
   initializeDocument,
   initializeContent,
-  initializeContentNoAttrs,
 })

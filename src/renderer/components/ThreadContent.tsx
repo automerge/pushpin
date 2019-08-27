@@ -201,13 +201,8 @@ function initializeDocument(threadDoc: Doc) {
   threadDoc.messages = []
 }
 
-function initializeContentFromAttrs(typeAttrs, callback) {
+function initializeContent(typeAttrs, callback) {
   const contentUrl = Content.initializeContentDoc('thread', typeAttrs)
-  callback(createDocumentLink('thread', contentUrl))
-}
-
-function initializeContentNoAttrs(callback) {
-  const contentUrl = Content.initializeContentDoc('thread', {})
   callback(createDocumentLink('thread', contentUrl))
 }
 
@@ -220,6 +215,5 @@ ContentTypes.register({
     board: ThreadContent,
   },
   initializeDocument,
-  initializeContentFromAttrs,
-  initializeContentNoAttrs,
+  initializeContent,
 })
