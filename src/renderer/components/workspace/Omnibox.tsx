@@ -426,6 +426,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
   navigate = (url) => {
     window.location = url
+    this.props.omniboxFinished()
   }
 
   offerDocumentToIdentity = (contactUrl) => {

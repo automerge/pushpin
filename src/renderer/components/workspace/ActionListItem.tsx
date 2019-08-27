@@ -20,7 +20,7 @@ ActionListItem.defaultProps = {
 export default function ActionListItem(props: Props) {
   const { contentUrl, actions, selected } = props
   const [defaultAction] = actions
-  const onClick = defaultAction ? () => defaultAction.callback(contentUrl) : undefined
+  const onClick = defaultAction ? defaultAction.callback(contentUrl) : undefined
   return (
     <ListMenuItem selected={selected} onClick={onClick}>
       <Stretch>
