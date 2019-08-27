@@ -1,15 +1,16 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import Debug from 'debug'
 import { remote } from 'electron'
+import { Handle } from 'hypermerge'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../ContentTypes'
-import Content, { ContentProps } from './Content'
+import { ContentProps } from './Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
 import './PdfContent.css'
-import { createDocumentLink } from '../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../ShareLink'
 import { PDF_DIALOG_OPTIONS } from '../constants'
 
 const { dialog } = remote
@@ -137,11 +138,7 @@ interface Attrs {
   hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
-function initializeDocument(pdf: PdfDoc, { hyperfileUrl }: Attrs) {
-  pdf.hyperfileUrl = hyperfileUrl
-}
-
-const initializeContentNoAttrs = (callback) => {
+const initializeContentNoAttrs = (handle, callback) => {
   dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
     // User aborted.
     if (!paths) {
@@ -153,8 +150,10 @@ const initializeContentNoAttrs = (callback) => {
 
     Hyperfile.write(paths[0])
       .then((hyperfileUrl) => {
-        const contentUrl = Content.initializeContentDoc('pdf', { hyperfileUrl })
-        callback(createDocumentLink('pdf', contentUrl))
+        handle.change((doc) => {
+          doc.hyperfileUrl = hyperfileUrl
+        })
+        callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
       })
       .catch((err) => {
         log(err)
@@ -162,16 +161,17 @@ const initializeContentNoAttrs = (callback) => {
   })
 }
 
-function initializeContentFromFile(entry: File, callback) {
+function initializeContentFromFile(entry: File, handle: Handle<PdfDoc>, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
     const buffer = Buffer.from(reader.result as ArrayBuffer)
     Hyperfile.writeBuffer(buffer)
       .then((hyperfileUrl) => {
-        // XXX: obviously we shouldn't need to do this
-        const contentUrl = Content.initializeContentDoc('pdf', { hyperfileUrl })
-        callback(createDocumentLink('pdf', contentUrl))
+        handle.change((doc) => {
+          doc.hyperfileUrl = hyperfileUrl
+        })
+        callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
       })
       .catch((err) => {
         log(err)
@@ -181,11 +181,11 @@ function initializeContentFromFile(entry: File, callback) {
   reader.readAsArrayBuffer(entry)
 }
 
-function initializeContent(attributes, callback) {
+function initializeContent(attributes, handle, callback) {
   if (attributes.file) {
-    return initializeContentFromFile(attributes.file, callback)
+    return initializeContentFromFile(attributes.file, handle, callback)
   }
-  return initializeContentNoAttrs(callback)
+  return initializeContentNoAttrs(handle, callback)
 }
 
 ContentTypes.register({
@@ -196,6 +196,5 @@ ContentTypes.register({
     workspace: PdfContent,
     board: PdfContent,
   },
-  initializeDocument,
   initializeContent,
 })

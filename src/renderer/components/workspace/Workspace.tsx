@@ -78,8 +78,9 @@ export default function Workspace(props: ContentProps) {
     }
 
     function onNew() {
-      const hypermergeUrl = Content.initializeContentDoc('board', { selfId })
-      openDoc(createDocumentLink('board', hypermergeUrl))
+      ContentTypes.create('board', { selfId }, (boardUrl) => {
+        openDoc(createDocumentLink('board', boardUrl))
+      })
     }
 
     ipcRenderer.on('loadDocumentUrl', onLoad)
@@ -120,20 +121,7 @@ function renderContent(currentDocUrl?: PushpinUrl) {
   )
 }
 
-function initializeDocument(workspace: Doc) {
-  const selfId = Content.initializeContentDoc('contact')
-
-  // this is, uh, a nasty hack.
-  // we should refactor not to require the hypermergeUrl on the contact
-  // but i don't want to pull that in scope right now
-  window.repo.change(selfId, (doc: ContactDoc) => {
-    doc.hypermergeUrl = selfId
-  })
-
-  const boardId = Content.initializeContentDoc('board', { title: 'Welcome to PushPin!', selfId })
-  const docUrl = createDocumentLink('board', boardId)
-
-  const text = `Welcome to PushPin!
+const WELCOME_TEXT = `Welcome to PushPin!
 
 We've created your first text card for you.
 You can edit it, or make more by double-clicking the background.
@@ -149,27 +137,44 @@ Quick travel around by clicking the Omnibox. Typing part of a name will show you
 
 To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-  const textDocId = Content.initializeContentDoc('text', { text })
-  const textDocUrl = createDocumentLink('text', textDocId)
+function initializeContent(attrs, handle, callback) {
+  ContentTypes.create('contact', {}, (selfContentUrl) => {
+    const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
+    // this is, uh, a nasty hack.
+    // we should refactor not to require the hypermergeUrl on the contact
+    // but i don't want to pull that in scope right now
+    window.repo.change(selfHypermergeUrl, (doc: ContactDoc) => {
+      doc.hypermergeUrl = selfHypermergeUrl
+    })
 
-  const id = uuid()
-  window.repo.change(boardId, (doc: BoardDoc) => {
-    doc.cards[id] = {
-      type: 'text',
-      id,
-      url: textDocUrl,
-      x: 20,
-      y: 20,
-      width: 320,
-      height: 540,
-    }
+    ContentTypes.create(
+      'board',
+      { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
+      (boardUrl) => {
+        ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
+          const id = uuid()
+          window.repo.change(parseDocumentLink(boardUrl).docId, (doc: BoardDoc) => {
+            doc.cards[id] = {
+              type: 'text',
+              id,
+              url: textDocUrl,
+              x: 20,
+              y: 20,
+              width: 320,
+              height: 540,
+            }
+          })
+          // Then make changes to workspace doc.
+          handle.change((workspace) => {
+            workspace.selfId = selfHypermergeUrl
+            workspace.contactIds = []
+            workspace.currentDocUrl = boardUrl
+            workspace.viewedDocUrls = [boardUrl]
+          })
+        })
+      }
+    )
   })
-
-  // Then make changes to workspace doc.
-  workspace.selfId = selfId
-  workspace.contactIds = []
-  workspace.currentDocUrl = docUrl
-  workspace.viewedDocUrls = [docUrl]
 }
 
 ContentTypes.register({
@@ -179,5 +184,5 @@ ContentTypes.register({
   contexts: { root: Workspace },
   resizable: false,
   unlisted: true,
-  initializeDocument,
+  initializeContent,
 })

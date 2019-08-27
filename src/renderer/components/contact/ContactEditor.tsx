@@ -17,6 +17,7 @@ import Heading from '../Heading'
 import SecondaryText from '../SecondaryText'
 
 import './ContactEditor.css'
+import ContentTypes from '../../ContentTypes'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -61,9 +62,10 @@ export default function ContactEditor(props: ContentProps) {
 
       Hyperfile.write(paths[0])
         .then((hyperfileUrl) => {
-          const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-          changeDoc((d) => {
-            d.avatarDocId = hypermergeUrl
+          ContentTypes.create('image', { hyperfileUrl }, (hypermergeUrl) => {
+            changeDoc((d) => {
+              d.avatarDocId = hypermergeUrl
+            })
           })
         })
         .catch((err) => {

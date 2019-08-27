@@ -1,5 +1,7 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
+import { Handle } from 'hypermerge'
+import { HypermergeUrl } from './ShareLink'
 // import { ContentProps } from './components/Content';
 
 const log = Debug('pushpin:content-types')
@@ -21,11 +23,14 @@ interface ContentType {
   type: string
   name: string
   icon: string
-  initializeDocument: (document: any, typeAttrs: any) => void
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
-  initializeContent: (typeAttrs: any, callback: (contentUrl: string) => void) => void
+  initializeContent: (
+    typeAttrs: any,
+    handle: Handle<any>,
+    callback: (contentUrl: string) => void
+  ) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -86,7 +91,9 @@ function createFromFile(type, file, callback): void {
     return
   }
 
-  entry.initializeContent({ file }, callback)
+  const url = window.repo.create() as HypermergeUrl
+  const handle = window.repo.open(url)
+  entry.initializeContent({ file }, handle, callback)
 }
 
 function create(type, attrs = {}, callback): void {
@@ -96,7 +103,9 @@ function create(type, attrs = {}, callback): void {
     return
   }
 
-  entry.initializeContent(attrs, callback)
+  const url = window.repo.create() as HypermergeUrl
+  const handle = window.repo.open(url)
+  entry.initializeContent(attrs, handle, callback)
 }
 
 export interface ListQuery {
@@ -116,20 +125,11 @@ function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
   return allTypes.filter((ct) => ct && !ct.unlisted)
 }
 
-function initializeDocument(type: string, doc: any, typeAttrs: any) {
-  const entry = registry[type]
-  if (!entry) {
-    throw new Error('Attempted to initialize an unregistered type!')
-  }
-  entry.initializeDocument(doc, typeAttrs)
-}
-
 export default {
   register,
   registerDefault,
   lookup,
   list,
-  initializeDocument,
   createFromFile,
   create,
 }

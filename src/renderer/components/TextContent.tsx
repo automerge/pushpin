@@ -5,9 +5,9 @@ import Debug from 'debug'
 import Automerge from 'automerge'
 
 import ContentTypes from '../ContentTypes'
-import Content, { ContentProps } from './Content'
+import { ContentProps } from './Content'
 import { useDocument } from '../Hooks'
-import { createDocumentLink } from '../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../ShareLink'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -227,34 +227,37 @@ function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
 }
 
-function initializeDocument(editor: TextDoc, { text }) {
-  editor.text = new Automerge.Text()
-  if (text) {
-    editor.text.insertAt(0, ...text.split(''))
-  }
-}
-
-function initializeContentFromFile(entry, callback) {
+function initializeContentFromFile(entry, handle, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
-    const contentUrl = Content.initializeContentDoc('text', { text: reader.result })
-    callback(createDocumentLink('text', contentUrl))
+    handle.change((doc) => {
+      doc.text = new Automerge.Text()
+      if (reader.result) {
+        const text = reader.result as string
+        doc.text.insertAt(0, ...text.split(''))
+      }
+    })
+    callback(createDocumentLink('text', `hypermerge:/${handle.id}` as HypermergeUrl))
   }
 
   reader.readAsText(entry)
 }
 
-function initializeContent(typeAttrs, callback) {
-  if (typeAttrs.file) {
-    initializeContentFromFile(typeAttrs.file, callback)
+function initializeContent({ text, file }, handle, callback) {
+  if (file) {
+    initializeContentFromFile(file, handle, callback)
     return
   }
-  if (!typeAttrs.text) {
-    typeAttrs.text = ''
-  }
-  const contentUrl = Content.initializeContentDoc('text', typeAttrs)
-  callback(createDocumentLink('text', contentUrl))
+
+  handle.change((doc) => {
+    doc.text = new Automerge.Text()
+    if (text) {
+      doc.text.insertAt(0, ...text.split(''))
+    }
+  })
+
+  callback(createDocumentLink('text', `hypermerge:/${handle.id}` as HypermergeUrl))
 }
 
 ContentTypes.register({
@@ -265,6 +268,5 @@ ContentTypes.register({
     workspace: TextContent,
     board: TextContent,
   },
-  initializeDocument,
   initializeContent,
 })

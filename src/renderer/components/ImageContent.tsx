@@ -2,11 +2,12 @@ import React from 'react'
 import Debug from 'debug'
 
 import { remote } from 'electron'
+import { Handle } from 'hypermerge'
 import * as Hyperfile from '../hyperfile'
-import Content, { ContentProps } from './Content'
+import { ContentProps } from './Content'
 import ContentTypes from '../ContentTypes'
 import { useDocument } from '../Hooks'
-import { createDocumentLink } from '../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../ShareLink'
 import { IMAGE_DIALOG_OPTIONS } from '../constants'
 
 const { dialog } = remote
@@ -38,11 +39,7 @@ interface Attrs {
   hyperfileUrl: string
 }
 
-function initializeDocument(image: ImageDoc, { hyperfileUrl }: Attrs) {
-  image.hyperfileUrl = hyperfileUrl
-}
-
-const initializeContentNoAttrs = (callback) => {
+const initializeContentNoAttrs = (handle, callback) => {
   dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
     // User aborted.
     if (!paths) {
@@ -54,8 +51,11 @@ const initializeContentNoAttrs = (callback) => {
 
     Hyperfile.write(paths[0])
       .then((hyperfileUrl) => {
-        const contentUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-        callback(createDocumentLink('image', contentUrl))
+        handle.change((doc) => {
+          doc.hyperfileUrl = hyperfileUrl
+        })
+
+        callback(createDocumentLink('image', `hypermerge:/${handle.id}` as HypermergeUrl))
       })
       .catch((err) => {
         log(err)
@@ -63,7 +63,7 @@ const initializeContentNoAttrs = (callback) => {
   })
 }
 
-function initializeContentFromFile(entry, callback) {
+function initializeContentFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -71,8 +71,10 @@ function initializeContentFromFile(entry, callback) {
     Hyperfile.writeBuffer(buffer)
       .then((hyperfileUrl) => {
         // XXX: obviously we shouldn't need to do this
-        const contentUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-        callback(createDocumentLink('image', contentUrl))
+        handle.change((doc) => {
+          doc.hyperfileUrl = hyperfileUrl
+        })
+        callback(createDocumentLink('image', `hypermerge:/${handle.id}` as HypermergeUrl))
       })
       .catch((err) => {
         log(err)
@@ -82,12 +84,12 @@ function initializeContentFromFile(entry, callback) {
   reader.readAsArrayBuffer(entry)
 }
 
-function initializeContent({ file }, callback) {
+function initializeContent({ file }, handle: Handle<ImageDoc>, callback) {
   if (file) {
-    initializeContentFromFile(file, callback)
-    return
+    initializeContentFromFile(file, handle, callback)
+  } else {
+    initializeContentNoAttrs(handle, callback)
   }
-  initializeContentNoAttrs(callback)
 }
 
 ContentTypes.register({
@@ -98,6 +100,5 @@ ContentTypes.register({
     workspace: ImageContent,
     board: ImageContent,
   },
-  initializeDocument,
   initializeContent,
 })

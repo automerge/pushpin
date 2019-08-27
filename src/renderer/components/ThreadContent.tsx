@@ -197,13 +197,11 @@ const css: { [k: string]: React.CSSProperties } = {
   },
 }
 
-function initializeDocument(threadDoc: Doc) {
-  threadDoc.messages = []
-}
-
-function initializeContent(typeAttrs, callback) {
-  const contentUrl = Content.initializeContentDoc('thread', typeAttrs)
-  callback(createDocumentLink('thread', contentUrl))
+function initializeContent(unusedAttrs, handle, callback) {
+  handle.change((doc) => {
+    doc.messages = []
+  })
+  callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
 }
 
 ContentTypes.register({
@@ -214,6 +212,5 @@ ContentTypes.register({
     workspace: ThreadContent,
     board: ThreadContent,
   },
-  initializeDocument,
   initializeContent,
 })

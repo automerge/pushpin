@@ -22,18 +22,7 @@ interface Props {
   [arbitraryProp: string]: any
 }
 
-export function initializeContentDoc(type: string, typeAttrs = {}): HypermergeUrl {
-  const { repo } = window // still not a great idea
-
-  const url = repo.create() as HypermergeUrl
-  repo.change(url, (doc) => ContentTypes.initializeDocument(type, doc, typeAttrs))
-
-  return url
-}
-
-export default Object.assign(React.memo(Content), {
-  initializeContentDoc,
-})
+export default React.memo(Content)
 
 function Content(props: Props) {
   const { context, url } = props

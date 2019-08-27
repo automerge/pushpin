@@ -1,3 +1,4 @@
+import { Handle } from 'hypermerge'
 import ContentTypes from '../../ContentTypes'
 
 // board in various contexts
@@ -5,7 +6,6 @@ import Board, { BOARD_COLORS } from './Board'
 import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
 import { HypermergeUrl, PushpinUrl, createDocumentLink } from '../../ShareLink'
-import Content from '../Content'
 
 export interface BoardDocCard {
   type: string
@@ -37,18 +37,20 @@ function randomColor(): string {
 }
 
 function initializeBoard(
-  board: BoardDoc,
-  { title = 'No Title', backgroundColor = randomColor() }: Attrs
+  { title = 'No Title', backgroundColor = randomColor() }: Attrs,
+  handle: Handle<BoardDoc>
 ) {
-  board.title = title
-  board.backgroundColor = backgroundColor
-  board.cards = {}
-  board.authorIds = []
+  handle.change((board) => {
+    board.title = title
+    board.backgroundColor = backgroundColor
+    board.cards = {}
+    board.authorIds = []
+  })
 }
 
-function initializeContent(typeAttrs, callback) {
-  const contentUrl = Content.initializeContentDoc('board', typeAttrs)
-  callback(createDocumentLink('board', contentUrl))
+function initializeContent(typeAttrs, handle, callback) {
+  initializeBoard(typeAttrs, handle)
+  callback(createDocumentLink('board', `hypermerge:/${handle.id}` as HypermergeUrl))
 }
 
 ContentTypes.register({
@@ -60,6 +62,5 @@ ContentTypes.register({
   },
   name: 'Board',
   icon: 'copy',
-  initializeDocument: initializeBoard,
   initializeContent,
 })

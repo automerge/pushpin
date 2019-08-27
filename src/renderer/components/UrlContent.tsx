@@ -2,9 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 
+import { Handle } from 'hypermerge'
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../ContentTypes'
-import Content, { ContentProps } from './Content'
+import { ContentProps } from './Content'
 import { ChangeFn, useDocument } from '../Hooks'
 import { HypermergeUrl, createDocumentLink } from '../ShareLink'
 
@@ -224,13 +225,13 @@ function removeEmpty(obj: object) {
   })
 }
 
-function initializeDocument(urlDoc: UrlDoc, { url = '' }) {
-  urlDoc.url = url
-}
-
-function initializeContent(typeAttrs, callback) {
-  const contentUrl = Content.initializeContentDoc('url', typeAttrs)
-  callback(createDocumentLink('url', contentUrl))
+function initializeContent({ url }, handle: Handle<UrlDoc>, callback) {
+  if (url) {
+    handle.change((doc) => {
+      doc.url = url
+    })
+  }
+  callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
 }
 
 ContentTypes.register({
@@ -241,7 +242,6 @@ ContentTypes.register({
     workspace: UrlContent,
     board: UrlContent,
   },
-  initializeDocument,
   initializeContent,
 })
 
