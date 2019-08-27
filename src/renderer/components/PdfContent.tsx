@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import Debug from 'debug'
+import { remote } from 'electron'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
@@ -9,6 +10,9 @@ import Content, { ContentProps } from './Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
 import './PdfContent.css'
 import { createDocumentLink } from '../ShareLink'
+import { PDF_DIALOG_OPTIONS } from '../constants'
+
+const { dialog } = remote
 
 const log = Debug('pushpin:pdfcontent')
 
@@ -137,6 +141,27 @@ function initializeDocument(pdf: PdfDoc, { hyperfileUrl }: Attrs) {
   pdf.hyperfileUrl = hyperfileUrl
 }
 
+const initializeContentNoAttrs = (callback) => {
+  dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
+    // User aborted.
+    if (!paths) {
+      return
+    }
+    if (paths.length !== 1) {
+      throw new Error('Expected exactly one path?')
+    }
+
+    Hyperfile.write(paths[0])
+      .then((hyperfileUrl) => {
+        const contentUrl = Content.initializeContentDoc('pdf', { hyperfileUrl })
+        callback(createDocumentLink('pdf', contentUrl))
+      })
+      .catch((err) => {
+        log(err)
+      })
+  })
+}
+
 function initializeContent(entry, callback) {
   const reader = new FileReader()
 
@@ -166,4 +191,5 @@ ContentTypes.register({
   },
   initializeDocument,
   initializeContent,
+  initializeContentNoAttrs,
 })

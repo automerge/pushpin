@@ -250,6 +250,11 @@ function initializeContentFromAttrs(typeAttrs, callback) {
   callback(createDocumentLink('text', contentUrl))
 }
 
+function initializeContentNoAttrs(callback) {
+  const contentUrl = Content.initializeContentDoc('text', { text: '' })
+  callback(createDocumentLink('text', contentUrl))
+}
+
 ContentTypes.register({
   type: 'text',
   name: 'Text',
@@ -261,4 +266,5 @@ ContentTypes.register({
   initializeDocument,
   initializeContent,
   initializeContentFromAttrs,
+  initializeContentNoAttrs,
 })

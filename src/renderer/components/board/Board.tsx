@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { remote } from 'electron'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
 
@@ -8,7 +7,6 @@ import { Handle } from 'hypermerge'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
-import { PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
@@ -23,8 +21,6 @@ import {
   snapDimensionToGrid,
   snapPositionToGrid,
 } from './BoardGrid'
-
-const { dialog } = remote
 
 const log = Debug('pushpin:board')
 
@@ -320,9 +316,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: this.state.contextMenuPosition.y - this.boardRef.current.getBoundingClientRect().top,
     }
 
-    let cardId
-    /* the contents of this switch statement
-       should almost certainly run in the relevant components */
     switch (contentType.type) {
       case 'image':
         ContentTypes.createNoAttrs('image', (url) => {
@@ -331,55 +324,31 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         })
         break
       case 'pdf':
-        dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
-          // User aborted.
-          if (!paths) {
-            return
-          }
-          if (paths.length !== 1) {
-            throw new Error('Expected exactly one path?')
-          }
-
-          cardId = this.createPdfCardFromPath(position, paths[0])
-          // this happens here because we're in a callback
+        ContentTypes.createNoAttrs('pdf', (url) => {
+          const cardId = this.addCardForContent({ position, url })
           this.selectOnly(cardId)
         })
         break
       case 'board':
-        cardId = this.createCard({
-          position,
-          type: contentType.type,
-          typeAttrs: {
+        ContentTypes.createFromAttrs(
+          'board',
+          {
             title: `Sub-board of ${
               this.state.doc && this.state.doc.title ? this.state.doc.title : 'Untitled'
             }`,
           },
-        })
-        this.selectOnly(cardId)
+          (url) => {
+            const cardId = this.addCardForContent({ position, url })
+            this.selectOnly(cardId)
+          }
+        )
         break
       default:
-        cardId = this.createCard({
-          position,
-          type: contentType.type,
-          typeAttrs: { text: '' },
+        ContentTypes.createNoAttrs('text', (url) => {
+          const cardId = this.addCardForContent({ position, url })
+          this.selectOnly(cardId)
         })
-        this.selectOnly(cardId)
     }
-  }
-
-  createPdfCardFromPath = (position, path) => {
-    Hyperfile.write(path)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'pdf',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
   }
 
   createCard = ({ position, dimension, type, typeAttrs }: CreateCardArgs) => {

@@ -62,6 +62,7 @@ const initializeContentNoAttrs = (callback) => {
       })
   })
 }
+
 function initializeContent(entry, callback) {
   const reader = new FileReader()
 
