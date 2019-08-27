@@ -5,13 +5,12 @@ import { Handle } from 'hypermerge'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
-import * as Hyperfile from '../hyperfile'
-import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
-import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
+import * as Hyperfile from '../../hyperfile'
+import ContentTypes from '../../ContentTypes'
+import { ContentProps } from '../Content'
+import { useDocument, useHyperfile, useConfirmableInput } from '../../Hooks'
 import './PdfContent.css'
-import { createDocumentLink, HypermergeUrl } from '../ShareLink'
-import { PDF_DIALOG_OPTIONS } from '../constants'
+import { PDF_DIALOG_OPTIONS } from '../../constants'
 
 const { dialog } = remote
 
@@ -153,7 +152,7 @@ const createNoAttrs = (handle, callback) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
         })
-        callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
+        callback()
       })
       .catch((err) => {
         log(err)
@@ -171,7 +170,7 @@ function createFromFile(entry: File, handle: Handle<PdfDoc>, callback) {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
         })
-        callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
+        callback()
       })
       .catch((err) => {
         log(err)

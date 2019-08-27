@@ -9,15 +9,15 @@ import {
   PushpinUrl,
   HypermergeUrl,
   isPushpinUrl,
-} from '../../ShareLink'
-import Content, { ContentProps } from '../Content'
-import ContentTypes from '../../ContentTypes'
-import SelfContext from '../SelfContext'
+} from '../../../ShareLink'
+import Content, { ContentProps } from '../../Content'
+import ContentTypes from '../../../ContentTypes'
+import SelfContext from '../../SelfContext'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
 
 import './Workspace.css'
-import { useDocument, useAllHeartbeats, useHeartbeat } from '../../Hooks'
+import { useDocument, useAllHeartbeats, useHeartbeat } from '../../../Hooks'
 import { BoardDoc } from '../board'
 
 const log = Debug('pushpin:workspace')

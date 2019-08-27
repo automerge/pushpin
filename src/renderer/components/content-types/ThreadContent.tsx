@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import ContentTypes from '../ContentTypes'
-import Content, { ContentProps } from './Content'
-import { createDocumentLink, HypermergeUrl } from '../ShareLink'
-import { useDocument } from '../Hooks'
+import ContentTypes from '../../ContentTypes'
+import Content, { ContentProps } from '../Content'
+import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
+import { useDocument } from '../../Hooks'
 
 interface Message {
   authorId: HypermergeUrl
@@ -201,7 +201,7 @@ function create(unusedAttrs, handle, callback) {
   handle.change((doc) => {
     doc.messages = []
   })
-  callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
+  callback()
 }
 
 ContentTypes.register({

@@ -7,7 +7,6 @@ import * as Hyperfile from '../../hyperfile'
 import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument } from '../../Hooks'
-import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
 import { IMAGE_DIALOG_OPTIONS } from '../../constants'
 
 const { dialog } = remote
@@ -55,7 +54,7 @@ const createNoAttrs = (handle, callback) => {
           doc.hyperfileUrl = hyperfileUrl
         })
 
-        callback(createDocumentLink('image', `hypermerge:/${handle.id}` as HypermergeUrl))
+        callback()
       })
       .catch((err) => {
         log(err)
@@ -74,7 +73,7 @@ function createFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
         })
-        callback(createDocumentLink('image', `hypermerge:/${handle.id}` as HypermergeUrl))
+        callback()
       })
       .catch((err) => {
         log(err)

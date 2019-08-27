@@ -4,10 +4,9 @@ import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 import Automerge from 'automerge'
 
-import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
-import { useDocument } from '../Hooks'
-import { createDocumentLink, HypermergeUrl } from '../ShareLink'
+import ContentTypes from '../../ContentTypes'
+import { ContentProps } from '../Content'
+import { useDocument } from '../../Hooks'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -238,7 +237,7 @@ function createFromFile(entry, handle, callback) {
         doc.text.insertAt(0, ...text.split(''))
       }
     })
-    callback(createDocumentLink('text', `hypermerge:/${handle.id}` as HypermergeUrl))
+    callback()
   }
 
   reader.readAsText(entry)
@@ -257,7 +256,7 @@ function create({ text, file }, handle, callback) {
     }
   })
 
-  callback(createDocumentLink('text', `hypermerge:/${handle.id}` as HypermergeUrl))
+  callback()
 }
 
 ContentTypes.register({

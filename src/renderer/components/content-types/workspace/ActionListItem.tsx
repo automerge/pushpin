@@ -1,9 +1,9 @@
 import React from 'react'
 
-import Content from '../Content'
+import Content from '../../Content'
 import Actions, { ActionItem } from './Actions'
-import { PushpinUrl } from '../../ShareLink'
-import ListMenuItem, { Stretch } from '../ListMenuItem'
+import { PushpinUrl } from '../../../ShareLink'
+import ListMenuItem, { Stretch } from '../../ListMenuItem'
 
 export interface Props {
   contentUrl: PushpinUrl

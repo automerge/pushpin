@@ -2,9 +2,9 @@ import React from 'react'
 import classNames from 'classnames'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
-import ColorPicker from '../ColorPicker'
+import ColorPicker from '../../ColorPicker'
 import './ContextMenu.css'
-import { LookupResult } from '../../ContentTypes'
+import { LookupResult } from '../../../ContentTypes'
 
 interface Props {
   contentTypes: LookupResult[]

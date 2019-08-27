@@ -1,7 +1,7 @@
 import { Handle, RepoFrontend } from 'hypermerge'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from './ShareLink'
-import { ContactDoc } from './components/contact'
-import { Doc } from './components/workspace/Workspace'
+import { ContactDoc } from './components/content-types/contact'
+import { Doc } from './components/content-types/workspace/Workspace'
 
 //
 // Example:

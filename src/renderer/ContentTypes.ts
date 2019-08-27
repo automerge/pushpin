@@ -1,7 +1,7 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
 import { Handle } from 'hypermerge'
-import { HypermergeUrl } from './ShareLink'
+import { HypermergeUrl, createDocumentLink } from './ShareLink'
 // import { ContentProps } from './components/Content';
 
 const log = Debug('pushpin:content-types')
@@ -26,7 +26,7 @@ interface ContentType {
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
-  create: (typeAttrs: any, handle: Handle<any>, callback: (contentUrl: string) => void) => void
+  create: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -93,7 +93,6 @@ function createFromFile(type, file, callback): void {
 }
 
 function create(type, attrs = {}, callback): void {
-  // XXX -> use mimetypes here
   const entry = registry[type]
   if (!entry) {
     return
@@ -101,7 +100,9 @@ function create(type, attrs = {}, callback): void {
 
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.create(attrs, handle, callback)
+  entry.create(attrs, handle, () => {
+    callback(createDocumentLink(type, url))
+  })
 }
 
 export interface ListQuery {

@@ -3,11 +3,11 @@ import Unfluff from 'unfluff'
 import Debug from 'debug'
 
 import { Handle } from 'hypermerge'
-import * as Hyperfile from '../hyperfile'
-import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
-import { ChangeFn, useDocument } from '../Hooks'
-import { HypermergeUrl, createDocumentLink } from '../ShareLink'
+import * as Hyperfile from '../../hyperfile'
+import ContentTypes from '../../ContentTypes'
+import { ContentProps } from '../Content'
+import { ChangeFn, useDocument } from '../../Hooks'
+import { HypermergeUrl } from '../../ShareLink'
 
 const log = Debug('pushpin:url')
 
@@ -231,7 +231,7 @@ function create({ url }, handle: Handle<UrlDoc>, callback) {
       doc.url = url
     })
   }
-  callback(createDocumentLink('url', `hypermerge:/${handle.id}` as HypermergeUrl))
+  callback()
 }
 
 ContentTypes.register({

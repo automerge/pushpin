@@ -1,6 +1,6 @@
-import ContentTypes from '../../ContentTypes'
-import { USER } from '../../constants'
-import { HypermergeUrl, PushpinUrl, createDocumentLink } from '../../ShareLink'
+import ContentTypes from '../../../ContentTypes'
+import { USER } from '../../../constants'
+import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 
 import ContactEditor, { USER_COLORS } from './ContactEditor'
 import ContactInVarious from './ContactInVarious'
@@ -22,7 +22,7 @@ function create(typeAttrs, handle, callback) {
     const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
     doc.color = color
   })
-  callback(createDocumentLink('contact', `hypermerge:/${handle.id}` as HypermergeUrl))
+  callback()
 }
 
 ContentTypes.register({
