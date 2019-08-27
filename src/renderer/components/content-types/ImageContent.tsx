@@ -3,12 +3,12 @@ import Debug from 'debug'
 
 import { remote } from 'electron'
 import { Handle } from 'hypermerge'
-import * as Hyperfile from '../hyperfile'
-import { ContentProps } from './Content'
-import ContentTypes from '../ContentTypes'
-import { useDocument } from '../Hooks'
-import { createDocumentLink, HypermergeUrl } from '../ShareLink'
-import { IMAGE_DIALOG_OPTIONS } from '../constants'
+import * as Hyperfile from '../../hyperfile'
+import { ContentProps } from '../Content'
+import ContentTypes from '../../ContentTypes'
+import { useDocument } from '../../Hooks'
+import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
+import { IMAGE_DIALOG_OPTIONS } from '../../constants'
 
 const { dialog } = remote
 

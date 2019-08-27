@@ -6,17 +6,22 @@ import Debug from 'debug'
 
 import { Handle } from 'hypermerge'
 
-import { createDocumentLink, parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
+import {
+  createDocumentLink,
+  parseDocumentLink,
+  HypermergeUrl,
+  PushpinUrl,
+} from '../../../ShareLink'
 
-import InvitationsView from '../../InvitationsView'
+import InvitationsView from '../../../InvitationsView'
 import { ContactDoc } from '../contact'
-import Badge from '../Badge'
-import Text from '../Text'
+import Badge from '../../Badge'
+import Text from '../../Text'
 import './Omnibox.css'
 import InvitationListItem from './InvitationListItem'
-import ListMenuSection from '../ListMenuSection'
-import ListMenuItem from '../ListMenuItem'
-import ListMenu from '../ListMenu'
+import ListMenuSection from '../../ListMenuSection'
+import ListMenuItem from '../../ListMenuItem'
+import ListMenu from '../../ListMenu'
 import ActionListItem from './ActionListItem'
 
 const log = Debug('pushpin:omnibox')
