@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo } from 'react'
 
 import Automerge from 'automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
 import Delta from 'quill-delta'
 import ContentTypes from '../ContentTypes'
 import { ContentProps } from './Content'
-import { useDocument } from '../Hooks'
+import { useDocument, useStaticCallback } from '../Hooks'
 import './TextContent.css'
 
 interface TextDoc {
@@ -116,13 +116,6 @@ function useQuill({
   }, [textString])
 
   return [ref, quill.current]
-}
-
-function useStaticCallback<T extends (...args: any[]) => any>(callback: T): T {
-  const cb = useRef<T>(callback)
-  cb.current = callback
-
-  return useCallback((...args: any[]) => cb.current(...args), []) as T
 }
 
 function stopPropagation(e: React.SyntheticEvent) {
