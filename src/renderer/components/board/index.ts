@@ -4,7 +4,8 @@ import ContentTypes from '../../ContentTypes'
 import Board, { BOARD_COLORS } from './Board'
 import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
-import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
+import { HypermergeUrl, PushpinUrl, createDocumentLink } from '../../ShareLink'
+import Content from '../Content'
 
 export interface BoardDocCard {
   type: string
@@ -45,6 +46,11 @@ function initializeBoard(
   board.authorIds = []
 }
 
+function initializeContentFromAttrs(typeAttrs, callback) {
+  const contentUrl = Content.initializeContentDoc('board', typeAttrs)
+  callback(createDocumentLink('board', contentUrl))
+}
+
 ContentTypes.register({
   type: 'board',
   contexts: {
@@ -55,4 +61,5 @@ ContentTypes.register({
   name: 'Board',
   icon: 'copy',
   initializeDocument: initializeBoard,
+  initializeContentFromAttrs,
 })

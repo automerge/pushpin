@@ -229,8 +229,13 @@ function initializeDocument(urlDoc: UrlDoc, { url = '' }) {
 }
 
 function initializeContentFromAttrs(typeAttrs, callback) {
-  const contentUrl = Content.initializeContentDoc('text', typeAttrs)
-  callback(createDocumentLink('text', contentUrl))
+  const contentUrl = Content.initializeContentDoc('url', typeAttrs)
+  callback(createDocumentLink('url', contentUrl))
+}
+
+function initializeContentNoAttrs(callback) {
+  const contentUrl = Content.initializeContentDoc('url', {})
+  callback(createDocumentLink('url', contentUrl))
 }
 
 ContentTypes.register({
@@ -243,6 +248,7 @@ ContentTypes.register({
   },
   initializeDocument,
   initializeContentFromAttrs,
+  initializeContentNoAttrs,
 })
 
 // Should be { [name: string]: React.CSSProperties }

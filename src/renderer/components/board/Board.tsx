@@ -317,18 +317,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     }
 
     switch (contentType.type) {
-      case 'image':
-        ContentTypes.createNoAttrs('image', (url) => {
-          const cardId = this.addCardForContent({ position, url })
-          this.selectOnly(cardId)
-        })
-        break
-      case 'pdf':
-        ContentTypes.createNoAttrs('pdf', (url) => {
-          const cardId = this.addCardForContent({ position, url })
-          this.selectOnly(cardId)
-        })
-        break
       case 'board':
         ContentTypes.createFromAttrs(
           'board',
@@ -344,7 +332,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         )
         break
       default:
-        ContentTypes.createNoAttrs('text', (url) => {
+        ContentTypes.createNoAttrs(contentType.type, (url) => {
           const cardId = this.addCardForContent({ position, url })
           this.selectOnly(cardId)
         })
