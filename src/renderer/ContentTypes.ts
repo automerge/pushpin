@@ -89,7 +89,7 @@ function createFromFile(type, file, callback): void {
   entry.initializeContent({ file }, callback)
 }
 
-function createFromAttrs(type, attrs, callback): void {
+function create(type, attrs = {}, callback): void {
   // XXX -> use mimetypes here
   const entry = registry[type]
   if (!entry) {
@@ -99,15 +99,6 @@ function createFromAttrs(type, attrs, callback): void {
   entry.initializeContent(attrs, callback)
 }
 
-function createNoAttrs(type, callback): void {
-  // XXX -> use mimetypes here
-  const entry = registry[type]
-  if (!entry) {
-    return
-  }
-
-  entry.initializeContent({}, callback)
-}
 export interface ListQuery {
   context: Context
   withUnlisted?: boolean
@@ -140,8 +131,7 @@ export default {
   list,
   initializeDocument,
   createFromFile,
-  createFromAttrs,
-  createNoAttrs,
+  create,
 }
 
 // Not yet included in / drive from the generic ContentTypes registry:

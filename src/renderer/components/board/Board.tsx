@@ -196,7 +196,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: e.pageY - this.boardRef.current.offsetTop,
     }
 
-    ContentTypes.createNoAttrs('text', (url) => {
+    ContentTypes.create('text', { text: '' }, (url) => {
       const cardId = this.addCardForContent({ position, url })
       this.selectOnly(cardId)
     })
@@ -245,11 +245,11 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         if (isPushpinUrl(plainText)) {
           callback(url, 0)
         } else {
-          ContentTypes.createFromAttrs('url', { url: url.toString() }, (url) => callback(url, 0))
+          ContentTypes.create('url', { url: url.toString() }, (url) => callback(url, 0))
         }
       } catch (e) {
         // i guess it's not a URL after all, we'lll just make a text card
-        ContentTypes.createFromAttrs('text', { text: plainText }, (url) => callback(url, 0))
+        ContentTypes.create('text', { text: plainText }, (url) => callback(url, 0))
       }
     }
   }
@@ -313,7 +313,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     switch (contentType.type) {
       case 'board':
-        ContentTypes.createFromAttrs(
+        ContentTypes.create(
           'board',
           {
             title: `Sub-board of ${
@@ -327,7 +327,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         )
         break
       default:
-        ContentTypes.createNoAttrs(contentType.type, (url) => {
+        ContentTypes.create(contentType.type, {}, (url) => {
           const cardId = this.addCardForContent({ position, url })
           this.selectOnly(cardId)
         })
