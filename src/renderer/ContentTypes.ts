@@ -27,6 +27,7 @@ interface ContentType {
   contexts: Contexts
   initializeContent?: (entry: File, callback: (contentUrl: string) => void) => void
   initializeContentFromAttrs?: (typeAttrs: any, callback: (contentUrl: string) => void) => void
+  initializeContentNoAttrs?: (callback: (contentUrl: string) => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -108,6 +109,19 @@ function createFromAttrs(type, attrs, callback): void {
   entry.initializeContentFromAttrs(attrs, callback)
 }
 
+function createNoAttrs(type, callback): void {
+  // XXX -> use mimetypes here
+  const entry = registry[type]
+  if (!entry) {
+    return
+  }
+  // XXX TODO
+  if (!entry.initializeContentNoAttrs) {
+    return
+  }
+
+  entry.initializeContentNoAttrs(callback)
+}
 export interface ListQuery {
   context: Context
   withUnlisted?: boolean
@@ -141,6 +155,7 @@ export default {
   initializeDocument,
   createFromFile,
   createFromAttrs,
+  createNoAttrs,
 }
 
 // Not yet included in / drive from the generic ContentTypes registry:

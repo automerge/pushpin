@@ -1,10 +1,15 @@
 import React from 'react'
 import Debug from 'debug'
+
+import { remote } from 'electron'
 import * as Hyperfile from '../hyperfile'
 import Content, { ContentProps } from './Content'
 import ContentTypes from '../ContentTypes'
 import { useDocument } from '../Hooks'
 import { createDocumentLink } from '../ShareLink'
+import { IMAGE_DIALOG_OPTIONS } from '../constants'
+
+const { dialog } = remote
 
 const log = Debug('pushpin:imagecontent')
 
@@ -37,19 +42,26 @@ function initializeDocument(image: ImageDoc, { hyperfileUrl }: Attrs) {
   image.hyperfileUrl = hyperfileUrl
 }
 
-/*
-const createImageCardFromPath = (path, callback) => {
-  Hyperfile.write(path)
-    .then((hyperfileUrl) => {
-      const contentUrl = Content.initializeContentDoc('image', { typeAttrs: { hyperfileUrl } })
-      callback(contentUrl)
-    })
-    .catch((err) => {
-      log(err)
-    })
-}
-*/
+const initializeContentNoAttrs = (callback) => {
+  dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
+    // User aborted.
+    if (!paths) {
+      return
+    }
+    if (paths.length !== 1) {
+      throw new Error('Expected exactly one path?')
+    }
 
+    Hyperfile.write(paths[0])
+      .then((hyperfileUrl) => {
+        const contentUrl = Content.initializeContentDoc('image', { hyperfileUrl })
+        callback(createDocumentLink('image', contentUrl))
+      })
+      .catch((err) => {
+        log(err)
+      })
+  })
+}
 function initializeContent(entry, callback) {
   const reader = new FileReader()
 
@@ -79,4 +91,5 @@ ContentTypes.register({
   },
   initializeDocument,
   initializeContent,
+  initializeContentNoAttrs,
 })

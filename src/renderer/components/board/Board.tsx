@@ -8,7 +8,7 @@ import { Handle } from 'hypermerge'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
-import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
+import { PDF_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink, parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../ShareLink'
 import * as Hyperfile from '../../hyperfile'
 import { BoardDoc } from '.'
@@ -216,6 +216,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.stopPropagation()
   }
 
+  // this could move out of board soon to somewhere other components could use it
   importDataTransfer = (dataTransfer, callback) => {
     const url = dataTransfer.getData('application/pushpin-url')
     if (url) {
@@ -324,18 +325,9 @@ export default class Board extends React.PureComponent<ContentProps, State> {
        should almost certainly run in the relevant components */
     switch (contentType.type) {
       case 'image':
-        dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
-          // User aborted.
-          if (!paths) {
-            return
-          }
-          if (paths.length !== 1) {
-            throw new Error('Expected exactly one path?')
-          }
-
-          /* cardId = this.createImageCardFromPath(position, paths[0])
-          // this happens here because we're in a callback
-          this.selectOnly(cardId) */
+        ContentTypes.createNoAttrs('image', (url) => {
+          const cardId = this.addCardForContent({ position, url })
+          this.selectOnly(cardId)
         })
         break
       case 'pdf':
