@@ -5,8 +5,9 @@ import Debug from 'debug'
 import Automerge from 'automerge'
 
 import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
+import Content, { ContentProps } from './Content'
 import { useDocument } from '../Hooks'
+import { createDocumentLink } from '../ShareLink'
 
 const log = Debug('pushpin:code-mirror-editor')
 
@@ -233,6 +234,22 @@ function initializeDocument(editor: TextDoc, { text }) {
   }
 }
 
+function initializeContent(entry, callback) {
+  const reader = new FileReader()
+
+  reader.onload = () => {
+    const contentUrl = Content.initializeContentDoc('text', { text: reader.result })
+    callback(createDocumentLink('text', contentUrl))
+  }
+
+  reader.readAsText(entry)
+}
+
+function initializeContentFromAttrs(typeAttrs, callback) {
+  const contentUrl = Content.initializeContentDoc('text', typeAttrs)
+  callback(createDocumentLink('text', contentUrl))
+}
+
 ContentTypes.register({
   type: 'text',
   name: 'Text',
@@ -242,4 +259,6 @@ ContentTypes.register({
     board: TextContent,
   },
   initializeDocument,
+  initializeContent,
+  initializeContentFromAttrs,
 })

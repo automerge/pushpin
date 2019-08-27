@@ -233,6 +233,65 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     return files
   }
 
+  processDataTransfer = (position, dataTransfer) => {
+    const url = dataTransfer.getData('application/pushpin-url')
+    if (url) {
+      this.addCardForContent({ position, url })
+      return
+    }
+
+    /* Adapted from:
+      https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
+    const { length } = dataTransfer.files
+    // fun fact: as of this writing, onDrop dataTransfer doesn't support iterators, but onPaste does
+    // hence the oldschool iteration code
+    for (let i = 0; i < length; i += 1) {
+      const entry = dataTransfer.files[i]
+
+      const offsetPosition = gridOffset(position, i)
+
+      if (entry.type.match('image/')) {
+        // need a better API
+        ContentTypes.createFromFile('image', entry, (url) => {
+          this.addCardForContent({ position: offsetPosition, url })
+        })
+      } else if (entry.type.match('application/pdf')) {
+        ContentTypes.createFromFile('pdf', entry, (url) => {
+          this.addCardForContent({ position: offsetPosition, url })
+        })
+      } else if (entry.type.match('text/')) {
+        ContentTypes.createFromFile('text', entry, (url) => {
+          this.addCardForContent({ position: offsetPosition, url })
+        })
+      }
+    }
+    if (length > 0) {
+      return
+    }
+
+    // If we can't get the item as a bunch of files, let's hope it works as plaintext.
+    const plainText = dataTransfer.getData('text/plain')
+    if (plainText) {
+      try {
+        // wait!? is this some kind of URL?
+        const url = new URL(plainText)
+        // for pushpin URLs pasted in, let's turn them into cards
+        if (isPushpinUrl(plainText)) {
+          this.addCardForContent({ position, url: plainText })
+        } else {
+          ContentTypes.createFromAttrs('url', { url: url.toString() }, (url) => {
+            this.addCardForContent({ position, url })
+          })
+        }
+      } catch (e) {
+        // i guess it's not a URL after all, we'lll just make a text card
+        ContentTypes.createFromAttrs('text', { text: plainText }, (url) => {
+          this.addCardForContent({ position, url })
+        })
+      }
+    }
+  }
+
   onDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -246,60 +305,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: pageY - this.boardRef.current.offsetTop,
     }
 
-    const url = e.dataTransfer.getData('application/pushpin-url')
-    if (url) {
-      this.addCardForContent({ position, url })
-      return
-    }
-
-    /* Adapted from:
-      https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
-    const { length } = e.dataTransfer.files
-    for (let i = 0; i < length; i += 1) {
-      const entry = e.dataTransfer.files[i]
-
-      const reader = new FileReader()
-      const offsetPosition = gridOffset(position, i)
-
-      if (entry.type.match('image/')) {
-        // need a better API
-        ContentTypes.createFromFile('image', entry, (url) => {
-          this.addCardForContent({ position: offsetPosition, url })
-        })
-      } else if (entry.type.match('application/pdf')) {
-        reader.onload = () => {
-          this.createPdfCardFromBuffer(offsetPosition, Buffer.from(reader.result as ArrayBuffer))
-        }
-        reader.readAsArrayBuffer(entry)
-      } else if (entry.type.match('text/')) {
-        reader.onload = () => {
-          this.createCard({
-            position: offsetPosition,
-            type: 'text',
-            typeAttrs: { text: reader.readAsText(entry) },
-          })
-        }
-      }
-    }
-    if (length > 0) {
-      return
-    }
-
-    // If we can't get the item as a bunch of files, let's hope it works as plaintext.
-    const plainText = e.dataTransfer.getData('text/plain')
-    if (plainText) {
-      try {
-        const url = new URL(plainText)
-        if (isPushpinUrl(plainText)) {
-          this.addCardForContent({ position, url: plainText })
-        } else {
-          this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
-        }
-      } catch (e) {
-        // i guess it's not a URL, just make a text card
-        this.createCard({ position, type: 'text', typeAttrs: { text: plainText } })
-      }
-    }
+    this.processDataTransfer(position, e.dataTransfer)
   }
 
   /* We can't get the mouse position on a paste event,
@@ -310,50 +316,16 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.preventDefault()
     e.stopPropagation()
 
+    if (!e.clipboardData) {
+      return
+    }
+
     const position = {
       x: window.pageXOffset + 100,
       y: window.pageYOffset + 100,
     }
 
-    const dataTransfer = e.clipboardData
-    if (!dataTransfer) {
-      return
-    }
-
-    // Note that the X/Y coordinates will all be the same for these cards,
-    // and the chromium code supports that... but I can't think of it could happen,
-    // so if you're reading this because it did, sorry!
-    if (dataTransfer.files.length > 0) {
-      Array.from(dataTransfer.files).forEach((file, i) => {
-        // make sure we have an image
-        if (!file.type.match('image/')) {
-          log(`we had a pasted file that was a ${file.type} not an image`)
-          return
-        }
-
-        const reader = new FileReader()
-        reader.onload = () => {
-          // xxx: talk to jeff on this one
-          // this.createImageCardFromBuffer(position, Buffer.from(reader.result as ArrayBuffer))
-        }
-        reader.readAsArrayBuffer(file)
-      })
-    }
-
-    const plainTextData = dataTransfer.getData('text/plain')
-    if (plainTextData) {
-      try {
-        const url = new URL(plainTextData)
-        if (isPushpinUrl(plainTextData)) {
-          this.addCardForContent({ position, url: plainTextData })
-        } else {
-          this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
-        }
-      } catch (e) {
-        // i guess it's not a URL, just make a text card
-        this.createCard({ position, type: 'text', typeAttrs: { text: plainTextData } })
-      }
-    }
+    this.processDataTransfer(position, e.clipboardData)
   }
 
   addContent = (e, contentType) => {

@@ -26,6 +26,7 @@ interface ContentType {
   resizable?: boolean
   contexts: Contexts
   initializeContent?: (entry: File, callback: (contentUrl: string) => void) => void
+  initializeContentFromAttrs?: (typeAttrs: any, callback: (contentUrl: string) => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -93,6 +94,20 @@ function createFromFile(type, file, callback): void {
   entry.initializeContent(file, callback)
 }
 
+function createFromAttrs(type, attrs, callback): void {
+  // XXX -> use mimetypes here
+  const entry = registry[type]
+  if (!entry) {
+    return
+  }
+  // XXX TODO
+  if (!entry.initializeContentFromAttrs) {
+    return
+  }
+
+  entry.initializeContentFromAttrs(attrs, callback)
+}
+
 export interface ListQuery {
   context: Context
   withUnlisted?: boolean
@@ -118,7 +133,15 @@ function initializeDocument(type: string, doc: any, typeAttrs: any) {
   entry.initializeDocument(doc, typeAttrs)
 }
 
-export default { register, registerDefault, lookup, list, initializeDocument, createFromFile }
+export default {
+  register,
+  registerDefault,
+  lookup,
+  list,
+  initializeDocument,
+  createFromFile,
+  createFromAttrs,
+}
 
 // Not yet included in / drive from the generic ContentTypes registry:
 //

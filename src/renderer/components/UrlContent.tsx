@@ -4,9 +4,9 @@ import Debug from 'debug'
 
 import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
+import Content, { ContentProps } from './Content'
 import { ChangeFn, useDocument } from '../Hooks'
-import { HypermergeUrl } from '../ShareLink'
+import { HypermergeUrl, createDocumentLink } from '../ShareLink'
 
 const log = Debug('pushpin:url')
 
@@ -228,6 +228,11 @@ function initializeDocument(urlDoc: UrlDoc, { url = '' }) {
   urlDoc.url = url
 }
 
+function initializeContentFromAttrs(typeAttrs, callback) {
+  const contentUrl = Content.initializeContentDoc('text', typeAttrs)
+  callback(createDocumentLink('text', contentUrl))
+}
+
 ContentTypes.register({
   type: 'url',
   name: 'URL',
@@ -237,6 +242,7 @@ ContentTypes.register({
     board: UrlContent,
   },
   initializeDocument,
+  initializeContentFromAttrs,
 })
 
 // Should be { [name: string]: React.CSSProperties }

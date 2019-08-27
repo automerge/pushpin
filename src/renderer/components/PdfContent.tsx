@@ -1,16 +1,20 @@
 import React, { useState, useCallback, useMemo } from 'react'
+import Debug from 'debug'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
+import * as Hyperfile from '../hyperfile'
 import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
+import Content, { ContentProps } from './Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
 import './PdfContent.css'
-import { HyperfileUrl } from '../hyperfile'
+import { createDocumentLink } from '../ShareLink'
+
+const log = Debug('pushpin:pdfcontent')
 
 interface PdfDoc {
   title?: string
-  hyperfileUrl: HyperfileUrl
+  hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
 PdfContent.minWidth = 3
@@ -126,11 +130,30 @@ export default function PdfContent(props: ContentProps) {
 }
 
 interface Attrs {
-  hyperfileUrl: HyperfileUrl
+  hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
 function initializeDocument(pdf: PdfDoc, { hyperfileUrl }: Attrs) {
   pdf.hyperfileUrl = hyperfileUrl
+}
+
+function initializeContent(entry, callback) {
+  const reader = new FileReader()
+
+  reader.onload = () => {
+    const buffer = Buffer.from(reader.result as ArrayBuffer)
+    Hyperfile.writeBuffer(buffer)
+      .then((hyperfileUrl) => {
+        // XXX: obviously we shouldn't need to do this
+        const contentUrl = Content.initializeContentDoc('pdf', { hyperfileUrl })
+        callback(createDocumentLink('pdf', contentUrl))
+      })
+      .catch((err) => {
+        log(err)
+      })
+  }
+
+  reader.readAsArrayBuffer(entry)
 }
 
 ContentTypes.register({
@@ -142,4 +165,5 @@ ContentTypes.register({
     board: PdfContent,
   },
   initializeDocument,
+  initializeContent,
 })
