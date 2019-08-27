@@ -139,9 +139,20 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-function initializeDocument(doc: TextDoc) {
+interface Attrs {
+  text?: string
+}
+
+function initializeDocument(doc: TextDoc, { text }: Attrs) {
   doc.text = new Automerge.Text()
-  doc.text.insertAt(0, '\n') // Quill prefers an ending newline.
+
+  if (text) {
+    doc.text.insertAt(0, ...text.split(''))
+  }
+
+  if (!text || !text.endsWith('\n')) {
+    doc.text.push('\n') // Quill prefers an ending newline
+  }
 }
 
 ContentTypes.register({
