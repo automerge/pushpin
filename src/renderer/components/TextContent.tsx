@@ -12,11 +12,15 @@ interface TextDoc {
   text: Automerge.Text
 }
 
+interface Props extends ContentProps {
+  uniquelySelected?: boolean
+}
+
 TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 12
 
-export default function TextContent(props: ContentProps) {
+export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
   const [ref] = useQuill({
@@ -24,6 +28,7 @@ export default function TextContent(props: ContentProps) {
     change(fn) {
       changeDoc((doc) => fn(doc.text))
     },
+    selected: !!props.uniquelySelected,
     config: {
       placeholder: 'Type something...',
       formats: [],
@@ -39,10 +44,16 @@ export default function TextContent(props: ContentProps) {
 interface QuillOpts {
   text: Automerge.Text | null
   change: (cb: (text: Automerge.Text) => void) => void
+  selected: boolean
   config?: QuillOptionsStatic
 }
 
-function useQuill({ text, change, config }: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
+function useQuill({
+  text,
+  change,
+  selected,
+  config,
+}: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
   const textString = useMemo(() => text && text.join(''), [text])
@@ -57,6 +68,7 @@ function useQuill({ text, change, config }: QuillOpts): [React.Ref<HTMLDivElemen
     quill.current = q
 
     if (textString) q.setText(textString)
+    if (selected) q.focus()
 
     const onChange: TextChangeHandler = (changeDelta, _oldContents, source) => {
       if (source !== 'user') return
