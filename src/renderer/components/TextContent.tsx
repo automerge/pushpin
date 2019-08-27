@@ -34,6 +34,10 @@ export default function TextContent(props: Props) {
       formats: [],
       modules: {
         toolbar: false,
+        history: {
+          maxStack: 500,
+          userOnly: true,
+        },
       },
     },
   })
@@ -60,9 +64,8 @@ function useQuill({
   const makeChange = useStaticCallback(change)
 
   useEffect(() => {
-    if (!ref.current) {
-      return () => {}
-    }
+    if (!ref.current) return () => {}
+
     const container = ref.current
     const q = new Quill(container, { scrollingContainer: container, ...config })
     quill.current = q
@@ -77,10 +80,7 @@ function useQuill({
     }
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'Backspace') {
-        e.stopPropagation()
-        return
-      }
+      if (e.key !== 'Backspace') return
 
       const str = q.getText()
       if (str !== '' && str !== '\n') {
