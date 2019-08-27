@@ -30,7 +30,6 @@ export default function TextContent(props: Props) {
     },
     selected: props.uniquelySelected,
     config: {
-      placeholder: 'Type something...',
       formats: [],
       modules: {
         toolbar: false,
