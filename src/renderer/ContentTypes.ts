@@ -25,6 +25,7 @@ interface ContentType {
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
+  initializeContent?: (entry: File, callback: (contentUrl: string) => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -78,6 +79,20 @@ function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
+function createFromFile(type, file, callback): void {
+  // XXX -> use mimetypes here
+  const entry = registry[type]
+  if (!entry) {
+    return
+  }
+  // XXX TODO
+  if (!entry.initializeContent) {
+    return
+  }
+
+  entry.initializeContent(file, callback)
+}
+
 export interface ListQuery {
   context: Context
   withUnlisted?: boolean
@@ -103,7 +118,7 @@ function initializeDocument(type: string, doc: any, typeAttrs: any) {
   entry.initializeDocument(doc, typeAttrs)
 }
 
-export default { register, registerDefault, lookup, list, initializeDocument }
+export default { register, registerDefault, lookup, list, initializeDocument, createFromFile }
 
 // Not yet included in / drive from the generic ContentTypes registry:
 //

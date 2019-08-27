@@ -118,7 +118,7 @@ interface CardArgs {
   dimension?: Dimension
 }
 
-interface LinkCardArgs extends CardArgs {
+interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
@@ -248,7 +248,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     const url = e.dataTransfer.getData('application/pushpin-url')
     if (url) {
-      this.linkCard({ position, url })
+      this.addCardForContent({ position, url })
       return
     }
 
@@ -262,10 +262,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       const offsetPosition = gridOffset(position, i)
 
       if (entry.type.match('image/')) {
-        reader.onload = () => {
-          this.createImageCardFromBuffer(offsetPosition, Buffer.from(reader.result as ArrayBuffer))
-        }
-        reader.readAsArrayBuffer(entry)
+        // need a better API
+        ContentTypes.createFromFile('image', entry, (url) => {
+          this.addCardForContent({ position: offsetPosition, url })
+        })
       } else if (entry.type.match('application/pdf')) {
         reader.onload = () => {
           this.createPdfCardFromBuffer(offsetPosition, Buffer.from(reader.result as ArrayBuffer))
@@ -291,7 +291,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       try {
         const url = new URL(plainText)
         if (isPushpinUrl(plainText)) {
-          this.linkCard({ position, url: plainText })
+          this.addCardForContent({ position, url: plainText })
         } else {
           this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
         }
@@ -334,7 +334,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         const reader = new FileReader()
         reader.onload = () => {
           // xxx: talk to jeff on this one
-          this.createImageCardFromBuffer(position, Buffer.from(reader.result as ArrayBuffer))
+          // this.createImageCardFromBuffer(position, Buffer.from(reader.result as ArrayBuffer))
         }
         reader.readAsArrayBuffer(file)
       })
@@ -345,7 +345,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       try {
         const url = new URL(plainTextData)
         if (isPushpinUrl(plainTextData)) {
-          this.linkCard({ position, url: plainTextData })
+          this.addCardForContent({ position, url: plainTextData })
         } else {
           this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
         }
@@ -385,9 +385,9 @@ export default class Board extends React.PureComponent<ContentProps, State> {
             throw new Error('Expected exactly one path?')
           }
 
-          cardId = this.createImageCardFromPath(position, paths[0])
+          /* cardId = this.createImageCardFromPath(position, paths[0])
           // this happens here because we're in a callback
-          this.selectOnly(cardId)
+          this.selectOnly(cardId) */
         })
         break
       case 'pdf':
@@ -457,42 +457,16 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       })
   }
 
-  createImageCardFromPath = (position, path) => {
-    Hyperfile.write(path)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'image',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  createImageCardFromBuffer = (position, buffer) => {
-    Hyperfile.writeBuffer(buffer)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'image',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
   createCard = ({ position, dimension, type, typeAttrs }: CreateCardArgs) => {
     const hypermergeUrl = Content.initializeContentDoc(type, typeAttrs)
-    return this.linkCard({ position, dimension, url: createDocumentLink(type, hypermergeUrl) })
+    return this.addCardForContent({
+      position,
+      dimension,
+      url: createDocumentLink(type, hypermergeUrl),
+    })
   }
 
-  linkCard = ({ position, dimension, url }: LinkCardArgs) => {
+  addCardForContent = ({ position, dimension, url }: AddCardArgs) => {
     const id = uuid()
 
     const { type } = parseDocumentLink(url)
