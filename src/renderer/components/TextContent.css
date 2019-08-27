@@ -18,13 +18,16 @@
   outline: 0;
   min-height: 100%;
   cursor: text;
+  overflow: hidden;
 }
 
 .ql-clipboard {
+  /* Hiding this element causes the cursor to mess up when pasting */
   left: -100000px;
   height: 1px;
   overflow-y: hidden;
-  position: absolute;
+  /* `position: absolute` causes a bizarre 1-frame scroll to the left when pasting */
+  position: fixed;
   top: 50%;
 }
 
