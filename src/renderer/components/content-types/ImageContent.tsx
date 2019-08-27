@@ -69,7 +69,6 @@ function createFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
     const buffer = Buffer.from(reader.result as ArrayBuffer)
     Hyperfile.writeBuffer(buffer)
       .then((hyperfileUrl) => {
-        // XXX: obviously we shouldn't need to do this
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
         })
