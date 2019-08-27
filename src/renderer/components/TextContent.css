@@ -1,0 +1,60 @@
+.TextContent {
+  background-color: white;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: calc(var(--cellSize) * 2 + 1px);
+  outline: 0;
+  box-sizing: border-box;
+  overflow: auto;
+  border: solid 1px var(--colorPaleGrey);
+}
+
+.ql-editor {
+  padding: calc(var(--halfCellSize) - 1px);
+  box-sizing: border-box;
+  outline: 0;
+  min-height: 100%;
+  cursor: text;
+  overflow: hidden;
+}
+
+.ql-clipboard {
+  /* Hiding this element causes the cursor to mess up when pasting */
+  left: -100000px;
+  height: 1px;
+  overflow-y: hidden;
+  /* `position: absolute` causes a bizarre 1-frame scroll to the left when pasting */
+  position: fixed;
+  top: 50%;
+}
+
+/* Scrollbar */
+
+.TextContent::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.TextContent::-webkit-scrollbar-track {
+  background-color: transparent;
+  margin-bottom: 10px;
+}
+
+.TextContent::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.TextContent:hover::-webkit-scrollbar-track {
+  background-color: #f3f3f3;
+}
+
+.TextContent:hover::-webkit-scrollbar-thumb {
+  background-color: var(--colorPaleGrey);
+}
+
+.TextContent::-webkit-scrollbar-thumb:hover {
+  background-color: #cbd5db;
+}
