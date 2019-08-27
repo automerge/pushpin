@@ -216,27 +216,10 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.stopPropagation()
   }
 
-  getFiles = (dataTransfer) => {
-    const files: any[] = []
-    // NB: if i recall correctly, this is a weird array
-    //  that can't be iterated over for C++ reasons
-    for (let i = 0; i < dataTransfer.files.length; i += 1) {
-      const item = dataTransfer.items[i]
-      if (item.kind === 'file') {
-        const file = item.getAsFile()
-        if (file) {
-          files.push(file)
-        }
-      }
-    }
-
-    return files
-  }
-
-  processDataTransfer = (position, dataTransfer) => {
+  importDataTransfer = (dataTransfer, callback) => {
     const url = dataTransfer.getData('application/pushpin-url')
     if (url) {
-      this.addCardForContent({ position, url })
+      callback(url, 0)
       return
     }
 
@@ -248,21 +231,12 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     for (let i = 0; i < length; i += 1) {
       const entry = dataTransfer.files[i]
 
-      const offsetPosition = gridOffset(position, i)
-
       if (entry.type.match('image/')) {
-        // need a better API
-        ContentTypes.createFromFile('image', entry, (url) => {
-          this.addCardForContent({ position: offsetPosition, url })
-        })
+        ContentTypes.createFromFile('image', entry, (url) => callback(url, i))
       } else if (entry.type.match('application/pdf')) {
-        ContentTypes.createFromFile('pdf', entry, (url) => {
-          this.addCardForContent({ position: offsetPosition, url })
-        })
+        ContentTypes.createFromFile('pdf', entry, (url) => callback(url, i))
       } else if (entry.type.match('text/')) {
-        ContentTypes.createFromFile('text', entry, (url) => {
-          this.addCardForContent({ position: offsetPosition, url })
-        })
+        ContentTypes.createFromFile('text', entry, (url) => callback(url, i))
       }
     }
     if (length > 0) {
@@ -277,17 +251,13 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         const url = new URL(plainText)
         // for pushpin URLs pasted in, let's turn them into cards
         if (isPushpinUrl(plainText)) {
-          this.addCardForContent({ position, url: plainText })
+          callback(url, 0)
         } else {
-          ContentTypes.createFromAttrs('url', { url: url.toString() }, (url) => {
-            this.addCardForContent({ position, url })
-          })
+          ContentTypes.createFromAttrs('url', { url: url.toString() }, (url) => callback(url, 0))
         }
       } catch (e) {
         // i guess it's not a URL after all, we'lll just make a text card
-        ContentTypes.createFromAttrs('text', { text: plainText }, (url) => {
-          this.addCardForContent({ position, url })
-        })
+        ContentTypes.createFromAttrs('text', { text: plainText }, (url) => callback(url, 0))
       }
     }
   }
@@ -305,12 +275,12 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: pageY - this.boardRef.current.offsetTop,
     }
 
-    this.processDataTransfer(position, e.dataTransfer)
+    this.importDataTransfer(e.dataTransfer, (url, i) => {
+      const offsetPosition = gridOffset(position, i)
+      this.addCardForContent({ position: offsetPosition, url })
+    })
   }
 
-  /* We can't get the mouse position on a paste event,
-     so we ask the window for the current pageX/Y offsets and just stick the new card
-     100px in from there. (The new React might support this through pointer events.) */
   onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     log('onPaste')
     e.preventDefault()
@@ -320,12 +290,18 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       return
     }
 
+    /* We can't get the mouse position on a paste event,
+     so we ask the window for the current pageX/Y offsets and just stick the new card
+     100px in from there. (The new React might support this through pointer events.) */
     const position = {
       x: window.pageXOffset + 100,
       y: window.pageYOffset + 100,
     }
 
-    this.processDataTransfer(position, e.clipboardData)
+    this.importDataTransfer(e.clipboardData, (url, i) => {
+      const offsetPosition = gridOffset(position, i)
+      this.addCardForContent({ position: offsetPosition, url })
+    })
   }
 
   addContent = (e, contentType) => {
@@ -401,21 +377,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
   createPdfCardFromPath = (position, path) => {
     Hyperfile.write(path)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'pdf',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  createPdfCardFromBuffer = (position, buffer) => {
-    Hyperfile.writeBuffer(buffer)
       .then((hyperfileUrl) => {
         const cardId = this.createCard({
           position,
