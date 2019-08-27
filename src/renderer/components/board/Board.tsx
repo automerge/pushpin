@@ -5,9 +5,9 @@ import uuid from 'uuid/v4'
 
 import { Handle } from 'hypermerge'
 import { ContextMenuTrigger } from 'react-contextmenu'
-import Content, { ContentProps } from '../Content'
+import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
-import { createDocumentLink, parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../ShareLink'
+import { parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../ShareLink'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
@@ -196,14 +196,15 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       return
     }
 
-    const cardId = this.createCard({
-      position: {
-        x: e.pageX - this.boardRef.current.offsetLeft,
-        y: e.pageY - this.boardRef.current.offsetTop,
-      },
-      type: 'text',
+    const position = {
+      x: e.pageX - this.boardRef.current.offsetLeft,
+      y: e.pageY - this.boardRef.current.offsetTop,
+    }
+
+    ContentTypes.createNoAttrs('text', (url) => {
+      const cardId = this.addCardForContent({ position, url })
+      this.selectOnly(cardId)
     })
-    this.selectOnly(cardId)
   }
 
   onDragOver = (e) => {
@@ -336,15 +337,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
           this.selectOnly(cardId)
         })
     }
-  }
-
-  createCard = ({ position, dimension, type, typeAttrs }: CreateCardArgs) => {
-    const hypermergeUrl = Content.initializeContentDoc(type, typeAttrs)
-    return this.addCardForContent({
-      position,
-      dimension,
-      url: createDocumentLink(type, hypermergeUrl),
-    })
   }
 
   addCardForContent = ({ position, dimension, url }: AddCardArgs) => {
