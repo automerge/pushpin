@@ -66,6 +66,12 @@ You can navigate new places quickly by pressing "/" and then typing part of the 
 
 You can also see who's online in the top right corner of your workspace.
 
+
+## Keeping Your Data Available
+
+[pushpin-peer](https://github.com/mjtognetti/pushpin-peer) is a simple data peer you can use to ensure your pushpin data is available. You can run pushpin peer on a server or in the cloud.
+
+
 ## Hacking on PushPin
 
 PushPin is built to be easily extended. You could add new kinds of cards like movies or music, a fancier text editor, a PDF viewer, a deck of cards, or a drum machine. You could replace our card layout with your own code, or build a 3d game using WebGL. The sky's the limit.
