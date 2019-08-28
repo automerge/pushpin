@@ -243,7 +243,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         const url = new URL(plainText)
         // for pushpin URLs pasted in, let's turn them into cards
         if (isPushpinUrl(plainText)) {
-          callback(url, 0)
+          callback(plainText, 0)
         } else {
           ContentTypes.create('url', { url: url.toString() }, (url) => callback(url, 0))
         }

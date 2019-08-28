@@ -89,7 +89,9 @@ function createFromFile(type, file, callback): void {
 
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.create({ file }, handle, callback)
+  entry.create({ file }, handle, () => {
+    callback(createDocumentLink(type, url))
+  })
 }
 
 function create(type, attrs = {}, callback): void {
