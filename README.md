@@ -71,6 +71,9 @@ You can also see who's online in the top right corner of your workspace.
 
 [pushpin-peer](https://github.com/mjtognetti/pushpin-peer) is a simple data peer you can use to ensure your pushpin data is available. You can run pushpin peer on a server or in the cloud.
 
+**Important note:**
+Due to hypermerge limitations (which we're working on!), syncing between pushpin and pushpin-peer may not work exactly as you would expect. Pushpin will only replicate documents to pushpin-peer which you have actively opened within the pushpin app (i.e. loaded onto a board or navigated to). We're working on improving replication to remove this constraint!
+
 
 ## Hacking on PushPin
 
