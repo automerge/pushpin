@@ -4387,9 +4387,9 @@ hyperdiscovery@^9.0.1:
     hypercore-protocol "^6.9.0"
     mutexify "^1.2.0"
 
-"hypermerge@git+https://github.com/automerge/hypermerge#document-message-prototype":
+"hypermerge@git+https://github.com/automerge/hypermerge":
   version "1.0.42"
-  resolved "git+https://github.com/automerge/hypermerge#43c333681edee6f2c8e15c165b9ea6a005cc135f"
+  resolved "git+https://github.com/automerge/hypermerge#c26535863fcf7093781fdea22283b51e2472edd0"
   dependencies:
     automerge "^0.10.1"
     bs58 "^4.0.1"
