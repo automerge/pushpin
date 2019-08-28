@@ -1,16 +1,24 @@
 import React, { useState, useCallback, useMemo } from 'react'
+import Debug from 'debug'
+import { remote } from 'electron'
+import { Handle } from 'hypermerge'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
-import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
-import { useDocument, useHyperfile, useConfirmableInput } from '../Hooks'
+import * as Hyperfile from '../../hyperfile'
+import ContentTypes from '../../ContentTypes'
+import { ContentProps } from '../Content'
+import { useDocument, useHyperfile, useConfirmableInput } from '../../Hooks'
 import './PdfContent.css'
-import { HyperfileUrl } from '../hyperfile'
+import { PDF_DIALOG_OPTIONS } from '../../constants'
+
+const { dialog } = remote
+
+const log = Debug('pushpin:pdfcontent')
 
 interface PdfDoc {
   title?: string
-  hyperfileUrl: HyperfileUrl
+  hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
 PdfContent.minWidth = 3
@@ -126,11 +134,57 @@ export default function PdfContent(props: ContentProps) {
 }
 
 interface Attrs {
-  hyperfileUrl: HyperfileUrl
+  hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
-function initializeDocument(pdf: PdfDoc, { hyperfileUrl }: Attrs) {
-  pdf.hyperfileUrl = hyperfileUrl
+const createNoAttrs = (handle, callback) => {
+  dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
+    // User aborted.
+    if (!paths) {
+      return
+    }
+    if (paths.length !== 1) {
+      throw new Error('Expected exactly one path?')
+    }
+
+    Hyperfile.write(paths[0])
+      .then((hyperfileUrl) => {
+        handle.change((doc) => {
+          doc.hyperfileUrl = hyperfileUrl
+        })
+        callback()
+      })
+      .catch((err) => {
+        log(err)
+      })
+  })
+}
+
+function createFromFile(entry: File, handle: Handle<PdfDoc>, callback) {
+  const reader = new FileReader()
+
+  reader.onload = () => {
+    const buffer = Buffer.from(reader.result as ArrayBuffer)
+    Hyperfile.writeBuffer(buffer)
+      .then((hyperfileUrl) => {
+        handle.change((doc) => {
+          doc.hyperfileUrl = hyperfileUrl
+        })
+        callback()
+      })
+      .catch((err) => {
+        log(err)
+      })
+  }
+
+  reader.readAsArrayBuffer(entry)
+}
+
+function create(attributes, handle, callback) {
+  if (attributes.file) {
+    return createFromFile(attributes.file, handle, callback)
+  }
+  return createNoAttrs(handle, callback)
 }
 
 ContentTypes.register({
@@ -141,5 +195,5 @@ ContentTypes.register({
     workspace: PdfContent,
     board: PdfContent,
   },
-  initializeDocument,
+  create,
 })

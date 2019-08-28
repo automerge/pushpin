@@ -2,14 +2,14 @@ import React from 'react'
 import { DraggableCore, DraggableData } from 'react-draggable'
 import classNames from 'classnames'
 
-import Content from '../Content'
-import ContentTypes from '../../ContentTypes'
-import { parseDocumentLink, HypermergeUrl } from '../../ShareLink'
+import Content from '../../Content'
+import ContentTypes from '../../../ContentTypes'
+import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard } from '.'
 import { TrackingEntry, DragType, isResizing, isMoving } from './Board'
 import { ContactDoc } from '../contact'
-import { useDocument } from '../../Hooks'
+import { useDocument } from '../../../Hooks'
 import './BoardCard.css'
 
 type DraggableEvent =

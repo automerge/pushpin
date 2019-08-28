@@ -1,16 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { remote } from 'electron'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
 
 import { Handle } from 'hypermerge'
 import { ContextMenuTrigger } from 'react-contextmenu'
-import Content, { ContentProps } from '../Content'
-import ContentTypes from '../../ContentTypes'
-import { IMAGE_DIALOG_OPTIONS, PDF_DIALOG_OPTIONS } from '../../constants'
-import { createDocumentLink, parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../ShareLink'
-import * as Hyperfile from '../../hyperfile'
+import { ContentProps } from '../../Content'
+import ContentTypes from '../../../ContentTypes'
+import { parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../../ShareLink'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
@@ -23,8 +20,6 @@ import {
   snapDimensionToGrid,
   snapPositionToGrid,
 } from './BoardGrid'
-
-const { dialog } = remote
 
 const log = Debug('pushpin:board')
 
@@ -118,13 +113,8 @@ interface CardArgs {
   dimension?: Dimension
 }
 
-interface LinkCardArgs extends CardArgs {
+interface AddCardArgs extends CardArgs {
   url: PushpinUrl
-}
-
-interface CreateCardArgs extends CardArgs {
-  type: string
-  typeAttrs?: any
 }
 
 export default class Board extends React.PureComponent<ContentProps, State> {
@@ -201,14 +191,15 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       return
     }
 
-    const cardId = this.createCard({
-      position: {
-        x: e.pageX - this.boardRef.current.offsetLeft,
-        y: e.pageY - this.boardRef.current.offsetTop,
-      },
-      type: 'text',
+    const position = {
+      x: e.pageX - this.boardRef.current.offsetLeft,
+      y: e.pageY - this.boardRef.current.offsetTop,
+    }
+
+    ContentTypes.create('text', { text: '' }, (url) => {
+      const cardId = this.addCardForContent({ position, url })
+      this.selectOnly(cardId)
     })
-    this.selectOnly(cardId)
   }
 
   onDragOver = (e) => {
@@ -216,21 +207,51 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.stopPropagation()
   }
 
-  getFiles = (dataTransfer) => {
-    const files: any[] = []
-    // NB: if i recall correctly, this is a weird array
-    //  that can't be iterated over for C++ reasons
-    for (let i = 0; i < dataTransfer.files.length; i += 1) {
-      const item = dataTransfer.items[i]
-      if (item.kind === 'file') {
-        const file = item.getAsFile()
-        if (file) {
-          files.push(file)
-        }
-      }
+  // this could move out of board soon to somewhere other components could use it
+  importDataTransfer = (dataTransfer, callback) => {
+    const url = dataTransfer.getData('application/pushpin-url')
+    if (url) {
+      callback(url, 0)
+      return
     }
 
-    return files
+    /* Adapted from:
+      https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
+    const { length } = dataTransfer.files
+    // fun fact: as of this writing, onDrop dataTransfer doesn't support iterators, but onPaste does
+    // hence the oldschool iteration code
+    for (let i = 0; i < length; i += 1) {
+      const entry = dataTransfer.files[i]
+
+      if (entry.type.match('image/')) {
+        ContentTypes.createFromFile('image', entry, (url) => callback(url, i))
+      } else if (entry.type.match('application/pdf')) {
+        ContentTypes.createFromFile('pdf', entry, (url) => callback(url, i))
+      } else if (entry.type.match('text/')) {
+        ContentTypes.createFromFile('text', entry, (url) => callback(url, i))
+      }
+    }
+    if (length > 0) {
+      return
+    }
+
+    // If we can't get the item as a bunch of files, let's hope it works as plaintext.
+    const plainText = dataTransfer.getData('text/plain')
+    if (plainText) {
+      try {
+        // wait!? is this some kind of URL?
+        const url = new URL(plainText)
+        // for pushpin URLs pasted in, let's turn them into cards
+        if (isPushpinUrl(plainText)) {
+          callback(plainText, 0)
+        } else {
+          ContentTypes.create('url', { url: url.toString() }, (url) => callback(url, 0))
+        }
+      } catch (e) {
+        // i guess it's not a URL after all, we'lll just make a text card
+        ContentTypes.create('text', { text: plainText }, (url) => callback(url, 0))
+      }
+    }
   }
 
   onDrop = (e) => {
@@ -246,114 +267,33 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: pageY - this.boardRef.current.offsetTop,
     }
 
-    const url = e.dataTransfer.getData('application/pushpin-url')
-    if (url) {
-      this.linkCard({ position, url })
-      return
-    }
-
-    /* Adapted from:
-      https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
-    const { length } = e.dataTransfer.files
-    for (let i = 0; i < length; i += 1) {
-      const entry = e.dataTransfer.files[i]
-
-      const reader = new FileReader()
+    this.importDataTransfer(e.dataTransfer, (url, i) => {
       const offsetPosition = gridOffset(position, i)
-
-      if (entry.type.match('image/')) {
-        reader.onload = () => {
-          this.createImageCardFromBuffer(offsetPosition, Buffer.from(reader.result as ArrayBuffer))
-        }
-        reader.readAsArrayBuffer(entry)
-      } else if (entry.type.match('application/pdf')) {
-        reader.onload = () => {
-          this.createPdfCardFromBuffer(offsetPosition, Buffer.from(reader.result as ArrayBuffer))
-        }
-        reader.readAsArrayBuffer(entry)
-      } else if (entry.type.match('text/')) {
-        reader.onload = () => {
-          this.createCard({
-            position: offsetPosition,
-            type: 'text',
-            typeAttrs: { text: reader.readAsText(entry) },
-          })
-        }
-      }
-    }
-    if (length > 0) {
-      return
-    }
-
-    // If we can't get the item as a bunch of files, let's hope it works as plaintext.
-    const plainText = e.dataTransfer.getData('text/plain')
-    if (plainText) {
-      try {
-        const url = new URL(plainText)
-        if (isPushpinUrl(plainText)) {
-          this.linkCard({ position, url: plainText })
-        } else {
-          this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
-        }
-      } catch (e) {
-        // i guess it's not a URL, just make a text card
-        this.createCard({ position, type: 'text', typeAttrs: { text: plainText } })
-      }
-    }
+      this.addCardForContent({ position: offsetPosition, url })
+    })
   }
 
-  /* We can't get the mouse position on a paste event,
-     so we ask the window for the current pageX/Y offsets and just stick the new card
-     100px in from there. (The new React might support this through pointer events.) */
   onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     log('onPaste')
     e.preventDefault()
     e.stopPropagation()
 
+    if (!e.clipboardData) {
+      return
+    }
+
+    /* We can't get the mouse position on a paste event,
+     so we ask the window for the current pageX/Y offsets and just stick the new card
+     100px in from there. (The new React might support this through pointer events.) */
     const position = {
       x: window.pageXOffset + 100,
       y: window.pageYOffset + 100,
     }
 
-    const dataTransfer = e.clipboardData
-    if (!dataTransfer) {
-      return
-    }
-
-    // Note that the X/Y coordinates will all be the same for these cards,
-    // and the chromium code supports that... but I can't think of it could happen,
-    // so if you're reading this because it did, sorry!
-    if (dataTransfer.files.length > 0) {
-      Array.from(dataTransfer.files).forEach((file, i) => {
-        // make sure we have an image
-        if (!file.type.match('image/')) {
-          log(`we had a pasted file that was a ${file.type} not an image`)
-          return
-        }
-
-        const reader = new FileReader()
-        reader.onload = () => {
-          // xxx: talk to jeff on this one
-          this.createImageCardFromBuffer(position, Buffer.from(reader.result as ArrayBuffer))
-        }
-        reader.readAsArrayBuffer(file)
-      })
-    }
-
-    const plainTextData = dataTransfer.getData('text/plain')
-    if (plainTextData) {
-      try {
-        const url = new URL(plainTextData)
-        if (isPushpinUrl(plainTextData)) {
-          this.linkCard({ position, url: plainTextData })
-        } else {
-          this.createCard({ position, type: 'url', typeAttrs: { url: url.toString() } })
-        }
-      } catch (e) {
-        // i guess it's not a URL, just make a text card
-        this.createCard({ position, type: 'text', typeAttrs: { text: plainTextData } })
-      }
-    }
+    this.importDataTransfer(e.clipboardData, (url, i) => {
+      const offsetPosition = gridOffset(position, i)
+      this.addCardForContent({ position: offsetPosition, url })
+    })
   }
 
   addContent = (e, contentType) => {
@@ -371,128 +311,30 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: this.state.contextMenuPosition.y - this.boardRef.current.getBoundingClientRect().top,
     }
 
-    let cardId
-    /* the contents of this switch statement
-       should almost certainly run in the relevant components */
     switch (contentType.type) {
-      case 'image':
-        dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
-          // User aborted.
-          if (!paths) {
-            return
-          }
-          if (paths.length !== 1) {
-            throw new Error('Expected exactly one path?')
-          }
-
-          cardId = this.createImageCardFromPath(position, paths[0])
-          // this happens here because we're in a callback
-          this.selectOnly(cardId)
-        })
-        break
-      case 'pdf':
-        dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
-          // User aborted.
-          if (!paths) {
-            return
-          }
-          if (paths.length !== 1) {
-            throw new Error('Expected exactly one path?')
-          }
-
-          cardId = this.createPdfCardFromPath(position, paths[0])
-          // this happens here because we're in a callback
-          this.selectOnly(cardId)
-        })
-        break
       case 'board':
-        cardId = this.createCard({
-          position,
-          type: contentType.type,
-          typeAttrs: {
+        ContentTypes.create(
+          'board',
+          {
             title: `Sub-board of ${
               this.state.doc && this.state.doc.title ? this.state.doc.title : 'Untitled'
             }`,
           },
-        })
-        this.selectOnly(cardId)
+          (url) => {
+            const cardId = this.addCardForContent({ position, url })
+            this.selectOnly(cardId)
+          }
+        )
         break
       default:
-        cardId = this.createCard({
-          position,
-          type: contentType.type,
-          typeAttrs: { text: '' },
+        ContentTypes.create(contentType.type, {}, (url) => {
+          const cardId = this.addCardForContent({ position, url })
+          this.selectOnly(cardId)
         })
-        this.selectOnly(cardId)
     }
   }
 
-  createPdfCardFromPath = (position, path) => {
-    Hyperfile.write(path)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'pdf',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  createPdfCardFromBuffer = (position, buffer) => {
-    Hyperfile.writeBuffer(buffer)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'pdf',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  createImageCardFromPath = (position, path) => {
-    Hyperfile.write(path)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'image',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  createImageCardFromBuffer = (position, buffer) => {
-    Hyperfile.writeBuffer(buffer)
-      .then((hyperfileUrl) => {
-        const cardId = this.createCard({
-          position,
-          type: 'image',
-          typeAttrs: { hyperfileUrl },
-        })
-        this.selectOnly(cardId)
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  createCard = ({ position, dimension, type, typeAttrs }: CreateCardArgs) => {
-    const hypermergeUrl = Content.initializeContentDoc(type, typeAttrs)
-    return this.linkCard({ position, dimension, url: createDocumentLink(type, hypermergeUrl) })
-  }
-
-  linkCard = ({ position, dimension, url }: LinkCardArgs) => {
+  addCardForContent = ({ position, dimension, url }: AddCardArgs) => {
     const id = uuid()
 
     const { type } = parseDocumentLink(url)

@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
-import TitleEditor from '../TitleEditor'
+import TitleEditor from '../../TitleEditor'
 import { BoardDoc } from '.'
-import { ContentProps } from '../Content'
-import { useDocument } from '../../Hooks'
-import Badge from '../Badge'
+import { ContentProps } from '../../Content'
+import { useDocument } from '../../../Hooks'
+import Badge from '../../Badge'
 
 interface Props extends ContentProps {
   editable: boolean

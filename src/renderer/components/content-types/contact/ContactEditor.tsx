@@ -2,21 +2,22 @@ import React from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import { createDocumentLink } from '../../ShareLink'
-import * as Hyperfile from '../../hyperfile'
+import { createDocumentLink } from '../../../ShareLink'
+import * as Hyperfile from '../../../hyperfile'
 
-import { IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../constants'
-import Content, { ContentProps } from '../Content'
+import { IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../../constants'
+import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import ColorPicker from '../ColorPicker'
-import Label from '../Label'
-import { useDocument } from '../../Hooks'
-import Popover from '../Popover'
-import Heading from '../Heading'
-import SecondaryText from '../SecondaryText'
+import ColorPicker from '../../ColorPicker'
+import Label from '../../Label'
+import { useDocument } from '../../../Hooks'
+import Popover from '../../Popover'
+import Heading from '../../Heading'
+import SecondaryText from '../../SecondaryText'
 
 import './ContactEditor.css'
+import ContentTypes from '../../../ContentTypes'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -61,9 +62,10 @@ export default function ContactEditor(props: ContentProps) {
 
       Hyperfile.write(paths[0])
         .then((hyperfileUrl) => {
-          const hypermergeUrl = Content.initializeContentDoc('image', { hyperfileUrl })
-          changeDoc((d) => {
-            d.avatarDocId = hypermergeUrl
+          ContentTypes.create('image', { hyperfileUrl }, (hypermergeUrl) => {
+            changeDoc((d) => {
+              d.avatarDocId = hypermergeUrl
+            })
           })
         })
         .catch((err) => {

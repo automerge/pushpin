@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import Debug from 'debug'
 
-import Content from '../Content'
-import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../ShareLink'
+import Content from '../../Content'
+import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { Doc as WorkspaceDoc } from './Workspace'
 
 import './Authors.css'
-import { useDocument } from '../../Hooks'
+import { useDocument } from '../../../Hooks'
 
 const log = Debug('pushpin:authors')
 

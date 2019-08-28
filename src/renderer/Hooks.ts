@@ -3,7 +3,7 @@ import { Handle, RepoFrontend } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 import SelfContext from './components/SelfContext'
-import { ContactDoc } from './components/contact'
+import { ContactDoc } from './components/content-types/contact'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 

@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { ContentProps } from '../Content'
+import { ContentProps } from '../../Content'
 import { BoardDoc } from '.'
-import { createDocumentLink } from '../../ShareLink'
-import { useDocument } from '../../Hooks'
+import { createDocumentLink } from '../../../ShareLink'
+import { useDocument } from '../../../Hooks'
 
 BoardInBoard.minWidth = 4
 BoardInBoard.minHeight = 6

@@ -2,11 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 
-import * as Hyperfile from '../hyperfile'
-import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
-import { ChangeFn, useDocument } from '../Hooks'
-import { HypermergeUrl } from '../ShareLink'
+import { Handle } from 'hypermerge'
+import * as Hyperfile from '../../hyperfile'
+import ContentTypes from '../../ContentTypes'
+import { ContentProps } from '../Content'
+import { ChangeFn, useDocument } from '../../Hooks'
+import { HypermergeUrl } from '../../ShareLink'
 
 const log = Debug('pushpin:url')
 
@@ -224,8 +225,13 @@ function removeEmpty(obj: object) {
   })
 }
 
-function initializeDocument(urlDoc: UrlDoc, { url = '' }) {
-  urlDoc.url = url
+function create({ url }, handle: Handle<UrlDoc>, callback) {
+  if (url) {
+    handle.change((doc) => {
+      doc.url = url
+    })
+  }
+  callback()
 }
 
 ContentTypes.register({
@@ -236,7 +242,7 @@ ContentTypes.register({
     workspace: UrlContent,
     board: UrlContent,
   },
-  initializeDocument,
+  create,
 })
 
 // Should be { [name: string]: React.CSSProperties }

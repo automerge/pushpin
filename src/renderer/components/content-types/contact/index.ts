@@ -1,6 +1,6 @@
-import ContentTypes from '../../ContentTypes'
-import { USER } from '../../constants'
-import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
+import ContentTypes from '../../../ContentTypes'
+import { USER } from '../../../constants'
+import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 
 import ContactEditor, { USER_COLORS } from './ContactEditor'
 import ContactInVarious from './ContactInVarious'
@@ -15,11 +15,14 @@ export interface ContactDoc {
   offeredUrls?: { [url: string]: PushpinUrl[] } // Used by share, a map of contact id to documents offered.
 }
 
-function initializeDocument(doc, typeAttrs) {
-  doc.name = USER
-  const USER_COLOR_VALUES = Object.values(USER_COLORS)
-  const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
-  doc.color = color
+function create(typeAttrs, handle, callback) {
+  handle.change((doc) => {
+    doc.name = USER
+    const USER_COLOR_VALUES = Object.values(USER_COLORS)
+    const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
+    doc.color = color
+  })
+  callback()
 }
 
 ContentTypes.register({
@@ -28,7 +31,7 @@ ContentTypes.register({
   icon: 'sticky-note',
   resizable: true,
   unlisted: true,
-  initializeDocument,
+  create,
   contexts: {
     workspace: ContactEditor,
     board: ContactInVarious,

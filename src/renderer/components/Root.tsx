@@ -6,21 +6,21 @@ import { RepoContext } from '../Hooks'
 import { PushpinUrl } from '../ShareLink'
 
 // We load these modules here so that the content registry will have them.
-import './workspace/Workspace'
+import './content-types/workspace/Workspace'
 
 // default context components
-import './defaults/DefaultInList'
+import './content-types/defaults/DefaultInList'
 
 // board in various contexts
-import './board'
-import './contact'
+import './content-types/board'
+import './content-types/contact'
 
 // other single-context components
-import './TextContent'
-import './ImageContent'
-import './ThreadContent'
-import './UrlContent'
-import './PdfContent'
+import './content-types/TextContent'
+import './content-types/ImageContent'
+import './content-types/ThreadContent'
+import './content-types/UrlContent'
+import './content-types/PdfContent'
 
 interface Props {
   url: PushpinUrl

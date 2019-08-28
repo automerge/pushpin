@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useMemo } from 'react'
+import { Handle } from 'hypermerge'
 
 import Automerge from 'automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
 import Delta from 'quill-delta'
-import ContentTypes from '../ContentTypes'
-import { ContentProps } from './Content'
-import { useDocument, useStaticCallback } from '../Hooks'
+import ContentTypes from '../../ContentTypes'
+import { ContentProps } from '../Content'
+import { useDocument, useStaticCallback } from '../../Hooks'
 import './TextContent.css'
 
 interface TextDoc {
@@ -143,25 +144,53 @@ interface Attrs {
   text?: string
 }
 
-function initializeDocument(doc: TextDoc, { text }: Attrs) {
-  doc.text = new Automerge.Text()
+function createFromFile(entry, handle: Handle<TextDoc>, callback) {
+  const reader = new FileReader()
 
-  if (text) {
-    doc.text.insertAt(0, ...text.split(''))
+  reader.onload = () => {
+    handle.change((doc) => {
+      doc.text = new Automerge.Text()
+      if (reader.result) {
+        const text = reader.result as string
+        doc.text.insertAt(0, ...text.split(''))
+
+        if (!text || !text.endsWith('\n')) {
+          doc.text.push('\n') // Quill prefers an ending newline
+        }
+      }
+    })
+    callback()
   }
 
-  if (!text || !text.endsWith('\n')) {
-    doc.text.push('\n') // Quill prefers an ending newline
+  reader.readAsText(entry)
+}
+
+function create({ text, file }, handle, callback) {
+  if (file) {
+    createFromFile(file, handle, callback)
+    return
   }
+
+  handle.change((doc) => {
+    doc.text = new Automerge.Text()
+    if (text) {
+      doc.text.insertAt(0, ...text.split(''))
+    }
+    if (!text || !text.endsWith('\n')) {
+      doc.text.push('\n') // Quill prefers an ending newline
+    }
+  })
+
+  callback()
 }
 
 ContentTypes.register({
   type: 'text',
   name: 'Text',
   icon: 'sticky-note',
-  initializeDocument,
   contexts: {
     board: TextContent,
     workspace: TextContent,
   },
+  create,
 })

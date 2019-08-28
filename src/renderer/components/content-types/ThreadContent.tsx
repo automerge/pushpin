@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import ContentTypes from '../ContentTypes'
-import Content, { ContentProps } from './Content'
-import { createDocumentLink, HypermergeUrl } from '../ShareLink'
-import { useDocument } from '../Hooks'
+import ContentTypes from '../../ContentTypes'
+import Content, { ContentProps } from '../Content'
+import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
+import { useDocument } from '../../Hooks'
 
 interface Message {
   authorId: HypermergeUrl
@@ -197,8 +197,11 @@ const css: { [k: string]: React.CSSProperties } = {
   },
 }
 
-function initializeDocument(threadDoc: Doc) {
-  threadDoc.messages = []
+function create(unusedAttrs, handle, callback) {
+  handle.change((doc) => {
+    doc.messages = []
+  })
+  callback()
 }
 
 ContentTypes.register({
@@ -209,5 +212,5 @@ ContentTypes.register({
     workspace: ThreadContent,
     board: ThreadContent,
   },
-  initializeDocument,
+  create,
 })

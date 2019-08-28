@@ -7,15 +7,13 @@ import { RepoFrontend } from 'hypermerge'
 import { ToFrontendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { WORKSPACE_URL_PATH } from './constants'
 import Root from './components/Root'
-import Content from './components/Content'
-
-import { createDocumentLink } from './ShareLink'
 
 import './app.css'
 import './react-toggle-override.css'
 import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
+import ContentTypes from './ContentTypes'
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
@@ -71,10 +69,10 @@ function initWorkspace(repo: RepoFrontend) {
   if (existingWorkspaceUrl !== '') {
     workspaceUrl = existingWorkspaceUrl
   } else {
-    const newWorkspaceId = Content.initializeContentDoc('workspace')
-    const newWorkspaceUrl = createDocumentLink('workspace', newWorkspaceId)
-    saveWorkspaceUrl(newWorkspaceUrl)
-    workspaceUrl = newWorkspaceUrl
+    ContentTypes.create('workspace', {}, (newWorkspaceUrl) => {
+      saveWorkspaceUrl(workspaceUrl)
+      workspaceUrl = newWorkspaceUrl
+    })
   }
 
   const workspace = <Root repo={repo} url={workspaceUrl} />

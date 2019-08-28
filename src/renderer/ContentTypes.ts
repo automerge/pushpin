@@ -1,5 +1,7 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
+import { Handle } from 'hypermerge'
+import { HypermergeUrl, createDocumentLink } from './ShareLink'
 // import { ContentProps } from './components/Content';
 
 const log = Debug('pushpin:content-types')
@@ -21,10 +23,10 @@ interface ContentType {
   type: string
   name: string
   icon: string
-  initializeDocument: (document: any, typeAttrs: any) => void
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
+  create: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -78,6 +80,33 @@ function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
+function createFromFile(type, file, callback): void {
+  // XXX -> use mimetypes here
+  const entry = registry[type]
+  if (!entry) {
+    return
+  }
+
+  const url = window.repo.create() as HypermergeUrl
+  const handle = window.repo.open(url)
+  entry.create({ file }, handle, () => {
+    callback(createDocumentLink(type, url))
+  })
+}
+
+function create(type, attrs = {}, callback): void {
+  const entry = registry[type]
+  if (!entry) {
+    return
+  }
+
+  const url = window.repo.create() as HypermergeUrl
+  const handle = window.repo.open(url)
+  entry.create(attrs, handle, () => {
+    callback(createDocumentLink(type, url))
+  })
+}
+
 export interface ListQuery {
   context: Context
   withUnlisted?: boolean
@@ -95,15 +124,14 @@ function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
   return allTypes.filter((ct) => ct && !ct.unlisted)
 }
 
-function initializeDocument(type: string, doc: any, typeAttrs: any) {
-  const entry = registry[type]
-  if (!entry) {
-    throw new Error('Attempted to initialize an unregistered type!')
-  }
-  entry.initializeDocument(doc, typeAttrs)
+export default {
+  register,
+  registerDefault,
+  lookup,
+  list,
+  createFromFile,
+  create,
 }
-
-export default { register, registerDefault, lookup, list, initializeDocument }
 
 // Not yet included in / drive from the generic ContentTypes registry:
 //

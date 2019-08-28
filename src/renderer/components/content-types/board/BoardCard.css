@@ -42,7 +42,7 @@
   height: 16px;
   bottom: 1px;
   right: 1px;
-  background: url('../../images/corner.svg');
+  background: url('../../../images/corner.svg');
   background-position: bottom right;
   background-repeat: no-repeat;
   background-origin: content-box;

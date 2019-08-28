@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 import Debug from 'debug'
 
-import Content, { ContentProps } from '../Content'
+import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
-import { DEFAULT_AVATAR_PATH } from '../../constants'
-import Text from '../Text'
-import Label from '../Label'
+import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
+import { DEFAULT_AVATAR_PATH } from '../../../constants'
+import Text from '../../Text'
+import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument, useMessaging, useTimeoutWhen } from '../../Hooks'
+import { useDocument, useMessaging, useTimeoutWhen } from '../../../Hooks'
 
 const log = Debug('pushpin:settings')
 
