@@ -12,7 +12,6 @@ import './app.css'
 import './react-toggle-override.css'
 import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
-import '../../node_modules/codemirror/lib/codemirror.css'
 import 'line-awesome/css/line-awesome.min.css'
 import ContentTypes from './ContentTypes'
 

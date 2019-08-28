@@ -1,232 +1,150 @@
-import React, { useRef, useEffect } from 'react'
-import CodeMirror from 'codemirror'
-import DiffMatchPatch from 'diff-match-patch'
-import Debug from 'debug'
-import Automerge from 'automerge'
+import React, { useEffect, useRef, useMemo } from 'react'
+import { Handle } from 'hypermerge'
 
+import Automerge from 'automerge'
+import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
+import Delta from 'quill-delta'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
-import { useDocument } from '../../Hooks'
-
-const log = Debug('pushpin:code-mirror-editor')
-
-// This is plain text note component with inline editing.
-//
-// It's a tricky component because it needs to bridge the functional-reactive
-// world of React with the imperative world of the CodeMirror editor, as well
-// as some data model mismatch between the Automerge.Text property and the
-// CodeMirror instance.
-//
-// Key ideas:
-// * The Automerge.Text property and the CodeMirror editor are seperate state,
-//   but we sync them in both directions. It's not a pure one-way data flow
-//   as we have elsewhere in the app.
-// * When the user does a local change in the editor, we pick that up and
-//   convert it into a corresponding Automerge.Text change. This causes
-//   updates to go out to other clients.
-// * When we see an Automerge.Text update, we apply changes to the editor to
-//   converge the editor's contents to those indicated in the Automerge.Text.
-// * Cursor state is managed only by CodeMirror. This means cursor state
-//   definetly remains correct when the user does local editing. Also when we
-//   apply remote ops to CodeMirror through its programtic editing APIs, the
-//   editor should automatically do the right thing with the user's cursor.
-//
-// This component is not "pure" in the literal sense. But PureComponent still
-// seems to give the right caching behaviour, so for now we'll extend from it.
+import { useDocument, useStaticCallback } from '../../Hooks'
+import './TextContent.css'
 
 interface TextDoc {
-  text?: Automerge.Text
+  text: Automerge.Text
 }
 
 interface Props extends ContentProps {
-  uniquelySelected: boolean
+  uniquelySelected?: boolean
 }
 
 TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 12
-// no default height to allow it to grow
-TextContent.maxWidth = 24
-TextContent.maxHeight = 36
 
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
-  const editorRef = useCodeMirror({
+  const [ref] = useQuill({
     text: doc && doc.text,
+    change(fn) {
+      changeDoc((doc) => fn(doc.text))
+    },
     selected: props.uniquelySelected,
-    change(cb) {
-      changeDoc((doc) => {
-        doc.text && cb(doc.text)
-      })
+    config: {
+      formats: [],
+      modules: {
+        toolbar: false,
+        history: {
+          maxStack: 500,
+          userOnly: true,
+        },
+      },
     },
   })
 
-  return (
-    <div className="CodeMirrorEditor">
-      <div
-        id={`editor-${props.hypermergeUrl}`}
-        className="CodeMirrorEditor__editor"
-        ref={editorRef}
-        onPaste={stopPropagation}
-      />
-    </div>
-  )
+  return <div className="TextContent" ref={ref} onPaste={stopPropagation} />
 }
 
-interface CodeMirrorProps {
-  text?: Automerge.Text
-  selected: boolean
-  change(cb: (text: Automerge.Text) => void): void
+interface QuillOpts {
+  text: Automerge.Text | null
+  change: (cb: (text: Automerge.Text) => void) => void
+  selected?: boolean
+  config?: QuillOptionsStatic
 }
 
-function useCodeMirror(props: CodeMirrorProps) {
-  const editorRef = useRef<HTMLDivElement>(null)
-  const codeMirrorRef = useRef<CodeMirror | null>(null)
+function useQuill({
+  text,
+  change,
+  selected,
+  config,
+}: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
+  const ref = useRef<HTMLDivElement>(null)
+  const quill = useRef<Quill | null>(null)
+  const textString = useMemo(() => text && text.join(''), [text])
+  const makeChange = useStaticCallback(change)
 
   useEffect(() => {
-    // Observe changes to the editor and make corresponding updates to the
-    // Automerge text.
-    function onCodeMirrorChange(codeMirror: CodeMirror, change: any) {
-      // We don't want to re-apply changes we already applied because of updates
-      // from Automerge.
-      if (change.origin === 'automerge') {
-        return
-      }
-      log('onCodeMirrorChange')
+    if (!ref.current) return () => {}
 
-      // Convert from CodeMirror coordinate space to Automerge text/array API.
-      const at = codeMirror.indexFromPos(change.from)
-      const removedLength = change.removed.join('\n').length
-      const addedText = change.text.join('\n')
+    const container = ref.current
+    const q = new Quill(container, { scrollingContainer: container, ...config })
+    quill.current = q
 
-      props.change((text) => {
-        if (removedLength > 0) {
-          text.splice(at, removedLength)
-        }
+    if (textString) q.setText(textString)
+    if (selected) q.focus()
 
-        if (addedText.length > 0) {
-          text.insertAt(at, ...addedText.split(''))
-        }
-      })
+    const onChange: TextChangeHandler = (changeDelta, _oldContents, source) => {
+      if (source !== 'user') return
+
+      makeChange((content) => applyDeltaToText(content, changeDelta))
     }
 
-    function onKeyDown(codeMirror: CodeMirror, e: React.KeyboardEvent) {
-      if (e.key !== 'Backspace') {
-        e.stopPropagation()
-        return
-      }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Backspace') return
 
-      // we normally prevent deletion by stopping event propagation
-      // but if the card is already empty and we hit delete, allow it
-      const text = codeMirror.getValue()
-      if (text.length !== 0) {
+      const str = q.getText()
+      if (str !== '' && str !== '\n') {
         e.stopPropagation()
       }
     }
 
-    // The props after `autofocus` are needed to get an editor that resizes
-    // according to the size of the text, without scrollbars or wrapping.
-    const codeMirror = CodeMirror(editorRef.current, {
-      autofocus: props.selected,
-      lineNumbers: false,
-      lineWrapping: true,
-      scrollbarStyle: 'null',
-      viewportMargin: Infinity,
-    })
+    q.on('text-change', onChange)
 
-    codeMirrorRef.current = codeMirror
-
-    codeMirror.on('change', onCodeMirrorChange)
-    codeMirror.on('keydown', onKeyDown)
+    /**
+     * We bind this as a native event because of React's event delegation.
+     * Quill will handle the keydown event and cause a react re-render before react has actually
+     * seen the event at all. This causes a race condition where the doc looks like it was already
+     * empty when Backspace is pressed, even though that very keypress made it empty.
+     */
+    container.addEventListener('keydown', onKeyDown, { capture: true })
 
     return () => {
-      codeMirror.off('change', onCodeMirrorChange)
-      codeMirror.off('keydown', onKeyDown)
+      quill.current = null
+      container.removeEventListener('keydown', onKeyDown, { capture: true })
+      q.off('text-change', onChange)
+      // Quill gets garbage collected automatically
     }
-  }, [])
+  }, [ref.current])
 
-  // Transform updates from the Automerge text into imperative text changes
-  // in the editor.
   useEffect(() => {
-    const { text } = props
-    const codeMirror = codeMirrorRef.current
+    if (!textString || !quill.current) return
 
-    // Short circuit if the text has not loaded yet.
-    if (!text || !codeMirror) {
-      return
-    }
+    const delta = new Delta().insert(textString)
+    const diff = quill.current.getContents().diff(delta)
 
-    // Short circuit if we don't need to apply any changes to the editor. This
-    // happens when we get a text update based on our own local edits.
-    const oldStr = codeMirror.getValue()
-    const newStr = text.join('')
-    if (oldStr === newStr) {
-      return
-    }
+    quill.current.updateContents(diff)
+  }, [textString])
 
-    // Otherwise find the diff between the current and desired contents, and
-    // apply corresponding editor ops to close them.
-    log('forceContents')
-    const dmp = new DiffMatchPatch()
-    const diff = dmp.diff_main(oldStr, newStr)
-
-    // Buffer CM's dom updates
-    codeMirror.operation(() => {
-      // The diff lib doesn't give indicies so we need to compute them ourself as
-      // we go along.
-      for (let i = 0, at = 0; i < diff.length; i += 1) {
-        const [type, str] = diff[i]
-
-        switch (type) {
-          case DiffMatchPatch.DIFF_EQUAL: {
-            at += str.length
-            break
-          }
-
-          case DiffMatchPatch.DIFF_INSERT: {
-            const fromPos = codeMirror.posFromIndex(at)
-            codeMirror.replaceRange(str, fromPos, null, 'automerge')
-            at += str.length
-            break
-          }
-
-          case DiffMatchPatch.DIFF_DELETE: {
-            const fromPos = codeMirror.posFromIndex(at)
-            const toPos = codeMirror.posFromIndex(at + str.length)
-            codeMirror.replaceRange('', fromPos, toPos, 'automerge')
-            break
-          }
-
-          default: {
-            throw new Error(`Did not expect diff type ${type}`)
-          }
-        }
-      }
-    })
-  }, [props.text])
-
-  // Ensure the CodeMirror editor is focused if we expect it to be.
-  useEffect(() => {
-    const codeMirror = codeMirrorRef.current
-    if (!codeMirror) {
-      return
-    }
-
-    if (props.selected && !codeMirror.hasFocus()) {
-      log('ensureFocus.forceFocus')
-      codeMirror.focus()
-    }
-  }, [props.selected])
-
-  return editorRef
+  return [ref, quill.current]
 }
 
 function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
+  e.nativeEvent.stopImmediatePropagation()
 }
 
-function createFromFile(entry, handle, callback) {
+function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
+  let i = 0
+  delta.forEach((op, idx) => {
+    if (op.retain) {
+      i += op.retain
+    }
+
+    if (typeof op.insert === 'string') {
+      const chars = op.insert.split('')
+      text.splice(i, 0, ...chars)
+      i += chars.length
+    } else if (op.delete) {
+      text.splice(i, op.delete)
+    }
+  })
+}
+
+interface Attrs {
+  text?: string
+}
+
+function createFromFile(entry, handle: Handle<TextDoc>, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -235,6 +153,10 @@ function createFromFile(entry, handle, callback) {
       if (reader.result) {
         const text = reader.result as string
         doc.text.insertAt(0, ...text.split(''))
+
+        if (!text || !text.endsWith('\n')) {
+          doc.text.push('\n') // Quill prefers an ending newline
+        }
       }
     })
     callback()
@@ -254,6 +176,9 @@ function create({ text, file }, handle, callback) {
     if (text) {
       doc.text.insertAt(0, ...text.split(''))
     }
+    if (!text || !text.endsWith('\n')) {
+      doc.text.push('\n') // Quill prefers an ending newline
+    }
   })
 
   callback()
@@ -264,8 +189,8 @@ ContentTypes.register({
   name: 'Text',
   icon: 'sticky-note',
   contexts: {
-    workspace: TextContent,
     board: TextContent,
+    workspace: TextContent,
   },
   create,
 })

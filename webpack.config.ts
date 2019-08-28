@@ -31,12 +31,10 @@ const cssRule: webpack.Rule = {
     {
       loader: 'css-loader',
       options: {
-        modules: false,
-        // // TODO: use css modules
-        // {
-        //   mode: 'local',
-        //   localIdentName: '[local]-[hash:base64:5]',
-        // },
+        modules: {
+          mode: 'global',
+          localIdentName: '[local]-[hash:base64:5]',
+        },
       },
     },
   ],
@@ -89,7 +87,7 @@ function shared({ isDev }: Options): webpack.Configuration {
     },
     externals: [
       nodeExternals({
-        whitelist: [/webpack/, '@ibm/plex', 'codemirror'],
+        whitelist: [/webpack/, '@ibm/plex'],
       }),
     ],
     module: {
