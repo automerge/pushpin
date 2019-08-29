@@ -32,7 +32,7 @@ PdfContent.maxWidth = 72
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.hypermergeUrl)
   const pdfData = useHyperfile(pdf && pdf.hyperfileUrl)
-  const fileData = useMemo(() => ({ data: pdfData }), [pdfData])
+  const fileData = useMemo(() => pdfData, [pdfData])
   const [pageNum, setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
 

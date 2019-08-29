@@ -21,6 +21,11 @@ repo.replicate(discovery)
 
 export type HyperfileUrl = string & { hyperfile: true }
 
+export interface HyperfileResult {
+  data: Uint8Array
+  mimeType: string
+}
+
 export function isHyperfileUrl(str: string): str is HyperfileUrl {
   return str.startsWith('hyperfile:/')
 }
@@ -46,10 +51,10 @@ export function writeBuffer(buffer: Uint8Array): Promise<HyperfileUrl> {
   })
 }
 
-export function fetch(hyperfileUrl: HyperfileUrl): Promise<Uint8Array> {
+export function fetch(hyperfileUrl: HyperfileUrl): Promise<HyperfileResult> {
   return new Promise((res) => {
-    repo.readFile(hyperfileUrl, (data, _mimeType) => {
-      res(data)
+    repo.readFile(hyperfileUrl, (data, mimeType) => {
+      res({ data, mimeType })
     })
   })
 }

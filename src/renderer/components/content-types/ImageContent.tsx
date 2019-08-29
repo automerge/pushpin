@@ -13,8 +13,8 @@ const { dialog } = remote
 
 const log = Debug('pushpin:imagecontent')
 
-interface ImageDoc {
-  hyperfileUrl: string
+export interface ImageDoc {
+  hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
 export default function ImageContent({ hypermergeUrl }: ContentProps) {

@@ -209,8 +209,8 @@ export function usePresence<P>(
   return remote
 }
 
-export function useHyperfile(url: Hyperfile.HyperfileUrl | null): Uint8Array | null {
-  const [data, setData] = useState<Uint8Array | null>(null)
+export function useHyperfile(url: Hyperfile.HyperfileUrl | null): Hyperfile.HyperfileResult | null {
+  const [data, setData] = useState<Hyperfile.HyperfileResult | null>(null)
 
   useEffect(() => {
     data && setData(null)

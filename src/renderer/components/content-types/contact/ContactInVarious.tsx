@@ -3,6 +3,7 @@ import Debug from 'debug'
 
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
+import { ImageDoc } from '../ImageContent'
 
 import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
@@ -10,13 +11,19 @@ import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument, useMessaging, useTimeoutWhen } from '../../../Hooks'
+import { useDocument, useHyperfile, useMessaging, useTimeoutWhen } from '../../../Hooks'
 
 const log = Debug('pushpin:settings')
 
 export default function ContactInVarious(props: ContentProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
   const isPresent = usePresence(props.hypermergeUrl)
+
+  const avatarDocId = contact ? contact.avatarDocId : null
+  const name = contact ? contact.name : null
+
+  const [avatarImageDoc] = useDocument<ImageDoc>(avatarDocId)
+  const avatarImageData = useHyperfile(avatarImageDoc && avatarImageDoc.hyperfileUrl)
   const isOnline = isPresent || props.selfId === props.hypermergeUrl
 
   function onDragStart(e: React.DragEvent) {
@@ -24,15 +31,21 @@ export default function ContactInVarious(props: ContentProps) {
       'application/pushpin-url',
       createDocumentLink('contact', props.hypermergeUrl)
     )
+    if (!avatarImageData) {
+      return
+    }
+    const { data, mimeType } = avatarImageData
+    const blob = new Blob([data.buffer], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    e.dataTransfer.setData('DownloadURL', `text:${name}:${url}`)
   }
-
-  const { context } = props
 
   if (!contact) {
     return null
   }
 
-  const { avatarDocId, name, color } = contact
+  const { context } = props
+  const { color } = contact
 
   const avatarImage = avatarDocId ? (
     <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
