@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Debug from 'debug'
+import mime from 'mime-types'
 
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
@@ -37,7 +38,9 @@ export default function ContactInVarious(props: ContentProps) {
     const { data, mimeType } = avatarImageData
     const blob = new Blob([data.buffer], { type: mimeType })
     const url = URL.createObjectURL(blob)
-    e.dataTransfer.setData('DownloadURL', `text:${name}:${url}`)
+    const extension = mime.extension(mimeType) || ''
+
+    e.dataTransfer.setData('DownloadURL', `text:${name}.${extension}:${url}`)
   }
 
   if (!contact) {
