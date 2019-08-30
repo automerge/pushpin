@@ -229,6 +229,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         ContentTypes.createFromFile('pdf', entry, (url) => callback(url, i))
       } else if (entry.type.match('text/')) {
         ContentTypes.createFromFile('text', entry, (url) => callback(url, i))
+      } else {
+        ContentTypes.createFromFile('file', entry, (url) => callback(url, i))
       }
     }
     if (length > 0) {

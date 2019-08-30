@@ -21,6 +21,7 @@ import './content-types/ImageContent'
 import './content-types/ThreadContent'
 import './content-types/UrlContent'
 import './content-types/PdfContent'
+import './content-types/FileContent'
 
 interface Props {
   url: PushpinUrl

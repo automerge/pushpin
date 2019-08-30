@@ -4,6 +4,10 @@ import DEFAULT_AVATAR_PATH from './images/default-avatar.png'
 
 export { DEFAULT_AVATAR_PATH }
 
+export const FILE_DIALOG_OPTIONS: OpenDialogOptions = {
+  properties: ['openFile'],
+}
+
 export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],

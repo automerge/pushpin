@@ -1,0 +1,51 @@
+.FileContent {
+  background-color: white;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: calc(var(--cellSize) * 2 + 1px);
+  outline: 0;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: solid 1px var(--colorPaleGrey);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.Icon {
+  display: flex;
+  width: 60px;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  border-radius: 15%;
+  flex: none;
+  background-color: orangered;
+}
+
+.Icon i {
+  padding-left: 4px; /* XXX fixme */
+}
+
+.Caption {
+  color: var(--colorSecondaryGrey);
+  margin-top: 2px;
+  width: 100%;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.Title {
+  color: var(--colorBlueBlack);
+  font-weight: 600;
+}
