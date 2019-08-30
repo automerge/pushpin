@@ -144,7 +144,7 @@ interface Attrs {
   text?: string
 }
 
-function createFromFile(entry, handle: Handle<TextDoc>, callback) {
+function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
@@ -165,12 +165,7 @@ function createFromFile(entry, handle: Handle<TextDoc>, callback) {
   reader.readAsText(entry)
 }
 
-function create({ text, file }, handle, callback) {
-  if (file) {
-    createFromFile(file, handle, callback)
-    return
-  }
-
+function create({ text }, handle, callback) {
   handle.change((doc) => {
     doc.text = new Automerge.Text()
     if (text) {
@@ -193,4 +188,5 @@ ContentTypes.register({
     workspace: TextContent,
   },
   create,
+  createFromFile,
 })

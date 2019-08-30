@@ -38,7 +38,27 @@ interface Attrs {
   hyperfileUrl: string
 }
 
-const createNoAttrs = (handle, callback) => {
+function createFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
+  const reader = new FileReader()
+
+  reader.onload = () => {
+    const buffer = Buffer.from(reader.result as ArrayBuffer)
+    Hyperfile.writeBuffer(buffer)
+      .then((hyperfileUrl) => {
+        handle.change((doc) => {
+          doc.hyperfileUrl = hyperfileUrl
+        })
+        callback()
+      })
+      .catch((err) => {
+        log(err)
+      })
+  }
+
+  reader.readAsArrayBuffer(entry)
+}
+
+function create(attrs, handle: Handle<ImageDoc>, callback) {
   dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
     // User aborted.
     if (!paths) {
@@ -62,34 +82,6 @@ const createNoAttrs = (handle, callback) => {
   })
 }
 
-function createFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
-  const reader = new FileReader()
-
-  reader.onload = () => {
-    const buffer = Buffer.from(reader.result as ArrayBuffer)
-    Hyperfile.writeBuffer(buffer)
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-        })
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  reader.readAsArrayBuffer(entry)
-}
-
-function create({ file }, handle: Handle<ImageDoc>, callback) {
-  if (file) {
-    createFromFile(file, handle, callback)
-  } else {
-    createNoAttrs(handle, callback)
-  }
-}
-
 ContentTypes.register({
   type: 'image',
   name: 'Image',
@@ -99,4 +91,5 @@ ContentTypes.register({
     board: ImageContent,
   },
   create,
+  createFromFile,
 })

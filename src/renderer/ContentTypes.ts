@@ -27,6 +27,7 @@ interface ContentType {
   resizable?: boolean
   contexts: Contexts
   create: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
+  createFromFile?: (file: File, handle: Handle<any>, callback: () => void) => void
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -87,9 +88,13 @@ function createFromFile(type, file, callback): void {
     return
   }
 
+  if (!entry.createFromFile) {
+    return
+  }
+
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.create({ file }, handle, () => {
+  entry.createFromFile(file, handle, () => {
     callback(createDocumentLink(type, url))
   })
 }

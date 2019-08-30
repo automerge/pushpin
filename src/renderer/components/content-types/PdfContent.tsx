@@ -181,9 +181,6 @@ function createFromFile(entry: File, handle: Handle<PdfDoc>, callback) {
 }
 
 function create(attributes, handle, callback) {
-  if (attributes.file) {
-    return createFromFile(attributes.file, handle, callback)
-  }
   return createNoAttrs(handle, callback)
 }
 
@@ -196,4 +193,5 @@ ContentTypes.register({
     board: PdfContent,
   },
   create,
+  createFromFile,
 })
