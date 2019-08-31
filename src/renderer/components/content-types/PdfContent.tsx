@@ -184,6 +184,8 @@ function create(attributes, handle, callback) {
   return createNoAttrs(handle, callback)
 }
 
+const supportsMimeType = (mimeType) => !!mimeType.match('application/pdf')
+
 ContentTypes.register({
   type: 'pdf',
   name: 'PDF',
@@ -194,4 +196,5 @@ ContentTypes.register({
   },
   create,
   createFromFile,
+  supportsMimeType,
 })

@@ -26,6 +26,7 @@ interface ContentType {
   resizable?: boolean
   contexts: Contexts
   create: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
+  supportsMimeType?: (type: string) => boolean
   createFromFile?: (file: File, handle: Handle<any>, callback: () => void) => void
 }
 
@@ -145,20 +146,18 @@ function mimeTypeToContentType(mimeType: string | null): string {
     return 'file'
   } // don't guess.
 
-  if (mimeType.match('image/')) {
-    return 'image'
+  const types = Object.values(registry)
+  const supportingType = types.find(
+    (type) => type.supportsMimeType && type.supportsMimeType(mimeType)
+  )
+  if (!supportingType) {
+    return 'file'
   }
-  if (mimeType.match('application/pdf')) {
-    return 'pdf'
-  }
-  if (mimeType.match('text/')) {
-    return 'text'
-  }
-  return 'file'
+
+  return supportingType.type
 }
 
 function createFromFile(file, callback): void {
-  // XXX -> let content types register with mime types
   const type = mimeTypeToContentType(file.type)
 
   const entry = registry[type]

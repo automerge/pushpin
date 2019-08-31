@@ -82,6 +82,8 @@ function create(attrs, handle: Handle<ImageDoc>, callback) {
   })
 }
 
+const supportsMimeType = (mimeType) => !!mimeType.match('image/')
+
 ContentTypes.register({
   type: 'image',
   name: 'Image',
@@ -92,4 +94,5 @@ ContentTypes.register({
   },
   create,
   createFromFile,
+  supportsMimeType,
 })

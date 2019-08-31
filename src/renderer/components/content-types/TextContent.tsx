@@ -179,6 +179,8 @@ function create({ text }, handle, callback) {
   callback()
 }
 
+const supportsMimeType = (mimeType) => !!mimeType.match('text/')
+
 ContentTypes.register({
   type: 'text',
   name: 'Text',
@@ -189,4 +191,5 @@ ContentTypes.register({
   },
   create,
   createFromFile,
+  supportsMimeType,
 })
