@@ -55,8 +55,8 @@ export default function FileContent({ hypermergeUrl }: ContentProps) {
     e.dataTransfer.setData('DownloadURL', `text:${name}.${extension}:${url}`)
   }
   return (
-    <div className="FileContent" draggable onDragStart={onDragStart}>
-      <div className="Icon">
+    <div className="FileContent">
+      <div className="Icon" draggable onDragStart={onDragStart}>
         <i className="fa fa-file " />
       </div>
       <div className="Caption">

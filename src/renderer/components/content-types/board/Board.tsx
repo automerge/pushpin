@@ -207,6 +207,50 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.stopPropagation()
   }
 
+  justMakeAUrlCard = (url, callback) => {
+    ContentTypes.create('url', { url: url.toString() }, (url) => callback(url, 0))
+  }
+
+  mimeTypeToContentType = (mimeType: string | null): string => {
+    if (!mimeType) {
+      return 'file'
+    } // don't guess.
+
+    if (mimeType.match('image/')) {
+      return 'image'
+    }
+    if (mimeType.match('application/pdf')) {
+      return 'pdf'
+    }
+    if (mimeType.match('text/')) {
+      return 'text'
+    }
+    return 'file'
+  }
+
+  determineUrlContents = (url, callback) => {
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) throw Error('Fetch failed, just keep the text.')
+        return response.blob()
+      })
+      .then((blob) => {
+        if (!blob) {
+          return
+        }
+        const file = new File([blob], 'file_name', { lastModified: Date.now() })
+        const contentTypeName = this.mimeTypeToContentType(blob.type)
+        ContentTypes.createFromFile(contentTypeName, file, (contentUrl) => callback(contentUrl, 0))
+      })
+      .catch((error) => {
+        // this is fine, really -- the URL upgrade to content is optional.
+        // it'd be nice to do something more sophisticated, perhaps
+        ContentTypes.create('text', { text: url.toString() }, (contentUrl) =>
+          callback(contentUrl, 0)
+        )
+      })
+  }
+
   // this could move out of board soon to somewhere other components could use it
   importDataTransfer = (dataTransfer, callback) => {
     const url = dataTransfer.getData('application/pushpin-url')
@@ -223,15 +267,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     for (let i = 0; i < length; i += 1) {
       const entry = dataTransfer.files[i]
 
-      if (entry.type.match('image/')) {
-        ContentTypes.createFromFile('image', entry, (url) => callback(url, i))
-      } else if (entry.type.match('application/pdf')) {
-        ContentTypes.createFromFile('pdf', entry, (url) => callback(url, i))
-      } else if (entry.type.match('text/')) {
-        ContentTypes.createFromFile('text', entry, (url) => callback(url, i))
-      } else {
-        ContentTypes.createFromFile('file', entry, (url) => callback(url, i))
-      }
+      const contentTypeName = this.mimeTypeToContentType(entry.type)
+      ContentTypes.createFromFile(contentTypeName, entry, (url) => callback(url, i))
     }
     if (length > 0) {
       return
@@ -247,7 +284,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         if (isPushpinUrl(plainText)) {
           callback(plainText, 0)
         } else {
-          ContentTypes.create('url', { url: url.toString() }, (url) => callback(url, 0))
+          this.determineUrlContents(url, callback)
         }
       } catch (e) {
         // i guess it's not a URL after all, we'lll just make a text card
