@@ -207,10 +207,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     e.stopPropagation()
   }
 
-  justMakeAUrlCard = (url, callback) => {
-    ContentTypes.create('url', { url: url.toString() }, (url) => callback(url, 0))
-  }
-
   determineUrlContents = (url, callback) => {
     fetch(url)
       .then((response) => {
