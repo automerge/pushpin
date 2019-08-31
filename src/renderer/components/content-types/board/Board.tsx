@@ -211,23 +211,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     ContentTypes.create('url', { url: url.toString() }, (url) => callback(url, 0))
   }
 
-  mimeTypeToContentType = (mimeType: string | null): string => {
-    if (!mimeType) {
-      return 'file'
-    } // don't guess.
-
-    if (mimeType.match('image/')) {
-      return 'image'
-    }
-    if (mimeType.match('application/pdf')) {
-      return 'pdf'
-    }
-    if (mimeType.match('text/')) {
-      return 'text'
-    }
-    return 'file'
-  }
-
   determineUrlContents = (url, callback) => {
     fetch(url)
       .then((response) => {
@@ -238,9 +221,9 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         if (!blob) {
           return
         }
-        const file = new File([blob], 'file_name', { lastModified: Date.now() })
-        const contentTypeName = this.mimeTypeToContentType(blob.type)
-        ContentTypes.createFromFile(contentTypeName, file, (contentUrl) => callback(contentUrl, 0))
+        // xxx guess at file_name
+        const file = new File([blob], 'file_name', { lastModified: Date.now() }) // check date.now()
+        ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
       })
       .catch((error) => {
         // this is fine, really -- the URL upgrade to content is optional.
@@ -266,9 +249,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     // hence the oldschool iteration code
     for (let i = 0; i < length; i += 1) {
       const entry = dataTransfer.files[i]
-
-      const contentTypeName = this.mimeTypeToContentType(entry.type)
-      ContentTypes.createFromFile(contentTypeName, entry, (url) => callback(url, i))
+      ContentTypes.createFromFile(entry, (url) => callback(url, i))
     }
     if (length > 0) {
       return

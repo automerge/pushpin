@@ -81,8 +81,27 @@ function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
-function createFromFile(type, file, callback): void {
-  // XXX -> use mimetypes here
+function mimeTypeToContentType(mimeType: string | null): string {
+  if (!mimeType) {
+    return 'file'
+  } // don't guess.
+
+  if (mimeType.match('image/')) {
+    return 'image'
+  }
+  if (mimeType.match('application/pdf')) {
+    return 'pdf'
+  }
+  if (mimeType.match('text/')) {
+    return 'text'
+  }
+  return 'file'
+}
+
+function createFromFile(file, callback): void {
+  // XXX -> let content types register with mime types
+  const type = mimeTypeToContentType(file.type)
+
   const entry = registry[type]
   if (!entry) {
     return
