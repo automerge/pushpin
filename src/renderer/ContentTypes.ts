@@ -1,4 +1,5 @@
 import Debug from 'debug'
+import path from 'path'
 import { ComponentType } from 'react'
 import { Handle } from 'hypermerge'
 import { HypermergeUrl, createDocumentLink, isPushpinUrl } from './ShareLink'
@@ -91,8 +92,9 @@ function determineUrlContents(url, callback) {
       if (!blob) {
         return
       }
-      // xxx guess at file_name
-      const file = new File([blob], 'file_name', { lastModified: Date.now() }) // check date.now()
+      const { pathname } = url
+      const filename = path.basename(pathname)
+      const file = new File([blob], filename, { lastModified: Date.now() }) // check date.now()
       createFromFile(file, (contentUrl) => callback(contentUrl, 0))
     })
     .catch((error) => {
