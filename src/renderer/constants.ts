@@ -8,6 +8,11 @@ export const FILE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
 }
 
+export const AUDIO_DIALOG_OPTIONS: OpenDialogOptions = {
+  properties: ['openFile'],
+  filters: [{ name: 'Audio', extensions: ['mp3', 'ogg', 'wav'] }],
+}
+
 export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
