@@ -13,6 +13,11 @@ export const AUDIO_DIALOG_OPTIONS: OpenDialogOptions = {
   filters: [{ name: 'Audio', extensions: ['mp3', 'ogg', 'wav'] }],
 }
 
+export const VIDEO_DIALOG_OPTIONS: OpenDialogOptions = {
+  properties: ['openFile'],
+  filters: [{ name: 'Video', extensions: ['mpeg', 'mp4', 'm4a', 'avi'] }],
+}
+
 export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
   properties: ['openFile'],
   filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
