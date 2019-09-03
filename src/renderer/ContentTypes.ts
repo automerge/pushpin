@@ -160,7 +160,15 @@ function mimeTypeToContentType(mimeType: string | null): string {
 }
 
 function createFromFile(file, callback): void {
-  const type = mimeTypeToContentType(file.type)
+  // const type = mimeTypeToContentType(file.type)
+
+  // xxx: todo
+  const type = ((mimeType) => {
+    if (mimeType && mimeType.match('text/')) {
+      return 'text'
+    }
+    return 'file'
+  })(file.type)
 
   const entry = registry[type]
   if (!entry) {
@@ -216,6 +224,7 @@ export default {
   createFromFile,
   create,
   importDataTransfer,
+  mimeTypeToContentType, // move this too?
 }
 
 // Not yet included in / drive from the generic ContentTypes registry:

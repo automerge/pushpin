@@ -17,13 +17,13 @@ import './content-types/contact'
 
 // other single-context components
 import './content-types/TextContent'
+import './content-types/ThreadContent'
+import './content-types/UrlContent'
+import './content-types/FileContent'
 import './content-types/ImageContent'
 import './content-types/AudioContent'
 import './content-types/VideoContent'
-import './content-types/ThreadContent'
-import './content-types/UrlContent'
 import './content-types/PdfContent'
-import './content-types/FileContent'
 
 interface Props {
   url: PushpinUrl

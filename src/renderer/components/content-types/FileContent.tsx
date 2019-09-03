@@ -6,7 +6,7 @@ import { Handle } from 'hypermerge'
 import mime from 'mime-types'
 import path from 'path'
 import * as Hyperfile from '../../hyperfile'
-import { ContentProps } from '../Content'
+import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument, useHyperfile } from '../../Hooks'
 import { FILE_DIALOG_OPTIONS } from '../../constants'
@@ -21,6 +21,7 @@ const log = Debug('pushpin:filecontent')
 export interface FileDoc {
   name: string // names are editable and not an intrinsic part of the file
   hyperfileUrl: Hyperfile.HyperfileUrl
+  mimeType: string
 }
 
 function humanFileSize(size: number) {
@@ -28,7 +29,7 @@ function humanFileSize(size: number) {
   return `${(size / 1024 ** i).toFixed(1)} ${['B', 'kB', 'MB', 'GB', 'TB'][i]}`
 }
 
-export default function FileContent({ hypermergeUrl }: ContentProps) {
+export default function FileContent({ hypermergeUrl, context }: ContentProps) {
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
   const { name = '', hyperfileUrl = null } = doc || {}
@@ -54,18 +55,29 @@ export default function FileContent({ hypermergeUrl }: ContentProps) {
 
     e.dataTransfer.setData('DownloadURL', `text:${name}.${extension}:${url}`)
   }
-  return (
-    <div className="FileContent">
-      <div className="Icon" draggable onDragStart={onDragStart}>
-        <i className="fa fa-file " />
+
+  function renderUnidentifiedFile() {
+    return (
+      <div className="FileContent">
+        <div className="Icon" draggable onDragStart={onDragStart}>
+          <i className="fa fa-file " />
+        </div>
+        <div className="Caption">
+          <span className="Title">{name}</span>
+          <br />
+          {`${size !== null ? humanFileSize(size) : 'unknown size'}`}
+        </div>
       </div>
-      <div className="Caption">
-        <span className="Title">{name}</span>
-        <br />
-        {`${size !== null ? humanFileSize(size) : 'unknown size'}`}
-      </div>
-    </div>
-  )
+    )
+  }
+
+  const { mimeType = null } = doc || {}
+
+  const contentType = ContentTypes.mimeTypeToContentType(mimeType)
+  if (contentType !== 'file') {
+    return <Content context={context} url={createDocumentLink(contentType, hypermergeUrl)} />
+  }
+  return renderUnidentifiedFile()
 }
 
 FileContent.minWidth = 4
@@ -89,6 +101,7 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
+          doc.mimeType = entry.type // this... shouldn't need to happen here
           doc.name = name
         })
         callback()
@@ -118,6 +131,7 @@ function create(attrs, handle: Handle<FileDoc>, callback) {
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
+          // where do i get a real mimetype here?
           doc.name = name
         })
 

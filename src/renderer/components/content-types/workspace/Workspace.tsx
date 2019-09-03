@@ -3,13 +3,7 @@ import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
 
-import {
-  createDocumentLink,
-  parseDocumentLink,
-  PushpinUrl,
-  HypermergeUrl,
-  isPushpinUrl,
-} from '../../../ShareLink'
+import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
@@ -79,7 +73,7 @@ export default function Workspace(props: ContentProps) {
 
     function onNew() {
       ContentTypes.create('board', { selfId }, (boardUrl) => {
-        openDoc(createDocumentLink('board', boardUrl))
+        openDoc(boardUrl)
       })
     }
 
