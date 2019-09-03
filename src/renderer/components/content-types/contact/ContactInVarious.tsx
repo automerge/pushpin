@@ -4,7 +4,7 @@ import mime from 'mime-types'
 
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
-import { ImageDoc } from '../ImageContent'
+import { FileDoc } from '../files/FileContent'
 
 import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
@@ -23,7 +23,7 @@ export default function ContactInVarious(props: ContentProps) {
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
 
-  const [avatarImageDoc] = useDocument<ImageDoc>(avatarDocId)
+  const [avatarImageDoc] = useDocument<FileDoc>(avatarDocId)
   const avatarImageData = useHyperfile(avatarImageDoc && avatarImageDoc.hyperfileUrl)
   const isOnline = isPresent || props.selfId === props.hypermergeUrl
 
