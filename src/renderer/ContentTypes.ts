@@ -160,9 +160,7 @@ function mimeTypeToContentType(mimeType: string | null): string {
 }
 
 function createFromFile(file, callback): void {
-  // const type = mimeTypeToContentType(file.type)
-
-  // xxx: todo
+  // normally we just create a file -- but we treat plain-text specially
   const type = ((mimeType) => {
     if (mimeType && mimeType.match('text/')) {
       return 'text'
