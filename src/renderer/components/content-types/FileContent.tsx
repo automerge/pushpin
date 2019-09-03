@@ -80,12 +80,11 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
   return renderUnidentifiedFile()
 }
 
-FileContent.minWidth = 4
+FileContent.minWidth = 6
 FileContent.minHeight = 6
-FileContent.defaultWidth = 6
-FileContent.defaultHeight = 6
-FileContent.maxWidth = 9
-FileContent.maxHeight = 9
+FileContent.defaultWidth = 18
+FileContent.maxWidth = 72
+FileContent.maxHeight = 72
 
 interface Attrs {
   hyperfileUrl: string
@@ -97,7 +96,7 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
 
   reader.onload = () => {
     const buffer = Buffer.from(reader.result as ArrayBuffer)
-    Hyperfile.writeBuffer(buffer)
+    Hyperfile.writeBuffer(buffer, entry.type)
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl

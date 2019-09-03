@@ -26,9 +26,9 @@ interface ContentType {
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
-  create: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
-  supportsMimeType?: (type: string) => boolean
+  create?: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
   createFromFile?: (file: File, handle: Handle<any>, callback: () => void) => void
+  supportsMimeType?: (type: string) => boolean
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -176,7 +176,7 @@ function createFromFile(file, callback): void {
   }
 
   if (!entry.createFromFile) {
-    return
+    throw Error(`The ${type} content type cannot be created from a file directly.`)
   }
 
   const url = window.repo.create() as HypermergeUrl
@@ -194,6 +194,10 @@ function create(type, attrs = {}, callback): void {
 
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
+
+  if (!entry.create) {
+    throw Error(`The ${type} content type cannot be created directly.`)
+  }
   entry.create(attrs, handle, () => {
     callback(createDocumentLink(type, url))
   })

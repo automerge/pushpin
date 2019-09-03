@@ -10,7 +10,6 @@ import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../../Hooks'
 import './PdfContent.css'
-import { PDF_DIALOG_OPTIONS } from '../../constants'
 
 const { dialog } = remote
 
@@ -137,53 +136,6 @@ interface Attrs {
   hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
-const createNoAttrs = (handle, callback) => {
-  dialog.showOpenDialog(PDF_DIALOG_OPTIONS, (paths) => {
-    // User aborted.
-    if (!paths) {
-      return
-    }
-    if (paths.length !== 1) {
-      throw new Error('Expected exactly one path?')
-    }
-
-    Hyperfile.write(paths[0])
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-        })
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  })
-}
-
-function createFromFile(entry: File, handle: Handle<PdfDoc>, callback) {
-  const reader = new FileReader()
-
-  reader.onload = () => {
-    const buffer = Buffer.from(reader.result as ArrayBuffer)
-    Hyperfile.writeBuffer(buffer)
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-        })
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  reader.readAsArrayBuffer(entry)
-}
-
-function create(attributes, handle, callback) {
-  return createNoAttrs(handle, callback)
-}
-
 const supportsMimeType = (mimeType) => !!mimeType.match('application/pdf')
 
 ContentTypes.register({
@@ -194,7 +146,5 @@ ContentTypes.register({
     workspace: PdfContent,
     board: PdfContent,
   },
-  create,
-  createFromFile,
   supportsMimeType,
 })

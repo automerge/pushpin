@@ -43,50 +43,6 @@ interface Attrs {
   hyperfileUrl: string
 }
 
-function createFromFile(entry: File, handle: Handle<VideoDoc>, callback) {
-  const reader = new FileReader()
-
-  reader.onload = () => {
-    const buffer = Buffer.from(reader.result as ArrayBuffer)
-    Hyperfile.writeBuffer(buffer)
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-        })
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  reader.readAsArrayBuffer(entry)
-}
-
-function create(attrs, handle: Handle<VideoDoc>, callback) {
-  dialog.showOpenDialog(VIDEO_DIALOG_OPTIONS, (paths) => {
-    // User aborted.
-    if (!paths) {
-      return
-    }
-    if (paths.length !== 1) {
-      throw new Error('Expected exactly one path?')
-    }
-
-    Hyperfile.write(paths[0])
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-        })
-
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  })
-}
-
 const supportsMimeType = (mimeType) => !!mimeType.match('video/')
 
 ContentTypes.register({
@@ -97,7 +53,5 @@ ContentTypes.register({
     workspace: VideoContent,
     board: VideoContent,
   },
-  create,
-  createFromFile,
   supportsMimeType,
 })

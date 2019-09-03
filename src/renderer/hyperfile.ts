@@ -44,9 +44,12 @@ export function write(filePath: string): Promise<HyperfileUrl> {
   })
 }
 
-export function writeBuffer(buffer: Uint8Array): Promise<HyperfileUrl> {
+export function writeBuffer(
+  buffer: Uint8Array,
+  mimeType: string = 'application/octet-stream'
+): Promise<HyperfileUrl> {
   return new Promise((res) => {
-    const hyperfileUrl = repo.writeFile(buffer, 'application/octet-stream') as HyperfileUrl // TODO: mime type
+    const hyperfileUrl = repo.writeFile(buffer, mimeType) as HyperfileUrl
     res(hyperfileUrl)
   })
 }

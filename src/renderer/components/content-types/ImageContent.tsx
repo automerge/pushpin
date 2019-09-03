@@ -7,7 +7,6 @@ import * as Hyperfile from '../../hyperfile'
 import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument } from '../../Hooks'
-import { IMAGE_DIALOG_OPTIONS } from '../../constants'
 
 const { dialog } = remote
 
@@ -38,50 +37,6 @@ interface Attrs {
   hyperfileUrl: string
 }
 
-function createFromFile(entry: File, handle: Handle<ImageDoc>, callback) {
-  const reader = new FileReader()
-
-  reader.onload = () => {
-    const buffer = Buffer.from(reader.result as ArrayBuffer)
-    Hyperfile.writeBuffer(buffer)
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-        })
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  reader.readAsArrayBuffer(entry)
-}
-
-function create(attrs, handle: Handle<ImageDoc>, callback) {
-  dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
-    // User aborted.
-    if (!paths) {
-      return
-    }
-    if (paths.length !== 1) {
-      throw new Error('Expected exactly one path?')
-    }
-
-    Hyperfile.write(paths[0])
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-        })
-
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  })
-}
-
 const supportsMimeType = (mimeType) => !!mimeType.match('image/')
 
 ContentTypes.register({
@@ -92,7 +47,5 @@ ContentTypes.register({
     workspace: ImageContent,
     board: ImageContent,
   },
-  create,
-  createFromFile,
   supportsMimeType,
 })
