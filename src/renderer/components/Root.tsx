@@ -19,11 +19,11 @@ import './content-types/contact'
 import './content-types/TextContent'
 import './content-types/ThreadContent'
 import './content-types/UrlContent'
-import './content-types/FileContent'
-import './content-types/ImageContent'
-import './content-types/AudioContent'
-import './content-types/VideoContent'
-import './content-types/PdfContent'
+import './content-types/files/FileContent'
+import './content-types/files/ImageContent'
+import './content-types/files/AudioContent'
+import './content-types/files/VideoContent'
+import './content-types/files/PdfContent'
 
 interface Props {
   url: PushpinUrl

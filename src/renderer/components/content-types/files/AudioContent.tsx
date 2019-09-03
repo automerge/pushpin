@@ -1,9 +1,9 @@
 import React from 'react'
 import { FileDoc } from './FileContent'
 
-import { ContentProps } from '../Content'
-import ContentTypes from '../../ContentTypes'
-import { useDocument } from '../../Hooks'
+import { ContentProps } from '../../Content'
+import ContentTypes from '../../../ContentTypes'
+import { useDocument } from '../../../Hooks'
 import './AudioContent.css'
 
 export default function AudioContent({ hypermergeUrl }: ContentProps) {
