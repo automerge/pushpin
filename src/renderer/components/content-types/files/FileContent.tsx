@@ -84,10 +84,6 @@ FileContent.defaultWidth = 18
 FileContent.maxWidth = 72
 FileContent.maxHeight = 72
 
-interface Attrs {
-  hyperfileUrl: string
-}
-
 function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
   const reader = new FileReader()
   const { name = 'Unnamed File' } = entry
@@ -141,7 +137,7 @@ function create(attrs, handle: Handle<FileDoc>, callback) {
 ContentTypes.register({
   type: 'file',
   name: 'File',
-  icon: 'file',
+  icon: 'file-o',
   contexts: {
     workspace: FileContent,
     board: FileContent,

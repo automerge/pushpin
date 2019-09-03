@@ -9,13 +9,9 @@ import './AudioContent.css'
 export default function AudioContent({ hypermergeUrl }: ContentProps) {
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
-  if (!doc) {
+  if (!(doc && doc.hyperfileUrl)) {
     return null
   }
-  if (!doc.hyperfileUrl) {
-    return null
-  }
-
   return (
     <div className="AudioContent">
       <audio controls src={doc.hyperfileUrl} />
@@ -23,22 +19,12 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
   )
 }
 
-AudioContent.minWidth = 15
-AudioContent.minHeight = 4
-AudioContent.maxHeight = 6
-AudioContent.defaultWidth = 18
-AudioContent.defaultHeight = 4
-
-interface Attrs {
-  hyperfileUrl: string
-}
-
 const supportsMimeType = (mimeType) => !!mimeType.match('audio/')
 
 ContentTypes.register({
   type: 'audio',
   name: 'Audio',
-  icon: 'audio',
+  icon: 'file-audio-o',
   unlisted: true,
   contexts: {
     workspace: AudioContent,

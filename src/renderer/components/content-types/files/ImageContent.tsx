@@ -18,20 +18,12 @@ export default function ImageContent({ hypermergeUrl }: ContentProps) {
   return <img className="Image" alt="" src={doc.hyperfileUrl} />
 }
 
-ImageContent.minWidth = 3
-ImageContent.minHeight = 3
-ImageContent.defaultWidth = 18
-
-interface Attrs {
-  hyperfileUrl: string
-}
-
 const supportsMimeType = (mimeType) => !!mimeType.match('image/')
 
 ContentTypes.register({
   type: 'image',
   name: 'Image',
-  icon: 'image',
+  icon: 'file-image-o',
   unlisted: true,
   contexts: {
     workspace: ImageContent,

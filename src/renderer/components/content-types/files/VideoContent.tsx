@@ -9,10 +9,7 @@ import './VideoContent.css'
 export default function VideoContent({ hypermergeUrl }: ContentProps) {
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
-  if (!doc) {
-    return null
-  }
-  if (!doc.hyperfileUrl) {
+  if (!(doc && doc.hyperfileUrl)) {
     return null
   }
 
@@ -23,20 +20,12 @@ export default function VideoContent({ hypermergeUrl }: ContentProps) {
   )
 }
 
-VideoContent.minWidth = 15
-VideoContent.minHeight = 12
-VideoContent.defaultWidth = 18
-
-interface Attrs {
-  hyperfileUrl: string
-}
-
 const supportsMimeType = (mimeType) => !!mimeType.match('video/')
 
 ContentTypes.register({
   type: 'video',
   name: 'Video',
-  icon: 'video',
+  icon: 'file-video-o',
   unlisted: true,
   contexts: {
     workspace: VideoContent,

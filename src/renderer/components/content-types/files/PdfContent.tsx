@@ -3,7 +3,6 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 import { FileDoc } from './FileContent'
 
-import * as Hyperfile from '../../../hyperfile'
 import ContentTypes from '../../../ContentTypes'
 import { ContentProps } from '../../Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../../../Hooks'
@@ -12,14 +11,6 @@ import './PdfContent.css'
 interface PdfDoc extends FileDoc {
   title?: string
 }
-
-PdfContent.minWidth = 3
-PdfContent.minHeight = 3
-PdfContent.defaultWidth = 18
-// no default height to allow it to grow
-// suggestion: no max/min width on images, we dont
-// know what aspect ratios people will be using day to day
-PdfContent.maxWidth = 72
 
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.hypermergeUrl)
@@ -125,16 +116,12 @@ export default function PdfContent(props: ContentProps) {
   )
 }
 
-interface Attrs {
-  hyperfileUrl: Hyperfile.HyperfileUrl
-}
-
 const supportsMimeType = (mimeType) => !!mimeType.match('application/pdf')
 
 ContentTypes.register({
   type: 'pdf',
   name: 'PDF',
-  icon: 'book',
+  icon: 'file-pdf-o',
   unlisted: true,
   contexts: {
     workspace: PdfContent,
