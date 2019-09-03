@@ -41,6 +41,7 @@ ContentTypes.register({
   type: 'video',
   name: 'Video',
   icon: 'video',
+  unlisted: true,
   contexts: {
     workspace: VideoContent,
     board: VideoContent,

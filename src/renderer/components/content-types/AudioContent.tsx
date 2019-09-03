@@ -43,6 +43,7 @@ ContentTypes.register({
   type: 'audio',
   name: 'Audio',
   icon: 'audio',
+  unlisted: true,
   contexts: {
     workspace: AudioContent,
     board: AudioContent,

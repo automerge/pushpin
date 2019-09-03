@@ -36,6 +36,7 @@ ContentTypes.register({
   type: 'image',
   name: 'Image',
   icon: 'image',
+  unlisted: true,
   contexts: {
     workspace: ImageContent,
     board: ImageContent,

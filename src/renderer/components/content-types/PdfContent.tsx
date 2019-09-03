@@ -135,6 +135,7 @@ ContentTypes.register({
   type: 'pdf',
   name: 'PDF',
   icon: 'book',
+  unlisted: true,
   contexts: {
     workspace: PdfContent,
     board: PdfContent,
