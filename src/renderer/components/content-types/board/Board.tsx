@@ -7,6 +7,7 @@ import { Handle } from 'hypermerge'
 import { ContextMenuTrigger } from 'react-contextmenu'
 import { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
+import * as ImportData from '../../../ImportData'
 import { parseDocumentLink, PushpinUrl } from '../../../ShareLink'
 import { BoardDoc } from '.'
 import BoardCard from './BoardCard'
@@ -220,7 +221,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: pageY - this.boardRef.current.offsetTop,
     }
 
-    ContentTypes.importDataTransfer(e.dataTransfer, (url, i) => {
+    ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
       const offsetPosition = gridOffset(position, i)
       this.addCardForContent({ position: offsetPosition, url })
     })
@@ -243,7 +244,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       y: window.pageYOffset + 100,
     }
 
-    ContentTypes.importDataTransfer(e.clipboardData, (url, i) => {
+    ImportData.importDataTransfer(e.clipboardData, (url, i) => {
       const offsetPosition = gridOffset(position, i)
       this.addCardForContent({ position: offsetPosition, url })
     })
