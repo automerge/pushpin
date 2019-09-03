@@ -1,16 +1,9 @@
 import React from 'react'
-import Debug from 'debug'
 
-import { remote } from 'electron'
-import { Handle } from 'hypermerge'
 import * as Hyperfile from '../../hyperfile'
 import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument } from '../../Hooks'
-
-const { dialog } = remote
-
-const log = Debug('pushpin:imagecontent')
 
 export interface ImageDoc {
   hyperfileUrl: Hyperfile.HyperfileUrl

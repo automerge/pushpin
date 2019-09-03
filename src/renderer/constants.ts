@@ -1,32 +1,8 @@
 import Path from 'path'
-import electron, { OpenDialogOptions } from 'electron'
+import electron from 'electron'
 import DEFAULT_AVATAR_PATH from './images/default-avatar.png'
 
 export { DEFAULT_AVATAR_PATH }
-
-export const FILE_DIALOG_OPTIONS: OpenDialogOptions = {
-  properties: ['openFile'],
-}
-
-export const AUDIO_DIALOG_OPTIONS: OpenDialogOptions = {
-  properties: ['openFile'],
-  filters: [{ name: 'Audio', extensions: ['mp3', 'ogg', 'wav'] }],
-}
-
-export const VIDEO_DIALOG_OPTIONS: OpenDialogOptions = {
-  properties: ['openFile'],
-  filters: [{ name: 'Video', extensions: ['mpeg', 'mp4', 'm4a', 'avi'] }],
-}
-
-export const IMAGE_DIALOG_OPTIONS: OpenDialogOptions = {
-  properties: ['openFile'],
-  filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
-}
-
-export const PDF_DIALOG_OPTIONS: OpenDialogOptions = {
-  properties: ['openFile'],
-  filters: [{ name: 'PDF files', extensions: ['pdf'] }],
-}
 
 // Prefer NAME if explicitly set.
 // Otherwise look for OS-level USER (Mac / Linux) or USERNAME (Windows.)

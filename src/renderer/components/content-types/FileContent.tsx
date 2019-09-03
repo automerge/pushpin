@@ -9,7 +9,6 @@ import * as Hyperfile from '../../hyperfile'
 import Content, { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument, useHyperfile } from '../../Hooks'
-import { FILE_DIALOG_OPTIONS } from '../../constants'
 import { createDocumentLink } from '../../ShareLink'
 
 import './FileContent.css'
@@ -21,7 +20,6 @@ const log = Debug('pushpin:filecontent')
 export interface FileDoc {
   name: string // names are editable and not an intrinsic part of the file
   hyperfileUrl: Hyperfile.HyperfileUrl
-  mimeType: string
 }
 
 function humanFileSize(size: number) {
@@ -71,7 +69,7 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
     )
   }
 
-  const { mimeType = null } = doc || {}
+  const { mimeType = null } = fileData || {}
 
   const contentType = ContentTypes.mimeTypeToContentType(mimeType)
   if (contentType !== 'file') {
@@ -100,7 +98,6 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
-          doc.mimeType = entry.type // this... shouldn't need to happen here
           doc.name = name
         })
         callback()
@@ -114,7 +111,7 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
 }
 
 function create(attrs, handle: Handle<FileDoc>, callback) {
-  dialog.showOpenDialog(FILE_DIALOG_OPTIONS, (paths) => {
+  dialog.showOpenDialog({ properties: ['openFile'] }, (paths) => {
     // User aborted.
     if (!paths) {
       return
@@ -130,7 +127,6 @@ function create(attrs, handle: Handle<FileDoc>, callback) {
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
-          // where do i get a real mimetype here?
           doc.name = name
         })
 

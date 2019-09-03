@@ -1,7 +1,4 @@
 import React, { useState, useCallback, useMemo } from 'react'
-import Debug from 'debug'
-import { remote } from 'electron'
-import { Handle } from 'hypermerge'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
@@ -10,10 +7,6 @@ import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../../Hooks'
 import './PdfContent.css'
-
-const { dialog } = remote
-
-const log = Debug('pushpin:pdfcontent')
 
 interface PdfDoc {
   title?: string

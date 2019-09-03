@@ -1,18 +1,10 @@
 import React from 'react'
-import Debug from 'debug'
 
-import { remote } from 'electron'
-import { Handle } from 'hypermerge'
 import * as Hyperfile from '../../hyperfile'
 import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument } from '../../Hooks'
-import { VIDEO_DIALOG_OPTIONS } from '../../constants'
 import './VideoContent.css'
-
-const { dialog } = remote
-
-const log = Debug('pushpin:videocontent')
 
 export interface VideoDoc {
   hyperfileUrl: Hyperfile.HyperfileUrl
