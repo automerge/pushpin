@@ -1,16 +1,12 @@
 import React from 'react'
+import { FileDoc } from './FileContent'
 
-import * as Hyperfile from '../../hyperfile'
 import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument } from '../../Hooks'
 
-export interface ImageDoc {
-  hyperfileUrl: Hyperfile.HyperfileUrl
-}
-
 export default function ImageContent({ hypermergeUrl }: ContentProps) {
-  const [doc] = useDocument<ImageDoc>(hypermergeUrl)
+  const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
   if (!doc) {
     return null

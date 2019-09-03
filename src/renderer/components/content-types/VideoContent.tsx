@@ -1,17 +1,13 @@
 import React from 'react'
 
-import * as Hyperfile from '../../hyperfile'
+import { FileDoc } from './FileContent'
 import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument } from '../../Hooks'
 import './VideoContent.css'
 
-export interface VideoDoc {
-  hyperfileUrl: Hyperfile.HyperfileUrl
-}
-
 export default function VideoContent({ hypermergeUrl }: ContentProps) {
-  const [doc] = useDocument<VideoDoc>(hypermergeUrl)
+  const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
   if (!doc) {
     return null

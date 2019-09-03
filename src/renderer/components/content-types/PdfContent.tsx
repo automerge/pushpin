@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
+import { FileDoc } from './FileContent'
 
 import * as Hyperfile from '../../hyperfile'
 import ContentTypes from '../../ContentTypes'
@@ -8,9 +9,8 @@ import { ContentProps } from '../Content'
 import { useDocument, useHyperfile, useConfirmableInput } from '../../Hooks'
 import './PdfContent.css'
 
-interface PdfDoc {
+interface PdfDoc extends FileDoc {
   title?: string
-  hyperfileUrl: Hyperfile.HyperfileUrl
 }
 
 PdfContent.minWidth = 3

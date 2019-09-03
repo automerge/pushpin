@@ -1,17 +1,13 @@
 import React from 'react'
+import { FileDoc } from './FileContent'
 
-import * as Hyperfile from '../../hyperfile'
 import { ContentProps } from '../Content'
 import ContentTypes from '../../ContentTypes'
 import { useDocument } from '../../Hooks'
 import './AudioContent.css'
 
-export interface AudioDoc {
-  hyperfileUrl: Hyperfile.HyperfileUrl
-}
-
 export default function AudioContent({ hypermergeUrl }: ContentProps) {
-  const [doc] = useDocument<AudioDoc>(hypermergeUrl)
+  const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
   if (!doc) {
     return null
