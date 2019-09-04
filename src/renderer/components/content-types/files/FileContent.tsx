@@ -41,9 +41,10 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
   }
 
   function renderUnidentifiedFile() {
+    // i removed the draggable from the onDragStart for now
     return (
       <div className="FileContent">
-        <div className="Icon" draggable onDragStart={onDragStart}>
+        <div className="Icon" onDragStart={onDragStart}>
           <i className="fa fa-file " />
         </div>
         <div className="Caption">
