@@ -7,7 +7,7 @@ import './ContextMenu.css'
 import ContentTypes, { LookupResult } from '../../../ContentTypes'
 import { importFileList } from '../../../ImportData'
 import { AddCardArgs } from './Board'
-import { Position } from './BoardGrid'
+import { gridOffset, Position } from './BoardGrid'
 
 interface Props {
   contentTypes: LookupResult[]
@@ -68,7 +68,7 @@ export default function BoardContextMenu(props: Props) {
   }
   const onFilesChanged = (e) => {
     importFileList(e.target.files, (url, i) =>
-      props.addCardForContent({ position: contextMenuPosition, url })
+      props.addCardForContent({ position: gridOffset(contextMenuPosition, i), url })
     )
   }
 
