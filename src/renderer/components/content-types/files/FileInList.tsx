@@ -32,7 +32,7 @@ export default function FileInList(props: Props) {
 
   return (
     <div draggable onDragStart={onDragStart} className="FileListItem">
-      <Badge ref={badgeRef} icon="files-o" backgroundColor={backgroundColor} />
+      <Badge ref={badgeRef} shape="square" icon="files-o" backgroundColor={backgroundColor} />
       {props.editable ? (
         <TitleEditor url={props.hypermergeUrl} />
       ) : (

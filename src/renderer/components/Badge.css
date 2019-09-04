@@ -2,8 +2,7 @@
   cursor: pointer;
   padding: 8px;
   font-size: 24px;
-  border-radius: 50%;
-  background-color: #D5DFE5;
+  background-color: #d5dfe5;
 }
 
 .Badge--blue {
@@ -28,4 +27,11 @@
 
 .Badge--pink {
   background: #ff84cd;
+}
+
+.Badge--circle {
+  border-radius: 50%;
+}
+.Badge--square {
+  border-radius: 10%;
 }
