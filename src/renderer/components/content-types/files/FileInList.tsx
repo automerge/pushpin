@@ -5,11 +5,13 @@ import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
 
+import './FileInList.css'
+
 interface Props extends ContentProps {
   editable: boolean
 }
 
-export default function BoardInList(props: Props) {
+export default function FileInList(props: Props) {
   const [doc] = useDocument<FileDoc>(props.hypermergeUrl)
   const badgeRef = useRef<HTMLElement>(null)
 
@@ -26,7 +28,7 @@ export default function BoardInList(props: Props) {
   }
 
   const backgroundColor = 'orangered'
-  const { name } = doc
+  const { title } = doc
 
   return (
     <div draggable onDragStart={onDragStart} className="FileListItem">
@@ -34,7 +36,7 @@ export default function BoardInList(props: Props) {
       {props.editable ? (
         <TitleEditor url={props.hypermergeUrl} />
       ) : (
-        <div className="FileListItem__title">{name}</div>
+        <div className="FileListItem__title">{title}</div>
       )}
     </div>
   )

@@ -16,7 +16,7 @@ function humanFileSize(size: number) {
 export default function FileContent({ hypermergeUrl, context }: ContentProps) {
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
-  const { name = '', hyperfileUrl = null } = doc || {}
+  const { title = '', hyperfileUrl = null } = doc || {}
 
   const fileData = useHyperfile(hyperfileUrl)
 
@@ -37,7 +37,7 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
     const url = URL.createObjectURL(blob)
     const extension = mime.extension(mimeType) || ''
 
-    e.dataTransfer.setData('DownloadURL', `text:${name}.${extension}:${url}`)
+    e.dataTransfer.setData('DownloadURL', `text:${title}.${extension}:${url}`)
   }
 
   function renderUnidentifiedFile() {
@@ -47,7 +47,7 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
           <i className="fa fa-file " />
         </div>
         <div className="Caption">
-          <span className="Title">{name}</span>
+          <span className="Title">{title}</span>
           <br />
           {`${size !== null ? humanFileSize(size) : 'unknown size'}`}
         </div>

@@ -10,7 +10,7 @@ import * as Hyperfile from '../../../hyperfile'
 const log = Debug('pushpin:filecontent')
 
 export interface FileDoc {
-  name: string // names are editable and not an intrinsic part of the file
+  title: string // names are editable and not an intrinsic part of the file
   hyperfileUrl: HyperfileUrl
 }
 
@@ -25,7 +25,7 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
-          doc.name = name
+          doc.title = name
         })
         callback()
       })
