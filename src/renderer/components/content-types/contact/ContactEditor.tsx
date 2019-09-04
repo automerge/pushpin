@@ -5,7 +5,7 @@ import Debug from 'debug'
 import { createDocumentLink } from '../../../ShareLink'
 import * as Hyperfile from '../../../hyperfile'
 
-import { IMAGE_DIALOG_OPTIONS, DEFAULT_AVATAR_PATH } from '../../../constants'
+import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
@@ -50,28 +50,35 @@ export default function ContactEditor(props: ContentProps) {
     return null
   }
 
+  // XXX - this should probably use the new File stuff?
   function chooseAvatar() {
-    dialog.showOpenDialog(IMAGE_DIALOG_OPTIONS, (paths) => {
-      // User aborted.
-      if (!paths) {
-        return
-      }
-      if (paths.length !== 1) {
-        throw new Error('Expected exactly one path?')
-      }
+    dialog.showOpenDialog(
+      {
+        properties: ['openFile'],
+        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
+      },
+      (paths) => {
+        // User aborted.
+        if (!paths) {
+          return
+        }
+        if (paths.length !== 1) {
+          throw new Error('Expected exactly one path?')
+        }
 
-      Hyperfile.write(paths[0])
-        .then((hyperfileUrl) => {
-          ContentTypes.create('image', { hyperfileUrl }, (hypermergeUrl) => {
-            changeDoc((d) => {
-              d.avatarDocId = hypermergeUrl
+        Hyperfile.write(paths[0])
+          .then((hyperfileUrl) => {
+            ContentTypes.create('image', { hyperfileUrl }, (hypermergeUrl) => {
+              changeDoc((d) => {
+                d.avatarDocId = hypermergeUrl
+              })
             })
           })
-        })
-        .catch((err) => {
-          log(err)
-        })
-    })
+          .catch((err) => {
+            log(err)
+          })
+      }
+    )
   }
 
   function setName(e: React.ChangeEvent<HTMLInputElement>) {

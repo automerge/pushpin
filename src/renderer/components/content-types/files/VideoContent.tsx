@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { FileDoc } from './FileContent'
+import { FileDoc } from '.'
 import { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import { useDocument } from '../../../Hooks'

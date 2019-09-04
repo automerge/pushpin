@@ -14,12 +14,12 @@ import './content-types/defaults/DefaultInList'
 // board in various contexts
 import './content-types/board'
 import './content-types/contact'
+import './content-types/files'
 
 // other single-context components
 import './content-types/TextContent'
 import './content-types/ThreadContent'
 import './content-types/UrlContent'
-import './content-types/files/FileContent'
 import './content-types/files/ImageContent'
 import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'

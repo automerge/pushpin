@@ -4,7 +4,7 @@ import mime from 'mime-types'
 
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
-import { FileDoc } from '../files/FileContent'
+import { FileDoc } from '../files'
 
 import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'

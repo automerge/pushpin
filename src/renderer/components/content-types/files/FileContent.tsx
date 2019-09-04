@@ -1,26 +1,12 @@
 import React from 'react'
-import Debug from 'debug'
-
-import { remote } from 'electron'
-import { Handle } from 'hypermerge'
 import mime from 'mime-types'
-import path from 'path'
-import * as Hyperfile from '../../../hyperfile'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import { useDocument, useHyperfile } from '../../../Hooks'
 import { createDocumentLink } from '../../../ShareLink'
+import { FileDoc } from '.'
 
 import './FileContent.css'
-
-const { dialog } = remote
-
-const log = Debug('pushpin:filecontent')
-
-export interface FileDoc {
-  name: string // names are editable and not an intrinsic part of the file
-  hyperfileUrl: Hyperfile.HyperfileUrl
-}
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -83,65 +69,3 @@ FileContent.minHeight = 6
 FileContent.defaultWidth = 18
 FileContent.maxWidth = 72
 FileContent.maxHeight = 72
-
-function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
-  const reader = new FileReader()
-  const { name = 'Unnamed File' } = entry
-
-  reader.onload = () => {
-    const buffer = Buffer.from(reader.result as ArrayBuffer)
-    Hyperfile.writeBuffer(buffer, entry.type)
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-          doc.name = name
-        })
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
-
-  reader.readAsArrayBuffer(entry)
-}
-
-function create(attrs, handle: Handle<FileDoc>, callback) {
-  dialog.showOpenDialog({ properties: ['openFile'] }, (paths) => {
-    // User aborted.
-    if (!paths) {
-      return
-    }
-    if (paths.length !== 1) {
-      throw new Error('Expected exactly one path?')
-    }
-
-    const filePath = paths[0]
-    const name = path.parse(filePath).base
-
-    Hyperfile.write(filePath)
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-          doc.name = name
-        })
-
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  })
-}
-
-ContentTypes.register({
-  type: 'file',
-  name: 'File',
-  icon: 'file-o',
-  contexts: {
-    workspace: FileContent,
-    board: FileContent,
-  },
-  create,
-  createFromFile,
-})
