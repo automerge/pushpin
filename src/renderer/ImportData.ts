@@ -1,4 +1,3 @@
-import path from 'path'
 import { isPushpinUrl, PushpinUrl } from './ShareLink'
 import ContentTypes from './ContentTypes'
 
@@ -54,21 +53,25 @@ function importPlainText(plainText: string, callback: CreatedContentCallback) {
 function determineUrlContents(url, callback: CreatedContentCallback) {
   fetch(url)
     .then((response) => {
-      if (!response.ok) throw Error('Fetch failed, just keep the text.')
+      if (!response.ok) throw Error('Fetch failed, just make a URL card.')
+      const contentType = response.headers.get('Content-Type')
+      if (contentType && contentType.indexOf('text/html') !== -1) {
+        // looks like we got ourselves a website
+        throw Error('Found text/html, just make a URL card.')
+        // XXX: this is bad
+      }
       return response.blob()
     })
     .then((blob) => {
       if (!blob) {
         return
       }
-      const { pathname } = url
-      const filename = path.basename(pathname)
-      const file = new File([blob], filename, { type: blob.type, lastModified: Date.now() })
+      const file = new File([blob], url, { type: blob.type, lastModified: Date.now() })
       ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
     })
     .catch((error) => {
       // this is fine, really -- the URL upgrade to content is optional.
       // it'd be nice to do something more sophisticated, perhaps
-      ContentTypes.create('text', { text: url.toString() }, (contentUrl) => callback(contentUrl, 0))
+      ContentTypes.create('url', { url: url.toString() }, (contentUrl) => callback(contentUrl, 0))
     })
 }

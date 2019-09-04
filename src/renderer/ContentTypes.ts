@@ -103,6 +103,7 @@ function createFromFile(file, callback): void {
     if (mimeType && mimeType.match('text/')) {
       return 'text'
     }
+
     return 'file'
   })(file.type)
 
