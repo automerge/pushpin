@@ -1,7 +1,7 @@
 import Fs from 'fs'
 import mime from 'mime-types'
 
-import { Repo } from 'hypermerge'
+import { Repo, HyperfileUrl } from 'hypermerge'
 import DiscoverySwarm from 'discovery-cloud-client'
 import storage from 'random-access-file'
 import { HYPERFILE_PATH } from './constants'
@@ -18,8 +18,6 @@ const url = 'wss://discovery-cloud.herokuapp.com'
 const discovery = new DiscoverySwarm({ url, id: repo.id, stream: repo.stream })
 
 repo.replicate(discovery)
-
-export type HyperfileUrl = string & { hyperfile: true }
 
 export interface HyperfileResult {
   data: Uint8Array

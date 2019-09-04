@@ -147,7 +147,7 @@ function create(attrs, handle, callback) {
       (boardUrl) => {
         ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
           const id = uuid()
-          window.repo.change(parseDocumentLink(boardUrl).docId, (doc: BoardDoc) => {
+          window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
             doc.cards[id] = {
               type: 'text',
               id,

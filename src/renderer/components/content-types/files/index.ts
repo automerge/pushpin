@@ -1,5 +1,5 @@
 import Debug from 'debug'
-import { Handle } from 'hypermerge'
+import { Handle, HyperfileUrl } from 'hypermerge'
 import mime from 'mime-types'
 import ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
@@ -11,7 +11,7 @@ const log = Debug('pushpin:filecontent')
 
 export interface FileDoc {
   name: string // names are editable and not an intrinsic part of the file
-  hyperfileUrl: Hyperfile.HyperfileUrl
+  hyperfileUrl: HyperfileUrl
 }
 
 function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {

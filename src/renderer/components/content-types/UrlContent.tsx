@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 
-import { Handle } from 'hypermerge'
+import { Handle, HyperfileUrl } from 'hypermerge'
 import * as Hyperfile from '../../hyperfile'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
@@ -209,7 +209,7 @@ function unfluffUrl(url: string): Promise<UrlData> {
     })
 }
 
-function uploadImageUrl(url: string): Promise<Hyperfile.HyperfileUrl> {
+function uploadImageUrl(url: string): Promise<HyperfileUrl> {
   return fetch(url)
     .then((response) => response.arrayBuffer())
     .then((buffer) => Hyperfile.writeBuffer(new Uint8Array(buffer)))

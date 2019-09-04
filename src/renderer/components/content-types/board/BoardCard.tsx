@@ -27,7 +27,7 @@ interface BoardCardProps {
 
   selected: boolean
   uniquelySelected: boolean
-  remoteSelected: string[]
+  remoteSelected: HypermergeUrl[]
 
   onDrag(card: BoardDocCard, event: DraggableEvent, dragData: DraggableData): void
   onStop(card: BoardDocCard, event: DraggableEvent, dragData: DraggableData): void
@@ -40,10 +40,10 @@ export default function BoardCard(props: BoardCardProps) {
   const {
     card,
     dragState = { dragState: DragType.NOT_DRAGGING },
-    remoteSelected: [remoteSelection],
+    remoteSelected: [remoteSelectorContact],
   } = props
 
-  const [doc] = useDocument<ContactDoc>(remoteSelection || null)
+  const [doc] = useDocument<ContactDoc>(remoteSelectorContact || null)
   const highlightColor = doc && doc.color
 
   function onDrag(e: DraggableEvent, d: DraggableData) {

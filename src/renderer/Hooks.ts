@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
-import { Handle, RepoFrontend } from 'hypermerge'
+import { Handle, RepoFrontend, HyperfileUrl } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 import SelfContext from './components/SelfContext'
@@ -37,7 +37,10 @@ export function useSelf(): [Readonly<ContactDoc> | null, ChangeFn<ContactDoc>] {
  * Only acquires a new handle when the given url changes,
  * and ensures all handles are properly closed.
  */
-export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Cleanup): RepoFrontend {
+export function useHandle<D>(
+  url: HypermergeUrl | null,
+  cb: (handle: Handle<D>) => Cleanup
+): RepoFrontend {
   const repo = useRepo()
 
   useEffect(() => {
@@ -58,7 +61,7 @@ export function useHandle<D>(url: string | null, cb: (handle: Handle<D>) => Clea
   return repo
 }
 
-export function useDocument<D>(url: string | null): [Readonly<D> | null, ChangeFn<D>] {
+export function useDocument<D>(url: HypermergeUrl | null): [Readonly<D> | null, ChangeFn<D>] {
   const [doc, setDoc] = useState<D | null>(null)
 
   const repo = useHandle<D>(url, (handle) => {
@@ -82,7 +85,7 @@ export function useDocument<D>(url: string | null): [Readonly<D> | null, ChangeF
 }
 
 export function useDocumentReducer<D, A>(
-  url: string | null,
+  url: HypermergeUrl | null,
   reducer: (doc: D, action: A) => void
 ): [D | null, (action: A) => void] {
   const [doc, changeDoc] = useDocument<D>(url)
@@ -96,7 +99,10 @@ export function useDocumentReducer<D, A>(
   return [doc, dispatch]
 }
 
-export function useMessaging<M>(url: string | null, onMsg: (msg: M) => void): (msg: M) => void {
+export function useMessaging<M>(
+  url: HypermergeUrl | null,
+  onMsg: (msg: M) => void
+): (msg: M) => void {
   const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
 
   // Without this ref, we'd close over the `onMsg` passed during the very first render.
@@ -138,21 +144,27 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       // to be open, allowing any kind of card to render a list of "present" folks.
       Object.entries(heartbeats).forEach(([url, count]) => {
         if (count > 0) {
-          repo.message(url, { contact: selfId, heartbeat: true, presence: myPresence[url] })
+          // we can't use HypermergeUrl as a key in heartbeats, so we do this bad thign
+          repo.message(url as HypermergeUrl, {
+            contact: selfId,
+            heartbeat: true,
+            presence: myPresence[url],
+          })
         } else {
-          depart(url)
+          depart(url as HypermergeUrl)
           delete heartbeats[url]
         }
       })
     }, HEARTBEAT_INTERVAL)
 
-    function depart(url: string) {
+    function depart(url: HypermergeUrl) {
       repo.message(url, { contact: selfId, departing: true })
     }
 
     return () => {
       clearInterval(interval)
-      Object.entries(heartbeats).forEach(([url]) => depart(url))
+      // heartbeats can't have HypermergeUrls as keys, so we do this
+      Object.entries(heartbeats).forEach(([url]) => depart(url as HypermergeUrl))
     }
   }, [selfId])
 }
@@ -209,7 +221,7 @@ export function usePresence<P>(
   return remote
 }
 
-export function useHyperfile(url: Hyperfile.HyperfileUrl | null): Hyperfile.HyperfileResult | null {
+export function useHyperfile(url: HyperfileUrl | null): Hyperfile.HyperfileResult | null {
   const [data, setData] = useState<Hyperfile.HyperfileResult | null>(null)
 
   useEffect(() => {

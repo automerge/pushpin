@@ -179,13 +179,17 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           // create a handle for each contact
           if (!this.contactHandles[contactId]) {
             // when it changes, put it into this.state.contacts[contactId]
-            const handle = window.repo.watch(contactId, (doc: ContactDoc) => {
-              this.setState((state) => {
-                const { contacts } = state
-                contacts[contactId] = doc
-                return { contacts }
-              })
-            })
+
+            const handle = window.repo.watch(
+              (contactId as unknown) as HypermergeUrl, // XXX: this is... wrong?
+              (doc: ContactDoc) => {
+                this.setState((state) => {
+                  const { contacts } = state
+                  contacts[contactId] = doc
+                  return { contacts }
+                })
+              }
+            )
             this.contactHandles[contactId] = handle
           }
         })

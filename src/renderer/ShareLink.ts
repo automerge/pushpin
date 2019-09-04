@@ -4,8 +4,9 @@ import { crc16 } from 'js-crc'
 /** share link helper functions
  * lifted and adapted from pixelpusher
  */
+import { DocUrl } from 'hypermerge'
 
-export type HypermergeUrl = string & { hypermerge: true }
+export type HypermergeUrl = DocUrl
 export type PushpinUrl = string & { pushpin: true }
 
 export function isHypermergeUrl(str: string): str is HypermergeUrl {
