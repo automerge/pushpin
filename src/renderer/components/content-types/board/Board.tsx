@@ -114,7 +114,7 @@ interface CardArgs {
   dimension?: Dimension
 }
 
-interface AddCardArgs extends CardArgs {
+export interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
@@ -250,42 +250,8 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     })
   }
 
-  addContent = (e, contentType) => {
-    e.stopPropagation()
-
-    if (!this.boardRef.current) {
-      return
-    }
-    if (!this.state.contextMenuPosition) {
-      return
-    }
-
-    const position = {
-      x: this.state.contextMenuPosition.x - this.boardRef.current.getBoundingClientRect().left,
-      y: this.state.contextMenuPosition.y - this.boardRef.current.getBoundingClientRect().top,
-    }
-
-    switch (contentType.type) {
-      case 'board':
-        ContentTypes.create(
-          'board',
-          {
-            title: `Sub-board of ${
-              this.state.doc && this.state.doc.title ? this.state.doc.title : 'Untitled'
-            }`,
-          },
-          (url) => {
-            const cardId = this.addCardForContent({ position, url })
-            this.selectOnly(cardId)
-          }
-        )
-        break
-      default:
-        ContentTypes.create(contentType.type, {}, (url) => {
-          const cardId = this.addCardForContent({ position, url })
-          this.selectOnly(cardId)
-        })
-    }
+  onFilesOpened = (e: React.FormEvent<HTMLInputElement>) => {
+    // e.target.files
   }
 
   addCardForContent = ({ position, dimension, url }: AddCardArgs) => {
@@ -652,10 +618,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     this.finishedDrag = true
   }
 
-  onShowContextMenu = (e) => {
-    this.setState({ contextMenuPosition: e.detail.position })
-  }
-
   render = () => {
     log('render')
     if (!(this.state.doc && this.state.doc.cards)) {
@@ -717,8 +679,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       >
         <BoardContextMenu
           contentTypes={ContentTypes.list({ context: 'board' })}
-          addContent={this.addContent}
-          onShowContextMenu={this.onShowContextMenu}
+          addCardForContent={this.addCardForContent}
           backgroundColor={this.state.doc.backgroundColor || BOARD_COLORS.DEFAULT}
           backgroundColors={BOARD_COLOR_VALUES}
           changeBackgroundColor={this.changeBackgroundColor}

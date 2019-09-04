@@ -1,6 +1,4 @@
 import Debug from 'debug'
-import path from 'path'
-import { remote } from 'electron'
 import { Handle } from 'hypermerge'
 import mime from 'mime-types'
 import ContentTypes from '../../../ContentTypes'
@@ -8,8 +6,6 @@ import FileContent from './FileContent'
 import FileInList from './FileInList'
 
 import * as Hyperfile from '../../../hyperfile'
-
-const { dialog } = remote
 
 const log = Debug('pushpin:filecontent')
 
@@ -41,43 +37,15 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
   reader.readAsArrayBuffer(entry)
 }
 
-function create(attrs, handle: Handle<FileDoc>, callback) {
-  dialog.showOpenDialog({ properties: ['openFile'] }, (paths) => {
-    // User aborted.
-    if (!paths) {
-      return
-    }
-    if (paths.length !== 1) {
-      throw new Error('Expected exactly one path?')
-    }
-
-    const filePath = paths[0]
-    const name = path.parse(filePath).base
-
-    Hyperfile.write(filePath)
-      .then((hyperfileUrl) => {
-        handle.change((doc) => {
-          doc.hyperfileUrl = hyperfileUrl
-          doc.name = name
-        })
-
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  })
-}
-
 ContentTypes.register({
   type: 'file',
   name: 'File',
   icon: 'file-o',
+  unlisted: true,
   contexts: {
     workspace: FileContent,
     board: FileContent,
     list: FileInList,
   },
-  create,
   createFromFile,
 })
