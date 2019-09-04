@@ -11,6 +11,7 @@ import { gridOffset, Position } from './BoardGrid'
 
 interface Props {
   contentTypes: LookupResult[]
+  boardTitle: string
   backgroundColor: string
   backgroundColors: string[]
   addCardForContent(addArgs: AddCardArgs): void
@@ -27,17 +28,14 @@ export default function BoardContextMenu(props: Props) {
       return
     }
 
-    const position = {
-      x: contextMenuPosition.x, // - this.boardRef.current.getBoundingClientRect().left, // XXX TODO
-      y: contextMenuPosition.y, //  - this.boardRef.current.getBoundingClientRect().top,
-    }
+    const position = contextMenuPosition
 
     switch (contentType.type) {
       case 'board':
         ContentTypes.create(
           'board',
           {
-            title: `Sub-board of ${'Untitled'}`, // xxx fixme
+            title: `Sub-board of ${props.boardTitle}`,
           },
           (url) => {
             props.addCardForContent({ position, url })

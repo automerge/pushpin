@@ -678,6 +678,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         role="presentation"
       >
         <BoardContextMenu
+          boardTitle={this.state.doc.title}
           contentTypes={ContentTypes.list({ context: 'board' })}
           addCardForContent={this.addCardForContent}
           backgroundColor={this.state.doc.backgroundColor || BOARD_COLORS.DEFAULT}
