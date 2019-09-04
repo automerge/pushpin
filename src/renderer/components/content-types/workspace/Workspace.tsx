@@ -169,6 +169,7 @@ function create(attrs, handle, callback) {
       }
     )
   })
+  callback()
 }
 
 ContentTypes.register({
