@@ -140,10 +140,6 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-interface Attrs {
-  text?: string
-}
-
 function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
   const reader = new FileReader()
 
