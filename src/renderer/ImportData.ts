@@ -14,7 +14,7 @@ function determineUrlContents(url, callback) {
       }
       const { pathname } = url
       const filename = path.basename(pathname)
-      const file = new File([blob], filename, { lastModified: Date.now() }) // check date.now()
+      const file = new File([blob], filename, { type: blob.type, lastModified: Date.now() })
       ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
     })
     .catch((error) => {

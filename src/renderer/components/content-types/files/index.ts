@@ -2,6 +2,7 @@ import Debug from 'debug'
 import path from 'path'
 import { remote } from 'electron'
 import { Handle } from 'hypermerge'
+import mime from 'mime-types'
 import ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
 import FileInList from './FileInList'
@@ -23,7 +24,8 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
 
   reader.onload = () => {
     const buffer = Buffer.from(reader.result as ArrayBuffer)
-    Hyperfile.writeBuffer(buffer, entry.type)
+    const mimeType = mime.contentType(entry.type) || 'application/octet-stream'
+    Hyperfile.writeBuffer(buffer, mimeType)
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
