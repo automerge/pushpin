@@ -65,7 +65,6 @@ interface State {
   selected: any[]
   remoteSelection: { [contact: string]: string[] }
   contextMenuPosition?: Position
-  tracking: { [cardId: string]: TrackingEntry }
   doc?: BoardDoc
 }
 
@@ -123,8 +122,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
   private boardRef = React.createRef<HTMLDivElement>()
   private cardRefs: Map<string, HTMLDivElement> = new Map<string, HTMLDivElement>()
-  private finishedDrag: boolean = false
-  private tracking: { [cardId: string]: TrackingEntry } = {}
 
   private heartbeatTimerId?: NodeJS.Timer
   private contactHeartbeatTimerId: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
@@ -132,7 +129,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   state: State = {
     remoteSelection: {},
     selected: [],
-    tracking: {},
   }
 
   componentWillMount = () => {
@@ -163,13 +159,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   }
 
   onCardClicked = (card, e) => {
-    if (this.finishedDrag) {
-      // this is the end of a resize / move event, don't change selection
-      this.finishedDrag = false
-      e.stopPropagation()
-      return
-    }
-
     if (e.ctrlKey || e.shiftKey) {
       this.selectToggle(card.id)
     } else {
@@ -430,98 +419,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     this.cardRefs[id] = node
   }
 
-  onDrag = (card, e, d) => {
-    if (!(this.state.doc && this.state.doc.cards)) {
-      return
-    }
-    log('onDrag')
-    const tracking = this.tracking[card.id]
-
-    // If we haven't started tracking this drag, initialize tracking
-    if (!tracking) {
-      const resizing = e.target.className === 'BoardCard-resizeHandle'
-      const moving = !resizing
-
-      if (moving) {
-        const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
-
-        cards.forEach((c) => {
-          this.tracking[c.id] = {
-            dragType: DragType.MOVING,
-            moveX: c.x,
-            moveY: c.y,
-            slackX: 0,
-            slackY: 0,
-          }
-        })
-      }
-
-      if (resizing) {
-        // If the card has no fixed dimensions yet, get its current rendered dimensions
-        if (!Number.isInteger(card.width) || !Number.isInteger(card.height)) {
-          this.handle &&
-            this.handle.change((b) => {
-              // clientWidth and clientHeight are rounded so we add 1px to get the ceiling,
-              // this prevents visual changes like scrollbar from triggering on drag
-              /* eslint react/no-find-dom-node: "off" */
-              b.cards[card.id].width = ReactDOM.findDOMNode(this.cardRefs[card.id]).clientWidth + 1
-              b.cards[card.id].height =
-                ReactDOM.findDOMNode(this.cardRefs[card.id]).clientHeight + 1
-            })
-
-          card = this.state.doc.cards[card.id]
-        }
-
-        const { type } = parseDocumentLink(card.url)
-        const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) as any
-        const minWidth = gridCellsToPixels(component.minWidth) || CARD_MIN_WIDTH
-        const minHeight = gridCellsToPixels(component.minHeight) || CARD_MIN_HEIGHT
-        const maxWidth = gridCellsToPixels(component.maxWidth) || Infinity
-        const maxHeight = gridCellsToPixels(component.maxWidth) || Infinity
-
-        this.tracking[card.id] = {
-          dragType: DragType.RESIZING,
-          slackWidth: 0,
-          slackHeight: 0,
-          resizeWidth: card.width,
-          resizeHeight: card.height,
-          minWidth,
-          minHeight,
-          maxWidth,
-          maxHeight,
-        }
-      }
-
-      return
-    }
-
-    if (tracking.dragType === DragType.MOVING) {
-      const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
-      cards.forEach((card) => {
-        const t = this.tracking[card.id]
-        this.effectDrag(card, t, d)
-
-        this.setState((prevState) => ({
-          tracking: {
-            ...prevState.tracking,
-            [card.id]: t,
-          },
-        }))
-      })
-    }
-
-    if (tracking.dragType === DragType.RESIZING) {
-      this.effectDrag(card, tracking, d)
-
-      this.setState((prevState) => ({
-        tracking: {
-          ...prevState.tracking,
-          [card.id]: tracking,
-        },
-      }))
-    }
-  }
-
   onMessage = (msg) => {
     const { contact, selected } = msg
 
@@ -578,46 +475,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     this.updateSelection([])
   }
 
-  onStop = (card, e, d) => {
-    log('onStop')
-    if (!(this.state.doc && this.state.doc.cards)) {
-      return
-    }
-
-    const { id } = card
-    const tracking = this.tracking[id]
-
-    // If tracking is not initialized, treat this as a click
-    if (!tracking) {
-      return
-    }
-
-    if (tracking.dragType === DragType.MOVING) {
-      const cards = draggableCards(this.state.doc.cards, this.state.selected, card)
-      cards.forEach((card) => {
-        const t = this.tracking[card.id] as MoveTracking
-
-        const position = { x: t.moveX, y: t.moveY }
-        this.cardMoved({ id: card.id, position })
-      })
-      this.tracking = {}
-      this.setState({ tracking: {} })
-    }
-
-    if (tracking.dragType === DragType.RESIZING) {
-      const dimension = {
-        width: tracking.resizeWidth,
-        height: tracking.resizeHeight,
-      }
-
-      this.cardResized({ id: card.id, dimension })
-      this.tracking = {}
-      this.setState({ tracking: {} })
-    }
-
-    this.finishedDrag = true
-  }
-
   render = () => {
     log('render')
     if (!(this.state.doc && this.state.doc.cards)) {
@@ -650,9 +507,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
           selected={selected}
           remoteSelected={cardsSelected[id] || []}
           uniquelySelected={uniquelySelected}
-          dragState={this.state.tracking[id]}
-          onDrag={this.onDrag}
-          onStop={this.onStop}
           onCardClicked={this.onCardClicked}
           onCardDoubleClicked={this.onCardDoubleClicked}
           setCardRef={this.setCardRef}
