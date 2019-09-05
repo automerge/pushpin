@@ -226,7 +226,7 @@ export function useHyperfile(url: HyperfileUrl | null): Hyperfile.HyperfileResul
 
   useEffect(() => {
     data && setData(null)
-    url && Hyperfile.fetch(url).then(setData)
+    url && Hyperfile.fetch(url).then(([data, mimeType, size]) => setData({ data, mimeType, size }))
   }, [url])
 
   return data

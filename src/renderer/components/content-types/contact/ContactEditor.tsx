@@ -66,7 +66,7 @@ export default function ContactEditor(props: ContentProps) {
           throw new Error('Expected exactly one path?')
         }
 
-        Hyperfile.write(paths[0])
+        Hyperfile.writeFromPath(paths[0])
           .then((hyperfileUrl) => {
             ContentTypes.create('image', { hyperfileUrl }, (hypermergeUrl) => {
               changeDoc((d) => {

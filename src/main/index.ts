@@ -210,13 +210,13 @@ function registerProtocolHandlers() {
     mainWindow && mainWindow.webContents.send('loadDocumentUrl', req.url)
   })
 
-  protocol.registerBufferProtocol(
+  protocol.registerStreamProtocol(
     'hyperfile',
     async (request, callback) => {
       try {
         if (Hyperfile.isHyperfileUrl(request.url)) {
-          const { data } = await Hyperfile.fetch(request.url)
-          callback(Buffer.from(data))
+          const [stream] = await Hyperfile.fetch(request.url)
+          callback(stream)
         }
       } catch (e) {
         log(e)

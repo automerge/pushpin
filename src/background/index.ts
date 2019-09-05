@@ -15,7 +15,7 @@ const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
 const url = 'wss://discovery-cloud.herokuapp.com'
 const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
 
-back.replicate(discovery)
+back.setSwarm(discovery as any)
 
 ipc.config.silent = true
 ipc.config.appspace = 'pushpin.'

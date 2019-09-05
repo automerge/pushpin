@@ -32,12 +32,13 @@ export default function ContactInVarious(props: ContentProps) {
       'application/pushpin-url',
       createDocumentLink('contact', props.hypermergeUrl)
     )
-    if (!avatarImageData) {
-      return
-    }
-    const { data, mimeType } = avatarImageData
-    const blob = new Blob([data.buffer], { type: mimeType })
-    const url = URL.createObjectURL(blob)
+    if (!avatarImageDoc) return
+    if (!avatarImageData) return
+
+    const url = avatarImageDoc.hyperfileUrl
+    if (!url) return
+
+    const { mimeType } = avatarImageData
     const extension = mime.extension(mimeType) || ''
 
     e.dataTransfer.setData('DownloadURL', `text:${name}.${extension}:${url}`)

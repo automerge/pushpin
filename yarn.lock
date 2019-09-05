@@ -560,6 +560,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/uuid@^3.4.5":
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.5.tgz#d4dc10785b497a1474eae0ba7f0cb09c0ddfd6eb"
+  integrity sha512-MNL15wC3EKyw1VLF+RoVO4hJJdk9t/Hlv3rt1OL65Qvuadm4BYo6g9ZJQqoq7X8NBFSsQXgAujWciovh2lpVjA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/webpack-dev-server@^3.1.6":
   version "3.1.6"
   resolved "https://registry.yarnpkg.com/@types/webpack-dev-server/-/webpack-dev-server-3.1.6.tgz#a674bcdbe045390e6301977790d465f4aeb5b1c0"
@@ -4396,10 +4403,11 @@ hyperdiscovery@^9.0.1:
     hypercore-protocol "^6.9.0"
     mutexify "^1.2.0"
 
-"hypermerge@git+https://github.com/automerge/hypermerge":
+"hypermerge@git+https://github.com/automerge/hypermerge#feed-store":
   version "1.0.42"
-  resolved "git+https://github.com/automerge/hypermerge#2615ea118147e1a304d7359381419f805afb8a02"
+  resolved "git+https://github.com/automerge/hypermerge#463fab5624a8915a893536e75d1a3ea3fd1505c8"
   dependencies:
+    "@types/uuid" "^3.4.5"
     automerge "^0.10.1"
     bs58 "^4.0.1"
     debug "^4.1.0"
@@ -4408,6 +4416,7 @@ hyperdiscovery@^9.0.1:
     iltorb "^2.4.1"
     js-sha1 "^0.6.0"
     mime-types "^2.1.24"
+    uuid "^3.3.3"
 
 iconv-lite@0.4.24, iconv-lite@^0.4.24, iconv-lite@^0.4.4:
   version "0.4.24"
@@ -8793,6 +8802,11 @@ uuid@^3.0.1, uuid@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
+
+uuid@^3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
+  integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
 
 v8-compile-cache@2.0.3:
   version "2.0.3"

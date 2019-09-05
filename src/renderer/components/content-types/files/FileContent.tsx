@@ -24,20 +24,17 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
     return null
   }
 
-  const size =
-    fileData && fileData.data && fileData.data.buffer ? fileData.data.buffer.byteLength : null
+  const size = fileData ? fileData.size : null
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData('application/pushpin-url', createDocumentLink('file', hypermergeUrl))
     if (!fileData) {
       return
     }
-    const { data, mimeType } = fileData
-    const blob = new Blob([data.buffer], { type: mimeType })
-    const url = URL.createObjectURL(blob)
+    const { mimeType } = fileData
     const extension = mime.extension(mimeType) || ''
 
-    e.dataTransfer.setData('DownloadURL', `text:${title}.${extension}:${url}`)
+    e.dataTransfer.setData('DownloadURL', `text:${title}.${extension}:${hyperfileUrl}`)
   }
 
   function renderUnidentifiedFile() {
@@ -59,6 +56,7 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
   const { mimeType = null } = fileData || {}
 
   const contentType = ContentTypes.mimeTypeToContentType(mimeType)
+  console.log(contentType)
   if (contentType !== 'file') {
     return <Content context={context} url={createDocumentLink(contentType, hypermergeUrl)} />
   }
