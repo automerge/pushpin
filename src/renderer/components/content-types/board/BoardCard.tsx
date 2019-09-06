@@ -52,6 +52,13 @@ export default function BoardCard(props: BoardCardProps) {
     e.stopPropagation()
   }
 
+  function onDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('application/pushpin-url', card.url)
+
+    /*    if (badgeRef.current) {
+      e.dataTransfer.setDragImage(badgeRef.current, 0, 0)
+    } */
+  }
   const style: React.CSSProperties = {
     ['--highlight-color' as any]: highlightColor,
     position: 'absolute',
@@ -81,6 +88,8 @@ export default function BoardCard(props: BoardCardProps) {
       onClick={onCardClicked}
       onDoubleClick={onCardDoubleClicked}
       onContextMenu={stopPropagation}
+      draggable
+      onDragStart={onDragStart}
     >
       <Content context="board" url={card.url} uniquelySelected={props.uniquelySelected} />
       {contentType && contentType.resizable !== false && (

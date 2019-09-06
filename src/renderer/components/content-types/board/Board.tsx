@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
 
