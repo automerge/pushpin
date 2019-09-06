@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import classNames from 'classnames'
+import mime from 'mime-types'
 
 import Content from '../../Content'
 import ContentTypes from '../../../ContentTypes'
@@ -8,7 +9,7 @@ import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { BoardDocCard } from '.'
 import { Position } from './BoardGrid'
 import { ContactDoc } from '../contact'
-import { useDocument } from '../../../Hooks'
+import { useDocument, useHyperfile } from '../../../Hooks'
 import './BoardCard.css'
 import {
   PUSHPIN_DRAG_TYPE,
@@ -36,11 +37,18 @@ export default function BoardCard(props: BoardCardProps) {
     remoteSelected: [remoteSelectorContact],
   } = props
 
-  const [doc] = useDocument<ContactDoc>(remoteSelectorContact || null)
-  const highlightColor = doc && doc.color
+  const [contactDoc] = useDocument<ContactDoc>(remoteSelectorContact || null)
+  const highlightColor = contactDoc && contactDoc.color
 
   const [drag, setDrag] = useState<Position | null>(null)
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 })
+
+  const { hypermergeUrl } = parseDocumentLink(card.url)
+  const [doc] = useDocument<any>(hypermergeUrl)
+
+  // yeeeech
+  const { hyperfileUrl = null, title = 'untitled' } = doc || {}
+  const hyperfileData = useHyperfile(hyperfileUrl)
 
   function onCardClicked(e: React.MouseEvent) {
     props.onCardClicked(card, e)
@@ -58,12 +66,25 @@ export default function BoardCard(props: BoardCardProps) {
     setDrag({ x: e.pageX, y: e.pageY })
     const dragOffset = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }
     setDragOffset(dragOffset)
+
+    // when dragging on the board, we want to maintain the true card element
     e.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
-    e.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
     e.dataTransfer.setData(BOARD_CARD_DRAG_TYPE, card.id)
     e.dataTransfer.setData(BOARD_CARD_DRAG_OFFSET_X, dragOffset.x.toString())
     e.dataTransfer.setData(BOARD_CARD_DRAG_OFFSET_Y, dragOffset.y.toString())
-    return true
+
+    // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
+    e.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
+
+    // and we'll add a DownloadURL (if there's a toFile available on the type)
+    if (hyperfileData) {
+      const { mimeType } = hyperfileData
+      const extension = mime.extension(mimeType) || ''
+
+      const downloadUrl = `text:${title}.${extension}:${hyperfileUrl}`
+      e.dataTransfer.setData('DownloadURL', downloadUrl)
+      console.log('DLU', downloadUrl)
+    }
   }
 
   // we don't want to make changes to the document until the drag ends
@@ -71,6 +92,7 @@ export default function BoardCard(props: BoardCardProps) {
   // we don't have ugly ghosting
   function onDrag(e: React.DragEvent) {
     setDrag({ x: e.pageX, y: e.pageY })
+    e.preventDefault()
   }
 
   function onDragEnd(e: React.DragEvent) {
