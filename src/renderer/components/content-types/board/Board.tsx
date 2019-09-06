@@ -20,6 +20,11 @@ import {
   snapDimensionToGrid,
   snapPositionToGrid,
 } from './BoardGrid'
+import {
+  BOARD_CARD_DRAG_TYPE,
+  BOARD_CARD_DRAG_OFFSET_X,
+  BOARD_CARD_DRAG_OFFSET_Y,
+} from '../../../constants'
 
 const log = Debug('pushpin:board')
 
@@ -44,21 +49,11 @@ export const BOARD_COLORS = {
   BLACK: '#2b2b2b',
 }
 
-const CARD_MIN_WIDTH = 81
-const CARD_MIN_HEIGHT = 41
-
 const BOARD_WIDTH = 3600
 const BOARD_HEIGHT = 1800
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
-
-const draggableCards = (cards, selected, card) => {
-  if (selected.length > 0 && selected.find((id) => id === card.id)) {
-    return selected.map((id) => cards[id])
-  }
-  return [card]
-}
 
 interface State {
   selected: any[]
@@ -66,46 +61,6 @@ interface State {
   contextMenuPosition?: Position
   doc?: BoardDoc
 }
-
-export enum DragType {
-  MOVING,
-  RESIZING,
-  NOT_DRAGGING,
-}
-
-export interface MoveTracking {
-  dragType: DragType.MOVING
-  moveX: number
-  moveY: number
-  slackX: number
-  slackY: number
-}
-
-export interface ResizeTracking {
-  dragType: DragType.RESIZING
-  slackWidth: number
-  slackHeight: number
-  resizeWidth: number
-  resizeHeight: number
-  minWidth: number
-  minHeight: number
-  maxWidth: number
-  maxHeight: number
-}
-
-export interface NotDraggingTracking {
-  dragType: DragType.NOT_DRAGGING
-}
-
-export function isMoving(tracking): tracking is MoveTracking {
-  return tracking.dragType === DragType.MOVING
-}
-
-export function isResizing(tracking): tracking is ResizeTracking {
-  return tracking.dragType === DragType.RESIZING
-}
-
-export type TrackingEntry = MoveTracking | ResizeTracking | NotDraggingTracking
 
 interface CardArgs {
   position: Position
@@ -192,6 +147,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
   }
 
   onDragOver = (e) => {
+    e.dataTransfer.dropEffect = 'move'
     e.preventDefault()
     e.stopPropagation()
   }
@@ -204,14 +160,32 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     if (!this.boardRef.current) {
       return
     }
-    const position = {
+    const dropPosition = {
       x: pageX - this.boardRef.current.offsetLeft,
       y: pageY - this.boardRef.current.offsetTop,
     }
 
+    if (!(this.state.doc && this.state.doc.cards)) {
+      return
+    }
+    const cardId = e.dataTransfer.getData(BOARD_CARD_DRAG_TYPE)
+    if (this.state.doc.cards[cardId]) {
+      const offset = {
+        x: parseFloat(e.dataTransfer.getData(BOARD_CARD_DRAG_OFFSET_X)),
+        y: parseFloat(e.dataTransfer.getData(BOARD_CARD_DRAG_OFFSET_Y)),
+      }
+      const position = {
+        x: dropPosition.x - offset.x,
+        y: dropPosition.y - offset.y,
+      }
+      e.dataTransfer.dropEffect = 'move'
+      this.cardMoved({ id: cardId, position })
+      return
+    }
+
     ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
-      const offsetPosition = gridOffset(position, i)
-      this.addCardForContent({ position: offsetPosition, url })
+      const position = gridOffset(dropPosition, i)
+      this.addCardForContent({ position, url })
     })
   }
 
@@ -272,6 +246,26 @@ export default class Board extends React.PureComponent<ContentProps, State> {
     return id
   }
 
+  cardMoved = ({ id, position }) => {
+    if (!(this.state.doc && this.state.doc.cards)) {
+      return
+    }
+
+    // This gets called when uniquely selecting a card, so avoid a document
+    // change if in fact the card hasn't moved mod snapping.
+    const snapPosition = snapPositionToGrid(position)
+    const cardPosition = { x: this.state.doc.cards[id].x, y: this.state.doc.cards[id].y }
+    if (snapPosition.x === cardPosition.x && snapPosition.y === cardPosition.y) {
+      return
+    }
+    this.handle &&
+      this.handle.change((b) => {
+        const card = b.cards[id]
+        card.x = snapPosition.x
+        card.y = snapPosition.y
+      })
+  }
+
   deleteCard = (id) => {
     // allow either an array or a single card to be passed in
     if (id.constructor !== Array) {
@@ -298,124 +292,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
       this.handle.change((b) => {
         b.backgroundColor = color.hex
       })
-  }
-
-  /**
-   *
-   * Card placement / manipulation actions
-   *
-   */
-
-  cardMoved = ({ id, position }) => {
-    if (!(this.state.doc && this.state.doc.cards)) {
-      return
-    }
-
-    // This gets called when uniquely selecting a card, so avoid a document
-    // change if in fact the card hasn't moved mod snapping.
-    const snapPosition = snapPositionToGrid(position)
-    const cardPosition = { x: this.state.doc.cards[id].x, y: this.state.doc.cards[id].y }
-    if (snapPosition.x === cardPosition.x && snapPosition.y === cardPosition.y) {
-      return
-    }
-    this.handle &&
-      this.handle.change((b) => {
-        const card = b.cards[id]
-        card.x = snapPosition.x
-        card.y = snapPosition.y
-      })
-  }
-
-  cardResized = ({ id, dimension }) => {
-    if (!(this.state.doc && this.state.doc.cards)) {
-      return
-    }
-
-    // This gets called when we click the drag corner of a card, so avoid a
-    // document change if in fact the card won't resize mod snapping.
-    const snapDimension = snapDimensionToGrid(dimension)
-    const cardDimension = {
-      width: this.state.doc.cards[id].width,
-      height: this.state.doc.cards[id].height,
-    }
-    if (
-      snapDimension.width === cardDimension.width &&
-      snapDimension.height === cardDimension.height
-    ) {
-      return
-    }
-    this.handle &&
-      this.handle.change((b) => {
-        const card = b.cards[id]
-        card.width = snapDimension.width
-        card.height = snapDimension.height
-      })
-  }
-
-  effectDrag = (card, tracking: TrackingEntry, { deltaX, deltaY }) => {
-    if (deltaX === 0 && deltaY === 0) {
-      return
-    }
-
-    if (isMoving(tracking)) {
-      // First guess at change in location given mouse movements.
-      const preClampX = tracking.moveX + deltaX
-      const preClampY = tracking.moveY + deltaY
-
-      // Add slack to the values used to calculate bound position. This will
-      // ensure that if we start removing slack, the element won't react to
-      // it right away until it's been completely removed.
-      let newX = preClampX + tracking.slackX
-      let newY = preClampY + tracking.slackY
-
-      // Clamp to ensure card doesn't move beyond the board.
-      newX = Math.max(newX, 0)
-      newX = Math.min(newX, BOARD_WIDTH - card.width)
-      tracking.moveX = newX
-      newY = Math.max(newY, 0)
-      newY = Math.min(newY, BOARD_HEIGHT - card.height)
-      tracking.moveY = newY
-
-      // If the numbers changed, we must have introduced some slack.
-      // Record it for the next iteration.
-      tracking.slackX = tracking.slackX + preClampX - newX
-      tracking.slackY = tracking.slackY + preClampY - newY
-    }
-
-    if (isResizing(tracking)) {
-      // First guess at change in dimensions given mouse movements.
-      const preClampWidth = tracking.resizeWidth + deltaX
-      const preClampHeight = tracking.resizeHeight + deltaY
-
-      if (preClampWidth + card.x > BOARD_WIDTH || preClampHeight + card.y > BOARD_HEIGHT) {
-        return
-      }
-
-      // Add slack to the values used to calculate bound position. This will
-      // ensure that if we start removing slack, the element won't react to
-      // it right away until it's been completely removed.
-      let newWidth = preClampWidth + tracking.slackWidth
-      let newHeight = preClampHeight + tracking.slackHeight
-
-      // Clamp to ensure card doesn't resize beyond the board or min dimensions.
-      newWidth = Math.max(tracking.minWidth, newWidth)
-      newWidth = Math.min(tracking.maxWidth, newWidth)
-      newWidth = Math.min(BOARD_WIDTH - card.x, newWidth)
-      tracking.resizeWidth = newWidth
-      newHeight = Math.max(tracking.minHeight, newHeight)
-      newHeight = Math.min(tracking.maxHeight, newHeight)
-      newHeight = Math.min(BOARD_HEIGHT - card.y, newHeight)
-      tracking.resizeHeight = newHeight
-
-      // If the numbers changed, we must have introduced some slack.
-      // Record it for the next iteration.
-      tracking.slackWidth = tracking.slackWidth + preClampWidth - newWidth
-      tracking.slackHeight = tracking.slackHeight + preClampHeight - newHeight
-    }
-  }
-
-  setCardRef = (id, node) => {
-    this.cardRefs[id] = node
   }
 
   onMessage = (msg) => {
@@ -508,7 +384,6 @@ export default class Board extends React.PureComponent<ContentProps, State> {
           uniquelySelected={uniquelySelected}
           onCardClicked={this.onCardClicked}
           onCardDoubleClicked={this.onCardDoubleClicked}
-          setCardRef={this.setCardRef}
         />
       )
     })
@@ -526,6 +401,7 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onDragOver={this.onDragOver}
+        onDragEnter={this.onDragOver}
         onDrop={this.onDrop}
         onPaste={this.onPaste}
         role="presentation"

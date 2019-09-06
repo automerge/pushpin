@@ -20,3 +20,9 @@ export const USER_PATH = Path.join(DATA_PATH, 'pushpin-v10', USER)
 export const WORKSPACE_URL_PATH = Path.join(USER_PATH, 'workspace-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
+
+// this next one should maybe just be URL list
+export const PUSHPIN_DRAG_TYPE = 'application/pushpin-url'
+export const BOARD_CARD_DRAG_TYPE = 'application/x-pushpin-board-card-id'
+export const BOARD_CARD_DRAG_OFFSET_X = 'application/x-pushpin-board-card-offset-x'
+export const BOARD_CARD_DRAG_OFFSET_Y = 'application/x-pushpin-board-card-offset-y'
