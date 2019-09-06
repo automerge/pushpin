@@ -211,13 +211,16 @@ function registerProtocolHandlers() {
     mainWindow && mainWindow.webContents.send('loadDocumentUrl', req.url)
   })
 
-  protocol.registerStreamProtocol(
+  // TODO: convert to a stream protocol once we support content range the
+  // hypermerge FileServer
+  protocol.registerBufferProtocol(
     'hyperfile',
     async (request, callback) => {
       try {
         if (Hyperfile.isHyperfileUrl(request.url)) {
           const [stream] = await Hyperfile.fetch(request.url)
-          callback(stream)
+          const buffer = await Hyperfile.streamToBuffer(stream)
+          callback(buffer)
         }
       } catch (e) {
         log(e)

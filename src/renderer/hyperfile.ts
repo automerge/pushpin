@@ -14,6 +14,11 @@ export interface HyperfileResult {
   size: number
 }
 
+export interface BufferedHyperfileResult {
+  data: Buffer
+  mimeType: string
+}
+
 export function isHyperfileUrl(str: string): str is HyperfileUrl {
   return str.startsWith('hyperfile:/')
 }
@@ -50,11 +55,21 @@ export async function fetch(hyperfileUrl: HyperfileUrl): Promise<[Readable, stri
   return repo.files.read(hyperfileUrl)
 }
 
-function bufferToStream(buffer: Buffer): Readable {
+export function bufferToStream(buffer: Buffer): Readable {
   return new Readable({
     read() {
       this.push(buffer)
       this.push(null)
     },
+  })
+}
+
+export function streamToBuffer(stream: Readable): Promise<Buffer> {
+  return new Promise((res, rej) => {
+    const buffers: Buffer[] = []
+    stream
+      .on('data', (data: Buffer) => buffers.push(data))
+      .on('error', (err: any) => rej(err))
+      .on('end', () => res(Buffer.concat(buffers)))
   })
 }

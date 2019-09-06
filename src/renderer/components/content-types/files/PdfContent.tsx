@@ -5,13 +5,13 @@ import { FileDoc } from '.'
 
 import ContentTypes from '../../../ContentTypes'
 import { ContentProps } from '../../Content'
-import { useDocument, useHyperfile, useConfirmableInput } from '../../../Hooks'
+import { useDocument, useHyperfileBuffer, useConfirmableInput } from '../../../Hooks'
 import './PdfContent.css'
 
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<FileDoc>(props.hypermergeUrl)
-  const pdfData = useHyperfile(pdf && pdf.hyperfileUrl)
-  const fileData = useMemo(() => pdfData, [pdfData])
+  const pdfData = useHyperfileBuffer(pdf && pdf.hyperfileUrl)
+  const fileData = useMemo(() => ({ data: pdfData && pdfData.data }), [pdfData])
   const [pageNum, setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
 
