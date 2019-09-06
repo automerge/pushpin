@@ -56,7 +56,6 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
   const { mimeType = null } = fileData || {}
 
   const contentType = ContentTypes.mimeTypeToContentType(mimeType)
-  console.log(contentType)
   if (contentType !== 'file') {
     return <Content context={context} url={createDocumentLink(contentType, hypermergeUrl)} />
   }

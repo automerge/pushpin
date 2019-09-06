@@ -1,24 +1,12 @@
 import Fs from 'fs'
 import mime from 'mime-types'
 
-import { Repo, HyperfileUrl } from 'hypermerge'
-import DiscoverySwarm from 'discovery-cloud-client'
-import storage from 'random-access-file'
+import { RepoFrontend, HyperfileUrl } from 'hypermerge'
 import { Readable } from 'stream'
-import { HYPERFILE_PATH } from './constants'
+import { FILE_SERVER_PATH } from './constants'
 
-const repo = new Repo({ storage, path: HYPERFILE_PATH, serverPath: '/tmp/pushpin.files' })
-
-// DAT's discovery swarm or truly serverless discovery
-// const DiscoverySwarm = require('discovery-swarm')
-// const defaults = require('dat-swarm-defaults')
-
-// const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
-
-const url = 'wss://discovery-cloud.herokuapp.com'
-const discovery = new DiscoverySwarm({ url, id: repo.id, stream: repo.stream })
-
-repo.setSwarm(discovery as any)
+const repo = new RepoFrontend()
+repo.setFileServerPath(FILE_SERVER_PATH)
 
 export interface HyperfileResult {
   data: Readable

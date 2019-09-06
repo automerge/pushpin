@@ -4405,7 +4405,7 @@ hyperdiscovery@^9.0.1:
 
 "hypermerge@git+https://github.com/automerge/hypermerge#feed-store":
   version "1.0.42"
-  resolved "git+https://github.com/automerge/hypermerge#463fab5624a8915a893536e75d1a3ea3fd1505c8"
+  resolved "git+https://github.com/automerge/hypermerge#6c390d9f492083a9e9e5e733968a2675f95bf34a"
   dependencies:
     "@types/uuid" "^3.4.5"
     automerge "^0.10.1"

@@ -20,3 +20,5 @@ export const USER_PATH = Path.join(DATA_PATH, 'pushpin-v10', USER)
 export const WORKSPACE_URL_PATH = Path.join(USER_PATH, 'workspace-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
+
+export const FILE_SERVER_PATH = '/tmp/pushpin.files'
