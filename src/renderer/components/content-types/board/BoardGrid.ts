@@ -22,9 +22,8 @@ export interface Position {
   y: number
 }
 
-// we support null dimensions to indicate "free"
 type Measure = number | Undimensioned
-type Undimensioned = null
+type Undimensioned = undefined
 export interface Dimension {
   width: Measure
   height: Measure
@@ -51,7 +50,7 @@ export const gridCellsToPixels = (i): Measure => {
   // but that's how the calling code expects it to work, so i'm leaving it thus for now
   // if you're chasing a weird bug and found yourself here... hope this helps.
   if (!i) {
-    return null
+    return undefined
   }
   return i * GRID_SIZE
 }
@@ -78,7 +77,7 @@ export const snapPositionToGrid = ({ x, y }: Position): Position => ({
 })
 
 export const snapDimensionToGrid = (
-  { width, height }: Dimension = { width: null, height: null }
+  { width, height }: Dimension = { width: undefined, height: undefined }
 ): Dimension => ({
   // we don't snap falsey-values like null or zero because we don't want them to become 1
   width: width ? snapToGrid(width) + 1 : width,

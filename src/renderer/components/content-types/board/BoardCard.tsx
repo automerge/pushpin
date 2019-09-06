@@ -83,7 +83,6 @@ export default function BoardCard(props: BoardCardProps) {
 
       const downloadUrl = `text:${title}.${extension}:${hyperfileUrl}`
       e.dataTransfer.setData('DownloadURL', downloadUrl)
-      console.log('DLU', downloadUrl)
     }
   }
 
@@ -114,15 +113,12 @@ export default function BoardCard(props: BoardCardProps) {
 
   const selected = props.selected || props.remoteSelected.length > 0
 
+  // XXX - the resize-handle is totally broken right now!
   return (
     <div
       tabIndex={-1}
       id={`card-${card.id}`}
-      className={classNames(
-        'BoardCard',
-        `BoardCard-${card.type}`,
-        selected && 'BoardCard--selected'
-      )}
+      className={classNames('BoardCard', selected && 'BoardCard--selected')}
       style={style}
       onClick={onCardClicked}
       onDoubleClick={onCardDoubleClicked}

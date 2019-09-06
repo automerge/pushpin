@@ -1,5 +1,4 @@
 import React from 'react'
-import mime from 'mime-types'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import { useDocument, useHyperfile } from '../../../Hooks'

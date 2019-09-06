@@ -1,14 +1,14 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
-
-import { Handle } from 'hypermerge'
+import { DocUrl } from 'hypermerge'
 import { ContextMenuTrigger } from 'react-contextmenu'
-import { ContentProps } from '../../Content'
+
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
-import { parseDocumentLink, PushpinUrl } from '../../../ShareLink'
-import { BoardDoc } from '.'
+import { parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../../ShareLink'
+import { ContentProps } from '../../Content'
+import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
@@ -25,6 +25,7 @@ import {
   BOARD_CARD_DRAG_OFFSET_X,
   BOARD_CARD_DRAG_OFFSET_Y,
 } from '../../../constants'
+import { useMessaging, useDocument, useRepo } from '../../../Hooks'
 
 const log = Debug('pushpin:board')
 
@@ -55,13 +56,6 @@ const BOARD_HEIGHT = 1800
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
-interface State {
-  selected: any[]
-  remoteSelection: { [contact: string]: string[] }
-  contextMenuPosition?: Position
-  doc?: BoardDoc
-}
-
 interface CardArgs {
   position: Position
   dimension?: Dimension
@@ -71,105 +65,85 @@ export interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
-export default class Board extends React.PureComponent<ContentProps, State> {
-  private handle?: Handle<BoardDoc>
+export default function Board(props: ContentProps) {
+  const [doc, changeDoc] = useDocument<BoardDoc>(props.hypermergeUrl)
+  const [selected, setSelection] = useState<CardId[]>([])
+  const [remoteSelection, setMyRemoteSelection] = useRemoteSelections(props.hypermergeUrl)
+  const contactHeartbeatTimerIds = useRef({})
+  const boardRef = useRef<HTMLDivElement>(null)
+  const repo = useRepo() // for repo.message
 
-  private boardRef = React.createRef<HTMLDivElement>()
-  private cardRefs: Map<string, HTMLDivElement> = new Map<string, HTMLDivElement>()
-
-  private heartbeatTimerId?: NodeJS.Timer
-  private contactHeartbeatTimerId: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
-
-  state: State = {
-    remoteSelection: {},
-    selected: [],
-  }
-
-  componentWillMount = () => {
-    this.handle = window.repo.open(this.props.hypermergeUrl)
-    this.handle.subscribe((doc) => this.onChange(doc))
-    this.handle.subscribeMessage((msg) => this.onMessage(msg))
-  }
-  componentWillUnmount = () => {
-    this.handle && this.handle.close()
-    this.heartbeatTimerId && clearInterval(this.heartbeatTimerId)
-  }
-
-  onChange = (doc) => {
-    this.setState({ doc })
-  }
-
-  onKeyDown = (e) => {
+  const onKeyDown = (e) => {
     // this event can be consumed by a card if it wants to keep control of backspace
     // for example, see text-content.jsx onKeyDown
     if (e.key === 'Backspace') {
-      this.deleteCard(this.state.selected)
+      deleteCard(selected)
     }
   }
 
-  onClick = (e) => {
+  const onClick = (e) => {
     log('onClick')
-    this.selectNone()
+    selectNone()
   }
 
-  onCardClicked = (card, e) => {
+  const onCardClicked = (card: BoardDocCard, e) => {
     if (e.ctrlKey || e.shiftKey) {
-      this.selectToggle(card.id)
+      selectToggle(card.id)
     } else {
       // otherwise we don't have shift/ctrl, so just set selection to this
-      this.selectOnly(card.id)
+      selectOnly(card.id)
     }
     e.stopPropagation()
   }
 
-  onCardDoubleClicked = (card, e) => {
+  const onCardDoubleClicked = (card, e) => {
     window.location = card.url
     e.stopPropagation()
   }
 
-  onDoubleClick = (e) => {
+  const onDoubleClick = (e) => {
     log('onDoubleClick')
 
     // guard against a missing boardRef
-    if (!this.boardRef.current) {
+    if (!boardRef.current) {
       return
     }
 
     const position = {
-      x: e.pageX - this.boardRef.current.offsetLeft,
-      y: e.pageY - this.boardRef.current.offsetTop,
+      x: e.pageX - boardRef.current.offsetLeft,
+      y: e.pageY - boardRef.current.offsetTop,
     }
 
     ContentTypes.create('text', { text: '' }, (url) => {
-      const cardId = this.addCardForContent({ position, url })
-      this.selectOnly(cardId)
+      const cardId = addCardForContent({ position, url })
+      selectOnly(cardId)
     })
   }
 
-  onDragOver = (e) => {
+  const onDragOver = (e) => {
     e.dataTransfer.dropEffect = 'move'
     e.preventDefault()
     e.stopPropagation()
   }
 
-  onDrop = (e) => {
+  const onDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
     const { pageX, pageY } = e
 
-    if (!this.boardRef.current) {
+    if (!boardRef.current) {
       return
     }
     const dropPosition = {
-      x: pageX - this.boardRef.current.offsetLeft,
-      y: pageY - this.boardRef.current.offsetTop,
+      x: pageX - boardRef.current.offsetLeft,
+      y: pageY - boardRef.current.offsetTop,
     }
 
-    if (!(this.state.doc && this.state.doc.cards)) {
+    if (!(doc && doc.cards)) {
       return
     }
     const cardId = e.dataTransfer.getData(BOARD_CARD_DRAG_TYPE)
-    if (this.state.doc.cards[cardId]) {
+    if (doc.cards[cardId]) {
       const offset = {
         x: parseFloat(e.dataTransfer.getData(BOARD_CARD_DRAG_OFFSET_X)),
         y: parseFloat(e.dataTransfer.getData(BOARD_CARD_DRAG_OFFSET_Y)),
@@ -179,17 +153,19 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         y: dropPosition.y - offset.y,
       }
       e.dataTransfer.dropEffect = 'move'
-      this.cardMoved({ id: cardId, position })
+      cardMoved({ id: cardId, position })
+
+      // XXX - this needs updating to move all the selected cards
       return
     }
 
     ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
       const position = gridOffset(dropPosition, i)
-      this.addCardForContent({ position, url })
+      addCardForContent({ position, url })
     })
   }
 
-  onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+  const onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     log('onPaste')
     e.preventDefault()
     e.stopPropagation()
@@ -208,16 +184,12 @@ export default class Board extends React.PureComponent<ContentProps, State> {
 
     ImportData.importDataTransfer(e.clipboardData, (url, i) => {
       const offsetPosition = gridOffset(position, i)
-      this.addCardForContent({ position: offsetPosition, url })
+      addCardForContent({ position: offsetPosition, url })
     })
   }
 
-  onFilesOpened = (e: React.FormEvent<HTMLInputElement>) => {
-    // e.target.files
-  }
-
-  addCardForContent = ({ position, dimension, url }: AddCardArgs) => {
-    const id = uuid()
+  const addCardForContent = ({ position, dimension, url }: AddCardArgs) => {
+    const id = uuid() as CardId // ehhhhh
 
     const { type } = parseDocumentLink(url)
     const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) as any
@@ -228,196 +200,192 @@ export default class Board extends React.PureComponent<ContentProps, State> {
         height: gridCellsToPixels(component.defaultHeight),
       }
 
-    this.handle &&
-      this.handle.change((b) => {
-        const { x, y } = snapPositionToGrid(position)
-        const { width, height } = snapDimensionToGrid(dimension)
-        const newCard = {
-          id,
-          url,
-          x,
-          y,
-          width,
-          height,
-        }
-        b.cards[id] = newCard
-      })
+    changeDoc((b: BoardDoc) => {
+      const { x, y } = snapPositionToGrid(position)
+      const { width, height } = snapDimensionToGrid(dimension)
+      const newCard = {
+        id,
+        url,
+        x,
+        y,
+        width,
+        height,
+      }
+      b.cards[id] = newCard
+    })
 
     return id
   }
 
-  cardMoved = ({ id, position }) => {
-    if (!(this.state.doc && this.state.doc.cards)) {
+  const cardMoved = ({ id, position }) => {
+    if (!(doc && doc.cards)) {
       return
     }
 
     // This gets called when uniquely selecting a card, so avoid a document
     // change if in fact the card hasn't moved mod snapping.
     const snapPosition = snapPositionToGrid(position)
-    const cardPosition = { x: this.state.doc.cards[id].x, y: this.state.doc.cards[id].y }
+    const cardPosition = { x: doc.cards[id].x, y: doc.cards[id].y }
     if (snapPosition.x === cardPosition.x && snapPosition.y === cardPosition.y) {
       return
     }
-    this.handle &&
-      this.handle.change((b) => {
-        const card = b.cards[id]
-        card.x = snapPosition.x
-        card.y = snapPosition.y
-      })
+
+    changeDoc((b) => {
+      const card = b.cards[id]
+      card.x = snapPosition.x
+      card.y = snapPosition.y
+    })
   }
 
-  deleteCard = (id) => {
+  const deleteCard = (id) => {
     // allow either an array or a single card to be passed in
     if (id.constructor !== Array) {
       id = [id]
     }
 
-    this.handle &&
-      this.handle.change((b) => {
-        id.forEach((id) => delete b.cards[id])
-      })
+    changeDoc((b) => {
+      id.forEach((id) => delete b.cards[id])
+    })
   }
 
-  changeTitle = (title) => {
-    log('changeTitle')
-    this.handle &&
-      this.handle.change((b) => {
-        b.title = title
-      })
-  }
-
-  changeBackgroundColor = (color) => {
+  const changeBackgroundColor = (color) => {
     log('changeBackgroundColor')
-    this.handle &&
-      this.handle.change((b) => {
-        b.backgroundColor = color.hex
-      })
+    changeDoc((b) => {
+      b.backgroundColor = color.hex
+    })
   }
 
-  onMessage = (msg) => {
-    const { contact, selected } = msg
-
-    if (contact && selected) {
-      this.setState((prevState) => ({
-        remoteSelection: {
-          ...prevState.remoteSelection,
-          [contact]: selected,
-        },
-      }))
-    }
-
-    // if we don't hear from another user for a while, assume they've gone offline
-    if (contact) {
-      clearTimeout(this.contactHeartbeatTimerId[contact])
-      // if we miss two heartbeats (11s), assume they've gone offline
-      this.contactHeartbeatTimerId[contact] = setTimeout(() => {
-        this.clearRemoteSelection(contact)
-      }, 3000)
-    }
+  const updateSelection = (selected: CardId[]) => {
+    setSelection(selected)
+    setMyRemoteSelection(selected)
   }
 
-  clearRemoteSelection = (contact) => {
-    this.setState((prevState) => ({
-      remoteSelection: {
-        ...prevState.remoteSelection,
-        [contact]: undefined,
-      },
-    }))
-  }
-
-  updateSelection = (selected) => {
-    this.setState({ selected })
-    this.handle && this.handle.message({ contact: this.props.selfId, selected })
-  }
-
-  selectToggle = (cardId) => {
-    const { selected } = this.state
-
+  const selectToggle = (cardId: CardId) => {
     if (selected.includes(cardId)) {
       // remove from the current state if we have it
-      this.updateSelection([selected.filter((filterId) => filterId !== cardId)])
+      const newSelection = selected.filter((filterId) => filterId !== cardId)
+      updateSelection(newSelection)
     } else {
       // add to the current state if we don't
-      this.updateSelection([...selected, cardId])
+      updateSelection([...selected, cardId])
     }
   }
 
-  selectOnly = (cardId) => {
-    this.updateSelection([cardId])
+  const selectOnly = (cardId: CardId) => {
+    updateSelection([cardId])
   }
 
-  selectNone = () => {
-    this.updateSelection([])
+  const selectNone = () => {
+    updateSelection([])
   }
 
-  render = () => {
-    log('render')
-    if (!(this.state.doc && this.state.doc.cards)) {
-      return null
-    }
+  log('render')
+  if (!(doc && doc.cards)) {
+    return null
+  }
 
-    // invert the client->cards to a cards->client mapping
-    const { remoteSelection } = this.state
-    const cardsSelected = {}
-    Object.entries(remoteSelection).forEach(([contact, cards]) => {
-      cards &&
-        cards.forEach((card) => {
-          if (!cardsSelected[card]) {
-            cardsSelected[card] = []
-          }
-          cardsSelected[card].push(contact)
-        })
+  interface RemoteSelectionData {
+    [contact: string]: string[] | undefined // technically, undefined is not an option but...
+  }
+
+  type SendSelectionFn = (selection: string[]) => void
+
+  interface RemoteSelectionMessage {
+    contact: DocUrl
+    selected: CardId[]
+    depart: boolean
+  }
+
+  function useRemoteSelections(url: HypermergeUrl): [RemoteSelectionData, SendSelectionFn] {
+    const [remoteSelection, setRemoteSelection] = useState<RemoteSelectionData>({})
+
+    useMessaging<RemoteSelectionMessage>(url, (msg) => {
+      const { contact, selected, depart } = msg
+
+      if (contact) {
+        clearTimeout(contactHeartbeatTimerIds.current[contact])
+        // if we miss two heartbeats (11s), assume they've gone offline
+        contactHeartbeatTimerIds.current[contact] = setTimeout(() => {
+          setRemoteSelection({ ...remoteSelection, [contact]: undefined })
+        }, 5000)
+      }
+
+      if (selected) {
+        setRemoteSelection({ ...remoteSelection, [contact]: selected })
+      }
+
+      if (depart) {
+        setRemoteSelection({ ...remoteSelection, [contact]: undefined })
+      }
     })
 
-    const cards = this.state.doc.cards || {}
-    const cardChildren = Object.entries(cards).map(([id, card]) => {
-      const selected = this.state.selected.includes(id)
-      const uniquelySelected = selected && this.state.selected.length === 1
-      return (
-        <BoardCard
-          key={id}
-          id={id}
-          boardUrl={this.props.hypermergeUrl}
-          card={card}
-          selected={selected}
-          remoteSelected={cardsSelected[id] || []}
-          uniquelySelected={uniquelySelected}
-          onCardClicked={this.onCardClicked}
-          onCardDoubleClicked={this.onCardDoubleClicked}
-        />
-      )
-    })
+    const sendFn = (selected) =>
+      repo.message(props.hypermergeUrl, { contact: props.selfId, selected })
 
+    return [remoteSelection, sendFn]
+  }
+
+  // invert the client->cards to a cards->client mapping
+  const cardsSelected = {}
+
+  Object.entries(remoteSelection).forEach(([contact, cards]) => {
+    cards &&
+      cards.forEach((card) => {
+        if (!cardsSelected[card]) {
+          cardsSelected[card] = []
+        }
+        cardsSelected[card].push(contact)
+      })
+  })
+
+  const { cards } = doc
+  const cardChildren = Object.entries(cards).map(([id, card]) => {
+    const isSelected = selected.includes(id as CardId) // sadly we can't have IDs as non-string types
+    const uniquelySelected = isSelected && selected.length === 1
     return (
-      <div
-        className="Board"
-        ref={this.boardRef}
-        style={{
-          backgroundColor: this.state.doc.backgroundColor,
-          width: BOARD_WIDTH,
-          height: BOARD_HEIGHT,
-        }}
-        onKeyDown={this.onKeyDown}
-        onClick={this.onClick}
-        onDoubleClick={this.onDoubleClick}
-        onDragOver={this.onDragOver}
-        onDragEnter={this.onDragOver}
-        onDrop={this.onDrop}
-        onPaste={this.onPaste}
-        role="presentation"
-      >
-        <BoardContextMenu
-          boardTitle={this.state.doc.title}
-          contentTypes={ContentTypes.list({ context: 'board' })}
-          addCardForContent={this.addCardForContent}
-          backgroundColor={this.state.doc.backgroundColor || BOARD_COLORS.DEFAULT}
-          backgroundColors={BOARD_COLOR_VALUES}
-          changeBackgroundColor={this.changeBackgroundColor}
-        />
-        <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
-          <div>{cardChildren}</div>
-        </ContextMenuTrigger>
-      </div>
+      <BoardCard
+        key={id}
+        id={id}
+        boardUrl={props.hypermergeUrl}
+        card={card}
+        selected={isSelected}
+        remoteSelected={cardsSelected[id] || []}
+        uniquelySelected={uniquelySelected}
+        onCardClicked={onCardClicked}
+        onCardDoubleClicked={onCardDoubleClicked}
+      />
     )
-  }
+  })
+
+  return (
+    <div
+      className="Board"
+      ref={boardRef}
+      style={{
+        backgroundColor: doc.backgroundColor,
+        width: BOARD_WIDTH,
+        height: BOARD_HEIGHT,
+      }}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
+      onDoubleClick={onDoubleClick}
+      onDragOver={onDragOver}
+      onDragEnter={onDragOver}
+      onDrop={onDrop}
+      onPaste={onPaste}
+      role="presentation"
+    >
+      <BoardContextMenu
+        boardTitle={doc.title}
+        contentTypes={ContentTypes.list({ context: 'board' })}
+        addCardForContent={addCardForContent}
+        backgroundColor={doc.backgroundColor || BOARD_COLORS.DEFAULT}
+        backgroundColors={BOARD_COLOR_VALUES}
+        changeBackgroundColor={changeBackgroundColor}
+      />
+      <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
+        <div>{cardChildren}</div>
+      </ContextMenuTrigger>
+    </div>
+  )
 }

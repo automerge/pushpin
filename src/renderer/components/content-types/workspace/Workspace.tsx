@@ -12,7 +12,7 @@ import { ContactDoc } from '../contact'
 
 import './Workspace.css'
 import { useDocument, useAllHeartbeats, useHeartbeat } from '../../../Hooks'
-import { BoardDoc } from '../board'
+import { BoardDoc, CardId } from '../board'
 
 const log = Debug('pushpin:workspace')
 
@@ -146,10 +146,9 @@ function create(attrs, handle, callback) {
       { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
       (boardUrl) => {
         ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
-          const id = uuid()
+          const id = uuid() as CardId
           window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
             doc.cards[id] = {
-              type: 'text',
               id,
               url: textDocUrl,
               x: 20,
