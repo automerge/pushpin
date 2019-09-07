@@ -6,8 +6,8 @@ import Content from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
-import { BoardDocCard } from '.'
-import { Position } from './BoardGrid'
+import { BoardDocCard, CardId } from '.'
+import { Position, Dimension } from './BoardGrid'
 import { ContactDoc } from '../contact'
 import { useDocument, useHyperfile } from '../../../Hooks'
 import './BoardCard.css'
@@ -29,6 +29,7 @@ interface BoardCardProps {
 
   onCardClicked(card: BoardDocCard, event: React.MouseEvent): void
   onCardDoubleClicked(card: BoardDocCard, event: React.MouseEvent): void
+  resizeCard(id: CardId, dimension: Dimension): void
 }
 
 export default function BoardCard(props: BoardCardProps) {
@@ -42,6 +43,10 @@ export default function BoardCard(props: BoardCardProps) {
 
   const [drag, setDrag] = useState<Position | null>(null)
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 })
+
+  const [resizeStart, setResizeStart] = useState<Position | null>(null)
+
+  const [resize, setResize] = useState<Dimension | null>(null)
 
   const { hypermergeUrl } = parseDocumentLink(card.url)
   const [doc] = useDocument<any>(hypermergeUrl)
@@ -98,10 +103,44 @@ export default function BoardCard(props: BoardCardProps) {
     setDrag(null)
   }
 
+  const resizePointerDown = (e: React.PointerEvent) => {
+    setResizeStart({ x: e.pageX, y: e.pageY })
+    setResize({ width: card.width, height: card.height })
+    ;(e.target as Element).setPointerCapture(e.pointerId)
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const resizePointerMove = (e: React.PointerEvent) => {
+    if (!resize) {
+      return
+    }
+    // actually this is possible... need to fix
+    if (!card || !card.width || !card.height || !resizeStart || !resize) {
+      return
+    }
+    setResize({
+      width: card.width - resizeStart.x + e.pageX,
+      height: card.height - resizeStart.y + e.pageY,
+    })
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  function resizePointerUp(e: React.PointerEvent) {
+    ;(e.target as Element).releasePointerCapture(e.pointerId)
+    if (resize) {
+      props.resizeCard(card.id, resize)
+    }
+    setResizeStart(null)
+    setResize(null)
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
   const style: React.CSSProperties = {
     ['--highlight-color' as any]: highlightColor,
-    width: card.width,
-    height: card.height,
+    width: resize ? resize.width : card.width,
+    height: resize ? resize.height : card.height,
     position: drag ? 'fixed' : 'absolute',
     left: drag ? drag.x - dragOffset.x : card.x,
     top: drag ? drag.y - dragOffset.y : card.y,
@@ -130,7 +169,13 @@ export default function BoardCard(props: BoardCardProps) {
     >
       <Content context="board" url={card.url} uniquelySelected={props.uniquelySelected} />
       {contentType && contentType.resizable !== false && (
-        <span className="BoardCard-resizeHandle" />
+        <span
+          onPointerDown={resizePointerDown}
+          onPointerMove={resizePointerMove}
+          onPointerUp={resizePointerUp}
+          onPointerCancel={resizePointerUp}
+          className="BoardCard-resizeHandle"
+        />
       )}
     </div>
   )

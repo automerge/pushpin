@@ -237,6 +237,29 @@ export default function Board(props: ContentProps) {
     })
   }
 
+  const cardResized = (id: CardId, dimension: Dimension) => {
+    if (!(doc && doc.cards)) {
+      return
+    }
+
+    // This gets called when uniquely selecting a card, so avoid a document
+    // change if in fact the card hasn't moved mod snapping.
+    const snapDimension = snapDimensionToGrid(dimension)
+    const cardDimension = { width: doc.cards[id].width, height: doc.cards[id].height }
+    if (
+      snapDimension.width === cardDimension.width &&
+      snapDimension.height === cardDimension.height
+    ) {
+      return
+    }
+
+    changeDoc((b) => {
+      const card = b.cards[id]
+      card.width = snapDimension.width
+      card.height = snapDimension.height
+    })
+  }
+
   const deleteCard = (id) => {
     // allow either an array or a single card to be passed in
     if (id.constructor !== Array) {
@@ -353,6 +376,7 @@ export default function Board(props: ContentProps) {
         uniquelySelected={uniquelySelected}
         onCardClicked={onCardClicked}
         onCardDoubleClicked={onCardDoubleClicked}
+        resizeCard={cardResized}
       />
     )
   })
