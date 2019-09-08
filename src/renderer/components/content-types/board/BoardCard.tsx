@@ -119,8 +119,8 @@ export default function BoardCard(props: BoardCardProps) {
     if (!resize || !resizeStart) {
       return
     }
-    // actually this is possible... need to fix
-    if (!(card && cardRef.current)) {
+
+    if (!cardRef.current) {
       return
     }
 
