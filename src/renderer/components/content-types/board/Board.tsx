@@ -1,12 +1,11 @@
 import React, { useRef, useState } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
-import { DocUrl } from 'hypermerge'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
-import { parseDocumentLink, PushpinUrl, HypermergeUrl } from '../../../ShareLink'
+import { parseDocumentLink, PushpinUrl } from '../../../ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard from './BoardCard'
@@ -23,7 +22,8 @@ import {
 import { boundPosition } from './BoardBoundary'
 
 import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
-import { useMessaging, useDocument, useRepo } from '../../../Hooks'
+import { useDocument } from '../../../Hooks'
+import { useRemoteSelections } from './BroadcastSelectionHook'
 
 const log = Debug('pushpin:board')
 
@@ -51,18 +51,6 @@ export const BOARD_COLORS = {
 export const BOARD_WIDTH = 3600
 export const BOARD_HEIGHT = 1800
 
-interface RemoteSelectionData {
-  [contact: string]: string[] | undefined // technically, undefined is not an option but...
-}
-
-type SendSelectionFn = (selection: string[]) => void
-
-interface RemoteSelectionMessage {
-  contact: DocUrl
-  selected: CardId[]
-  depart: boolean
-}
-
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
@@ -78,14 +66,15 @@ export interface AddCardArgs extends CardArgs {
 export default function Board(props: ContentProps) {
   const [doc, changeDoc] = useDocument<BoardDoc>(props.hypermergeUrl)
   const [selected, setSelection] = useState<CardId[]>([])
-  const [remoteSelection, setMyRemoteSelection] = useRemoteSelections(props.hypermergeUrl)
+  const [remoteSelection, broadcastSelection] = useRemoteSelections(
+    props.hypermergeUrl,
+    props.selfId
+  )
   const [selectionDragOffset, setSelectionDragOffset] = useState<Position>({
     x: 0,
     y: 0,
   })
-  const contactHeartbeatTimerIds = useRef({})
   const boardRef = useRef<HTMLDivElement>(null)
-  const repo = useRepo() // for repo.message
 
   const onKeyDown = (e) => {
     // this event can be consumed by a card if it wants to keep control of backspace
@@ -317,7 +306,7 @@ export default function Board(props: ContentProps) {
    */
   const updateSelection = (selected: CardId[]) => {
     setSelection(selected)
-    setMyRemoteSelection(selected)
+    broadcastSelection(selected)
   }
 
   const selectToggle = (cardId: CardId) => {
@@ -337,36 +326,6 @@ export default function Board(props: ContentProps) {
 
   const selectNone = () => {
     updateSelection([])
-  }
-
-  // a custom hook for selections. XXX: clean up and move this
-  const useRemoteSelections = (url: HypermergeUrl): [RemoteSelectionData, SendSelectionFn] => {
-    const [remoteSelection, setRemoteSelection] = useState<RemoteSelectionData>({})
-
-    useMessaging<RemoteSelectionMessage>(url, (msg) => {
-      const { contact, selected, depart } = msg
-
-      if (contact) {
-        clearTimeout(contactHeartbeatTimerIds.current[contact])
-        // if we miss two heartbeats (11s), assume they've gone offline
-        contactHeartbeatTimerIds.current[contact] = setTimeout(() => {
-          setRemoteSelection({ ...remoteSelection, [contact]: undefined })
-        }, 5000)
-      }
-
-      if (selected) {
-        setRemoteSelection({ ...remoteSelection, [contact]: selected })
-      }
-
-      if (depart) {
-        setRemoteSelection({ ...remoteSelection, [contact]: undefined })
-      }
-    })
-
-    const sendFn = (selected) =>
-      repo.message(props.hypermergeUrl, { contact: props.selfId, selected })
-
-    return [remoteSelection, sendFn]
   }
 
   /**
