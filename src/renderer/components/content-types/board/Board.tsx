@@ -142,7 +142,7 @@ export default function Board(props: ContentProps) {
 
   const onDropInternal = (e) => {
     e.dataTransfer.dropEffect = 'move'
-    moveCardsBy({ selected, offset: selectionDragOffset })
+    moveCardsBy(selected, selectionDragOffset)
     setSelectionDragOffset({ x: 0, y: 0 })
   }
 
@@ -221,7 +221,7 @@ export default function Board(props: ContentProps) {
     return id
   }
 
-  const moveCardsBy = ({ selected, offset }) => {
+  const moveCardsBy = (selected, offset) => {
     if (!(doc && doc.cards)) {
       return
     }
