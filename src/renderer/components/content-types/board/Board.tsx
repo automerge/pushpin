@@ -23,7 +23,7 @@ import { boundPosition } from './BoardBoundary'
 
 import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { useDocument } from '../../../Hooks'
-import { useRemoteSelections } from './BroadcastSelectionHook'
+import { useSelection } from './BroadcastSelection'
 
 const log = Debug('pushpin:board')
 
@@ -65,16 +65,15 @@ export interface AddCardArgs extends CardArgs {
 
 export default function Board(props: ContentProps) {
   const [doc, changeDoc] = useDocument<BoardDoc>(props.hypermergeUrl)
-  const [selected, setSelection] = useState<CardId[]>([])
-  const [remoteSelection, broadcastSelection] = useRemoteSelections(
-    props.hypermergeUrl,
-    props.selfId
-  )
   const [selectionDragOffset, setSelectionDragOffset] = useState<Position>({
     x: 0,
     y: 0,
   })
   const boardRef = useRef<HTMLDivElement>(null)
+  const { selected, remoteSelection, selectOnly, selectToggle, selectNone } = useSelection(
+    props.hypermergeUrl,
+    props.selfId
+  )
 
   const onKeyDown = (e) => {
     // this event can be consumed by a card if it wants to keep control of backspace
@@ -297,35 +296,6 @@ export default function Board(props: ContentProps) {
     changeDoc((b) => {
       b.backgroundColor = color.hex
     })
-  }
-
-  /*
-   * Selection manipulation functions
-   * these functional control the currently selected set of cards
-   * and broadcast changes to the set to your fellow editors
-   */
-  const updateSelection = (selected: CardId[]) => {
-    setSelection(selected)
-    broadcastSelection(selected)
-  }
-
-  const selectToggle = (cardId: CardId) => {
-    if (selected.includes(cardId)) {
-      // remove from the current state if we have it
-      const newSelection = selected.filter((filterId) => filterId !== cardId)
-      updateSelection(newSelection)
-    } else {
-      // add to the current state if we don't
-      updateSelection([...selected, cardId])
-    }
-  }
-
-  const selectOnly = (cardId: CardId) => {
-    updateSelection([cardId])
-  }
-
-  const selectNone = () => {
-    updateSelection([])
   }
 
   /**
