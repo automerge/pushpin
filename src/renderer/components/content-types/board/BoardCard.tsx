@@ -139,7 +139,8 @@ export default function BoardCard(props: BoardCardProps) {
     e.preventDefault()
     e.stopPropagation()
   }
-  function resizePointerUp(e: React.PointerEvent) {
+
+  const resizePointerUp = (e: React.PointerEvent) => {
     ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       props.resizeCard(card.id, resize)
