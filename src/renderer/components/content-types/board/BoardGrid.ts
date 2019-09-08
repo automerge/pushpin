@@ -15,6 +15,8 @@
  *
  * */
 
+import { BOARD_HEIGHT, BOARD_WIDTH } from './Board'
+
 const GRID_SIZE = 20
 
 export interface Position {
@@ -74,6 +76,14 @@ export const snapToGrid = (num) => {
 export const snapPositionToGrid = ({ x, y }: Position): Position => ({
   x: snapToGrid(x),
   y: snapToGrid(y),
+})
+
+export const boundPosition = (
+  { x, y }: Position,
+  { width = 0, height = 0 }: Dimension
+): Position => ({
+  x: Math.min(Math.max(x, 0), BOARD_WIDTH - width),
+  y: Math.min(Math.max(y, 0), BOARD_HEIGHT - height),
 })
 
 export const snapDimensionToGrid = (

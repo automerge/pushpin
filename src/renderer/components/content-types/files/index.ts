@@ -1,6 +1,7 @@
 import Debug from 'debug'
 import { Handle, HyperfileUrl } from 'hypermerge'
 import mime from 'mime-types'
+import path from 'path'
 import ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
 import FileInList from './FileInList'
@@ -25,7 +26,7 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
       .then((hyperfileUrl) => {
         handle.change((doc) => {
           doc.hyperfileUrl = hyperfileUrl
-          doc.title = name
+          doc.title = path.basename(name)
         })
         callback()
       })

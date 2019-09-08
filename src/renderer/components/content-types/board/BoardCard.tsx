@@ -11,12 +11,7 @@ import { Position, Dimension } from './BoardGrid'
 import { ContactDoc } from '../contact'
 import { useDocument, useHyperfile } from '../../../Hooks'
 import './BoardCard.css'
-import {
-  PUSHPIN_DRAG_TYPE,
-  BOARD_CARD_DRAG_TYPE,
-  BOARD_CARD_DRAG_OFFSET_X,
-  BOARD_CARD_DRAG_OFFSET_Y,
-} from '../../../constants'
+import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 
 interface BoardCardProps {
   id: string
@@ -30,6 +25,9 @@ interface BoardCardProps {
   onCardClicked(card: BoardDocCard, event: React.MouseEvent): void
   onCardDoubleClicked(card: BoardDocCard, event: React.MouseEvent): void
   resizeCard(id: CardId, dimension: Dimension): void
+
+  announceDragOffset(amount: Position): void
+  dragOffset: Position
 }
 
 export default function BoardCard(props: BoardCardProps) {
@@ -41,8 +39,7 @@ export default function BoardCard(props: BoardCardProps) {
   const [contactDoc] = useDocument<ContactDoc>(remoteSelectorContact || null)
   const highlightColor = contactDoc && contactDoc.color
 
-  const [drag, setDrag] = useState<Position | null>(null)
-  const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 })
+  const [dragStart, setDragStart] = useState<Position | null>(null)
 
   const [resizeStart, setResizeStart] = useState<Position | null>(null)
 
@@ -68,20 +65,19 @@ export default function BoardCard(props: BoardCardProps) {
   }
 
   function onDragStart(e: React.DragEvent) {
-    setDrag({ x: e.pageX, y: e.pageY })
-    const dragOffset = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }
-    setDragOffset(dragOffset)
+    if (!selected) {
+      props.onCardClicked(card, e)
+    }
+    setDragStart({ x: e.pageX, y: e.pageY })
 
     // when dragging on the board, we want to maintain the true card element
     e.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
-    e.dataTransfer.setData(BOARD_CARD_DRAG_TYPE, card.id)
-    e.dataTransfer.setData(BOARD_CARD_DRAG_OFFSET_X, dragOffset.x.toString())
-    e.dataTransfer.setData(BOARD_CARD_DRAG_OFFSET_Y, dragOffset.y.toString())
+    e.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
     // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
     e.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
 
-    // and we'll add a DownloadURL (if there's a toFile available on the type)
+    // and we'll add a DownloadURL
     if (hyperfileData) {
       const { mimeType } = hyperfileData
       const extension = mime.extension(mimeType) || ''
@@ -95,12 +91,15 @@ export default function BoardCard(props: BoardCardProps) {
   // but we want to move the actual DOM element during the drag so that
   // we don't have ugly ghosting
   function onDrag(e: React.DragEvent) {
-    setDrag({ x: e.pageX, y: e.pageY })
+    if (!dragStart) {
+      return
+    }
+    props.announceDragOffset({ x: e.pageX - dragStart.x, y: e.pageY - dragStart.y })
     e.preventDefault()
   }
 
   function onDragEnd(e: React.DragEvent) {
-    setDrag(null)
+    setDragStart(null)
   }
 
   const resizePointerDown = (e: React.PointerEvent) => {
@@ -116,7 +115,7 @@ export default function BoardCard(props: BoardCardProps) {
       return
     }
     // actually this is possible... need to fix
-    if (!card || !card.width || !card.height || !resizeStart || !resize) {
+    if (!card || !card.width || !card.height || !resizeStart) {
       return
     }
     setResize({
@@ -141,9 +140,9 @@ export default function BoardCard(props: BoardCardProps) {
     ['--highlight-color' as any]: highlightColor,
     width: resize ? resize.width : card.width,
     height: resize ? resize.height : card.height,
-    position: drag ? 'fixed' : 'absolute',
-    left: drag ? drag.x - dragOffset.x : card.x,
-    top: drag ? drag.y - dragOffset.y : card.y,
+    position: 'absolute',
+    left: card.x + props.dragOffset.x,
+    top: card.y + props.dragOffset.y,
   }
 
   const { type } = parseDocumentLink(card.url)

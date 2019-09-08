@@ -19,12 +19,9 @@ import {
   gridCellsToPixels,
   snapDimensionToGrid,
   snapPositionToGrid,
+  boundPosition,
 } from './BoardGrid'
-import {
-  BOARD_CARD_DRAG_TYPE,
-  BOARD_CARD_DRAG_OFFSET_X,
-  BOARD_CARD_DRAG_OFFSET_Y,
-} from '../../../constants'
+import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { useMessaging, useDocument, useRepo } from '../../../Hooks'
 
 const log = Debug('pushpin:board')
@@ -50,8 +47,8 @@ export const BOARD_COLORS = {
   BLACK: '#2b2b2b',
 }
 
-const BOARD_WIDTH = 3600
-const BOARD_HEIGHT = 1800
+export const BOARD_WIDTH = 3600
+export const BOARD_HEIGHT = 1800
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
@@ -69,6 +66,10 @@ export default function Board(props: ContentProps) {
   const [doc, changeDoc] = useDocument<BoardDoc>(props.hypermergeUrl)
   const [selected, setSelection] = useState<CardId[]>([])
   const [remoteSelection, setMyRemoteSelection] = useRemoteSelections(props.hypermergeUrl)
+  const [selectionDragOffset, setSelectionDragOffset] = useState<Position>({
+    x: 0,
+    y: 0,
+  })
   const contactHeartbeatTimerIds = useRef({})
   const boardRef = useRef<HTMLDivElement>(null)
   const repo = useRepo() // for repo.message
@@ -121,7 +122,6 @@ export default function Board(props: ContentProps) {
   }
 
   const onDragOver = (e) => {
-    e.dataTransfer.dropEffect = 'move'
     e.preventDefault()
     e.stopPropagation()
   }
@@ -129,40 +129,29 @@ export default function Board(props: ContentProps) {
   const onDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    const { pageX, pageY } = e
 
-    if (!boardRef.current) {
+    if (!(boardRef.current && doc && doc.cards)) {
       return
     }
-    const dropPosition = {
-      x: pageX - boardRef.current.offsetLeft,
-      y: pageY - boardRef.current.offsetTop,
-    }
 
-    if (!(doc && doc.cards)) {
-      return
-    }
-    const cardId = e.dataTransfer.getData(BOARD_CARD_DRAG_TYPE)
-    if (doc.cards[cardId]) {
-      const offset = {
-        x: parseFloat(e.dataTransfer.getData(BOARD_CARD_DRAG_OFFSET_X)),
-        y: parseFloat(e.dataTransfer.getData(BOARD_CARD_DRAG_OFFSET_Y)),
-      }
-      const position = {
-        x: dropPosition.x - offset.x,
-        y: dropPosition.y - offset.y,
-      }
+    // If we have an origin board, and it's us, this is a move operation.
+    const originBoard = e.dataTransfer.getData(BOARD_CARD_DRAG_ORIGIN)
+    if (originBoard === props.hypermergeUrl) {
       e.dataTransfer.dropEffect = 'move'
-      cardMoved({ id: cardId, position })
-
-      // XXX - this needs updating to move all the selected cards
-      return
+      moveCardsBy({ selected, offset: selectionDragOffset })
+      setSelectionDragOffset({ x: 0, y: 0 })
+    } else {
+      // Otherwise consttruct the drop point and import the data.
+      const { pageX, pageY } = e
+      const dropPosition = {
+        x: pageX - boardRef.current.offsetLeft,
+        y: pageY - boardRef.current.offsetTop,
+      }
+      ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
+        const position = gridOffset(dropPosition, i)
+        addCardForContent({ position, url })
+      })
     }
-
-    ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
-      const position = gridOffset(dropPosition, i)
-      addCardForContent({ position, url })
-    })
   }
 
   const onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -203,13 +192,18 @@ export default function Board(props: ContentProps) {
     changeDoc((b: BoardDoc) => {
       const { x, y } = snapPositionToGrid(position)
       const { width, height } = snapDimensionToGrid(dimension)
-      const newCard = {
+      const newCard: BoardDocCard = {
         id,
         url,
         x,
         y,
-        width,
-        height,
+      }
+      // Automerge doesn't accept undefined values.
+      if (width) {
+        newCard.width = width
+      }
+      if (height) {
+        newCard.height = height
       }
       b.cards[id] = newCard
     })
@@ -217,23 +211,35 @@ export default function Board(props: ContentProps) {
     return id
   }
 
-  const cardMoved = ({ id, position }) => {
+  const moveCardsBy = ({ selected, offset }) => {
     if (!(doc && doc.cards)) {
       return
     }
-
-    // This gets called when uniquely selecting a card, so avoid a document
-    // change if in fact the card hasn't moved mod snapping.
-    const snapPosition = snapPositionToGrid(position)
-    const cardPosition = { x: doc.cards[id].x, y: doc.cards[id].y }
-    if (snapPosition.x === cardPosition.x && snapPosition.y === cardPosition.y) {
-      return
-    }
-
     changeDoc((b) => {
-      const card = b.cards[id]
-      card.x = snapPosition.x
-      card.y = snapPosition.y
+      selected.forEach((id) => {
+        const position = {
+          x: doc.cards[id].x + offset.x,
+          y: doc.cards[id].y + offset.y,
+        }
+
+        const size = {
+          width: doc.cards[id].width,
+          height: doc.cards[id].width,
+        }
+        // This gets called when uniquely selecting a card, so avoid a document
+        // change if in fact the card hasn't moved mod snapping.
+        const snapPosition = snapPositionToGrid(position)
+        const newPosition = boundPosition(snapPosition, size)
+
+        const cardPosition = { x: doc.cards[id].x, y: doc.cards[id].y }
+        if (newPosition.x === cardPosition.x && newPosition.y === cardPosition.y) {
+          return
+        }
+
+        const card = b.cards[id]
+        card.x = newPosition.x
+        card.y = newPosition.y
+      })
     })
   }
 
@@ -371,6 +377,8 @@ export default function Board(props: ContentProps) {
         id={id}
         boardUrl={props.hypermergeUrl}
         card={card}
+        announceDragOffset={setSelectionDragOffset}
+        dragOffset={isSelected ? selectionDragOffset : { x: 0, y: 0 }}
         selected={isSelected}
         remoteSelected={cardsSelected[id] || []}
         uniquelySelected={uniquelySelected}
