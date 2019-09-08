@@ -18,6 +18,7 @@ import {
   gridCellsToPixels,
   snapDimensionToGrid,
   snapPositionToGrid,
+  GRID_SIZE,
 } from './BoardGrid'
 import { boundPosition } from './BoardBoundary'
 
@@ -176,8 +177,8 @@ export default function Board(props: ContentProps) {
      so we ask the window for the current pageX/Y offsets and just stick the new card
      100px in from there. (The new React might support this through pointer events.) */
     const position = {
-      x: window.pageXOffset + 100,
-      y: window.pageYOffset + 100,
+      x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
+      y: window.pageYOffset + window.innerHeight / 2,
     }
 
     ImportData.importDataTransfer(e.clipboardData, (url, i) => {
