@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import classNames from 'classnames'
 import mime from 'mime-types'
 
@@ -44,6 +44,8 @@ export default function BoardCard(props: BoardCardProps) {
   const [resizeStart, setResizeStart] = useState<Position | null>(null)
 
   const [resize, setResize] = useState<Dimension | null>(null)
+
+  const cardRef = useRef<HTMLDivElement>(null)
 
   const { hypermergeUrl } = parseDocumentLink(card.url)
   const [doc] = useDocument<any>(hypermergeUrl)
@@ -103,6 +105,9 @@ export default function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerDown = (e: React.PointerEvent) => {
+    if (!selected) {
+      props.onCardClicked(card, e)
+    }
     setResizeStart({ x: e.pageX, y: e.pageY })
     setResize({ width: card.width, height: card.height })
     ;(e.target as Element).setPointerCapture(e.pointerId)
@@ -111,13 +116,22 @@ export default function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerMove = (e: React.PointerEvent) => {
-    if (!resize) {
+    if (!resize || !resizeStart) {
       return
     }
     // actually this is possible... need to fix
-    if (!card || !card.width || !card.height || !resizeStart) {
+    if (!(card && cardRef.current)) {
       return
     }
+
+    if (!card.width) {
+      card.width = cardRef.current.clientWidth
+    }
+
+    if (!card.height) {
+      card.height = cardRef.current.clientHeight
+    }
+
     setResize({
       width: card.width - resizeStart.x + e.pageX,
       height: card.height - resizeStart.y + e.pageY,
@@ -155,6 +169,7 @@ export default function BoardCard(props: BoardCardProps) {
   return (
     <div
       tabIndex={-1}
+      ref={cardRef}
       id={`card-${card.id}`}
       className={classNames('BoardCard', selected && 'BoardCard--selected')}
       style={style}
