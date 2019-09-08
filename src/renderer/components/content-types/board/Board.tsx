@@ -51,6 +51,18 @@ export const BOARD_COLORS = {
 export const BOARD_WIDTH = 3600
 export const BOARD_HEIGHT = 1800
 
+interface RemoteSelectionData {
+  [contact: string]: string[] | undefined // technically, undefined is not an option but...
+}
+
+type SendSelectionFn = (selection: string[]) => void
+
+interface RemoteSelectionMessage {
+  contact: DocUrl
+  selected: CardId[]
+  depart: boolean
+}
+
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
@@ -186,6 +198,10 @@ export default function Board(props: ContentProps) {
     })
   }
 
+  /*
+   * Card manipulation functions
+   * all the functions in this section call changeDoc
+   */
   const addCardForContent = ({ position, dimension, url }: AddCardArgs) => {
     const id = uuid() as CardId // ehhhhh
 
@@ -294,6 +310,11 @@ export default function Board(props: ContentProps) {
     })
   }
 
+  /*
+   * Selection manipulation functions
+   * these functional control the currently selected set of cards
+   * and broadcast changes to the set to your fellow editors
+   */
   const updateSelection = (selected: CardId[]) => {
     setSelection(selected)
     setMyRemoteSelection(selected)
@@ -318,24 +339,8 @@ export default function Board(props: ContentProps) {
     updateSelection([])
   }
 
-  log('render')
-  if (!(doc && doc.cards)) {
-    return null
-  }
-
-  interface RemoteSelectionData {
-    [contact: string]: string[] | undefined // technically, undefined is not an option but...
-  }
-
-  type SendSelectionFn = (selection: string[]) => void
-
-  interface RemoteSelectionMessage {
-    contact: DocUrl
-    selected: CardId[]
-    depart: boolean
-  }
-
-  function useRemoteSelections(url: HypermergeUrl): [RemoteSelectionData, SendSelectionFn] {
+  // a custom hook for selections. XXX: clean up and move this
+  const useRemoteSelections = (url: HypermergeUrl): [RemoteSelectionData, SendSelectionFn] => {
     const [remoteSelection, setRemoteSelection] = useState<RemoteSelectionData>({})
 
     useMessaging<RemoteSelectionMessage>(url, (msg) => {
@@ -362,6 +367,14 @@ export default function Board(props: ContentProps) {
       repo.message(props.hypermergeUrl, { contact: props.selfId, selected })
 
     return [remoteSelection, sendFn]
+  }
+
+  /**
+   * at long last, render begins here
+   */
+  log('render')
+  if (!(doc && doc.cards)) {
+    return null
   }
 
   // invert the client->cards to a cards->client mapping
