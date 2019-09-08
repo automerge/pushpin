@@ -19,8 +19,9 @@ import {
   gridCellsToPixels,
   snapDimensionToGrid,
   snapPositionToGrid,
-  boundPosition,
 } from './BoardGrid'
+import { boundPosition } from './BoardBoundary'
+
 import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { useMessaging, useDocument, useRepo } from '../../../Hooks'
 
@@ -130,28 +131,36 @@ export default function Board(props: ContentProps) {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!(boardRef.current && doc && doc.cards)) {
-      return
-    }
-
     // If we have an origin board, and it's us, this is a move operation.
     const originBoard = e.dataTransfer.getData(BOARD_CARD_DRAG_ORIGIN)
     if (originBoard === props.hypermergeUrl) {
-      e.dataTransfer.dropEffect = 'move'
-      moveCardsBy({ selected, offset: selectionDragOffset })
-      setSelectionDragOffset({ x: 0, y: 0 })
+      onDropInternal(e)
     } else {
-      // Otherwise consttruct the drop point and import the data.
-      const { pageX, pageY } = e
-      const dropPosition = {
-        x: pageX - boardRef.current.offsetLeft,
-        y: pageY - boardRef.current.offsetTop,
-      }
-      ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
-        const position = gridOffset(dropPosition, i)
-        addCardForContent({ position, url })
-      })
+      onDropExternal(e)
     }
+  }
+
+  const onDropInternal = (e) => {
+    e.dataTransfer.dropEffect = 'move'
+    moveCardsBy({ selected, offset: selectionDragOffset })
+    setSelectionDragOffset({ x: 0, y: 0 })
+  }
+
+  const onDropExternal = (e) => {
+    if (!boardRef.current) {
+      return
+    }
+
+    // Otherwise consttruct the drop point and import the data.
+    const { pageX, pageY } = e
+    const dropPosition = {
+      x: pageX - boardRef.current.offsetLeft,
+      y: pageY - boardRef.current.offsetTop,
+    }
+    ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
+      const position = gridOffset(dropPosition, i)
+      addCardForContent({ position, url })
+    })
   }
 
   const onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -198,7 +207,8 @@ export default function Board(props: ContentProps) {
         x,
         y,
       }
-      // Automerge doesn't accept undefined values.
+      // Automerge doesn't accept undefined values,
+      // which we use to indicate content should set its own size on that dimension.
       if (width) {
         newCard.width = width
       }
