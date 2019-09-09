@@ -174,8 +174,9 @@ export default function Board(props: ContentProps) {
     }
 
     /* We can't get the mouse position on a paste event,
-     so we ask the window for the current pageX/Y offsets and just stick the new card
-     100px in from there. (The new React might support this through pointer events.) */
+     so we just stick the card in the middle of the current scrolled position screen. 
+     (We bump it a bit to the left too to pretend we're really centering, but doing that 
+      would require knowledge of the card's ) */
     const position = {
       x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
       y: window.pageYOffset + window.innerHeight / 2,

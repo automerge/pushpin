@@ -74,6 +74,8 @@ export default function BoardCard(props: BoardCardProps) {
 
     // when dragging on the board, we want to maintain the true card element
     e.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
+
+    // annotate the drag with the current board's URL so we can tell if this is where we came from
     e.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
     // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
@@ -96,6 +98,14 @@ export default function BoardCard(props: BoardCardProps) {
     if (!dragStart) {
       return
     }
+
+    // if you drag outside the window, you'll get an onDrag where pageX and pageY are zero.
+    // this sticks the drag preview into a dumb spot, so we're just going to filter those out
+    // unless anyone has a better idea.
+    if (e.pageX === 0 && e.pageY === 0) {
+      return
+    }
+
     props.announceDragOffset({ x: e.pageX - dragStart.x, y: e.pageY - dragStart.y })
     e.preventDefault()
   }
@@ -166,7 +176,6 @@ export default function BoardCard(props: BoardCardProps) {
 
   const selected = props.selected || props.remoteSelected.length > 0
 
-  // XXX - the resize-handle is totally broken right now!
   return (
     <div
       tabIndex={-1}
