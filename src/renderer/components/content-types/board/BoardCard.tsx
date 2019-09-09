@@ -4,19 +4,15 @@ import mime from 'mime-types'
 
 import Content from '../../Content'
 import ContentTypes from '../../../ContentTypes'
-import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../../../ShareLink'
+import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard, CardId } from '.'
-import { Position, Dimension, gridCellsToPixels } from './BoardGrid'
+import { Position, Dimension } from './BoardGrid'
 import { ContactDoc } from '../contact'
 import { useDocument, useHyperfile } from '../../../Hooks'
 import './BoardCard.css'
 import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
-
-const CARD_MIN_WIDTH = 4
-const CARD_MIN_HEIGHT = 2
-const CARD_MAX_WIDTH = 72
-const CARD_MAX_HEIGHT = 72
+import { boundDimension, boundSizeByType } from './BoardBoundary'
 
 interface BoardCardProps {
   id: string
@@ -119,31 +115,6 @@ export default function BoardCard(props: BoardCardProps) {
     setDragStart(null)
   }
 
-  const determineResizeBounds = (
-    url: PushpinUrl
-  ): { min: { width: number; height: number }; max: { width: number; height: number } } => {
-    const { type } = parseDocumentLink(url)
-    const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) || {}
-    const {
-      minWidth = CARD_MIN_WIDTH,
-      minHeight = CARD_MIN_HEIGHT,
-      maxWidth = CARD_MAX_WIDTH,
-      maxHeight = CARD_MAX_HEIGHT,
-    } = component as any
-
-    // this undefined values option for dimensions is super annoying
-    return {
-      min: {
-        width: gridCellsToPixels(minWidth) || 0,
-        height: gridCellsToPixels(minHeight) || 0,
-      },
-      max: {
-        width: gridCellsToPixels(maxWidth) || 0,
-        height: gridCellsToPixels(maxHeight) || 0,
-      },
-    }
-  }
-
   const resizePointerDown = (e: React.PointerEvent) => {
     if (!selected) {
       props.onCardClicked(card, e)
@@ -172,19 +143,15 @@ export default function BoardCard(props: BoardCardProps) {
       card.height = cardRef.current.clientHeight
     }
 
-    const bounds = determineResizeBounds(card.url)
-
     const movedSize = {
       width: card.width - resizeStart.x + e.pageX,
       height: card.height - resizeStart.y + e.pageY,
     }
 
-    const clampedSize = {
-      width: Math.min(bounds.max.width, Math.max(bounds.min.width, movedSize.width)),
-      height: Math.min(bounds.max.height, Math.max(bounds.min.height, movedSize.height)),
-    }
+    const clampedSize = boundSizeByType(card.url, movedSize)
+    const boundedSize = boundDimension({ x: card.x, y: card.y }, clampedSize)
 
-    setResize(clampedSize)
+    setResize(boundedSize)
     e.preventDefault()
     e.stopPropagation()
   }
