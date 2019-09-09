@@ -240,12 +240,12 @@ export default function Board(props: ContentProps) {
 
         const size = {
           width: doc.cards[id].width,
-          height: doc.cards[id].width,
+          height: doc.cards[id].height,
         }
         // This gets called when uniquely selecting a card, so avoid a document
         // change if in fact the card hasn't moved mod snapping.
-        const snapPosition = snapPositionToGrid(position)
-        const newPosition = boundPosition(snapPosition, size)
+        const boundedPosition = boundPosition(position, size)
+        const newPosition = snapPositionToGrid(boundedPosition)
 
         const cardPosition = { x: doc.cards[id].x, y: doc.cards[id].y }
         if (newPosition.x === cardPosition.x && newPosition.y === cardPosition.y) {

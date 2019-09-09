@@ -103,7 +103,7 @@ export default function BoardCard(props: BoardCardProps) {
     // if you drag outside the window, you'll get an onDrag where pageX and pageY are zero.
     // this sticks the drag preview into a dumb spot, so we're just going to filter those out
     // unless anyone has a better idea.
-    if (e.pageX === 0 && e.pageY === 0) {
+    if (e.screenX === 0 && e.screenY === 0) {
       return
     }
 
@@ -113,6 +113,7 @@ export default function BoardCard(props: BoardCardProps) {
 
   function onDragEnd(e: React.DragEvent) {
     setDragStart(null)
+    props.announceDragOffset({ x: 0, y: 0 })
   }
 
   const resizePointerDown = (e: React.PointerEvent) => {
