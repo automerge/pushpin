@@ -7,17 +7,15 @@ import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard, CardId } from '.'
 import { Position, Dimension } from './BoardGrid'
-import { ContactDoc } from '../contact'
-import { useDocument } from '../../../Hooks'
+import { usePresence, useSelf } from '../../../Hooks'
 import './BoardCard.css'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 
 interface BoardCardProps {
   card: BoardDocCard
-
+  boardUrl: HypermergeUrl
   selected: boolean
   uniquelySelected: boolean
-  remoteSelected: HypermergeUrl[]
 
   onCardClicked(card: BoardDocCard, event: React.MouseEvent): void
   onCardDoubleClicked(card: BoardDocCard, event: React.MouseEvent): void
@@ -28,19 +26,29 @@ interface BoardCardProps {
   resizeCard(id: CardId, dimension: Dimension): void
 }
 
-export default function BoardCard(props: BoardCardProps) {
-  const {
-    card,
-    remoteSelected: [remoteSelectorContact],
-  } = props
+interface Presence {
+  color: string | null
+}
 
-  const [contactDoc] = useDocument<ContactDoc>(remoteSelectorContact || null)
-  const highlightColor = contactDoc && contactDoc.color
+export default function BoardCard(props: BoardCardProps) {
+  const { card } = props
+  const [self] = useSelf()
+  const remotePresences = usePresence<Presence>(
+    props.boardUrl,
+    props.selected && self
+      ? {
+          color: self.color,
+        }
+      : null,
+    card.id
+  )
+  const remotePresence = Object.values(remotePresences)[0]
+  const highlightColor = remotePresence && remotePresence.color
 
   const [resizeStart, setResizeStart] = useState<Position | null>(null)
   const [resize, setResize] = useState<Dimension | null>(null)
 
-  const selected = props.selected || props.remoteSelected.length > 0
+  const selected = props.selected || remotePresence
 
   const cardRef = useRef<HTMLDivElement>(null)
 
