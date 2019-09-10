@@ -72,20 +72,17 @@ export default function Board(props: ContentProps) {
     y: 0,
   })
   const boardRef = useRef<HTMLDivElement>(null)
-  const { selected, remoteSelection, selectOnly, selectToggle, selectNone } = useSelection(
-    props.hypermergeUrl,
-    props.selfId
-  )
+  const { selected, selectOnly, selectToggle, selectNone } = useSelection()
 
   const [dragStart, setDragStart] = useState<Position | null>(null)
 
-  /* 
+  /*
   const { hypermergeUrl } = parseDocumentLink(card.url)
   const [doc] = useDocument<any>(hypermergeUrl)
 
   // yeeeech
   const { hyperfileUrl = null, title = 'untitled' } = doc || {}
-  const hyperfileData = useHyperfile(hyperfileUrl) 
+  const hyperfileData = useHyperfile(hyperfileUrl)
   */
 
   const onKeyDown = (e) => {
@@ -240,8 +237,8 @@ export default function Board(props: ContentProps) {
     }
 
     /* We can't get the mouse position on a paste event,
-     so we just stick the card in the middle of the current scrolled position screen. 
-     (We bump it a bit to the left too to pretend we're really centering, but doing that 
+     so we just stick the card in the middle of the current scrolled position screen.
+     (We bump it a bit to the left too to pretend we're really centering, but doing that
       would require knowledge of the card's ) */
     const position = {
       x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
@@ -378,19 +375,6 @@ export default function Board(props: ContentProps) {
     return null
   }
 
-  // invert the client->cards to a cards->client mapping
-  const cardsSelected = {}
-
-  Object.entries(remoteSelection).forEach(([contact, cards]) => {
-    cards &&
-      cards.forEach((card) => {
-        if (!cardsSelected[card]) {
-          cardsSelected[card] = []
-        }
-        cardsSelected[card].push(contact)
-      })
-  })
-
   const { cards } = doc
   const cardChildren = Object.entries(cards).map(([id, card]) => {
     const isSelected = selected.includes(id as CardId) // sadly we can't have IDs as non-string types
@@ -403,8 +387,8 @@ export default function Board(props: ContentProps) {
           x: isSelected ? card.x + selectionDragOffset.x : card.x,
           y: isSelected ? card.y + selectionDragOffset.y : card.y,
         }}
+        boardUrl={props.hypermergeUrl}
         selected={isSelected}
-        remoteSelected={cardsSelected[id] || []}
         uniquelySelected={uniquelySelected}
         onCardClicked={onCardClicked}
         onCardDoubleClicked={onCardDoubleClicked}
