@@ -22,7 +22,9 @@ app.on('ready', () => {
   createWindow()
 })
 
-protocol.registerStandardSchemes(['pushpin'])
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'pushpin', privileges: { standard: true, bypassCSP: true } },
+])
 
 async function createWindow() {
   // Create the browser window.
