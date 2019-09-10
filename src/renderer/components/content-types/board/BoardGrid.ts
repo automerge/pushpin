@@ -1,3 +1,5 @@
+import { useState, useLayoutEffect } from 'react'
+
 /* Board Grid Utilities
  * (Please be careful before re-using these, they're somewhat idiosyncratic.)
  *
@@ -83,3 +85,37 @@ export const snapDimensionToGrid = (
   width: width ? snapToGrid(width) + 1 : width,
   height: height ? snapToGrid(height) + 1 : height,
 })
+
+/**
+ * measure the distance from a start point over time
+ */
+export function useDistance(): {
+  measuring: boolean
+  distance: Position
+  startMeasure: (Position) => void
+  setCurrent: (Position) => void
+  endMeasure: () => void
+} {
+  const [measuring, setMeasuring] = useState<boolean>(false)
+  const [start, setStart] = useState<Position>({ x: 0, y: 0 })
+  const [current, setCurrent] = useState<Position>({ x: 0, y: 0 })
+
+  const startMeasure = (position) => {
+    setMeasuring(true)
+    setStart(position)
+    setCurrent(position)
+  }
+
+  const endMeasure = () => {
+    setMeasuring(false)
+    setStart(current)
+  }
+
+  const [distance, setDistance] = useState<Position>({ x: 0, y: 0 })
+
+  useLayoutEffect(() => {
+    setDistance({ x: current.x - start.x, y: current.y - start.y })
+  }, [start, current])
+
+  return { measuring, distance, startMeasure, setCurrent, endMeasure }
+}

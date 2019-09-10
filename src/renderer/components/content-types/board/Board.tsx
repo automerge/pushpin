@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
 import { ContextMenuTrigger } from 'react-contextmenu'
@@ -20,6 +20,7 @@ import {
   snapDimensionToGrid,
   snapPositionToGrid,
   GRID_SIZE,
+  useDistance,
 } from './BoardGrid'
 import { boundPosition } from './BoardBoundary'
 
@@ -67,17 +68,13 @@ export interface AddCardArgs extends CardArgs {
 
 export default function Board(props: ContentProps) {
   const [doc, changeDoc] = useDocument<BoardDoc>(props.hypermergeUrl)
-  const [selectionDragOffset, setSelectionDragOffset] = useState<Position>({
-    x: 0,
-    y: 0,
-  })
   const boardRef = useRef<HTMLDivElement>(null)
   const { selected, remoteSelection, selectOnly, selectToggle, selectNone } = useSelection(
     props.hypermergeUrl,
     props.selfId
   )
 
-  const [dragStart, setDragStart] = useState<Position | null>(null)
+  const { distance, startMeasure, setCurrent, endMeasure } = useDistance()
 
   /* 
   const { hypermergeUrl } = parseDocumentLink(card.url)
@@ -120,7 +117,8 @@ export default function Board(props: ContentProps) {
     if (!selected.includes(card.id)) {
       onCardClicked(card, e)
     }
-    setDragStart({ x: e.pageX, y: e.pageY })
+
+    startMeasure({ x: e.pageX, y: e.pageY })
 
     // when dragging on the board, we want to maintain the true card element
     e.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
@@ -147,10 +145,6 @@ export default function Board(props: ContentProps) {
   // but we want to move the actual DOM element during the drag so that
   // we don't have ugly ghosting
   function onCardDrag(card: BoardDocCard, e: React.DragEvent) {
-    if (!dragStart) {
-      return
-    }
-
     // if you drag outside the window, you'll get an onDrag where pageX and pageY are zero.
     // this sticks the drag preview into a dumb spot, so we're just going to filter those out
     // unless anyone has a better idea.
@@ -158,12 +152,12 @@ export default function Board(props: ContentProps) {
       return
     }
 
-    setSelectionDragOffset({ x: e.pageX - dragStart.x, y: e.pageY - dragStart.y })
+    setCurrent({ x: e.pageX, y: e.pageY })
     e.preventDefault()
   }
 
   function onCardDragEnd(card: BoardDocCard, e: React.DragEvent) {
-    setDragStart(null)
+    endMeasure()
   }
 
   const onDoubleClick = (e) => {
@@ -209,8 +203,7 @@ export default function Board(props: ContentProps) {
 
   const onDropInternal = (e) => {
     e.dataTransfer.dropEffect = 'move'
-    moveCardsBy(selected, selectionDragOffset)
-    setSelectionDragOffset({ x: 0, y: 0 })
+    moveCardsBy(selected, distance)
   }
 
   const onDropExternal = (e) => {
@@ -400,8 +393,8 @@ export default function Board(props: ContentProps) {
         key={id}
         card={{
           ...card,
-          x: isSelected ? card.x + selectionDragOffset.x : card.x,
-          y: isSelected ? card.y + selectionDragOffset.y : card.y,
+          x: isSelected ? card.x + distance.x : card.x,
+          y: isSelected ? card.y + distance.y : card.y,
         }}
         selected={isSelected}
         remoteSelected={cardsSelected[id] || []}
