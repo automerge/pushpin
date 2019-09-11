@@ -1,38 +1,33 @@
 import { useState } from 'react'
-import { CardId } from '.'
+import { useStaticCallback } from '../../../Hooks'
 
-type Selection = CardId[]
+type Selection<T> = T[]
 
 /*
  * Selection manipulation functions
  * these functional control the currently selected set of cards
  */
-export function useSelection(): {
-  selected: Selection
-  selectToggle: (cardId: CardId) => void
-  selectOnly: (cardId: CardId) => void
+export function useSelection<T>(): {
+  selected: Selection<T>
+  selectToggle: (id: T) => void
+  selectOnly: (id: T) => void
   selectNone: () => void
 } {
-  const [selected, setSelection] = useState<CardId[]>([])
+  const [selected, setSelection] = useState<T[]>([])
 
-  const selectToggle = (cardId: CardId) => {
-    if (selected.includes(cardId)) {
-      // remove from the current state if we have it
-      const newSelection = selected.filter((filterId) => filterId !== cardId)
-      setSelection(newSelection)
-    } else {
-      // add to the current state if we don't
-      setSelection([...selected, cardId])
-    }
-  }
+  const selectToggle = useStaticCallback((id: T) =>
+    setSelection((selected) =>
+      selected.includes(id) ? selected.filter((filterId) => filterId !== id) : [...selected, id]
+    )
+  )
 
-  const selectOnly = (cardId: CardId) => {
-    setSelection([cardId])
-  }
+  const selectOnly = useStaticCallback((id: T) => {
+    setSelection([id])
+  })
 
-  const selectNone = () => {
+  const selectNone = useStaticCallback(() => {
     setSelection([])
-  }
+  })
 
   return { selected, selectOnly, selectToggle, selectNone }
 }

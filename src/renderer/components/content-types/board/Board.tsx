@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
 import { ContextMenuTrigger } from 'react-contextmenu'
