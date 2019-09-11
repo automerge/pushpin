@@ -1,7 +1,7 @@
 import { Handle, RepoFrontend } from 'hypermerge'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from './ShareLink'
 import { ContactDoc } from './components/content-types/contact'
-import { Doc } from './components/content-types/workspace/Workspace'
+import { Doc as WorkspaceDoc } from './components/content-types/workspace/Workspace'
 
 //
 // Example:
@@ -21,7 +21,7 @@ interface Invitation {
 export default class InvitationsView {
   repo: RepoFrontend
   selfId?: HypermergeUrl
-  workspaceHandle: Handle<Doc>
+  workspaceHandle: Handle<WorkspaceDoc>
   contactHandles: { [contactId: string]: Handle<ContactDoc> }
   docHandles: { [docId: string]: Handle<any> }
   invitations: Invitation[]

@@ -1,3 +1,5 @@
+@import '../../../../node_modules/quill/dist/quill.snow.css';
+
 .TextContent {
   background-color: white;
   position: relative;
@@ -29,6 +31,11 @@
   /* `position: absolute` causes a bizarre 1-frame scroll to the left when pasting */
   position: fixed;
   top: 50%;
+}
+
+.ql-toolbar {
+  position: absolute;
+  z-index: 1;
 }
 
 /* Scrollbar */

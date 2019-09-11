@@ -124,6 +124,14 @@ table {
   border-spacing: 0;
 }
 
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
 /* Line Awesome */
 
 .fa {

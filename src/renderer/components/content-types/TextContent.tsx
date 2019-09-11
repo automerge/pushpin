@@ -3,11 +3,11 @@ import { Handle } from 'hypermerge'
 
 import Automerge from 'automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
-import Delta from 'quill-delta'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument, useStaticCallback } from '../../Hooks'
 import './TextContent.css'
+import { textToDelta, applyDeltaToText } from '../../TextDelta'
 
 interface TextDoc {
   text: Automerge.Text
@@ -31,9 +31,9 @@ export default function TextContent(props: Props) {
     },
     selected: props.uniquelySelected,
     config: {
-      formats: [],
+      theme: 'snow',
       modules: {
-        toolbar: false,
+        toolbar: props.context === 'workspace' ? undefined : false,
         history: {
           maxStack: 500,
           userOnly: true,
@@ -60,23 +60,27 @@ function useQuill({
 }: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
-  const textString = useMemo(() => text && text.join(''), [text])
+  const textDelta = useMemo(() => text && textToDelta(text), [text])
   const makeChange = useStaticCallback(change)
 
   useEffect(() => {
     if (!ref.current) return () => {}
+    if (quill.current) return () => {}
 
     const container = ref.current
+
     const q = new Quill(container, { scrollingContainer: container, ...config })
     quill.current = q
 
-    if (textString) q.setText(textString)
+    if (textDelta) q.setContents(textDelta)
     if (selected) q.focus()
 
     const onChange: TextChangeHandler = (changeDelta, _oldContents, source) => {
       if (source !== 'user') return
 
-      makeChange((content) => applyDeltaToText(content, changeDelta))
+      makeChange((content) => {
+        applyDeltaToText(content, changeDelta)
+      })
     }
 
     function onKeyDown(e: KeyboardEvent) {
@@ -107,13 +111,12 @@ function useQuill({
   }, [ref.current])
 
   useEffect(() => {
-    if (!textString || !quill.current) return
+    if (!textDelta || !quill.current) return
 
-    const delta = new Delta().insert(textString)
-    const diff = quill.current.getContents().diff(delta)
+    const diff = quill.current.getContents().diff(textDelta)
 
     quill.current.updateContents(diff)
-  }, [textString])
+  }, [textDelta])
 
   return [ref, quill.current]
 }
@@ -123,32 +126,17 @@ function stopPropagation(e: React.SyntheticEvent) {
   e.nativeEvent.stopImmediatePropagation()
 }
 
-function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
-  let i = 0
-  delta.forEach((op, idx) => {
-    if (op.retain) {
-      i += op.retain
-    }
-
-    if (typeof op.insert === 'string') {
-      const chars = op.insert.split('')
-      text.insertAt!(i, ...chars)
-      i += chars.length
-    } else if (op.delete) {
-      text.deleteAt!(i, op.delete)
-    }
-  })
-}
-
 function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
   const reader = new FileReader()
 
   reader.onload = () => {
     handle.change((doc) => {
       doc.text = new Automerge.Text()
+
       if (reader.result) {
         const text = reader.result as string
-        doc.text.insertAt!(0, ...text.split(''))
+
+        doc.text.insertAt!(0, ...text.split('')) // eslint-disable-line
 
         if (!text || !text.endsWith('\n')) {
           doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
@@ -161,11 +149,11 @@ function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
   reader.readAsText(entry)
 }
 
-function create({ text }, handle: Handle<TextDoc>, callback) {
+function create({ text = '' }, handle: Handle<TextDoc>, callback) {
   handle.change((doc) => {
     doc.text = new Automerge.Text(text)
-    if (!text || !text.endsWith('\n')) {
-      doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
+    if (!text.endsWith('\n')) {
+      doc.text.insertAt!(text.length, '\n') // Quill prefers an ending newline
     }
   })
 
