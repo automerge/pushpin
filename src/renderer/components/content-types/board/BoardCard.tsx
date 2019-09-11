@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef } from 'react'
 import classNames from 'classnames'
+import mime from 'mime-types'
 
 import Content from '../../Content'
 import ContentTypes from '../../../ContentTypes'
@@ -7,23 +8,24 @@ import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard, CardId } from '.'
 import { Position, Dimension } from './BoardGrid'
-import { usePresence, useSelf } from '../../../Hooks'
+import { usePresence, useSelf, useDocument, useHyperfile } from '../../../Hooks'
 import './BoardCard.css'
+import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 
 interface BoardCardProps {
-  card: BoardDocCard
+  id: string
   boardUrl: HypermergeUrl
+  card: BoardDocCard
   selected: boolean
   uniquelySelected: boolean
 
   onCardClicked(card: BoardDocCard, event: React.MouseEvent): void
   onCardDoubleClicked(card: BoardDocCard, event: React.MouseEvent): void
-  onCardDragStart(card: BoardDocCard, event: React.DragEvent): void
-  onCardDrag(card: BoardDocCard, event: React.DragEvent): void
-  onCardDragEnd(card: BoardDocCard, event: React.DragEvent): void
-
   resizeCard(id: CardId, dimension: Dimension): void
+
+  announceDragOffset(amount: Position): void
+  dragOffset: Position
 }
 
 interface Presence {
@@ -45,100 +47,125 @@ export default function BoardCard(props: BoardCardProps) {
   const remotePresence = Object.values(remotePresences)[0]
   const highlightColor = remotePresence && remotePresence.color
 
+  const [dragStart, setDragStart] = useState<Position | null>(null)
+
   const [resizeStart, setResizeStart] = useState<Position | null>(null)
-  const [resize, setResize] = useState<Dimension | null>(null)
 
   const selected = props.selected || remotePresence
+  const [resize, setResize] = useState<Dimension | null>(null)
 
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const onCardClicked = useCallback(
-    (e: React.MouseEvent) => {
-      props.onCardClicked(card, e)
-    },
-    [card]
-  )
+  const { hypermergeUrl } = parseDocumentLink(card.url)
+  const [doc] = useDocument<any>(hypermergeUrl)
 
-  const onCardDoubleClicked = useCallback(
-    (e: React.MouseEvent) => {
-      props.onCardDoubleClicked(card, e)
-    },
-    [card]
-  )
+  // yeeeech
+  const { hyperfileUrl = null, title = 'untitled' } = doc || {}
+  const hyperfileData = useHyperfile(hyperfileUrl)
 
-  const onContextMenu = useCallback((e: React.SyntheticEvent) => {
+  function onCardClicked(e: React.MouseEvent) {
+    props.onCardClicked(card, e)
+  }
+
+  function onCardDoubleClicked(e: React.MouseEvent) {
+    props.onCardDoubleClicked(card, e)
+  }
+
+  function stopPropagation(e: React.SyntheticEvent) {
     e.stopPropagation()
-  }, [])
+  }
 
-  const onCardDragStart = useCallback(
-    (e: React.DragEvent) => {
-      props.onCardDragStart(card, e)
-    },
-    [card]
-  )
+  function onDragStart(e: React.DragEvent) {
+    if (!selected) {
+      props.onCardClicked(card, e)
+    }
+    setDragStart({ x: e.pageX, y: e.pageY })
 
-  const onCardDrag = useCallback(
-    (e: React.DragEvent) => {
-      props.onCardDrag(card, e)
-    },
-    [card]
-  )
+    // when dragging on the board, we want to maintain the true card element
+    e.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
 
-  const onCardDragEnd = useCallback(
-    (e: React.DragEvent) => {
-      props.onCardDragEnd(card, e)
-    },
-    [card]
-  )
+    // annotate the drag with the current board's URL so we can tell if this is where we came from
+    e.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
-  const resizePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      if (!selected) {
-        props.onCardClicked(card, e)
-      }
-      setResizeStart({ x: e.pageX, y: e.pageY })
-      setResize({ width: card.width, height: card.height })
-      ;(e.target as Element).setPointerCapture(e.pointerId)
-      e.preventDefault()
-      e.stopPropagation()
-    },
-    [card, selected]
-  )
+    // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
+    e.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
 
-  const resizePointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!resize || !resizeStart) {
-        return
-      }
+    // and we'll add a DownloadURL
+    if (hyperfileData) {
+      const { mimeType } = hyperfileData
+      const extension = mime.extension(mimeType) || ''
 
-      if (!cardRef.current) {
-        return
-      }
+      const downloadUrl = `text:${title}.${extension}:${hyperfileUrl}`
+      e.dataTransfer.setData('DownloadURL', downloadUrl)
+    }
+  }
 
-      if (!card.width) {
-        card.width = cardRef.current.clientWidth
-      }
+  // we don't want to make changes to the document until the drag ends
+  // but we want to move the actual DOM element during the drag so that
+  // we don't have ugly ghosting
+  function onDrag(e: React.DragEvent) {
+    if (!dragStart) {
+      return
+    }
 
-      if (!card.height) {
-        card.height = cardRef.current.clientHeight
-      }
+    // if you drag outside the window, you'll get an onDrag where pageX and pageY are zero.
+    // this sticks the drag preview into a dumb spot, so we're just going to filter those out
+    // unless anyone has a better idea.
+    if (e.screenX === 0 && e.screenY === 0) {
+      return
+    }
 
-      const movedSize = {
-        width: card.width - resizeStart.x + e.pageX,
-        height: card.height - resizeStart.y + e.pageY,
-      }
+    props.announceDragOffset({ x: e.pageX - dragStart.x, y: e.pageY - dragStart.y })
+    e.preventDefault()
+  }
 
-      const clampedSize = boundSizeByType(card.url, movedSize)
-      const boundedSize = boundDimension({ x: card.x, y: card.y }, clampedSize)
+  function onDragEnd(e: React.DragEvent) {
+    setDragStart(null)
+    props.announceDragOffset({ x: 0, y: 0 })
+  }
 
-      setResize(boundedSize)
-      e.preventDefault()
-      e.stopPropagation()
-    },
-    [resize, resizeStart, cardRef, card]
-  )
+  const resizePointerDown = (e: React.PointerEvent) => {
+    if (!selected) {
+      props.onCardClicked(card, e)
+    }
+    setResizeStart({ x: e.pageX, y: e.pageY })
+    setResize({ width: card.width, height: card.height })
+    ;(e.target as Element).setPointerCapture(e.pointerId)
+    e.preventDefault()
+    e.stopPropagation()
+  }
 
-  const resizePointerUp = useCallback((e: React.PointerEvent) => {
+  const resizePointerMove = (e: React.PointerEvent) => {
+    if (!resize || !resizeStart) {
+      return
+    }
+
+    if (!cardRef.current) {
+      return
+    }
+
+    if (!card.width) {
+      card.width = cardRef.current.clientWidth
+    }
+
+    if (!card.height) {
+      card.height = cardRef.current.clientHeight
+    }
+
+    const movedSize = {
+      width: card.width - resizeStart.x + e.pageX,
+      height: card.height - resizeStart.y + e.pageY,
+    }
+
+    const clampedSize = boundSizeByType(card.url, movedSize)
+    const boundedSize = boundDimension({ x: card.x, y: card.y }, clampedSize)
+
+    setResize(boundedSize)
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const resizePointerUp = (e: React.PointerEvent) => {
     ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       props.resizeCard(card.id, resize)
@@ -147,15 +174,15 @@ export default function BoardCard(props: BoardCardProps) {
     setResize(null)
     e.preventDefault()
     e.stopPropagation()
-  }, [])
+  }
 
   const style: React.CSSProperties = {
     ['--highlight-color' as any]: highlightColor,
     width: resize ? resize.width : card.width,
     height: resize ? resize.height : card.height,
     position: 'absolute',
-    left: card.x,
-    top: card.y,
+    left: card.x + props.dragOffset.x,
+    top: card.y + props.dragOffset.y,
   }
 
   const { type } = parseDocumentLink(card.url)
@@ -171,11 +198,11 @@ export default function BoardCard(props: BoardCardProps) {
       style={style}
       onClick={onCardClicked}
       onDoubleClick={onCardDoubleClicked}
-      onContextMenu={onContextMenu}
+      onContextMenu={stopPropagation}
       draggable
-      onDrag={onCardDrag}
-      onDragStart={onCardDragStart}
-      onDragEnd={onCardDragEnd}
+      onDrag={onDrag}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     >
       <Content context="board" url={card.url} uniquelySelected={props.uniquelySelected} />
       {contentType && contentType.resizable !== false && (

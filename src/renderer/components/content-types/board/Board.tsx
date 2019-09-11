@@ -2,7 +2,6 @@ import React, { useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid/v4'
 import { ContextMenuTrigger } from 'react-contextmenu'
-// import mime from 'mime-types'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
@@ -20,11 +19,10 @@ import {
   snapDimensionToGrid,
   snapPositionToGrid,
   GRID_SIZE,
-  useDistance,
 } from './BoardGrid'
 import { boundPosition } from './BoardBoundary'
 
-import { BOARD_CARD_DRAG_ORIGIN, PUSHPIN_DRAG_TYPE } from '../../../constants'
+import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { useDocument } from '../../../Hooks'
 import { useSelection } from './BroadcastSelection'
 
@@ -70,17 +68,7 @@ export default function Board(props: ContentProps) {
   const [doc, changeDoc] = useDocument<BoardDoc>(props.hypermergeUrl)
   const boardRef = useRef<HTMLDivElement>(null)
   const { selected, selectOnly, selectToggle, selectNone } = useSelection()
-
-  const { distance, startMeasure, setCurrent, endMeasure } = useDistance()
-
-  /*
-  const { hypermergeUrl } = parseDocumentLink(card.url)
-  const [doc] = useDocument<any>(hypermergeUrl)
-
-  // yeeeech
-  const { hyperfileUrl = null, title = 'untitled' } = doc || {}
-  const hyperfileData = useHyperfile(hyperfileUrl)
-  */
+  const [distance, setDistance] = useState<Position>({ x: 0, y: 0 })
 
   const onKeyDown = (e) => {
     // this event can be consumed by a card if it wants to keep control of backspace
@@ -110,53 +98,6 @@ export default function Board(props: ContentProps) {
     e.stopPropagation()
   }
 
-  function onCardDragStart(card: BoardDocCard, e: React.DragEvent) {
-    if (!selected.includes(card.id)) {
-      onCardClicked(card, e)
-    }
-
-    startMeasure({ x: e.pageX, y: e.pageY })
-
-    // when dragging on the board, we want to maintain the true card element
-    e.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
-
-    // annotate the drag with the current board's URL so we can tell if this is where we came from
-    e.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.hypermergeUrl)
-
-    // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
-    e.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
-
-    /*
-    // and we'll add a DownloadURL
-    if (hyperfileData) {
-      const { mimeType } = hyperfileData
-      const extension = mime.extension(mimeType) || ''
-
-      const downloadUrl = `text:${title}.${extension}:${hyperfileUrl}`
-      e.dataTransfer.setData('DownloadURL', downloadUrl)
-    }
-    */
-  }
-
-  // we don't want to make changes to the document until the drag ends
-  // but we want to move the actual DOM element during the drag so that
-  // we don't have ugly ghosting
-  function onCardDrag(card: BoardDocCard, e: React.DragEvent) {
-    // if you drag outside the window, you'll get an onDrag where pageX and pageY are zero.
-    // this sticks the drag preview into a dumb spot, so we're just going to filter those out
-    // unless anyone has a better idea.
-    if (e.screenX === 0 && e.screenY === 0) {
-      return
-    }
-
-    setCurrent({ x: e.pageX, y: e.pageY })
-    e.preventDefault()
-  }
-
-  function onCardDragEnd(card: BoardDocCard, e: React.DragEvent) {
-    endMeasure()
-  }
-
   const onDoubleClick = (e) => {
     log('onDoubleClick')
 
@@ -171,16 +112,12 @@ export default function Board(props: ContentProps) {
     }
 
     ContentTypes.create('text', { text: '' }, (url) => {
-      // XXX: this needs to have a corrected offset to keep new cards from going out of bounds
       const cardId = addCardForContent({ position, url })
       selectOnly(cardId)
     })
   }
 
   const onDragOver = (e) => {
-    // HTML5's default dragOver is to end the drag session
-    // this is necessary boilerplate on anything that wants
-    // to receive drops
     e.preventDefault()
     e.stopPropagation()
   }
@@ -277,16 +214,13 @@ export default function Board(props: ContentProps) {
       if (height) {
         newCard.height = height
       }
-
-      // XXX: this should be keeping the card within the board bounds
-
       b.cards[id] = newCard
     })
 
     return id
   }
 
-  const moveCardsBy = (selected: CardId[], offset: Position) => {
+  const moveCardsBy = (selected, offset) => {
     if (!(doc && doc.cards)) {
       return
     }
@@ -301,12 +235,11 @@ export default function Board(props: ContentProps) {
           width: doc.cards[id].width,
           height: doc.cards[id].height,
         }
-
+        // This gets called when uniquely selecting a card, so avoid a document
+        // change if in fact the card hasn't moved mod snapping.
         const boundedPosition = boundPosition(position, size)
         const newPosition = snapPositionToGrid(boundedPosition)
 
-        // This gets called when uniquely selecting a card, so avoid a document
-        // change if in fact the card hasn't moved mod snapping.
         const cardPosition = { x: doc.cards[id].x, y: doc.cards[id].y }
         if (newPosition.x === cardPosition.x && newPosition.y === cardPosition.y) {
           return
@@ -375,19 +308,15 @@ export default function Board(props: ContentProps) {
     return (
       <BoardCard
         key={id}
-        card={{
-          ...card,
-          x: isSelected ? card.x + distance.x : card.x,
-          y: isSelected ? card.y + distance.y : card.y,
-        }}
+        id={id}
         boardUrl={props.hypermergeUrl}
+        card={card}
+        announceDragOffset={setDistance}
+        dragOffset={isSelected ? distance : { x: 0, y: 0 }}
         selected={isSelected}
         uniquelySelected={uniquelySelected}
         onCardClicked={onCardClicked}
         onCardDoubleClicked={onCardDoubleClicked}
-        onCardDragStart={onCardDragStart}
-        onCardDrag={onCardDrag}
-        onCardDragEnd={onCardDragEnd}
         resizeCard={cardResized}
       />
     )
