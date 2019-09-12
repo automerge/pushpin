@@ -1,19 +1,19 @@
 import { useState } from 'react'
 import { useStaticCallback } from '../../../Hooks'
 
-type Selection<T> = T[]
+export type Selection<T> = T[]
 
 /*
  * Selection manipulation functions
  * these functional control the currently selected set of cards
  */
 export function useSelection<T>(): {
-  selected: Selection<T>
+  selection: Selection<T>
   selectToggle: (id: T) => void
   selectOnly: (id: T) => void
   selectNone: () => void
 } {
-  const [selected, setSelection] = useState<T[]>([])
+  const [selection, setSelection] = useState<T[]>([])
 
   const selectToggle = useStaticCallback((id: T) =>
     setSelection((selected) =>
@@ -29,5 +29,5 @@ export function useSelection<T>(): {
     setSelection([])
   })
 
-  return { selected, selectOnly, selectToggle, selectNone }
+  return { selection, selectOnly, selectToggle, selectNone }
 }

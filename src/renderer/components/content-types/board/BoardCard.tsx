@@ -13,6 +13,29 @@ import './BoardCard.css'
 import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 
+interface Clicked {
+  type: 'Clicked'
+  cardId: CardId
+  event: React.MouseEvent
+}
+interface DoubleClicked {
+  type: 'DoubleClicked'
+  cardId: CardId
+  event: React.MouseEvent
+}
+interface Resized {
+  type: 'Resized'
+  cardId: CardId
+  dimension: Dimension
+}
+
+interface Dragging {
+  type: 'Dragging'
+  distance: Position
+}
+
+export type BoardCardAction = Clicked | DoubleClicked | Resized | Dragging
+
 interface BoardCardProps {
   id: string
   boardUrl: HypermergeUrl
@@ -20,11 +43,7 @@ interface BoardCardProps {
   selected: boolean
   uniquelySelected: boolean
 
-  onCardClicked(card: BoardDocCard, event: React.MouseEvent): void
-  onCardDoubleClicked(card: BoardDocCard, event: React.MouseEvent): void
-  resizeCard(id: CardId, dimension: Dimension): void
-
-  announceDragOffset(amount: Position): void
+  dispatch(action: BoardCardAction): void
   dragOffset: Position
 }
 
@@ -33,7 +52,9 @@ interface Presence {
 }
 
 export default function BoardCard(props: BoardCardProps) {
-  const { card } = props
+  const { dispatch, card } = props
+  const cardId = card.id
+
   const [self] = useSelf()
   const remotePresences = usePresence<Presence>(
     props.boardUrl,
@@ -63,32 +84,33 @@ export default function BoardCard(props: BoardCardProps) {
   const { hyperfileUrl = null, title = 'untitled' } = doc || {}
   const hyperfileData = useHyperfile(hyperfileUrl)
 
-  function onCardClicked(e: React.MouseEvent) {
-    props.onCardClicked(card, e)
+  function onCardClicked(event: React.MouseEvent) {
+    dispatch({ type: 'Clicked', cardId, event })
   }
 
-  function onCardDoubleClicked(e: React.MouseEvent) {
-    props.onCardDoubleClicked(card, e)
+  function onCardDoubleClicked(event: React.MouseEvent) {
+    dispatch({ type: 'DoubleClicked', cardId, event })
   }
 
   function stopPropagation(e: React.SyntheticEvent) {
     e.stopPropagation()
   }
 
-  function onDragStart(e: React.DragEvent) {
+  function onDragStart(event: React.DragEvent) {
     if (!selected) {
-      props.onCardClicked(card, e)
+      dispatch({ type: 'Clicked', cardId, event })
     }
-    setDragStart({ x: e.pageX, y: e.pageY })
+
+    setDragStart({ x: event.pageX, y: event.pageY })
 
     // when dragging on the board, we want to maintain the true card element
-    e.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
+    event.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
 
     // annotate the drag with the current board's URL so we can tell if this is where we came from
-    e.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
+    event.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
     // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
-    e.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
+    event.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
 
     // and we'll add a DownloadURL
     if (hyperfileData) {
@@ -96,7 +118,7 @@ export default function BoardCard(props: BoardCardProps) {
       const extension = mime.extension(mimeType) || ''
 
       const downloadUrl = `text:${title}.${extension}:${hyperfileUrl}`
-      e.dataTransfer.setData('DownloadURL', downloadUrl)
+      event.dataTransfer.setData('DownloadURL', downloadUrl)
     }
   }
 
@@ -115,24 +137,24 @@ export default function BoardCard(props: BoardCardProps) {
       return
     }
 
-    props.announceDragOffset({ x: e.pageX - dragStart.x, y: e.pageY - dragStart.y })
+    dispatch({ type: 'Dragging', distance: { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y } })
     e.preventDefault()
   }
 
   function onDragEnd(e: React.DragEvent) {
     setDragStart(null)
-    props.announceDragOffset({ x: 0, y: 0 })
+    dispatch({ type: 'Dragging', distance: { x: 0, y: 0 } })
   }
 
-  const resizePointerDown = (e: React.PointerEvent) => {
+  const resizePointerDown = (event: React.PointerEvent) => {
     if (!selected) {
-      props.onCardClicked(card, e)
+      dispatch({ type: 'Clicked', cardId, event })
     }
-    setResizeStart({ x: e.pageX, y: e.pageY })
+    setResizeStart({ x: event.pageX, y: event.pageY })
     setResize({ width: card.width, height: card.height })
-    ;(e.target as Element).setPointerCapture(e.pointerId)
-    e.preventDefault()
-    e.stopPropagation()
+    ;(event.target as Element).setPointerCapture(event.pointerId)
+    event.preventDefault()
+    event.stopPropagation()
   }
 
   const resizePointerMove = (e: React.PointerEvent) => {
@@ -168,7 +190,7 @@ export default function BoardCard(props: BoardCardProps) {
   const resizePointerUp = (e: React.PointerEvent) => {
     ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
-      props.resizeCard(card.id, resize)
+      dispatch({ type: 'Resized', cardId, dimension: resize })
     }
     setResizeStart(null)
     setResize(null)

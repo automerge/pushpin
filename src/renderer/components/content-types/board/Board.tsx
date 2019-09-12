@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useCallback, memo } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
@@ -7,21 +7,22 @@ import * as ImportData from '../../../ImportData'
 import { PushpinUrl } from '../../../ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
-import BoardCard from './BoardCard'
+import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
 import { Position, Dimension, gridOffset, GRID_SIZE } from './BoardGrid'
+import { useSelection } from './BoardSelection'
 import {
   deleteCards,
   addCardForContent,
   moveCardsBy,
   cardResized,
   changeBackgroundColor,
+  BoardDocManipulationAction,
 } from './BoardDocManipulation'
 
 import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
-import { useDocument, useStaticCallback } from '../../../Hooks'
-import { useSelection } from './BoardSelection'
+import { useDocumentReducer } from '../../../Hooks'
 
 const log = Debug('pushpin:board')
 
@@ -52,6 +53,8 @@ export const BOARD_HEIGHT = 1800
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
+export type BoardAction = BoardDocManipulationAction | BoardCardAction
+
 interface CardArgs {
   position: Position
   dimension?: Dimension
@@ -61,24 +64,62 @@ export interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
-export default function Board(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<BoardDoc>(props.hypermergeUrl)
+function Board(props: ContentProps) {
   const boardRef = useRef<HTMLDivElement>(null)
-  const { selected, selectOnly, selectToggle, selectNone } = useSelection<CardId>()
+  const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>()
   const [distance, setDistance] = useState<Position>({ x: 0, y: 0 })
 
-  const onKeyDown = (e) => {
-    // this event can be consumed by a card if it wants to keep control of backspace
-    // for example, see text-content.jsx onKeyDown
-    if (e.key === 'Backspace') {
-      changeDoc((b) => deleteCards(b, selected))
-    }
-  }
+  const onKeyDown = useCallback(
+    (e) => {
+      // this event can be consumed by a card if it wants to keep control of backspace
+      // for example, see text-content.jsx onKeyDown
+      if (e.key === 'Backspace') {
+        dispatch({ type: 'DeleteCards', selection })
+      }
+    },
+    [selection]
+  )
 
-  const onClick = (e) => {
+  const onClick = useCallback((e) => {
     log('onClick')
     selectNone()
-  }
+  }, [])
+
+  const [doc, dispatch] = useDocumentReducer<BoardDoc, BoardAction>(
+    props.hypermergeUrl,
+    (doc, action) => {
+      let cardId // hmmm
+      switch (action.type) {
+        case 'MoveCardsBy':
+          moveCardsBy(doc, action.selection, action.distance)
+          break
+        case 'DeleteCards':
+          deleteCards(doc, selection)
+          break
+        case 'Dragging':
+          setDistance(action.distance)
+          break
+        case 'Resized':
+          cardResized(doc, action.cardId, action.dimension)
+          break
+        case 'Clicked':
+          onCardClicked(doc.cards[action.cardId], action.event)
+          break
+        case 'DoubleClicked':
+          onCardDoubleClicked(doc.cards[action.cardId], action.event)
+          break
+        case 'AddCardForContent':
+          cardId = addCardForContent(doc, { position: action.position, url: action.url })
+          if (action.selectOnly) {
+            selectOnly(cardId)
+          }
+          break
+        case 'ChangeBackgroundColor':
+          changeBackgroundColor(doc, action.color)
+          break
+      }
+    }
+  )
 
   const onCardClicked = (card: BoardDocCard, e) => {
     if (e.ctrlKey || e.shiftKey) {
@@ -109,10 +150,7 @@ export default function Board(props: ContentProps) {
     }
 
     ContentTypes.create('text', { text: '' }, (url) => {
-      changeDoc((b) => {
-        const cardId = addCardForContent(b, { position, url })
-        selectOnly(cardId)
-      })
+      dispatch({ type: 'AddCardForContent', position, url, selectOnly: true })
     })
   }
 
@@ -136,7 +174,7 @@ export default function Board(props: ContentProps) {
 
   const onDropInternal = (e) => {
     e.dataTransfer.dropEffect = 'move'
-    changeDoc((b) => moveCardsBy(b, selected, distance))
+    dispatch({ type: 'MoveCardsBy', selection, distance })
   }
 
   const onDropExternal = (e) => {
@@ -152,7 +190,7 @@ export default function Board(props: ContentProps) {
     }
     ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
       const position = gridOffset(dropPosition, i)
-      changeDoc((b) => addCardForContent(b, { position, url }))
+      dispatch({ type: 'AddCardForContent', position, url })
     })
   }
 
@@ -176,20 +214,18 @@ export default function Board(props: ContentProps) {
 
     ImportData.importDataTransfer(e.clipboardData, (url, i) => {
       const offsetPosition = gridOffset(position, i)
-      changeDoc((b) => addCardForContent(b, { position: offsetPosition, url }))
+      dispatch({ type: 'AddCardForContent', position: offsetPosition, url })
     })
   }
 
-  const resizeCard = useStaticCallback((id, dimension) =>
-    changeDoc((b) => cardResized(b, id, dimension))
-  )
+  /*
   const changeBackgroundColorCurried = useStaticCallback((color) =>
     changeDoc((b) => changeBackgroundColor(b, color))
   )
 
   const addCardForContentCurried = useStaticCallback((addCardArgs) =>
     changeDoc((b) => addCardForContent(b, addCardArgs))
-  )
+  ) */
 
   /**
    * at long last, render begins here
@@ -201,21 +237,18 @@ export default function Board(props: ContentProps) {
 
   const { cards } = doc
   const cardChildren = Object.entries(cards).map(([id, card]) => {
-    const isSelected = selected.includes(id as CardId) // sadly we can't have IDs as non-string types
-    const uniquelySelected = isSelected && selected.length === 1
+    const isSelected = selection.includes(id as CardId) // sadly we can't have IDs as non-string types
+    const uniquelySelected = isSelected && selection.length === 1
     return (
       <BoardCard
         key={id}
         id={id}
         boardUrl={props.hypermergeUrl}
         card={card}
-        announceDragOffset={setDistance}
         dragOffset={isSelected ? distance : { x: 0, y: 0 }}
         selected={isSelected}
         uniquelySelected={uniquelySelected}
-        onCardClicked={onCardClicked}
-        onCardDoubleClicked={onCardDoubleClicked}
-        resizeCard={resizeCard}
+        dispatch={dispatch}
       />
     )
   })
@@ -241,10 +274,9 @@ export default function Board(props: ContentProps) {
       <BoardContextMenu
         boardTitle={doc.title}
         contentTypes={ContentTypes.list({ context: 'board' })}
-        addCardForContent={addCardForContentCurried}
+        dispatch={dispatch}
         backgroundColor={doc.backgroundColor || BOARD_COLORS.DEFAULT}
         backgroundColors={BOARD_COLOR_VALUES}
-        changeBackgroundColor={changeBackgroundColorCurried}
       />
       <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
         <div>{cardChildren}</div>
@@ -252,3 +284,5 @@ export default function Board(props: ContentProps) {
     </div>
   )
 }
+
+export default memo(Board)
