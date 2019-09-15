@@ -88,7 +88,6 @@ function Board(props: ContentProps) {
   const [doc, dispatch] = useDocumentReducer<BoardDoc, BoardAction>(
     props.hypermergeUrl,
     (doc, action) => {
-      let cardId // hmmm
       switch (action.type) {
         case 'MoveCardsBy':
           moveCardsBy(doc, action.selection, action.distance)
@@ -109,10 +108,7 @@ function Board(props: ContentProps) {
           onCardDoubleClicked(doc.cards[action.cardId], action.event)
           break
         case 'AddCardForContent':
-          cardId = addCardForContent(doc, { position: action.position, url: action.url })
-          if (action.selectOnly) {
-            selectOnly(cardId)
-          }
+          addAndSelectCard(doc, action.position, action.url, action.selectOnly)
           break
         case 'ChangeBackgroundColor':
           changeBackgroundColor(doc, action.color)
@@ -120,6 +116,13 @@ function Board(props: ContentProps) {
       }
     }
   )
+
+  function addAndSelectCard(doc: BoardDoc, position, url, selectOnly) {
+    const cardId = addCardForContent(doc, { position, url })
+    if (selectOnly) {
+      selectOnly(cardId)
+    }
+  }
 
   const onCardClicked = (card: BoardDocCard, e) => {
     if (e.ctrlKey || e.shiftKey) {
