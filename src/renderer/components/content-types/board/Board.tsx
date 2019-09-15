@@ -175,7 +175,7 @@ function Board(props: ContentProps) {
         onDropExternal(e)
       }
     },
-    [props.hypermergeUrl]
+    [props.hypermergeUrl, selection, distance]
   )
 
   const onDropInternal = (e) => {
