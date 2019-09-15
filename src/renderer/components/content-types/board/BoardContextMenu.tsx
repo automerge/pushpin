@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, memo } from 'react'
 import classNames from 'classnames'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
@@ -17,7 +17,7 @@ interface Props {
   dispatch(action: BoardAction): void
 }
 
-export default function BoardContextMenu(props: Props) {
+function BoardContextMenu(props: Props) {
   const [contextMenuPosition, setContextMenuPosition] = useState<Position>({ x: 0, y: 0 })
 
   const addContent = (e, contentType) => {
@@ -118,3 +118,5 @@ export default function BoardContextMenu(props: Props) {
     </ContextMenu>
   )
 }
+
+export default memo(BoardContextMenu)

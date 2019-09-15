@@ -36,15 +36,14 @@ interface Dragging {
 
 export type BoardCardAction = Clicked | DoubleClicked | Resized | Dragging
 
-interface BoardCardProps {
-  id: string
+interface BoardCardProps extends BoardDocCard {
   boardUrl: HypermergeUrl
-  card: BoardDocCard
   selected: boolean
   uniquelySelected: boolean
 
   dispatch(action: BoardCardAction): void
-  dragOffset: Position
+  dragOffsetX: number
+  dragOffsetY: number
 }
 
 interface Presence {
@@ -52,8 +51,7 @@ interface Presence {
 }
 
 export default function BoardCard(props: BoardCardProps) {
-  const { dispatch, card } = props
-  const cardId = card.id
+  const { dispatch, id, url, x, y, width, height } = props
 
   const [self] = useSelf()
   const remotePresences = usePresence<Presence>(
@@ -63,7 +61,7 @@ export default function BoardCard(props: BoardCardProps) {
           color: self.color,
         }
       : null,
-    card.id
+    id
   )
   const remotePresence = Object.values(remotePresences)[0]
   const highlightColor = remotePresence && remotePresence.color
@@ -77,7 +75,7 @@ export default function BoardCard(props: BoardCardProps) {
 
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const { hypermergeUrl } = parseDocumentLink(card.url)
+  const { hypermergeUrl } = parseDocumentLink(url)
   const [doc] = useDocument<any>(hypermergeUrl)
 
   // yeeeech
@@ -85,11 +83,11 @@ export default function BoardCard(props: BoardCardProps) {
   const hyperfileData = useHyperfile(hyperfileUrl)
 
   function onCardClicked(event: React.MouseEvent) {
-    dispatch({ type: 'Clicked', cardId, event })
+    dispatch({ type: 'Clicked', cardId: id, event })
   }
 
   function onCardDoubleClicked(event: React.MouseEvent) {
-    dispatch({ type: 'DoubleClicked', cardId, event })
+    dispatch({ type: 'DoubleClicked', cardId: id, event })
   }
 
   function stopPropagation(e: React.SyntheticEvent) {
@@ -98,7 +96,7 @@ export default function BoardCard(props: BoardCardProps) {
 
   function onDragStart(event: React.DragEvent) {
     if (!selected) {
-      dispatch({ type: 'Clicked', cardId, event })
+      dispatch({ type: 'Clicked', cardId: id, event })
     }
 
     setDragStart({ x: event.pageX, y: event.pageY })
@@ -110,7 +108,7 @@ export default function BoardCard(props: BoardCardProps) {
     event.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
     // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
-    event.dataTransfer.setData(PUSHPIN_DRAG_TYPE, card.url)
+    event.dataTransfer.setData(PUSHPIN_DRAG_TYPE, url)
 
     // and we'll add a DownloadURL
     if (hyperfileData) {
@@ -148,10 +146,10 @@ export default function BoardCard(props: BoardCardProps) {
 
   const resizePointerDown = (event: React.PointerEvent) => {
     if (!selected) {
-      dispatch({ type: 'Clicked', cardId, event })
+      dispatch({ type: 'Clicked', cardId: id, event })
     }
     setResizeStart({ x: event.pageX, y: event.pageY })
-    setResize({ width: card.width, height: card.height })
+    setResize({ width, height })
     ;(event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
@@ -166,21 +164,16 @@ export default function BoardCard(props: BoardCardProps) {
       return
     }
 
-    if (!card.width) {
-      card.width = cardRef.current.clientWidth
-    }
-
-    if (!card.height) {
-      card.height = cardRef.current.clientHeight
-    }
+    const deNulledWidth = width || cardRef.current.clientWidth
+    const deNulledHeight = height || cardRef.current.clientHeight
 
     const movedSize = {
-      width: card.width - resizeStart.x + e.pageX,
-      height: card.height - resizeStart.y + e.pageY,
+      width: deNulledWidth - resizeStart.x + e.pageX,
+      height: deNulledHeight - resizeStart.y + e.pageY,
     }
 
-    const clampedSize = boundSizeByType(card.url, movedSize)
-    const boundedSize = boundDimension({ x: card.x, y: card.y }, clampedSize)
+    const clampedSize = boundSizeByType(url, movedSize)
+    const boundedSize = boundDimension({ x, y }, clampedSize)
 
     setResize(boundedSize)
     e.preventDefault()
@@ -190,7 +183,7 @@ export default function BoardCard(props: BoardCardProps) {
   const resizePointerUp = (e: React.PointerEvent) => {
     ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
-      dispatch({ type: 'Resized', cardId, dimension: resize })
+      dispatch({ type: 'Resized', cardId: id, dimension: resize })
     }
     setResizeStart(null)
     setResize(null)
@@ -200,14 +193,14 @@ export default function BoardCard(props: BoardCardProps) {
 
   const style: React.CSSProperties = {
     ['--highlight-color' as any]: highlightColor,
-    width: resize ? resize.width : card.width,
-    height: resize ? resize.height : card.height,
+    width: resize ? resize.width : width,
+    height: resize ? resize.height : height,
     position: 'absolute',
-    left: card.x + props.dragOffset.x,
-    top: card.y + props.dragOffset.y,
+    left: x + props.dragOffsetX,
+    top: y + props.dragOffsetY,
   }
 
-  const { type } = parseDocumentLink(card.url)
+  const { type } = parseDocumentLink(url)
   const context = 'board'
   const contentType = ContentTypes.lookup({ type, context })
 
@@ -215,7 +208,7 @@ export default function BoardCard(props: BoardCardProps) {
     <div
       tabIndex={-1}
       ref={cardRef}
-      id={`card-${card.id}`}
+      id={`card-${id}`}
       className={classNames('BoardCard', selected && 'BoardCard--selected')}
       style={style}
       onClick={onCardClicked}
@@ -226,7 +219,7 @@ export default function BoardCard(props: BoardCardProps) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <Content context="board" url={card.url} uniquelySelected={props.uniquelySelected} />
+      <Content context="board" url={url} uniquelySelected={props.uniquelySelected} />
       {contentType && contentType.resizable !== false && (
         <span
           onPointerDown={resizePointerDown}

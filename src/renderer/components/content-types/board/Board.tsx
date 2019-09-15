@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, memo } from 'react'
+import React, { useRef, useState, useCallback, memo, useMemo } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
@@ -136,41 +136,47 @@ function Board(props: ContentProps) {
     e.stopPropagation()
   }
 
-  const onDoubleClick = (e) => {
-    log('onDoubleClick')
+  const onDoubleClick = useCallback(
+    (e) => {
+      log('onDoubleClick')
 
-    // guard against a missing boardRef
-    if (!boardRef.current) {
-      return
-    }
+      // guard against a missing boardRef
+      if (!boardRef.current) {
+        return
+      }
 
-    const position = {
-      x: e.pageX - boardRef.current.offsetLeft,
-      y: e.pageY - boardRef.current.offsetTop,
-    }
+      const position = {
+        x: e.pageX - boardRef.current.offsetLeft,
+        y: e.pageY - boardRef.current.offsetTop,
+      }
 
-    ContentTypes.create('text', { text: '' }, (url) => {
-      dispatch({ type: 'AddCardForContent', position, url, selectOnly: true })
-    })
-  }
+      ContentTypes.create('text', { text: '' }, (url) => {
+        dispatch({ type: 'AddCardForContent', position, url, selectOnly: true })
+      })
+    },
+    [boardRef, dispatch]
+  )
 
-  const onDragOver = (e) => {
+  const onDragOver = useCallback((e) => {
     e.preventDefault()
     e.stopPropagation()
-  }
+  }, [])
 
-  const onDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const onDrop = useCallback(
+    (e) => {
+      e.preventDefault()
+      e.stopPropagation()
 
-    // If we have an origin board, and it's us, this is a move operation.
-    const originBoard = e.dataTransfer.getData(BOARD_CARD_DRAG_ORIGIN)
-    if (originBoard === props.hypermergeUrl) {
-      onDropInternal(e)
-    } else {
-      onDropExternal(e)
-    }
-  }
+      // If we have an origin board, and it's us, this is a move operation.
+      const originBoard = e.dataTransfer.getData(BOARD_CARD_DRAG_ORIGIN)
+      if (originBoard === props.hypermergeUrl) {
+        onDropInternal(e)
+      } else {
+        onDropExternal(e)
+      }
+    },
+    [props.hypermergeUrl]
+  )
 
   const onDropInternal = (e) => {
     e.dataTransfer.dropEffect = 'move'
@@ -194,58 +200,67 @@ function Board(props: ContentProps) {
     })
   }
 
-  const onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-    log('onPaste')
-    e.preventDefault()
-    e.stopPropagation()
+  const onPaste = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
+      log('onPaste')
+      e.preventDefault()
+      e.stopPropagation()
 
-    if (!e.clipboardData) {
-      return
-    }
+      if (!e.clipboardData) {
+        return
+      }
 
-    /* We can't get the mouse position on a paste event,
-     so we just stick the card in the middle of the current scrolled position screen.
-     (We bump it a bit to the left too to pretend we're really centering, but doing that
-      would require knowledge of the card's ) */
-    const position = {
-      x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
-      y: window.pageYOffset + window.innerHeight / 2,
-    }
+      /* We can't get the mouse position on a paste event,
+         so we just stick the card in the middle of the current scrolled position screen.
+         (We bump it a bit to the left too to pretend we're really centering, but doing that
+         would require knowledge of the card's ) */
+      const position = {
+        x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
+        y: window.pageYOffset + window.innerHeight / 2,
+      }
 
-    ImportData.importDataTransfer(e.clipboardData, (url, i) => {
-      const offsetPosition = gridOffset(position, i)
-      dispatch({ type: 'AddCardForContent', position: offsetPosition, url })
-    })
-  }
-
-  /*
-  const changeBackgroundColorCurried = useStaticCallback((color) =>
-    changeDoc((b) => changeBackgroundColor(b, color))
+      ImportData.importDataTransfer(e.clipboardData, (url, i) => {
+        const offsetPosition = gridOffset(position, i)
+        dispatch({ type: 'AddCardForContent', position: offsetPosition, url })
+      })
+    },
+    [dispatch]
   )
 
-  const addCardForContentCurried = useStaticCallback((addCardArgs) =>
-    changeDoc((b) => addCardForContent(b, addCardArgs))
-  ) */
+  const docTitle = doc && doc.title ? doc.title : ''
+  const contentTypes = useMemo(() => ContentTypes.list({ context: 'board' }), [])
+  const { backgroundColor = '#fff' } = doc || {}
+
+  const style = useMemo(
+    () => ({
+      backgroundColor,
+      width: BOARD_WIDTH,
+      height: BOARD_HEIGHT,
+    }),
+    [backgroundColor]
+  )
 
   /**
    * at long last, render begins here
    */
   log('render')
-  if (!(doc && doc.cards)) {
-    return null
-  }
 
-  const { cards } = doc
+  const { cards = [] } = doc || {}
   const cardChildren = Object.entries(cards).map(([id, card]) => {
     const isSelected = selection.includes(id as CardId) // sadly we can't have IDs as non-string types
     const uniquelySelected = isSelected && selection.length === 1
     return (
       <BoardCard
         key={id}
-        id={id}
+        id={id as CardId}
+        x={card.x}
+        y={card.y}
+        width={card.width}
+        height={card.height}
+        url={card.url}
         boardUrl={props.hypermergeUrl}
-        card={card}
-        dragOffset={isSelected ? distance : { x: 0, y: 0 }}
+        dragOffsetX={isSelected ? distance.x : 0}
+        dragOffsetY={isSelected ? distance.y : 0}
         selected={isSelected}
         uniquelySelected={uniquelySelected}
         dispatch={dispatch}
@@ -257,11 +272,7 @@ function Board(props: ContentProps) {
     <div
       className="Board"
       ref={boardRef}
-      style={{
-        backgroundColor: doc.backgroundColor,
-        width: BOARD_WIDTH,
-        height: BOARD_HEIGHT,
-      }}
+      style={style}
       onKeyDown={onKeyDown}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
@@ -272,10 +283,10 @@ function Board(props: ContentProps) {
       role="presentation"
     >
       <BoardContextMenu
-        boardTitle={doc.title}
-        contentTypes={ContentTypes.list({ context: 'board' })}
+        boardTitle={docTitle}
+        contentTypes={contentTypes}
         dispatch={dispatch}
-        backgroundColor={doc.backgroundColor || BOARD_COLORS.DEFAULT}
+        backgroundColor={backgroundColor}
         backgroundColors={BOARD_COLOR_VALUES}
       />
       <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
