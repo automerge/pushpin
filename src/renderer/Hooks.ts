@@ -187,7 +187,7 @@ export interface RemotePresence<P> {
   [contactUrl: string]: P | undefined
 }
 
-const myPresence: { [url: string]: { [key: string]: any } } = {}
+const myPresence: { [url: string /* HypermergeUrl */]: { [key: string]: any } } = {}
 
 export function usePresence<P>(
   url: HypermergeUrl | null,
@@ -195,12 +195,16 @@ export function usePresence<P>(
   key: string = '/'
 ): RemotePresence<P> {
   const [remote, setRemote] = useState<RemotePresence<P>>({})
+  const [bumpTimeout, depart] = useTimeouts(5000, (contactUrl: HypermergeUrl) => {
+    setRemote(({ [contactUrl]: _, ...rest }) => rest)
+  })
 
   useMessaging<any>(url, (msg: any) => {
     if (msg.heartbeat && msg.presence) {
+      bumpTimeout(msg.contact)
       setRemote((rest) => ({ ...rest, [msg.contact]: msg.presence[key] }))
     } else if (msg.departing) {
-      setRemote(({ [msg.contact]: _, ...rest }) => rest)
+      depart(msg.contact)
     }
   })
 
@@ -273,6 +277,36 @@ export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
   }, [cond])
 
   return () => reset.current()
+}
+
+/**
+ * Manages a set of timeouts keyed by type `K`.
+ *
+ * @remarks
+ * Returns a tuple containing two functions:
+ * A function of a key to reset a timeout back to `ms`.
+ * A function of a key to perform a timeout early.
+ */
+export function useTimeouts<K>(
+  ms: number,
+  onTimeout: (key: K) => void
+): [(key: K) => void, (key: K) => void] {
+  const timeoutIds = useRef<Map<K, NodeJS.Timeout>>(new Map())
+  const timedOut = useStaticCallback((key: K) => {
+    timeoutIds.current.delete(key)
+    onTimeout(key)
+  })
+
+  const bump = useCallback(
+    (key: K) => {
+      const timeoutId = timeoutIds.current.get(key)
+      if (timeoutId) clearTimeout(timeoutId)
+      timeoutIds.current.set(key, setTimeout(() => timedOut(key), ms))
+    },
+    [onTimeout]
+  )
+
+  return [bump, timedOut]
 }
 
 type InputEvent = React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>
