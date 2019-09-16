@@ -6,8 +6,8 @@ import { HYPERMERGE_PATH, HYPERFILE_PATH } from '../renderer/constants'
 
 const log = Debug('HyperfileMigration')
 
-// TODO: Remove this file if found after Aug 1st, 2019.
-// Added on Jul 17th, 2019.
+// TODO: Remove this file if found after Oct 1st, 2019.
+// Added on Sep 16th, 2019.
 migrateHyperfileData()
 
 function migrateHyperfileData() {
@@ -17,7 +17,7 @@ function migrateHyperfileData() {
   try {
     const destinationDir = HYPERMERGE_PATH
     const sourceDir = HYPERFILE_PATH
-    const migratedSourceDir = `${sourceDir}_migrated`
+    const migratedSourceDir = `${sourceDir}_premigration_ledger`
     fs.mkdirSync(migratedSourceDir)
 
     const filenames = fs.readdirSync(sourceDir)
