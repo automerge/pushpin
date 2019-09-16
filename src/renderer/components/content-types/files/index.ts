@@ -13,6 +13,8 @@ const log = Debug('pushpin:filecontent')
 export interface FileDoc {
   title: string // names are editable and not an intrinsic part of the file
   hyperfileUrl: HyperfileUrl
+  extension: string
+  mimeType: string
 }
 
 function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
@@ -24,9 +26,13 @@ function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
     const mimeType = mime.contentType(entry.type) || 'application/octet-stream'
     Hyperfile.writeBuffer(buffer, mimeType)
       .then((hyperfileUrl) => {
-        handle.change((doc) => {
+        handle.change((doc: FileDoc) => {
+          const parsed = path.parse(name)
           doc.hyperfileUrl = hyperfileUrl
-          doc.title = path.basename(name)
+          doc.title = parsed.name
+          doc.extension = parsed.ext.slice(1)
+          doc.mimeType = mimeType
+          // save the mimetype so we don't have to look it up
         })
         callback()
       })

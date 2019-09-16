@@ -8,7 +8,7 @@ import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard, CardId } from '.'
 import { Position, Dimension } from './BoardGrid'
-import { usePresence, useSelf, useDocument, useHyperfile } from '../../../Hooks'
+import { usePresence, useSelf, useDocument } from '../../../Hooks'
 import './BoardCard.css'
 import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
@@ -79,8 +79,12 @@ export default function BoardCard(props: BoardCardProps) {
   const [doc] = useDocument<any>(hypermergeUrl)
 
   // yeeeech
-  const { hyperfileUrl = null, title = 'untitled' } = doc || {}
-  const hyperfileData = useHyperfile(hyperfileUrl)
+  const {
+    hyperfileUrl = null,
+    title = 'untitled',
+    mimeType = 'application/octet',
+    extension = null,
+  } = doc || {}
 
   function onCardClicked(event: React.MouseEvent) {
     dispatch({ type: 'Clicked', cardId: id, event })
@@ -111,11 +115,10 @@ export default function BoardCard(props: BoardCardProps) {
     event.dataTransfer.setData(PUSHPIN_DRAG_TYPE, url)
 
     // and we'll add a DownloadURL
-    if (hyperfileData) {
-      const { mimeType } = hyperfileData
-      const extension = mime.extension(mimeType) || ''
+    if (hyperfileUrl) {
+      const outputExtension = extension || mime.extension(mimeType) || ''
 
-      const downloadUrl = `text:${title}.${extension}:${hyperfileUrl}`
+      const downloadUrl = `text:${title}.${outputExtension}:${hyperfileUrl}`
       event.dataTransfer.setData('DownloadURL', downloadUrl)
     }
   }
