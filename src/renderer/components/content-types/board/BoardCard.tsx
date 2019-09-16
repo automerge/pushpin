@@ -13,28 +13,28 @@ import './BoardCard.css'
 import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 
-interface Clicked {
-  type: 'Clicked'
+interface CardClicked {
+  type: 'CardClicked'
   cardId: CardId
   event: React.MouseEvent
 }
-interface DoubleClicked {
-  type: 'DoubleClicked'
+interface CardDoubleClicked {
+  type: 'CardDoubleClicked'
   cardId: CardId
   event: React.MouseEvent
 }
-interface Resized {
-  type: 'Resized'
+interface CardResized {
+  type: 'CardResized'
   cardId: CardId
   dimension: Dimension
 }
 
-interface Dragging {
-  type: 'Dragging'
+interface CardDragging {
+  type: 'CardDragging'
   distance: Position
 }
 
-export type BoardCardAction = Clicked | DoubleClicked | Resized | Dragging
+export type BoardCardAction = CardClicked | CardDoubleClicked | CardResized | CardDragging
 
 interface BoardCardProps extends BoardDocCard {
   id: CardId

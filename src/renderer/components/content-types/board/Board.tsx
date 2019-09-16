@@ -6,7 +6,7 @@ import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
 import { PushpinUrl } from '../../../ShareLink'
 import { ContentProps } from '../../Content'
-import { BoardDoc, BoardDocCard, CardId } from '.'
+import { BoardDoc, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
@@ -70,7 +70,7 @@ function Board(props: ContentProps) {
   const [distance, setDistance] = useState<Position>({ x: 0, y: 0 })
 
   const onKeyDown = useCallback(
-    (e) => {
+    (e: React.KeyboardEvent) => {
       // this event can be consumed by a card if it wants to keep control of backspace
       // for example, see text-content.jsx onKeyDown
       if (e.key === 'Backspace') {
@@ -80,7 +80,7 @@ function Board(props: ContentProps) {
     [selection]
   )
 
-  const onClick = useCallback((e) => {
+  const onClick = useCallback((e: React.MouseEvent) => {
     log('onClick')
     selectNone()
   }, [])
@@ -89,58 +89,71 @@ function Board(props: ContentProps) {
     props.hypermergeUrl,
     (doc, action) => {
       switch (action.type) {
-        case 'MoveCardsBy':
-          moveCardsBy(doc, action.selection, action.distance)
-          break
-        case 'DeleteCards':
-          deleteCards(doc, selection)
-          break
-        case 'Dragging':
-          setDistance(action.distance)
-          break
-        case 'Resized':
-          cardResized(doc, action.cardId, action.dimension)
-          break
-        case 'Clicked':
-          onCardClicked(doc.cards[action.cardId], action.event)
-          break
-        case 'DoubleClicked':
-          onCardDoubleClicked(doc.cards[action.cardId], action.event)
-          break
+        // board actions
         case 'AddCardForContent':
           addAndSelectCard(doc, action.position, action.url, action.selectOnly)
           break
         case 'ChangeBackgroundColor':
           changeBackgroundColor(doc, action.color)
           break
+        case 'MoveCardsBy':
+          moveCardsBy(doc, action.selection, action.distance)
+          break
+        case 'DeleteCards':
+          deleteCards(doc, selection)
+          break
+
+        // card actions
+        case 'CardDragging':
+          setDistance(action.distance)
+          break
+        case 'CardResized':
+          cardResized(doc, action.cardId, action.dimension)
+          break
+        case 'CardClicked':
+          onCardClicked(action.cardId, action.event)
+          break
+        case 'CardDoubleClicked':
+          onCardDoubleClicked(doc, action.cardId, action.event)
+          break
       }
     }
   )
 
-  function addAndSelectCard(doc: BoardDoc, position, url, selectOnly) {
+  // xxx: this one is tricky because it feels like it should be in boardDocManipulation
+  // but there isn't really a good way to get the cardId back from the dispatch
+  function addAndSelectCard(
+    doc: BoardDoc,
+    position: Position,
+    url: PushpinUrl,
+    shouldSelect?: boolean
+  ) {
     const cardId = addCardForContent(doc, { position, url })
-    if (selectOnly) {
+    if (shouldSelect) {
       selectOnly(cardId)
     }
   }
 
-  const onCardClicked = (card: BoardDocCard, e) => {
+  const onCardClicked = (id: CardId, e: React.MouseEvent) => {
     if (e.ctrlKey || e.shiftKey) {
-      selectToggle(card.id)
+      selectToggle(id)
     } else {
       // otherwise we don't have shift/ctrl, so just set selection to this
-      selectOnly(card.id)
+      selectOnly(id)
     }
     e.stopPropagation()
   }
 
-  const onCardDoubleClicked = (card, e) => {
-    window.location = card.url
+  const onCardDoubleClicked = (doc: BoardDoc, id: CardId, e: React.MouseEvent) => {
+    const card = doc.cards[id]
+    if (card && card.url) {
+      window.location.href = card.url as string
+    }
     e.stopPropagation()
   }
 
   const onDoubleClick = useCallback(
-    (e) => {
+    (e: React.MouseEvent) => {
       log('onDoubleClick')
 
       // guard against a missing boardRef
@@ -160,13 +173,13 @@ function Board(props: ContentProps) {
     [boardRef, dispatch]
   )
 
-  const onDragOver = useCallback((e) => {
+  const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
   }, [])
 
   const onDrop = useCallback(
-    (e) => {
+    (e: React.DragEvent) => {
       e.preventDefault()
       e.stopPropagation()
 
@@ -181,12 +194,12 @@ function Board(props: ContentProps) {
     [props.hypermergeUrl, selection, distance]
   )
 
-  const onDropInternal = (e) => {
+  const onDropInternal = (e: React.DragEvent) => {
     e.dataTransfer.dropEffect = 'move'
     dispatch({ type: 'MoveCardsBy', selection, distance })
   }
 
-  const onDropExternal = (e) => {
+  const onDropExternal = (e: React.DragEvent) => {
     if (!boardRef.current) {
       return
     }
