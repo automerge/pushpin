@@ -15,21 +15,26 @@ function migrateHyperfileData() {
   // than to check for the existance of the files. This will error if either
   // `../Electron` does not exist, or `DATA_PATH/pushpin-v10` already exists.
   try {
-    const destinationDir = path.resolve(HYPERMERGE_PATH)
-    const sourceDir = path.resolve(HYPERFILE_PATH)
+    const destinationDir = HYPERMERGE_PATH
+    const sourceDir = HYPERFILE_PATH
+    const migratedSourceDir = `${sourceDir}_migrated`
+    fs.mkdirSync(migratedSourceDir)
 
     const filenames = fs.readdirSync(sourceDir)
     filenames.forEach((filename: string) => {
-      if (filename === 'ledger') return
-      const source = path.resolve(sourceDir, filename)
-      const destination = path.resolve(destinationDir, filename)
+      const source = path.join(sourceDir, filename)
+      let destination
+      if (filename === 'ledger') {
+        destination = path.join(migratedSourceDir, filename)
+      } else {
+        destination = path.join(destinationDir, filename)
+      }
       fs.renameSync(source, destination)
     })
 
-    const migratedSourceDir = `${sourceDir}_migrated`
-    fs.renameSync(path.resolve(sourceDir), migratedSourceDir)
-    log(`Hyperfile data migrated`)
+    fs.rmdirSync(sourceDir)
+    log('Hyperfile data migrated')
   } catch (_err) {
-    log('Hyperfile data not migrated.')
+    log(`Hyperfile data not migrated. Reason: \n${_err}`)
   }
 }
