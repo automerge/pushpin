@@ -5,9 +5,10 @@ import { crc16 } from 'js-crc'
  * lifted and adapted from pixelpusher
  */
 import { DocUrl } from 'hypermerge'
+import { Freeze } from 'automerge'
 
 export type HypermergeUrl = DocUrl
-export type PushpinUrl = string & { pushpin: true }
+export type PushpinUrl = string & Freeze<{ pushpin: true }>
 
 export function isHypermergeUrl(str: string): str is HypermergeUrl {
   return /^hypermerge:\/\/\w+$/.test(str)

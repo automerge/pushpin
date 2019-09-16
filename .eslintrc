@@ -71,6 +71,9 @@
     // someday, we should turn this back on, but we use it 44 times
     "@typescript-eslint/no-explicit-any": "off",
 
+    // third-party lib types sometimes lie
+    "@typescript-eslint/no-non-null-assertion": "off",
+
     // we agreed unused arguments should be left in-place and not removed
     "@typescript-eslint/no-unused-vars": [
       "error",

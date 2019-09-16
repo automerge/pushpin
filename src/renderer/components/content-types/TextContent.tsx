@@ -148,10 +148,10 @@ function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
       doc.text = new Automerge.Text()
       if (reader.result) {
         const text = reader.result as string
-        doc.text.insertAt(0, ...text.split(''))
+        doc.text.insertAt!(0, ...text.split(''))
 
         if (!text || !text.endsWith('\n')) {
-          doc.text.push('\n') // Quill prefers an ending newline
+          doc.text.insertAt!(text.length, '\n') // Quill prefers an ending newline
         }
       }
     })
@@ -161,14 +161,11 @@ function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
   reader.readAsText(entry)
 }
 
-function create({ text }, handle, callback) {
+function create({ text }, handle: Handle<TextDoc>, callback) {
   handle.change((doc) => {
-    doc.text = new Automerge.Text()
-    if (text) {
-      doc.text.insertAt(0, ...text.split(''))
-    }
+    doc.text = new Automerge.Text(text)
     if (!text || !text.endsWith('\n')) {
-      doc.text.push('\n') // Quill prefers an ending newline
+      doc.text.insertAt!(text.length, '\n') // Quill prefers an ending newline
     }
   })
 
