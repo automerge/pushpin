@@ -151,8 +151,15 @@ export default function BoardCard(props: BoardCardProps) {
     if (!selected) {
       dispatch({ type: 'Clicked', cardId: id, event })
     }
+
+    if (!cardRef.current) {
+      return
+    }
+
     setResizeStart({ x: event.pageX, y: event.pageY })
-    setResize({ width, height })
+    const widthC = width || cardRef.current.clientWidth
+    const height = height || cardRef.current.clientHeight
+    setResize({ width: widthC, height })
     ;(event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()

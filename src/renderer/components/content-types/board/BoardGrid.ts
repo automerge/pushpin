@@ -24,11 +24,9 @@ export interface Position {
   y: number
 }
 
-type Measure = number | Undimensioned
-type Undimensioned = undefined
 export interface Dimension {
-  width: Measure
-  height: Measure
+  width: number
+  height: number
 }
 
 /* given X/Y coordinates and an index, return the i-th offset.
@@ -47,13 +45,7 @@ export const gridOffset = ({ x, y }: Position, i: number) => {
 // many components have their default size expressed in grid cells
 // this is useful if we change grid sizes by a few pixels here or there
 // but will probably fall apart if we changed them by large amounts
-export const gridCellsToPixels = (i): Measure => {
-  // there's a smell here that we're checking truthiness of i and returning null
-  // but that's how the calling code expects it to work, so i'm leaving it thus for now
-  // if you're chasing a weird bug and found yourself here... hope this helps.
-  if (!i) {
-    return undefined
-  }
+export const gridCellsToPixels = (i: number): number => {
   return i * GRID_SIZE
 }
 
@@ -78,9 +70,7 @@ export const snapPositionToGrid = ({ x, y }: Position): Position => ({
   y: snapToGrid(y),
 })
 
-export const snapDimensionToGrid = (
-  { width, height }: Dimension = { width: undefined, height: undefined }
-): Dimension => ({
+export const snapDimensionToGrid = ({ width, height }: Dimension): Dimension => ({
   // we don't snap falsey-values like null or zero because we don't want them to become 1
   width: width ? snapToGrid(width) + 1 : width,
   height: height ? snapToGrid(height) + 1 : height,

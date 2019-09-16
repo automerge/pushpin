@@ -154,7 +154,7 @@ function Board(props: ContentProps) {
       }
 
       ContentTypes.create('text', { text: '' }, (url) => {
-        dispatch({ type: 'AddCardForContent', position, url, selectOnly: true })
+        dispatch({ type: 'AddCardForContent', position, url })
       })
     },
     [boardRef, dispatch]
