@@ -7,14 +7,14 @@ import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
 import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 
+export type CardId = string & { cardId: true }
+
 export interface BoardDocCard {
-  type: string
-  id: string
   url: PushpinUrl
   x: number
   y: number
-  height: number
-  width: number
+  height?: number
+  width?: number
 }
 
 export interface BoardDoc {

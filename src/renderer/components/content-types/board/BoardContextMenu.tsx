@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, memo } from 'react'
 import classNames from 'classnames'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
@@ -6,7 +6,7 @@ import ColorPicker from '../../ColorPicker'
 import './ContextMenu.css'
 import ContentTypes, { LookupResult } from '../../../ContentTypes'
 import { importFileList } from '../../../ImportData'
-import { AddCardArgs } from './Board'
+import { BoardAction } from './Board'
 import { gridOffset, Position } from './BoardGrid'
 
 interface Props {
@@ -14,11 +14,10 @@ interface Props {
   boardTitle: string
   backgroundColor: string
   backgroundColors: string[]
-  addCardForContent(addArgs: AddCardArgs): void
-  changeBackgroundColor(color: string): void
+  dispatch(action: BoardAction): void
 }
 
-export default function BoardContextMenu(props: Props) {
+function BoardContextMenu(props: Props) {
   const [contextMenuPosition, setContextMenuPosition] = useState<Position>({ x: 0, y: 0 })
 
   const addContent = (e, contentType) => {
@@ -38,13 +37,13 @@ export default function BoardContextMenu(props: Props) {
             title: `Sub-board of ${props.boardTitle}`,
           },
           (url) => {
-            props.addCardForContent({ position, url })
+            props.dispatch({ type: 'AddCardForContent', position, url })
           }
         )
         break
       default:
         ContentTypes.create(contentType.type, {}, (url) => {
-          props.addCardForContent({ position, url })
+          props.dispatch({ type: 'AddCardForContent', position, url })
         })
     }
   }
@@ -66,7 +65,11 @@ export default function BoardContextMenu(props: Props) {
   }
   const onFilesChanged = (e) => {
     importFileList(e.target.files, (url, i) =>
-      props.addCardForContent({ position: gridOffset(contextMenuPosition, i), url })
+      props.dispatch({
+        type: 'AddCardForContent',
+        position: gridOffset(contextMenuPosition, i),
+        url,
+      })
     )
   }
 
@@ -76,6 +79,8 @@ export default function BoardContextMenu(props: Props) {
       y: e.detail.position.y - e.detail.target.parentElement.offsetLeft,
     })
   }
+
+  const onChangeComplete = (color) => props.dispatch({ type: 'ChangeBackgroundColor', color })
 
   return (
     <ContextMenu id="BoardMenu" onShow={onShowContextMenu} className="ContextMenu">
@@ -106,10 +111,12 @@ export default function BoardContextMenu(props: Props) {
           <ColorPicker
             color={props.backgroundColor}
             colors={props.backgroundColors}
-            onChangeComplete={props.changeBackgroundColor}
+            onChangeComplete={onChangeComplete}
           />
         </ContextMenuItem>
       </div>
     </ContextMenu>
   )
 }
+
+export default memo(BoardContextMenu)
