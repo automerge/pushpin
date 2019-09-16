@@ -1,3 +1,5 @@
+import { useState, useLayoutEffect } from 'react'
+
 /* Board Grid Utilities
  * (Please be careful before re-using these, they're somewhat idiosyncratic.)
  *
@@ -15,19 +17,16 @@
  *
  * */
 
-const GRID_SIZE = 20
+export const GRID_SIZE = 20
 
 export interface Position {
   x: number
   y: number
 }
 
-// we support null dimensions to indicate "free"
-type Measure = number | Undimensioned
-type Undimensioned = null
 export interface Dimension {
-  width: Measure
-  height: Measure
+  width: number
+  height: number
 }
 
 /* given X/Y coordinates and an index, return the i-th offset.
@@ -46,13 +45,7 @@ export const gridOffset = ({ x, y }: Position, i: number) => {
 // many components have their default size expressed in grid cells
 // this is useful if we change grid sizes by a few pixels here or there
 // but will probably fall apart if we changed them by large amounts
-export const gridCellsToPixels = (i): Measure => {
-  // there's a smell here that we're checking truthiness of i and returning null
-  // but that's how the calling code expects it to work, so i'm leaving it thus for now
-  // if you're chasing a weird bug and found yourself here... hope this helps.
-  if (!i) {
-    return null
-  }
+export const gridCellsToPixels = (i: number): number => {
   return i * GRID_SIZE
 }
 
@@ -77,10 +70,42 @@ export const snapPositionToGrid = ({ x, y }: Position): Position => ({
   y: snapToGrid(y),
 })
 
-export const snapDimensionToGrid = (
-  { width, height }: Dimension = { width: null, height: null }
-): Dimension => ({
+export const snapDimensionToGrid = ({ width, height }: Dimension): Dimension => ({
   // we don't snap falsey-values like null or zero because we don't want them to become 1
   width: width ? snapToGrid(width) + 1 : width,
   height: height ? snapToGrid(height) + 1 : height,
 })
+
+/**
+ * measure the distance from a start point over time
+ */
+export function useDistance(): {
+  measuring: boolean
+  distance: Position
+  startMeasure: (Position) => void
+  setCurrent: (Position) => void
+  endMeasure: () => void
+} {
+  const [measuring, setMeasuring] = useState<boolean>(false)
+  const [start, setStart] = useState<Position>({ x: 0, y: 0 })
+  const [current, setCurrent] = useState<Position>({ x: 0, y: 0 })
+
+  const startMeasure = (position) => {
+    setMeasuring(true)
+    setStart(position)
+    setCurrent(position)
+  }
+
+  const endMeasure = () => {
+    setMeasuring(false)
+    setStart(current)
+  }
+
+  const [distance, setDistance] = useState<Position>({ x: 0, y: 0 })
+
+  useLayoutEffect(() => {
+    setDistance({ x: current.x - start.x, y: current.y - start.y })
+  }, [start, current])
+
+  return { measuring, distance, startMeasure, setCurrent, endMeasure }
+}

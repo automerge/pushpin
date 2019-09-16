@@ -70,7 +70,7 @@ function initWorkspace(repo: RepoFrontend) {
     workspaceUrl = existingWorkspaceUrl
   } else {
     ContentTypes.create('workspace', {}, (newWorkspaceUrl) => {
-      saveWorkspaceUrl(workspaceUrl)
+      saveWorkspaceUrl(newWorkspaceUrl)
       workspaceUrl = newWorkspaceUrl
     })
   }

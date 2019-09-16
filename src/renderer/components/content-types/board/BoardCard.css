@@ -23,19 +23,6 @@
   z-index: 2;
 }
 
-.BoardCard--text {
-  /* use an inset box-shadow to avoid the mitering of corners with normal borders */
-  min-width: 48px;
-  max-width: 481px;
-}
-
-.BoardCard--image {
-  padding: 12px;
-  box-sizing: border-box;
-  background: white;
-  border: solid 1px var(--colorPaleGrey);
-}
-
 .BoardCard-resizeHandle {
   position: absolute;
   width: 16px;

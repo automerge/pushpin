@@ -1,5 +1,4 @@
 import React from 'react'
-import mime from 'mime-types'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import { useDocument, useHyperfile } from '../../../Hooks'
@@ -26,22 +25,10 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
 
   const size = fileData ? fileData.size : null
 
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', createDocumentLink('file', hypermergeUrl))
-    if (!fileData) {
-      return
-    }
-    const { mimeType } = fileData
-    const extension = mime.extension(mimeType) || ''
-
-    e.dataTransfer.setData('DownloadURL', `text:${title}.${extension}:${hyperfileUrl}`)
-  }
-
   function renderUnidentifiedFile() {
-    // i removed the draggable from the onDragStart for now
     return (
       <div className="FileContent">
-        <div className="Icon" onDragStart={onDragStart}>
+        <div className="Icon">
           <i className="fa fa-file " />
         </div>
         <div className="Caption">

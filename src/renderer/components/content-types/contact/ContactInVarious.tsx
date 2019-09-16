@@ -12,7 +12,7 @@ import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument, useHyperfile, useMessaging, useTimeoutWhen } from '../../../Hooks'
+import { useDocument, useMessaging, useTimeoutWhen } from '../../../Hooks'
 
 const log = Debug('pushpin:settings')
 
@@ -24,7 +24,9 @@ export default function ContactInVarious(props: ContentProps) {
   const name = contact ? contact.name : null
 
   const [avatarImageDoc] = useDocument<FileDoc>(avatarDocId)
-  const avatarImageData = useHyperfile(avatarImageDoc && avatarImageDoc.hyperfileUrl)
+  const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
+    avatarImageDoc || {}
+
   const isOnline = isPresent || props.selfId === props.hypermergeUrl
 
   function onDragStart(e: React.DragEvent) {
@@ -32,16 +34,14 @@ export default function ContactInVarious(props: ContentProps) {
       'application/pushpin-url',
       createDocumentLink('contact', props.hypermergeUrl)
     )
-    if (!avatarImageDoc) return
-    if (!avatarImageData) return
 
-    const url = avatarImageDoc.hyperfileUrl
-    if (!url) return
+    // and we'll add a DownloadURL
+    if (hyperfileUrl) {
+      const outputExtension = extension || mime.extension(mimeType) || 'bin'
 
-    const { mimeType } = avatarImageData
-    const extension = mime.extension(mimeType) || ''
-
-    e.dataTransfer.setData('DownloadURL', `text:${name}.${extension}:${url}`)
+      const downloadUrl = `text:${name}.${outputExtension}:${hyperfileUrl}`
+      e.dataTransfer.setData('DownloadURL', downloadUrl)
+    }
   }
 
   if (!contact) {
