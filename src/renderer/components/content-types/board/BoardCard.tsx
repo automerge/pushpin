@@ -87,11 +87,11 @@ export default function BoardCard(props: BoardCardProps) {
   } = doc || {}
 
   function onCardClicked(event: React.MouseEvent) {
-    dispatch({ type: 'Clicked', cardId: id, event })
+    dispatch({ type: 'CardClicked', cardId: id, event })
   }
 
   function onCardDoubleClicked(event: React.MouseEvent) {
-    dispatch({ type: 'DoubleClicked', cardId: id, event })
+    dispatch({ type: 'CardDoubleClicked', cardId: id, event })
   }
 
   function stopPropagation(e: React.SyntheticEvent) {
@@ -100,7 +100,7 @@ export default function BoardCard(props: BoardCardProps) {
 
   function onDragStart(event: React.DragEvent) {
     if (!selected) {
-      dispatch({ type: 'Clicked', cardId: id, event })
+      dispatch({ type: 'CardClicked', cardId: id, event })
     }
 
     setDragStart({ x: event.pageX, y: event.pageY })
@@ -138,18 +138,21 @@ export default function BoardCard(props: BoardCardProps) {
       return
     }
 
-    dispatch({ type: 'Dragging', distance: { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y } })
+    dispatch({
+      type: 'CardDragging',
+      distance: { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y },
+    })
     e.preventDefault()
   }
 
   function onDragEnd(e: React.DragEvent) {
     setDragStart(null)
-    dispatch({ type: 'Dragging', distance: { x: 0, y: 0 } })
+    dispatch({ type: 'CardDragging', distance: { x: 0, y: 0 } })
   }
 
   const resizePointerDown = (event: React.PointerEvent) => {
     if (!selected) {
-      dispatch({ type: 'Clicked', cardId: id, event })
+      dispatch({ type: 'CardClicked', cardId: id, event })
     }
 
     if (!cardRef.current) {
@@ -193,7 +196,7 @@ export default function BoardCard(props: BoardCardProps) {
   const resizePointerUp = (e: React.PointerEvent) => {
     ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
-      dispatch({ type: 'Resized', cardId: id, dimension: resize })
+      dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }
     setResizeStart(null)
     setResize(null)
