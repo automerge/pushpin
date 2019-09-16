@@ -149,7 +149,6 @@ function create(attrs, handle, callback) {
           const id = uuid() as CardId
           window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
             doc.cards[id] = {
-              id,
               url: textDocUrl,
               x: 20,
               y: 20,

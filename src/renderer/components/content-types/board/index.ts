@@ -10,7 +10,6 @@ import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 export type CardId = string & { cardId: true }
 
 export interface BoardDocCard {
-  id: CardId
   url: PushpinUrl
   x: number
   y: number

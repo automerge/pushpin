@@ -12,7 +12,7 @@ import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument, useHyperfile, useMessaging, useTimeoutWhen } from '../../../Hooks'
+import { useDocument, useMessaging, useTimeoutWhen } from '../../../Hooks'
 
 const log = Debug('pushpin:settings')
 

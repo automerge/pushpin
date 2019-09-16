@@ -37,6 +37,7 @@ interface Dragging {
 export type BoardCardAction = Clicked | DoubleClicked | Resized | Dragging
 
 interface BoardCardProps extends BoardDocCard {
+  id: CardId
   boardUrl: HypermergeUrl
   selected: boolean
   uniquelySelected: boolean
@@ -157,8 +158,8 @@ export default function BoardCard(props: BoardCardProps) {
 
     setResizeStart({ x: event.pageX, y: event.pageY })
     const widthC = width || cardRef.current.clientWidth
-    const height = height || cardRef.current.clientHeight
-    setResize({ width: widthC, height })
+    const heightC = height || cardRef.current.clientHeight
+    setResize({ width: widthC, height: heightC })
     ;(event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()

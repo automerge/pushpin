@@ -33,7 +33,6 @@ export const addCardForContent = (b: BoardDoc, { position, dimension, url }: Add
   const { x, y } = snapPositionToGrid(position)
   const { width, height } = snapDimensionToGrid(dimension)
   const newCard: BoardDocCard = {
-    id,
     url,
     x,
     y,
@@ -61,9 +60,12 @@ export const moveCardsBy = (b: BoardDoc, selected: CardId[], offset: Position) =
       y: b.cards[id].y + offset.y,
     }
 
+    // XXX: this line here is why cards can escape the bounds of the app
+    //      we need to do some design around how to handle "floating" dimensions
+    //      like width & height so we don't encounter this anymore
     const size = {
-      width: b.cards[id].width,
-      height: b.cards[id].height,
+      width: b.cards[id].width || 0,
+      height: b.cards[id].height || 0,
     }
 
     const boundedPosition = boundPosition(position, size)
