@@ -24,7 +24,9 @@ export default function ContactInVarious(props: ContentProps) {
   const name = contact ? contact.name : null
 
   const [avatarImageDoc] = useDocument<FileDoc>(avatarDocId)
-  const avatarImageData = useHyperfile(avatarImageDoc && avatarImageDoc.hyperfileUrl)
+  const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
+    avatarImageDoc || {}
+
   const isOnline = isPresent || props.selfId === props.hypermergeUrl
 
   function onDragStart(e: React.DragEvent) {
@@ -32,15 +34,14 @@ export default function ContactInVarious(props: ContentProps) {
       'application/pushpin-url',
       createDocumentLink('contact', props.hypermergeUrl)
     )
-    if (!avatarImageData || !avatarImageDoc) {
-      return
+
+    // and we'll add a DownloadURL
+    if (hyperfileUrl) {
+      const outputExtension = extension || mime.extension(mimeType) || 'bin'
+
+      const downloadUrl = `text:${name}.${outputExtension}:${hyperfileUrl}`
+      e.dataTransfer.setData('DownloadURL', downloadUrl)
     }
-    const { mimeType } = avatarImageData
-
-    const url = avatarImageDoc.hyperfileUrl
-    const extension = mime.extension(mimeType) || ''
-
-    e.dataTransfer.setData('DownloadURL', `text:${name}.${extension}:${url}`)
   }
 
   if (!contact) {

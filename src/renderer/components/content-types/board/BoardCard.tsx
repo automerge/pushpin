@@ -78,7 +78,6 @@ export default function BoardCard(props: BoardCardProps) {
   const { hypermergeUrl } = parseDocumentLink(url)
   const [doc] = useDocument<any>(hypermergeUrl)
 
-  // yeeeech
   const {
     hyperfileUrl = null,
     title = 'untitled',
