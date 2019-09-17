@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
-import { Handle, RepoFrontend, HyperfileUrl } from 'hypermerge'
+import { Handle, RepoFrontend, HyperfileUrl, Doc } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 import SelfContext from './components/SelfContext'
@@ -48,7 +48,7 @@ export function useHandle<D>(
       return () => {}
     }
 
-    const handle = repo.open(url)
+    const handle = repo.open<D>(url)
 
     const cleanup = cb(handle)
 
@@ -61,8 +61,8 @@ export function useHandle<D>(
   return repo
 }
 
-export function useDocument<D>(url: HypermergeUrl | null): [Readonly<D> | null, ChangeFn<D>] {
-  const [doc, setDoc] = useState<D | null>(null)
+export function useDocument<D>(url: HypermergeUrl | null): [Doc<D> | null, ChangeFn<D>] {
+  const [doc, setDoc] = useState<Doc<D> | null>(null)
 
   const repo = useHandle<D>(url, (handle) => {
     handle.subscribe((doc) => setDoc(doc))
@@ -87,7 +87,7 @@ export function useDocument<D>(url: HypermergeUrl | null): [Readonly<D> | null, 
 export function useDocumentReducer<D, A>(
   url: HypermergeUrl | null,
   reducer: (doc: D, action: A) => void
-): [D | null, (action: A) => void] {
+): [Doc<D> | null, (action: A) => void] {
   const [doc, changeDoc] = useDocument<D>(url)
 
   const dispatch = useCallback((action: A) => {

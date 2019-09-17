@@ -4,7 +4,7 @@
 import React from 'react'
 import Debug from 'debug'
 
-import { Handle } from 'hypermerge'
+import { Handle, Doc } from 'hypermerge'
 
 import {
   createDocumentLink,
@@ -32,9 +32,9 @@ export interface Props {
   omniboxFinished: Function
 }
 
-interface Doc {
+interface WorkspaceDoc {
   selfId: HypermergeUrl
-  contactIds: PushpinUrl[]
+  contactIds: HypermergeUrl[]
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls?: PushpinUrl[]
@@ -46,7 +46,7 @@ interface State {
   invitations: any[]
   viewedDocs: { [docUrl: string]: any } // PushpinUrl
   contacts: { [contactId: string]: ContactDoc } // HypermergeUrl
-  doc?: Doc
+  doc?: Doc<WorkspaceDoc>
 }
 
 interface SectionIndex {
@@ -84,7 +84,7 @@ interface Action {
 
 export default class Omnibox extends React.PureComponent<Props, State> {
   omniboxInput = React.createRef<HTMLInputElement>()
-  handle?: Handle<any>
+  handle?: Handle<WorkspaceDoc>
   viewedDocHandles: { [docUrl: string]: Handle<any> }
   contactHandles: { [contactId: string]: Handle<ContactDoc> }
   invitationsView: any
@@ -153,7 +153,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     this.setState({ invitations }, () => this.forceUpdate())
   }
 
-  onChange = (doc: Doc) => {
+  onChange = (doc: Doc<WorkspaceDoc>) => {
     log('onChange', doc)
     this.setState({ doc }, () => {
       this.state.doc &&
@@ -472,7 +472,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
   archiveDocument = (url) => {
     this.handle &&
-      this.handle.change((doc: Doc) => {
+      this.handle.change((doc) => {
         if (!doc.archivedDocUrls) {
           doc.archivedDocUrls = []
         }
@@ -485,7 +485,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
   unarchiveDocument = (url) => {
     this.handle &&
-      this.handle.change((doc: Doc) => {
+      this.handle.change((doc) => {
         if (!doc.archivedDocUrls) {
           return
         }
