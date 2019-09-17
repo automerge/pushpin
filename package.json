@@ -26,7 +26,7 @@
   "main": "./dist/main.js",
   "config": {},
   "dependencies": {
-    "automerge": "https://github.com/automerge/automerge#text-hack",
+    "automerge": "github:automerge/automerge#opaque-strings",
     "bs58": "^4.0.1",
     "classnames": "^2.2.6",
     "diff-match-patch": "^1.0.4",
@@ -114,10 +114,10 @@
     "webpack-node-externals": "^1.7.2"
   },
   "resolutions": {
+    "automerge": "github:automerge/automerge#opaque-strings",
     "hypercore": "^7.2.0",
     "hypercore-protocol": "^6.11.0",
     "random-access-file": "https://github.com/pvh/random-access-file",
-    "automerge": "https://github.com/automerge/automerge#text-hack",
     "utp-native": "^2.1.4",
     "iltorb": "^2.4.3"
   }
