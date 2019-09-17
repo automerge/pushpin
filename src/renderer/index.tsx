@@ -15,6 +15,8 @@ import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 import ContentTypes from './ContentTypes'
 
+window._debug = {}
+
 // The debug module wants to cache the env['DEBUG'] config, but they get it
 // wrong, at least for the render process. Delete the attempted cache so it
 // doesn't confuse future instances.
@@ -32,6 +34,8 @@ ipc.config.maxRetries = 2 as any
 
 function initHypermerge(cb: (repo: RepoFrontend) => void) {
   const front = new RepoFrontend()
+
+  window._debug.repo = front
 
   ipc.connectTo('background', () => {
     ipc.of.background.on('repo.msg', (msg: ToFrontendRepoMsg) => {

@@ -43,6 +43,9 @@
     // arguably we should not do this, but there are 70 cases where we do
     "no-param-reassign": "off",
 
+    // third-party libs often use this
+    "no-underscore-dangle": "off",
+
     // we agreed this is a bad rule
     "react/destructuring-assignment": "off",
 

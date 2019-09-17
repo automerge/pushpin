@@ -11,9 +11,14 @@ import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { Socket } from 'net'
 import { HYPERMERGE_PATH } from '../renderer/constants'
 
+window._debug = {}
+
 const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
 const url = 'wss://discovery-cloud.herokuapp.com'
 const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
+
+window._debug.repo = back
+window._debug.discovery = discovery
 
 back.replicate(discovery)
 
