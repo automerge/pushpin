@@ -6,7 +6,7 @@ import { Readable } from 'stream'
 import { FILE_SERVER_PATH } from './constants'
 
 const repo = new RepoFrontend()
-repo.setFileServerPath(FILE_SERVER_PATH)
+repo.files.setServerPath(FILE_SERVER_PATH)
 
 export interface HyperfileResult {
   data: Readable
