@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, memo } from 'react'
 import classNames from 'classnames'
 import mime from 'mime-types'
 
@@ -51,7 +51,7 @@ interface Presence {
   color: string | null
 }
 
-export default function BoardCard(props: BoardCardProps) {
+function BoardCard(props: BoardCardProps) {
   const { dispatch, id, url, x, y, width, height } = props
 
   const [self] = useSelf()
@@ -92,10 +92,6 @@ export default function BoardCard(props: BoardCardProps) {
 
   function onCardDoubleClicked(event: React.MouseEvent) {
     dispatch({ type: 'CardDoubleClicked', cardId: id, event })
-  }
-
-  function stopPropagation(e: React.SyntheticEvent) {
-    e.stopPropagation()
   }
 
   function onDragStart(event: React.DragEvent) {
@@ -245,3 +241,9 @@ export default function BoardCard(props: BoardCardProps) {
     </div>
   )
 }
+
+function stopPropagation(e: React.SyntheticEvent) {
+  e.stopPropagation()
+}
+
+export default memo(BoardCard)
