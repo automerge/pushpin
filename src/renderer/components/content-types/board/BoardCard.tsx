@@ -43,7 +43,6 @@ interface BoardCardProps extends BoardDocCard {
   uniquelySelected: boolean
 
   dispatch(action: BoardCardAction): void
-
 }
 
 interface Presence {
@@ -58,8 +57,8 @@ function BoardCard(props: BoardCardProps) {
     props.boardUrl,
     props.selected && self
       ? {
-        color: self.color,
-      }
+          color: self.color,
+        }
       : null,
     id
   )
@@ -119,7 +118,7 @@ function BoardCard(props: BoardCardProps) {
     }
 
     // we want to skip expensive React recalculations, so we'll just update the style directly here
-    selectedCardsRef.current = document.querySelectorAll('.BoardCardDragWrapper--selected')
+    selectedCardsRef.current = document.querySelectorAll('.BoardCard--selected')
   }
 
   // we don't want to make changes to the document until the drag ends
@@ -141,8 +140,8 @@ function BoardCard(props: BoardCardProps) {
 
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
-        element.style.setProperty('--drag-x', distance.x + "px");
-        element.style.setProperty('--drag-y', distance.y + "px");
+        element.style.setProperty('--drag-x', `${distance.x}px`)
+        element.style.setProperty('--drag-y', `${distance.y}px`)
       })
     }
 
@@ -160,8 +159,8 @@ function BoardCard(props: BoardCardProps) {
     setDragStart(null)
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
-        element.style.setProperty('--drag-x', "0px");
-        element.style.setProperty('--drag-y', "0px");
+        element.style.setProperty('--drag-x', '0px')
+        element.style.setProperty('--drag-y', '0px')
       })
     }
   }
@@ -179,7 +178,7 @@ function BoardCard(props: BoardCardProps) {
     const widthC = width || cardRef.current.clientWidth
     const heightC = height || cardRef.current.clientHeight
     setResize({ width: widthC, height: heightC })
-      ; (event.target as Element).setPointerCapture(event.pointerId)
+    ;(event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
   }
@@ -210,7 +209,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerUp = (e: React.PointerEvent) => {
-    ; (e.target as Element).releasePointerCapture(e.pointerId)
+    ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }
@@ -226,8 +225,7 @@ function BoardCard(props: BoardCardProps) {
     height: resize ? resize.height : height,
     position: 'absolute',
     willChange: selected ? 'transform' : '',
-    transform: `translate3d(${x}px, ${y}px, 0)`
-      + (selected ? 'translate3d(var(--drag-x), var(--drag-y), 0)' : '')
+    transform: `translate3d(${x}px, ${y}px, 0) translate(var(--drag-x, 0), var(--drag-y, 0))`,
   }
 
   const { type } = parseDocumentLink(url)
@@ -235,32 +233,30 @@ function BoardCard(props: BoardCardProps) {
   const contentType = ContentTypes.lookup({ type, context })
 
   return (
-    <div className={classNames('BoardCardDragWrapper', selected && 'BoardCardDragWrapper--selected')}>
-      <div
-        tabIndex={-1}
-        ref={cardRef}
-        id={`card-${id}`}
-        className={classNames('BoardCard', selected && 'BoardCard--selected')}
-        style={style}
-        onClick={onCardClicked}
-        onDoubleClick={onCardDoubleClicked}
-        onContextMenu={stopPropagation}
-        draggable
-        onDrag={onDrag}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      >
-        <Content context="board" url={url} uniquelySelected={props.uniquelySelected} />
-        {contentType && contentType.resizable !== false && (
-          <span
-            onPointerDown={resizePointerDown}
-            onPointerMove={resizePointerMove}
-            onPointerUp={resizePointerUp}
-            onPointerCancel={resizePointerUp}
-            className="BoardCard-resizeHandle"
-          />
-        )}
-      </div>
+    <div
+      tabIndex={-1}
+      ref={cardRef}
+      id={`card-${id}`}
+      className={classNames('BoardCard', selected && 'BoardCard--selected')}
+      style={style}
+      onClick={onCardClicked}
+      onDoubleClick={onCardDoubleClicked}
+      onContextMenu={stopPropagation}
+      draggable
+      onDrag={onDrag}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+    >
+      <Content context="board" url={url} uniquelySelected={props.uniquelySelected} />
+      {contentType && contentType.resizable !== false && (
+        <span
+          onPointerDown={resizePointerDown}
+          onPointerMove={resizePointerMove}
+          onPointerUp={resizePointerUp}
+          onPointerCancel={resizePointerUp}
+          className="BoardCard-resizeHandle"
+        />
+      )}
     </div>
   )
 }
