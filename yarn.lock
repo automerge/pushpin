@@ -4327,9 +4327,9 @@ hyperdiscovery@^9.0.1:
     hypercore-protocol "^6.9.0"
     mutexify "^1.2.0"
 
-"hypermerge@git+https://github.com/automerge/hypermerge#feed-store":
+"hypermerge@git+https://github.com/automerge/hypermerge":
   version "1.0.42"
-  resolved "git+https://github.com/automerge/hypermerge#22a829e045d164abab0da2f171b5d89fef8c96d9"
+  resolved "git+https://github.com/automerge/hypermerge#de0e9b680eb04ecacb945b4f41580da104f92b10"
   dependencies:
     automerge "^0.12.1"
     bs58 "^4.0.1"

@@ -37,7 +37,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "html-webpack-plugin": "^3.2.0",
     "hyperdiscovery": "^9.0.1",
-    "hypermerge": "git+https://github.com/automerge/hypermerge#feed-store",
+    "hypermerge": "git+https://github.com/automerge/hypermerge",
     "immutable": "^3.8.2",
     "jimp": "^0.6.4",
     "js-crc": "^0.2.0",
