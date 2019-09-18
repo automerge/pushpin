@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
-import ipc from 'node-ipc'
 import Fs from 'fs'
 import { RepoFrontend } from 'hypermerge'
 import { ToFrontendRepoMsg } from 'hypermerge/dist/RepoMsg'
+import ipc from '../ipc'
 import { WORKSPACE_URL_PATH } from './constants'
 import Root from './components/Root'
 
@@ -27,10 +27,7 @@ localStorage.removeItem('debug')
 // emitter leaks.
 EventEmitter.defaultMaxListeners = 500
 
-ipc.config.silent = true
-ipc.config.appspace = 'pushpin.'
 ipc.config.id = 'renderer'
-ipc.config.maxRetries = 2 as any
 
 function initHypermerge(cb: (repo: RepoFrontend) => void) {
   const front = new RepoFrontend()

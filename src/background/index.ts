@@ -3,12 +3,10 @@ import raf from 'random-access-file'
 // const DiscoverySwarm = require('discovery-swarm')
 // const defaults = require('dat-swarm-defaults')
 import DiscoverySwarm from 'discovery-cloud-client'
-
 import { RepoBackend } from 'hypermerge'
-import ipc from 'node-ipc'
-
 import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { Socket } from 'net'
+import ipc from '../ipc'
 import { HYPERMERGE_PATH, FILE_SERVER_PATH } from '../renderer/constants'
 
 window._debug = {}
@@ -22,10 +20,7 @@ back.startFileServer(FILE_SERVER_PATH)
 window._debug.repo = back
 window._debug.discovery = discovery
 
-ipc.config.silent = true
-ipc.config.appspace = 'pushpin.'
 ipc.config.id = 'background'
-ipc.config.maxConnections = 1
 
 ipc.serve(() => {
   ipc.server.on('repo.msg', (msg: ToBackendRepoMsg) => {
