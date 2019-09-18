@@ -1,4 +1,5 @@
 import './DataMigration'
+import './HyperfileMigration'
 import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
@@ -212,13 +213,16 @@ function registerProtocolHandlers() {
     mainWindow && mainWindow.webContents.send('loadDocumentUrl', req.url)
   })
 
+  // TODO: convert to a stream protocol once we support content range the
+  // hypermerge FileServer
   protocol.registerBufferProtocol(
     'hyperfile',
     async (request, callback) => {
       try {
         if (Hyperfile.isHyperfileUrl(request.url)) {
-          const { data } = await Hyperfile.fetch(request.url)
-          callback(Buffer.from(data))
+          const [stream] = await Hyperfile.fetch(request.url)
+          const buffer = await Hyperfile.streamToBuffer(stream)
+          callback(buffer)
         }
       } catch (e) {
         log(e)

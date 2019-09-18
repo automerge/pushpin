@@ -23,8 +23,7 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
     return null
   }
 
-  const size =
-    fileData && fileData.data && fileData.data.buffer ? fileData.data.buffer.byteLength : null
+  const size = fileData ? fileData.size : null
 
   function renderUnidentifiedFile() {
     return (

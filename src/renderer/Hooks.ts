@@ -230,10 +230,27 @@ export function useHyperfile(url: HyperfileUrl | null): Hyperfile.HyperfileResul
 
   useEffect(() => {
     data && setData(null)
-    url && Hyperfile.fetch(url).then(setData)
+    url && Hyperfile.fetch(url).then(([data, mimeType, size]) => setData({ data, mimeType, size }))
   }, [url])
 
   return data
+}
+
+export function useHyperfileBuffer(
+  url: HyperfileUrl | null
+): Hyperfile.BufferedHyperfileResult | null {
+  const [buffered, setBuffered] = useState<Hyperfile.BufferedHyperfileResult | null>(null)
+  const data = useHyperfile(url)
+
+  useEffect(() => {
+    buffered && setBuffered(null)
+    data &&
+      Hyperfile.streamToBuffer(data.data).then((buffer) =>
+        setBuffered({ data: buffer, mimeType: data.mimeType })
+      )
+  }, [data])
+
+  return buffered
 }
 
 export function useInterval(ms: number, cb: () => void, deps: any[]) {

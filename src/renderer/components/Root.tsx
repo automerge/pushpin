@@ -22,8 +22,8 @@ import './content-types/ThreadContent'
 import './content-types/UrlContent'
 import './content-types/files/ImageContent'
 // disabled for now
-// import './content-types/files/AudioContent'
-// import './content-types/files/VideoContent'
+import './content-types/files/AudioContent'
+import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
 
 interface Props {
