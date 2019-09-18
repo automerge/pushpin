@@ -59,8 +59,8 @@ function BoardCard(props: BoardCardProps) {
     props.boardUrl,
     props.selected && self
       ? {
-          color: self.color,
-        }
+        color: self.color,
+      }
       : null,
     id
   )
@@ -159,7 +159,7 @@ function BoardCard(props: BoardCardProps) {
     const widthC = width || cardRef.current.clientWidth
     const heightC = height || cardRef.current.clientHeight
     setResize({ width: widthC, height: heightC })
-    ;(event.target as Element).setPointerCapture(event.pointerId)
+      ; (event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
   }
@@ -190,7 +190,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerUp = (e: React.PointerEvent) => {
-    ;(e.target as Element).releasePointerCapture(e.pointerId)
+    ; (e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }
@@ -205,8 +205,7 @@ function BoardCard(props: BoardCardProps) {
     width: resize ? resize.width : width,
     height: resize ? resize.height : height,
     position: 'absolute',
-    left: x + props.dragOffsetX,
-    top: y + props.dragOffsetY,
+    transform: `translate(${x + props.dragOffsetX}px, ${y + props.dragOffsetY}px)`
   }
 
   const { type } = parseDocumentLink(url)
