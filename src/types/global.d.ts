@@ -4,6 +4,7 @@ import { Repo, RepoFrontend } from 'hypermerge'
 declare global {
   interface Window {
     repo: RepoFrontend
+    _debug: any
   }
 
   const __static: string

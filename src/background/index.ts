@@ -11,12 +11,16 @@ import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { Socket } from 'net'
 import { HYPERMERGE_PATH, FILE_SERVER_PATH } from '../renderer/constants'
 
+window._debug = {}
+
 const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
 const url = 'wss://discovery-cloud.herokuapp.com'
 const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
 
 back.setSwarm(discovery as any)
 back.startFileServer(FILE_SERVER_PATH)
+window._debug.repo = back
+window._debug.discovery = discovery
 
 ipc.config.silent = true
 ipc.config.appspace = 'pushpin.'

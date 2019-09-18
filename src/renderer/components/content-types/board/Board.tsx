@@ -100,7 +100,7 @@ function Board(props: ContentProps) {
           moveCardsBy(doc, action.selection, action.distance)
           break
         case 'DeleteCards':
-          deleteCards(doc, selection)
+          deleteCards(doc, action.selection)
           break
 
         // card actions
