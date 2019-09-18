@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, memo, useMemo } from 'react'
+import React, { useRef, useCallback, memo, useMemo } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
@@ -113,7 +113,8 @@ function Board(props: ContentProps) {
           onCardDoubleClicked(doc, action.cardId, action.event)
           break
       }
-    }, [selection]
+    },
+    [selection]
   )
 
   // xxx: this one is tricky because it feels like it should be in boardDocManipulation
