@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import Debug from 'debug'
 import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
+import ipc from '../../../../ipc'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
@@ -32,6 +33,11 @@ export default function Workspace(props: ContentProps) {
 
   useAllHeartbeats(selfId)
   useHeartbeat(currentDocUrl)
+
+  useEffect(() => {
+    // For background debugging:
+    ipc.of.background.emit('workspace.msg', { type: 'Navigate', url: currentDocUrl })
+  }, [currentDocUrl])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {

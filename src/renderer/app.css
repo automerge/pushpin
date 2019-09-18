@@ -191,6 +191,14 @@ input {
   outline: none;
 }
 
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
 /* End globals */
 
 .DocLink {
