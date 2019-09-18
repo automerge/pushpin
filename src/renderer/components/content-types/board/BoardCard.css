@@ -23,6 +23,10 @@
   z-index: 2;
 }
 
+.BoardCardDragWrapper--selected {
+  translate: transform3d(var(--drag-x, 0), var(--drag-y, 0), 0)
+}
+
 .BoardCard-resizeHandle {
   position: absolute;
   width: 16px;
