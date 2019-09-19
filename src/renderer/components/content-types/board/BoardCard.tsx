@@ -29,12 +29,12 @@ interface CardResized {
   dimension: Dimension
 }
 
-interface CardDragging {
-  type: 'CardDragging'
+interface CardDragEnd {
+  type: 'CardDragEnd'
   distance: Position
 }
 
-export type BoardCardAction = CardClicked | CardDoubleClicked | CardResized | CardDragging
+export type BoardCardAction = CardClicked | CardDoubleClicked | CardResized | CardDragEnd
 
 interface BoardCardProps extends BoardDocCard {
   id: CardId
@@ -43,8 +43,6 @@ interface BoardCardProps extends BoardDocCard {
   uniquelySelected: boolean
 
   dispatch(action: BoardCardAction): void
-  dragOffsetX: number
-  dragOffsetY: number
 }
 
 interface Presence {
@@ -75,6 +73,7 @@ function BoardCard(props: BoardCardProps) {
   const [resize, setResize] = useState<Dimension | null>(null)
 
   const cardRef = useRef<HTMLDivElement>(null)
+  const selectedCardsRef = useRef<NodeListOf<HTMLDivElement> | null>(null)
 
   const { hypermergeUrl } = parseDocumentLink(url)
   const [doc] = useDocument<any>(hypermergeUrl)
@@ -134,16 +133,35 @@ function BoardCard(props: BoardCardProps) {
       return
     }
 
-    dispatch({
-      type: 'CardDragging',
-      distance: { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y },
-    })
+    const distance = { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y }
+
+    // we want to skip expensive React recalculations, so we'll just update the style directly here
+    selectedCardsRef.current = document.querySelectorAll('.BoardCard--selected')
+    if (selectedCardsRef.current) {
+      selectedCardsRef.current.forEach((element) => {
+        element.style.setProperty('--drag-x', `${distance.x}px`)
+        element.style.setProperty('--drag-y', `${distance.y}px`)
+      })
+    }
+
     e.preventDefault()
   }
 
   function onDragEnd(e: React.DragEvent) {
+    if (!dragStart) {
+      return
+    }
+
+    const distance = { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y }
+
+    dispatch({ type: 'CardDragEnd', distance })
     setDragStart(null)
-    dispatch({ type: 'CardDragging', distance: { x: 0, y: 0 } })
+    if (selectedCardsRef.current) {
+      selectedCardsRef.current.forEach((element) => {
+        element.style.setProperty('--drag-x', '0px')
+        element.style.setProperty('--drag-y', '0px')
+      })
+    }
   }
 
   const resizePointerDown = (event: React.PointerEvent) => {
@@ -205,8 +223,8 @@ function BoardCard(props: BoardCardProps) {
     width: resize ? resize.width : width,
     height: resize ? resize.height : height,
     position: 'absolute',
-    left: x + props.dragOffsetX,
-    top: y + props.dragOffsetY,
+    willChange: selected ? 'transform' : '',
+    transform: `translate3d(${x}px, ${y}px, 0) translate(var(--drag-x, 0), var(--drag-y, 0))`,
   }
 
   const { type } = parseDocumentLink(url)

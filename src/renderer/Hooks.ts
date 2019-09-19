@@ -45,7 +45,7 @@ export function useHandle<D>(
 
   useEffect(() => {
     if (!url) {
-      return () => {}
+      return () => { }
     }
 
     const handle = repo.open<D>(url)
@@ -86,7 +86,7 @@ export function useDocument<D>(url: HypermergeUrl | null): [Doc<D> | null, Chang
 
 export function useDocumentReducer<D, A>(
   url: HypermergeUrl | null,
-  reducer: (doc: D, action: A) => void
+  reducer: (doc: D, action: A) => void, deps?: any[]
 ): [Doc<D> | null, (action: A) => void] {
   const [doc, changeDoc] = useDocument<D>(url)
 
@@ -94,7 +94,7 @@ export function useDocumentReducer<D, A>(
     changeDoc((doc) => {
       reducer(doc, action)
     })
-  }, [])
+  }, [deps])
 
   return [doc, dispatch]
 }
@@ -103,7 +103,7 @@ export function useMessaging<M>(
   url: HypermergeUrl | null,
   onMsg: (msg: M) => void
 ): (msg: M) => void {
-  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
+  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() { } })
 
   // Without this ref, we'd close over the `onMsg` passed during the very first render.
   // Instead, we close over the ref object and can be sure we're always reading
@@ -116,8 +116,8 @@ export function useMessaging<M>(
     setSend({ send: handle.message })
 
     return () => {
-      onMsgRef.current = () => {}
-      setSend({ send() {} })
+      onMsgRef.current = () => { }
+      setSend({ send() { } })
     }
   })
   return sendObj.send
@@ -131,7 +131,7 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
 
   useEffect(() => {
     if (!selfId) {
-      return () => {}
+      return () => { }
     }
 
     const interval = setInterval(() => {
@@ -172,7 +172,7 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
 export function useHeartbeat(docUrl: HypermergeUrl | null) {
   useEffect(() => {
     if (!docUrl) {
-      return () => {}
+      return () => { }
     }
 
     heartbeats[docUrl] = (heartbeats[docUrl] || 0) + 1
@@ -209,7 +209,7 @@ export function usePresence<P>(
   })
 
   useEffect(() => {
-    if (!url || !key) return () => {}
+    if (!url || !key) return () => { }
 
     if (!myPresence[url]) {
       myPresence[url] = {}
@@ -271,12 +271,12 @@ export function useInterval(ms: number, cb: () => void, deps: any[]) {
  * The timeout is cancelled when `cond` is set to false.
  */
 export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
-  const reset = useRef(() => {})
+  const reset = useRef(() => { })
 
   useEffect(() => {
     if (!cond) {
-      reset.current = () => {}
-      return () => {}
+      reset.current = () => { }
+      return () => { }
     }
 
     let id: NodeJS.Timeout

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, memo, useMemo } from 'react'
+import React, { useRef, useCallback, memo, useMemo } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
@@ -67,7 +67,6 @@ export interface AddCardArgs extends CardArgs {
 function Board(props: ContentProps) {
   const boardRef = useRef<HTMLDivElement>(null)
   const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>()
-  const [distance, setDistance] = useState<Position>({ x: 0, y: 0 })
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -96,16 +95,13 @@ function Board(props: ContentProps) {
         case 'ChangeBackgroundColor':
           changeBackgroundColor(doc, action.color)
           break
-        case 'MoveCardsBy':
-          moveCardsBy(doc, action.selection, action.distance)
-          break
         case 'DeleteCards':
-          deleteCards(doc, action.selection)
+          deleteCards(doc, selection)
           break
 
         // card actions
-        case 'CardDragging':
-          setDistance(action.distance)
+        case 'CardDragEnd':
+          moveCardsBy(doc, selection, action.distance)
           break
         case 'CardResized':
           cardResized(doc, action.cardId, action.dimension)
@@ -117,7 +113,8 @@ function Board(props: ContentProps) {
           onCardDoubleClicked(doc, action.cardId, action.event)
           break
       }
-    }
+    },
+    [selection]
   )
 
   // xxx: this one is tricky because it feels like it should be in boardDocManipulation
@@ -191,12 +188,12 @@ function Board(props: ContentProps) {
         onDropExternal(e)
       }
     },
-    [props.hypermergeUrl, selection, distance]
+    [props.hypermergeUrl, selection]
   )
 
   const onDropInternal = (e: React.DragEvent) => {
     e.dataTransfer.dropEffect = 'move'
-    dispatch({ type: 'MoveCardsBy', selection, distance })
+    // do nothing (for now)
   }
 
   const onDropExternal = (e: React.DragEvent) => {
@@ -275,8 +272,6 @@ function Board(props: ContentProps) {
         height={card.height}
         url={card.url}
         boardUrl={props.hypermergeUrl}
-        dragOffsetX={isSelected ? distance.x : 0}
-        dragOffsetY={isSelected ? distance.y : 0}
         selected={isSelected}
         uniquelySelected={uniquelySelected}
         dispatch={dispatch}
