@@ -100,6 +100,7 @@ function Selection(props: SelectionProps) {
     if (!(selectionRef && selectionRef.current)) {
       return
     }
+
     selectionRef.current.style.setProperty('--drag-x', `${distance.x}px`)
     selectionRef.current.style.setProperty('--drag-y', `${distance.y}px`)
 

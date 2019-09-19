@@ -147,7 +147,7 @@ function BoardCard(props: BoardCardProps) {
       id={`card-${id}`}
       className={classNames('BoardCard', selected && 'BoardCard--selected')}
       style={style}
-      onClick={onCardClicked}
+      onPointerDown={onCardClicked}
       onDoubleClick={onCardDoubleClicked}
     >
       <Content context="board" url={url} uniquelySelected={props.uniquelySelected} />
