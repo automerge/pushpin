@@ -15,10 +15,10 @@ export default function Info(info: Props) {
       }}
     >
       {Object.keys(info).map((k) => (
-        <>
+        <React.Fragment key={k}>
           <div>{k}:</div>
           <div>{info[k]}</div>
-        </>
+        </React.Fragment>
       ))}
     </code>
   )

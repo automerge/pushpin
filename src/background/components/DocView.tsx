@@ -25,7 +25,7 @@ export default function DocView({ url }: Props) {
     >
       <Info docUrl={url} feeds={String(actorIds.length)} />
       {actorIds.map((actorId) => (
-        <Card>
+        <Card key={actorId}>
           <FeedView feedId={actorId} />
         </Card>
       ))}
