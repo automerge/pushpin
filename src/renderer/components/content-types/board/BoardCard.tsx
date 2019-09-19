@@ -75,6 +75,7 @@ function BoardCard(props: BoardCardProps) {
 
   const cardRef = useRef<HTMLDivElement>(null)
   const selectedCardsRef = useRef<NodeListOf<HTMLDivElement> | null>(null)
+  const previousDistance = useRef<Position | null>(null)
 
   const { hypermergeUrl } = parseDocumentLink(url)
   const [doc] = useDocument<any>(hypermergeUrl)
@@ -136,6 +137,21 @@ function BoardCard(props: BoardCardProps) {
 
     const distance = { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y }
 
+    // we throw away the first frame because it's getting the wrong pageX / pageY
+    // but only on windows and linux. if it's long after 9/19/2019 see if you get
+    // weird flickering at the start of drag when you remove this check
+    if (!previousDistance.current) {
+      previousDistance.current = distance
+      return
+    }
+
+    // don't make CSS changes if we haven't moved position
+    if (previousDistance.current.x === distance.x && previousDistance.current.y === distance.y) {
+      return
+    }
+
+    previousDistance.current = distance
+
     // we want to skip expensive React recalculations, so we'll just update the style directly here
     selectedCardsRef.current = document.querySelectorAll('.BoardCard--selected')
     if (selectedCardsRef.current) {
@@ -157,6 +173,8 @@ function BoardCard(props: BoardCardProps) {
 
     dispatch({ type: 'CardDragEnd', distance })
     setDragStart(null)
+    previousDistance.current = null
+
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
         element.style.setProperty('--drag-x', '0px')
