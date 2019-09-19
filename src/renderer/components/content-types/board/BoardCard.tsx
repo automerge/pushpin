@@ -116,9 +116,6 @@ function BoardCard(props: BoardCardProps) {
       const downloadUrl = `text:${title}.${outputExtension}:${hyperfileUrl}`
       event.dataTransfer.setData('DownloadURL', downloadUrl)
     }
-
-    // we want to skip expensive React recalculations, so we'll just update the style directly here
-    selectedCardsRef.current = document.querySelectorAll('.BoardCard--selected')
   }
 
   // we don't want to make changes to the document until the drag ends
@@ -138,6 +135,8 @@ function BoardCard(props: BoardCardProps) {
 
     const distance = { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y }
 
+    // we want to skip expensive React recalculations, so we'll just update the style directly here
+    selectedCardsRef.current = document.querySelectorAll('.BoardCard--selected')
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
         element.style.setProperty('--drag-x', `${distance.x}px`)
