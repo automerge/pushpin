@@ -71,6 +71,7 @@ function BoardCard(props: BoardCardProps) {
 
   const selected = props.selected || remotePresence
   const [resize, setResize] = useState<Dimension | null>(null)
+  const [originalSize, setOriginalSize] = useState<Dimension | null>(null)
 
   const cardRef = useRef<HTMLDivElement>(null)
   const selectedCardsRef = useRef<NodeListOf<HTMLDivElement> | null>(null)
@@ -176,6 +177,7 @@ function BoardCard(props: BoardCardProps) {
     setResizeStart({ x: event.pageX, y: event.pageY })
     const widthC = width || cardRef.current.clientWidth
     const heightC = height || cardRef.current.clientHeight
+    setOriginalSize({ width: widthC, height: heightC })
     setResize({ width: widthC, height: heightC })
     ;(event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
@@ -183,7 +185,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerMove = (e: React.PointerEvent) => {
-    if (!resize || !resizeStart) {
+    if (!resize || !resizeStart || !originalSize) {
       return
     }
 
@@ -191,12 +193,9 @@ function BoardCard(props: BoardCardProps) {
       return
     }
 
-    const deNulledWidth = width || cardRef.current.clientWidth
-    const deNulledHeight = height || cardRef.current.clientHeight
-
     const movedSize = {
-      width: deNulledWidth - resizeStart.x + e.pageX,
-      height: deNulledHeight - resizeStart.y + e.pageY,
+      width: originalSize.width - resizeStart.x + e.pageX,
+      height: originalSize.height - resizeStart.y + e.pageY,
     }
 
     const clampedSize = boundSizeByType(url, movedSize)
