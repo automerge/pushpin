@@ -151,7 +151,7 @@ function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
         doc.text.insertAt!(0, ...text.split(''))
 
         if (!text || !text.endsWith('\n')) {
-          doc.text.insertAt!(text.length, '\n') // Quill prefers an ending newline
+          doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
         }
       }
     })
@@ -165,7 +165,7 @@ function create({ text }, handle: Handle<TextDoc>, callback) {
   handle.change((doc) => {
     doc.text = new Automerge.Text(text)
     if (!text || !text.endsWith('\n')) {
-      doc.text.insertAt!(text.length, '\n') // Quill prefers an ending newline
+      doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
     }
   })
 
