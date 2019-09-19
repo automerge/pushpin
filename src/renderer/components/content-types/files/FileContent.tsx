@@ -13,14 +13,23 @@ function humanFileSize(size: number) {
 }
 
 export default function FileContent({ hypermergeUrl, context }: ContentProps) {
-  const [doc] = useDocument<FileDoc>(hypermergeUrl)
+  const [doc, changeDoc] = useDocument<FileDoc>(hypermergeUrl)
 
-  const { title = '', hyperfileUrl = null } = doc || {}
+  const { title = '', mimeType = null, hyperfileUrl = null } = doc || {}
 
   const fileData = useHyperfile(hyperfileUrl)
 
   if (!hyperfileUrl) {
     return null
+  }
+
+  // Write mimetypes from files in if we don't have them.
+  // This is essentially a migration, but we can throw it out
+  // if we have fast file metadata lookup in the future.
+  if (fileData && fileData.mimeType && !mimeType) {
+    changeDoc((doc) => {
+      doc.mimeType = fileData.mimeType
+    })
   }
 
   const size = fileData ? fileData.size : null
@@ -39,8 +48,6 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
       </div>
     )
   }
-
-  const { mimeType = null } = fileData || {}
 
   const contentType = ContentTypes.mimeTypeToContentType(mimeType)
   if (contentType !== 'file') {
