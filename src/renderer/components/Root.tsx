@@ -25,16 +25,20 @@ import './content-types/files/ImageContent'
 import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
+import System, { SystemContext } from '../System'
 
 interface Props {
   url: PushpinUrl
   repo: RepoFrontend
+  system: System
 }
 
-export default function Root({ repo, url }: Props) {
+export default function Root({ repo, url, system }: Props) {
   return (
     <RepoContext.Provider value={repo}>
-      <Content context="root" url={url} />
+      <SystemContext.Provider value={system}>
+        <Content context="root" url={url} />
+      </SystemContext.Provider>
     </RepoContext.Provider>
   )
 }

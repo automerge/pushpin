@@ -3,11 +3,17 @@ import raf from 'random-access-file'
 // const DiscoverySwarm = require('discovery-swarm')
 // const defaults = require('dat-swarm-defaults')
 import DiscoverySwarm from 'discovery-cloud-client'
-import { RepoBackend } from 'hypermerge'
+import * as ReactDOM from 'react-dom'
+import React from 'react'
+
+import { RepoBackend, DocUrl } from 'hypermerge'
+
 import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { Socket } from 'net'
 import ipc from '../ipc'
 import { HYPERMERGE_PATH, FILE_SERVER_PATH } from '../renderer/constants'
+import Root from './components/Root'
+import { ToSystemMsg } from '../renderer/System'
 
 window._debug = {}
 
@@ -27,9 +33,39 @@ ipc.serve(() => {
     back.receive(msg)
   })
 
+  ipc.server.on('system.msg', (msg: ToSystemMsg) => {
+    switch (msg.type) {
+      case 'Navigated':
+        mount(msg.url, Root)
+        break
+    }
+  })
+
   ipc.server.on('connect', (socket: Socket) => {
     back.subscribe((msg) => ipc.server.emit(socket, 'repo.msg', msg))
   })
 })
 
 ipc.server.start()
+
+const container = document.createElement('div')
+container.id = 'app'
+document.body.appendChild(container)
+
+let currentUrl: DocUrl
+function mount(url: DocUrl, NewRoot: typeof Root) {
+  currentUrl = url
+  try {
+    ReactDOM.render(<NewRoot repo={back} currentUrl={url} />, container)
+  } catch (e) {
+    console.error('mount error', e) // eslint-disable-line
+  }
+}
+
+// HMR
+if (module.hot) {
+  module.hot.accept('./components/Root.tsx', () => {
+    const NextRoot = require('./components/Root').default // eslint-disable-line global-require
+    mount(currentUrl, NextRoot)
+  })
+}
