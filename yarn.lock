@@ -1192,6 +1192,7 @@ atomic-batcher@^1.0.2:
 
 automerge@^0.12.1, "automerge@github:automerge/automerge#opaque-strings":
   version "0.12.1"
+  uid "90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   resolved "https://codeload.github.com/automerge/automerge/tar.gz/90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   dependencies:
     immutable "^3.8.2"
