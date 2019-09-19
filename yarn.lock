@@ -1192,7 +1192,6 @@ atomic-batcher@^1.0.2:
 
 automerge@^0.12.1, "automerge@github:automerge/automerge#opaque-strings":
   version "0.12.1"
-  uid "90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   resolved "https://codeload.github.com/automerge/automerge/tar.gz/90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   dependencies:
     immutable "^3.8.2"
@@ -1524,7 +1523,7 @@ buffer-alloc-unsafe@^1.0.0, buffer-alloc-unsafe@^1.1.0:
   resolved "https://registry.yarnpkg.com/buffer-alloc-unsafe/-/buffer-alloc-unsafe-1.1.0.tgz#bd7dc26ae2972d0eda253be061dba992349c19f0"
   integrity sha512-TEM2iMIEQdJ2yjPJoSIsldnleVaAk1oW3DBVUykyOLsEsFmEc9kn+SFFPz+gl54KQNxlDnAwCXosOS9Okx2xAg==
 
-buffer-alloc@^1.1.0:
+buffer-alloc@^1.1.0, buffer-alloc@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/buffer-alloc/-/buffer-alloc-1.2.0.tgz#890dd90d923a873e08e10e5fd51a57e5b7cce0ec"
   integrity sha512-CFsHQgjtW1UChdXgbyJGtnm+O/uLQeZdtbDo8mfUgYXCHSM1wgrVxXm6bSyrUuErEb+4sYVGCzASBRot7zyrow==
@@ -1920,10 +1919,10 @@ code-point-at@^1.0.0:
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
-codecs@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/codecs/-/codecs-2.0.0.tgz#680d1d4ac8ac3c8adbaa625c7ce06c6ee5792b50"
-  integrity sha512-WXvpJRAgc693oqYvZte9uYEiL5YHtfrxyEq12uVny9oBJ1k37zSva5vVz7trsnt6R9Y15hEgOSC7VFZT2pfYnA==
+codecs@^1.2.0:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/codecs/-/codecs-1.2.1.tgz#10155c751578919883bd87e425db04af86a0188c"
+  integrity sha512-SPnx+ZHXVJ0qTInRXmnxuyu8PDvSzvop5MXp1BOr/urFQI3yL2n5ewE755skTklF/hKVlWj8cinGxdR2gvLvTA==
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -4271,7 +4270,7 @@ hypercore-crypto@^1.0.0:
     sodium-universal "^2.0.0"
     uint64be "^2.0.2"
 
-hypercore-protocol@^6.11.0, hypercore-protocol@^6.12.0, hypercore-protocol@^6.5.0, hypercore-protocol@^6.9.0:
+hypercore-protocol@^6.12.0, hypercore-protocol@^6.4.1, hypercore-protocol@^6.9.0:
   version "6.12.0"
   resolved "https://registry.yarnpkg.com/hypercore-protocol/-/hypercore-protocol-6.12.0.tgz#0fafa7c047a7e4c35b2d77639e2489f60d7b1a0d"
   integrity sha512-T3oy9/7QFejqJX2RGcCUU1944e5/eKbLlSz9JPTNN1QbYFJgat/r7eTyOO8SMSLUimUmQx6YBMKhgYbdKzp7Bw==
@@ -4285,27 +4284,31 @@ hypercore-protocol@^6.11.0, hypercore-protocol@^6.12.0, hypercore-protocol@^6.5.
     sorted-indexof "^1.0.0"
     varint "^5.0.0"
 
-hypercore@^6.20.2, hypercore@^6.24.0, hypercore@^7.2.0:
-  version "7.6.2"
-  resolved "https://registry.yarnpkg.com/hypercore/-/hypercore-7.6.2.tgz#bc7b42ac9c52d5c121da81e91f621d8abb4f91b6"
-  integrity sha512-wkRWmL1eZnRNrBIqxEPCLt9/6eX8QvawgmiiA58es83bAOkZEG1FQwm9XSJ+tSng8gQlawalnRetOl6wCIIBcQ==
+hypercore@^6.20.2, hypercore@^6.24.0:
+  version "6.26.0"
+  resolved "https://registry.yarnpkg.com/hypercore/-/hypercore-6.26.0.tgz#a3b53f7980229da8e5badfd117ead8feebcaae5a"
+  integrity sha512-su/bucp958SyFWWF5uzeLT05N0k7gTbktvLCo0TaloXWSSs2OiFyj3Ka7v93yaD9u0vBT3i0foPoZnj1yC/dog==
   dependencies:
     array-lru "^1.1.0"
     atomic-batcher "^1.0.2"
     bitfield-rle "^2.2.1"
+    buffer-alloc "^1.2.0"
+    buffer-alloc-unsafe "^1.0.0"
+    buffer-from "^1.0.0"
     bulk-write-stream "^1.1.3"
-    codecs "^2.0.0"
+    codecs "^1.2.0"
     fast-bitfield "^1.2.2"
     flat-tree "^1.6.0"
     from2 "^2.3.0"
     hypercore-crypto "^1.0.0"
-    hypercore-protocol "^6.5.0"
+    hypercore-protocol "^6.4.1"
     inherits "^2.0.3"
     inspect-custom-symbol "^1.1.0"
     last-one-wins "^1.0.4"
     memory-pager "^1.0.2"
     merkle-tree-stream "^3.0.3"
     pretty-hash "^1.0.1"
+    process-nextick-args "^1.0.7"
     random-access-file "^2.1.0"
     sodium-universal "^2.0.0"
     sparse-bitfield "^3.0.0"
@@ -6743,6 +6746,11 @@ pretty-hash@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/pretty-hash/-/pretty-hash-1.0.1.tgz#16e0579188def56bdb565892bcd05a5d65324807"
   integrity sha1-FuBXkYje9WvbVliSvNBaXWUySAc=
+
+process-nextick-args@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-1.0.7.tgz#150e20b756590ad3f91093f25a4f2ad8bff30ba3"
+  integrity sha1-FQ4gt1ZZCtP5EJPyWk8q2L/zC6M=
 
 process-nextick-args@~2.0.0:
   version "2.0.1"

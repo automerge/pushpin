@@ -117,8 +117,6 @@
   },
   "resolutions": {
     "automerge": "github:automerge/automerge#opaque-strings",
-    "hypercore": "^7.2.0",
-    "hypercore-protocol": "^6.11.0",
     "random-access-file": "https://github.com/pvh/random-access-file",
     "utp-native": "^2.1.4",
     "iltorb": "^2.4.3"
