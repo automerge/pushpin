@@ -10,7 +10,7 @@ import {
   Position,
 } from './BoardGrid'
 import { boundPosition } from './BoardBoundary'
-import { Selection } from './BoardSelection'
+import { SelectionData } from './BoardSelection'
 
 import uuid = require('uuid')
 
@@ -111,11 +111,11 @@ export const changeBackgroundColor = (b: BoardDoc, color: any) => {
 
 interface DeleteCards {
   type: 'DeleteCards'
-  selection: Selection<CardId>
+  selection: SelectionData<CardId>
 }
 interface MoveCardsBy {
   type: 'MoveCardsBy'
-  selection: Selection<CardId>
+  selection: SelectionData<CardId>
   distance: Position
 }
 interface AddCardForContent extends AddCardArgs {
