@@ -43,6 +43,7 @@ export default function FeedView(props: Props) {
 }
 
 declare module 'hypermerge/dist/hypercore' {
+  // The hypermerge Feed type is not quite correct:
   interface Feed<T> {
     on(event: 'append', cb: () => void): this
     off(event: string, cb: Function): this

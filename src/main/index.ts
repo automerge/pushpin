@@ -4,6 +4,7 @@ import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions }
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
 import * as Hyperfile from '../renderer/hyperfile'
+import { FromSystemMsg } from '../renderer/System'
 
 const log = Debug('pushpin:electron')
 
@@ -154,8 +155,8 @@ function createMenu() {
         {
           label: 'New',
           accelerator: 'CmdOrCtrl+N',
-          click: (_item, focusedWindow) => {
-            focusedWindow.webContents.send('newDocument')
+          click: (_item, _focusedWindow) => {
+            sendSystemMsg({ type: 'NewDocument' })
           },
         },
       ],
@@ -210,7 +211,7 @@ function registerProtocolHandlers() {
   protocol.registerHttpProtocol('pushpin', (req, _cb) => {
     // we don't want to use loadURL because we don't want to reset the whole app state
     // so we use the workspace manipulation function here
-    mainWindow && mainWindow.webContents.send('loadDocumentUrl', req.url)
+    sendSystemMsg({ type: 'IncomingUrl', url: req.url })
   })
 
   // TODO: convert to a stream protocol once we support content range the
@@ -234,6 +235,10 @@ function registerProtocolHandlers() {
       }
     }
   )
+}
+
+function sendSystemMsg(msg: FromSystemMsg): void {
+  mainWindow && mainWindow.webContents.send('system.msg', msg)
 }
 
 function toggleWindow(win: BrowserWindow): boolean {

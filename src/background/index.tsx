@@ -13,6 +13,7 @@ import { Socket } from 'net'
 import ipc from '../ipc'
 import { HYPERMERGE_PATH, FILE_SERVER_PATH } from '../renderer/constants'
 import Root from './components/Root'
+import { ToSystemMsg } from '../renderer/System'
 
 window._debug = {}
 
@@ -32,9 +33,9 @@ ipc.serve(() => {
     back.receive(msg)
   })
 
-  ipc.server.on('workspace.msg', (msg: any) => {
+  ipc.server.on('system.msg', (msg: ToSystemMsg) => {
     switch (msg.type) {
-      case 'Navigate':
+      case 'Navigated':
         mount(msg.url, Root)
         break
     }

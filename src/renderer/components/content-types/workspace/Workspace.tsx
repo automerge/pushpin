@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
 import Debug from 'debug'
-import { ipcRenderer } from 'electron'
 import uuid from 'uuid'
-import ipc from '../../../../ipc'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
@@ -14,6 +12,7 @@ import { ContactDoc } from '../contact'
 import './Workspace.css'
 import { useDocument, useAllHeartbeats, useHeartbeat } from '../../../Hooks'
 import { BoardDoc, CardId } from '../board'
+import { useSystem } from '../../../System'
 
 const log = Debug('pushpin:workspace')
 
@@ -34,9 +33,27 @@ export default function Workspace(props: ContentProps) {
   useAllHeartbeats(selfId)
   useHeartbeat(currentDocUrl)
 
+  const sendToSystem = useSystem(
+    (msg) => {
+      switch (msg.type) {
+        case 'IncomingUrl':
+          openDoc(msg.url)
+          break
+
+        case 'NewDocument':
+          if (!selfId) break
+          ContentTypes.create('board', { selfId }, (boardUrl: PushpinUrl) => {
+            openDoc(boardUrl)
+          })
+          break
+      }
+    },
+    [selfId]
+  )
+
   useEffect(() => {
     // For background debugging:
-    ipc.of.background.emit('workspace.msg', { type: 'Navigate', url: currentDocUrl })
+    if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
   }, [currentDocUrl])
 
   function openDoc(docUrl: string) {
@@ -67,30 +84,6 @@ export default function Workspace(props: ContentProps) {
       }
     })
   }
-
-  useEffect(() => {
-    if (!selfId) {
-      return () => {}
-    }
-
-    function onLoad(event: any, url: string) {
-      openDoc(url)
-    }
-
-    function onNew() {
-      ContentTypes.create('board', { selfId }, (boardUrl) => {
-        openDoc(boardUrl)
-      })
-    }
-
-    ipcRenderer.on('loadDocumentUrl', onLoad)
-    ipcRenderer.on('newDocument', onNew)
-
-    return () => {
-      ipcRenderer.removeListener('loadDocumentUrl', onLoad)
-      ipcRenderer.removeListener('newDocument', onNew)
-    }
-  }, [selfId])
 
   log('render')
   if (!workspace) {
