@@ -1,12 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { EventEmitter } from 'events'
-import Fs from 'fs'
 import { RepoFrontend } from 'hypermerge'
 import { ToFrontendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { ipcRenderer } from 'electron'
 import ipc from '../ipc'
-import { WORKSPACE_URL_PATH } from './constants'
 import Root from './components/Root'
 
 import './app.css'
@@ -14,7 +12,6 @@ import './react-toggle-override.css'
 import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
-import ContentTypes from './ContentTypes'
 import System, { FromSystemMsg } from './System'
 
 window._debug = {}
@@ -51,36 +48,11 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
   cb(front)
 }
 
-function loadWorkspaceUrl() {
-  if (Fs.existsSync(WORKSPACE_URL_PATH)) {
-    const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
-    if (json.workspaceUrl) {
-      return json.workspaceUrl
-    }
-  }
-  return ''
-}
-
-function saveWorkspaceUrl(workspaceUrl) {
-  const workspaceUrlData = { workspaceUrl }
-  Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
-}
 
 function initWorkspace(repo: RepoFrontend) {
-  let workspaceUrl
-  const existingWorkspaceUrl = loadWorkspaceUrl()
-  if (existingWorkspaceUrl !== '') {
-    workspaceUrl = existingWorkspaceUrl
-  } else {
-    ContentTypes.create('workspace', {}, (newWorkspaceUrl) => {
-      saveWorkspaceUrl(newWorkspaceUrl)
-      workspaceUrl = newWorkspaceUrl
-    })
-  }
-
   const system = initSystem()
 
-  const workspace = <Root repo={repo} url={workspaceUrl} system={system} />
+  const workspace = <Root repo={repo} system={system} />
   const element = document.createElement('div')
   element.id = 'app'
   document.body.appendChild(element)
@@ -90,7 +62,7 @@ function initWorkspace(repo: RepoFrontend) {
   if (module.hot) {
     module.hot.accept('./components/Root.tsx', () => {
       const NextRoot = require('./components/Root').default // eslint-disable-line global-require
-      ReactDOM.render(<NextRoot repo={repo} url={workspaceUrl} system={system} />, element)
+      ReactDOM.render(<NextRoot repo={repo} system={system} />, element)
     })
   }
 }

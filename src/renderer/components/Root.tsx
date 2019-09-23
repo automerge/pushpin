@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { RepoFrontend } from 'hypermerge'
 import Content from './Content'
@@ -26,18 +26,57 @@ import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
 import System, { SystemContext } from '../System'
+import { WORKSPACE_URL_PATH } from '../constants';
+import Fs from 'fs'
+import ContentTypes from '../ContentTypes';
 
 interface Props {
-  url: PushpinUrl
   repo: RepoFrontend
   system: System
 }
 
-export default function Root({ repo, url, system }: Props) {
+function loadWorkspaceUrl(): PushpinUrl | null {
+  if (Fs.existsSync(WORKSPACE_URL_PATH)) {
+    const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
+    if (json.workspaceUrl) {
+      return json.workspaceUrl
+    }
+  }
+  return null
+}
+
+function saveWorkspaceUrl(workspaceUrl: PushpinUrl): void {
+  const workspaceUrlData = { workspaceUrl }
+  Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
+}
+
+function useWorkspaceUrl(): [PushpinUrl | null, (newUrl: PushpinUrl) => void] {
+  const [workspaceUrl, setWorkspaceUrl] = useState<PushpinUrl | null>(null)
+
+  useEffect(() => {
+    const existingWorkspaceUrl = loadWorkspaceUrl()
+    if (existingWorkspaceUrl) {
+      setWorkspaceUrl(existingWorkspaceUrl)
+    } else {
+      ContentTypes.create('workspace', {}, (newWorkspaceUrl: PushpinUrl) => {
+        saveWorkspaceUrl(newWorkspaceUrl)
+        setWorkspaceUrl(newWorkspaceUrl)
+      })
+    }
+  }, [workspaceUrl])
+
+  return [workspaceUrl, setWorkspaceUrl]
+}
+
+export default function Root({ repo, system }: Props) {
+  const [workspaceUrl, setWorkspaceUrl] = useWorkspaceUrl()
+
+  if (!workspaceUrl) { return null }
+
   return (
     <RepoContext.Provider value={repo}>
       <SystemContext.Provider value={system}>
-        <Content context="root" url={url} />
+        <Content context="root" url={workspaceUrl} />
       </SystemContext.Provider>
     </RepoContext.Provider>
   )
