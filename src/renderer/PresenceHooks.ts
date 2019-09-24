@@ -28,7 +28,6 @@ export interface RemotePresenceCache<P> {
 interface HeartbeatMessage {
   contact: HypermergeUrl
   device: HypermergeUrl
-  subject: HypermergeUrl // for testing, remove this
   heartbeat?: boolean
   departing?: boolean
   data?: any
@@ -53,7 +52,6 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
     }
 
     const interval = setInterval(() => {
-      console.log('send heartbeats', Date.now())
       // Post a presence heartbeat on documents currently considered
       // to be open, allowing any kind of card to render a list of "present" folks.
       Object.entries(heartbeats).forEach(([url, count]) => {
@@ -62,13 +60,8 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
             contact: selfId,
             device: currentDeviceHypermergeUrl,
             heartbeat: true,
-            subject: url as HypermergeUrl,
             data: myPresence[url],
           }
-          console.log(
-            `[${selfId!.slice(12, 17)}-${currentDeviceHypermergeUrl!.slice(12, 17)}] => ${url}`,
-            msg.data
-          )
           // we can't use HypermergeUrl as a key in heartbeats, so we do this bad thing
           repo.message(url as HypermergeUrl, msg)
         } else {
@@ -85,7 +78,6 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       const departMessage: HeartbeatMessage = {
         contact: selfId,
         device: currentDeviceHypermergeUrl,
-        subject: url as HypermergeUrl,
         departing: true,
       }
       repo.message(url, departMessage)
@@ -139,11 +131,7 @@ export function usePresence<P>(
   })
 
   useMessaging<any>(url, (msg: HeartbeatMessage) => {
-    const { contact, device, heartbeat, departing, data, subject } = msg
-    console.log(
-      `[${contact!.slice(12, 17)}-${device!.slice(12, 17)}] -> ${url} / ${subject}`,
-      msg.data
-    )
+    const { contact, device, heartbeat, departing, data } = msg
     const presence = { contact, device, data }
     if (heartbeat || data) {
       bumpTimeout(remotePresenceToLookupKey(presence))
