@@ -33,7 +33,7 @@ function Content(props: Props) {
 
   const { type, hypermergeUrl } = parseDocumentLink(url)
 
-  useHeartbeat(['workspace', 'board'].includes(context) ? hypermergeUrl : null)
+  useHeartbeat(['workspace'].includes(context) ? hypermergeUrl : null)
 
   useEffect(() => {
     setCrashed(false)
