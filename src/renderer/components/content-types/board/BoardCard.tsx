@@ -57,23 +57,24 @@ function BoardCard(props: BoardCardProps) {
     props.boardUrl,
     props.selected && self
       ? {
-        color: self.color,
-      }
+          color: self.color,
+        }
       : null,
     id
   )
 
   // Blech.
-  const [remotePresence] = remotePresences
-  const { data = null } = remotePresence || {}
-  const highlightColor = (remotePresence && data && data.color) ? data.color : undefined
-  console.log(remotePresence, highlightColor)
+  const presence = remotePresences.find(
+    (presence) => presence && presence.data && presence.data.color
+  )
+  const highlightColor = presence ? presence!.data!.color : undefined
+  // ^^ we proved it has data & color above
 
   const [dragStart, setDragStart] = useState<Position | null>(null)
 
   const [resizeStart, setResizeStart] = useState<Position | null>(null)
 
-  const selected = props.selected || remotePresence
+  const selected = props.selected || highlightColor
   const [resize, setResize] = useState<Dimension | null>(null)
   const [originalSize, setOriginalSize] = useState<Dimension | null>(null)
 
@@ -201,7 +202,7 @@ function BoardCard(props: BoardCardProps) {
     const heightC = height || cardRef.current.clientHeight
     setOriginalSize({ width: widthC, height: heightC })
     setResize({ width: widthC, height: heightC })
-      ; (event.target as Element).setPointerCapture(event.pointerId)
+    ;(event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
   }
@@ -229,7 +230,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerUp = (e: React.PointerEvent) => {
-    ; (e.target as Element).releasePointerCapture(e.pointerId)
+    ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }

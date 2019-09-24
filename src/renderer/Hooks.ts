@@ -4,7 +4,7 @@ import * as Hyperfile from './hyperfile'
 import { HypermergeUrl, parseDocumentLink } from './ShareLink'
 import SelfContext from './components/SelfContext'
 import { ContactDoc } from './components/content-types/contact'
-import { CurrentDeviceContext } from './components/content-types/workspace/Device';
+import { CurrentDeviceContext } from './components/content-types/workspace/Device'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -46,7 +46,7 @@ export function useHandle<D>(
 
   useEffect(() => {
     if (!url) {
-      return () => { }
+      return () => {}
     }
 
     const handle = repo.open<D>(url)
@@ -87,15 +87,19 @@ export function useDocument<D>(url: HypermergeUrl | null): [Doc<D> | null, Chang
 
 export function useDocumentReducer<D, A>(
   url: HypermergeUrl | null,
-  reducer: (doc: D, action: A) => void, deps?: any[]
+  reducer: (doc: D, action: A) => void,
+  deps?: any[]
 ): [Doc<D> | null, (action: A) => void] {
   const [doc, changeDoc] = useDocument<D>(url)
 
-  const dispatch = useCallback((action: A) => {
-    changeDoc((doc) => {
-      reducer(doc, action)
-    })
-  }, [deps])
+  const dispatch = useCallback(
+    (action: A) => {
+      changeDoc((doc) => {
+        reducer(doc, action)
+      })
+    },
+    [deps]
+  )
 
   return [doc, dispatch]
 }
@@ -104,7 +108,7 @@ export function useMessaging<M>(
   url: HypermergeUrl | null,
   onMsg: (msg: M) => void
 ): (msg: M) => void {
-  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() { } })
+  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
 
   // Without this ref, we'd close over the `onMsg` passed during the very first render.
   // Instead, we close over the ref object and can be sure we're always reading
@@ -117,8 +121,8 @@ export function useMessaging<M>(
     setSend({ send: handle.message })
 
     return () => {
-      onMsgRef.current = () => { }
-      setSend({ send() { } })
+      onMsgRef.current = () => {}
+      setSend({ send() {} })
     }
   })
   return sendObj.send
@@ -137,7 +141,7 @@ interface HeartbeatMessage {
 
 /**
  * Send all the heartbeats associated with every document
- * @param selfId 
+ * @param selfId
  */
 export function useAllHeartbeats(selfId: HypermergeUrl | null) {
   const repo = useRepo()
@@ -147,10 +151,10 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
 
   useEffect(() => {
     if (!selfId) {
-      return () => { }
+      return () => {}
     }
     if (!currentDeviceHypermergeUrl) {
-      return () => { }
+      return () => {}
     }
 
     const interval = setInterval(() => {
@@ -162,7 +166,6 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       // Post a presence heartbeat on documents currently considered
       // to be open, allowing any kind of card to render a list of "present" folks.
       Object.entries(heartbeats).forEach(([url, count]) => {
-
         if (count > 0) {
           const outboundMessage: HeartbeatMessage = {
             contact: selfId,
@@ -180,8 +183,14 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
     }, HEARTBEAT_INTERVAL)
 
     function depart(url: HypermergeUrl) {
-      const departMessage: HeartbeatMessage =
-        { contact: selfId, device: currentDeviceHypermergeUrl, departing: true }
+      if (!selfId || !currentDeviceHypermergeUrl) {
+        return
+      }
+      const departMessage: HeartbeatMessage = {
+        contact: selfId,
+        device: currentDeviceHypermergeUrl,
+        departing: true,
+      }
       repo.message(url, departMessage)
     }
 
@@ -196,7 +205,7 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
 export function useHeartbeat(docUrl: HypermergeUrl | null) {
   useEffect(() => {
     if (!docUrl) {
-      return () => { }
+      return () => {}
     }
 
     heartbeats[docUrl] = (heartbeats[docUrl] || 0) + 1
@@ -239,26 +248,24 @@ export function usePresence<P>(
       [remotePresenceToLookupKey(presence)]: { ...presence },
     }))
   }
-  const [bumpTimeout, depart] = useTimeouts(
-    5000,
-    (key: string) => {
-      const [contact, device] = lookupKeyToPresencePieces(key)
-      setSingleRemote({ contact, device, data: undefined })
-    })
+  const [bumpTimeout, depart] = useTimeouts(5000, (key: string) => {
+    const [contact, device] = lookupKeyToPresencePieces(key)
+    setSingleRemote({ contact, device, data: undefined })
+  })
 
   useMessaging<any>(url, (msg: HeartbeatMessage) => {
     const { contact, device, heartbeat, departing, data } = msg
+    const presence = { contact, device, data }
     if (heartbeat && data) {
-      const presence = { contact, device, data }
       bumpTimeout(remotePresenceToLookupKey(presence))
       setSingleRemote(presence)
-    } else if (msg.departing) {
-      depart(msg.contact)
+    } else if (departing) {
+      depart(remotePresenceToLookupKey(presence))
     }
   })
 
   useEffect(() => {
-    if (!url || !key) return () => { }
+    if (!url || !key) return () => {}
 
     if (!myPresence[url]) {
       myPresence[url] = {}
@@ -271,7 +278,7 @@ export function usePresence<P>(
     }
   }, [key, presence])
 
-  return Object.values(remote).map(presence => ({ ...presence, data: presence.data![key] }))
+  return Object.values(remote).map((presence) => ({ ...presence, data: presence.data![key] }))
 }
 
 export function useHyperfile(url: HyperfileUrl | null): Hyperfile.HyperfileResult | null {
@@ -320,12 +327,12 @@ export function useInterval(ms: number, cb: () => void, deps: any[]) {
  * The timeout is cancelled when `cond` is set to false.
  */
 export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
-  const reset = useRef(() => { })
+  const reset = useRef(() => {})
 
   useEffect(() => {
     if (!cond) {
-      reset.current = () => { }
-      return () => { }
+      reset.current = () => {}
+      return () => {}
     }
 
     let id: NodeJS.Timeout
