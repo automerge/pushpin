@@ -4,6 +4,7 @@ import { RepoFrontend } from 'hypermerge'
 import Content from './Content'
 import { RepoContext } from '../Hooks'
 import { PushpinUrl } from '../ShareLink'
+import { useCurrentDeviceUrl, CurrentDeviceContext } from './content-types/workspace/Device'
 
 // We load these modules here so that the content registry will have them.
 import './content-types/workspace/Workspace'
@@ -65,18 +66,23 @@ function useWorkspaceUrl(): [PushpinUrl | null, (newUrl: PushpinUrl) => void] {
     }
   }, [workspaceUrl])
 
+  console.log('workspace', workspaceUrl)
   return [workspaceUrl, setWorkspaceUrl]
 }
 
 export default function Root({ repo, system }: Props) {
   const [workspaceUrl, setWorkspaceUrl] = useWorkspaceUrl()
+  const currentDeviceUrl = useCurrentDeviceUrl()
+  console.log('rcdu', currentDeviceUrl)
 
   if (!workspaceUrl) { return null }
 
   return (
     <RepoContext.Provider value={repo}>
       <SystemContext.Provider value={system}>
-        <Content context="root" url={workspaceUrl} />
+        <CurrentDeviceContext.Provider value={currentDeviceUrl}>
+          <Content context="root" url={workspaceUrl} />
+        </CurrentDeviceContext.Provider>
       </SystemContext.Provider>
     </RepoContext.Provider>
   )

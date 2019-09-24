@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import Debug from 'debug'
 import mime from 'mime-types'
 
@@ -54,8 +54,8 @@ export default function ContactInVarious(props: ContentProps) {
   const avatarImage = avatarDocId ? (
     <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
   ) : (
-    <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-  )
+      <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+    )
 
   const avatar = (
     <div

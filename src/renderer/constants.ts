@@ -18,6 +18,7 @@ export const DATA_PATH = app.getPath('userData')
 export const USER_PATH = Path.join(DATA_PATH, 'pushpin-v10', USER)
 
 export const WORKSPACE_URL_PATH = Path.join(USER_PATH, 'workspace-id.json')
+export const DEVICE_URL_PATH = Path.join(USER_PATH, 'device-id.json')
 export const HYPERMERGE_PATH = Path.join(USER_PATH, 'hypermerge')
 export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
 

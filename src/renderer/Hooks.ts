@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
 import { Handle, RepoFrontend, HyperfileUrl, Doc } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
-import { HypermergeUrl } from './ShareLink'
+import { HypermergeUrl, parseDocumentLink } from './ShareLink'
 import SelfContext from './components/SelfContext'
 import { ContactDoc } from './components/content-types/contact'
+import { CurrentDeviceContext } from './components/content-types/workspace/Device';
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -126,11 +127,29 @@ export function useMessaging<M>(
 const heartbeats: { [url: string]: number } = {} // url: HypermergeUrl
 const HEARTBEAT_INTERVAL = 1000 // ms
 
+interface HeartbeatMessage {
+  contact: HypermergeUrl
+  device: HypermergeUrl
+  heartbeat?: boolean
+  departing?: boolean
+  data?: any
+}
+
+/**
+ * Send all the heartbeats associated with every document
+ * @param selfId 
+ */
 export function useAllHeartbeats(selfId: HypermergeUrl | null) {
   const repo = useRepo()
+  const currentDeviceId = useContext(CurrentDeviceContext)
+  const parsed = parseDocumentLink(currentDeviceId || '')
+  const currentDeviceHypermergeUrl = parsed.hypermergeUrl || null
 
   useEffect(() => {
     if (!selfId) {
+      return () => { }
+    }
+    if (!currentDeviceHypermergeUrl) {
       return () => { }
     }
 
@@ -143,13 +162,16 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       // Post a presence heartbeat on documents currently considered
       // to be open, allowing any kind of card to render a list of "present" folks.
       Object.entries(heartbeats).forEach(([url, count]) => {
+
         if (count > 0) {
-          // we can't use HypermergeUrl as a key in heartbeats, so we do this bad thign
-          repo.message(url as HypermergeUrl, {
+          const outboundMessage: HeartbeatMessage = {
             contact: selfId,
+            device: currentDeviceHypermergeUrl,
             heartbeat: true,
-            presence: myPresence[url],
-          })
+            data: myPresence[url],
+          }
+          // we can't use HypermergeUrl as a key in heartbeats, so we do this bad thing
+          repo.message(url as HypermergeUrl, outboundMessage)
         } else {
           depart(url as HypermergeUrl)
           delete heartbeats[url]
@@ -158,7 +180,9 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
     }, HEARTBEAT_INTERVAL)
 
     function depart(url: HypermergeUrl) {
-      repo.message(url, { contact: selfId, departing: true })
+      const departMessage: HeartbeatMessage =
+        { contact: selfId, device: currentDeviceHypermergeUrl, departing: true }
+      repo.message(url, departMessage)
     }
 
     return () => {
@@ -166,7 +190,7 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       // heartbeats can't have HypermergeUrls as keys, so we do this
       Object.entries(heartbeats).forEach(([url]) => depart(url as HypermergeUrl))
     }
-  }, [selfId])
+  }, [selfId, currentDeviceId])
 }
 
 export function useHeartbeat(docUrl: HypermergeUrl | null) {
@@ -184,25 +208,50 @@ export function useHeartbeat(docUrl: HypermergeUrl | null) {
 }
 
 export interface RemotePresence<P> {
-  [contactUrl: string]: P | undefined
+  contact: HypermergeUrl
+  device: HypermergeUrl
+  data?: P
+}
+
+export interface RemotePresenceCache<P> {
+  [contactAndDevice: string]: RemotePresence<P>
 }
 
 const myPresence: { [url: string /* HypermergeUrl */]: { [key: string]: any } } = {}
+
+function remotePresenceToLookupKey<T>(presence: RemotePresence<T>): string {
+  return `${presence.contact}-${presence.device}`
+}
+function lookupKeyToPresencePieces(key: string): [HypermergeUrl, HypermergeUrl] {
+  const [contact, device] = key.split('-')
+  return [contact as HypermergeUrl, device as HypermergeUrl]
+}
 
 export function usePresence<P>(
   url: HypermergeUrl | null,
   presence: P | null,
   key: string = '/'
-): RemotePresence<P> {
-  const [remote, setRemote] = useState<RemotePresence<P>>({})
-  const [bumpTimeout, depart] = useTimeouts(5000, (contactUrl: HypermergeUrl) => {
-    setRemote(({ [contactUrl]: _, ...rest }) => rest)
-  })
+): RemotePresence<P>[] {
+  const [remote, setRemoteInner] = useState<RemotePresenceCache<P>>({})
+  const setSingleRemote = (presence: RemotePresence<P>) => {
+    setRemoteInner((prev) => ({
+      ...prev,
+      [remotePresenceToLookupKey(presence)]: { ...presence },
+    }))
+  }
+  const [bumpTimeout, depart] = useTimeouts(
+    5000,
+    (key: string) => {
+      const [contact, device] = lookupKeyToPresencePieces(key)
+      setSingleRemote({ contact, device, data: undefined })
+    })
 
-  useMessaging<any>(url, (msg: any) => {
-    if (msg.heartbeat && msg.presence) {
-      bumpTimeout(msg.contact)
-      setRemote((rest) => ({ ...rest, [msg.contact]: msg.presence[key] }))
+  useMessaging<any>(url, (msg: HeartbeatMessage) => {
+    const { contact, device, heartbeat, departing, data } = msg
+    if (heartbeat && data) {
+      const presence = { contact, device, data }
+      bumpTimeout(remotePresenceToLookupKey(presence))
+      setSingleRemote(presence)
     } else if (msg.departing) {
       depart(msg.contact)
     }
@@ -222,7 +271,7 @@ export function usePresence<P>(
     }
   }, [key, presence])
 
-  return remote
+  return Object.values(remote).map(presence => ({ ...presence, data: presence.data![key] }))
 }
 
 export function useHyperfile(url: HyperfileUrl | null): Hyperfile.HyperfileResult | null {
