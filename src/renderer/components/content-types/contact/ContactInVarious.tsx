@@ -19,7 +19,7 @@ const log = Debug('pushpin:settings')
 
 export default function ContactInVarious(props: ContentProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
-  const presences = usePresence<{}>(props.hypermergeUrl, null)
+  const presences = usePresence<{}>(props.hypermergeUrl)
 
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
@@ -68,9 +68,10 @@ export default function ContactInVarious(props: ContentProps) {
     </div>
   )
 
+  /*
   const deviceContents = presences.map(({ contact, device }) => (
     <Content key={device} context={context} url={createDocumentLink('device', device)} />
-  ))
+  )) */
 
   switch (context) {
     case 'list':

@@ -60,7 +60,7 @@ function BoardCard(props: BoardCardProps) {
       ? {
           color: self.color,
         }
-      : null,
+      : undefined,
     id
   )
 

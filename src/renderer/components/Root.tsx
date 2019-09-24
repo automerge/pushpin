@@ -66,14 +66,12 @@ function useWorkspaceUrl(): [PushpinUrl | null, (newUrl: PushpinUrl) => void] {
     }
   }, [workspaceUrl])
 
-  console.log('workspace', workspaceUrl)
   return [workspaceUrl, setWorkspaceUrl]
 }
 
 export default function Root({ repo, system }: Props) {
   const [workspaceUrl] = useWorkspaceUrl()
   const currentDeviceUrl = useCurrentDeviceUrl()
-  console.log('rcdu', currentDeviceUrl)
 
   if (!workspaceUrl) {
     return null
