@@ -4,7 +4,7 @@ import ContentTypes, { Context } from '../ContentTypes'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
 import SelfContext from './SelfContext'
 import Crashable from './Crashable'
-import { useHeartbeat } from '../Hooks'
+import { useHeartbeat } from '../PresenceHooks'
 
 // this is the interface imported by Content types
 export interface ContentProps {

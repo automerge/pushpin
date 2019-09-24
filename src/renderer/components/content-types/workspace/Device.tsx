@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Fs from 'fs'
+import Os from 'os'
 import ContentTypes from '../../../ContentTypes'
-import { PushpinUrl, HypermergeUrl } from '../../../ShareLink'
+import { PushpinUrl } from '../../../ShareLink'
 import { DEVICE_URL_PATH } from '../../../constants'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
@@ -18,7 +19,7 @@ function Device(props: ContentProps) {
 
 function create(deviceAttrs, handle, callback) {
   handle.change((doc: DeviceDoc) => {
-    doc.name = 'Computer'
+    doc.name = Os.hostname()
   })
   callback()
 }

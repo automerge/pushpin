@@ -12,7 +12,8 @@ import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument, usePresence } from '../../../Hooks'
+import { useDocument } from '../../../Hooks'
+import { usePresence } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:settings')
 
