@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Fs from 'fs'
 
 import { RepoFrontend } from 'hypermerge'
 import Content from './Content'
@@ -27,9 +28,8 @@ import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
 import System, { SystemContext } from '../System'
-import { WORKSPACE_URL_PATH } from '../constants';
-import Fs from 'fs'
-import ContentTypes from '../ContentTypes';
+import { WORKSPACE_URL_PATH } from '../constants'
+import ContentTypes from '../ContentTypes'
 
 interface Props {
   repo: RepoFrontend
@@ -71,11 +71,13 @@ function useWorkspaceUrl(): [PushpinUrl | null, (newUrl: PushpinUrl) => void] {
 }
 
 export default function Root({ repo, system }: Props) {
-  const [workspaceUrl, setWorkspaceUrl] = useWorkspaceUrl()
+  const [workspaceUrl] = useWorkspaceUrl()
   const currentDeviceUrl = useCurrentDeviceUrl()
   console.log('rcdu', currentDeviceUrl)
 
-  if (!workspaceUrl) { return null }
+  if (!workspaceUrl) {
+    return null
+  }
 
   return (
     <RepoContext.Provider value={repo}>

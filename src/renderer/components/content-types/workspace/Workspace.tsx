@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
 
@@ -32,8 +32,8 @@ export default function Workspace(props: ContentProps) {
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
   useAllHeartbeats(selfId)
-  useHeartbeat(currentDocUrl)
   useHeartbeat(selfId)
+  useHeartbeat(currentDocUrl)
 
   const sendToSystem = useSystem(
     (msg) => {

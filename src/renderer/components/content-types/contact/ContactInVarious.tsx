@@ -105,7 +105,6 @@ export default function ContactInVarious(props: ContentProps) {
         <div className="Contact--board">
           {avatar}
           <div className="Contact-boardLabel">{name}</div>
-          <div className="Devices">{deviceContents}</div>
         </div>
       )
 

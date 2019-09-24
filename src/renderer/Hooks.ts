@@ -45,7 +45,7 @@ export function useHandle<D>(
 
   useEffect(() => {
     if (!url) {
-      return () => { }
+      return () => {}
     }
 
     const handle = repo.open<D>(url)
@@ -107,7 +107,7 @@ export function useMessaging<M>(
   url: HypermergeUrl | null,
   onMsg: (msg: M) => void
 ): (msg: M) => void {
-  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() { } })
+  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
 
   // Without this ref, we'd close over the `onMsg` passed during the very first render.
   // Instead, we close over the ref object and can be sure we're always reading
@@ -120,8 +120,8 @@ export function useMessaging<M>(
     setSend({ send: handle.message })
 
     return () => {
-      onMsgRef.current = () => { }
-      setSend({ send() { } })
+      onMsgRef.current = () => {}
+      setSend({ send() {} })
     }
   })
   return sendObj.send
@@ -173,12 +173,12 @@ export function useInterval(ms: number, cb: () => void, deps: any[]) {
  * The timeout is cancelled when `cond` is set to false.
  */
 export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
-  const reset = useRef(() => { })
+  const reset = useRef(() => {})
 
   useEffect(() => {
     if (!cond) {
-      reset.current = () => { }
-      return () => { }
+      reset.current = () => {}
+      return () => {}
     }
 
     let id: NodeJS.Timeout
