@@ -10,10 +10,11 @@ import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
 
 import './Workspace.css'
-import { useDocument, useAllHeartbeats, useHeartbeat } from '../../../Hooks'
+import { useDocument } from '../../../Hooks'
+import { useAllHeartbeats, useHeartbeat } from '../../../PresenceHooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
-import { useCurrentDeviceUrl, CurrentDeviceContext } from './Device'
+import { CurrentDeviceContext } from './Device'
 
 const log = Debug('pushpin:workspace')
 

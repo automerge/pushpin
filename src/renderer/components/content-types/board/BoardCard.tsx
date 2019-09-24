@@ -8,7 +8,8 @@ import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard, CardId } from '.'
 import { Position, Dimension } from './BoardGrid'
-import { usePresence, useSelf, useDocument } from '../../../Hooks'
+import { useSelf, useDocument } from '../../../Hooks'
+import { usePresence } from '../../../PresenceHooks'
 import './BoardCard.css'
 import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
@@ -57,8 +58,8 @@ function BoardCard(props: BoardCardProps) {
     props.boardUrl,
     props.selected && self
       ? {
-          color: self.color,
-        }
+        color: self.color,
+      }
       : null,
     id
   )
@@ -201,7 +202,7 @@ function BoardCard(props: BoardCardProps) {
     const heightC = height || cardRef.current.clientHeight
     setOriginalSize({ width: widthC, height: heightC })
     setResize({ width: widthC, height: heightC })
-    ;(event.target as Element).setPointerCapture(event.pointerId)
+      ; (event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
   }
@@ -229,7 +230,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerUp = (e: React.PointerEvent) => {
-    ;(e.target as Element).releasePointerCapture(e.pointerId)
+    ; (e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }
