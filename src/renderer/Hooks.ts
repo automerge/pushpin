@@ -158,11 +158,6 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
     }
 
     const interval = setInterval(() => {
-      // Post on the self-contact ID that we're online.
-      // This means any avatar anywhere will have a colored ring around it
-      // if that user is online.
-      repo.message(selfId, 'heartbeat')
-
       // Post a presence heartbeat on documents currently considered
       // to be open, allowing any kind of card to render a list of "present" folks.
       Object.entries(heartbeats).forEach(([url, count]) => {
@@ -173,6 +168,7 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
             heartbeat: true,
             data: myPresence[url],
           }
+
           // we can't use HypermergeUrl as a key in heartbeats, so we do this bad thing
           repo.message(url as HypermergeUrl, outboundMessage)
         } else {
@@ -213,7 +209,7 @@ export function useHeartbeat(docUrl: HypermergeUrl | null) {
     return () => {
       heartbeats[docUrl] && (heartbeats[docUrl] -= 1)
     }
-  }, [])
+  }, [docUrl])
 }
 
 export interface RemotePresence<P> {
@@ -278,7 +274,9 @@ export function usePresence<P>(
     }
   }, [key, presence])
 
-  return Object.values(remote).map((presence) => ({ ...presence, data: presence.data![key] }))
+  return Object.values(remote)
+    .filter((presence) => presence.data)
+    .map((presence) => ({ ...presence, data: presence.data![key] }))
 }
 
 export function useHyperfile(url: HyperfileUrl | null): Hyperfile.HyperfileResult | null {

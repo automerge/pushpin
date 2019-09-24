@@ -63,12 +63,11 @@ function BoardCard(props: BoardCardProps) {
     id
   )
 
-  // Blech.
   const presence = remotePresences.find(
     (presence) => presence && presence.data && presence.data.color
   )
   const highlightColor = presence ? presence!.data!.color : undefined
-  // ^^ we proved it has data & color above
+  // ^^ we proved it has data & color above, so ! is reasonable
 
   const [dragStart, setDragStart] = useState<Position | null>(null)
 

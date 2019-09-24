@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React from 'react'
 import Debug from 'debug'
 import mime from 'mime-types'
 
@@ -6,19 +6,19 @@ import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
-import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
+import { createDocumentLink } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument, useMessaging, useTimeoutWhen } from '../../../Hooks'
+import { useDocument, usePresence } from '../../../Hooks'
 
 const log = Debug('pushpin:settings')
 
 export default function ContactInVarious(props: ContentProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
-  const isPresent = usePresence(props.hypermergeUrl)
+  const presences = usePresence<{}>(props.hypermergeUrl, null)
 
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
@@ -27,7 +27,7 @@ export default function ContactInVarious(props: ContentProps) {
   const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
     avatarImageDoc || {}
 
-  const isOnline = isPresent || props.selfId === props.hypermergeUrl
+  const isOnline = presences.length > 0 || props.selfId === props.hypermergeUrl
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData(
@@ -54,8 +54,8 @@ export default function ContactInVarious(props: ContentProps) {
   const avatarImage = avatarDocId ? (
     <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
   ) : (
-      <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-    )
+    <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+  )
 
   const avatar = (
     <div
@@ -66,6 +66,10 @@ export default function ContactInVarious(props: ContentProps) {
       {avatarImage}
     </div>
   )
+
+  const deviceContents = presences.map(({ contact, device }) => (
+    <Content key={device} context={context} url={createDocumentLink('device', device)} />
+  ))
 
   switch (context) {
     case 'list':
@@ -100,6 +104,7 @@ export default function ContactInVarious(props: ContentProps) {
         <div className="Contact--board">
           {avatar}
           <div className="Contact-boardLabel">{name}</div>
+          <div className="Devices">{deviceContents}</div>
         </div>
       )
 
@@ -107,21 +112,6 @@ export default function ContactInVarious(props: ContentProps) {
       log('contact render called in an unexpected context')
       return null
   }
-}
-
-function usePresence(url: HypermergeUrl): boolean {
-  const [isPresent, set] = useState(false)
-
-  const reset = useTimeoutWhen(isPresent, 5000, () => {
-    set(false)
-  })
-
-  useMessaging(url, () => {
-    reset()
-    isPresent || set(true)
-  })
-
-  return isPresent
 }
 
 const css = {

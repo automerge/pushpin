@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Fs from 'fs'
 import ContentTypes from '../../../ContentTypes'
-import { PushpinUrl, HypermergeUrl } from '../../../ShareLink';
+import { PushpinUrl, HypermergeUrl } from '../../../ShareLink'
 import { DEVICE_URL_PATH } from '../../../constants'
-import { ContentProps } from '../../Content';
-import { useDocument } from '../../../Hooks';
+import { ContentProps } from '../../Content'
+import { useDocument } from '../../../Hooks'
 
 export interface DeviceDoc {
   name: string
@@ -12,13 +12,14 @@ export interface DeviceDoc {
 
 function Device(props: ContentProps) {
   const [doc, changeDoc] = useDocument<DeviceDoc>(props.hypermergeUrl)
+  console.log('device', props.hypermergeUrl, doc)
   if (!doc) return null
-  return <div>{doc.name}</div>
+  return <div>Device: {doc.name}</div>
 }
 
 function create(deviceAttrs, handle, callback) {
   handle.change((doc: DeviceDoc) => {
-    doc.name = "Computer"
+    doc.name = 'Computer'
   })
   callback()
 }
@@ -28,13 +29,13 @@ ContentTypes.register({
   name: 'Device',
   icon: 'desktop',
   contexts: {
-    "title-bar": Device
+    'title-bar': Device,
+    board: Device,
   },
   resizable: false,
   unlisted: true,
   create,
 })
-
 
 function loadDeviceUrl(): PushpinUrl | null {
   if (Fs.existsSync(DEVICE_URL_PATH)) {
@@ -60,12 +61,12 @@ export function useCurrentDeviceUrl(): PushpinUrl | null {
     const existingDeviceUrl = loadDeviceUrl()
     if (existingDeviceUrl) {
       setDeviceUrl(existingDeviceUrl)
-      console.log("edu", existingDeviceUrl)
+      console.log('edu', existingDeviceUrl)
     } else {
       ContentTypes.create('device', {}, (newDeviceUrl: PushpinUrl) => {
         saveDeviceUrl(newDeviceUrl)
 
-        console.log("ndu", newDeviceUrl)
+        console.log('ndu', newDeviceUrl)
         setDeviceUrl(newDeviceUrl)
       })
     }

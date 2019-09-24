@@ -13,7 +13,7 @@ import './Workspace.css'
 import { useDocument, useAllHeartbeats, useHeartbeat } from '../../../Hooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
-import { useCurrentDeviceUrl, CurrentDeviceContext } from './Device';
+import { useCurrentDeviceUrl, CurrentDeviceContext } from './Device'
 
 const log = Debug('pushpin:workspace')
 
@@ -34,6 +34,12 @@ export default function Workspace(props: ContentProps) {
 
   useAllHeartbeats(selfId)
   useHeartbeat(currentDocUrl)
+  console.log('self', selfId)
+  useHeartbeat(selfId)
+
+  const { hypermergeUrl } = parseDocumentLink(currentDeviceUrl)
+  const [doc, changeDoc] = useDocument<DeviceDoc>(hypermergeUrl)
+  console.log(doc)
 
   const sendToSystem = useSystem(
     (msg) => {
