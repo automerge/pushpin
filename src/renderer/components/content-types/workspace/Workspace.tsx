@@ -34,12 +34,9 @@ export default function Workspace(props: ContentProps) {
 
   useAllHeartbeats(selfId)
   useHeartbeat(currentDocUrl)
-  console.log('self', selfId)
   useHeartbeat(selfId)
 
   const { hypermergeUrl } = parseDocumentLink(currentDeviceUrl)
-  const [doc, changeDoc] = useDocument<DeviceDoc>(hypermergeUrl)
-  console.log(doc)
 
   const sendToSystem = useSystem(
     (msg) => {

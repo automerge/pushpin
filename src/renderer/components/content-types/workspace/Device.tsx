@@ -11,8 +11,7 @@ export interface DeviceDoc {
 }
 
 function Device(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<DeviceDoc>(props.hypermergeUrl)
-  console.log('device', props.hypermergeUrl, doc)
+  const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
   if (!doc) return null
   return <div>Device: {doc.name}</div>
 }
@@ -57,16 +56,12 @@ export function useCurrentDeviceUrl(): PushpinUrl | null {
   const [deviceUrl, setDeviceUrl] = useState<PushpinUrl | null>(null)
 
   useEffect(() => {
-    console.log('loading')
     const existingDeviceUrl = loadDeviceUrl()
     if (existingDeviceUrl) {
       setDeviceUrl(existingDeviceUrl)
-      console.log('edu', existingDeviceUrl)
     } else {
       ContentTypes.create('device', {}, (newDeviceUrl: PushpinUrl) => {
         saveDeviceUrl(newDeviceUrl)
-
-        console.log('ndu', newDeviceUrl)
         setDeviceUrl(newDeviceUrl)
       })
     }
