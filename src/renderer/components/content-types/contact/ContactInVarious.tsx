@@ -68,10 +68,9 @@ export default function ContactInVarious(props: ContentProps) {
     </div>
   )
 
-  /*
   const deviceContents = presences.map(({ contact, device }) => (
     <Content key={device} context={context} url={createDocumentLink('device', device)} />
-  )) */
+  ))
 
   switch (context) {
     case 'list':
@@ -105,6 +104,7 @@ export default function ContactInVarious(props: ContentProps) {
       return (
         <div className="Contact--board">
           {avatar}
+          <div className="Contact-devices">{deviceContents}</div>
           <div className="Contact-boardLabel">{name}</div>
         </div>
       )

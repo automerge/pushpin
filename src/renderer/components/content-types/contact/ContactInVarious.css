@@ -3,9 +3,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width:100%;
+  width: 100%;
   box-sizing: border-box;
-  padding:10px;
+  padding: 10px;
   background-color: white;
   border: 1px solid var(--colorPaleGrey);
 }
@@ -25,4 +25,11 @@
 .Contact-avatar {
   flex: none;
   margin-right: 8px;
+}
+
+.Contact-devices {
+  width: 60px;
+  display: flex;
+  flex-direction: row-reverse;
+  position: absolute;
 }
