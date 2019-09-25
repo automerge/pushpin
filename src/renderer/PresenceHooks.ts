@@ -35,19 +35,19 @@ interface HeartbeatMessage {
 
 /**
  * Send all the heartbeats associated with every document
- * @param selfId
+ * @param contact: (selfId HypermergeUrl)
  */
-export function useAllHeartbeats(selfId: HypermergeUrl | null) {
+export function useAllHeartbeats(contact: HypermergeUrl | null) {
   const repo = useRepo()
   const currentDeviceId = useContext(CurrentDeviceContext)
   const parsed = parseDocumentLink(currentDeviceId || '')
-  const currentDeviceHypermergeUrl = parsed.hypermergeUrl || null
+  const device = parsed.hypermergeUrl || null
 
   useEffect(() => {
-    if (!selfId) {
+    if (!contact) {
       return () => {}
     }
-    if (!currentDeviceHypermergeUrl) {
+    if (!device) {
       return () => {}
     }
 
@@ -57,8 +57,8 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       Object.entries(heartbeats).forEach(([url, count]) => {
         if (count > 0) {
           const msg: HeartbeatMessage = {
-            contact: selfId,
-            device: currentDeviceHypermergeUrl,
+            contact,
+            device,
             heartbeat: true,
             data: myPresence[url],
           }
@@ -72,12 +72,12 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
     }, HEARTBEAT_INTERVAL)
 
     function depart(url: HypermergeUrl) {
-      if (!selfId || !currentDeviceHypermergeUrl) {
+      if (!contact || !device) {
         return
       }
       const departMessage: HeartbeatMessage = {
-        contact: selfId,
-        device: currentDeviceHypermergeUrl,
+        contact,
+        device,
         departing: true,
       }
       repo.message(url, departMessage)
@@ -88,7 +88,7 @@ export function useAllHeartbeats(selfId: HypermergeUrl | null) {
       // heartbeats can't have HypermergeUrls as keys, so we do this
       Object.entries(heartbeats).forEach(([url]) => depart(url as HypermergeUrl))
     }
-  }, [selfId, currentDeviceId])
+  }, [contact, device])
 }
 
 export function useHeartbeat(docUrl: HypermergeUrl | null) {
