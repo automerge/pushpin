@@ -14,6 +14,7 @@ import Label from '../../Label'
 import './ContactInVarious.css'
 import { useDocument } from '../../../Hooks'
 import { usePresence } from '../../../PresenceHooks'
+import SyncState from '../../SyncState';
 
 const log = Debug('pushpin:settings')
 
@@ -55,8 +56,8 @@ export default function ContactInVarious(props: ContentProps) {
   const avatarImage = avatarDocId ? (
     <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
   ) : (
-    <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-  )
+      <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+    )
 
   const avatar = (
     <div

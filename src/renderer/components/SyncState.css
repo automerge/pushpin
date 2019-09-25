@@ -2,3 +2,39 @@
   display: flex;
   flex-direction: row;
 }
+
+.SyncState {
+  width: 100%;
+}
+
+.SyncState--side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.SyncState--behind {
+  align-items: flex-end;
+}
+
+.SyncState--ahead {
+  border-left: 1px solid grey;
+}
+
+.SyncState--label {
+  font-size: 10px;
+  line-height: 10px;
+  padding: 0 4px;
+}
+.SyncState--bar {
+  min-width: 3px;
+  background-color: darkgrey;
+  height: 4px;
+}
+
+.SyncState--bar-behind {
+  border-radius: 3px 0 0 3px;
+}
+.SyncState--bar-ahead {
+  border-radius: 0 3px 3px 0;
+}

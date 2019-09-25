@@ -26,9 +26,9 @@ function Device(props: ContentProps) {
           <Badge icon="desktop" shape="square" />
           <div className="Device-capsule">
             {doc.name}
+            <SyncState ahead={300} behind={22} />
           </div>
 
-          <SyncState ahead={300} behind={22} />
         </div>
       )
     default:

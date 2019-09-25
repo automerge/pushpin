@@ -14,21 +14,31 @@ function numberToUsefulLogPercentage(unscaled: number) {
   const logged = Math.log10(unscaled)
   const capped = Math.min(3, logged)
   const scaled = capped / 3.0 // 0-1 range
-  return scaled
+  return `${scaled * 100}%`
 }
 
 export default function SyncState(props: SyncStateProps) {
   const { ahead, behind } = props
 
+  if (ahead === 0 && behind === 0) {
+    return (
+      <div className="SyncState">
+        <div className="SyncState--label">
+          Synced!
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="SyncState" data-ahead={ahead} data-behind={behind}>
-      <div className="behind">
-        <div className="label">{behind}</div>
-        <div className="bar" style={{ width: numberToUsefulLogPercentage(behind) }} />
+      <div className="SyncState--behind SyncState--side">
+        <div className="SyncState--label">{behind}</div>
+        <div className="SyncState--bar SyncState--bar-behind" style={{ width: numberToUsefulLogPercentage(behind) }} />
       </div>
-      <div className="ahead">
-        <div className="label">{ahead}</div>
-        <div className="bar" style={{ width: numberToUsefulLogPercentage(ahead) }} />
+      <div className="SyncState--ahead SyncState--side">
+        <div className="SyncState--label">{ahead}</div>
+        <span className="SyncState--bar SyncState--bar-ahead" style={{ width: numberToUsefulLogPercentage(ahead) }} />
       </div>
     </div>
   )
