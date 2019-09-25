@@ -8,6 +8,7 @@ import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
 import './Device.css'
+import SyncState from '../../SyncState';
 
 export interface DeviceDoc {
   name: string
@@ -22,8 +23,12 @@ function Device(props: ContentProps) {
     case 'board':
       return (
         <div className="Device">
-          <Badge icon="desktop" />
-          <div className="Device-capsule">{doc.name}</div>
+          <Badge icon="desktop" shape="square" />
+          <div className="Device-capsule">
+            {doc.name}
+          </div>
+
+          <SyncState ahead={300} behind={22} />
         </div>
       )
     default:
