@@ -25,7 +25,11 @@ export interface Doc {
   archivedDocUrls: PushpinUrl[]
 }
 
-export default function Workspace(props: ContentProps) {
+interface WorkspaceContentProps extends ContentProps {
+  setWorkspaceUrl: (newWorkspaceUrl: PushpinUrl) => void
+}
+
+export default function Workspace(props: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
 
   const selfId = workspace && workspace.selfId
@@ -67,6 +71,13 @@ export default function Workspace(props: ContentProps) {
       parseDocumentLink(docUrl)
     } catch (e) {
       // if we can't parse the document, don't navigate
+      return
+    }
+
+    const { type } = parseDocumentLink(docUrl)
+    if (type === 'workspace') {
+      // we're going to have to deal with this specially...
+      props.setWorkspaceUrl(docUrl)
       return
     }
 
