@@ -5,7 +5,6 @@ import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdow
 import Omnibox from './Omnibox'
 import Content from '../../Content'
 import Authors from './Authors'
-import Share from './Share'
 import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 
 import './TitleBar.css'
@@ -139,18 +138,6 @@ export default function TitleBar(props: Props) {
 
       <Content url={doc.currentDocUrl} context="list" editable />
       <Authors hypermergeUrl={props.hypermergeUrl} />
-
-      <Dropdown
-        className="TitleBar__menuItem
-        TitleBar__right"
-      >
-        <DropdownTrigger>
-          <i className="fa fa-group" />
-        </DropdownTrigger>
-        <DropdownContent>
-          <Share hypermergeUrl={props.hypermergeUrl} />
-        </DropdownContent>
-      </Dropdown>
 
       <button
         className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"

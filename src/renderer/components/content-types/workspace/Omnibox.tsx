@@ -23,6 +23,7 @@ import ListMenuSection from '../../ListMenuSection'
 import ListMenuItem from '../../ListMenuItem'
 import ListMenu from '../../ListMenu'
 import ActionListItem from './ActionListItem'
+import Content from '../../Content'
 
 const log = Debug('pushpin:omnibox')
 
@@ -570,14 +571,22 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
     return (
       <div className="Omnibox">
-        <input
-          type="text"
-          ref={this.omniboxInput}
-          style={css.omniboxInput}
-          onChange={this.onInputChange}
-          value={this.state.search}
-          placeholder="Search..."
-        />
+        <div className="Omnibox--header">
+          <input
+            className="Omnibox--input"
+            type="text"
+            ref={this.omniboxInput}
+            onChange={this.onInputChange}
+            value={this.state.search}
+            placeholder="Search..."
+          />
+          <div className="Omnibox--Workspace">
+            <Content
+              context="title-bar"
+              url={createDocumentLink('workspace', this.props.hypermergeUrl)}
+            />
+          </div>
+        </div>
         <ListMenu>
           {this.renderInvitationsSection()}
           {this.sectionDefinitions.map((sectionDefinition) =>
@@ -588,19 +597,4 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       </div>
     )
   }
-}
-
-const css = {
-  omniboxInput: {
-    fontSize: '18px',
-    color: 'var(--colorBlueBlack)',
-    fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
-    background: 'var(--colorInputGrey)',
-    border: '0px',
-    outline: 'none',
-    borderRadius: '4px',
-    margin: '4px',
-    height: '24px',
-    lineHeight: '24px',
-  },
 }

@@ -86,34 +86,6 @@ button[disabled].TitleBar__menuItem .fa {
   margin-right: 8px;
 }
 
-.BoardTitle__clipboard:hover:after {
-  content: 'Copy link to this...';
-  right: 4px;
-}
-
-.BoardTitle__clipboard:focus {
-  animation-duration: 0.5s;
-  animation-name: color-flash;
-}
-
-.BoardTitle__labeledIcon:hover:after {
-  display: block;
-  position: absolute;
-  white-space: nowrap;
-  max-width: 104px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-  padding: 2px 4px;
-  background-color: white;
-  border-radius: 4px;
-  top: 36px;
-  font-size: 12px;
-  line-height: 16px;
-}
-
 @keyframes color-flash {
   from {
     color: transparent;

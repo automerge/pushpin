@@ -1,5 +1,23 @@
-#workspace, .Workspace, .Workspace__container {
+#workspace,
+.Workspace,
+.Workspace__container {
   height: 100%;
+}
+
+.Workspace--TitleBar {
+  position: relative;
+}
+
+.Workspace--Badge {
+  height: 12px;
+  padding: 2px;
+  position: absolute;
+  left: 18px;
+  bottom: 4px;
+}
+.Workspace--Badge > i {
+  font-size: 12px;
+  padding: 2px;
 }
 
 .Workspace__container {
@@ -12,7 +30,7 @@
   align-items: center;
 }
 .Workspace__container.Workspace__container--image > * {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, .45);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
 }
 
 .Workspace__container.Workspace__container--text {

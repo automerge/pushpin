@@ -12,6 +12,32 @@
   flex-direction: column;
 }
 
+.Omnibox--header {
+  display: flex;
+  flex-direction: row;
+}
+
+.Omnibox--input {
+  font-size: 18px;
+  color: var(--colorBlueBlack);
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--colorInputGrey);
+  border: 0px;
+  outline: none;
+  border-radius: 4px;
+  margin: 4px;
+  height: 32px;
+  line-height: 24px;
+}
+
+.Omnibox--Workspace {
+  padding: 4px;
+}
+
+.Omnibox--header > input {
+  flex: 1;
+}
+
 .Omnibox .ListMenu__item .Actions {
   visibility: hidden;
 }
@@ -37,6 +63,6 @@
 }
 
 .Omnibox-nothingFoundBadge {
-  flex:none;
+  flex: none;
   margin-right: 8px;
 }
