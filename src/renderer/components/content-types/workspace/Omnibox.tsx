@@ -5,6 +5,7 @@ import React from 'react'
 import Debug from 'debug'
 
 import { Handle, Doc } from 'hypermerge'
+import { clipboard } from 'electron'
 
 import {
   createDocumentLink,
@@ -568,6 +569,9 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     }
     this.navigate(createDocumentLink('contact', this.state.doc.selfId))
   }
+  onClickWorkspaceCopy = (e) => {
+    clipboard.writeText(createDocumentLink('workspace', this.props.hypermergeUrl))
+  }
 
   render = () => {
     log('render')
@@ -592,6 +596,15 @@ export default class Omnibox extends React.PureComponent<Props, State> {
               context="title-bar"
               url={createDocumentLink('workspace', this.props.hypermergeUrl)}
             />
+          </div>
+          <div className="Omnibox--Workspace">
+            <button
+              className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
+              type="button"
+              onClick={this.onClickWorkspaceCopy}
+            >
+              <i className="fa fa-clipboard" />
+            </button>
           </div>
         </div>
         <ListMenu>
