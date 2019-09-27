@@ -123,7 +123,7 @@ function useFeed(feedId: string): Feed<Uint8Array> | null {
   const repo = useRepo()
 
   useEffect(() => {
-    repo.store.getFeed(feedId as any).then((fd) => {
+    repo.feeds.getFeed(feedId as any).then((fd) => {
       setFeed(fd)
     })
   }, [feedId])
