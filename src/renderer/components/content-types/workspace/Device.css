@@ -1,0 +1,11 @@
+.DeviceListItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.DeviceListItem__title {
+  margin-left: 10px;
+  -webkit-user-drag: none;
+  user-select: none;
+}

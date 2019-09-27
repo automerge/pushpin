@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
 
@@ -20,6 +20,7 @@ import { useDocument } from '../../../Hooks'
 import { useAllHeartbeats, useHeartbeat } from '../../../PresenceHooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
+import { CurrentDeviceContext } from './Device'
 
 const log = Debug('pushpin:workspace')
 
@@ -37,9 +38,12 @@ interface WorkspaceContentProps extends ContentProps {
 
 export default function Workspace(props: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
+  const currentDeviceUrl = useContext(CurrentDeviceContext)
 
   const selfId = workspace && workspace.selfId
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
+
+  const [self, changeSelf] = useDocument<ContactDoc>(selfId)
 
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
@@ -67,6 +71,22 @@ export default function Workspace(props: WorkspaceContentProps) {
     // For background debugging:
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
   }, [currentDocUrl])
+
+  useEffect(() => {
+    if (!currentDeviceUrl || !self) {
+      return
+    }
+
+    const { hypermergeUrl } = parseDocumentLink(currentDeviceUrl)
+    if (!self.devices || !self.devices.includes(hypermergeUrl)) {
+      changeSelf((doc: ContactDoc) => {
+        if (!doc.devices) {
+          doc.devices = []
+        }
+        doc.devices.push(hypermergeUrl)
+      })
+    }
+  }, [currentDeviceUrl, self])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {

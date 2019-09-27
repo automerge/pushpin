@@ -6,15 +6,23 @@ import { PushpinUrl } from '../../../ShareLink'
 import { DEVICE_URL_PATH } from '../../../constants'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
+import Badge from '../../Badge'
+import './Device.css'
 
 export interface DeviceDoc {
+  icon: string // fa-icon name
   name: string
 }
 
 function Device(props: ContentProps) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
   if (!doc) return null
-  return <div>Device: {doc.name}</div>
+  return (
+    <div className="DeviceListItem">
+      <Badge icon={doc.icon || 'desktop'} shape="square" />
+      <div className="DeviceListItem__title">{doc.name}</div>
+    </div>
+  )
 }
 
 function create(deviceAttrs, handle, callback) {
