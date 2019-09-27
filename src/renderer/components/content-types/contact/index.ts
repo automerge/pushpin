@@ -13,6 +13,7 @@ export interface ContactDoc {
   avatarDocId: HypermergeUrl
   hypermergeUrl: HypermergeUrl // Used by workspace
   offeredUrls?: { [url: string]: PushpinUrl[] } // Used by share, a map of contact id to documents offered.
+  devices?: HypermergeUrl[]
 }
 
 function create(typeAttrs, handle, callback) {

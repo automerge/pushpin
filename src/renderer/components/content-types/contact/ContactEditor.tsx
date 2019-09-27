@@ -12,7 +12,6 @@ import { ContactDoc } from '.'
 import ColorPicker from '../../ColorPicker'
 import Label from '../../Label'
 import { useDocument } from '../../../Hooks'
-import Popover from '../../Popover'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
 
@@ -93,7 +92,7 @@ export default function ContactEditor(props: ContentProps) {
     })
   }
 
-  const { avatarDocId, name, color } = doc
+  const { avatarDocId, name, color, devices } = doc
 
   let avatar
   if (avatarDocId) {
@@ -102,11 +101,20 @@ export default function ContactEditor(props: ContentProps) {
     avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   }
 
+  let renderedDevices
+  if (devices) {
+    renderedDevices = devices.map((d) => (
+      <Content context="board" url={createDocumentLink('device', d)} />
+    ))
+  } else {
+    renderedDevices = <SecondaryText>No devices registered...</SecondaryText>
+  }
+
   return (
-    <Popover>
+    <div className="ContactEditor-frame">
       <div className="ContactEditor">
         <div className="ContactEditor-heading">
-          <Heading>Your Profile</Heading>
+          <Heading>Edit Profile...</Heading>
         </div>
         <div className="ContactEditor-section">
           <div className="ContactEditor-sectionLabel">Display Name</div>
@@ -150,7 +158,11 @@ export default function ContactEditor(props: ContentProps) {
             </div>
           </div>
         </div>
+        <div className="ContactEditor-section">
+          <div className="ContactEditor-sectionLabel">Devices</div>
+          <div className="ContactEditor-sectionContent">{renderedDevices}</div>
+        </div>
       </div>
-    </Popover>
+    </div>
   )
 }
