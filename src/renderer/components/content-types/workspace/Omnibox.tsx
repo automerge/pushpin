@@ -562,6 +562,13 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     )
   }
 
+  onClickWorkspace = (e) => {
+    if (!this.state.doc) {
+      return
+    }
+    this.navigate(createDocumentLink('contact', this.state.doc.selfId))
+  }
+
   render = () => {
     log('render')
 
@@ -580,7 +587,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
             value={this.state.search}
             placeholder="Search..."
           />
-          <div className="Omnibox--Workspace">
+          <div className="Omnibox--Workspace" onClick={this.onClickWorkspace}>
             <Content
               context="title-bar"
               url={createDocumentLink('workspace', this.props.hypermergeUrl)}

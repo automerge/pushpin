@@ -20,7 +20,6 @@ import { useDocument } from '../../../Hooks'
 import { useAllHeartbeats, useHeartbeat } from '../../../PresenceHooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
-import Badge from '../../Badge'
 
 const log = Debug('pushpin:workspace')
 
