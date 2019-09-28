@@ -28,3 +28,19 @@ export function useWindowVisibility(): boolean {
 
   return visible
 }
+
+export function useSample(ms: number): number {
+  const [state, setState] = useState(1)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setState((x) => x + 1)
+    }, ms)
+
+    return () => {
+      clearInterval(id)
+    }
+  }, [])
+
+  return state
+}

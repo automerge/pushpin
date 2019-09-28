@@ -15,7 +15,7 @@ export default function FeedView(props: Props) {
     <div>
       <Info
         feedId={props.feedId}
-        writable={String(info.writable)}
+        isWritable={info.writable}
         blocks={`${info.downloaded} / ${info.total}`}
       />
 
