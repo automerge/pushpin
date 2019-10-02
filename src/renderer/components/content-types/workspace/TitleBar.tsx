@@ -9,6 +9,7 @@ import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 
 import './TitleBar.css'
 import { useDocument, useEvent } from '../../../Hooks'
+import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl
@@ -119,11 +120,16 @@ export default function TitleBar(props: Props) {
           <i className="fa fa-map" />
         </DropdownTrigger>
         <DropdownContent>
-          <Omnibox
-            active={activeOmnibox}
-            hypermergeUrl={props.hypermergeUrl}
-            omniboxFinished={deactivateOmnibox}
-          />
+          <WorkspaceUrlsContext.Consumer>
+            {(workspaceUrlsContext) => (
+              <Omnibox
+                active={activeOmnibox}
+                hypermergeUrl={props.hypermergeUrl}
+                omniboxFinished={deactivateOmnibox}
+                workspaceUrlsContext={workspaceUrlsContext}
+              />
+            )}
+          </WorkspaceUrlsContext.Consumer>
         </DropdownContent>
       </Dropdown>
 

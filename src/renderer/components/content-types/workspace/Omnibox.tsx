@@ -14,6 +14,8 @@ import {
   PushpinUrl,
 } from '../../../ShareLink'
 
+import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
+
 import InvitationsView from '../../../InvitationsView'
 import { ContactDoc } from '../contact'
 import Badge from '../../Badge'
@@ -32,6 +34,7 @@ export interface Props {
   active: boolean
   hypermergeUrl: HypermergeUrl
   omniboxFinished: Function
+  workspaceUrlsContext: UseWorkspaceUrlsHook
 }
 
 interface WorkspaceDoc {
@@ -579,6 +582,12 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     if (!this.state.doc || !this.state.doc.currentDocUrl) {
       return null
     }
+
+    const WSAPI = this.props.workspaceUrlsContext
+    if (!WSAPI) {
+      return null
+    }
+    const { workspaceUrls } = WSAPI
 
     return (
       <div className="Omnibox">

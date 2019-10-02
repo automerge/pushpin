@@ -4,6 +4,7 @@ import { RepoFrontend } from 'hypermerge'
 import Content from './Content'
 import { RepoContext } from '../Hooks'
 import { useCurrentDeviceUrl, CurrentDeviceContext } from './content-types/workspace/Device'
+import { useWorkspaceUrls, WorkspaceUrlsContext } from '../WorkspaceHooks'
 
 // We load these modules here so that the content registry will have them.
 import './content-types/workspace/Workspace'
@@ -26,7 +27,10 @@ import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
 import System, { SystemContext } from '../System'
+<<<<<<< HEAD
 import { useWorkspaceUrl } from '../WorkspaceHooks'
+=======
+>>>>>>> first draft of bringing workspace URLs into the Omnibox
 
 interface Props {
   repo: RepoFrontend
@@ -34,19 +38,23 @@ interface Props {
 }
 
 export default function Root({ repo, system }: Props) {
-  const [workspaceUrl, setWorkspaceUrl] = useWorkspaceUrl()
+  const workspaceUrlsContextData = useWorkspaceUrls()
+
   const currentDeviceUrl = useCurrentDeviceUrl()
 
-  if (!workspaceUrl) {
+  const { workspaceUrls, setWorkspaceUrl } = workspaceUrlsContextData
+  if (!workspaceUrls[0]) {
     return null
   }
 
   return (
     <RepoContext.Provider value={repo}>
       <SystemContext.Provider value={system}>
-        <CurrentDeviceContext.Provider value={currentDeviceUrl}>
-          <Content context="root" url={workspaceUrl} setWorkspaceUrl={setWorkspaceUrl} />
-        </CurrentDeviceContext.Provider>
+        <WorkspaceUrlsContext.Provider value={workspaceUrlsContextData}>
+          <CurrentDeviceContext.Provider value={currentDeviceUrl}>
+            <Content context="root" url={workspaceUrls[0]} setWorkspaceUrl={setWorkspaceUrl}/>
+          </CurrentDeviceContext.Provider>
+        </WorkspaceUrlsContext.Provider>
       </SystemContext.Provider>
     </RepoContext.Provider>
   )
