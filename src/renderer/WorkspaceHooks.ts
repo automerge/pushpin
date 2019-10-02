@@ -1,46 +1,69 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, createContext } from 'react'
 import Fs from 'fs'
 import { WORKSPACE_URL_PATH } from './constants'
-import ContentTypes from './ContentTypes'
 import { PushpinUrl } from './ShareLink'
+import ContentTypes from './ContentTypes'
 
-function loadWorkspaceUrl(): PushpinUrl | null {
+function loadWorkspaceUrls(): PushpinUrl[] {
   if (Fs.existsSync(WORKSPACE_URL_PATH)) {
     const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
     if (json.workspaceUrl) {
-      return json.workspaceUrl
+      return [json.workspaceUrl]
+    }
+    if (json.workspaceUrls) {
+      return json.workspaceUrls
     }
   }
-  return null
+  return []
 }
 
-function saveWorkspaceUrl(workspaceUrl: PushpinUrl): void {
-  const workspaceUrlData = { workspaceUrl }
+function saveWorkspaceUrls(workspaceUrls: PushpinUrl[]): void {
+  const workspaceUrlData = { workspaceUrls }
   Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
 }
 
-export function useWorkspaceUrl(): [PushpinUrl | null, (newUrl: PushpinUrl) => void] {
-  const [workspaceUrl, setWorkspaceUrl] = useState<PushpinUrl | null>(null)
-
-  useEffect(() => {
-    if (workspaceUrl !== null) {
-      return
-    }
-    const existingWorkspaceUrl = loadWorkspaceUrl()
-    if (existingWorkspaceUrl) {
-      setWorkspaceUrl(existingWorkspaceUrl)
-    } else {
-      ContentTypes.create('workspace', {}, (newWorkspaceUrl: PushpinUrl) => {
-        setWorkspaceUrl(newWorkspaceUrl)
-      })
-    }
-  }, [workspaceUrl])
-
-  useEffect(() => {
-    if (workspaceUrl) {
-      saveWorkspaceUrl(workspaceUrl)
-    }
-  }, [workspaceUrl])
-
-  return [workspaceUrl, setWorkspaceUrl]
+export interface UseWorkspaceUrlsHook {
+  workspaceUrls: PushpinUrl[]
+  addWorkspaceUrl: (url: PushpinUrl) => void
+  removeWorkspaceUrl: (url: PushpinUrl) => void
+  createWorkspace: () => void
 }
+
+export function useWorkspaceUrls(): UseWorkspaceUrlsHook {
+  const [workspaceUrls, setWorkspaceUrls] = useState<PushpinUrl[]>([])
+
+  useEffect(() => {
+    const existingWorkspaceUrls = loadWorkspaceUrls()
+    if (existingWorkspaceUrls.length > 0) {
+      setWorkspaceUrls(existingWorkspaceUrls)
+    } else {
+      createWorkspace()
+    }
+  }, [workspaceUrls])
+
+  useEffect(() => {
+    if (workspaceUrls) {
+      saveWorkspaceUrls(workspaceUrls)
+    }
+  }, [workspaceUrls])
+
+  function addWorkspaceUrl(newWorkspaceUrl) {
+    if (!workspaceUrls.includes(newWorkspaceUrl)) {
+      setWorkspaceUrls([newWorkspaceUrl, ...workspaceUrls])
+    }
+  }
+
+  function removeWorkspaceUrl(workspaceUrl) {
+    setWorkspaceUrls(workspaceUrls.filter((w) => w === workspaceUrl))
+  }
+
+  function createWorkspace() {
+    ContentTypes.create('workspace', {}, (newWorkspaceUrl: PushpinUrl) => {
+      addWorkspaceUrl(newWorkspaceUrl)
+    })
+  }
+
+  return { workspaceUrls, addWorkspaceUrl, removeWorkspaceUrl, createWorkspace }
+}
+
+export const WorkspaceUrlsContext = createContext<UseWorkspaceUrlsHook | null>(null)
