@@ -440,6 +440,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       label: 'Workspaces',
       actions: [this.view],
       items: (state, props) =>
+        // we hide workspace results during a search right now
         !this.props.workspaceUrlsContext || state.search
           ? []
           : this.props.workspaceUrlsContext.workspaceUrls.map((url) => ({ url })),
