@@ -39,7 +39,7 @@ export function useWorkspaceUrls(): UseWorkspaceUrlsHook {
     } else {
       createWorkspace()
     }
-  }, [workspaceUrls])
+  }, [])
 
   useEffect(() => {
     if (workspaceUrls.length > 0) {
@@ -49,9 +49,8 @@ export function useWorkspaceUrls(): UseWorkspaceUrlsHook {
 
   const addWorkspaceUrl = useCallback(
     (workspaceUrl) => {
-      if (!workspaceUrls.includes(workspaceUrl)) {
-        setWorkspaceUrls([workspaceUrl, ...workspaceUrls])
-      }
+      const newWorkspaceUrls = [workspaceUrl, ...workspaceUrls.filter((u) => u !== workspaceUrl)]
+      setWorkspaceUrls(newWorkspaceUrls)
     },
     [workspaceUrls]
   )
