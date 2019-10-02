@@ -14,7 +14,7 @@ import {
   PushpinUrl,
 } from '../../../ShareLink'
 
-import { UseWorkspaceUrlsHook } from '../../../WorkspaceHooks'
+import { WorkspaceUrlsApi } from '../../../WorkspaceHooks'
 
 import InvitationsView from '../../../InvitationsView'
 import { ContactDoc } from '../contact'
@@ -34,7 +34,7 @@ export interface Props {
   active: boolean
   hypermergeUrl: HypermergeUrl
   omniboxFinished: Function
-  workspaceUrlsContext: UseWorkspaceUrlsHook | null
+  workspaceUrlsContext: WorkspaceUrlsApi | null
 }
 
 interface WorkspaceDoc {

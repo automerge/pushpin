@@ -22,14 +22,14 @@ function saveWorkspaceUrls(workspaceUrls: PushpinUrl[]): void {
   Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
 }
 
-export interface UseWorkspaceUrlsHook {
+export interface WorkspaceUrlsApi {
   workspaceUrls: PushpinUrl[]
   addWorkspaceUrl: (url: PushpinUrl) => void
   removeWorkspaceUrl: (url: PushpinUrl) => void
   createWorkspace: () => void
 }
 
-export function useWorkspaceUrls(): UseWorkspaceUrlsHook {
+export function useWorkspaceUrls(): WorkspaceUrlsApi {
   const [workspaceUrls, setWorkspaceUrls] = useState<PushpinUrl[]>([])
 
   useEffect(() => {
@@ -71,4 +71,4 @@ export function useWorkspaceUrls(): UseWorkspaceUrlsHook {
   return { workspaceUrls, addWorkspaceUrl, removeWorkspaceUrl, createWorkspace }
 }
 
-export const WorkspaceUrlsContext = createContext<UseWorkspaceUrlsHook | null>(null)
+export const WorkspaceUrlsContext = createContext<WorkspaceUrlsApi | null>(null)

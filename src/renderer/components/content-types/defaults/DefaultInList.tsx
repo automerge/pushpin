@@ -27,21 +27,13 @@ export default function ListItem(props: ContentProps) {
 
   // TODO: pick background color based on url
   return (
-    <div className="DocLink" style={css.listItem}>
+    <div className="DocLink">
       <span draggable onDragStart={onDragStart}>
         <Badge icon={icon} />
       </span>
       <div className="DocLink__title">{doc.title || name}</div>
     </div>
   )
-}
-
-const css = {
-  listItem: {
-    padding: '5px',
-    border: '1px solid #eaeaea',
-    borderRadius: '4px',
-  },
 }
 
 ContentTypes.registerDefault({
