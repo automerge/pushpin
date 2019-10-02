@@ -34,7 +34,7 @@ export interface Props {
   active: boolean
   hypermergeUrl: HypermergeUrl
   omniboxFinished: Function
-  workspaceUrlsContext: UseWorkspaceUrlsHook
+  workspaceUrlsContext: UseWorkspaceUrlsHook | null
 }
 
 interface WorkspaceDoc {

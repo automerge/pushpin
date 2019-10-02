@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from 'react'
+import { useEffect, useState, createContext, useCallback } from 'react'
 import Fs from 'fs'
 import { WORKSPACE_URL_PATH } from './constants'
 import { PushpinUrl } from './ShareLink'
@@ -42,26 +42,32 @@ export function useWorkspaceUrls(): UseWorkspaceUrlsHook {
   }, [workspaceUrls])
 
   useEffect(() => {
-    if (workspaceUrls) {
+    if (workspaceUrls.length > 0) {
       saveWorkspaceUrls(workspaceUrls)
     }
   }, [workspaceUrls])
 
-  function addWorkspaceUrl(newWorkspaceUrl) {
-    if (!workspaceUrls.includes(newWorkspaceUrl)) {
-      setWorkspaceUrls([newWorkspaceUrl, ...workspaceUrls])
-    }
-  }
+  const addWorkspaceUrl = useCallback(
+    (workspaceUrl) => {
+      if (!workspaceUrls.includes(workspaceUrl)) {
+        setWorkspaceUrls([workspaceUrl, ...workspaceUrls])
+      }
+    },
+    [workspaceUrls]
+  )
 
-  function removeWorkspaceUrl(workspaceUrl) {
-    setWorkspaceUrls(workspaceUrls.filter((w) => w === workspaceUrl))
-  }
+  const removeWorkspaceUrl = useCallback(
+    (workspaceUrl) => {
+      setWorkspaceUrls(workspaceUrls.filter((w) => w === workspaceUrl))
+    },
+    [workspaceUrls]
+  )
 
-  function createWorkspace() {
+  const createWorkspace = useCallback(() => {
     ContentTypes.create('workspace', {}, (newWorkspaceUrl: PushpinUrl) => {
       addWorkspaceUrl(newWorkspaceUrl)
     })
-  }
+  }, [workspaceUrls])
 
   return { workspaceUrls, addWorkspaceUrl, removeWorkspaceUrl, createWorkspace }
 }

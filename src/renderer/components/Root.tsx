@@ -27,10 +27,6 @@ import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
 import System, { SystemContext } from '../System'
-<<<<<<< HEAD
-import { useWorkspaceUrl } from '../WorkspaceHooks'
-=======
->>>>>>> first draft of bringing workspace URLs into the Omnibox
 
 interface Props {
   repo: RepoFrontend
@@ -42,7 +38,7 @@ export default function Root({ repo, system }: Props) {
 
   const currentDeviceUrl = useCurrentDeviceUrl()
 
-  const { workspaceUrls, setWorkspaceUrl } = workspaceUrlsContextData
+  const { workspaceUrls, addWorkspaceUrl } = workspaceUrlsContextData
   if (!workspaceUrls[0]) {
     return null
   }
@@ -52,7 +48,7 @@ export default function Root({ repo, system }: Props) {
       <SystemContext.Provider value={system}>
         <WorkspaceUrlsContext.Provider value={workspaceUrlsContextData}>
           <CurrentDeviceContext.Provider value={currentDeviceUrl}>
-            <Content context="root" url={workspaceUrls[0]} setWorkspaceUrl={setWorkspaceUrl}/>
+            <Content context="root" url={workspaceUrls[0]} setWorkspaceUrl={addWorkspaceUrl} />
           </CurrentDeviceContext.Provider>
         </WorkspaceUrlsContext.Provider>
       </SystemContext.Provider>
