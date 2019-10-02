@@ -435,6 +435,15 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           .filter(([id, doc]) => doc.name.match(new RegExp(state.search, 'i')))
           .map(([id, doc]) => ({ url: createDocumentLink('contact', id as HypermergeUrl) })),
     },
+    {
+      name: 'workspaces',
+      label: 'Workspaces',
+      actions: [this.view],
+      items: (state, props) =>
+        !this.props.workspaceUrlsContext
+          ? []
+          : this.props.workspaceUrlsContext.workspaceUrls.map((url) => ({ url })),
+    },
   ]
   /* end sections */
 
@@ -576,6 +585,36 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     clipboard.writeText(createDocumentLink('workspace', this.props.hypermergeUrl))
   }
 
+  renderOmniboxHeader = () => {
+    return (
+      <div className="Omnibox--header">
+        <input
+          className="Omnibox--input"
+          type="text"
+          ref={this.omniboxInput}
+          onChange={this.onInputChange}
+          value={this.state.search}
+          placeholder="Search..."
+        />
+        <div className="Omnibox--Workspace" onClick={this.onClickWorkspace}>
+          <Content
+            context="title-bar"
+            url={createDocumentLink('workspace', this.props.hypermergeUrl)}
+          />
+        </div>
+        <div className="Omnibox--Workspace">
+          <button
+            className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
+            type="button"
+            onClick={this.onClickWorkspaceCopy}
+          >
+            <i className="fa fa-clipboard" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   render = () => {
     log('render')
 
@@ -583,39 +622,9 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       return null
     }
 
-    const WSAPI = this.props.workspaceUrlsContext
-    if (!WSAPI) {
-      return null
-    }
-    const { workspaceUrls } = WSAPI
-
     return (
       <div className="Omnibox">
-        <div className="Omnibox--header">
-          <input
-            className="Omnibox--input"
-            type="text"
-            ref={this.omniboxInput}
-            onChange={this.onInputChange}
-            value={this.state.search}
-            placeholder="Search..."
-          />
-          <div className="Omnibox--Workspace" onClick={this.onClickWorkspace}>
-            <Content
-              context="title-bar"
-              url={createDocumentLink('workspace', this.props.hypermergeUrl)}
-            />
-          </div>
-          <div className="Omnibox--Workspace">
-            <button
-              className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
-              type="button"
-              onClick={this.onClickWorkspaceCopy}
-            >
-              <i className="fa fa-clipboard" />
-            </button>
-          </div>
-        </div>
+        {this.renderOmniboxHeader()}
         <ListMenu>
           {this.renderInvitationsSection()}
           {this.sectionDefinitions.map((sectionDefinition) =>
