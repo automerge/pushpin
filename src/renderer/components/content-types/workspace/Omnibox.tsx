@@ -14,7 +14,7 @@ import {
   PushpinUrl,
 } from '../../../ShareLink'
 
-import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
+import { UseWorkspaceUrlsHook } from '../../../WorkspaceHooks'
 
 import InvitationsView from '../../../InvitationsView'
 import { ContactDoc } from '../contact'
