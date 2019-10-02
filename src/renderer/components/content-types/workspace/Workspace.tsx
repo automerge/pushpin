@@ -22,6 +22,8 @@ import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
 
+import WorkspaceInList from './WorkspaceInList'
+
 const log = Debug('pushpin:workspace')
 
 export interface Doc {
@@ -233,7 +235,12 @@ ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
-  contexts: { root: Workspace, 'title-bar': WorkspaceInTitleBar },
+  contexts: {
+    root: Workspace,
+    'title-bar': WorkspaceInTitleBar,
+    list: WorkspaceInList,
+    board: WorkspaceInList,
+  },
   resizable: false,
   unlisted: true,
   create,
