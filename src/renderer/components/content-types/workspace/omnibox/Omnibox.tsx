@@ -6,7 +6,7 @@ import Debug from 'debug'
 
 import { HypermergeUrl, parseDocumentLink } from '../../../../ShareLink'
 import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
-import WorkspaceInOmnibox from './WorkspaceInOmnibox'
+import WorkspaceInOmnibox from './OmniboxWorkspace'
 import './Omnibox.css'
 
 const log = Debug('pushpin:omnibox')

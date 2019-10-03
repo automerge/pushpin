@@ -1,7 +1,7 @@
 import React from 'react'
 import ActionListItem from './ActionListItem'
 import ListMenuSection from '../../../ListMenuSection'
-import { Action, Item } from './ListMenuInWorkspace'
+import { Action, Item } from './OmniboxWorkspaceListMenu'
 
 interface Props {
   name: string
@@ -10,7 +10,7 @@ interface Props {
   items: Item[]
 }
 
-export default function OmniboxWorkspaceContentSection({ name, label, actions, items }: Props) {
+export default function OmniboxWorkspaceListMenuSection({ name, label, actions, items }: Props) {
   if (items.length === 0) {
     return null
   }

@@ -2,14 +2,14 @@ import React, { useCallback } from 'react'
 import { DocUrl } from 'hypermerge'
 import { clipboard } from 'electron'
 import Content from '../../../Content'
-import ListMenuInWorkspace from './ListMenuInWorkspace'
+import ListMenuInWorkspace from './OmniboxWorkspaceListMenu'
 import { createDocumentLink } from '../../../../ShareLink'
 import { useDocument } from '../../../../Hooks'
 import { Doc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
 import ListMenuHeader from '../../../ListMenuHeader'
 
-import './WorkspaceInOmnibox.css'
+import './OmniboxWorkspace.css'
 
 export interface Props {
   viewContents: boolean
@@ -19,7 +19,7 @@ export interface Props {
   omniboxFinished: Function
 }
 
-export default function WorkspaceInOmnibox(props: Props) {
+export default function OmniboxWorkspace(props: Props) {
   const { active, search, hypermergeUrl, omniboxFinished, viewContents } = props
   const [workspaceDoc] = useDocument<WorkspaceDoc>(hypermergeUrl)
   const [selfDoc] = useDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)

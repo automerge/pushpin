@@ -82,7 +82,7 @@ export interface Action {
   keysForActionPressed: (e: any) => boolean
 }
 
-export default class WorkspaceInOmnibox extends React.PureComponent<Props, State> {
+export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props, State> {
   omniboxInput = React.createRef<HTMLInputElement>()
   handle?: Handle<WorkspaceDoc>
   viewedDocHandles: { [docUrl: string]: Handle<any> }
