@@ -435,16 +435,6 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           .filter(([id, doc]) => doc.name.match(new RegExp(state.search, 'i')))
           .map(([id, doc]) => ({ url: createDocumentLink('contact', id as HypermergeUrl) })),
     },
-    {
-      name: 'workspaces',
-      label: 'Workspaces',
-      actions: [this.view],
-      items: (state, props) =>
-        // we hide workspace results during a search right now
-        !this.props.workspaceUrlsContext || state.search
-          ? []
-          : this.props.workspaceUrlsContext.workspaceUrls.map((url) => ({ url })),
-    },
   ]
   /* end sections */
 
@@ -597,22 +587,35 @@ export default class Omnibox extends React.PureComponent<Props, State> {
           value={this.state.search}
           placeholder="Search..."
         />
-        <div className="Omnibox--Workspace" onClick={this.onClickWorkspace}>
-          <Content
-            context="title-bar"
-            url={createDocumentLink('workspace', this.props.hypermergeUrl)}
-          />
-        </div>
-        <div className="Omnibox--Workspace">
-          <button
-            className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
-            type="button"
-            onClick={this.onClickWorkspaceCopy}
-          >
-            <i className="fa fa-clipboard" />
-          </button>
-        </div>
       </div>
+    )
+  }
+
+  renderWorkspace = (workspaceUrl: PushpinUrl) => {
+    return (
+      <div className="Omnibox-WorkspaceWrapper">
+        <div className="Omnibox-Workspace" onClick={this.onClickWorkspace}>
+          <Content context="title-bar" url={workspaceUrl} />
+        </div>
+        <ListMenu>
+          {this.renderInvitationsSection()}
+          {this.sectionDefinitions.map((sectionDefinition) =>
+            this.renderContentSection(sectionDefinition)
+          )}
+          {this.renderNothingFound()}
+        </ListMenu>
+      </div>
+    )
+  }
+
+  renderWorkspaces = () => {
+    if (!this.props.workspaceUrlsContext) {
+      return []
+    }
+    return (
+      this.props.workspaceUrlsContext.workspaceUrls
+        // .filter((url) => url !== createDocumentLink('workspace', this.props.hypermergeUrl))
+        .map((url) => this.renderWorkspace(url))
     )
   }
 
@@ -623,17 +626,6 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       return null
     }
 
-    return (
-      <div className="Omnibox">
-        {this.renderOmniboxHeader()}
-        <ListMenu>
-          {this.renderInvitationsSection()}
-          {this.sectionDefinitions.map((sectionDefinition) =>
-            this.renderContentSection(sectionDefinition)
-          )}
-          {this.renderNothingFound()}
-        </ListMenu>
-      </div>
-    )
+    return <div className="Omnibox">{this.renderWorkspaces()}</div>
   }
 }
