@@ -1,7 +1,7 @@
 /* eslint-disable react/sort-comp */
 // this component has a bunch of weird pseudo-members that make eslint sad
 
-import React, { useRef, useState, useCallback } from 'react'
+import React, { useRef, useState, useCallback, useEffect } from 'react'
 import Debug from 'debug'
 
 import { HypermergeUrl, parseDocumentLink } from '../../../../ShareLink'
@@ -19,6 +19,7 @@ export interface Props {
 }
 
 export default function Omnibox(props: Props) {
+  const { active, workspaceUrlsContext } = props
   const omniboxInput = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState('')
 
@@ -26,13 +27,19 @@ export default function Omnibox(props: Props) {
     setSearch(e.target.value)
   }, [])
 
+  useEffect(() => {
+    if (active && omniboxInput.current) {
+      omniboxInput.current.focus()
+    }
+  }, [active])
+
   log('render')
 
-  if (!props.workspaceUrlsContext) {
+  if (!workspaceUrlsContext) {
     return null
   }
 
-  const { workspaceUrls } = props.workspaceUrlsContext
+  const { workspaceUrls } = workspaceUrlsContext
 
   return (
     <div className="Omnibox">
@@ -56,7 +63,7 @@ export default function Omnibox(props: Props) {
               omniboxFinished={props.omniboxFinished}
               hypermergeUrl={hypermergeUrl}
               search={search}
-              active={props.active}
+              active={active}
             />
           )
         })}
