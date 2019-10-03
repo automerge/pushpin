@@ -1,7 +1,7 @@
 import React from 'react'
 import ActionListItem from './ActionListItem'
 import ListMenuSection from '../../../ListMenuSection'
-import { Section, Item } from './WorkspaceInOmnibox'
+import { Section, Item } from './ListMenuInWorkspace'
 
 interface Props extends Section {
   materializedItems: Item[]

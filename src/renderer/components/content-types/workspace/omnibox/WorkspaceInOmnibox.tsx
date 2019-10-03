@@ -4,12 +4,12 @@ import { clipboard } from 'electron'
 import Content from '../../../Content'
 import ListMenuInWorkspace from './ListMenuInWorkspace'
 import { createDocumentLink } from '../../../../ShareLink'
-import Badge from '../../../Badge'
-import './WorkspaceInOmnibox.css'
 import { useDocument } from '../../../../Hooks'
 import { Doc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
 import ListMenuHeader from '../../../ListMenuHeader'
+
+import './WorkspaceInOmnibox.css'
 
 export interface Props {
   viewContents: boolean
