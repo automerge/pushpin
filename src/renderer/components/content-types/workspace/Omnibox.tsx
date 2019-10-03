@@ -1,14 +1,11 @@
 /* eslint-disable react/sort-comp */
 // this component has a bunch of weird pseudo-members that make eslint sad
 
-import React from 'react'
+import React, { useRef, useState, useCallback } from 'react'
 import Debug from 'debug'
 
-import { Handle } from 'hypermerge'
 import { HypermergeUrl } from '../../../ShareLink'
 import { WorkspaceUrlsApi } from '../../../WorkspaceHooks'
-import { ContactDoc } from '../contact'
-import { Doc as WorkspaceDoc } from './Workspace'
 import WorkspaceInOmnibox from './WorkspaceInOmnibox'
 import './Omnibox.css'
 
@@ -21,78 +18,42 @@ export interface Props {
   workspaceUrlsContext: WorkspaceUrlsApi | null
 }
 
-interface State {
-  search: string
-}
+export default function Omnibox(props: Props) {
+  const omniboxInput = useRef<HTMLInputElement>(null)
+  const [search, setSearch] = useState('')
 
-export default class Omnibox extends React.PureComponent<Props, State> {
-  omniboxInput = React.createRef<HTMLInputElement>()
-  handle?: Handle<WorkspaceDoc>
-  viewedDocHandles: { [docUrl: string]: Handle<any> }
-  contactHandles: { [contactId: string]: Handle<ContactDoc> }
-  invitationsView: any
+  const onInputChange = useCallback((e) => {
+    setSearch(e.target.value)
+  }, [])
 
-  state: State = {
-    search: '',
+  log('render')
+
+  if (!props.workspaceUrlsContext) {
+    return null
   }
 
-  constructor(props) {
-    super(props)
-    this.viewedDocHandles = {}
-    this.contactHandles = {}
-  }
+  const { workspaceUrls } = props.workspaceUrlsContext
 
-  // TODO: remove the need for this
-  componentWillReceiveProps(newProps: Props) {
-    if (!this.props.active && newProps.active) {
-      this.setState({ search: '' }, () => {
-        setTimeout(() => {
-          this.omniboxInput && this.omniboxInput.current && this.omniboxInput.current.focus()
-        }, 0)
-      })
-    }
-  }
-
-  // pass this down
-  endSession = () => {
-    this.props.omniboxFinished()
-  }
-
-  // pass input down too
-  onInputChange = (e) => {
-    this.setState({ search: e.target.value })
-  }
-
-  render = () => {
-    log('render')
-
-    if (!this.props.workspaceUrlsContext) {
-      return null
-    }
-
-    const { workspaceUrls } = this.props.workspaceUrlsContext
-
-    return (
-      <div className="Omnibox">
-        <div className="Omnibox--header">
-          <input
-            className="Omnibox--input"
-            type="text"
-            ref={this.omniboxInput}
-            onChange={this.onInputChange}
-            value={this.state.search}
-            placeholder="Search..."
-          />
-        </div>
-        {workspaceUrls.map((url) => (
-          <WorkspaceInOmnibox
-            omniboxFinished={this.props.omniboxFinished}
-            hypermergeUrl={this.props.hypermergeUrl}
-            search={this.state.search}
-            active={this.props.active}
-          />
-        ))}
+  return (
+    <div className="Omnibox">
+      <div className="Omnibox--header">
+        <input
+          className="Omnibox--input"
+          type="text"
+          ref={omniboxInput}
+          onChange={onInputChange}
+          value={search}
+          placeholder="Search..."
+        />
       </div>
-    )
-  }
+      {workspaceUrls.map((url) => (
+        <WorkspaceInOmnibox
+          omniboxFinished={props.omniboxFinished}
+          hypermergeUrl={props.hypermergeUrl}
+          search={search}
+          active={props.active}
+        />
+      ))}
+    </div>
+  )
 }
