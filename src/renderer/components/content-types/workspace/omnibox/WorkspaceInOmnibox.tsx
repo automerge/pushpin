@@ -24,6 +24,10 @@ export default function WorkspaceInOmnibox(props: Props) {
   const [workspaceDoc] = useDocument<WorkspaceDoc>(hypermergeUrl)
   const [selfDoc] = useDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)
 
+  const onClickWorkspace = useCallback((e) => {
+    omniboxFinished()
+  }, [])
+
   const onClickWorkspaceCopy = useCallback((e) => {
     clipboard.writeText(createDocumentLink('workspace', hypermergeUrl))
   }, [])
@@ -36,7 +40,11 @@ export default function WorkspaceInOmnibox(props: Props) {
   const { color, name } = selfDoc
 
   return (
-    <div className="WorkspaceInOmnibox" style={{ '--workspace-color': color } as any}>
+    <div
+      className="WorkspaceInOmnibox"
+      onClick={onClickWorkspace}
+      style={{ '--workspace-color': color } as any}
+    >
       <div className="WorkspaceInOmnibox-TemporaryFigLeaf">
         <ListMenuHeader>
           <a
@@ -45,8 +53,10 @@ export default function WorkspaceInOmnibox(props: Props) {
           >
             {name}&apos;s Documents
           </a>
-          <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-          <div onClick={onClickWorkspaceCopy}>
+          <a href={createDocumentLink('contact', selfId)}>
+            <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
+          </a>
+          <div className="WorkspaceInOmnibox-CopyBadge" onClick={onClickWorkspaceCopy}>
             <i
               className="Badge Badge--circle fa fa-clipboard"
               style={{ fontSize: '14px', background: color }}

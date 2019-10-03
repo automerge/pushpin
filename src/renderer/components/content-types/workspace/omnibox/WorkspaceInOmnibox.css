@@ -24,3 +24,7 @@
   background-color: white;
   padding-left: 8px;
 }
+
+.WorkspaceInOmnibox-CopyBadge {
+  padding-left: 4px;
+}

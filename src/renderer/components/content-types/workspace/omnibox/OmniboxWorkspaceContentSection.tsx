@@ -1,20 +1,16 @@
 import React from 'react'
 import ActionListItem from './ActionListItem'
 import ListMenuSection from '../../../ListMenuSection'
-import { Section, Item } from './ListMenuInWorkspace'
+import { Action, Item } from './ListMenuInWorkspace'
 
-interface Props extends Section {
-  materializedItems: Item[]
+interface Props {
+  name: string
+  label?: string
+  actions: Action[]
+  items: Item[]
 }
 
-export default function OmniboxWorkspaceContentSection({
-  name,
-  label,
-  actions,
-  materializedItems,
-}: Props) {
-  const items = materializedItems // XXX this is a bad name
-
+export default function OmniboxWorkspaceContentSection({ name, label, actions, items }: Props) {
   if (items.length === 0) {
     return null
   }

@@ -58,11 +58,11 @@ interface SectionRange {
   end: number
 }
 
-export interface Section {
+interface Section {
   name: string
   label?: string
   actions: Action[]
-  items?: (state: State, props: Props) => Item[]
+  items: (state: State, props: Props) => Item[]
 }
 
 export interface Item {
@@ -73,7 +73,7 @@ export interface Item {
   actions?: Action[]
 }
 
-interface Action {
+export interface Action {
   name: string
   callback: (url: any) => () => void
   faIcon: string
@@ -545,7 +545,7 @@ export default class WorkspaceInOmnibox extends React.PureComponent<Props, State
             name={name}
             label={label}
             actions={actions}
-            materializedItems={this.sectionItems(name)}
+            items={this.sectionItems(name)}
           />
         ))}
         {this.renderNothingFound()}
