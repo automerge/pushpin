@@ -37,7 +37,7 @@ export default function OmniboxWorkspace(props: Props) {
   }
 
   const { selfId } = workspaceDoc
-  const { color, name } = selfDoc
+  const { color, name, devices = [] } = selfDoc
 
   return (
     <div
@@ -53,6 +53,11 @@ export default function OmniboxWorkspace(props: Props) {
           >
             {name}&apos;s Documents
           </a>
+          <div className="OmniboxWorkspace-Devices">
+            {devices.map((d) => (
+              <Content key={d} context="title-bar" url={createDocumentLink('device', d)} />
+            ))}
+          </div>
           <a href={createDocumentLink('contact', selfId)}>
             <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
           </a>

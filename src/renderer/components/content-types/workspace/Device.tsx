@@ -17,12 +17,21 @@ export interface DeviceDoc {
 function Device(props: ContentProps) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
   if (!doc) return null
-  return (
-    <div className="DeviceListItem">
-      <Badge icon={doc.icon || 'desktop'} shape="square" />
-      <div className="DeviceListItem__title">{doc.name}</div>
-    </div>
-  )
+  switch (props.context) {
+    case 'title-bar':
+      return (
+        <div className="DeviceListItem">
+          <Badge icon={doc.icon || 'desktop'} shape="square" />
+        </div>
+      )
+    default:
+      return (
+        <div className="DeviceListItem">
+          <Badge icon={doc.icon || 'desktop'} shape="square" />
+          <div className="DeviceListItem__title">{doc.name}</div>
+        </div>
+      )
+  }
 }
 
 function create(deviceAttrs, handle, callback) {
