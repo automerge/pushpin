@@ -24,6 +24,8 @@ import ListMenuItem from '../../../ListMenuItem'
 import ListMenu from '../../../ListMenu'
 import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
 
+import './OmniboxWorkspaceListMenu.css'
+
 const log = Debug('pushpin:omnibox')
 
 export interface Props {

@@ -41,22 +41,22 @@ export default function OmniboxWorkspace(props: Props) {
 
   return (
     <div
-      className="WorkspaceInOmnibox"
+      className="OmniboxWorkspace"
       onClick={onClickWorkspace}
       style={{ '--workspace-color': color } as any}
     >
-      <div className="WorkspaceInOmnibox-TemporaryFigLeaf">
+      <div className="OmniboxWorkspace-TemporaryFigLeaf">
         <ListMenuHeader>
           <a
             href={createDocumentLink('workspace', hypermergeUrl)}
-            className="WorkspaceInOmnibox-Title"
+            className="OmniboxWorkspace-Title"
           >
             {name}&apos;s Documents
           </a>
           <a href={createDocumentLink('contact', selfId)}>
             <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
           </a>
-          <div className="WorkspaceInOmnibox-CopyBadge" onClick={onClickWorkspaceCopy}>
+          <div className="OmniboxWorkspace-CopyBadge" onClick={onClickWorkspaceCopy}>
             <i
               className="Badge Badge--circle fa fa-clipboard"
               style={{ fontSize: '14px', background: color }}
