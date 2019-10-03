@@ -1,19 +1,26 @@
 .WorkspaceInOmnibox {
-  padding: 4px 0 0 4px;
   background-color: var(--workspace-color);
-  opacity: 1;
+}
+
+.WorkspaceInOmnibox-TemporaryFigLeaf {
+  padding: 4px 0 0 4px;
+  background-color: white;
+  opacity: 0.9;
 }
 
 .WorkspaceInOmnibox-Header {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  align-items: center;
+  border-bottom: var(--colorSecondaryGray);
 }
 
 .WorkspaceInOmnibox-Title {
   flex-grow: 1;
+  color: var(--colorBlueBlack);
 }
 
 .WorkspaceInOmnibox > .ListMenu {
+  background-color: white;
   padding-left: 8px;
 }

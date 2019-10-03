@@ -9,9 +9,10 @@ import './WorkspaceInOmnibox.css'
 import { useDocument } from '../../../../Hooks'
 import { Doc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
-import Text from '../../../Text'
+import ListMenuHeader from '../../../ListMenuHeader'
 
 export interface Props {
+  viewContents: boolean
   active: boolean
   search: string
   hypermergeUrl: DocUrl
@@ -19,14 +20,9 @@ export interface Props {
 }
 
 export default function WorkspaceInOmnibox(props: Props) {
-  const { active, search, hypermergeUrl, omniboxFinished } = props
+  const { active, search, hypermergeUrl, omniboxFinished, viewContents } = props
   const [workspaceDoc] = useDocument<WorkspaceDoc>(hypermergeUrl)
   const [selfDoc] = useDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)
-
-  const onClickWorkspace = useCallback((e) => {
-    window.location.href = createDocumentLink('workspace', hypermergeUrl)
-    omniboxFinished()
-  }, [])
 
   const onClickWorkspaceCopy = useCallback((e) => {
     clipboard.writeText(createDocumentLink('workspace', hypermergeUrl))
@@ -41,22 +37,31 @@ export default function WorkspaceInOmnibox(props: Props) {
 
   return (
     <div className="WorkspaceInOmnibox" style={{ '--workspace-color': color } as any}>
-      <div className="WorkspaceInOmnibox-Header" onClick={onClickWorkspace}>
-        <div className="WorkspaceInOmnibox-Title">Documents for {name}</div>
-        <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-        <div onClick={onClickWorkspaceCopy}>
-          <i
-            className="Badge Badge--circle fa fa-clipboard"
-            style={{ fontSize: '14px', background: color }}
+      <div className="WorkspaceInOmnibox-TemporaryFigLeaf">
+        <ListMenuHeader>
+          <a
+            href={createDocumentLink('workspace', hypermergeUrl)}
+            className="WorkspaceInOmnibox-Title"
+          >
+            {name}&apos;s Documents
+          </a>
+          <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
+          <div onClick={onClickWorkspaceCopy}>
+            <i
+              className="Badge Badge--circle fa fa-clipboard"
+              style={{ fontSize: '14px', background: color }}
+            />
+          </div>
+        </ListMenuHeader>
+        {!viewContents ? null : (
+          <ListMenuInWorkspace
+            active={active}
+            search={search}
+            hypermergeUrl={hypermergeUrl}
+            omniboxFinished={omniboxFinished}
           />
-        </div>
+        )}
       </div>
-      <ListMenuInWorkspace
-        active={active}
-        search={search}
-        hypermergeUrl={hypermergeUrl}
-        omniboxFinished={omniboxFinished}
-      />
     </div>
   )
 }

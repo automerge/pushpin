@@ -47,11 +47,12 @@ export default function Omnibox(props: Props) {
         />
       </div>
       <div className="Omnibox-Workspaces">
-        {workspaceUrls.map((url) => {
+        {workspaceUrls.map((url, i) => {
           const { hypermergeUrl } = parseDocumentLink(url)
           return (
             <WorkspaceInOmnibox
               key={url}
+              viewContents={i === 0}
               omniboxFinished={props.omniboxFinished}
               hypermergeUrl={hypermergeUrl}
               search={search}
