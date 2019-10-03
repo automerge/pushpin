@@ -5,9 +5,10 @@ import React from 'react'
 import Debug from 'debug'
 
 import { Handle } from 'hypermerge'
-import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
+import { HypermergeUrl } from '../../../ShareLink'
 import { WorkspaceUrlsApi } from '../../../WorkspaceHooks'
 import { ContactDoc } from '../contact'
+import { Doc as WorkspaceDoc } from './Workspace'
 import WorkspaceInOmnibox from './WorkspaceInOmnibox'
 import './Omnibox.css'
 
@@ -20,33 +21,8 @@ export interface Props {
   workspaceUrlsContext: WorkspaceUrlsApi | null
 }
 
-interface WorkspaceDoc {
-  selfId: HypermergeUrl
-  contactIds: HypermergeUrl[]
-  currentDocUrl: PushpinUrl
-  viewedDocUrls: PushpinUrl[]
-  archivedDocUrls?: PushpinUrl[]
-}
-
 interface State {
   search: string
-}
-
-interface Item {
-  type?: string
-  object?: any
-  url?: PushpinUrl
-  selected?: boolean
-  actions?: Action[]
-}
-
-interface Action {
-  name: string
-  callback: (url: any) => () => void
-  faIcon: string
-  label: string
-  shortcut: string
-  keysForActionPressed: (e: any) => boolean
 }
 
 export default class Omnibox extends React.PureComponent<Props, State> {

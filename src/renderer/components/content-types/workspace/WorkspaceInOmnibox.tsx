@@ -553,6 +553,7 @@ export default class WorkspaceInOmnibox extends React.PureComponent<Props, State
     }
     this.navigate(createDocumentLink('contact', this.state.doc.selfId))
   }
+
   onClickWorkspaceCopy = (e) => {
     clipboard.writeText(createDocumentLink('workspace', this.props.hypermergeUrl))
   }
