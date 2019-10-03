@@ -13,7 +13,7 @@ import { DocUrl } from 'hypermerge'
  */
 
 export type ToSystemMsg = NavigatedMsg
-export type FromSystemMsg = NewDocumentMsg | IncomingUrlMsg
+export type FromSystemMsg = NewDocumentMsg | NewWorkspaceMsg | IncomingUrlMsg
 
 interface NavigatedMsg {
   type: 'Navigated'
@@ -22,6 +22,10 @@ interface NavigatedMsg {
 
 interface NewDocumentMsg {
   type: 'NewDocument'
+}
+
+interface NewWorkspaceMsg {
+  type: 'NewWorkspace'
 }
 
 interface IncomingUrlMsg {

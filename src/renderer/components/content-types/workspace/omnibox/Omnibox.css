@@ -8,16 +8,17 @@
   position: fixed;
   top: 52px;
   left: 20%;
+  height: 60vh;
   display: flex;
   flex-direction: column;
 }
 
-.Omnibox--header {
+.Omnibox-header {
   display: flex;
   flex-direction: row;
 }
 
-.Omnibox--input {
+.Omnibox-input {
   font-size: 18px;
   color: var(--colorBlueBlack);
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
@@ -30,18 +31,16 @@
   line-height: 24px;
 }
 
-.Omnibox--Workspace {
-  padding: 4px;
+.Omnibox-Workspaces {
+  overflow-y: scroll;
 }
 
-.Omnibox--header > input {
+.Omnibox-input {
   flex: 1;
 }
 
 .Omnibox .ListMenu {
   color: var(--colorBlueBlack);
-  height: 60vh;
-  overflow-y: scroll;
 }
 
 .Omnibox .ListMenu__item .Actions {

@@ -4,7 +4,7 @@
 import React, { useRef, useState, useCallback } from 'react'
 import Debug from 'debug'
 
-import { HypermergeUrl } from '../../../../ShareLink'
+import { HypermergeUrl, parseDocumentLink } from '../../../../ShareLink'
 import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
 import WorkspaceInOmnibox from './WorkspaceInOmnibox'
 import './Omnibox.css'
@@ -36,9 +36,9 @@ export default function Omnibox(props: Props) {
 
   return (
     <div className="Omnibox">
-      <div className="Omnibox--header">
+      <div className="Omnibox-header">
         <input
-          className="Omnibox--input"
+          className="Omnibox-input"
           type="text"
           ref={omniboxInput}
           onChange={onInputChange}
@@ -46,14 +46,20 @@ export default function Omnibox(props: Props) {
           placeholder="Search..."
         />
       </div>
-      {workspaceUrls.map((url) => (
-        <WorkspaceInOmnibox
-          omniboxFinished={props.omniboxFinished}
-          hypermergeUrl={props.hypermergeUrl}
-          search={search}
-          active={props.active}
-        />
-      ))}
+      <div className="Omnibox-Workspaces">
+        {workspaceUrls.map((url) => {
+          const { hypermergeUrl } = parseDocumentLink(url)
+          return (
+            <WorkspaceInOmnibox
+              key={url}
+              omniboxFinished={props.omniboxFinished}
+              hypermergeUrl={hypermergeUrl}
+              search={search}
+              active={props.active}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }

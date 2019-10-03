@@ -1,0 +1,19 @@
+.WorkspaceInOmnibox {
+  padding: 4px 0 0 4px;
+  background-color: var(--workspace-color);
+  opacity: 1;
+}
+
+.WorkspaceInOmnibox-Header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.WorkspaceInOmnibox-Title {
+  flex-grow: 1;
+}
+
+.WorkspaceInOmnibox > .ListMenu {
+  padding-left: 8px;
+}
