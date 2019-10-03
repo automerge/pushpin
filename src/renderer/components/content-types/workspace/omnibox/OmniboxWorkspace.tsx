@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react'
 import { DocUrl } from 'hypermerge'
 import { clipboard } from 'electron'
-import Content from '../../../Content'
-import ListMenuInWorkspace from './OmniboxWorkspaceListMenu'
 import { createDocumentLink } from '../../../../ShareLink'
 import { useDocument } from '../../../../Hooks'
+import Content from '../../../Content'
 import { Doc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
+import OmniboxWorkspaceListMenu from './OmniboxWorkspaceListMenu'
 import ListMenuHeader from '../../../ListMenuHeader'
 
 import './OmniboxWorkspace.css'
@@ -64,7 +64,7 @@ export default function OmniboxWorkspace(props: Props) {
           </div>
         </ListMenuHeader>
         {!viewContents ? null : (
-          <ListMenuInWorkspace
+          <OmniboxWorkspaceListMenu
             active={active}
             search={search}
             hypermergeUrl={hypermergeUrl}

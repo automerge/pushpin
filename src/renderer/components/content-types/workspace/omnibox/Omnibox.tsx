@@ -6,7 +6,7 @@ import Debug from 'debug'
 
 import { HypermergeUrl, parseDocumentLink } from '../../../../ShareLink'
 import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
-import WorkspaceInOmnibox from './OmniboxWorkspace'
+import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
 
 const log = Debug('pushpin:omnibox')
@@ -57,7 +57,7 @@ export default function Omnibox(props: Props) {
         {workspaceUrls.map((url, i) => {
           const { hypermergeUrl } = parseDocumentLink(url)
           return (
-            <WorkspaceInOmnibox
+            <OmniboxWorkspace
               key={url}
               viewContents={i === 0}
               omniboxFinished={props.omniboxFinished}

@@ -29,6 +29,12 @@ export interface WorkspaceUrlsApi {
   createWorkspace: () => void
 }
 
+/**
+ * useWorkspaceUrls
+ * returns the list of known workspace URLs stored in a JSON file
+ * the first entry will be the "current" workspace, and rendered by the main workspace widget
+ * accordingly.
+ */
 export function useWorkspaceUrls(): WorkspaceUrlsApi {
   const [workspaceUrls, setWorkspaceUrls] = useState<PushpinUrl[]>([])
 

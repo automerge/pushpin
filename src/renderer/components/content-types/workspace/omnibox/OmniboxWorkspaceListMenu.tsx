@@ -22,7 +22,7 @@ import InvitationListItem from './InvitationListItem'
 import ListMenuSection from '../../../ListMenuSection'
 import ListMenuItem from '../../../ListMenuItem'
 import ListMenu from '../../../ListMenu'
-import OmniboxWorkspaceContentSection from './OmniboxWorkspaceContentSection'
+import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
 
 const log = Debug('pushpin:omnibox')
 
@@ -540,7 +540,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       <ListMenu>
         {this.renderInvitationsSection()}
         {this.sectionDefinitions.map(({ name, label, actions }) => (
-          <OmniboxWorkspaceContentSection
+          <OmniboxWorkspaceListMenuSection
             key={name}
             name={name}
             label={label}
