@@ -36,6 +36,7 @@ export interface Doc {
 
 interface WorkspaceContentProps extends ContentProps {
   setWorkspaceUrl: (newWorkspaceUrl: PushpinUrl) => void
+  createWorkspace: () => void
 }
 
 export default function Workspace(props: WorkspaceContentProps) {
@@ -63,6 +64,9 @@ export default function Workspace(props: WorkspaceContentProps) {
           ContentTypes.create('board', { selfId }, (boardUrl: PushpinUrl) => {
             openDoc(boardUrl)
           })
+          break
+        case 'NewWorkspace':
+          props.createWorkspace()
           break
       }
     },

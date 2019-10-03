@@ -1,0 +1,40 @@
+.Omnibox {
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.2);
+  width: 60%;
+  z-index: 10;
+  position: fixed;
+  top: 52px;
+  left: 20%;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.Omnibox-header {
+  display: flex;
+  flex-direction: row;
+}
+
+.Omnibox-input {
+  font-size: 18px;
+  color: var(--colorBlueBlack);
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--colorInputGrey);
+  border: 0px;
+  outline: none;
+  border-radius: 4px;
+  margin: 4px;
+  height: 32px;
+  line-height: 24px;
+}
+
+.Omnibox-Workspaces {
+  overflow-y: scroll;
+}
+
+.Omnibox-input {
+  flex: 1;
+}

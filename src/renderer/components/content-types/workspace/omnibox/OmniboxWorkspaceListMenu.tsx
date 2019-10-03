@@ -4,37 +4,35 @@
 import React from 'react'
 import Debug from 'debug'
 
-import { Handle, Doc } from 'hypermerge'
-import { clipboard } from 'electron'
+import { Handle, Doc, DocUrl } from 'hypermerge'
 
 import {
   createDocumentLink,
   parseDocumentLink,
   HypermergeUrl,
   PushpinUrl,
-} from '../../../ShareLink'
+} from '../../../../ShareLink'
 
-import { WorkspaceUrlsApi } from '../../../WorkspaceHooks'
-
-import InvitationsView from '../../../InvitationsView'
-import { ContactDoc } from '../contact'
-import Badge from '../../Badge'
-import Text from '../../Text'
+import InvitationsView from '../../../../InvitationsView'
+import { ContactDoc } from '../../contact'
+import Badge from '../../../Badge'
+import Text from '../../../Text'
 import './Omnibox.css'
 import InvitationListItem from './InvitationListItem'
-import ListMenuSection from '../../ListMenuSection'
-import ListMenuItem from '../../ListMenuItem'
-import ListMenu from '../../ListMenu'
-import ActionListItem from './ActionListItem'
-import Content from '../../Content'
+import ListMenuSection from '../../../ListMenuSection'
+import ListMenuItem from '../../../ListMenuItem'
+import ListMenu from '../../../ListMenu'
+import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
+
+import './OmniboxWorkspaceListMenu.css'
 
 const log = Debug('pushpin:omnibox')
 
 export interface Props {
   active: boolean
-  hypermergeUrl: HypermergeUrl
+  search: string
+  hypermergeUrl: DocUrl
   omniboxFinished: Function
-  workspaceUrlsContext: WorkspaceUrlsApi | null
 }
 
 interface WorkspaceDoc {
@@ -46,7 +44,6 @@ interface WorkspaceDoc {
 }
 
 interface State {
-  search: string
   selectedIndex: number
   invitations: any[]
   viewedDocs: { [docUrl: string]: any } // PushpinUrl
@@ -70,7 +67,7 @@ interface Section {
   items: (state: State, props: Props) => Item[]
 }
 
-interface Item {
+export interface Item {
   type?: string
   object?: any
   url?: PushpinUrl
@@ -78,7 +75,7 @@ interface Item {
   actions?: Action[]
 }
 
-interface Action {
+export interface Action {
   name: string
   callback: (url: any) => () => void
   faIcon: string
@@ -87,7 +84,7 @@ interface Action {
   keysForActionPressed: (e: any) => boolean
 }
 
-export default class Omnibox extends React.PureComponent<Props, State> {
+export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props, State> {
   omniboxInput = React.createRef<HTMLInputElement>()
   handle?: Handle<WorkspaceDoc>
   viewedDocHandles: { [docUrl: string]: Handle<any> }
@@ -95,7 +92,6 @@ export default class Omnibox extends React.PureComponent<Props, State> {
   invitationsView: any
 
   state: State = {
-    search: '',
     selectedIndex: 0,
     invitations: [],
     viewedDocs: {},
@@ -132,17 +128,6 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     log('componentDidUpdate')
     if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
       this.refreshHandle(this.props.hypermergeUrl)
-    }
-  }
-
-  // TODO: remove the need for this
-  componentWillReceiveProps(newProps: Props) {
-    if (!this.props.active && newProps.active) {
-      this.setState({ search: '' }, () => {
-        setTimeout(() => {
-          this.omniboxInput && this.omniboxInput.current && this.omniboxInput.current.focus()
-        }, 0)
-      })
     }
   }
 
@@ -261,10 +246,6 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     }
   }
 
-  onInputChange = (e) => {
-    this.setState({ search: e.target.value, selectedIndex: 0 })
-  }
-
   menuSections = (): { items: Item[]; sectionIndices: SectionIndex } => {
     const { doc } = this.state
     if (!doc) {
@@ -273,7 +254,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
 
     let items: Item[] = []
     const sectionIndices: { [section: string]: SectionRange } = {}
-    const { search } = this.state
+    const { search } = this.props
 
     let searchRegEx
     // if we have an invalid regex, shortcircuit out of here
@@ -302,7 +283,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     // add each section definition's items to the output
     this.sectionDefinitions.forEach((sectionDefinition) => {
       // this is really, really not my favorite thing
-      const sectionItems = sectionDefinition.items(this.state, this.props)
+      const sectionItems = sectionDefinition.items!(this.state, this.props)
       // don't tell my mom about this next line
       sectionItems.forEach((item) => {
         item.actions = sectionDefinition.actions
@@ -396,7 +377,7 @@ export default class Omnibox extends React.PureComponent<Props, State> {
               !state.doc.archivedDocUrls.includes(url as PushpinUrl)
           )
           .filter(([url, _doc]) => parseDocumentLink(url).type === 'board')
-          .filter(([_url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
+          .filter(([_url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {
@@ -404,12 +385,12 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       label: 'Archived',
       actions: [this.view, this.unarchive],
       items: (state, props) =>
-        state.search === '' || !state.doc
+        props.search === '' || !state.doc
           ? [] // don't show archived URLs unless there's a current search term
           : (state.doc.archivedDocUrls || [])
               .map((url) => [url, this.state.viewedDocs[url]])
               .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
-              .filter(([url, doc]) => doc && doc.title.match(new RegExp(state.search, 'i')))
+              .filter(([url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
               .map(([url, doc]) => ({ url })),
     },
     {
@@ -418,8 +399,8 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       items: (state, props) => {
         // try parsing the "search" to see if it is a valid document URL
         try {
-          parseDocumentLink(state.search)
-          return [{ url: state.search as PushpinUrl }]
+          parseDocumentLink(props.search)
+          return [{ url: props.search as PushpinUrl }]
         } catch {
           return []
         }
@@ -432,18 +413,8 @@ export default class Omnibox extends React.PureComponent<Props, State> {
       items: (state, props) =>
         Object.entries(this.state.contacts)
           .filter(([id, doc]) => doc.name)
-          .filter(([id, doc]) => doc.name.match(new RegExp(state.search, 'i')))
+          .filter(([id, doc]) => doc.name.match(new RegExp(props.search, 'i')))
           .map(([id, doc]) => ({ url: createDocumentLink('contact', id as HypermergeUrl) })),
-    },
-    {
-      name: 'workspaces',
-      label: 'Workspaces',
-      actions: [this.view],
-      items: (state, props) =>
-        // we hide workspace results during a search right now
-        !this.props.workspaceUrlsContext || state.search
-          ? []
-          : this.props.workspaceUrlsContext.workspaceUrls.map((url) => ({ url })),
     },
   ]
   /* end sections */
@@ -558,82 +529,29 @@ export default class Omnibox extends React.PureComponent<Props, State> {
     return null
   }
 
-  renderContentSection = ({ name, label, actions }: Section) => {
-    const items = this.sectionItems(name)
-
-    if (items.length === 0) {
-      return null
-    }
-    return (
-      <ListMenuSection key={name} title={label}>
-        {items.map(
-          ({ url, selected }) =>
-            url && (
-              <ActionListItem key={url} contentUrl={url} actions={actions} selected={selected} />
-            )
-        )}
-      </ListMenuSection>
-    )
-  }
-
-  onClickWorkspace = (e) => {
-    if (!this.state.doc) {
-      return
-    }
-    this.navigate(createDocumentLink('contact', this.state.doc.selfId))
-  }
-  onClickWorkspaceCopy = (e) => {
-    clipboard.writeText(createDocumentLink('workspace', this.props.hypermergeUrl))
-  }
-
-  renderOmniboxHeader = () => {
-    return (
-      <div className="Omnibox--header">
-        <input
-          className="Omnibox--input"
-          type="text"
-          ref={this.omniboxInput}
-          onChange={this.onInputChange}
-          value={this.state.search}
-          placeholder="Search..."
-        />
-        <div className="Omnibox--Workspace" onClick={this.onClickWorkspace}>
-          <Content
-            context="title-bar"
-            url={createDocumentLink('workspace', this.props.hypermergeUrl)}
-          />
-        </div>
-        <div className="Omnibox--Workspace">
-          <button
-            className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
-            type="button"
-            onClick={this.onClickWorkspaceCopy}
-          >
-            <i className="fa fa-clipboard" />
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   render = () => {
-    log('render')
+    if (!this.state.doc) {
+      return null
+    }
 
-    if (!this.state.doc || !this.state.doc.currentDocUrl) {
+    if (!this.props.hypermergeUrl) {
       return null
     }
 
     return (
-      <div className="Omnibox">
-        {this.renderOmniboxHeader()}
-        <ListMenu>
-          {this.renderInvitationsSection()}
-          {this.sectionDefinitions.map((sectionDefinition) =>
-            this.renderContentSection(sectionDefinition)
-          )}
-          {this.renderNothingFound()}
-        </ListMenu>
-      </div>
+      <ListMenu>
+        {this.renderInvitationsSection()}
+        {this.sectionDefinitions.map(({ name, label, actions }) => (
+          <OmniboxWorkspaceListMenuSection
+            key={name}
+            name={name}
+            label={label}
+            actions={actions}
+            items={this.sectionItems(name)}
+          />
+        ))}
+        {this.renderNothingFound()}
+      </ListMenu>
     )
   }
 }

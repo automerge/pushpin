@@ -38,7 +38,7 @@ export default function Root({ repo, system }: Props) {
 
   const currentDeviceUrl = useCurrentDeviceUrl()
 
-  const { workspaceUrls, addWorkspaceUrl } = workspaceUrlsContextData
+  const { workspaceUrls, addWorkspaceUrl, createWorkspace } = workspaceUrlsContextData
   if (!workspaceUrls[0]) {
     return null
   }
@@ -48,7 +48,12 @@ export default function Root({ repo, system }: Props) {
       <SystemContext.Provider value={system}>
         <WorkspaceUrlsContext.Provider value={workspaceUrlsContextData}>
           <CurrentDeviceContext.Provider value={currentDeviceUrl}>
-            <Content context="root" url={workspaceUrls[0]} setWorkspaceUrl={addWorkspaceUrl} />
+            <Content
+              context="root"
+              url={workspaceUrls[0]}
+              setWorkspaceUrl={addWorkspaceUrl}
+              createWorkspace={createWorkspace}
+            />
           </CurrentDeviceContext.Provider>
         </WorkspaceUrlsContext.Provider>
       </SystemContext.Provider>
