@@ -12,19 +12,19 @@ import {
   parseDocumentLink,
   HypermergeUrl,
   PushpinUrl,
-} from '../../../ShareLink'
+} from '../../../../ShareLink'
 
-import InvitationsView from '../../../InvitationsView'
-import { ContactDoc } from '../contact'
-import Badge from '../../Badge'
-import Text from '../../Text'
+import InvitationsView from '../../../../InvitationsView'
+import { ContactDoc } from '../../contact'
+import Badge from '../../../Badge'
+import Text from '../../../Text'
 import './Omnibox.css'
 import InvitationListItem from './InvitationListItem'
-import ListMenuSection from '../../ListMenuSection'
-import ListMenuItem from '../../ListMenuItem'
-import ListMenu from '../../ListMenu'
-import ActionListItem from './ActionListItem'
-import Content from '../../Content'
+import ListMenuSection from '../../../ListMenuSection'
+import ListMenuItem from '../../../ListMenuItem'
+import ListMenu from '../../../ListMenu'
+import Content from '../../../Content'
+import OmniboxWorkspaceContentSection from './OmniboxWorkspaceContentSection'
 
 const log = Debug('pushpin:omnibox')
 
@@ -60,14 +60,14 @@ interface SectionRange {
   end: number
 }
 
-interface Section {
+export interface Section {
   name: string
   label?: string
   actions: Action[]
-  items: (state: State, props: Props) => Item[]
+  items?: (state: State, props: Props) => Item[]
 }
 
-interface Item {
+export interface Item {
   type?: string
   object?: any
   url?: PushpinUrl
@@ -283,7 +283,7 @@ export default class WorkspaceInOmnibox extends React.PureComponent<Props, State
     // add each section definition's items to the output
     this.sectionDefinitions.forEach((sectionDefinition) => {
       // this is really, really not my favorite thing
-      const sectionItems = sectionDefinition.items(this.state, this.props)
+      const sectionItems = sectionDefinition.items!(this.state, this.props)
       // don't tell my mom about this next line
       sectionItems.forEach((item) => {
         item.actions = sectionDefinition.actions
@@ -529,24 +529,6 @@ export default class WorkspaceInOmnibox extends React.PureComponent<Props, State
     return null
   }
 
-  renderContentSection = ({ name, label, actions }: Section) => {
-    const items = this.sectionItems(name)
-
-    if (items.length === 0) {
-      return null
-    }
-    return (
-      <ListMenuSection key={name} title={label}>
-        {items.map(
-          ({ url, selected }) =>
-            url && (
-              <ActionListItem key={url} contentUrl={url} actions={actions} selected={selected} />
-            )
-        )}
-      </ListMenuSection>
-    )
-  }
-
   onClickWorkspace = (e) => {
     if (!this.state.doc) {
       return
@@ -577,9 +559,14 @@ export default class WorkspaceInOmnibox extends React.PureComponent<Props, State
         </div>
         <ListMenu>
           {this.renderInvitationsSection()}
-          {this.sectionDefinitions.map((sectionDefinition) =>
-            this.renderContentSection(sectionDefinition)
-          )}
+          {this.sectionDefinitions.map(({ name, label, actions }) => (
+            <OmniboxWorkspaceContentSection
+              name={name}
+              label={label}
+              actions={actions}
+              materializedItems={this.sectionItems(name)}
+            />
+          ))}
           {this.renderNothingFound()}
         </ListMenu>
       </div>

@@ -1,8 +1,8 @@
 import React from 'react'
-import ListMenuItem, { Stretch } from '../../ListMenuItem'
-import Badge from '../../Badge'
-import Text from '../../Text'
-import SecondaryText from '../../SecondaryText'
+import ListMenuItem, { Stretch } from '../../../ListMenuItem'
+import Badge from '../../../Badge'
+import Text from '../../../Text'
+import SecondaryText from '../../../SecondaryText'
 
 export interface Props {
   invitation: any

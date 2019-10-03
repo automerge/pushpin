@@ -4,8 +4,8 @@
 import React, { useRef, useState, useCallback } from 'react'
 import Debug from 'debug'
 
-import { HypermergeUrl } from '../../../ShareLink'
-import { WorkspaceUrlsApi } from '../../../WorkspaceHooks'
+import { HypermergeUrl } from '../../../../ShareLink'
+import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
 import WorkspaceInOmnibox from './WorkspaceInOmnibox'
 import './Omnibox.css'
 
