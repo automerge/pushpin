@@ -10,21 +10,20 @@ import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 import './TitleBar.css'
 import { useDocument, useEvent } from '../../../Hooks'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
+import { Doc as WorkspaceDoc } from './Workspace'
+import { ContactDoc } from '../contact'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl
   openDoc: Function
 }
 
-interface Doc {
-  currentDocUrl?: PushpinUrl
-}
-
 export default function TitleBar(props: Props) {
   const [sessionHistory, setHistory] = useState<PushpinUrl[]>([])
   const [historyIndex, setIndex] = useState(0)
   const [activeOmnibox, setActive] = useState(false)
-  const [doc] = useDocument<Doc>(props.hypermergeUrl)
+  const [doc] = useDocument<WorkspaceDoc>(props.hypermergeUrl)
+  const [selfDoc] = useDocument<ContactDoc>(doc && doc.selfId)
 
   const dropdownRef = useRef<Dropdown>(null)
 
@@ -105,8 +104,11 @@ export default function TitleBar(props: Props) {
     return null
   }
 
+  const workspaceColor = selfDoc ? selfDoc.color : 'white'
+
   return (
     <div className="TitleBar">
+      <div className="TitleBar-overlay" style={{ '--workspace-color': workspaceColor } as any} />
       <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar__menuItem">
         <i className="fa fa-angle-left" />
       </button>
