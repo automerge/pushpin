@@ -48,3 +48,9 @@
 .Badge--square {
   border-radius: 10%;
 }
+
+/* The clipboard icon is offset, so we have to counteroffset manually. */
+.Badge.fa.fa-clipboard {
+  display: inline-block;
+  transform: translate(2.5%, -3%);
+}
