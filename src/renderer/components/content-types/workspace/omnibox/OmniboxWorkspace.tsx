@@ -8,6 +8,7 @@ import { Doc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
 import OmniboxWorkspaceListMenu from './OmniboxWorkspaceListMenu'
 import ListMenuHeader from '../../../ListMenuHeader'
+import Badge from '../../../Badge'
 
 import './OmniboxWorkspace.css'
 
@@ -37,30 +38,36 @@ export default function OmniboxWorkspace(props: Props) {
   }
 
   const { selfId } = workspaceDoc
-  const { color, name } = selfDoc
+  const { color, name, devices = [] } = selfDoc
 
+  // XXX: the badge here should be an action!
   return (
     <div
       className="OmniboxWorkspace"
       onClick={onClickWorkspace}
       style={{ '--workspace-color': color } as any}
     >
-      <div className="OmniboxWorkspace-TemporaryFigLeaf">
+      <div className="OmniboxWorkspace-overlay">
         <ListMenuHeader>
           <a
             href={createDocumentLink('workspace', hypermergeUrl)}
-            className="OmniboxWorkspace-Title"
+            className="OmniboxWorkspace-name"
           >
             {name}&apos;s Documents
           </a>
-          <a href={createDocumentLink('contact', selfId)}>
-            <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-          </a>
-          <div className="OmniboxWorkspace-CopyBadge" onClick={onClickWorkspaceCopy}>
-            <i
-              className="Badge Badge--circle fa fa-clipboard"
-              style={{ fontSize: '14px', background: color }}
-            />
+          {devices.map((d) => (
+            <div className="OmniboxWorkspace-badge" key={d}>
+              <Content context="title-bar" url={createDocumentLink('device', d)} />
+            </div>
+          ))}
+          <div className="OmniboxWorkspace-badge" key="contact">
+            <a href={createDocumentLink('contact', selfId)}>
+              <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
+            </a>
+          </div>
+
+          <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
+            <Badge shape="circle" icon="clipboard" size="medium" />
           </div>
         </ListMenuHeader>
         {!viewContents ? null : (

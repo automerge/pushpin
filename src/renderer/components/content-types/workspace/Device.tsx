@@ -24,16 +24,25 @@ function Device(props: Props) {
   if (!doc) return null
   const { icon = 'desktop', name } = doc
 
-  return (
-    <div className="DeviceListItem">
-      <Badge icon={icon} shape="circle" />
-      {props.editable ? (
-        <TitleEditor field="name" url={props.hypermergeUrl} />
-      ) : (
-        <div className="DocLink__title">{name}</div>
-      )}
-    </div>
-  )
+  switch (props.context) {
+    case 'title-bar':
+      return (
+        <div className="Device">
+          <Badge icon={doc.icon || 'desktop'} shape="square" size="medium" />
+        </div>
+      )
+    default:
+      return (
+        <div className="DeviceListItem">
+          <Badge icon={icon} shape="circle" />
+          {props.editable ? (
+            <TitleEditor field="name" url={props.hypermergeUrl} />
+          ) : (
+            <div className="DocLink__title">{name}</div>
+          )}
+        </div>
+      )
+  }
 }
 
 function create(deviceAttrs, handle, callback) {
