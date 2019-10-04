@@ -63,6 +63,7 @@ ContentTypes.register({
   icon: 'desktop',
   contexts: {
     list: Device,
+    'title-bar': Device,
     board: Device,
   },
   resizable: false,
