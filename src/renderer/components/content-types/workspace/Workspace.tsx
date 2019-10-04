@@ -2,13 +2,7 @@ import React, { useEffect, useContext } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
 
-import {
-  parseDocumentLink,
-  PushpinUrl,
-  HypermergeUrl,
-  isPushpinUrl,
-  createDocumentLink,
-} from '../../../ShareLink'
+import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
@@ -214,34 +208,12 @@ function create(attrs, handle, callback) {
   callback()
 }
 
-function WorkspaceInTitleBar(props: WorkspaceContentProps) {
-  const [workspace] = useDocument<Doc>(props.hypermergeUrl)
-
-  const selfId = workspace && workspace.selfId
-
-  if (!selfId) {
-    return null
-  }
-  return (
-    <div className="Workspace--TitleBar">
-      <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-      <div className="Workspace--Badge">
-        <i
-          className="Badge Badge--square fa fa-briefcase"
-          style={{ background: 'var(--colorInputGrey)', fontSize: '12px' }}
-        />
-      </div>
-    </div>
-  )
-}
-
 ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
   contexts: {
     root: Workspace,
-    'title-bar': WorkspaceInTitleBar,
     list: WorkspaceInList,
     board: WorkspaceInList,
   },

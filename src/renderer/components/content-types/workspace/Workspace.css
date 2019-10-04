@@ -4,22 +4,6 @@
   height: 100%;
 }
 
-.Workspace--TitleBar {
-  position: relative;
-}
-
-.Workspace--Badge {
-  height: 12px;
-  padding: 2px;
-  position: absolute;
-  left: 18px;
-  bottom: 4px;
-}
-.Workspace--Badge > i {
-  font-size: 12px;
-  padding: 2px;
-}
-
 .Workspace__container {
   margin-top: 40px;
 }
