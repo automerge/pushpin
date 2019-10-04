@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
 
+import Automerge from 'automerge'
 import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
 import * as Hyperfile from '../../../hyperfile'
 
@@ -20,6 +21,7 @@ import ActionListItem from '../workspace/omnibox/ActionListItem'
 import './ContactEditor.css'
 import ContentTypes from '../../../ContentTypes'
 import { CurrentDeviceContext } from '../workspace/Device'
+import { DocUrl } from 'hypermerge'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -106,18 +108,18 @@ export default function ContactEditor(props: ContentProps) {
   }
 
   function removeDevice(url: PushpinUrl) {
-    console.log(url, doc)
-
     const { hypermergeUrl } = parseDocumentLink(url)
     changeDoc((d) => {
-      if (!d.devices) {
+      const devices = d.devices as Automerge.List<DocUrl>
+      if (!devices) {
         return
       }
-      const dPos = d.devices.findIndex((u) => u === hypermergeUrl)
+      const dPos = devices.findIndex((u) => u === hypermergeUrl)
       if (!dPos) {
         return
       }
-      delete d.devices[dPos]
+      // the automerge type for deleteAt is wrong
+      devices.deleteAt!(dPos)
     })
   }
 
