@@ -7,17 +7,26 @@ type Circle = 'circle'
 type Square = 'square'
 export type BadgeShape = Circle | Square
 
+type Large = 'large'
+type TitleBar = 'titleBar'
+type Overlay = 'overlay'
+export type BadgeSize = Large | TitleBar | Overlay
+
 export interface Props {
   icon: string
   backgroundColor?: string
   shape?: BadgeShape
+  size?: BadgeSize
 }
 
 export default React.forwardRef(
-  ({ icon, backgroundColor, shape = 'circle' }: Props, ref: React.Ref<HTMLElement>) => (
+  (
+    { icon, backgroundColor, size = 'large', shape = 'circle' }: Props,
+    ref: React.Ref<HTMLElement>
+  ) => (
     <i
       ref={ref}
-      className={`Badge Badge--${shape} fa fa-${icon}`}
+      className={`Badge Badge-${size} Badge-${shape} fa fa-${icon}`}
       style={{ background: backgroundColor }}
     />
   )

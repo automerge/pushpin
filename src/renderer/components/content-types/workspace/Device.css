@@ -1,3 +1,7 @@
+.Device {
+  padding: 4px;
+}
+
 .DeviceListItem {
   display: flex;
   align-items: center;

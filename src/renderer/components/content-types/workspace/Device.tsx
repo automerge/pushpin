@@ -20,7 +20,7 @@ function Device(props: ContentProps) {
   switch (props.context) {
     case 'title-bar':
       return (
-        <div className="DeviceListItem">
+        <div className="Device">
           <Badge icon={doc.icon || 'desktop'} shape="square" />
         </div>
       )

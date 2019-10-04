@@ -8,6 +8,7 @@ import { Doc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
 import OmniboxWorkspaceListMenu from './OmniboxWorkspaceListMenu'
 import ListMenuHeader from '../../../ListMenuHeader'
+import Badge from '../../../Badge'
 
 import './OmniboxWorkspace.css'
 
@@ -39,6 +40,7 @@ export default function OmniboxWorkspace(props: Props) {
   const { selfId } = workspaceDoc
   const { color, name, devices = [] } = selfDoc
 
+  // XXX: the badge here should be an action!
   return (
     <div
       className="OmniboxWorkspace"
@@ -62,10 +64,7 @@ export default function OmniboxWorkspace(props: Props) {
             <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
           </a>
           <div className="OmniboxWorkspace-CopyBadge" onClick={onClickWorkspaceCopy}>
-            <i
-              className="Badge Badge--circle fa fa-clipboard"
-              style={{ fontSize: '14px', background: color }}
-            />
+            <Badge shape="circle" icon="clipboard" size="titleBar" color={color} />
           </div>
         </ListMenuHeader>
         {!viewContents ? null : (

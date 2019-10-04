@@ -23,6 +23,7 @@ import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
 
 import WorkspaceInList from './WorkspaceInList'
+import Badge from '../../Badge'
 
 const log = Debug('pushpin:workspace')
 
@@ -214,34 +215,12 @@ function create(attrs, handle, callback) {
   callback()
 }
 
-function WorkspaceInTitleBar(props: WorkspaceContentProps) {
-  const [workspace] = useDocument<Doc>(props.hypermergeUrl)
-
-  const selfId = workspace && workspace.selfId
-
-  if (!selfId) {
-    return null
-  }
-  return (
-    <div className="Workspace--TitleBar">
-      <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-      <div className="Workspace--Badge">
-        <i
-          className="Badge Badge--square fa fa-briefcase"
-          style={{ background: 'var(--colorInputGrey)', fontSize: '12px' }}
-        />
-      </div>
-    </div>
-  )
-}
-
 ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
   contexts: {
     root: Workspace,
-    'title-bar': WorkspaceInTitleBar,
     list: WorkspaceInList,
     board: WorkspaceInList,
   },

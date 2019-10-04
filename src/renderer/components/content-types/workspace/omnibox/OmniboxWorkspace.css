@@ -20,6 +20,11 @@
   color: var(--colorBlueBlack);
 }
 
+.OmniboxWorkspace-Devices {
+  display: flex;
+  flex-direction: row;
+}
+
 .OmniboxWorkspace > .ListMenu {
   background-color: white;
   padding-left: 8px;
