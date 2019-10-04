@@ -2,34 +2,21 @@
   background-color: var(--workspace-color);
 }
 
-.OmniboxWorkspace-TemporaryFigLeaf {
-  padding: 4px 0 0 4px;
+.OmniboxWorkspace-overlay {
+  padding-left: 4px;
   background-color: white;
   opacity: 0.9;
 }
 
-.OmniboxWorkspace-Header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border-bottom: var(--colorSecondaryGray);
-}
-
-.OmniboxWorkspace-Title {
+.OmniboxWorkspace-name {
   flex-grow: 1;
   color: var(--colorBlueBlack);
 }
 
-.OmniboxWorkspace-Devices {
-  display: flex;
-  flex-direction: row;
+.OmniboxWorkspace-badge {
+  margin-left: 4px;
 }
 
-.OmniboxWorkspace > .ListMenu {
-  background-color: white;
-  padding-left: 8px;
-}
-
-.OmniboxWorkspace-CopyBadge {
+.OmniboxWorkspace-copyBadge {
   padding-left: 4px;
 }

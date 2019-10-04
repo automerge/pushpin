@@ -47,24 +47,27 @@ export default function OmniboxWorkspace(props: Props) {
       onClick={onClickWorkspace}
       style={{ '--workspace-color': color } as any}
     >
-      <div className="OmniboxWorkspace-TemporaryFigLeaf">
+      <div className="OmniboxWorkspace-overlay">
         <ListMenuHeader>
           <a
             href={createDocumentLink('workspace', hypermergeUrl)}
-            className="OmniboxWorkspace-Title"
+            className="OmniboxWorkspace-name"
           >
             {name}&apos;s Documents
           </a>
-          <div className="OmniboxWorkspace-Devices">
-            {devices.map((d) => (
-              <Content key={d} context="title-bar" url={createDocumentLink('device', d)} />
-            ))}
+          {devices.map((d) => (
+            <div className="OmniboxWorkspace-badge" key={d}>
+              <Content context="title-bar" url={createDocumentLink('device', d)} />
+            </div>
+          ))}
+          <div className="OmniboxWorkspace-badge" key="contact">
+            <a href={createDocumentLink('contact', selfId)}>
+              <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
+            </a>
           </div>
-          <a href={createDocumentLink('contact', selfId)}>
-            <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-          </a>
-          <div className="OmniboxWorkspace-CopyBadge" onClick={onClickWorkspaceCopy}>
-            <Badge shape="circle" icon="clipboard" size="titleBar" color={color} />
+
+          <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
+            <Badge shape="circle" icon="clipboard" size="medium" />
           </div>
         </ListMenuHeader>
         {!viewContents ? null : (

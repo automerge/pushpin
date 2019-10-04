@@ -21,7 +21,7 @@ function Device(props: ContentProps) {
     case 'title-bar':
       return (
         <div className="Device">
-          <Badge icon={doc.icon || 'desktop'} shape="square" />
+          <Badge icon={doc.icon || 'desktop'} shape="square" size="medium" />
         </div>
       )
     default:

@@ -2,13 +2,7 @@ import React, { useEffect, useContext } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
 
-import {
-  parseDocumentLink,
-  PushpinUrl,
-  HypermergeUrl,
-  isPushpinUrl,
-  createDocumentLink,
-} from '../../../ShareLink'
+import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
@@ -23,7 +17,6 @@ import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
 
 import WorkspaceInList from './WorkspaceInList'
-import Badge from '../../Badge'
 
 const log = Debug('pushpin:workspace')
 
