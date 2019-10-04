@@ -29,7 +29,7 @@ export default function TitleEditor(props: Props) {
   }
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    changeDoc((doc: Doc) => {
+    changeDoc((doc: AnyDoc) => {
       doc[field] = e.target.value
     })
   }

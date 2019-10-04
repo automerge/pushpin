@@ -2,7 +2,7 @@ import React from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import { createDocumentLink } from '../../../ShareLink'
+import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
 import * as Hyperfile from '../../../hyperfile'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
@@ -14,6 +14,8 @@ import Label from '../../Label'
 import { useDocument } from '../../../Hooks'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
+
+import ActionListItem from '../workspace/omnibox/ActionListItem'
 
 import './ContactEditor.css'
 import ContentTypes from '../../../ContentTypes'
@@ -101,10 +103,46 @@ export default function ContactEditor(props: ContentProps) {
     avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   }
 
+  function removeDevice(url: PushpinUrl) {
+    console.log(url, doc)
+
+    const { hypermergeUrl } = parseDocumentLink(url)
+    changeDoc((d) => {
+      if (!d.devices) {
+        return
+      }
+      const dPos = d.devices.findIndex((u) => u === hypermergeUrl)
+      if (!dPos) {
+        return
+      }
+      delete d.devices[dPos]
+    })
+  }
+
+  const deviceActions = [
+    {
+      name: 'remove',
+      destructive: true,
+      callback: (url: PushpinUrl) => () => removeDevice(url),
+      faIcon: 'fa-trash',
+      label: 'Remove',
+      shortcut: '⌘+⌫',
+      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    },
+  ]
   let renderedDevices
   if (devices) {
     renderedDevices = devices.map((d) => (
-      <Content key={d} context="board" url={createDocumentLink('device', d)} editable />
+      <div className="ContactEditor-DeviceEntry">
+        <ActionListItem
+          key={d}
+          contentUrl={createDocumentLink('device', d)}
+          actions={deviceActions} // once we know the current device, don't allow removal of it
+          selected={false}
+        >
+          <Content context="list" url={createDocumentLink('device', d)} editable />
+        </ActionListItem>
+      </div>
     ))
   } else {
     renderedDevices = <SecondaryText>No devices registered...</SecondaryText>

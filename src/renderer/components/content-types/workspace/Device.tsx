@@ -23,6 +23,7 @@ function Device(props: Props) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
   if (!doc) return null
   const { icon = 'desktop', name } = doc
+
   return (
     <div className="DeviceListItem">
       <Badge icon={icon} shape="circle" />
@@ -36,8 +37,13 @@ function Device(props: Props) {
 }
 
 function create(deviceAttrs, handle, callback) {
-  handle.change((doc: DeviceDoc) => {
-    doc.name = Os.hostname()
+  ;(navigator as any).getBattery().then((b) => {
+    const isLaptop = b.chargingTime !== 0
+    const icon = isLaptop ? 'laptop' : 'desktop'
+    handle.change((doc: DeviceDoc) => {
+      doc.name = Os.hostname()
+      doc.icon = icon
+    })
   })
   callback()
 }
@@ -47,7 +53,7 @@ ContentTypes.register({
   name: 'Device',
   icon: 'desktop',
   contexts: {
-    'title-bar': Device,
+    list: Device,
     board: Device,
   },
   resizable: false,

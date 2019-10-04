@@ -2,6 +2,7 @@ import React from 'react'
 import ActionListItem from './ActionListItem'
 import ListMenuSection from '../../../ListMenuSection'
 import { Action, Item } from './OmniboxWorkspaceListMenu'
+import Content from '../../../Content'
 
 interface Props {
   name: string
@@ -18,7 +19,11 @@ export default function OmniboxWorkspaceListMenuSection({ name, label, actions, 
     <ListMenuSection key={name} title={label}>
       {items.map(
         ({ url, selected }) =>
-          url && <ActionListItem key={url} contentUrl={url} actions={actions} selected={selected} />
+          url && (
+            <ActionListItem key={url} contentUrl={url} actions={actions} selected={selected}>
+              <Content context="list" url={url} />
+            </ActionListItem>
+          )
       )}
     </ListMenuSection>
   )
