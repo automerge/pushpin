@@ -8,19 +8,29 @@ import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
 import './Device.css'
+import TitleEditor from '../../TitleEditor'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
   name: string
 }
 
-function Device(props: ContentProps) {
+interface Props extends ContentProps {
+  editable: boolean
+}
+
+function Device(props: Props) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
   if (!doc) return null
+  const { icon = 'desktop', name } = doc
   return (
     <div className="DeviceListItem">
-      <Badge icon={doc.icon || 'desktop'} shape="square" />
-      <div className="DeviceListItem__title">{doc.name}</div>
+      <Badge icon={icon} shape="circle" />
+      {props.editable ? (
+        <TitleEditor field="name" url={props.hypermergeUrl} />
+      ) : (
+        <div className="DocLink__title">{name}</div>
+      )}
     </div>
   )
 }

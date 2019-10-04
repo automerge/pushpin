@@ -104,7 +104,7 @@ export default function ContactEditor(props: ContentProps) {
   let renderedDevices
   if (devices) {
     renderedDevices = devices.map((d) => (
-      <Content key={d} context="board" url={createDocumentLink('device', d)} />
+      <Content key={d} context="board" url={createDocumentLink('device', d)} editable />
     ))
   } else {
     renderedDevices = <SecondaryText>No devices registered...</SecondaryText>

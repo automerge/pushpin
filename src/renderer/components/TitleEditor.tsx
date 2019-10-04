@@ -4,12 +4,13 @@ import './TitleEditor.css'
 import { HypermergeUrl } from '../ShareLink'
 import { useDocument } from '../Hooks'
 
-interface Doc {
-  title?: string
+interface AnyDoc {
+  [field: string]: string
 }
 
 interface Props {
   url: HypermergeUrl
+  field?: string
   placeholder?: string
   preventDrag?: boolean
 }
@@ -17,9 +18,9 @@ interface Props {
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
 export default function TitleEditor(props: Props) {
-  const [doc, changeDoc] = useDocument<Doc>(props.url)
+  const [doc, changeDoc] = useDocument<AnyDoc>(props.url)
   const input = useRef<HTMLInputElement>(null)
-  const { preventDrag = false, placeholder = '' } = props
+  const { field = 'title', preventDrag = false, placeholder = '' } = props
 
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === 'Escape') {
@@ -29,7 +30,7 @@ export default function TitleEditor(props: Props) {
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     changeDoc((doc: Doc) => {
-      doc.title = e.target.value
+      doc[field] = e.target.value
     })
   }
 
@@ -52,7 +53,7 @@ export default function TitleEditor(props: Props) {
       onDragStart={onDragStart}
       type="text"
       className="TitleEditor"
-      value={doc.title}
+      value={doc[field]}
       placeholder={placeholder}
       onKeyDown={onKeyDown}
       onChange={onChange}
