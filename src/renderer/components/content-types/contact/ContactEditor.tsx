@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
 
@@ -19,6 +19,7 @@ import ActionListItem from '../workspace/omnibox/ActionListItem'
 
 import './ContactEditor.css'
 import ContentTypes from '../../../ContentTypes'
+import { CurrentDeviceContext } from '../workspace/Device'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -46,6 +47,7 @@ export const USER_COLORS = {
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
+  const currentDeviceId = useContext(CurrentDeviceContext)
 
   if (!doc) {
     return null
@@ -130,20 +132,21 @@ export default function ContactEditor(props: ContentProps) {
       keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
     },
   ]
+
   let renderedDevices
   if (devices) {
-    renderedDevices = devices.map((d) => (
-      <div className="ContactEditor-DeviceEntry">
+    renderedDevices = devices
+      .map((d) => createDocumentLink('device', d))
+      .map((d) => (
         <ActionListItem
           key={d}
-          contentUrl={createDocumentLink('device', d)}
-          actions={deviceActions} // once we know the current device, don't allow removal of it
+          contentUrl={d}
+          actions={d === currentDeviceId ? [] : deviceActions}
           selected={false}
         >
-          <Content context="list" url={createDocumentLink('device', d)} editable />
+          <Content context="list" url={d} editable />
         </ActionListItem>
-      </div>
-    ))
+      ))
   } else {
     renderedDevices = <SecondaryText>No devices registered...</SecondaryText>
   }

@@ -20,7 +20,13 @@ export default function OmniboxWorkspaceListMenuSection({ name, label, actions, 
       {items.map(
         ({ url, selected }) =>
           url && (
-            <ActionListItem key={url} contentUrl={url} actions={actions} selected={selected}>
+            <ActionListItem
+              key={url}
+              contentUrl={url}
+              defaultAction={actions[0]}
+              actions={actions}
+              selected={selected}
+            >
               <Content context="list" url={url} />
             </ActionListItem>
           )

@@ -5,6 +5,7 @@ import ListMenuItem, { Stretch } from '../../../ListMenuItem'
 
 export interface Props {
   contentUrl: PushpinUrl
+  defaultAction?: ActionItem
   actions: ActionItem[]
   selected: boolean
   children: ReactNode
@@ -17,8 +18,7 @@ ActionListItem.defaultProps = {
 
 // TODO: item highlighting
 export default function ActionListItem(props: Props) {
-  const { children, contentUrl, actions, selected } = props
-  const [defaultAction] = actions
+  const { children, contentUrl, actions, selected, defaultAction } = props
   const onClick = defaultAction ? defaultAction.callback(contentUrl) : undefined
   return (
     <ListMenuItem selected={selected} onClick={onClick}>
