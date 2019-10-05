@@ -26,7 +26,7 @@
   "main": "./dist/main.js",
   "config": {},
   "dependencies": {
-    "automerge": "github:automerge/automerge#text-control-objects",
+    "automerge": "github:automerge/automerge#hypermerge-patch-set",
     "bs58": "^4.0.1",
     "classnames": "^2.2.6",
     "diff-match-patch": "^1.0.4",
@@ -116,7 +116,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "resolutions": {
-    "automerge": "github:automerge/automerge#text-control-objects",
+    "automerge": "github:automerge/automerge#hypermerge-patch-set",
     "random-access-file": "https://github.com/pvh/random-access-file",
     "utp-native": "^2.1.4",
     "iltorb": "^2.4.3"

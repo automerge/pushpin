@@ -14,6 +14,15 @@
   border: solid 1px var(--colorPaleGrey);
 }
 
+.hide-ql-toolbar > .ql-toolbar {
+  display: none;
+}
+
+.ql-toolbar {
+  position: fixed;
+  top: 40px;
+}
+
 .ql-editor {
   padding: calc(var(--halfCellSize) - 1px);
   box-sizing: border-box;

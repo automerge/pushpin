@@ -24,7 +24,7 @@ TextContent.defaultWidth = 12
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
-  const [ref] = useQuill({
+  const [quillRef] = useQuill({
     text: doc && doc.text,
     change(fn) {
       changeDoc((doc) => fn(doc.text))
@@ -33,7 +33,26 @@ export default function TextContent(props: Props) {
     config: {
       theme: 'snow',
       modules: {
-        toolbar: props.context === 'workspace' ? undefined : false,
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+          ['blockquote', 'code-block'],
+
+          [{ header: 1 }, { header: 2 }], // custom button values
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          [{ script: 'sub' }, { script: 'super' }], // superscript/subscript
+          [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+          [{ direction: 'rtl' }], // text direction
+
+          [{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+          [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+          [{ font: [] }],
+          [{ align: [] }],
+
+          ['clean'], // remove formatting button
+        ],
+
         history: {
           maxStack: 500,
           userOnly: true,
@@ -42,7 +61,16 @@ export default function TextContent(props: Props) {
     },
   })
 
-  return <div className="TextContent" ref={ref} onPaste={stopPropagation} />
+  const shouldHideToolbar = props.context !== 'workspace'
+
+  return (
+    <div
+      className={`TextContent ${shouldHideToolbar ? 'hide-ql-toolbar' : ''}`}
+      onPaste={stopPropagation}
+    >
+      <div ref={quillRef} />
+    </div>
+  )
 }
 
 interface QuillOpts {
