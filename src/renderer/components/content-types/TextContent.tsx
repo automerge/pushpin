@@ -3,6 +3,8 @@ import { Handle } from 'hypermerge'
 
 import Automerge from 'automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
+import MarkdownShortcuts from 'quill-markdown-shortcuts'
+
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument, useStaticCallback } from '../../Hooks'
@@ -21,6 +23,8 @@ TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 12
 
+Quill.register('modules/markdownShortcuts', MarkdownShortcuts)
+
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
 
@@ -33,6 +37,7 @@ export default function TextContent(props: Props) {
     config: {
       theme: 'snow',
       modules: {
+        markdownShortcuts: {},
         toolbar: [
           ['bold', 'italic', 'underline', 'strike'], // toggled buttons
           ['blockquote', 'code-block'],
