@@ -9,6 +9,8 @@ import { ContentProps } from '../Content'
 import { ChangeFn, useDocument } from '../../Hooks'
 import { HypermergeUrl } from '../../ShareLink'
 
+import newCss from './UrlContent.css'
+
 const log = Debug('pushpin:url')
 
 interface UrlData {
@@ -20,6 +22,7 @@ interface UrlData {
 
 interface UrlDoc {
   url?: string
+  html?: string
   data?: UrlData | { error: string } // TODO: move error to top-level
   imageHyperfileUrl?: string
 }
@@ -225,13 +228,40 @@ function removeEmpty(obj: object) {
   })
 }
 
-function create({ url }, handle: Handle<UrlDoc>, callback) {
+function create({ url, html }, handle: Handle<UrlDoc>, callback) {
   if (url) {
     handle.change((doc) => {
       doc.url = url
+      doc.html = html
     })
   }
   callback()
+}
+
+function UrlFullscreenContent(props: ContentProps) {
+  const [doc] = useDocument<UrlDoc>(props.hypermergeUrl)
+
+  const onLoadIFrame = useCallback((event: React.SyntheticEvent<HTMLIFrameElement>) => {
+    const obj = event.target as HTMLIFrameElement
+    if (!obj || !obj.contentWindow) return
+    obj.style.height = `${obj.contentWindow.document.body.scrollHeight}px`
+  }, [])
+
+  if (!doc || !doc.url || !doc.html) {
+    return null
+  }
+  return (
+    <div className={newCss.Fullscreen}>
+      <iframe
+        title="Embedded Content"
+        frameBorder="0"
+        className={newCss.Fullscreen_IFrame}
+        srcDoc={doc.html}
+        onLoad={onLoadIFrame}
+      />
+      <div className={newCss.Fullscreen_Banner}>{doc.url}</div>
+    </div>
+  )
 }
 
 ContentTypes.register({
@@ -239,7 +269,7 @@ ContentTypes.register({
   name: 'URL',
   icon: 'chain',
   contexts: {
-    workspace: UrlContent,
+    workspace: UrlFullscreenContent,
     board: UrlContent,
   },
   create,

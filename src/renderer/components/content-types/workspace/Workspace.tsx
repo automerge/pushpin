@@ -129,13 +129,14 @@ export default function Workspace(props: WorkspaceContentProps) {
   }
 
   function importClip(payload: any) {
+    console.log('importing', payload)
     const { contentType, content } = payload
     if (!contentType || !content) {
       throw new Error('bad clip message')
     }
     switch (contentType) {
       case 'Text':
-        importPlainText(content, (importedUrl) =>
+        importPlainText(content.text, (importedUrl) =>
           changeWorkspace((d) => {
             if (!d.clips) {
               d.clips = []
