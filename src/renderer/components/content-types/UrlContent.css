@@ -1,0 +1,44 @@
+:local(.Fullscreen_Banner) {
+  background: #f6f6f6;
+  position: absolute;
+  height: 30px;
+  bottom: 0px;
+  width: 100%;
+  font-size: 12px;
+  font-style: medium;
+  text-align: center;
+  vertical-align: center;
+  line-height: 30px;
+  color: #b4b4b4;
+}
+
+:local(.Embed) {
+  border-radius: 3px;
+  border: 1px solid black;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+}
+
+:local(.Embed_ScaleWrapper) {
+  transform: scale(0.25);
+  transform-origin: 0 0;
+}
+
+:local(.Fullscreen) {
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+
+:local(.Fullscreen_IFrame) {
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+:local(.Embed_IFrame) {
+  overflow: hidden;
+  pointer-events: none;
+}
