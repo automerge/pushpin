@@ -199,6 +199,7 @@ em {
   display: flex;
   align-items: center;
   width: 100%;
+  min-width: 0; /* this prevents title overflow */
 }
 
 .DocLink__title {
