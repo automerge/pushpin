@@ -6,6 +6,7 @@
   padding-left: 4px;
   background-color: white;
   opacity: 0.9;
+  z-index: -1;
 }
 
 .OmniboxWorkspace-name {
