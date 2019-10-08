@@ -1204,6 +1204,7 @@ atomic-batcher@^1.0.2:
 
 automerge@^0.12.1, "automerge@github:automerge/automerge#hypermerge-patch-set":
   version "0.12.1"
+  uid d561e5dcc4e299118f12fb3c0acad49a89d7799c
   resolved "https://codeload.github.com/automerge/automerge/tar.gz/d561e5dcc4e299118f12fb3c0acad49a89d7799c"
   dependencies:
     immutable "^3.8.2"
