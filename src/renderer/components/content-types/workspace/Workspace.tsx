@@ -131,8 +131,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   function importClip(payload: any) {
     const { contentType, content } = payload
     if (!contentType || !content) {
-      console.log('bad clip message', payload)
-      return
+      throw new Error('bad clip message')
     }
     switch (contentType) {
       case 'Text':
@@ -146,7 +145,7 @@ export default function Workspace(props: WorkspaceContentProps) {
         )
         break
       default:
-        console.log('no idea how to deal with ', payload)
+        throw new Error(`no idea how to deal with ${payload.contentType}`)
     }
   }
 
