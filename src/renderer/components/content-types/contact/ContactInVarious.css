@@ -22,7 +22,19 @@
   text-overflow: ellipsis;
 }
 
-.Contact-avatar {
+.Contact-name {
   flex: none;
   margin-right: 8px;
+}
+
+.Contact-avatar {
+  position: relative;
+}
+
+.Contact-device {
+  position: absolute;
+  right: -3px;
+  bottom: -4px;
+  color: white;
+  font-size: 10px;
 }

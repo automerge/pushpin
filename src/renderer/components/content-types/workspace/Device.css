@@ -1,3 +1,7 @@
+.Device--online {
+  color: white;
+}
+
 .DeviceListItem {
   display: flex;
   align-items: center;
@@ -5,7 +9,11 @@
   margin-bottom: 4px;
 }
 
-.DeviceListItem__title {
+.DeviceListItem--online {
+  color: white;
+}
+
+.DeviceListItem-title {
   margin-left: 10px;
   -webkit-user-drag: none;
   user-select: none;

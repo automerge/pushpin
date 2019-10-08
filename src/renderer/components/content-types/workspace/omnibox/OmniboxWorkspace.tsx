@@ -62,7 +62,11 @@ export default function OmniboxWorkspace(props: Props) {
           ))}
           <div className="OmniboxWorkspace-badge" key="contact">
             <a href={createDocumentLink('contact', selfId)}>
-              <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
+              <Content
+                context="title-bar"
+                isShowingDeviceStatus={false}
+                url={createDocumentLink('contact', selfId)}
+              />
             </a>
           </div>
 

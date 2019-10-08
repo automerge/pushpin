@@ -13,14 +13,18 @@ import Label from '../../Label'
 
 import './ContactInVarious.css'
 import { useDocument } from '../../../Hooks'
-import { usePresence } from '../../../PresenceHooks'
+import { useContactOnlineDevice } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:settings')
 
-export default function ContactInVarious(props: ContentProps) {
-  const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
-  const presences = usePresence<{}>(props.hypermergeUrl)
+export interface Props extends ContentProps {
+  isShowingDeviceStatus: boolean
+}
 
+export default function ContactInVarious(props: Props) {
+  const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
+
+  const { isShowingDeviceStatus = true } = props
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
 
@@ -28,7 +32,8 @@ export default function ContactInVarious(props: ContentProps) {
   const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
     avatarImageDoc || {}
 
-  const isOnline = presences.length > 0 || props.selfId === props.hypermergeUrl
+  const onlineDevice = useContactOnlineDevice(props.hypermergeUrl)
+  const isOnline = !!onlineDevice
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData(
@@ -59,12 +64,19 @@ export default function ContactInVarious(props: ContentProps) {
   )
 
   const avatar = (
-    <div
-      className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
-      style={{ ['--highlight-color' as any]: color }}
-      data-name={name}
-    >
-      {avatarImage}
+    <div className="Contact-avatar">
+      <div
+        className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
+        style={{ ['--highlight-color' as any]: color }}
+        data-name={name}
+      >
+        {avatarImage}
+      </div>
+      {isShowingDeviceStatus && (
+        <div className="Contact-device">
+          {onlineDevice && <Content context="title-bar" url={onlineDevice} />}
+        </div>
+      )}
     </div>
   )
 
@@ -77,7 +89,7 @@ export default function ContactInVarious(props: ContentProps) {
     case 'list':
       return (
         <div draggable onDragStart={onDragStart} className="DocLink">
-          <div className="Contact-avatar">{avatar}</div>
+          <div className="Contact-name">{avatar}</div>
           <Label>
             <Text>{name}</Text>
           </Label>

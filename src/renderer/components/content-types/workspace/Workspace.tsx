@@ -44,6 +44,7 @@ export default function Workspace(props: WorkspaceContentProps) {
 
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
+  useHeartbeat(currentDeviceUrl ? parseDocumentLink(currentDeviceUrl).hypermergeUrl : null)
   useHeartbeat(currentDocUrl)
 
   const sendToSystem = useSystem(

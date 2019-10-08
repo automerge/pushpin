@@ -9,11 +9,15 @@ import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
 import './Device.css'
 import TitleEditor from '../../TitleEditor'
+import { useDeviceOnlineStatus } from '../../../PresenceHooks'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
   name: string
 }
+
+const ONLINE_COLOR = '#33AB77'
+const OFFLINE_COLOR = 'lightgray'
 
 interface Props extends ContentProps {
   editable: boolean
@@ -21,20 +25,30 @@ interface Props extends ContentProps {
 
 function Device(props: Props) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
+  const isOnline = useDeviceOnlineStatus(props.hypermergeUrl)
   if (!doc) return null
   const { icon = 'desktop', name } = doc
 
   switch (props.context) {
     case 'title-bar':
       return (
-        <div className="Device">
-          <Badge icon={doc.icon || 'desktop'} shape="square" size="medium" />
+        <div className={isOnline ? 'Device Device--online' : 'Device'}>
+          <Badge
+            icon={doc.icon || 'desktop'}
+            shape="circle"
+            size="small"
+            backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
+          />
         </div>
       )
     default:
       return (
-        <div className="DeviceListItem">
-          <Badge icon={icon} shape="circle" />
+        <div className={isOnline ? 'DeviceListItem DeviceListItem--online' : 'DeviceListItem'}>
+          <Badge
+            icon={icon}
+            shape="circle"
+            backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
+          />
           {props.editable ? (
             <TitleEditor field="name" url={props.hypermergeUrl} />
           ) : (
