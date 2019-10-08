@@ -228,11 +228,16 @@ function removeEmpty(obj: object) {
   })
 }
 
-function create({ url, html }, handle: Handle<UrlDoc>, callback) {
+function create({ url, src, content }, handle: Handle<UrlDoc>, callback) {
   if (url) {
     handle.change((doc) => {
       doc.url = url
-      doc.html = html
+    })
+  }
+  if (content) {
+    handle.change((doc) => {
+      doc.url = src // hmmm
+      doc.html = content
     })
   }
   callback()
