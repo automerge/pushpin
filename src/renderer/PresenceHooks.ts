@@ -175,7 +175,7 @@ export function usePresence<P>(
  * device for that context. Will return undefined if no device is online for the contact.
  * If the contact is self (the current user), will return the current device.
  */
-export function useContactOnlineDevice(contact: HypermergeUrl | null): PushpinUrl | undefined {
+export function useOnlineDeviceForContact(contact: HypermergeUrl | null): PushpinUrl | undefined {
   const selfId = useSelfId()
   const selfDevice = useContext(CurrentDeviceContext)
 
@@ -191,7 +191,7 @@ export function useContactOnlineDevice(contact: HypermergeUrl | null): PushpinUr
  * For a given device, return whether or not the device is online.
  * If the passed device is the current device, always returns true.
  */
-export function useDeviceOnlineStatus(deviceUrl: HypermergeUrl | null): boolean {
+export function useOnlineStatusForDevice(deviceUrl: HypermergeUrl | null): boolean {
   const localDevice = useContext(CurrentDeviceContext)
   const remotePresence = useRemotePresence(deviceUrl)
   const isSelf = localDevice && parseDocumentLink(localDevice).hypermergeUrl === deviceUrl

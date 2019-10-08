@@ -13,7 +13,7 @@ import Label from '../../Label'
 
 import './ContactInVarious.css'
 import { useDocument } from '../../../Hooks'
-import { useContactOnlineDevice } from '../../../PresenceHooks'
+import { useOnlineDeviceForContact } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:settings')
 
@@ -32,7 +32,7 @@ export default function ContactInVarious(props: Props) {
   const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
     avatarImageDoc || {}
 
-  const onlineDevice = useContactOnlineDevice(props.hypermergeUrl)
+  const onlineDevice = useOnlineDeviceForContact(props.hypermergeUrl)
   const isOnline = !!onlineDevice
 
   function onDragStart(e: React.DragEvent) {
