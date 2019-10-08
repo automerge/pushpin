@@ -35,6 +35,17 @@ function Device(props: Props) {
         <div className={isOnline ? 'Device Device--online' : 'Device'}>
           <Badge
             icon={doc.icon || 'desktop'}
+            shape="square"
+            size="medium"
+            backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
+          />
+        </div>
+      )
+    case 'contact':
+      return (
+        <div className={isOnline ? 'Device Device--online' : 'Device'}>
+          <Badge
+            icon={doc.icon || 'desktop'}
             shape="circle"
             size="small"
             backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
@@ -78,6 +89,7 @@ ContentTypes.register({
   contexts: {
     list: Device,
     'title-bar': Device,
+    contact: Device,
     board: Device,
   },
   resizable: false,

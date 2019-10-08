@@ -74,7 +74,7 @@ export default function ContactInVarious(props: Props) {
       </div>
       {isShowingDeviceStatus && (
         <div className="Contact-device">
-          {onlineDevice && <Content context="title-bar" url={onlineDevice} />}
+          {onlineDevice && <Content context="contact" url={onlineDevice} />}
         </div>
       )}
     </div>

@@ -33,8 +33,7 @@
 
 .Contact-device {
   position: absolute;
-  right: -3px;
-  bottom: -4px;
+  right: 0;
+  bottom: 0;
   color: white;
-  font-size: 10px;
 }
