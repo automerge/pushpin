@@ -13,7 +13,6 @@ import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 import System, { FromSystemMsg } from './System'
-import { importDataTransfer } from './ImportData'
 
 window._debug = {}
 
