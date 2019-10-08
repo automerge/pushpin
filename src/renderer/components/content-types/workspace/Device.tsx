@@ -36,7 +36,7 @@ function Device(props: Props) {
           <Badge
             icon={doc.icon || 'desktop'}
             shape="square"
-            size="medium"
+            size="large"
             backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
           />
         </div>

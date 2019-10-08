@@ -71,7 +71,7 @@ export default function OmniboxWorkspace(props: Props) {
           </div>
 
           <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
-            <Badge shape="circle" icon="clipboard" size="medium" />
+            <Badge shape="circle" icon="clipboard" size="large" />
           </div>
         </ListMenuHeader>
         {!viewContents ? null : (

@@ -5,13 +5,13 @@
 }
 
 .Badge--large {
-  padding: 8px;
-  font-size: 24px;
+  padding: 6px;
+  font-size: 20px;
 }
 
 .Badge--medium {
   padding: 4px;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .Badge--small {
