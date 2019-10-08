@@ -1,6 +1,7 @@
 .Badge {
   cursor: pointer;
   background-color: #d5dfe5;
+  line-height: 1;
 }
 
 .Badge--large {
@@ -17,6 +18,7 @@
   padding: 2px;
   font-size: 10px;
 }
+
 
 .Badge--blue {
   background: #8edce6;
@@ -50,7 +52,7 @@
 }
 
 /* The clipboard icon is offset, so we have to counteroffset manually. */
-.Badge.fa.fa-clipboard:before {
+.Badge .fa.fa-clipboard:before {
   display: inline-block;
-  transform: translate(2.5%, -3%);
+  transform: translate(5.5%, -3%);
 }
