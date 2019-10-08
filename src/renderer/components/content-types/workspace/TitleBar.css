@@ -21,6 +21,7 @@
   height: 40px;
   background-color: var(--workspace-color);
   opacity: 0.1;
+  z-index: -1;
 }
 
 .TitleBar__menuItem .fa {
