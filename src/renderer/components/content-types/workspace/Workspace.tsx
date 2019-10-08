@@ -17,12 +17,14 @@ import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
 
 import WorkspaceInList from './WorkspaceInList'
+import { importPlainText } from '../../../ImportData'
 
 const log = Debug('pushpin:workspace')
 
 export interface Doc {
   selfId: HypermergeUrl
   contactIds: HypermergeUrl[]
+  clips: PushpinUrl[] // this is a poor design, but fine(ish) for a POC
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
@@ -52,7 +54,9 @@ export default function Workspace(props: WorkspaceContentProps) {
         case 'IncomingUrl':
           openDoc(msg.url)
           break
-
+        case 'IncomingClip':
+          importClip(msg.payload)
+          break
         case 'NewDocument':
           if (!selfId) break
           ContentTypes.create('board', { selfId }, (boardUrl: PushpinUrl) => {
@@ -122,6 +126,28 @@ export default function Workspace(props: WorkspaceContentProps) {
         ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== docUrl)
       }
     })
+  }
+
+  function importClip(payload: any) {
+    const { contentType, content } = payload
+    if (!contentType || !content) {
+      console.log('bad clip message', payload)
+      return
+    }
+    switch (contentType) {
+      case 'Text':
+        importPlainText(content, (importedUrl) =>
+          changeWorkspace((d) => {
+            if (!d.clips) {
+              d.clips = []
+            }
+            d.clips.push(importedUrl)
+          })
+        )
+        break
+      default:
+        console.log('no idea how to deal with ', payload)
+    }
   }
 
   log('render')

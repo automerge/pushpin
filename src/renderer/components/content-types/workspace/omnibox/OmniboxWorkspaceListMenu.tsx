@@ -23,6 +23,7 @@ import ListMenuSection from '../../../ListMenuSection'
 import ListMenuItem from '../../../ListMenuItem'
 import ListMenu from '../../../ListMenu'
 import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
+import { Doc as WorkspaceDoc } from '../Workspace'
 
 import './OmniboxWorkspaceListMenu.css'
 
@@ -33,14 +34,6 @@ export interface Props {
   search: string
   hypermergeUrl: DocUrl
   omniboxFinished: Function
-}
-
-interface WorkspaceDoc {
-  selfId: HypermergeUrl
-  contactIds: HypermergeUrl[]
-  currentDocUrl: PushpinUrl
-  viewedDocUrls: PushpinUrl[]
-  archivedDocUrls?: PushpinUrl[]
 }
 
 interface State {
@@ -364,6 +357,15 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
   /* sections begin */
   sectionDefinitions: Section[] = [
+    {
+      name: 'clips',
+      label: 'Clipped Items',
+      actions: [this.view, this.archive],
+      items: (state, props) =>
+        !(this.state.doc && this.state.doc.clips)
+          ? []
+          : this.state.doc.clips.map((url) => ({ url: url as PushpinUrl })),
+    },
     {
       name: 'viewedDocUrls',
       label: 'Boards',

@@ -13,6 +13,7 @@ import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 import System, { FromSystemMsg } from './System'
+import { importDataTransfer } from './ImportData'
 
 window._debug = {}
 
@@ -48,7 +49,6 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
   cb(front)
 }
 
-
 function initWorkspace(repo: RepoFrontend) {
   const system = initSystem()
 
@@ -79,6 +79,13 @@ function initSystem(): System {
     ipc.of.background.emit('system.msg', msg)
     ipcRenderer.send('system.msg', msg)
   })
+
+  ipc.serve(() => {
+    ipc.server.on('message', (data, socket) => {
+      system.fromSystemQ.push({ type: 'IncomingClip', payload: data })
+    })
+  })
+  ipc.server.start()
 
   return system
 }

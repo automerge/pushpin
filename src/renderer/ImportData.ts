@@ -34,7 +34,7 @@ export function importFileList(files: FileList, callback: CreatedContentCallback
   }
 }
 
-function importPlainText(plainText: string, callback: CreatedContentCallback) {
+export function importPlainText(plainText: string, callback: CreatedContentCallback) {
   try {
     // wait!? is this some kind of URL?
     const url = new URL(plainText)
