@@ -136,7 +136,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     }
     switch (contentType) {
       case 'Text':
-        importPlainText(content.text, (importedUrl) =>
+        importPlainText(content, (importedUrl) =>
           changeWorkspace((d) => {
             if (!d.clips) {
               d.clips = []
