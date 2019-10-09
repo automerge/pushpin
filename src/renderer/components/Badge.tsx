@@ -22,11 +22,7 @@ export interface Props {
 export default React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) => {
   const { icon, backgroundColor, size = 'large', shape = 'circle' } = props
   return (
-    <div
-      ref={ref}
-      className={`Badge Badge--${size} Badge--${shape}`}
-      style={{ background: backgroundColor }}
-    >
+    <div ref={ref} className={`Badge Badge--${size} Badge--${shape}`} style={{ backgroundColor }}>
       <i className={`fa fa-${icon}`} />
     </div>
   )

@@ -1,4 +1,4 @@
-.Device {
+.Device, .DeviceListItem {
   --online-color: #33ab77;
   --offline-color: lightgray;
 }
@@ -7,7 +7,7 @@
   color: white;
 }
 
-.Device--online > .Badge {
+.Device--online .Badge {
   background-color: var(--online-color);
 }
 

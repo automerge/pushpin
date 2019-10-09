@@ -30,19 +30,24 @@ function Device(props: Props) {
     case 'title-bar':
       return (
         <div className={isOnline ? 'Device Device--online' : 'Device Device--offline'}>
-          <Badge icon={doc.icon || 'desktop'} shape="circle" size="large" />
-        </div>
-      )
-    case 'contact':
-      return (
-        <div className={isOnline ? 'Device Device--online' : 'Device'}>
-          <Badge icon={doc.icon || 'desktop'} shape="circle" size="small" />
+          <Badge
+            icon={doc.icon || 'desktop'}
+            shape="circle"
+            size="large"
+            backgroundColor={`var(${isOnline ? '--online-color' : '--offline-color'})`}
+          />
         </div>
       )
     default:
       return (
         <div className={isOnline ? 'DeviceListItem DeviceListItem--online' : 'DeviceListItem'}>
-          <Badge icon={icon} shape="circle" />
+          <div className="DeviceListItem-badge">
+            <Badge
+              icon={icon}
+              shape="circle"
+              backgroundColor={`var(${isOnline ? '--online-color' : '--offline-color'})`}
+            />
+          </div>
           {props.editable ? (
             <TitleEditor field="name" url={props.hypermergeUrl} />
           ) : (
