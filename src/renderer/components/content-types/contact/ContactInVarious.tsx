@@ -67,7 +67,6 @@ export default function ContactInVarious(props: ContentProps) {
         <div
           className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
           style={{ ['--highlight-color' as any]: color }}
-          data-name={name}
         >
           {avatarImage}
         </div>

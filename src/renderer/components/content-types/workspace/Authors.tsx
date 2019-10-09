@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import Debug from 'debug'
 
-import Content from '../../Content'
-import { createDocumentLink, parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
+import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { Doc as WorkspaceDoc } from './Workspace'
+import Author from './Author'
 
 import './Authors.css'
 import { useDocument } from '../../../Hooks'
@@ -23,7 +23,7 @@ export default function Authors(props: Props) {
   const authorIds = useAuthors(props.hypermergeUrl)
   const authors = authorIds
     .filter((id, i, a) => a.indexOf(id) === i)
-    .map((id) => <Content key={id} context="title-bar" url={createDocumentLink('contact', id)} />)
+    .map((id) => <Author key={id} contactId={id} />)
 
   return <div className="Authors">{authors}</div>
 }
