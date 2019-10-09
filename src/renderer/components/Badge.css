@@ -52,5 +52,5 @@
 /* The clipboard icon is offset, so we have to counteroffset manually. */
 .Badge .fa.fa-clipboard:before {
   display: inline-block;
-  transform: translate(5.5%, -3%);
+  transform: translate(2%, -3%);
 }
