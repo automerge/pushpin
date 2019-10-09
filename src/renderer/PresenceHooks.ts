@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
-import { HypermergeUrl, parseDocumentLink } from './ShareLink'
-import { useTimeouts, useMessaging, useRepo } from './Hooks'
+import { HypermergeUrl, parseDocumentLink, createDocumentLink, PushpinUrl } from './ShareLink'
+import { useTimeouts, useMessaging, useRepo, useSelfId } from './Hooks'
 import { CurrentDeviceContext } from './components/content-types/workspace/Device'
 
 /**
@@ -8,6 +8,7 @@ import { CurrentDeviceContext } from './components/content-types/workspace/Devic
  * report heartbeats (and forward our "presence data") to.
  */
 const heartbeats: { [url: string]: number } = {} // url: HypermergeUrl
+
 /**
  * myPresence is the data (per-url) that we send to our peers
  */
@@ -113,11 +114,7 @@ function lookupKeyToPresencePieces(key: string): [HypermergeUrl, HypermergeUrl] 
   return [contact as HypermergeUrl, device as HypermergeUrl]
 }
 
-export function usePresence<P>(
-  url: HypermergeUrl | null,
-  presence?: P,
-  key: string = '/'
-): RemotePresence<P>[] {
+function useRemotePresence<P>(url: HypermergeUrl | null, topic: string = '/') {
   const [remote, setRemoteInner] = useState<RemotePresenceCache<P>>({})
   const setSingleRemote = (presence: RemotePresence<P>) => {
     setRemoteInner((prev) => ({
@@ -140,6 +137,17 @@ export function usePresence<P>(
       depart(remotePresenceToLookupKey(presence))
     }
   })
+  return Object.values(remote)
+    .filter((presence) => presence.data)
+    .map((presence) => ({ ...presence, data: presence.data![topic] }))
+}
+
+export function usePresence<P>(
+  url: HypermergeUrl | null,
+  presence?: P,
+  key: string = '/'
+): RemotePresence<P>[] {
+  const remotePresence = useRemotePresence<P>(url, key)
 
   useEffect(() => {
     if (!url || !key) return () => {}
@@ -159,7 +167,42 @@ export function usePresence<P>(
     }
   }, [key, presence])
 
-  return Object.values(remote)
-    .filter((presence) => presence.data)
-    .map((presence) => ({ ...presence, data: presence.data![key] }))
+  return remotePresence
+}
+
+/**
+ * For a given contact, return the device urls (as pushpin urls) which are online
+ * devices for that context. Will return an empty array if no device is online for the contact.
+ * If the contact is self (the current user), the current device will be listed first.
+ */
+export function useOnlineDevicesForContact(contact: HypermergeUrl | null): PushpinUrl[] {
+  const selfId = useSelfId()
+  const selfDevice = useContext(CurrentDeviceContext)
+
+  const remotePresence = useRemotePresence(contact)
+  const onlineRemotes = remotePresence.filter((p) => p.contact === contact)
+  const remoteDevices = onlineRemotes.map((presence) =>
+    createDocumentLink('device', presence.device)
+  )
+
+  if (selfId === contact && selfDevice) {
+    remoteDevices.unshift(selfDevice)
+  }
+  return remoteDevices
+}
+
+/**
+ * For a given device, return whether or not the device is online.
+ * If the passed device is the current device, always returns true.
+ */
+export function useOnlineStatusForDevice(deviceUrl: HypermergeUrl | null): boolean {
+  const localDevice = useContext(CurrentDeviceContext)
+  const remotePresence = useRemotePresence(deviceUrl)
+  const isSelf = localDevice && parseDocumentLink(localDevice).hypermergeUrl === deviceUrl
+  return isSelf || remotePresence.some((p) => p.device === deviceUrl)
+}
+
+export function useOnlineStatus(contactId: HypermergeUrl | null): boolean {
+  const onlineDevices = useOnlineDevicesForContact(contactId)
+  return onlineDevices.length > 0
 }
