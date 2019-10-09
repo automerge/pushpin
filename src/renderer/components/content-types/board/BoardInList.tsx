@@ -11,7 +11,7 @@ interface Props extends ContentProps {
 
 export default function BoardInList(props: Props) {
   const [doc] = useDocument<BoardDoc>(props.hypermergeUrl)
-  const badgeRef = useRef<HTMLElement>(null)
+  const badgeRef = useRef<HTMLDivElement>(null)
 
   if (!doc) {
     return null

@@ -1,3 +1,20 @@
+.Device, .DeviceListItem {
+  --online-color: #33ab77;
+  --offline-color: lightgray;
+}
+
+.Device--online {
+  color: white;
+}
+
+.Device--online .Badge {
+  background-color: var(--online-color);
+}
+
+.Device--offline > .Badge {
+  background-color: var(--offline-color);
+}
+
 .DeviceListItem {
   display: flex;
   align-items: center;
@@ -5,7 +22,11 @@
   margin-bottom: 4px;
 }
 
-.DeviceListItem__title {
+.DeviceListItem--online {
+  color: white;
+}
+
+.DeviceListItem-title {
   margin-left: 10px;
   -webkit-user-drag: none;
   user-select: none;

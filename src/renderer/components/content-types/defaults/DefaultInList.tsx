@@ -29,7 +29,7 @@ export default function ListItem(props: ContentProps) {
   return (
     <div className="DocLink">
       <span draggable onDragStart={onDragStart}>
-        <Badge icon={icon} />
+        <Badge size="large" icon={icon} />
       </span>
       <div className="DocLink__title">{doc.title || name}</div>
     </div>

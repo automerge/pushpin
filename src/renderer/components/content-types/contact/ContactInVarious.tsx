@@ -12,14 +12,16 @@ import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument } from '../../../Hooks'
-import { usePresence } from '../../../PresenceHooks'
+import { useSelfId, useDocument } from '../../../Hooks'
+import { useOnlineStatus } from '../../../PresenceHooks'
+import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
+import ColorBadge from '../../ColorBadge'
 
 const log = Debug('pushpin:settings')
 
 export default function ContactInVarious(props: ContentProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
-  const presences = usePresence<{}>(props.hypermergeUrl)
+  const selfId = useSelfId()
 
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
@@ -28,7 +30,8 @@ export default function ContactInVarious(props: ContentProps) {
   const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
     avatarImageDoc || {}
 
-  const isOnline = presences.length > 0 || props.selfId === props.hypermergeUrl
+  const isSelf = selfId === props.hypermergeUrl
+  const isOnline = useOnlineStatus(props.hypermergeUrl)
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData(
@@ -59,25 +62,30 @@ export default function ContactInVarious(props: ContentProps) {
   )
 
   const avatar = (
-    <div
-      className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
-      style={{ ['--highlight-color' as any]: color }}
-      data-name={name}
-    >
-      {avatarImage}
+    <div className="Contact-avatar">
+      <a href={props.url}>
+        <div
+          className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
+          style={{ ['--highlight-color' as any]: color }}
+        >
+          {avatarImage}
+        </div>
+        <div className="Contact-status">
+          {isSelf ? (
+            <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
+          ) : (
+            isOnline && <ColorBadge color="green" />
+          )}
+        </div>
+      </a>
     </div>
   )
-
-  /*
-  const deviceContents = presences.map(({ contact, device }) => (
-    <Content key={device} context={context} url={createDocumentLink('device', device)} />
-  )) */
 
   switch (context) {
     case 'list':
       return (
         <div draggable onDragStart={onDragStart} className="DocLink">
-          <div className="Contact-avatar">{avatar}</div>
+          <div className="Contact-name">{avatar}</div>
           <Label>
             <Text>{name}</Text>
           </Label>

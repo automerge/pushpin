@@ -1,0 +1,34 @@
+.Author {
+  position: relative;
+  margin-right: 4px;
+}
+
+/** TODO: have avatar fill available height and width, rather than reaching across
+ * component boundaries like this.
+ */
+.Author .Avatar {
+  width: 28px;
+  height: 28px;
+}
+
+.Author:hover::after {
+  display: block;
+  position: absolute;
+  /* border: 2px solid var(--highlight-color, var(--colorOnline)); */
+  white-space: nowrap;
+  max-width: 204px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  padding: 2px 4px;
+  background-color: white;
+  border-radius: 4px;
+  content: attr(data-name);
+  top: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--colorBlueBlack)
+}
