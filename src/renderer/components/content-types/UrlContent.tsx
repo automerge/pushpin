@@ -12,6 +12,7 @@ import Text from '../Text'
 import './UrlContent.css'
 import SecondaryText from '../SecondaryText'
 import Badge from '../Badge'
+import Heading from '../Heading'
 
 const log = Debug('pushpin:url')
 
@@ -78,10 +79,16 @@ export default function UrlContent(props: ContentProps) {
           ) : null}
 
           <div className="urlCard-banner-title">
-            <Text>{data.title}</Text>
-            <SecondaryText>
-              <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
-            </SecondaryText>
+            {data.title ? (
+              <>
+                <Heading>{data.title}</Heading>
+                <SecondaryText>
+                  <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+                </SecondaryText>
+              </>
+            ) : (
+              <Heading>{url}</Heading>
+            )}
           </div>
         </div>
         {html ? (
@@ -224,7 +231,7 @@ function UrlContentInList(props: ContentProps) {
 
   if (!doc) return null
 
-  const title = doc.data ? doc.data.title : doc.url
+  const title = doc.data && !('error' in doc.data) ? doc.data.title : doc.url
 
   return (
     <div className="DocLink">
