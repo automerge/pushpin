@@ -12,6 +12,7 @@ export default function Tabs(tabs: Tabs) {
       <div style={{ display: 'flex', marginBottom: 10 }}>
         {Object.keys(tabs).map((tab) => (
           <div
+            key={tab}
             onClick={() => setTab(tab)}
             style={{
               padding: 8,
