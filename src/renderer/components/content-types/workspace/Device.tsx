@@ -16,9 +16,6 @@ export interface DeviceDoc {
   name: string
 }
 
-const ONLINE_COLOR = '#33AB77'
-const OFFLINE_COLOR = 'lightgray'
-
 interface Props extends ContentProps {
   editable: boolean
 }
@@ -32,34 +29,20 @@ function Device(props: Props) {
   switch (props.context) {
     case 'title-bar':
       return (
-        <div className={isOnline ? 'Device Device--online' : 'Device'}>
-          <Badge
-            icon={doc.icon || 'desktop'}
-            shape="square"
-            size="large"
-            backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
-          />
+        <div className={isOnline ? 'Device Device--online' : 'Device Device--offline'}>
+          <Badge icon={doc.icon || 'desktop'} shape="circle" size="large" />
         </div>
       )
     case 'contact':
       return (
         <div className={isOnline ? 'Device Device--online' : 'Device'}>
-          <Badge
-            icon={doc.icon || 'desktop'}
-            shape="circle"
-            size="small"
-            backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
-          />
+          <Badge icon={doc.icon || 'desktop'} shape="circle" size="small" />
         </div>
       )
     default:
       return (
         <div className={isOnline ? 'DeviceListItem DeviceListItem--online' : 'DeviceListItem'}>
-          <Badge
-            icon={icon}
-            shape="circle"
-            backgroundColor={isOnline ? ONLINE_COLOR : OFFLINE_COLOR}
-          />
+          <Badge icon={icon} shape="circle" />
           {props.editable ? (
             <TitleEditor field="name" url={props.hypermergeUrl} />
           ) : (

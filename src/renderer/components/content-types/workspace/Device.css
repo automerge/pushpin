@@ -1,5 +1,18 @@
+.Device {
+  --online-color: #33ab77;
+  --offline-color: lightgray;
+}
+
 .Device--online {
   color: white;
+}
+
+.Device--online > .Badge {
+  background-color: var(--online-color);
+}
+
+.Device--offline > .Badge {
+  background-color: var(--offline-color);
 }
 
 .DeviceListItem {
