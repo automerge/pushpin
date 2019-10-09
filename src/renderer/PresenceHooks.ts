@@ -171,20 +171,24 @@ export function usePresence<P>(
 }
 
 /**
- * For a given contact, return the device url (as a pushpin url) which is an online
- * device for that context. Will return undefined if no device is online for the contact.
- * If the contact is self (the current user), will return the current device.
+ * For a given contact, return the device urls (as pushpin urls) which are online
+ * devices for that context. Will return an empty array if no device is online for the contact.
+ * If the contact is self (the current user), the current device will be listed first.
  */
-export function useOnlineDeviceForContact(contact: HypermergeUrl | null): PushpinUrl | undefined {
+export function useOnlineDevicesForContact(contact: HypermergeUrl | null): PushpinUrl[] {
   const selfId = useSelfId()
   const selfDevice = useContext(CurrentDeviceContext)
 
   const remotePresence = useRemotePresence(contact)
-  const onlineRemote = remotePresence.find((p) => p.contact === contact)
-  const remoteDevice = onlineRemote && createDocumentLink('device', onlineRemote.device)
+  const onlineRemotes = remotePresence.filter((p) => p.contact === contact)
+  const remoteDevices = onlineRemotes.map((presence) =>
+    createDocumentLink('device', presence.device)
+  )
 
-  const onlineDevice = selfId === contact ? selfDevice : remoteDevice
-  return onlineDevice || undefined
+  if (selfId === contact && selfDevice) {
+    remoteDevices.unshift(selfDevice)
+  }
+  return remoteDevices
 }
 
 /**

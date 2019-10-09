@@ -13,18 +13,13 @@ import Label from '../../Label'
 
 import './ContactInVarious.css'
 import { useDocument } from '../../../Hooks'
-import { useOnlineDeviceForContact } from '../../../PresenceHooks'
+import { useOnlineDevicesForContact } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:settings')
 
-export interface Props extends ContentProps {
-  isShowingDeviceStatus: boolean
-}
-
-export default function ContactInVarious(props: Props) {
+export default function ContactInVarious(props: ContentProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
 
-  const { isShowingDeviceStatus = true } = props
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
 
@@ -32,8 +27,8 @@ export default function ContactInVarious(props: Props) {
   const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
     avatarImageDoc || {}
 
-  const onlineDevice = useOnlineDeviceForContact(props.hypermergeUrl)
-  const isOnline = !!onlineDevice
+  const onlineDevices = useOnlineDevicesForContact(props.hypermergeUrl)
+  const isOnline = onlineDevices.length > 0
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData(
@@ -72,18 +67,11 @@ export default function ContactInVarious(props: Props) {
       >
         {avatarImage}
       </div>
-      {isShowingDeviceStatus && (
-        <div className="Contact-device">
-          {onlineDevice && <Content context="contact" url={onlineDevice} />}
-        </div>
-      )}
+      <div className="Contact-device">
+        {onlineDevices[0] && <Content context="contact" url={onlineDevices[0]} />}
+      </div>
     </div>
   )
-
-  /*
-  const deviceContents = presences.map(({ contact, device }) => (
-    <Content key={device} context={context} url={createDocumentLink('device', device)} />
-  )) */
 
   switch (context) {
     case 'list':
