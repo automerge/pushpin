@@ -1,0 +1,23 @@
+.OmniboxWorkspace {
+  background-color: var(--workspace-color);
+}
+
+.OmniboxWorkspace-overlay {
+  padding-left: 4px;
+  background-color: white;
+  opacity: 0.9;
+  z-index: -1;
+}
+
+.OmniboxWorkspace-name {
+  flex-grow: 1;
+  color: var(--colorBlueBlack);
+}
+
+.OmniboxWorkspace-badge {
+  margin-left: 4px;
+}
+
+.OmniboxWorkspace-copyBadge {
+  padding-left: 4px;
+}

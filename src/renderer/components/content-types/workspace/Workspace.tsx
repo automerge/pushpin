@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
 
@@ -14,6 +14,9 @@ import { useDocument } from '../../../Hooks'
 import { useAllHeartbeats, useHeartbeat } from '../../../PresenceHooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
+import { CurrentDeviceContext } from './Device'
+
+import WorkspaceInList from './WorkspaceInList'
 
 const log = Debug('pushpin:workspace')
 
@@ -25,11 +28,19 @@ export interface Doc {
   archivedDocUrls: PushpinUrl[]
 }
 
-export default function Workspace(props: ContentProps) {
+interface WorkspaceContentProps extends ContentProps {
+  setWorkspaceUrl: (newWorkspaceUrl: PushpinUrl) => void
+  createWorkspace: () => void
+}
+
+export default function Workspace(props: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
+  const currentDeviceUrl = useContext(CurrentDeviceContext)
 
   const selfId = workspace && workspace.selfId
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
+
+  const [self, changeSelf] = useDocument<ContactDoc>(selfId)
 
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
@@ -48,6 +59,9 @@ export default function Workspace(props: ContentProps) {
             openDoc(boardUrl)
           })
           break
+        case 'NewWorkspace':
+          props.createWorkspace()
+          break
       }
     },
     [selfId]
@@ -58,6 +72,22 @@ export default function Workspace(props: ContentProps) {
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
   }, [currentDocUrl])
 
+  useEffect(() => {
+    if (!currentDeviceUrl || !self) {
+      return
+    }
+
+    const { hypermergeUrl } = parseDocumentLink(currentDeviceUrl)
+    if (!self.devices || !self.devices.includes(hypermergeUrl)) {
+      changeSelf((doc: ContactDoc) => {
+        if (!doc.devices) {
+          doc.devices = []
+        }
+        doc.devices.push(hypermergeUrl)
+      })
+    }
+  }, [currentDeviceUrl, self])
+
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
       return
@@ -67,6 +97,13 @@ export default function Workspace(props: ContentProps) {
       parseDocumentLink(docUrl)
     } catch (e) {
       // if we can't parse the document, don't navigate
+      return
+    }
+
+    const { type } = parseDocumentLink(docUrl)
+    if (type === 'workspace') {
+      // we're going to have to deal with this specially...
+      props.setWorkspaceUrl(docUrl)
       return
     }
 
@@ -175,7 +212,11 @@ ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
-  contexts: { root: Workspace },
+  contexts: {
+    root: Workspace,
+    list: WorkspaceInList,
+    board: WorkspaceInList,
+  },
   resizable: false,
   unlisted: true,
   create,

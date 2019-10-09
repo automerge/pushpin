@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
 
-import { createDocumentLink } from '../../../ShareLink'
+import Automerge from 'automerge'
+import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
 import * as Hyperfile from '../../../hyperfile'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
@@ -12,12 +13,15 @@ import { ContactDoc } from '.'
 import ColorPicker from '../../ColorPicker'
 import Label from '../../Label'
 import { useDocument } from '../../../Hooks'
-import Popover from '../../Popover'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
 
+import ActionListItem from '../workspace/omnibox/ActionListItem'
+
 import './ContactEditor.css'
 import ContentTypes from '../../../ContentTypes'
+import { CurrentDeviceContext } from '../workspace/Device'
+import { DocUrl } from 'hypermerge'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')
@@ -45,6 +49,7 @@ export const USER_COLORS = {
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
+  const currentDeviceId = useContext(CurrentDeviceContext)
 
   if (!doc) {
     return null
@@ -93,7 +98,7 @@ export default function ContactEditor(props: ContentProps) {
     })
   }
 
-  const { avatarDocId, name, color } = doc
+  const { avatarDocId, name, color, devices } = doc
 
   let avatar
   if (avatarDocId) {
@@ -102,11 +107,57 @@ export default function ContactEditor(props: ContentProps) {
     avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   }
 
+  function removeDevice(url: PushpinUrl) {
+    const { hypermergeUrl } = parseDocumentLink(url)
+    changeDoc((d) => {
+      const devices = d.devices as Automerge.List<DocUrl>
+      if (!devices) {
+        return
+      }
+      const dPos = devices.findIndex((u) => u === hypermergeUrl)
+      if (!dPos) {
+        return
+      }
+      // the automerge type for deleteAt is wrong
+      devices.deleteAt!(dPos)
+    })
+  }
+
+  const deviceActions = [
+    {
+      name: 'remove',
+      destructive: true,
+      callback: (url: PushpinUrl) => () => removeDevice(url),
+      faIcon: 'fa-trash',
+      label: 'Remove',
+      shortcut: '⌘+⌫',
+      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    },
+  ]
+
+  let renderedDevices
+  if (devices) {
+    renderedDevices = devices
+      .map((d) => createDocumentLink('device', d))
+      .map((d) => (
+        <ActionListItem
+          key={d}
+          contentUrl={d}
+          actions={d === currentDeviceId ? [] : deviceActions}
+          selected={false}
+        >
+          <Content context="list" url={d} editable />
+        </ActionListItem>
+      ))
+  } else {
+    renderedDevices = <SecondaryText>No devices registered...</SecondaryText>
+  }
+
   return (
-    <Popover>
+    <div className="ContactEditor-frame">
       <div className="ContactEditor">
         <div className="ContactEditor-heading">
-          <Heading>Your Profile</Heading>
+          <Heading>Edit Profile...</Heading>
         </div>
         <div className="ContactEditor-section">
           <div className="ContactEditor-sectionLabel">Display Name</div>
@@ -150,7 +201,11 @@ export default function ContactEditor(props: ContentProps) {
             </div>
           </div>
         </div>
+        <div className="ContactEditor-section">
+          <div className="ContactEditor-sectionLabel">Devices</div>
+          <div className="ContactEditor-sectionContent">{renderedDevices}</div>
+        </div>
       </div>
-    </Popover>
+    </div>
   )
 }

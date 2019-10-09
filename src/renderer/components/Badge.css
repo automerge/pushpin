@@ -1,8 +1,21 @@
 .Badge {
   cursor: pointer;
+  background-color: #d5dfe5;
+}
+
+.Badge--large {
   padding: 8px;
   font-size: 24px;
-  background-color: #d5dfe5;
+}
+
+.Badge--medium {
+  padding: 4px;
+  font-size: 12px;
+}
+
+.Badge--small {
+  padding: 1px;
+  font-size: 8px;
 }
 
 .Badge--blue {
@@ -34,4 +47,10 @@
 }
 .Badge--square {
   border-radius: 10%;
+}
+
+/* The clipboard icon is offset, so we have to counteroffset manually. */
+.Badge.fa.fa-clipboard:before {
+  display: inline-block;
+  transform: translate(2.5%, -3%);
 }

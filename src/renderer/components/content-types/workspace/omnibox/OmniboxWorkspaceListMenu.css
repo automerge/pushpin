@@ -1,15 +1,5 @@
-.Omnibox {
-  border-radius: 4px;
-  overflow: hidden;
-  background-color: #ffffff;
-  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.2);
-  width: 478px;
-  z-index: 10;
-  position: fixed;
-  top: 52px;
-  left: 12px;
-  display: flex;
-  flex-direction: column;
+.Omnibox .ListMenu {
+  color: var(--colorBlueBlack);
 }
 
 .Omnibox .ListMenu__item .Actions {
@@ -37,6 +27,6 @@
 }
 
 .Omnibox-nothingFoundBadge {
-  flex:none;
+  flex: none;
   margin-right: 8px;
 }

@@ -124,12 +124,6 @@ table {
   border-spacing: 0;
 }
 
-/* Line Awesome */
-
-.fa {
-  font-size: 16px;
-}
-
 /* Variables */
 
 :root {
@@ -205,12 +199,17 @@ em {
   display: flex;
   align-items: center;
   width: 100%;
+  min-width: 0; /* this prevents title overflow */
 }
 
 .DocLink__title {
   margin-left: 10px;
   -webkit-user-drag: none;
   user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70%;
 }
 
 .NothingFound .fa {

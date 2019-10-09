@@ -6,20 +6,53 @@ import { PushpinUrl } from '../../../ShareLink'
 import { DEVICE_URL_PATH } from '../../../constants'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
+import Badge from '../../Badge'
+import './Device.css'
+import TitleEditor from '../../TitleEditor'
 
 export interface DeviceDoc {
+  icon: string // fa-icon name
   name: string
 }
 
-function Device(props: ContentProps) {
+interface Props extends ContentProps {
+  editable: boolean
+}
+
+function Device(props: Props) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
   if (!doc) return null
-  return <div>Device: {doc.name}</div>
+  const { icon = 'desktop', name } = doc
+
+  switch (props.context) {
+    case 'title-bar':
+      return (
+        <div className="Device">
+          <Badge icon={doc.icon || 'desktop'} shape="square" size="medium" />
+        </div>
+      )
+    default:
+      return (
+        <div className="DeviceListItem">
+          <Badge icon={icon} shape="circle" />
+          {props.editable ? (
+            <TitleEditor field="name" url={props.hypermergeUrl} />
+          ) : (
+            <div className="DocLink__title">{name}</div>
+          )}
+        </div>
+      )
+  }
 }
 
 function create(deviceAttrs, handle, callback) {
-  handle.change((doc: DeviceDoc) => {
-    doc.name = Os.hostname()
+  ;(navigator as any).getBattery().then((b) => {
+    const isLaptop = b.chargingTime !== 0
+    const icon = isLaptop ? 'laptop' : 'desktop'
+    handle.change((doc: DeviceDoc) => {
+      doc.name = Os.hostname()
+      doc.icon = icon
+    })
   })
   callback()
 }
@@ -29,6 +62,7 @@ ContentTypes.register({
   name: 'Device',
   icon: 'desktop',
   contexts: {
+    list: Device,
     'title-bar': Device,
     board: Device,
   },

@@ -8,10 +8,20 @@
   width: 100%;
   align-items: center;
   align-content: space-between;
-  background-color: #ffffff;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
   user-select: none;
+  background-color: white;
+}
+
+.TitleBar-overlay {
+  position: absolute;
+  left: 0px;
+  width: 100%;
+  height: 40px;
+  background-color: var(--workspace-color);
+  opacity: 0.1;
+  z-index: -1;
 }
 
 .TitleBar__menuItem .fa {
@@ -84,34 +94,6 @@ button[disabled].TitleBar__menuItem .fa {
 
 .TitleBar__logo {
   margin-right: 8px;
-}
-
-.BoardTitle__clipboard:hover:after {
-  content: 'Copy link to this...';
-  right: 4px;
-}
-
-.BoardTitle__clipboard:focus {
-  animation-duration: 0.5s;
-  animation-name: color-flash;
-}
-
-.BoardTitle__labeledIcon:hover:after {
-  display: block;
-  position: absolute;
-  white-space: nowrap;
-  max-width: 104px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-  padding: 2px 4px;
-  background-color: white;
-  border-radius: 4px;
-  top: 36px;
-  font-size: 12px;
-  line-height: 16px;
 }
 
 @keyframes color-flash {

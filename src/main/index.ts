@@ -153,14 +153,22 @@ function createMenu() {
       label: 'File',
       submenu: [
         {
-          label: 'New',
+          label: 'New...',
           accelerator: 'CmdOrCtrl+N',
           click: (_item, _focusedWindow) => {
             sendSystemMsg({ type: 'NewDocument' })
           },
         },
+        {
+          label: 'New Workspace...',
+          accelerator: 'CmdOrCtrl+Shift+N',
+          click: (_item, _focusedWindow) => {
+            sendSystemMsg({ type: 'NewWorkspace' })
+          },
+        },
       ],
     },
+
     {
       label: 'Edit',
       submenu: [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }],
