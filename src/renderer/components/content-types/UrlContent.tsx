@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 
@@ -8,6 +8,10 @@ import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument } from '../../Hooks'
 import { HypermergeUrl } from '../../ShareLink'
+import Text from '../Text'
+import './UrlContent.css'
+import SecondaryText from '../SecondaryText'
+import Badge from '../Badge'
 
 const log = Debug('pushpin:url')
 
@@ -19,8 +23,9 @@ interface UrlData {
 }
 
 interface UrlDoc {
-  url?: string
+  url: string
   data?: UrlData | { error: string } // TODO: move error to top-level
+  html?: string // not yet implemented, see clipper branch
   imageHyperfileUrl?: string
 }
 
@@ -32,71 +37,19 @@ UrlContent.maxWidth = 24
 UrlContent.maxHeight = 32
 
 export default function UrlContent(props: ContentProps) {
-  const [urlInput, setUrl] = useState('')
-  const [doc, changeDoc] = useRefreshedDocument(props.hypermergeUrl)
-  const onDoubleClick = useCallback(
-    (e: React.MouseEvent) => {
-      // TODO: we must stop propagation to prevent board from fullscreening :(
-      e.stopPropagation()
-      if (!doc) return
-      window.open(doc.url, '_blank') // todo extract
-    },
-    [doc]
-  )
-  const onInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setUrl(e.target.value)
-    },
-    [setUrl]
-  )
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      e.stopPropagation()
-
-      if (e.key === 'Enter') {
-        e.preventDefault()
-
-        const url = urlInput.indexOf('://') === -1 ? `http://${urlInput}` : urlInput
-
-        changeDoc((doc: UrlDoc) => {
-          doc.url = url
-        })
-      }
-    },
-    [urlInput, changeDoc]
-  )
+  const [doc] = useRefreshedDocument(props.hypermergeUrl)
 
   if (!doc) {
     return null
   }
-  const { data, url } = doc
-
-  if (!url) {
-    return (
-      <div style={css.urlCard}>
-        <div style={css.inputGroup}>
-          <i style={css.inputGroupIcon} className="fa fa-link" />
-          <input
-            autoFocus
-            type="text"
-            style={css.urlInput}
-            value={urlInput}
-            onChange={onInputChange}
-            onKeyDown={onKeyDown}
-            onPaste={onPaste}
-            placeholder="Enter a URL..."
-          />
-        </div>
-      </div>
-    )
-  }
+  const { data, url, html } = doc
 
   if (!data) {
     return (
-      <div style={css.urlCard}>
-        <p style={css.title}>Fetching...</p>
-        <p style={css.link}>
-          <a style={css.titleAnchor} href={url}>
+      <div className="urlCard">
+        <p className="urlCard-title">Fetching...</p>
+        <p className="urlCard-link">
+          <a className="urlCard-titleAnchor" href={url}>
             {url}
           </a>
         </p>
@@ -106,32 +59,63 @@ export default function UrlContent(props: ContentProps) {
 
   if ('error' in data) {
     return (
-      <div style={css.urlCard}>
-        <p style={css.error}>(URL did not load.)</p>
+      <div className="urlCard">
+        <p className="urlCard-error">(URL did not load.)</p>
+        <p className="urlCard-link">
+          <a className="urlCard-titleAnchor" href={url}>
+            {url}
+          </a>
+        </p>
+      </div>
+    )
+  }
+  if (props.context === 'workspace') {
+    return (
+      <div className="urlCard urlCard--workspace">
+        <div className="urlCard-banner">
+          {doc.imageHyperfileUrl ? (
+            <img className="urlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
+          ) : null}
+
+          <div className="urlCard-banner-title">
+            <Text>{data.title}</Text>
+            <SecondaryText>
+              <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+            </SecondaryText>
+          </div>
+        </div>
+        {html ? (
+          <iframe frameBorder="0" title={data.title} srcDoc={html} />
+        ) : (
+          <iframe
+            className="urlCard-iframe"
+            frameBorder="0"
+            title={data.title}
+            src={data.canonicalLink || url}
+          />
+        )}
       </div>
     )
   }
 
   return (
-    <div style={css.urlCard} onDoubleClick={onDoubleClick}>
+    <div className="urlCard">
       {doc.imageHyperfileUrl ? (
-        <img style={css.img} src={doc.imageHyperfileUrl} alt={data.description} />
+        <img className="urlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
       ) : null}
 
-      <p style={css.title}>
-        <span style={css.titleAnchor}>{data.title}</span>
+      <p className="urlCard-title">
+        <span className="titleAnchor">{data.title}</span>
       </p>
 
-      <p style={css.text}>{data.description}</p>
-      <p style={css.link}>
-        <span style={css.titleAnchor}>{data.canonicalLink || url}</span>
+      <p className="urlCard-text">{data.description}</p>
+      <p className="urlCard-link">
+        <span className="urlCard-titleAnchor">
+          <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+        </span>
       </p>
     </div>
   )
-}
-
-function onPaste(e: React.ClipboardEvent) {
-  e.stopPropagation()
 }
 
 function useRefreshedDocument(url: HypermergeUrl): [null | UrlDoc, ChangeFn<UrlDoc>] {
@@ -226,14 +210,31 @@ function removeEmpty(obj: object) {
 }
 
 function create({ url }, handle: Handle<UrlDoc>, callback) {
-  if (url) {
-    handle.change((doc) => {
-      doc.url = url
-    })
-  }
+  handle.change((doc) => {
+    doc.url = url
+  })
   callback()
 }
 
+function UrlContentInList(props: ContentProps) {
+  const [doc] = useDocument<UrlDoc>(props.hypermergeUrl)
+  function onDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('application/pushpin-url', props.url)
+  }
+
+  if (!doc) return null
+
+  const title = doc.data ? doc.data.title : doc.url
+
+  return (
+    <div className="DocLink">
+      <span draggable onDragStart={onDragStart}>
+        <Badge icon="chain" />
+      </span>
+      <div className="DocLink__title">{title}</div>
+    </div>
+  )
+}
 ContentTypes.register({
   type: 'url',
   name: 'URL',
@@ -241,90 +242,8 @@ ContentTypes.register({
   contexts: {
     workspace: UrlContent,
     board: UrlContent,
+    list: UrlContentInList,
   },
   create,
+  unlisted: true,
 })
-
-// Should be { [name: string]: React.CSSProperties }
-const css: any = {
-  urlCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: 'white',
-    boxSizing: 'border-box',
-    overflow: 'auto',
-    position: 'relative',
-    padding: 12,
-    flex: '1 1 auto',
-    border: '1px solid var(--colorPaleGrey)',
-  },
-  img: {
-    WebkitUserDrag: 'none',
-    height: '192px',
-    display: 'block',
-    objectFit: 'cover',
-    marginBottom: 12,
-    marginLeft: -12,
-    marginTop: -12,
-    marginRight: -12,
-  },
-  title: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '18px',
-    lineHeight: '24px',
-    color: 'black',
-    textDecoration: 'none',
-    marginBottom: 12,
-    maxHeight: 72,
-    overflowY: 'hidden',
-    textOverflow: 'ellipsis',
-    flexShrink: 0,
-  },
-  titleAnchor: {
-    WebkitUserDrag: 'none',
-    color: 'inherit',
-    textDecoration: 'none',
-  },
-  text: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '12px',
-    lineHeight: '16px',
-    color: '#637389',
-    marginBottom: 12,
-    flex: 1,
-  },
-  error: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '10px',
-    lineHeight: 1.2,
-    color: '#637389',
-  },
-  link: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '10px',
-    lineHeight: 1.2,
-    color: '#637389',
-    justifySelf: 'flex-end',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    flexShrink: 0,
-  },
-  urlInput: {
-    backgroundColor: 'white',
-    padding: '4px',
-    height: 20,
-    flex: 1,
-    width: 'calc(100% -32px)',
-  },
-  inputGroup: {
-    display: 'flex',
-    flex: '1 0 auto',
-    alignItems: 'center',
-  },
-  inputGroupIcon: {
-    fontSize: 24,
-    flex: 'none',
-    color: '#637389',
-  },
-}
