@@ -12,13 +12,15 @@ import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useDocument } from '../../../Hooks'
+import { useSelfId, useDocument } from '../../../Hooks'
 import { useOnlineDevicesForContact } from '../../../PresenceHooks'
+import ConnectionStatusBadge from './ConnectionStatusBadge'
 
 const log = Debug('pushpin:settings')
 
 export default function ContactInVarious(props: ContentProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
+  const selfId = useSelfId()
 
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
@@ -27,6 +29,7 @@ export default function ContactInVarious(props: ContentProps) {
   const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
     avatarImageDoc || {}
 
+  const isSelf = selfId === props.hypermergeUrl
   const onlineDevices = useOnlineDevicesForContact(props.hypermergeUrl)
   const isOnline = onlineDevices.length > 0
 
@@ -68,9 +71,11 @@ export default function ContactInVarious(props: ContentProps) {
         >
           {avatarImage}
         </div>
-        <div className="Contact-device">
-          {onlineDevices[0] && <Content context="contact" url={onlineDevices[0]} />}
-        </div>
+        {isSelf && (
+          <div className="Contact-connectionStatus">
+            <ConnectionStatusBadge contactId={props.hypermergeUrl} />
+          </div>
+        )}
       </a>
     </div>
   )

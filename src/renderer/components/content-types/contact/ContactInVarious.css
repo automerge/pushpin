@@ -31,9 +31,8 @@
   position: relative;
 }
 
-.Contact-device {
+.Contact-connectionStatus {
   position: absolute;
   right: 0;
   bottom: 0;
-  color: white;
 }
