@@ -60,16 +60,18 @@ export default function ContactInVarious(props: ContentProps) {
 
   const avatar = (
     <div className="Contact-avatar">
-      <div
-        className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
-        style={{ ['--highlight-color' as any]: color }}
-        data-name={name}
-      >
-        {avatarImage}
-      </div>
-      <div className="Contact-device">
-        {onlineDevices[0] && <Content context="contact" url={onlineDevices[0]} />}
-      </div>
+      <a href={props.url}>
+        <div
+          className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
+          style={{ ['--highlight-color' as any]: color }}
+          data-name={name}
+        >
+          {avatarImage}
+        </div>
+        <div className="Contact-device">
+          {onlineDevices[0] && <Content context="contact" url={onlineDevices[0]} />}
+        </div>
+      </a>
     </div>
   )
 
