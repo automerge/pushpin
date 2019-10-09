@@ -8,7 +8,6 @@ import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument } from '../../Hooks'
 import { HypermergeUrl } from '../../ShareLink'
-import Text from '../Text'
 import './UrlContent.css'
 import SecondaryText from '../SecondaryText'
 import Badge from '../Badge'
@@ -73,24 +72,6 @@ export default function UrlContent(props: ContentProps) {
   if (props.context === 'workspace') {
     return (
       <div className="urlCard urlCard--workspace">
-        <div className="urlCard-banner">
-          {doc.imageHyperfileUrl ? (
-            <img className="urlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
-          ) : null}
-
-          <div className="urlCard-banner-title">
-            {data.title ? (
-              <>
-                <Heading>{data.title}</Heading>
-                <SecondaryText>
-                  <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
-                </SecondaryText>
-              </>
-            ) : (
-              <Heading>{url}</Heading>
-            )}
-          </div>
-        </div>
         {html ? (
           <iframe frameBorder="0" title={data.title} srcDoc={html} />
         ) : (
@@ -231,14 +212,31 @@ function UrlContentInList(props: ContentProps) {
 
   if (!doc) return null
 
-  const title = doc.data && !('error' in doc.data) ? doc.data.title : doc.url
+  const { data, url } = doc
 
   return (
     <div className="DocLink">
       <span draggable onDragStart={onDragStart}>
         <Badge icon="chain" />
       </span>
-      <div className="DocLink__title">{title}</div>
+      <div className="urlCard-banner">
+        {doc.imageHyperfileUrl ? (
+          <img className="urlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
+        ) : null}
+
+        <div className="urlCard-banner-title">
+          {data && !('error' in data) && data.title ? (
+            <>
+              <Heading>{data.title}</Heading>
+              <SecondaryText>
+                <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+              </SecondaryText>
+            </>
+          ) : (
+            <Heading>{url}</Heading>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
