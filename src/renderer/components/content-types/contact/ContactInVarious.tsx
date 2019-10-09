@@ -13,8 +13,9 @@ import Label from '../../Label'
 
 import './ContactInVarious.css'
 import { useSelfId, useDocument } from '../../../Hooks'
-import { useOnlineDevicesForContact } from '../../../PresenceHooks'
-import ConnectionStatusBadge from './ConnectionStatusBadge'
+import { useOnlineStatus } from '../../../PresenceHooks'
+import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
+import ColorBadge from '../../ColorBadge'
 
 const log = Debug('pushpin:settings')
 
@@ -30,8 +31,7 @@ export default function ContactInVarious(props: ContentProps) {
     avatarImageDoc || {}
 
   const isSelf = selfId === props.hypermergeUrl
-  const onlineDevices = useOnlineDevicesForContact(props.hypermergeUrl)
-  const isOnline = onlineDevices.length > 0
+  const isOnline = useOnlineStatus(props.hypermergeUrl)
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData(
@@ -71,11 +71,13 @@ export default function ContactInVarious(props: ContentProps) {
         >
           {avatarImage}
         </div>
-        {isSelf && (
-          <div className="Contact-connectionStatus">
-            <ConnectionStatusBadge contactId={props.hypermergeUrl} />
-          </div>
-        )}
+        <div className="Contact-status">
+          {isSelf ? (
+            <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
+          ) : (
+            isOnline && <ColorBadge color="green" />
+          )}
+        </div>
       </a>
     </div>
   )

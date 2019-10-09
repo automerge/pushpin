@@ -201,3 +201,8 @@ export function useOnlineStatusForDevice(deviceUrl: HypermergeUrl | null): boole
   const isSelf = localDevice && parseDocumentLink(localDevice).hypermergeUrl === deviceUrl
   return isSelf || remotePresence.some((p) => p.device === deviceUrl)
 }
+
+export function useOnlineStatus(contactId: HypermergeUrl | null): boolean {
+  const onlineDevices = useOnlineDevicesForContact(contactId)
+  return onlineDevices.length > 0
+}
