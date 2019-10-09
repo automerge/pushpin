@@ -38,9 +38,8 @@ export default function OmniboxWorkspace(props: Props) {
   }
 
   const { selfId } = workspaceDoc
-  const { color, name, devices = [] } = selfDoc
+  const { color, name = [] } = selfDoc
 
-  // XXX: the badge here should be an action!
   return (
     <div
       className="OmniboxWorkspace"
@@ -55,11 +54,6 @@ export default function OmniboxWorkspace(props: Props) {
           >
             {name}&apos;s Documents
           </a>
-          {devices.map((d) => (
-            <div className="OmniboxWorkspace-badge" key={d}>
-              <Content context="title-bar" url={createDocumentLink('device', d)} />
-            </div>
-          ))}
           <div className="OmniboxWorkspace-badge" key="contact">
             <a href={createDocumentLink('contact', selfId)}>
               <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
