@@ -152,6 +152,10 @@ a {
   visibility: hidden;
 }
 
+*[draggable] {
+  cursor: pointer;
+}
+
 /* App Styles */
 
 html,
