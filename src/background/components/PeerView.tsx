@@ -18,7 +18,7 @@ export default function PeerView({ peerId }: Props) {
   return (
     <div>
       <Info peerId={peerId} connection={connectionInfo(peer.connection)} />
-      {[...peer.pendingConnections].map((conn) => (
+      {Array.from(peer.pendingConnections).map((conn) => (
         <Info {...connectionInfo(conn)} />
       ))}
     </div>
