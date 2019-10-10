@@ -13,11 +13,13 @@ import ActionListItem from '../workspace/omnibox/ActionListItem'
 import './StoragePeerWorkspace.css'
 import TitleEditor from '../../TitleEditor'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
+import { ContactDoc } from '../contact'
 
 export default function StoragePeerEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<StoragePeerDoc>(props.hypermergeUrl)
   const selfId = useSelfId()
   const workspaceUrlsContext = useContext(WorkspaceUrlsContext)
+  const [selfDoc, changeSelfDoc] = useDocument<ContactDoc>(selfId)
 
   if (!workspaceUrlsContext) {
     return null
@@ -30,7 +32,16 @@ export default function StoragePeerEditor(props: ContentProps) {
     changeDoc((doc) => {
       doc.archivedUrls[selfId] = hypermergeUrl
     })
-  }, [])
+    console.log(selfId, selfDoc)
+    changeSelfDoc((selfDoc) => {
+      if (!selfDoc.devices) {
+        selfDoc.devices = []
+      }
+      if (doc && doc.device) {
+        selfDoc.devices.push(doc.device)
+      }
+    })
+  }, [selfDoc])
 
   if (!doc) {
     return null
