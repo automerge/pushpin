@@ -1242,7 +1242,6 @@ atomic-batcher@^1.0.2:
 
 automerge@^0.12.1, "automerge@github:automerge/automerge#opaque-strings":
   version "0.12.1"
-  uid "90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   resolved "https://codeload.github.com/automerge/automerge/tar.gz/90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   dependencies:
     immutable "^3.8.2"
@@ -4367,15 +4366,23 @@ hypercore@^8.0.2:
 
 "hypermerge@github:automerge/hypermerge#hyperswarm":
   version "1.0.42"
-  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/07f1753964862ef60b094bec6d81fa60555fdd26"
+  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/92f976e0eef2d5a0b897b43ad87bbcc7acb43520"
   dependencies:
+    "@types/better-sqlite3" "^5.4.0"
     automerge "^0.12.1"
+    better-sqlite3 "^5.4.3"
     bs58 "^4.0.1"
+    copyfiles "^2.1.1"
     debug "^4.1.1"
-    hypercore "^6.24.0"
-    hypercore-protocol "^6.12.0"
+    hypercore "^8.0.2"
+    hypercore-protocol "^7.1.1"
     iltorb "^2.4.3"
+    js-sha1 "^0.6.0"
     mime-types "^2.1.24"
+    multiplex "^6.7.0"
+    noise-peer "^1.1.0"
+    random-access-file "^2.1.3"
+    random-access-memory "^3.0.0"
 
 hyperswarm@^2.1.1:
   version "2.1.1"

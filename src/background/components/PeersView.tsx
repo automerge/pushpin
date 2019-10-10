@@ -13,15 +13,15 @@ export default function PeersView({ discoveryId }: Props) {
   useSample(3000)
 
   const repo = useRepo()
-  const peerIds = repo.network.peerDiscoveryIds.get(discoveryId)
+  const peers = repo.replication.getPeersWith([discoveryId])
 
   return (
     <>
-      <Info peers={peerIds.size} />
+      <Info peers={peers.size} />
 
-      {Array.from(peerIds).map((peerId) => (
-        <Card key={peerId}>
-          <PeerView peerId={peerId} />
+      {Array.from(peers).map((peer) => (
+        <Card key={peer.id}>
+          <PeerView peerId={peer.id} />
         </Card>
       ))}
     </>

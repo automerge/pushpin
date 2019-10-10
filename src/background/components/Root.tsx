@@ -22,7 +22,7 @@ export default function Root(props: Props) {
   return (
     <div id="root" style={{ margin: 10 }}>
       <RepoContext.Provider value={repo}>
-        <Tabs Doc={() => <DocView url={currentUrl} />} Network={() => <NetworkView />} />
+        <Tabs CurrentDoc={() => <DocView url={currentUrl} />} Network={() => <NetworkView />} />
       </RepoContext.Provider>
     </div>
   )

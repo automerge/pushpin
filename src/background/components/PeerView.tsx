@@ -1,5 +1,6 @@
 import React from 'react'
-import { PeerId, PeerConnection } from 'hypermerge/dist/NetworkPeer'
+import { PeerId } from 'hypermerge/dist/NetworkPeer'
+import PeerConnection from 'hypermerge/dist/PeerConnection'
 import Info from './Info'
 import { useSample, useRepo } from '../BackgroundHooks'
 
@@ -17,21 +18,24 @@ export default function PeerView({ peerId }: Props) {
   return (
     <div>
       <Info peerId={peerId} connection={connectionInfo(peer.connection)} />
+      {[...peer.pendingConnections].map((conn) => (
+        <Info {...connectionInfo(conn)} />
+      ))}
     </div>
   )
 }
 
-export function connectionInfo(conn?: PeerConnection<any>) {
-  if (!conn) return 'None'
+export function connectionInfo(conn: PeerConnection) {
+  const rawConn = conn as any
 
   return {
     type: conn.type,
     isOpen: conn.isOpen,
     isClient: conn.isClient,
-    sent: bytes(conn.socket.bytesWritten),
-    received: bytes(conn.socket.bytesRead),
-    host: conn.socket.remoteAddress,
-    port: conn.socket.remotePort,
+    sent: bytes(rawConn.rawSocket.bytesWritten),
+    received: bytes(rawConn.rawSocket.bytesRead),
+    host: rawConn.rawSocket.remoteAddress,
+    port: rawConn.rawSocket.remotePort,
   }
 }
 

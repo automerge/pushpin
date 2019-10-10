@@ -3,6 +3,7 @@ import { DocUrl } from 'hypermerge'
 import { useRepo, useSample } from '../BackgroundHooks'
 import Card from './Card'
 import Info from './Info'
+import PeerView from './PeerView'
 
 interface Props {
   url?: DocUrl
@@ -26,7 +27,9 @@ export default function NetworkView(props: Props) {
       <Info samples={samples} peers={peers.length} joined={network.joined.size} />
 
       {peers.map((peer) => (
-        <Card key={peer.id}>{peer.id}</Card>
+        <Card key={peer.id}>
+          <PeerView peerId={peer.id} />
+        </Card>
       ))}
     </div>
   )

@@ -10,6 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "pretty": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "downlevelIteration": true
   }
 }
