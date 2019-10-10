@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { remote } from 'electron'
 import Debug from 'debug'
+import { DocUrl } from 'hypermerge'
 
 import Automerge from 'automerge'
 import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
@@ -21,7 +22,6 @@ import ActionListItem from '../workspace/omnibox/ActionListItem'
 import './ContactEditor.css'
 import ContentTypes from '../../../ContentTypes'
 import { CurrentDeviceContext } from '../workspace/Device'
-import { DocUrl } from 'hypermerge'
 
 const { dialog } = remote
 const log = Debug('pushpin:settings')

@@ -1,0 +1,60 @@
+.StoragePeer {
+  color: var(--colorBlueBlack);
+}
+
+.StoragePeer-frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.StoragePeer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 8px;
+  line-height: 36px;
+  height: 40px;
+  border-bottom: 1px solid var(--colorPaleGrey);
+  margin-bottom: 8px;
+}
+
+.StoragePeer-section {
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--colorPaleGrey);
+}
+
+.StoragePeer-sectionLabel {
+  padding: 0 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--colorSecondaryGrey);
+  line-height: 16px;
+}
+
+.StoragePeer-sectionContent {
+  padding: 0 8px;
+}
+
+.StoragePeer-row {
+  display: flex;
+  align-items: center;
+}
+
+.StoragePeer-avatar {
+  flex: none;
+  margin-right: 8px;
+}
+
+.StoragePeer-input {
+  width: 100%;
+}
+
+.StoragePeer-colorCopy {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--colorSecondaryGrey);
+  line-height: 16px;
+}
