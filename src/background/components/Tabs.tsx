@@ -9,23 +9,41 @@ export default function Tabs(tabs: Tabs) {
 
   return (
     <div>
-      <div style={{ display: 'flex', marginBottom: 10 }}>
-        {Object.keys(tabs).map((tab) => (
-          <div
-            key={tab}
-            onClick={() => setTab(tab)}
-            style={{
-              padding: 8,
-              border: '1px solid silver',
-              marginRight: 8,
-              color: tab === currentTab ? 'red' : 'black',
-            }}
-          >
-            {tab}
-          </div>
-        ))}
+      <div style={{ display: 'flex', marginTop: 10 }}>
+        {Object.keys(tabs).map((tab) => {
+          const isCurrent = tab === currentTab
+
+          return (
+            <div
+              key={tab}
+              onClick={() => setTab(tab)}
+              style={{
+                padding: 8,
+                border: '1px solid silver',
+                borderBottom: 'none',
+                backgroundColor: 'white',
+                cursor: 'pointer',
+                marginLeft: 8,
+                color: isCurrent ? 'red' : 'black',
+                zIndex: isCurrent ? 2 : 0,
+              }}
+            >
+              {tab}
+            </div>
+          )
+        })}
       </div>
-      <div>{tabs[currentTab](currentTab)}</div>
+      <div
+        style={{
+          borderTop: '1px solid silver',
+          padding: 10,
+          marginTop: -1,
+          zIndex: 1,
+          position: 'relative',
+        }}
+      >
+        {tabs[currentTab](currentTab)}
+      </div>
     </div>
   )
 }

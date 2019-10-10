@@ -20,7 +20,7 @@ export default function Root(props: Props) {
   if (!currentUrl) return null
 
   return (
-    <div id="root" style={{ margin: 10 }}>
+    <div id="root">
       <RepoContext.Provider value={repo}>
         <Tabs CurrentDoc={() => <DocView url={currentUrl} />} Network={() => <NetworkView />} />
       </RepoContext.Provider>

@@ -32,15 +32,17 @@ export function connectionInfo(conn: PeerConnection) {
     type: conn.type,
     isOpen: conn.isOpen,
     isClient: conn.isClient,
-    sent: bytes(rawConn.rawSocket.bytesWritten),
-    received: bytes(rawConn.rawSocket.bytesRead),
     host: rawConn.rawSocket.remoteAddress,
     port: rawConn.rawSocket.remotePort,
+    sent: bytes(rawConn.rawSocket.bytesWritten),
+    received: bytes(rawConn.rawSocket.bytesRead),
   }
 }
 
 const mags = ['', 'KB', 'MB', 'GB']
-export function bytes(n: number): string {
+export function bytes(n?: number): string {
+  if (n == null) return 'N/A'
+
   let mag = 0
   while (n > 1024) {
     n /= 1024
