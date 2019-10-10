@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react'
-import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
+import React, { useCallback, useContext } from 'react'
+import { createDocumentLink, HypermergeUrl, parseDocumentLink } from '../../../ShareLink'
 
 import Content, { ContentProps } from '../../Content'
 import { StoragePeerDoc } from '.'
@@ -12,18 +12,23 @@ import ActionListItem from '../workspace/omnibox/ActionListItem'
 
 import './StoragePeerWorkspace.css'
 import TitleEditor from '../../TitleEditor'
-import { useWorkspaceUrls } from '../../../WorkspaceHooks'
+import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 
 export default function StoragePeerEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<StoragePeerDoc>(props.hypermergeUrl)
   const selfId = useSelfId()
-  const workspaceIds = useWorkspaceUrls()
-  const currentWorkspace = workspaceIds[0]
+  const workspaceUrlsContext = useContext(WorkspaceUrlsContext)
+
+  if (!workspaceUrlsContext) {
+    return null
+  }
+  const currentWorkspace = workspaceUrlsContext.workspaceUrls[0]
+  const { hypermergeUrl } = parseDocumentLink(currentWorkspace)
 
   const registerWithStoragePeer = useCallback(() => {
     console.log('registering with storage peer')
     changeDoc((doc) => {
-      doc.archivedUrls[selfId] = currentWorkspace
+      doc.archivedUrls[selfId] = hypermergeUrl
     })
   }, [])
 
@@ -44,8 +49,10 @@ export default function StoragePeerEditor(props: ContentProps) {
           actions={[]}
           selected={false}
         >
-          <Content context="list" url={createDocumentLink('contact', contact as HypermergeUrl)} />
-          <Content context="list" url={createDocumentLink('workspace', workspace)} />
+          <div className="StoragePeer-row">
+            <Content context="list" url={createDocumentLink('contact', contact as HypermergeUrl)} />
+            <Content context="list" url={createDocumentLink('workspace', workspace)} />
+          </div>
         </ActionListItem>
       ))
     ) : (
