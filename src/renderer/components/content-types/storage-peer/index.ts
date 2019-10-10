@@ -3,11 +3,10 @@ import { HypermergeUrl } from '../../../ShareLink'
 
 import StoragePeerWorkspace from './StoragePeerWorkspace'
 import StoragePeer from './StoragePeer'
+import { DeviceDoc } from '../workspace/Device'
 
-export interface StoragePeerDoc {
-  name: string
-  device: HypermergeUrl
-  archivedUrls: { [contact: string]: HypermergeUrl } // contact is actually a hypermergeURL too
+export interface StoragePeerDoc extends DeviceDoc {
+  storedUrls: { [contact: string]: HypermergeUrl } // contact is actually a hypermergeURL too
 }
 
 function create(typeAttrs, handle, callback) {

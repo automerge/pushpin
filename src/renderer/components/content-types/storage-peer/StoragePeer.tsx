@@ -11,6 +11,7 @@ import Label from '../../Label'
 import './StoragePeer.css'
 import { useDocument } from '../../../Hooks'
 import TitleEditor from '../../TitleEditor'
+import SecondaryText from '../../SecondaryText'
 
 const log = Debug('pushpin:settings')
 
@@ -29,7 +30,7 @@ export default function StoragePeer(props: ContentProps) {
   }
 
   const { context } = props
-  const { device } = doc
+  const { storedUrls } = doc
 
   switch (context) {
     case 'list':
@@ -37,7 +38,10 @@ export default function StoragePeer(props: ContentProps) {
         <div draggable onDragStart={onDragStart} className="DocLink">
           <Badge icon="cloud" shape="circle" />
           <Label>
-            <TitleEditor field="name" url={device} />
+            <TitleEditor field="name" url={props.hypermergeUrl} />
+            <SecondaryText>
+              {storedUrls.length} URL{Object.keys(storedUrls).length === 1 ? '' : 's'} stored
+            </SecondaryText>
           </Label>
         </div>
       )
@@ -46,7 +50,7 @@ export default function StoragePeer(props: ContentProps) {
       return (
         <div className="StoragePeer--board">
           <Badge icon="cloud" size="large" />
-          <TitleEditor field="name" url={device} />
+          <TitleEditor field="name" url={props.hypermergeUrl} />
         </div>
       )
 

@@ -15,7 +15,8 @@ import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 import { ContactDoc } from '../contact'
 
 export default function StoragePeerEditor(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<StoragePeerDoc>(props.hypermergeUrl)
+  const { hypermergeUrl } = props
+  const [doc, changeDoc] = useDocument<StoragePeerDoc>(hypermergeUrl)
   const selfId = useSelfId()
   const workspaceUrlsContext = useContext(WorkspaceUrlsContext)
   const [selfDoc, changeSelfDoc] = useDocument<ContactDoc>(selfId)
@@ -24,19 +25,19 @@ export default function StoragePeerEditor(props: ContentProps) {
     return null
   }
   const currentWorkspace = workspaceUrlsContext.workspaceUrls[0]
-  const { hypermergeUrl } = parseDocumentLink(currentWorkspace)
+  const { hypermergeUrl: workspaceUrl } = parseDocumentLink(currentWorkspace)
 
   const registerWithStoragePeer = useCallback(() => {
     changeDoc((doc) => {
-      doc.archivedUrls[selfId] = hypermergeUrl
+      doc.storedUrls[selfId] = workspaceUrl
     })
 
     changeSelfDoc((selfDoc) => {
       if (!selfDoc.devices) {
         selfDoc.devices = []
       }
-      if (doc && doc.device && !selfDoc.devices.includes(doc.device)) {
-        selfDoc.devices.push(doc.device)
+      if (doc && !selfDoc.devices.includes(hypermergeUrl)) {
+        selfDoc.devices.push(hypermergeUrl)
       }
     })
   }, [selfDoc])
@@ -45,9 +46,15 @@ export default function StoragePeerEditor(props: ContentProps) {
     return null
   }
 
-  const { device, archivedUrls } = doc
+  const { storedUrls } = doc
 
-  const archiveEntries = Object.entries(archivedUrls)
+  if (!storedUrls && (doc as any).archivedUrls) {
+    changeDoc((doc) => {
+      doc.storedUrls = (doc as any).archivedUrls
+    })
+  }
+
+  const archiveEntries = Object.entries(storedUrls)
 
   const renderedUrls =
     archiveEntries.length > 0 ? (
@@ -77,11 +84,11 @@ export default function StoragePeerEditor(props: ContentProps) {
         <div className="StoragePeerEditor-section">
           <div className="StoragePeerEditor-sectionLabel">Storage Peer</div>
           <div className="StoragePeerEditor-sectionContent">
-            <Content context="list" url={createDocumentLink('device', device)} editable />
+            <Content context="list" url={createDocumentLink('device', hypermergeUrl)} editable />
           </div>
         </div>
         <div className="StoragePeerEditor-section">
-          <div className="StoragePeerEditor-sectionLabel">Archived Workspaces</div>
+          <div className="StoragePeerEditor-sectionLabel">Stored Workspaces</div>
           <div className="StoragePeerEditor-sectionContent">{renderedUrls}</div>
         </div>
         <button type="button" onClick={registerWithStoragePeer}>
