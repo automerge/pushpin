@@ -221,7 +221,11 @@ function UrlContentInList(props: ContentProps) {
       </span>
       <div className="urlCard-banner">
         {doc.imageHyperfileUrl ? (
-          <img className="urlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
+          <img
+            className="urlCard-img"
+            src={doc.imageHyperfileUrl}
+            alt={data && !('error' in data) ? data.description : ''}
+          />
         ) : null}
 
         <div className="urlCard-banner-title">
