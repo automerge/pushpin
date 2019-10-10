@@ -69,6 +69,11 @@ export default function UrlContent(props: ContentProps) {
       </div>
     )
   }
+
+  function iframeOnLoad(e: Document) {
+    console.log(e.target)
+  }
+
   if (props.context === 'workspace') {
     return (
       <div className="urlCard urlCard--workspace">
@@ -78,6 +83,7 @@ export default function UrlContent(props: ContentProps) {
           <iframe
             className="urlCard-iframe"
             frameBorder="0"
+            onLoad={iframeOnLoad}
             title={data.title}
             src={data.canonicalLink || url}
           />
