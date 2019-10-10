@@ -1,12 +1,14 @@
 import React from 'react'
+import LogLink from './LogLink'
 
-type Value = string | number | boolean | React.ReactElement | object
+type Value = string | number | boolean | React.ReactElement | object | null | undefined
 
 interface Props {
+  log?: any
   [name: string]: Value
 }
 
-export default function Info(info: Props) {
+export default function Info({ log, ...info }: Props) {
   return (
     <code
       style={{
@@ -14,8 +16,14 @@ export default function Info(info: Props) {
         gridTemplateColumns: 'auto 1fr',
         gridGap: '0 5px',
         whiteSpace: 'pre-wrap',
+        position: 'relative',
       }}
     >
+      {log ? (
+        <div style={{ position: 'absolute', top: 0, right: 0 }}>
+          <LogLink v={log} />
+        </div>
+      ) : null}
       {Object.keys(info).map((k) => (
         <React.Fragment key={k}>
           <div>{k}:</div>

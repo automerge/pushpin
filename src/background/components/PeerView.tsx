@@ -17,9 +17,9 @@ export default function PeerView({ peerId }: Props) {
 
   return (
     <div>
-      <Info peerId={peerId} connection={connectionInfo(peer.connection)} />
-      {Array.from(peer.pendingConnections).map((conn) => (
-        <Info {...connectionInfo(conn)} />
+      <Info log={peer} peerId={peerId} connection={connectionInfo(peer.connection)} />
+      {Array.from(peer.pendingConnections).map((conn, i) => (
+        <Info key={String(i)} log={conn} {...connectionInfo(conn)} />
       ))}
     </div>
   )
@@ -30,8 +30,7 @@ export function connectionInfo(conn: PeerConnection) {
 
   return {
     type: conn.type,
-    isOpen: conn.isOpen,
-    isClient: conn.isClient,
+    isConnected: conn.isOpen,
     host: rawConn.rawSocket.remoteAddress,
     port: rawConn.rawSocket.remotePort,
     sent: bytes(rawConn.rawSocket.bytesWritten),

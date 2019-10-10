@@ -17,6 +17,7 @@ export default function DocView({ url }: Props) {
   const id = validateDocURL(url)
 
   const actorIds = repo.meta.actors(id)
+  const doc = repo.docs.get(id)
 
   return (
     <div
@@ -25,14 +26,26 @@ export default function DocView({ url }: Props) {
         gridGap: 8,
       }}
     >
-      <Info docUrl={url} feeds={String(actorIds.length)} />
+      <Info log={doc} docUrl={url} clock={renderClock(doc && doc.clock)} feeds={actorIds.length} />
 
       {actorIds.map((actorId) => (
         <Card key={actorId}>
           <FeedView feedId={actorId} />
         </Card>
       ))}
+
       <PeersView discoveryId={toDiscoveryId(id)} />
     </div>
+  )
+}
+
+function renderClock(clock: any) {
+  if (!clock) return null
+
+  return (
+    <details>
+      <summary>{Object.keys(clock).length} actors...</summary>
+      <Info {...clock} />
+    </details>
   )
 }

@@ -5,6 +5,7 @@ import { RepoContext, useWindowVisibility } from '../BackgroundHooks'
 import '../../renderer/app.css'
 import '../main.css'
 import NetworkView from './NetworkView'
+import ReplicationView from './ReplicationView'
 import Tabs from './Tabs'
 
 interface Props {
@@ -22,7 +23,11 @@ export default function Root(props: Props) {
   return (
     <div id="root">
       <RepoContext.Provider value={repo}>
-        <Tabs CurrentDoc={() => <DocView url={currentUrl} />} Network={() => <NetworkView />} />
+        <Tabs
+          CurrentDoc={() => <DocView url={currentUrl} />}
+          Network={() => <NetworkView />}
+          Replication={() => <ReplicationView />}
+        />
       </RepoContext.Provider>
     </div>
   )

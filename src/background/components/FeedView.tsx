@@ -10,14 +10,16 @@ interface Props {
   feedId: FeedId
 }
 
-export default function FeedView(props: Props) {
-  const info = useFeedInfo(props.feedId)
+export default function FeedView({ feedId }: Props) {
+  const feed = useFeed(feedId)
+  const info = useFeedInfo(feedId)
 
   return (
     <div>
       <Info
-        feedId={props.feedId}
-        discoveryId={toDiscoveryId(props.feedId)}
+        log={feed}
+        feedId={feedId}
+        discoveryId={toDiscoveryId(feedId)}
         isWritable={info.writable}
         blocks={`${info.downloaded} / ${info.total}`}
       />
