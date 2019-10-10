@@ -24,24 +24,24 @@
   z-index: -1;
 }
 
-button[disabled].TitleBar__menuItem .fa {
+button[disabled].TitleBar-menuItem .fa {
   color: #ccc;
 }
 
-.TitleBar__center {
+.TitleBar-center {
   display: flex;
   align-items: center;
   margin: 0 auto;
 }
 
-.TitleBar .TitleBar__right,
-.TitleBar .TitleBar__left {
+.TitleBar-right,
+.TitleBar-left {
   align-items: center;
   display: flex;
   height: 40px;
 }
 
-.TitleBar .TitleBar__menuItem {
+.TitleBar-menuItem {
   font-size: 24px;
   color: var(--colorSecondaryGrey);
   box-sizing: border-box;
@@ -57,16 +57,16 @@ button[disabled].TitleBar__menuItem .fa {
   outline: none;
 }
 
-.TitleBar .TitleBar__menuItem:active,
-.TitleBar .TitleBar__menuItem:focus {
+.TitleBar-menuItem:active,
+.TitleBar-menuItem:focus {
   outline: none;
 }
 
-.TitleBar .TitleBar__menuItem:hover {
+.TitleBar-menuItem:hover {
   color: var(--colorBlueBlack);
 }
 
-.TitleBar .TitleBar__right .dropdown__trigger {
+.TitleBar-right .dropdown__trigger {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,22 +74,26 @@ button[disabled].TitleBar__menuItem .fa {
   height: 40px;
 }
 
-.TitleBar .TitleBar__right .dropdown.dropdown--active {
+.TitleBar-right .dropdown.dropdown--active {
   background-color: var(--colorInputGrey);
 }
 
-.TitleBar .TitleBar__right .dropdown__content {
+.TitleBar-right .dropdown__content {
   top: 48px;
   right: 0px;
 }
 
-.TitleBar .TitleBar__left .dropdown__content {
+.TitleBar-left .dropdown__content {
   left: 0px;
   top: 48px;
 }
 
-.TitleBar__logo {
+.TitleBar-logo {
   margin-right: 8px;
+}
+
+.TitleBar-self {
+  padding-left: 4px;
 }
 
 @keyframes color-flash {
