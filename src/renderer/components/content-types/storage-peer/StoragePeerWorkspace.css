@@ -1,15 +1,15 @@
-.StoragePeer {
+.StoragePeerEditor {
   color: var(--colorBlueBlack);
 }
 
-.StoragePeer-frame {
+.StoragePeerEditor-frame {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.StoragePeer-heading {
+.StoragePeerEditor-heading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,13 +20,13 @@
   margin-bottom: 8px;
 }
 
-.StoragePeer-section {
+.StoragePeerEditor-section {
   padding-bottom: 8px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--colorPaleGrey);
 }
 
-.StoragePeer-sectionLabel {
+.StoragePeerEditor-sectionLabel {
   padding: 0 8px;
   margin-bottom: 8px;
   font-size: 14px;
@@ -34,25 +34,25 @@
   line-height: 16px;
 }
 
-.StoragePeer-sectionContent {
+.StoragePeerEditor-sectionContent {
   padding: 0 8px;
 }
 
-.StoragePeer-row {
+.StoragePeerEditor-row {
   display: flex;
   align-items: center;
 }
 
-.StoragePeer-avatar {
+.StoragePeerEditor-avatar {
   flex: none;
   margin-right: 8px;
 }
 
-.StoragePeer-input {
+.StoragePeerEditor-input {
   width: 100%;
 }
 
-.StoragePeer-colorCopy {
+.StoragePeerEditor-colorCopy {
   margin-top: 4px;
   font-size: 14px;
   color: var(--colorSecondaryGrey);

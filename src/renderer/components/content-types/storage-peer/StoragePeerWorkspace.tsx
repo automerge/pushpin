@@ -65,21 +65,21 @@ export default function StoragePeerEditor(props: ContentProps) {
           actions={[]}
           selected={false}
         >
-          <div className="StoragePeer-row">
+          <div className="StoragePeerEditor-row">
             <Content context="list" url={createDocumentLink('contact', contact as HypermergeUrl)} />
             <Content context="list" url={createDocumentLink('workspace', workspace)} />
           </div>
         </ActionListItem>
       ))
     ) : (
-      <SecondaryText>No devices registered...</SecondaryText>
+      <SecondaryText>No workspaces currently stored...</SecondaryText>
     )
 
   return (
     <div className="StoragePeerEditor-frame">
       <div className="StoragePeerEditor">
         <div className="StoragePeerEditor-heading">
-          <Heading>Edit Profile...</Heading>
+          <Heading>Storage Peer Control</Heading>
         </div>
         <div className="StoragePeerEditor-section">
           <div className="StoragePeerEditor-sectionLabel">Storage Peer</div>
