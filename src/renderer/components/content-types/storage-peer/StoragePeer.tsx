@@ -6,11 +6,11 @@ import { StoragePeerDoc } from '.'
 import Badge from '../../Badge'
 
 import { createDocumentLink } from '../../../ShareLink'
-import Text from '../../Text'
 import Label from '../../Label'
 
 import './StoragePeer.css'
 import { useDocument } from '../../../Hooks'
+import TitleEditor from '../../TitleEditor'
 
 const log = Debug('pushpin:settings')
 
@@ -29,7 +29,7 @@ export default function StoragePeer(props: ContentProps) {
   }
 
   const { context } = props
-  const { name } = doc
+  const { device } = doc
 
   switch (context) {
     case 'list':
@@ -37,7 +37,7 @@ export default function StoragePeer(props: ContentProps) {
         <div draggable onDragStart={onDragStart} className="DocLink">
           <Badge icon="cloud" shape="circle" />
           <Label>
-            <Text>{name}</Text>
+            <TitleEditor field="name" url={device} />
           </Label>
         </div>
       )
@@ -46,7 +46,7 @@ export default function StoragePeer(props: ContentProps) {
       return (
         <div className="StoragePeer--board">
           <Badge icon="cloud" size="large" />
-          <div className="StoragePeer-boardLabel">{name}</div>
+          <TitleEditor field="name" url={device} />
         </div>
       )
 

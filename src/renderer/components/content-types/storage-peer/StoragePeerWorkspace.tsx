@@ -11,7 +11,6 @@ import SecondaryText from '../../SecondaryText'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 
 import './StoragePeerWorkspace.css'
-import TitleEditor from '../../TitleEditor'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 import { ContactDoc } from '../contact'
 
@@ -28,16 +27,15 @@ export default function StoragePeerEditor(props: ContentProps) {
   const { hypermergeUrl } = parseDocumentLink(currentWorkspace)
 
   const registerWithStoragePeer = useCallback(() => {
-    console.log('registering with storage peer')
     changeDoc((doc) => {
       doc.archivedUrls[selfId] = hypermergeUrl
     })
-    console.log(selfId, selfDoc)
+
     changeSelfDoc((selfDoc) => {
       if (!selfDoc.devices) {
         selfDoc.devices = []
       }
-      if (doc && doc.device) {
+      if (doc && doc.device && !selfDoc.devices.includes(doc.device)) {
         selfDoc.devices.push(doc.device)
       }
     })
@@ -77,15 +75,9 @@ export default function StoragePeerEditor(props: ContentProps) {
           <Heading>Edit Profile...</Heading>
         </div>
         <div className="StoragePeerEditor-section">
-          <div className="StoragePeerEditor-sectionLabel">Storage Peer Name</div>
+          <div className="StoragePeerEditor-sectionLabel">Storage Peer</div>
           <div className="StoragePeerEditor-sectionContent">
-            <TitleEditor field="name" url={props.hypermergeUrl} />
-          </div>
-        </div>
-        <div className="StoragePeerEditor-section">
-          <div className="StoragePeerEditor-sectionLabel">Storage Peer Device Doc</div>
-          <div className="StoragePeerEditor-sectionContent">
-            <Content context="list" url={createDocumentLink('device', device)} />
+            <Content context="list" url={createDocumentLink('device', device)} editable />
           </div>
         </div>
         <div className="StoragePeerEditor-section">
