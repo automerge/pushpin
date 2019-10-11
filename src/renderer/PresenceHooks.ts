@@ -114,7 +114,11 @@ function lookupKeyToPresencePieces(key: string): [HypermergeUrl, HypermergeUrl] 
   return [contact as HypermergeUrl, device as HypermergeUrl]
 }
 
-function useRemotePresence<P>(url: HypermergeUrl | null, topic: string = '/') {
+export function usePresence<P>(
+  url: HypermergeUrl | null,
+  presence?: P,
+  key: string = '/'
+): RemotePresence<P>[] {
   const [remote, setRemoteInner] = useState<RemotePresenceCache<P>>({})
   const setSingleRemote = (presence: RemotePresence<P>) => {
     setRemoteInner((prev) => ({
@@ -137,17 +141,6 @@ function useRemotePresence<P>(url: HypermergeUrl | null, topic: string = '/') {
       depart(remotePresenceToLookupKey(presence))
     }
   })
-  return Object.values(remote)
-    .filter((presence) => presence.data)
-    .map((presence) => ({ ...presence, data: presence.data![topic] }))
-}
-
-export function usePresence<P>(
-  url: HypermergeUrl | null,
-  presence?: P,
-  key: string = '/'
-): RemotePresence<P>[] {
-  const remotePresence = useRemotePresence<P>(url, key)
 
   useEffect(() => {
     if (!url || !key) return () => {}
@@ -167,7 +160,9 @@ export function usePresence<P>(
     }
   }, [key, presence])
 
-  return remotePresence
+  return Object.values(remote)
+    .filter((presence) => presence.data)
+    .map((presence) => ({ ...presence, data: presence.data![key] }))
 }
 
 /**
@@ -175,34 +170,35 @@ export function usePresence<P>(
  * devices for that context. Will return an empty array if no device is online for the contact.
  * If the contact is self (the current user), the current device will be listed first.
  */
-export function useOnlineDevicesForContact(contact: HypermergeUrl | null): PushpinUrl[] {
+export function useOnlineDevicesForContact(contactId: HypermergeUrl | null): PushpinUrl[] {
   const selfId = useSelfId()
-  const selfDevice = useContext(CurrentDeviceContext)
+  const selfDeviceUrl = useContext(CurrentDeviceContext)
 
-  const remotePresence = useRemotePresence(contact)
-  const onlineRemotes = remotePresence.filter((p) => p.contact === contact)
+  const onlineRemotes = usePresence(contactId).filter((p) => p.contact === contactId)
   const remoteDevices = onlineRemotes.map((presence) =>
     createDocumentLink('device', presence.device)
   )
 
-  if (selfId === contact && selfDevice) {
-    remoteDevices.unshift(selfDevice)
+  if (selfId === contactId && selfDeviceUrl) {
+    remoteDevices.unshift(selfDeviceUrl)
   }
   return remoteDevices
+}
+
+export function useContactOnlineStatus(contactId: HypermergeUrl | null): boolean {
+  const selfId = useSelfId()
+  const presence = usePresence(contactId)
+  return selfId === contactId || presence.some((p) => p.contact === contactId)
 }
 
 /**
  * For a given device, return whether or not the device is online.
  * If the passed device is the current device, always returns true.
  */
-export function useOnlineStatusForDevice(deviceUrl: HypermergeUrl | null): boolean {
-  const localDevice = useContext(CurrentDeviceContext)
-  const remotePresence = useRemotePresence(deviceUrl)
-  const isSelf = localDevice && parseDocumentLink(localDevice).hypermergeUrl === deviceUrl
-  return isSelf || remotePresence.some((p) => p.device === deviceUrl)
-}
-
-export function useOnlineStatus(contactId: HypermergeUrl | null): boolean {
-  const onlineDevices = useOnlineDevicesForContact(contactId)
-  return onlineDevices.length > 0
+export function useDeviceOnlineStatus(deviceId: HypermergeUrl | null): boolean {
+  const currentDeviceUrl = useContext(CurrentDeviceContext)
+  const presence = usePresence(deviceId)
+  const isCurrentDevice =
+    currentDeviceUrl && parseDocumentLink(currentDeviceUrl).hypermergeUrl === deviceId
+  return isCurrentDevice || presence.some((p) => p.device === deviceId)
 }
