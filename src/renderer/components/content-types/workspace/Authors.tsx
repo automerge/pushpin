@@ -6,7 +6,7 @@ import { Doc as WorkspaceDoc } from './Workspace'
 import Author from './Author'
 
 import './Authors.css'
-import { useDocument } from '../../../Hooks'
+import { useDocument, useSelfId } from '../../../Hooks'
 
 const log = Debug('pushpin:authors')
 
@@ -21,7 +21,10 @@ interface DocWithAuthors {
 
 export default function Authors(props: Props) {
   const authorIds = useAuthors(props.hypermergeUrl)
+  // Remove self from the authors list.
+  const selfId = useSelfId()
   const authors = authorIds
+    .filter((authorId) => authorId !== selfId)
     .filter((id, i, a) => a.indexOf(id) === i)
     .map((id) => <Author key={id} contactId={id} />)
 
@@ -32,7 +35,7 @@ export function useAuthors(workspaceUrl: HypermergeUrl): HypermergeUrl[] {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(workspaceUrl)
   const { hypermergeUrl = null } = workspace ? parseDocumentLink(workspace.currentDocUrl) : {}
   const [board, changeBoard] = useDocument<DocWithAuthors>(hypermergeUrl)
-  const selfId = workspace && workspace.selfId
+  const selfId = useSelfId()
 
   useEffect(() => {
     if (!workspace || !board) {

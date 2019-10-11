@@ -1,14 +1,14 @@
-.ContactEditor {
+.StoragePeerEditor {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.ContactEditor-content {
+.StoragePeerEditor-content {
   color: var(--colorBlueBlack);
 }
 
-.ContactEditor-heading {
+.StoragePeerEditor-heading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,13 +19,13 @@
   margin-bottom: 8px;
 }
 
-.ContactEditor-section {
+.StoragePeerEditor-section {
   padding-bottom: 8px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--colorPaleGrey);
 }
 
-.ContactEditor-sectionLabel {
+.StoragePeerEditor-sectionLabel {
   padding: 0 8px;
   margin-bottom: 8px;
   font-size: 14px;
@@ -33,25 +33,25 @@
   line-height: 16px;
 }
 
-.ContactEditor-sectionContent {
+.StoragePeerEditor-sectionContent {
   padding: 0 8px;
 }
 
-.ContactEditor-row {
+.StoragePeerEditor-row {
   display: flex;
   align-items: center;
 }
 
-.ContactEditor-avatar {
+.StoragePeerEditor-avatar {
   flex: none;
   margin-right: 8px;
 }
 
-.ContactEditor-input {
+.StoragePeerEditor-input {
   width: 100%;
 }
 
-.ContactEditor-colorCopy {
+.StoragePeerEditor-colorCopy {
   margin-top: 4px;
   font-size: 14px;
   color: var(--colorSecondaryGrey);
