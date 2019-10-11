@@ -48,7 +48,7 @@ export default function StoragePeer(props: ContentProps) {
 
     case 'board':
       return (
-        <div className="StoragePeer--board">
+        <div className="StoragePeer">
           <Badge icon="cloud" size="large" />
           <TitleEditor field="name" url={props.hypermergeUrl} />
         </div>

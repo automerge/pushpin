@@ -71,22 +71,24 @@ export default function StoragePeerEditor(props: ContentProps) {
 
   return (
     <div className="StoragePeerEditor">
-      <div className="StoragePeerEditor-heading">
-        <Heading>Storage Peer Control</Heading>
-      </div>
-      <div className="StoragePeerEditor-section">
-        <div className="StoragePeerEditor-sectionLabel">Storage Peer</div>
-        <div className="StoragePeerEditor-sectionContent">
-          <Content context="list" url={createDocumentLink('device', hypermergeUrl)} editable />
+      <div className="StoragePeerEditor-content">
+        <div className="StoragePeerEditor-heading">
+          <Heading>Storage Peer Control</Heading>
         </div>
+        <div className="StoragePeerEditor-section">
+          <div className="StoragePeerEditor-sectionLabel">Storage Peer</div>
+          <div className="StoragePeerEditor-sectionContent">
+            <Content context="list" url={createDocumentLink('device', hypermergeUrl)} editable />
+          </div>
+        </div>
+        <div className="StoragePeerEditor-section">
+          <div className="StoragePeerEditor-sectionLabel">Stored Workspaces</div>
+          <div className="StoragePeerEditor-sectionContent">{renderedUrls}</div>
+        </div>
+        <button type="button" onClick={registerWithStoragePeer}>
+          Register with Storage Peer
+        </button>
       </div>
-      <div className="StoragePeerEditor-section">
-        <div className="StoragePeerEditor-sectionLabel">Stored Workspaces</div>
-        <div className="StoragePeerEditor-sectionContent">{renderedUrls}</div>
-      </div>
-      <button type="button" onClick={registerWithStoragePeer}>
-        Register with Storage Peer
-      </button>
     </div>
   )
 }

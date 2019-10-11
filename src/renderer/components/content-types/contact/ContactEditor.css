@@ -1,9 +1,11 @@
 .ContactEditor {
-  color: var(--colorBlueBlack);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+}
+
+.ContactEditor-content {
+  color: var(--colorBlueBlack);
 }
 
 .ContactEditor-heading {
