@@ -1,7 +1,8 @@
 import React from 'react'
 import LogLink from './LogLink'
 
-type Value = string | number | boolean | React.ReactElement | object | null | undefined
+type Value = string | number | boolean | React.ReactElement | object | null | undefined | ValueArray
+interface ValueArray extends Array<Value> {}
 
 interface Props {
   log?: any
@@ -34,10 +35,27 @@ export default function Info({ log, ...info }: Props) {
   )
 }
 
+export function hidden(summary: Value, details: Value): Value {
+  return (
+    <details>
+      <summary>{renderValue(summary)}</summary>
+      {renderValue(details)}
+    </details>
+  )
+}
+
 function renderValue(v: Value) {
   if (v == null) return ''
   if (typeof v === 'boolean') return v ? 'yes' : 'no'
   if (React.isValidElement(v)) return v
+  if (Array.isArray(v))
+    return (
+      <>
+        {v.map((v2, i) => (
+          <div key={String(i)}>{renderValue(v2)}</div>
+        ))}
+      </>
+    )
   if (typeof v === 'object') return <Info {...v} />
 
   return String(v)

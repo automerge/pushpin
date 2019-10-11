@@ -5,7 +5,7 @@ import { toDiscoveryId } from 'hypermerge/dist/Misc'
 import { useRepo } from '../BackgroundHooks'
 import FeedView from './FeedView'
 import Card from './Card'
-import Info from './Info'
+import Info, { hidden } from './Info'
 import PeersView from './PeersView'
 
 interface Props {
@@ -26,14 +26,17 @@ export default function DocView({ url }: Props) {
         gridGap: 8,
       }}
     >
-      <Info log={doc} docUrl={url} clock={renderClock(doc && doc.clock)} feeds={actorIds.length} />
+      <Info log={doc} docUrl={url} clock={renderClock(doc && doc.clock)} />
 
+      <hr />
+      <Info feeds={actorIds.length} />
       {actorIds.map((actorId) => (
         <Card key={actorId}>
           <FeedView feedId={actorId} />
         </Card>
       ))}
 
+      <hr />
       <PeersView discoveryId={toDiscoveryId(id)} />
     </div>
   )
@@ -41,11 +44,5 @@ export default function DocView({ url }: Props) {
 
 function renderClock(clock: any) {
   if (!clock) return null
-
-  return (
-    <details>
-      <summary>{Object.keys(clock).length} actors...</summary>
-      <Info {...clock} />
-    </details>
-  )
+  return hidden(`${Object.keys(clock).length} actors...`, clock)
 }

@@ -24,7 +24,6 @@ export default function Tabs(tabs: Tabs) {
                 backgroundColor: 'white',
                 cursor: 'pointer',
                 marginLeft: 8,
-                color: isCurrent ? 'red' : 'black',
                 zIndex: isCurrent ? 2 : 0,
               }}
             >
