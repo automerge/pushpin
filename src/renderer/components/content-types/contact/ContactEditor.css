@@ -1,8 +1,5 @@
 .ContactEditor {
   color: var(--colorBlueBlack);
-}
-
-.ContactEditor-frame {
   display: flex;
   flex-direction: column;
   justify-content: center;

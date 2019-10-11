@@ -154,57 +154,55 @@ export default function ContactEditor(props: ContentProps) {
   }
 
   return (
-    <div className="ContactEditor-frame">
-      <div className="ContactEditor">
-        <div className="ContactEditor-heading">
-          <Heading>Edit Profile...</Heading>
+    <div className="ContactEditor">
+      <div className="ContactEditor-heading">
+        <Heading>Edit Profile...</Heading>
+      </div>
+      <div className="ContactEditor-section">
+        <div className="ContactEditor-sectionLabel">Display Name</div>
+        <div className="ContactEditor-sectionContent">
+          <input
+            className="ContactEditor-input"
+            type="text"
+            onChange={setName}
+            value={name || ''}
+          />
         </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Display Name</div>
-          <div className="ContactEditor-sectionContent">
-            <input
-              className="ContactEditor-input"
-              type="text"
-              onChange={setName}
-              value={name || ''}
-            />
-          </div>
-        </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Avatar</div>
-          <div className="ContactEditor-sectionContent">
-            <div className="ContactEditor-row">
-              <div className="ContactEditor-avatar">
-                <div className="Avatar">{avatar}</div>
-              </div>
-              <Label>
-                <button type="button" onClick={chooseAvatar}>
-                  Choose from file...
-                </button>
-              </Label>
+      </div>
+      <div className="ContactEditor-section">
+        <div className="ContactEditor-sectionLabel">Avatar</div>
+        <div className="ContactEditor-sectionContent">
+          <div className="ContactEditor-row">
+            <div className="ContactEditor-avatar">
+              <div className="Avatar">{avatar}</div>
             </div>
+            <Label>
+              <button type="button" onClick={chooseAvatar}>
+                Choose from file...
+              </button>
+            </Label>
           </div>
         </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Presence Color</div>
-          <div className="ContactEditor-sectionContent">
-            <ColorPicker
-              color={color}
-              colors={Object.values(USER_COLORS)}
-              onChangeComplete={setColor}
-            />
-            <div className="ContactEditor-colorCopy">
-              <SecondaryText>
-                Your presence colour will be used to by other authors identify you when you are
-                active on a board.
-              </SecondaryText>
-            </div>
+      </div>
+      <div className="ContactEditor-section">
+        <div className="ContactEditor-sectionLabel">Presence Color</div>
+        <div className="ContactEditor-sectionContent">
+          <ColorPicker
+            color={color}
+            colors={Object.values(USER_COLORS)}
+            onChangeComplete={setColor}
+          />
+          <div className="ContactEditor-colorCopy">
+            <SecondaryText>
+              Your presence colour will be used to by other authors identify you when you are active
+              on a board.
+            </SecondaryText>
           </div>
         </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Devices</div>
-          <div className="ContactEditor-sectionContent">{renderedDevices}</div>
-        </div>
+      </div>
+      <div className="ContactEditor-section">
+        <div className="ContactEditor-sectionLabel">Devices</div>
+        <div className="ContactEditor-sectionContent">{renderedDevices}</div>
       </div>
     </div>
   )

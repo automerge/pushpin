@@ -36,7 +36,7 @@ export default function StoragePeerEditor(props: ContentProps) {
       if (!selfDoc.devices) {
         selfDoc.devices = []
       }
-      if (doc && !selfDoc.devices.includes(hypermergeUrl)) {
+      if (!selfDoc.devices.includes(hypermergeUrl)) {
         selfDoc.devices.push(hypermergeUrl)
       }
     })
@@ -48,11 +48,11 @@ export default function StoragePeerEditor(props: ContentProps) {
 
   const { storedUrls } = doc
 
-  const archiveEntries = Object.entries(storedUrls)
+  const storedEntries = Object.entries(storedUrls)
 
   const renderedUrls =
-    archiveEntries.length > 0 ? (
-      archiveEntries.map(([contact, workspace]) => (
+    storedEntries.length > 0 ? (
+      storedEntries.map(([contact, workspace]) => (
         <ActionListItem
           key={contact}
           contentUrl={createDocumentLink('workspace', workspace)}

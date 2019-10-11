@@ -6,7 +6,7 @@ import StoragePeer from './StoragePeer'
 import { DeviceDoc } from '../workspace/Device'
 
 export interface StoragePeerDoc extends DeviceDoc {
-  storedUrls: { [contact: string]: HypermergeUrl } // contact is actually a hypermergeURL too
+  storedUrls: { [contact: string /* HypermergeUrl */]: HypermergeUrl }
 }
 
 function create(typeAttrs, handle, callback) {
