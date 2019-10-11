@@ -70,23 +70,13 @@ export default function UrlContent(props: ContentProps) {
     )
   }
 
-  function iframeOnLoad(e: Document) {
-    console.log(e.target)
-  }
-
   if (props.context === 'workspace') {
     return (
       <div className="urlCard urlCard--workspace">
         {html ? (
           <iframe frameBorder="0" title={data.title} srcDoc={html} />
         ) : (
-          <iframe
-            className="urlCard-iframe"
-            frameBorder="0"
-            onLoad={iframeOnLoad}
-            title={data.title}
-            src={data.canonicalLink || url}
-          />
+          <webview className="urlCard-iframe" title={data.title} src={data.canonicalLink || url} />
         )}
       </div>
     )
