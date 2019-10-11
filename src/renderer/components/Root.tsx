@@ -16,13 +16,13 @@ import './content-types/defaults/DefaultInList'
 import './content-types/board'
 import './content-types/contact'
 import './content-types/files'
+import './content-types/storage-peer'
 
 // other single-context components
 import './content-types/TextContent'
 import './content-types/ThreadContent'
 import './content-types/UrlContent'
 import './content-types/files/ImageContent'
-// disabled for now
 import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
