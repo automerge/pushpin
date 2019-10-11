@@ -4,6 +4,7 @@ import { ContentProps } from '../../Content'
 import { BoardDoc } from '.'
 import { createDocumentLink } from '../../../ShareLink'
 import { useDocument } from '../../../Hooks'
+import './BoardInBoard.css'
 
 BoardInBoard.minWidth = 4
 BoardInBoard.minHeight = 6
@@ -29,53 +30,15 @@ export default function BoardInBoard(props: ContentProps) {
   }
 
   return (
-    <div className="BoardLink" onDoubleClick={handleDoubleClick} style={css.wrapper}>
-      <i className="fa fa-files-o" style={{ ...css.icon, background: backgroundColor }} />
-      <div style={css.caption}>
-        <span style={css.title}>{title}</span>
+    <div className="BoardLink BoardInBoard-wrapper" onDoubleClick={handleDoubleClick}>
+      <div className="BoardInBoard-icon" style={{ background: backgroundColor }}>
+        <i className="fa fa-files-o" />
+      </div>
+      <div className="BoardInBoard-caption">
+        <span className="BoardInBoard-title">{title}</span>
         <br />
         {`${childCardCount} card${childCardCount === 1 ? '' : 's'}`}
       </div>
     </div>
   )
-}
-
-const css = {
-  icon: {
-    display: 'flex' as 'flex',
-    alignItems: 'center' as 'center',
-    justifyContent: 'center' as 'center',
-    fontSize: '32px',
-    borderRadius: '50%',
-    width: 60,
-    height: 60,
-    flex: 'none' as 'none',
-  },
-  caption: {
-    color: 'var(--colorSecondaryGrey)',
-    marginTop: '2px',
-    width: '100%',
-    textOverflow: 'ellipsis' as 'ellipsis',
-    fontSize: '12px',
-    lineHeight: '20px',
-    textAlign: 'center' as 'center',
-    whiteSpace: 'nowrap' as 'nowrap',
-    overflow: 'hidden' as 'hidden',
-  },
-  title: {
-    color: 'var(--colorBlueBlack)',
-    fontWeight: '600' as 'bold', // errrrrr
-  },
-  wrapper: {
-    boxSizing: 'border-box' as 'border-box',
-    border: '1px solid var(--colorPaleGrey)',
-    overflow: 'hidden' as 'hidden',
-    padding: '10px',
-    backgroundColor: 'white',
-    display: 'flex' as 'flex',
-    flexDirection: 'column' as 'column',
-    alignItems: 'center' as 'center',
-    justifyContent: 'center' as 'center',
-    width: '100%',
-  },
 }

@@ -58,8 +58,8 @@ export default function ContactInVarious(props: ContentProps) {
   const avatarImage = avatarDocId ? (
     <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
   ) : (
-    <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-  )
+      <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+    )
 
   const avatar = (
     <div className="Contact-avatar">
@@ -74,8 +74,8 @@ export default function ContactInVarious(props: ContentProps) {
           {isSelf ? (
             <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
           ) : (
-            isOnline && <ColorBadge color="green" />
-          )}
+              isOnline && <ColorBadge color="green" />
+            )}
         </div>
       </a>
     </div>
@@ -94,11 +94,9 @@ export default function ContactInVarious(props: ContentProps) {
 
     case 'thread':
       return (
-        <div style={css.user}>
+        <div className="Contact-user">
           {avatar}
-          <div className="username" style={css.username}>
-            {name}
-          </div>
+          <div className="username Contact-username">{name}</div>
         </div>
       )
 
@@ -121,73 +119,4 @@ export default function ContactInVarious(props: ContentProps) {
       log('contact render called in an unexpected context')
       return null
   }
-}
-
-const css = {
-  threadWrapper: {
-    display: 'flex',
-    backgroundColor: 'white',
-    width: '100%',
-    overflow: 'auto',
-    height: '100%',
-  },
-  messageWrapper: {
-    padding: 12,
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    overflowY: 'scroll',
-    marginBottom: 49,
-    flexGrow: 1,
-  },
-  messageGroup: {
-    marginBottom: -24,
-    paddingTop: 12,
-  },
-  groupedMessages: {
-    position: 'relative',
-    top: -20,
-    paddingLeft: 40 + 8,
-  },
-  messages: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    flexGrow: '1',
-  },
-  message: {
-    color: 'black',
-    display: 'flex',
-    lineHeight: '20px',
-    padding: '2px 0',
-  },
-  user: {
-    display: 'flex',
-  },
-  username: {
-    paddingLeft: 8,
-    fontSize: 12,
-    color: 'var(--colorBlueBlack)',
-  },
-  avatar: {},
-  time: {
-    flex: 'none',
-    marginLeft: 'auto',
-    fontSize: 12,
-    color: 'var(--colorSecondaryGrey)',
-    marginTop: -22,
-  },
-  content: {},
-  inputWrapper: {
-    boxSizing: 'border-box',
-    width: 'calc(100% - 1px)',
-    borderTop: '1px solid var(--colorInputGrey)',
-    position: 'absolute',
-    bottom: 0,
-    backgroundColor: 'white',
-    padding: 8,
-  },
-  input: {
-    width: '100%',
-  },
 }
