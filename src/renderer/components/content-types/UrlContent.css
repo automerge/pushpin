@@ -15,34 +15,38 @@
   margin: 0;
 }
 
-.urlCard {
+.UrlCard {
   display: flex;
   flex-direction: column;
   background-color: white;
   box-sizing: border-box;
   overflow: auto;
   position: relative;
-  padding: 12;
+  padding: 12px;
   flex: 1 1 auto;
   border: 1px solid var(--colorPaleGrey);
 }
 
-.urlCard--workspace {
+.UrlCard--workspace {
   height: 100%;
 }
 
-.urlCard-banner {
+.UrlListItem {
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: 100%;
 }
 
-.urlCard-banner > .urlCard-img {
+.UrlListItem-icon {
   height: 40px;
-  padding: 0 8px 0 8px;
+  margin: 0 8px 0 8px;
+  -webkit-user-drag: none;
+  display: block;
+  object-fit: cover;
 }
 
-.urlCard-banner-title {
+.UrlListItem-title {
   display: flex;
   flex-direction: column;
   font-family: IBM Plex Sans;
@@ -56,57 +60,57 @@
   flex-shrink: 0;
 }
 
-.urlCard-iframe {
+.UrlCard-iframe {
   flex: 1;
 }
 
-.urlCard-img {
+.UrlCard-img {
   -webkit-user-drag: none;
   height: 192px;
   display: block;
   object-fit: cover;
-  margin-bottom: 12;
-  margin-left: -12;
-  margin-top: -12;
-  margin-right: -12;
+  margin-bottom: 12px;
+  margin-left: -12px;
+  margin-top: -12px;
+  margin-right: -12px;
 }
 
-.urlCard-title {
+.UrlCard-title {
   font-family: IBM Plex Sans;
   font-size: 18px;
   line-height: 24px;
   color: black;
   text-decoration: none;
-  margin-bottom: 12;
-  max-height: 72;
+  margin-bottom: 12px;
+  max-height: 72px;
   overflow-y: hidden;
   text-overflow: ellipsis;
   flex-shrink: 0;
 }
 
-.urlCard-titleAnchor {
+.UrlCard-titleAnchor {
   -webkit-user-drag: none;
   color: inherit;
   text-decoration: none;
 }
 
-.urlCard-text {
+.UrlCard-text {
   font-family: IBM Plex Sans;
   font-size: 12px;
   line-height: 16px;
   color: #637389;
-  margin-bottom: 12;
+  margin-bottom: 12px;
   flex: 1;
 }
 
-.urlCard-error {
+.UrlCard-error {
   font-family: IBM Plex Sans;
   font-size: 10px;
   line-height: 1.2;
   color: #637389;
 }
 
-.urlCard-link {
+.UrlCard-link {
   font-family: IBM Plex Sans;
   font-size: 10px;
   line-height: 1.2;

@@ -46,10 +46,10 @@ export default function UrlContent(props: ContentProps) {
 
   if (!data) {
     return (
-      <div className="urlCard">
-        <p className="urlCard-title">Fetching...</p>
-        <p className="urlCard-link">
-          <a className="urlCard-titleAnchor" href={url}>
+      <div className="UrlCard">
+        <p className="UrlCard-title">Fetching...</p>
+        <p className="UrlCard-link">
+          <a className="UrlCard-titleAnchor" href={url}>
             {url}
           </a>
         </p>
@@ -59,10 +59,10 @@ export default function UrlContent(props: ContentProps) {
 
   if ('error' in data) {
     return (
-      <div className="urlCard">
-        <p className="urlCard-error">(URL did not load.)</p>
-        <p className="urlCard-link">
-          <a className="urlCard-titleAnchor" href={url}>
+      <div className="UrlCard">
+        <p className="UrlCard-error">(URL did not load.)</p>
+        <p className="UrlCard-link">
+          <a className="UrlCard-titleAnchor" href={url}>
             {url}
           </a>
         </p>
@@ -72,29 +72,29 @@ export default function UrlContent(props: ContentProps) {
 
   if (props.context === 'workspace') {
     return (
-      <div className="urlCard urlCard--workspace">
+      <div className="UrlCard UrlCard--workspace">
         {html ? (
           <iframe frameBorder="0" title={data.title} srcDoc={html} />
         ) : (
-          <webview className="urlCard-iframe" title={data.title} src={data.canonicalLink || url} />
-        )}
+            <webview className="UrlCard-iframe" title={data.title} src={data.canonicalLink || url} />
+          )}
       </div>
     )
   }
 
   return (
-    <div className="urlCard">
+    <div className="UrlCard">
       {doc.imageHyperfileUrl ? (
-        <img className="urlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
+        <img className="UrlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
       ) : null}
 
-      <p className="urlCard-title">
+      <p className="UrlCard-title">
         <span className="titleAnchor">{data.title}</span>
       </p>
 
-      <p className="urlCard-text">{data.description}</p>
-      <p className="urlCard-link">
-        <span className="urlCard-titleAnchor">
+      <p className="UrlCard-text">{data.description}</p>
+      <p className="UrlCard-link">
+        <span className="UrlCard-titleAnchor">
           <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
         </span>
       </p>
@@ -211,31 +211,29 @@ function UrlContentInList(props: ContentProps) {
   const { data, url } = doc
 
   return (
-    <div className="DocLink">
+    <div className="UrlListItem">
       <span draggable onDragStart={onDragStart}>
         <Badge icon="chain" />
       </span>
-      <div className="urlCard-banner">
-        {doc.imageHyperfileUrl ? (
-          <img
-            className="urlCard-img"
-            src={doc.imageHyperfileUrl}
-            alt={data && !('error' in data) ? data.description : ''}
-          />
-        ) : null}
+      {doc.imageHyperfileUrl ? (
+        <img
+          className="UrlListItem-icon"
+          src={doc.imageHyperfileUrl}
+          alt={data && !('error' in data) ? data.description : ''}
+        />
+      ) : null}
 
-        <div className="urlCard-banner-title">
-          {data && !('error' in data) && data.title ? (
-            <>
-              <Heading>{data.title}</Heading>
-              <SecondaryText>
-                <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
-              </SecondaryText>
-            </>
-          ) : (
+      <div className="UrlListItem-title">
+        {data && !('error' in data) && data.title ? (
+          <>
+            <Heading>{data.title}</Heading>
+            <SecondaryText>
+              <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+            </SecondaryText>
+          </>
+        ) : (
             <Heading>{url}</Heading>
           )}
-        </div>
       </div>
     </div>
   )
