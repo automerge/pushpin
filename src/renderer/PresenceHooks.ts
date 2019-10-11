@@ -187,7 +187,7 @@ export function useOnlineDevicesForContact(contactId: HypermergeUrl | null): Pus
 
 export function useContactOnlineStatus(contactId: HypermergeUrl | null): boolean {
   const selfId = useSelfId()
-  const presence = usePresence(contactId)
+  const presence = usePresence(contactId, {}, 'onlineStatus')
   return selfId === contactId || presence.some((p) => p.contact === contactId)
 }
 
@@ -197,8 +197,8 @@ export function useContactOnlineStatus(contactId: HypermergeUrl | null): boolean
  */
 export function useDeviceOnlineStatus(deviceId: HypermergeUrl | null): boolean {
   const currentDeviceUrl = useContext(CurrentDeviceContext)
-  const presence = usePresence(deviceId)
   const isCurrentDevice =
     currentDeviceUrl && parseDocumentLink(currentDeviceUrl).hypermergeUrl === deviceId
+  const presence = usePresence(deviceId, {}, 'onlineStatus')
   return isCurrentDevice || presence.some((p) => p.device === deviceId)
 }
