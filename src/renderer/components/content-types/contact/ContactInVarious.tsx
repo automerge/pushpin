@@ -13,7 +13,7 @@ import Label from '../../Label'
 
 import './ContactInVarious.css'
 import { useSelfId, useDocument } from '../../../Hooks'
-import { useOnlineStatus } from '../../../PresenceHooks'
+import { useContactOnlineStatus } from '../../../PresenceHooks'
 import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
 import ColorBadge from '../../ColorBadge'
 
@@ -31,7 +31,7 @@ export default function ContactInVarious(props: ContentProps) {
     avatarImageDoc || {}
 
   const isSelf = selfId === props.hypermergeUrl
-  const isOnline = useOnlineStatus(props.hypermergeUrl)
+  const isOnline = useContactOnlineStatus(props.hypermergeUrl)
 
   function onDragStart(e: React.DragEvent) {
     e.dataTransfer.setData(
@@ -65,7 +65,7 @@ export default function ContactInVarious(props: ContentProps) {
     <div className="Contact-avatar">
       <a href={props.url}>
         <div
-          className={`Avatar Avatar--${context} Avatar--${isOnline ? 'online' : 'offline'}`}
+          className={`Avatar Avatar--${context}`}
           style={{ ['--highlight-color' as any]: color }}
         >
           {avatarImage}

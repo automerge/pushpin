@@ -9,7 +9,7 @@ import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
 import './Device.css'
 import TitleEditor from '../../TitleEditor'
-import { useOnlineStatusForDevice } from '../../../PresenceHooks'
+import { useDeviceOnlineStatus } from '../../../PresenceHooks'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
@@ -22,7 +22,7 @@ interface Props extends ContentProps {
 
 function Device(props: Props) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
-  const isOnline = useOnlineStatusForDevice(props.hypermergeUrl)
+  const isOnline = useDeviceOnlineStatus(props.hypermergeUrl)
   if (!doc) return null
   const { icon = 'desktop', name } = doc
 
