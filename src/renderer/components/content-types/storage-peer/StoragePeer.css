@@ -9,33 +9,3 @@
   background-color: white;
   border: 1px solid var(--colorPaleGrey);
 }
-
-.StoragePeer--boardLabel {
-  width: 100%;
-  margin-top: 2px;
-  color: var(--colorBlueBlack);
-  line-height: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.StoragePeer-name {
-  flex: none;
-  margin-right: 8px;
-}
-
-.StoragePeer-avatar {
-  position: relative;
-}
-
-.StoragePeer-status {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  height: 8px;
-  width: 8px;
-}

@@ -1,8 +1,5 @@
 .StoragePeerEditor {
   color: var(--colorBlueBlack);
-}
-
-.StoragePeerEditor-frame {
   display: flex;
   flex-direction: column;
   justify-content: center;
