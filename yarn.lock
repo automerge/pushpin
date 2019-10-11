@@ -1240,9 +1240,9 @@ atomic-batcher@^1.0.2:
   resolved "https://registry.yarnpkg.com/atomic-batcher/-/atomic-batcher-1.0.2.tgz#d16901d10ccec59516c197b9ccd8930689b813b4"
   integrity sha1-0WkB0QzOxZUWwZe5zNiTBom4E7Q=
 
-automerge@^0.12.1, "automerge@github:automerge/automerge#opaque-strings":
-  version "0.12.1"
-  resolved "https://codeload.github.com/automerge/automerge/tar.gz/90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
+"automerge@github:automerge/automerge#opaque-strings":
+  version "0.12.2-beta.0"
+  resolved "https://codeload.github.com/automerge/automerge/tar.gz/340ca073b716f28426175e221766352e52d84daf"
   dependencies:
     immutable "^3.8.2"
     transit-immutable-js "^0.7.0"
@@ -4372,11 +4372,11 @@ hypercore@^8.0.2:
     fd-lock "^1.0.2"
 
 "hypermerge@github:automerge/hypermerge#hyperswarm":
-  version "1.0.42"
-  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/80051154118f21c882178f8e7fc45204108137a9"
+  version "2.0.0-beta.2"
+  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/2f8878969f5b8274c4cc5cd787343f0bc001e455"
   dependencies:
     "@types/better-sqlite3" "^5.4.0"
-    automerge "^0.12.1"
+    automerge "github:automerge/automerge#opaque-strings"
     better-sqlite3 "^5.4.3"
     bs58 "^4.0.1"
     copyfiles "^2.1.1"
