@@ -40,7 +40,7 @@ export default function Root({ repo, system }: Props) {
 
   const { workspaceUrls, addWorkspaceUrl, createWorkspace } = workspaceUrlsContextData
   if (!workspaceUrls[0]) {
-    return null
+    return <div>No workspace urls</div>
   }
 
   return (

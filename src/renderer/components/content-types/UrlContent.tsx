@@ -83,6 +83,7 @@ export default function UrlContent(props: ContentProps) {
               className="UrlCard-webview"
               title={data.title}
               src={data.canonicalLink || url}
+              preload="./freeze-dry-preload.js"
             />
           )}
         </div>

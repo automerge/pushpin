@@ -109,7 +109,7 @@ function config(cb: (opts: Options) => webpack.Configuration) {
         mode,
         output: {
           path: path.resolve(__dirname, 'dist'),
-          filename: `[name].js`,
+          filename: `${conf.name}.js`,
           globalObject: 'this',
         },
       } as webpack.Configuration,
@@ -125,6 +125,28 @@ export default [
     name: 'main',
     entry: ['./src/main'],
     target: 'electron-main',
+    plugins: [
+      new ForkTsCheckerPlugin({
+        formatter: 'codeframe',
+      }),
+      ...(isDev
+        ? [
+            new HardSourcePlugin({
+              cacheDirectory,
+              info: {
+                level: 'warn',
+                mode: 'none',
+              },
+            }),
+          ]
+        : []),
+    ],
+  })),
+
+  config(({ isDev }) => ({
+    name: 'freeze-dry-preload',
+    entry: ['./src/freeze-dry-preload'],
+    target: 'electron-renderer',
     plugins: [
       new ForkTsCheckerPlugin({
         formatter: 'codeframe',
