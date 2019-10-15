@@ -11,7 +11,12 @@ import { ContactDoc } from '../contact'
 
 import './Workspace.css'
 import { useDocument } from '../../../Hooks'
-import { useAllHeartbeats, useHeartbeat } from '../../../PresenceHooks'
+import {
+  useAllHeartbeats,
+  useHeartbeat,
+  useContactOnlineStatus,
+  useDeviceOnlineStatus,
+} from '../../../PresenceHooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
@@ -41,10 +46,17 @@ export default function Workspace(props: WorkspaceContentProps) {
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
   const [self, changeSelf] = useDocument<ContactDoc>(selfId)
+  const currentDeviceId = currentDeviceUrl
+    ? parseDocumentLink(currentDeviceUrl).hypermergeUrl
+    : null
 
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
+  useHeartbeat(currentDeviceId)
   useHeartbeat(currentDocUrl)
+
+  useDeviceOnlineStatus(currentDeviceId)
+  useContactOnlineStatus(selfId)
 
   const sendToSystem = useSystem(
     (msg) => {

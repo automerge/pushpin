@@ -19,15 +19,11 @@ export interface Props {
   size?: BadgeSize
 }
 
-export default React.forwardRef(
-  (
-    { icon, backgroundColor, size = 'large', shape = 'circle' }: Props,
-    ref: React.Ref<HTMLElement>
-  ) => (
-    <i
-      ref={ref}
-      className={`Badge Badge--${size} Badge--${shape} fa fa-${icon}`}
-      style={{ background: backgroundColor }}
-    />
+export default React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) => {
+  const { icon, backgroundColor, size = 'large', shape = 'circle' } = props
+  return (
+    <div ref={ref} className={`Badge Badge--${size} Badge--${shape}`} style={{ backgroundColor }}>
+      <i className={`fa fa-${icon}`} />
+    </div>
   )
-)
+})

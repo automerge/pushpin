@@ -34,6 +34,7 @@ async function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
+      webviewTag: true,
     },
   })
 

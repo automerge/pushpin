@@ -48,7 +48,6 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
   cb(front)
 }
 
-
 function initWorkspace(repo: RepoFrontend) {
   const system = initSystem()
 

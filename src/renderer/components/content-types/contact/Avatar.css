@@ -30,7 +30,7 @@
   height: 60px;
 }
 
-.Avatar--online {
+.Avatar--present {
   border: 2px solid var(--highlight-color, var(--colorOnline));
   box-shadow: 0 0 4px 0 var(--highlight-color, var(--colorOnline));
 }

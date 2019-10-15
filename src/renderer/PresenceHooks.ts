@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
-import { HypermergeUrl, parseDocumentLink } from './ShareLink'
-import { useTimeouts, useMessaging, useRepo } from './Hooks'
+import { HypermergeUrl, parseDocumentLink, createDocumentLink, PushpinUrl } from './ShareLink'
+import { useTimeouts, useMessaging, useRepo, useSelfId } from './Hooks'
 import { CurrentDeviceContext } from './components/content-types/workspace/Device'
 
 /**
@@ -8,6 +8,7 @@ import { CurrentDeviceContext } from './components/content-types/workspace/Devic
  * report heartbeats (and forward our "presence data") to.
  */
 const heartbeats: { [url: string]: number } = {} // url: HypermergeUrl
+
 /**
  * myPresence is the data (per-url) that we send to our peers
  */
@@ -162,4 +163,42 @@ export function usePresence<P>(
   return Object.values(remote)
     .filter((presence) => presence.data)
     .map((presence) => ({ ...presence, data: presence.data![key] }))
+}
+
+/**
+ * For a given contact, return the device urls (as pushpin urls) which are online
+ * devices for that context. Will return an empty array if no device is online for the contact.
+ * If the contact is self (the current user), the current device will be listed first.
+ */
+export function useOnlineDevicesForContact(contactId: HypermergeUrl | null): PushpinUrl[] {
+  const selfId = useSelfId()
+  const selfDeviceUrl = useContext(CurrentDeviceContext)
+
+  const onlineRemotes = usePresence(contactId).filter((p) => p.contact === contactId)
+  const remoteDevices = onlineRemotes.map((presence) =>
+    createDocumentLink('device', presence.device)
+  )
+
+  if (selfId === contactId && selfDeviceUrl) {
+    remoteDevices.unshift(selfDeviceUrl)
+  }
+  return remoteDevices
+}
+
+export function useContactOnlineStatus(contactId: HypermergeUrl | null): boolean {
+  const selfId = useSelfId()
+  const presence = usePresence(contactId, {}, 'onlineStatus')
+  return selfId === contactId || presence.some((p) => p.contact === contactId)
+}
+
+/**
+ * For a given device, return whether or not the device is online.
+ * If the passed device is the current device, always returns true.
+ */
+export function useDeviceOnlineStatus(deviceId: HypermergeUrl | null): boolean {
+  const currentDeviceUrl = useContext(CurrentDeviceContext)
+  const isCurrentDevice =
+    currentDeviceUrl && parseDocumentLink(currentDeviceUrl).hypermergeUrl === deviceId
+  const presence = usePresence(deviceId, {}, 'onlineStatus')
+  return isCurrentDevice || presence.some((p) => p.device === deviceId)
 }
