@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Feed } from 'hypermerge/dist/hypercore'
+import { Feed, FeedId } from 'hypermerge/dist/FeedStore'
 import { useImmer } from 'use-immer'
 import { toDiscoveryId } from 'hypermerge/dist/Misc'
-import { FeedId } from 'hypermerge/dist/FeedStore'
+
 import { useRepo } from '../BackgroundHooks'
 import Info from './Info'
 
@@ -45,14 +45,6 @@ export default function FeedView({ feedId }: Props) {
       </div>
     </div>
   )
-}
-
-declare module 'hypermerge/dist/hypercore' {
-  // The hypermerge Feed type is not quite correct:
-  interface Feed<T> {
-    on(event: 'append', cb: () => void): this
-    off(event: string, cb: Function): this
-  }
 }
 
 interface FeedInfo {
@@ -123,8 +115,8 @@ function useFeedInfo(feedId: FeedId): FeedInfo {
   return info
 }
 
-function useFeed(feedId: FeedId): Feed<Uint8Array> | null {
-  const [feed, setFeed] = useState<Feed<Uint8Array> | null>(null)
+function useFeed(feedId: FeedId): Feed | null {
+  const [feed, setFeed] = useState<Feed | null>(null)
   const repo = useRepo()
 
   useEffect(() => {
