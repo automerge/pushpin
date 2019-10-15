@@ -58,8 +58,8 @@ export default function ContactInVarious(props: ContentProps) {
   const avatarImage = avatarDocId ? (
     <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
   ) : (
-      <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-    )
+    <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+  )
 
   const avatar = (
     <div className="Contact-avatar">
@@ -74,8 +74,8 @@ export default function ContactInVarious(props: ContentProps) {
           {isSelf ? (
             <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
           ) : (
-              isOnline && <ColorBadge color="green" />
-            )}
+            isOnline && <ColorBadge color="green" />
+          )}
         </div>
       </a>
     </div>

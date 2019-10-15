@@ -1,8 +1,4 @@
-import raf from 'random-access-file'
-
-// const DiscoverySwarm = require('discovery-swarm')
-// const defaults = require('dat-swarm-defaults')
-import DiscoverySwarm from 'discovery-cloud-client'
+import Hyperswarm from 'hyperswarm'
 import * as ReactDOM from 'react-dom'
 import React from 'react'
 
@@ -17,14 +13,13 @@ import { ToSystemMsg } from '../renderer/System'
 
 window._debug = {}
 
-const back = new RepoBackend({ storage: raf, path: HYPERMERGE_PATH })
-const url = 'wss://discovery-cloud.herokuapp.com'
-const discovery = new DiscoverySwarm({ url, id: back.id, stream: back.stream })
+const back = new RepoBackend({ path: HYPERMERGE_PATH })
+const swarm = Hyperswarm()
 
-back.setSwarm(discovery as any)
+back.setSwarm(swarm)
 back.startFileServer(FILE_SERVER_PATH)
 window._debug.repo = back
-window._debug.discovery = discovery
+window._debug.swarm = swarm
 
 ipc.config.id = 'background'
 

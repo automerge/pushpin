@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { Feed } from 'hypermerge/dist/hypercore'
 import { useImmer } from 'use-immer'
+import { toDiscoveryId } from 'hypermerge/dist/Misc'
+import { FeedId } from 'hypermerge/dist/FeedStore'
 import { useRepo } from '../BackgroundHooks'
 import Info from './Info'
 
 interface Props {
-  feedId: string
+  feedId: FeedId
 }
 
-export default function FeedView(props: Props) {
-  const info = useFeedInfo(props.feedId)
+export default function FeedView({ feedId }: Props) {
+  const feed = useFeed(feedId)
+  const info = useFeedInfo(feedId)
 
   return (
     <div>
       <Info
-        feedId={props.feedId}
-        writable={String(info.writable)}
+        log={feed}
+        feedId={feedId}
+        discoveryId={toDiscoveryId(feedId)}
+        isWritable={info.writable}
         blocks={`${info.downloaded} / ${info.total}`}
       />
 
@@ -57,7 +62,7 @@ interface FeedInfo {
   blocks: boolean[]
 }
 
-function useFeedInfo(feedId: string): FeedInfo {
+function useFeedInfo(feedId: FeedId): FeedInfo {
   const feed = useFeed(feedId)
   const [info, update] = useImmer<FeedInfo>({
     writable: false,
@@ -118,12 +123,12 @@ function useFeedInfo(feedId: string): FeedInfo {
   return info
 }
 
-function useFeed(feedId: string): Feed<Uint8Array> | null {
+function useFeed(feedId: FeedId): Feed<Uint8Array> | null {
   const [feed, setFeed] = useState<Feed<Uint8Array> | null>(null)
   const repo = useRepo()
 
   useEffect(() => {
-    repo.store.getFeed(feedId as any).then((fd) => {
+    repo.feeds.getFeed(feedId).then((fd) => {
       setFeed(fd)
     })
   }, [feedId])

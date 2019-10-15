@@ -4,6 +4,9 @@ import DocView from './DocView'
 import { RepoContext, useWindowVisibility } from '../BackgroundHooks'
 import '../../renderer/app.css'
 import '../main.css'
+import NetworkView from './NetworkView'
+import ReplicationView from './ReplicationView'
+import Tabs from './Tabs'
 
 interface Props {
   repo: RepoBackend
@@ -18,9 +21,13 @@ export default function Root(props: Props) {
   if (!currentUrl) return null
 
   return (
-    <div id="root" style={{ margin: 10 }}>
+    <div id="root">
       <RepoContext.Provider value={repo}>
-        <DocView url={currentUrl} />
+        <Tabs
+          CurrentDoc={() => <DocView url={currentUrl} />}
+          Network={() => <NetworkView />}
+          Replication={() => <ReplicationView />}
+        />
       </RepoContext.Provider>
     </div>
   )
