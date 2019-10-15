@@ -66,6 +66,7 @@ function determineUrlContents(url, callback: CreatedContentCallback) {
       if (!blob) {
         return
       }
+      // XXX: come back and look at this
       const file = new File([blob], url, { type: blob.type, lastModified: Date.now() })
       ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
     })

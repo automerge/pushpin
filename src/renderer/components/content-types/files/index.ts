@@ -7,41 +7,36 @@ import FileContent from './FileContent'
 import FileInList from './FileInList'
 
 import * as Hyperfile from '../../../hyperfile'
+import { toNodeReadable } from '../../../../NodeReadable'
 
 const log = Debug('pushpin:filecontent')
 
 export interface FileDoc {
   title: string // names are editable and not an intrinsic part of the file
-  hyperfileUrl: HyperfileUrl
   extension: string
-  mimeType: string
+  hyperfileUrl: HyperfileUrl
 }
 
 function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
-  const reader = new FileReader()
   const { name = 'Unnamed File' } = entry
 
-  reader.onload = () => {
-    const buffer = Buffer.from(reader.result as ArrayBuffer)
-    const mimeType = mime.contentType(entry.type) || 'application/octet-stream'
-    Hyperfile.writeBuffer(buffer, mimeType)
-      .then((hyperfileUrl) => {
-        handle.change((doc: FileDoc) => {
-          const parsed = path.parse(name)
-          doc.hyperfileUrl = hyperfileUrl
-          doc.title = parsed.name
-          doc.extension = parsed.ext.slice(1)
-          doc.mimeType = mimeType
-          // save the mimetype so we don't have to look it up
-        })
-        callback()
-      })
-      .catch((err) => {
-        log(err)
-      })
-  }
+  // XXX: fix this any type
+  const fileStream = toNodeReadable((entry as any).stream())
+  const mimeType = mime.contentType(entry.type) || 'application/octet-stream'
 
-  reader.readAsArrayBuffer(entry)
+  Hyperfile.write(fileStream, mimeType)
+    .then(({ url }) => {
+      handle.change((doc: FileDoc) => {
+        const parsed = path.parse(name)
+        doc.hyperfileUrl = url
+        doc.title = parsed.name
+        doc.extension = parsed.ext.slice(1)
+      })
+      callback()
+    })
+    .catch((err) => {
+      log(err)
+    })
 }
 
 ContentTypes.register({

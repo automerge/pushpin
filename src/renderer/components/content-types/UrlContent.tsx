@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 
-import { Handle, HyperfileUrl } from 'hypermerge'
+import { Handle } from 'hypermerge'
+import { Header } from 'hypermerge/dist/FileStore'
 import * as Hyperfile from '../../hyperfile'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
@@ -12,6 +13,7 @@ import './UrlContent.css'
 import SecondaryText from '../SecondaryText'
 import Badge from '../Badge'
 import Heading from '../Heading'
+import { toNodeReadable } from '../../../NodeReadable'
 
 const log = Debug('pushpin:url')
 
@@ -164,9 +166,9 @@ function refreshImageContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
     return
   }
 
-  uploadImageUrl(image).then((hyperfileUrl) => {
+  importImageUrl(image).then(({ url }: Header) => {
     change((doc: UrlDoc) => {
-      doc.imageHyperfileUrl = hyperfileUrl
+      doc.imageHyperfileUrl = url
     })
   })
 }
@@ -186,10 +188,14 @@ function unfluffUrl(url: string): Promise<UrlData> {
     })
 }
 
-function uploadImageUrl(url: string): Promise<HyperfileUrl> {
-  return fetch(url)
-    .then((response) => response.arrayBuffer())
-    .then((buffer) => Hyperfile.writeBuffer(new Uint8Array(buffer)))
+function importImageUrl(url: string): Promise<Header> {
+  return fetch(url).then((response) => {
+    if (!response.body) {
+      throw new Error('image fetch failed')
+    }
+    const contentType = response.headers.get('content-type') || 'application/octet-stream'
+    return Hyperfile.write(toNodeReadable(response.body), contentType)
+  })
 }
 
 function removeEmpty(obj: object) {
