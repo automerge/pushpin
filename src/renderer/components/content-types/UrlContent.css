@@ -23,6 +23,7 @@
   max-width: 1200px;
   height: 100%;
   padding: 12px 12px 0 12px;
+  margin-left: 28px; /* match space for external link */
 }
 
 .UrlListItem {
