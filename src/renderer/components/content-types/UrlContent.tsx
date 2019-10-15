@@ -83,10 +83,10 @@ export default function UrlContent(props: ContentProps) {
               src={data.canonicalLink || url}
             />
           )}
-          <div className="UrlCard-browserLink">
-            <i className="fa fa-external-link" />
-          </div>
         </div>
+        <a className="UrlCard-external" title="Open in browser..." href={data.canonicalLink || url}>
+          <i className="fa fa-external-link" />
+        </a>
       </div>
     )
   }

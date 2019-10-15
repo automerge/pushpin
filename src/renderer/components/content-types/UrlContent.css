@@ -22,6 +22,7 @@
 .UrlCard--workspace {
   max-width: 1200px;
   height: 100%;
+  padding: 12px 12px 0 12px;
 }
 
 .UrlListItem {
@@ -29,6 +30,13 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
+}
+
+.UrlCard-external {
+  font-size: 24px;
+  text-decoration: none;
+  color: var(--colorBlueBlack);
+  padding-left: 4px;
 }
 
 .UrlListItem-icon {
