@@ -1,18 +1,10 @@
-.Workspace__container.Workspace__container--url {
-  box-sizing: border-box;
+.UrlCardWorkspace {
   padding: 40px 0 40px 0;
   background: var(--colorInputGrey);
   display: flex;
   justify-content: center;
-}
-
-.Workspace__container.Workspace__container--url > * {
-  height: auto;
-  max-width: 1200px;
-  background-color: white;
-}
-.Workspace__container.Workspace__container--url > *::-webkit-scrollbar-track {
-  margin: 0;
+  box-sizing: border-box;
+  height: 100%;
 }
 
 .UrlCard {
@@ -28,7 +20,10 @@
 }
 
 .UrlCard--workspace {
+  max-width: 1200px;
   height: 100%;
+  padding: 12px 12px 0 12px;
+  margin-left: 28px; /* match space for external link */
 }
 
 .UrlListItem {
@@ -36,6 +31,13 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
+}
+
+.UrlCard-external {
+  font-size: 24px;
+  text-decoration: none;
+  color: var(--colorBlueBlack);
+  padding-left: 4px;
 }
 
 .UrlListItem-icon {
@@ -60,7 +62,7 @@
   flex-shrink: 0;
 }
 
-.UrlCard-iframe {
+.UrlCard-webview {
   flex: 1;
 }
 
