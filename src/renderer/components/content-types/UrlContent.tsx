@@ -72,12 +72,21 @@ export default function UrlContent(props: ContentProps) {
 
   if (props.context === 'workspace') {
     return (
-      <div className="UrlCard UrlCard--workspace">
-        {html ? (
-          <iframe frameBorder="0" title={data.title} srcDoc={html} />
-        ) : (
-            <webview className="UrlCard-iframe" title={data.title} src={data.canonicalLink || url} />
+      <div className="UrlCardWorkspace">
+        <div className="UrlCard UrlCard--workspace">
+          {html ? (
+            <iframe frameBorder="0" title={data.title} srcDoc={html} />
+          ) : (
+            <webview
+              className="UrlCard-webview"
+              title={data.title}
+              src={data.canonicalLink || url}
+            />
           )}
+          <div className="UrlCard-browserLink">
+            <i className="fa fa-external-link" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -232,8 +241,8 @@ function UrlContentInList(props: ContentProps) {
             </SecondaryText>
           </>
         ) : (
-            <Heading>{url}</Heading>
-          )}
+          <Heading>{url}</Heading>
+        )}
       </div>
     </div>
   )

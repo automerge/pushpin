@@ -7,6 +7,11 @@
 .Workspace__container {
   margin-top: 40px;
 }
+
+.Workspace__container > *::-webkit-scrollbar-track {
+  margin: 0;
+}
+
 .Workspace__container.Workspace__container--image {
   background: var(--colorInputGrey);
   display: flex;
