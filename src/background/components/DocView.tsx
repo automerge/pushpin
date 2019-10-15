@@ -17,7 +17,7 @@ export default function DocView({ url }: Props) {
   const id = validateDocURL(url)
 
   const clock = repo.cursors.get(repo.id, id)
-  const actorIds = Object.keys(clock)
+  const actorIds = Object.keys(clock) as any[]
   const doc = repo.docs.get(id)
 
   return (
