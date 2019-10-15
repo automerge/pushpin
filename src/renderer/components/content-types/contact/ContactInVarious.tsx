@@ -12,7 +12,7 @@ import Text from '../../Text'
 import Label from '../../Label'
 
 import './ContactInVarious.css'
-import { useSelfId, useDocument } from '../../../Hooks'
+import { useSelfId, useDocument, useHyperfile } from '../../../Hooks'
 import { useContactOnlineStatus } from '../../../PresenceHooks'
 import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
 import ColorBadge from '../../ColorBadge'
@@ -27,8 +27,16 @@ export default function ContactInVarious(props: ContentProps) {
   const name = contact ? contact.name : null
 
   const [avatarImageDoc] = useDocument<FileDoc>(avatarDocId)
-  const { hyperfileUrl = null, mimeType = 'application/octet', extension = null } =
-    avatarImageDoc || {}
+
+  const { hyperfileUrl = null, extension = null } = avatarImageDoc || {}
+
+  const [header] = useHyperfile(hyperfileUrl)
+
+  if (!header) {
+    return null
+  }
+
+  const { mimeType = 'application/octet-stream' } = header
 
   const isSelf = selfId === props.hypermergeUrl
   const isOnline = useContactOnlineStatus(props.hypermergeUrl)
