@@ -32,11 +32,7 @@ export default function ContactInVarious(props: ContentProps) {
 
   const [header] = useHyperfile(hyperfileUrl)
 
-  if (!header) {
-    return null
-  }
-
-  const { mimeType = 'application/octet-stream' } = header
+  const { mimeType = 'application/octet-stream' } = header || {}
 
   const isSelf = selfId === props.hypermergeUrl
   const isOnline = useContactOnlineStatus(props.hypermergeUrl)
