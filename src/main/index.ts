@@ -1,7 +1,6 @@
 import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
-import { Readable } from 'stream'
 import * as Hyperfile from '../renderer/hyperfile'
 import { FromSystemMsg } from '../renderer/System'
 
@@ -215,16 +214,6 @@ function createMenu() {
   Menu.setApplicationMenu(menu)
 }
 
-function streamToBuffer(stream: Readable): Promise<Buffer> {
-  return new Promise((res, rej) => {
-    const buffers: Buffer[] = []
-    stream
-      .on('data', (data: Buffer) => buffers.push(data))
-      .on('error', (err: any) => rej(err))
-      .on('end', () => res(Buffer.concat(buffers)))
-  })
-}
-
 function registerProtocolHandlers() {
   protocol.registerHttpProtocol('pushpin', (req, _cb) => {
     // we don't want to use loadURL because we don't want to reset the whole app state
@@ -240,7 +229,7 @@ function registerProtocolHandlers() {
       try {
         if (Hyperfile.isHyperfileUrl(request.url)) {
           const [, /* header */ stream] = await Hyperfile.fetch(request.url)
-          const buffer = await streamToBuffer(stream)
+          const buffer = await Hyperfile.streamToBuffer(stream)
           callback(buffer)
         }
       } catch (e) {
