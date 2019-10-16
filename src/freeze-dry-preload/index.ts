@@ -25,7 +25,10 @@ async function capturePage() {
   // TODO(jeff): Provide a custom `fetchResource(url: string): Response`
   // option to prevent cors errors.
   const html = await freezeDry(document)
-  const { url } = await files.write(Stream.fromBuffer(Buffer.from(html, 'utf8')), 'text/html')
+  const { url } = await files.write(
+    Stream.fromBuffer(Buffer.from(html, 'utf8')),
+    document.contentType
+  )
   ipcRenderer.sendToHost('freeze-dry', url)
 }
 
