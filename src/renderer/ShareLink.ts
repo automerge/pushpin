@@ -1,5 +1,4 @@
 import Base58 from 'bs58'
-import { crc16 } from 'js-crc'
 
 /** share link helper functions
  * lifted and adapted from pixelpusher
@@ -14,7 +13,7 @@ export function isHypermergeUrl(str: string): str is HypermergeUrl {
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  return /^hypermerge:\/\/.+\/\w+\/\?pushpinContentType=(\w+)&crc={1,4}$/.test(str)
+  return /^hypermerge:\/\/.+\/\w+\/\?pushpinContentType=(\w+)$/.test(str)
 }
 
 export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl {
@@ -30,7 +29,7 @@ export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl
   if (!type) {
     throw new Error('no type when creating URL')
   }
-  return withCrc(`hypermerge:/${id}?pushpinContentType=${type}`) as PushpinUrl
+  return `hypermerge:/${id}?pushpinContentType=${type}` as PushpinUrl
 }
 
 interface Parts {
@@ -45,11 +44,7 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error('Cannot parse an empty value as a link.')
   }
 
-  const { nonCrc, crc, scheme, type, docId } = parts(link)
-
-  if (!nonCrc || !crc || !isValidCRCShareLink(nonCrc, crc)) {
-    throw new Error(`Failed CRC check: ${crc16(nonCrc as string)} should have been ${crc}`)
-  }
+  const { scheme, type, docId } = parts(link)
 
   if (scheme !== 'hypermerge') {
     throw new Error(`Invalid url scheme: ${scheme} (expected hypermerge)`)
@@ -68,9 +63,6 @@ export function parseDocumentLink(link: string): Parts {
   return { scheme, type, docId, hypermergeUrl }
 }
 
-export const isValidCRCShareLink = (nonCrc: string, crc: string) =>
-  Boolean(nonCrc) && Boolean(crc) && crc16(nonCrc) === crc
-
 export function parts(str: string) {
   const p = encodedParts(str)
 
@@ -78,20 +70,16 @@ export function parts(str: string) {
     scheme: p.scheme,
     type: p.type,
     docId: p.docId,
-    nonCrc: p.nonCrc,
-    crc: p.crc && decode(p.crc),
   }
 }
 
 export const encodedParts = (str: string) => {
   // ugly
-  const [, /* whole match */ nonCrc, scheme, docId, type, crc] = str.match(
-    /^((\w+):\/(\w+)\?pushpinContentType=(\w+))&crc=(\w{1,4})$/
-  ) || [undefined, undefined, undefined, undefined, undefined, undefined]
-  return { nonCrc, scheme, type, docId, crc }
+  const [, /* whole match */ scheme, docId, type] = str.match(
+    /^(\w+):\/(\w+)\?pushpinContentType=(\w+)$/
+  ) || [undefined, undefined, undefined, undefined]
+  return { scheme, type, docId }
 }
-
-export const withCrc = (str: string) => `${str}&crc=${encode(crc16(str))}`
 
 export const encode = (str: string) => Base58.encode(hexToBuffer(str))
 
