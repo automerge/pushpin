@@ -24,6 +24,16 @@ app.on('ready', () => {
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'pushpin', privileges: { standard: true, bypassCSP: true } },
+  {
+    scheme: 'hyperfile',
+    privileges: {
+      bypassCSP: true,
+      supportFetchAPI: true,
+      allowServiceWorkers: true,
+      secure: true,
+      corsEnabled: true,
+    },
+  },
 ])
 
 async function createWindow() {
