@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
 interface Props {
-  summary: string | JSX.Element
-  children: () => JSX.Element
+  summary: React.ReactNode
+  children: () => React.ReactNode
 }
 
 declare global {

@@ -60,6 +60,10 @@ export function humanBytes(n?: number): string {
   return `${n} ${mags[mag]}`
 }
 
+export function humanNumber(n: number): string {
+  return n.toLocaleString()
+}
+
 export function hexDump(buffer: Uint8Array, blockSize = 16) {
   const lines: string[] = []
   const hex = '0123456789ABCDEF'

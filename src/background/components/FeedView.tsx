@@ -6,10 +6,10 @@ import { toDiscoveryId } from 'hypermerge/dist/Misc'
 import classnames from 'classnames'
 
 import { useRepo } from '../BackgroundHooks'
-import Info, { humanBytes } from './Info'
+import Info, { humanBytes, humanNumber } from './Info'
 import Card from './Card'
-import Expandable from './Expandable'
 import './FeedView.css'
+import LimitedList from './LimitedList'
 
 interface Props {
   feedId: FeedId
@@ -19,8 +19,6 @@ interface BlockInfo {
   index: number
   data: Uint8Array
 }
-
-const BLOCK_LIMIT = 1000
 
 export default function FeedView({ feedId }: Props) {
   const { feeds } = useRepo()
@@ -33,7 +31,7 @@ export default function FeedView({ feedId }: Props) {
     return (
       <div
         key={String(index)}
-        title={`Block ${index}`}
+        title={`Block ${humanNumber(index)}`}
         className={classnames('FeedView_Block', {
           FeedView_Block__selected: isSelected,
           FeedView_Block__downloaded: hasBlock,
@@ -41,10 +39,6 @@ export default function FeedView({ feedId }: Props) {
         onClick={() => feeds.read(feedId, index).then((data) => setBlock({ index, data }))}
       />
     )
-  }
-
-  function renderBlocks(blocks: boolean[]) {
-    return <div className="FeedView_Blocks">{blocks.map(renderBlock)}</div>
   }
 
   return (
@@ -55,16 +49,14 @@ export default function FeedView({ feedId }: Props) {
         discoveryId={toDiscoveryId(feedId)}
         isWritable={info.writable}
         bytes={humanBytes(info.bytes)}
-        blocks={`${info.downloaded} / ${info.total}`}
+        blocks={`${humanNumber(info.downloaded)} / ${humanNumber(info.total)}`}
       />
 
-      {renderBlocks(info.blocks.slice(0, BLOCK_LIMIT))}
-
-      {info.blocks.length > BLOCK_LIMIT ? (
-        <Expandable summary={`${info.blocks.length - BLOCK_LIMIT} more...`}>
-          {() => renderBlocks(info.blocks.slice(100))}
-        </Expandable>
-      ) : null}
+      <LimitedList limit={1000} items={info.blocks}>
+        {(blocks) => {
+          return <div className="FeedView_Blocks">{blocks.map(renderBlock)}</div>
+        }}
+      </LimitedList>
 
       {selectedBlock ? (
         <Card
