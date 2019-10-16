@@ -238,9 +238,9 @@ function registerProtocolHandlers() {
     async (request, callback) => {
       try {
         if (Hyperfile.isHyperfileUrl(request.url)) {
-          const [, /* header */ stream] = await Hyperfile.fetch(request.url)
-          const buffer = await Hyperfile.streamToBuffer(stream)
-          callback(buffer)
+          const [{ mimeType }, stream] = await Hyperfile.fetch(request.url)
+          const data = await Hyperfile.streamToBuffer(stream)
+          callback({ mimeType, data })
         }
       } catch (e) {
         log(e)
