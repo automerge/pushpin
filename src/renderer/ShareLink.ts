@@ -14,14 +14,14 @@ export function isHypermergeUrl(str: string): str is HypermergeUrl {
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  return /^pushpin:\/\/.+\/\w+\/\w{1,4}$/.test(str)
+  return /^hypermerge:\/\/.+\/\w+\/\?pushpinContentType=(\w+)&crc={1,4}$/.test(str)
 }
 
 export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl {
   if (!url.match('hypermerge:/')) {
     throw new Error('expecting a hypermerge URL as input')
   }
-  if (url.match('pushpin')) {
+  if (url.match('pushpinContentType')) {
     throw new Error('so-called ID contains "pushpin". you appear to have passed a URL as an ID')
   }
 
@@ -30,7 +30,7 @@ export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl
   if (!type) {
     throw new Error('no type when creating URL')
   }
-  return withCrc(`pushpin://${type}/${id}`) as PushpinUrl
+  return withCrc(`hypermerge:/${id}?pushpinContentType=${type}`) as PushpinUrl
 }
 
 interface Parts {
@@ -51,8 +51,8 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error(`Failed CRC check: ${crc16(nonCrc as string)} should have been ${crc}`)
   }
 
-  if (scheme !== 'pushpin') {
-    throw new Error(`Invalid url scheme: ${scheme} (expected pushpin)`)
+  if (scheme !== 'hypermerge') {
+    throw new Error(`Invalid url scheme: ${scheme} (expected hypermerge)`)
   }
 
   if (!type) {
@@ -85,13 +85,13 @@ export function parts(str: string) {
 
 export const encodedParts = (str: string) => {
   // ugly
-  const [, /* whole match */ nonCrc, scheme, type, docId, crc] = str.match(
-    /^((\w+):\/\/(.+)\/(\w+))\/(\w{1,4})$/
+  const [, /* whole match */ nonCrc, scheme, docId, type, crc] = str.match(
+    /^((\w+):\/(\w+)\?pushpinContentType=(\w+))&crc=(\w{1,4})$/
   ) || [undefined, undefined, undefined, undefined, undefined, undefined]
   return { nonCrc, scheme, type, docId, crc }
 }
 
-export const withCrc = (str: string) => `${str}/${encode(crc16(str))}`
+export const withCrc = (str: string) => `${str}&crc=${encode(crc16(str))}`
 
 export const encode = (str: string) => Base58.encode(hexToBuffer(str))
 
