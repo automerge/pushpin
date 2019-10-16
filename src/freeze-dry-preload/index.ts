@@ -22,6 +22,8 @@ ipcRenderer.on('freeze-dry', (_event, msg: Msg) => {
 messageQ.first().then(capturePage)
 
 async function capturePage() {
+  // TODO(jeff): Provide a custom `fetchResource(url: string): Response`
+  // option to prevent cors errors.
   const html = await freezeDry(document)
   const { url } = await files.write(Stream.fromBuffer(Buffer.from(html, 'utf8')), 'text/html')
   ipcRenderer.sendToHost('freeze-dry', url)
