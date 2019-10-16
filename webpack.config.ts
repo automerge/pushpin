@@ -109,7 +109,7 @@ function config(cb: (opts: Options) => webpack.Configuration) {
         mode,
         output: {
           path: path.resolve(__dirname, 'dist'),
-          filename: `${conf.name}.js`,
+          filename: `[name].js`,
           globalObject: 'this',
         },
       } as webpack.Configuration,
@@ -145,7 +145,7 @@ export default [
 
   config(({ isDev }) => ({
     name: 'freeze-dry-preload',
-    entry: ['./src/freeze-dry-preload'],
+    entry: { 'freeze-dry-preload': './src/freeze-dry-preload' },
     target: 'electron-renderer',
     plugins: [
       new ForkTsCheckerPlugin({

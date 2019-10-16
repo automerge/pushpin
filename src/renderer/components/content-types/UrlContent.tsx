@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react'
+import * as path from 'path'
+import React, { useEffect, useState } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
+import { IpcMessageEvent } from 'electron'
 
 import { Handle } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
@@ -14,6 +16,7 @@ import SecondaryText from '../SecondaryText'
 import Badge from '../Badge'
 import Heading from '../Heading'
 import { toNodeReadable } from '../../../NodeReadable'
+import { APP_PATH } from '../../constants'
 
 const log = Debug('pushpin:url')
 
@@ -29,6 +32,7 @@ interface UrlDoc {
   data?: UrlData | { error: string } // TODO: move error to top-level
   html?: string // not yet implemented, see clipper branch
   imageHyperfileUrl?: string
+  capturedAt?: string
 }
 
 UrlContent.minWidth = 9
@@ -39,12 +43,39 @@ UrlContent.maxWidth = 24
 UrlContent.maxHeight = 32
 
 export default function UrlContent(props: ContentProps) {
-  const [doc] = useRefreshedDocument(props.hypermergeUrl)
+  const [doc, changeDoc] = useRefreshedDocument(props.hypermergeUrl)
+  const [webview, setWebview] = useState<HTMLWebViewElement | null>(null)
+  useEffect(() => {
+    if (!webview) return () => {}
+
+    function onMessage({ channel, args }: IpcMessageEvent) {
+      if (channel !== 'freeze-dry') return
+      const [html] = args as [string]
+      console.log('captured new html')
+      changeDoc((doc) => {
+        doc.html = html
+        doc.capturedAt = new Date().toISOString()
+      })
+    }
+
+    ;(webview as any).addEventListener('ipc-message', onMessage)
+
+    return () => {
+      ;(webview as any).removeEventListener('ipc-message', onMessage)
+    }
+  }, [webview])
 
   if (!doc) {
     return null
   }
-  const { data, url, html } = doc
+
+  function refreshContent() {
+    changeDoc((doc) => {
+      delete doc.html
+      delete doc.capturedAt
+    })
+  }
+  const { data, url, html, capturedAt } = doc
 
   if (!data) {
     return (
@@ -76,20 +107,33 @@ export default function UrlContent(props: ContentProps) {
     return (
       <div className="UrlCardWorkspace">
         <div className="UrlCard UrlCard--workspace">
+          <div>{capturedAt}</div>
           {html ? (
             <iframe frameBorder="0" title={data.title} srcDoc={html} />
           ) : (
             <webview
+              ref={setWebview}
               className="UrlCard-webview"
               title={data.title}
               src={data.canonicalLink || url}
-              preload="./freeze-dry-preload.js"
+              preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
             />
           )}
         </div>
-        <a className="UrlCard-external" title="Open in browser..." href={data.canonicalLink || url}>
-          <i className="fa fa-external-link" />
-        </a>
+        <div>
+          <a
+            className="UrlCard-iconLink"
+            title="Open in browser..."
+            href={data.canonicalLink || url}
+          >
+            <i className="fa fa-external-link" />
+          </a>
+          {html ? (
+            <a className="UrlCard-iconLink" title="Refresh" href="#" onClick={refreshContent}>
+              <i className="fa fa-refresh" />
+            </a>
+          ) : null}
+        </div>
       </div>
     )
   }

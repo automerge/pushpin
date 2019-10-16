@@ -14,8 +14,6 @@ import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 import System, { FromSystemMsg } from './System'
 
-console.log('renderer.js')
-
 window._debug = {}
 
 // The debug module wants to cache the env['DEBUG'] config, but they get it
@@ -31,7 +29,6 @@ EventEmitter.defaultMaxListeners = 500
 ipc.config.id = 'renderer'
 
 function initHypermerge(cb: (repo: RepoFrontend) => void) {
-  console.log('initHypermerge')
   const front = new RepoFrontend()
 
   window._debug.repo = front
@@ -53,8 +50,6 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
 
 function initWorkspace(repo: RepoFrontend) {
   const system = initSystem()
-
-  console.log('rendering root')
 
   const workspace = <Root repo={repo} system={system} />
   const element = document.createElement('div')
