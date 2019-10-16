@@ -1,15 +1,25 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 import { FileDoc } from '.'
 
 import ContentTypes from '../../../ContentTypes'
 import { ContentProps } from '../../Content'
-import { useDocument, useConfirmableInput } from '../../../Hooks'
+import { useDocument, useConfirmableInput, useHyperfile } from '../../../Hooks'
+import { streamToBuffer } from '../../../hyperfile'
 import './PdfContent.css'
 
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<FileDoc>(props.hypermergeUrl)
+  const [, /* fileHeader */ fileStream] = useHyperfile(pdf && pdf.hyperfileUrl)
+  const [buffer, setBuffer] = useState<Buffer | null>(null)
+  useEffect(() => {
+    if (!fileStream) {
+      return
+    }
+    streamToBuffer(fileStream).then((buffer) => setBuffer(buffer))
+  }, [fileStream])
+
   const [pageNum, setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
 
@@ -48,7 +58,7 @@ export default function PdfContent(props: ContentProps) {
         }
       })
     },
-    [changePdf]
+    [changePdf, pdf]
   )
 
   if (!pdf) {
@@ -95,8 +105,8 @@ export default function PdfContent(props: ContentProps) {
   return (
     <div className="PdfContent">
       {header}
-      {pdf ? (
-        <Document file={pdf.hyperfileUrl} onLoadSuccess={onDocumentLoadSuccess}>
+      {buffer ? (
+        <Document file={{ data: buffer }} onLoadSuccess={onDocumentLoadSuccess}>
           <Page
             loading=""
             pageNumber={pageNum}

@@ -17,3 +17,14 @@ export function write(stream: Readable, mimeType: string): Promise<Header> {
 export async function fetch(hyperfileUrl: HyperfileUrl): Promise<[Header, Readable]> {
   return repo.files.read(hyperfileUrl)
 }
+
+// for our bad protocol implementation and our bad pdf implementation
+export function streamToBuffer(stream: Readable): Promise<Buffer> {
+  return new Promise((res, rej) => {
+    const buffers: Buffer[] = []
+    stream
+      .on('data', (data: Buffer) => buffers.push(data))
+      .on('error', (err: any) => rej(err))
+      .on('end', () => res(Buffer.concat(buffers)))
+  })
+}

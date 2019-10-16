@@ -8,6 +8,7 @@
     "__static": true
   },
   "parser": "@typescript-eslint/parser",
+  "plugins": ["react-hooks"],
   "extends": [
     "airbnb-typescript",
     "plugin:@typescript-eslint/recommended",
@@ -87,6 +88,9 @@
         "args": "none"
       }
     ],
+
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
 
     // import-specific rulings
     // we probably want to enable this, and it's violated 23 times
