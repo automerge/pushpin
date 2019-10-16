@@ -1,7 +1,7 @@
 import React from 'react'
 import { PeerId } from 'hypermerge/dist/NetworkPeer'
 import PeerConnection from 'hypermerge/dist/PeerConnection'
-import Info from './Info'
+import Info, { humanBytes } from './Info'
 import { useSample, useRepo } from '../BackgroundHooks'
 
 interface Props {
@@ -38,20 +38,7 @@ export function connectionInfo(conn: PeerConnection) {
     isConnected: conn.isOpen,
     host: rawConn.rawSocket.remoteAddress,
     port: rawConn.rawSocket.remotePort,
-    sent: bytes(rawConn.rawSocket.bytesWritten),
-    received: bytes(rawConn.rawSocket.bytesRead),
+    sent: humanBytes(rawConn.rawSocket.bytesWritten),
+    received: humanBytes(rawConn.rawSocket.bytesRead),
   }
-}
-
-const mags = ['', 'KB', 'MB', 'GB']
-export function bytes(n?: number): string {
-  if (n == null) return 'N/A'
-
-  let mag = 0
-  while (n > 1024) {
-    n /= 1024
-    mag += 1
-  }
-  n = Math.round(n * 100) / 100
-  return `${n} ${mags[mag]}`
 }

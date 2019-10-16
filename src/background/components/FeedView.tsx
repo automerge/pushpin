@@ -4,15 +4,23 @@ import { useImmer } from 'use-immer'
 import { toDiscoveryId } from 'hypermerge/dist/Misc'
 
 import { useRepo } from '../BackgroundHooks'
-import Info from './Info'
+import Info, { humanBytes } from './Info'
+import Card from './Card'
 
 interface Props {
   feedId: FeedId
 }
 
+interface BlockInfo {
+  index: number
+  data: Uint8Array
+}
+
 export default function FeedView({ feedId }: Props) {
+  const { feeds } = useRepo()
   const feed = useFeed(feedId)
   const info = useFeedInfo(feedId)
+  const [selectedBlock, setBlock] = useState<BlockInfo | null>(null)
 
   return (
     <div>
@@ -21,6 +29,7 @@ export default function FeedView({ feedId }: Props) {
         feedId={feedId}
         discoveryId={toDiscoveryId(feedId)}
         isWritable={info.writable}
+        bytes={humanBytes(info.bytes)}
         blocks={`${info.downloaded} / ${info.total}`}
       />
 
@@ -33,16 +42,39 @@ export default function FeedView({ feedId }: Props) {
           gridGap: 1,
         }}
       >
-        {info.blocks.map((block, index) => (
-          <div
-            key={String(index)}
-            title={`Block ${index}`}
-            style={{
-              backgroundColor: block ? 'green' : 'red',
-            }}
-          />
-        ))}
+        {info.blocks.map((hasBlock, index) => {
+          const isSelected = selectedBlock && index === selectedBlock.index
+          return (
+            <div
+              key={String(index)}
+              title={`Block ${index}`}
+              style={{
+                backgroundColor: isSelected ? 'skyblue' : hasBlock ? 'green' : 'red', // eslint-disable-line
+                cursor: 'pointer',
+              }}
+              onClick={() => feeds.read(feedId, index).then((data) => setBlock({ index, data }))}
+            />
+          )
+        })}
       </div>
+
+      {selectedBlock ? (
+        <Card
+          style={{
+            marginTop: 10,
+          }}
+        >
+          <a href="#" onClick={() => setBlock(null)} style={{ position: 'sticky', top: 10 }}>
+            Hide
+          </a>
+          <Info
+            log={selectedBlock.data}
+            block={selectedBlock.index}
+            bytes={humanBytes(selectedBlock.data.length)}
+            data={selectedBlock.data}
+          />
+        </Card>
+      ) : null}
     </div>
   )
 }
@@ -52,6 +84,7 @@ interface FeedInfo {
   downloaded: number
   total: number
   blocks: boolean[]
+  bytes: number
 }
 
 function useFeedInfo(feedId: FeedId): FeedInfo {
@@ -60,6 +93,7 @@ function useFeedInfo(feedId: FeedId): FeedInfo {
     writable: false,
     downloaded: 0,
     total: 0,
+    bytes: 0,
     blocks: [],
   })
 
@@ -69,6 +103,7 @@ function useFeedInfo(feedId: FeedId): FeedInfo {
     function setTotals(info: FeedInfo) {
       if (!feed) return
       info.total = feed.length
+      info.bytes = feed.byteLength
       info.downloaded = feed.downloaded()
     }
 
