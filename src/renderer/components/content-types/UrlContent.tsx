@@ -77,8 +77,6 @@ export default function UrlContent(props: ContentProps) {
   }
   const { data, url, htmlHyperfileUrl, capturedAt } = doc
 
-  console.log({ htmlHyperfileUrl })
-
   if (!data) {
     return (
       <div className="UrlCard">
@@ -108,10 +106,25 @@ export default function UrlContent(props: ContentProps) {
   if (props.context === 'workspace') {
     return (
       <div className="UrlCardWorkspace">
+        <div className="UrlCard-info">
+          {capturedAt ? (
+            <span>
+              Captured:{' '}
+              {new Date(capturedAt).toLocaleString(undefined, {
+                dateStyle: 'long',
+                timeStyle: 'short',
+              } as any)}
+            </span>
+          ) : null}
+        </div>
         <div className="UrlCard UrlCard--workspace">
-          <div>{capturedAt}</div>
           {htmlHyperfileUrl ? (
-            <iframe frameBorder="0" title={data.title} src={htmlHyperfileUrl} />
+            <iframe
+              className="UrlCard-iframe"
+              frameBorder="0"
+              title={data.title}
+              src={htmlHyperfileUrl}
+            />
           ) : (
             <webview
               ref={setWebview}
@@ -122,7 +135,7 @@ export default function UrlContent(props: ContentProps) {
             />
           )}
         </div>
-        <div>
+        <div className="UrlCard-buttons">
           <a
             className="UrlCard-iconLink"
             title="Open in browser..."
@@ -131,7 +144,7 @@ export default function UrlContent(props: ContentProps) {
             <i className="fa fa-external-link" />
           </a>
           {htmlHyperfileUrl ? (
-            <a className="UrlCard-iconLink" title="Refresh" href="#" onClick={refreshContent}>
+            <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={refreshContent}>
               <i className="fa fa-refresh" />
             </a>
           ) : null}

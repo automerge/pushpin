@@ -1,10 +1,14 @@
 .UrlCardWorkspace {
-  padding: 40px 0 40px 0;
+  padding: 0 0 40px 28px;
   background: var(--colorInputGrey);
-  display: flex;
-  justify-content: center;
   box-sizing: border-box;
   height: 100%;
+  display: grid;
+  grid-template-areas:
+    'info info'
+    'page buttons';
+  grid-template-rows: 40px 1fr;
+  grid-template-columns: 1fr auto;
 }
 
 .UrlCard {
@@ -20,10 +24,10 @@
 }
 
 .UrlCard--workspace {
+  grid-area: page;
   max-width: 1200px;
   height: 100%;
-  padding: 12px 12px 0 12px;
-  margin-left: 28px; /* match space for external link */
+  padding: 0;
 }
 
 .UrlListItem {
@@ -33,12 +37,27 @@
   width: 100%;
 }
 
+.UrlCard-info {
+  grid-area: info;
+  align-self: center;
+  color: var(--colorSecondaryGrey);
+}
+
+.UrlCard-iframe {
+  height: 100%;
+  width: 100%;
+}
+
+.UrlCard-buttons {
+  grid-area: buttons;
+}
+
 .UrlCard-iconLink {
   display: block;
   font-size: 24px;
   text-decoration: none;
   color: var(--colorBlueBlack);
-  padding-left: 4px;
+  padding: 0 4px;
   margin-bottom: 10px;
 }
 
