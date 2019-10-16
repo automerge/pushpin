@@ -35,5 +35,5 @@ initialCompiler.run((err, stats) => {
     stdio: ['ignore', 'inherit', 'inherit'],
   })
 
-  mainCompiler.watch({}, () => {})
+  initialCompiler.watch({}, () => {})
 })

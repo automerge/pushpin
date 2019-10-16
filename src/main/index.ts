@@ -28,7 +28,7 @@ app.once('will-quit', () => {
 })
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'pushpin', privileges: { standard: true, bypassCSP: true } },
+  { scheme: 'hypermerge', privileges: { standard: false, bypassCSP: true } },
   {
     scheme: 'hyperfile',
     privileges: {
@@ -88,7 +88,7 @@ async function createWindow() {
       return
     }
 
-    if (!url.startsWith('pushpin://')) {
+    if (!url.match('pushpinContentType')) {
       event.preventDefault()
     }
     if (isSafeishURL(url)) {
@@ -102,7 +102,7 @@ async function createWindow() {
     // or URLs within the app and getting stranded there
     // NB: i don't think we actually use new-window pushpin links, but
     //     this will hopefully guard it if for some reason we do in the future
-    if (!url.startsWith('pushpin://')) {
+    if (!url.match('pushpinContentType')) {
       event.preventDefault()
     }
     if (isSafeishURL(url)) {
@@ -248,7 +248,7 @@ function createMenu() {
 }
 
 function registerProtocolHandlers() {
-  protocol.registerHttpProtocol('pushpin', (req, _cb) => {
+  protocol.registerStringProtocol('hypermerge', (req, _cb) => {
     // we don't want to use loadURL because we don't want to reset the whole app state
     // so we use the workspace manipulation function here
     sendSystemMsg({ type: 'IncomingUrl', url: req.url })

@@ -9,11 +9,11 @@ export type HypermergeUrl = DocUrl
 export type PushpinUrl = string & { pushpin: true }
 
 export function isHypermergeUrl(str: string): str is HypermergeUrl {
-  return /^hypermerge:\/\/\w+$/.test(str)
+  return /^hypermerge:\/\w+$/.test(str)
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  return /^hypermerge:\/\/.+\/\w+\/\?pushpinContentType=(\w+)$/.test(str)
+  return /^hypermerge:\/.+\/?\?pushpinContentType=(\w+)$/.test(str)
 }
 
 export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl {

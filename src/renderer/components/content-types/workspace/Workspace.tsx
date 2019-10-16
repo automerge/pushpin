@@ -82,7 +82,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   useEffect(() => {
     // For background debugging:
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
-  }, [currentDocUrl])
+  }, [currentDocUrl, sendToSystem])
 
   useEffect(() => {
     if (!currentDeviceUrl || !self) {
@@ -98,17 +98,10 @@ export default function Workspace(props: WorkspaceContentProps) {
         doc.devices.push(hypermergeUrl)
       })
     }
-  }, [currentDeviceUrl, self])
+  }, [changeSelf, currentDeviceUrl, self])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
-      return
-    }
-
-    try {
-      parseDocumentLink(docUrl)
-    } catch (e) {
-      // if we can't parse the document, don't navigate
       return
     }
 

@@ -119,12 +119,7 @@ export default function UrlContent(props: ContentProps) {
         </div>
         <div className="UrlCard UrlCard--workspace">
           {htmlHyperfileUrl ? (
-            <iframe
-              className="UrlCard-iframe"
-              frameBorder="0"
-              title={data.title}
-              src={htmlHyperfileUrl}
-            />
+            <webview className="UrlCard-webview" title={data.title} src={htmlHyperfileUrl} />
           ) : (
             <webview
               ref={setWebview}
@@ -180,13 +175,13 @@ function useRefreshedDocument(url: HypermergeUrl): [null | UrlDoc, ChangeFn<UrlD
     if (doc) {
       refreshContent(doc, change)
     }
-  }, [doc && doc.url])
+  }, [change, doc])
 
   useEffect(() => {
     if (doc) {
       refreshImageContent(doc, change)
     }
-  }, [doc && doc.data])
+  }, [change, doc])
 
   return [doc, change]
 }
@@ -196,6 +191,7 @@ function refreshContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
     return
   }
 
+  // XXX TODO: this stuff should be part of the freeze-dry cycle
   unfluffUrl(doc.url)
     .then((data) => {
       change((doc: UrlDoc) => {
