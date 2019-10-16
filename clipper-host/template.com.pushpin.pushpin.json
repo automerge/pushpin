@@ -1,0 +1,9 @@
+{
+  "name": "com.pushpin.pushpin",
+  "description": "PushPin",
+  "path": "{HOST_PATH}",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://{EXTENSION_ID}"
+  ]
+}
