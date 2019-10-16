@@ -7,6 +7,7 @@ import FeedView from './FeedView'
 import Card from './Card'
 import Info, { hidden } from './Info'
 import PeersView from './PeersView'
+import { Clock } from 'hypermerge/dist/Clock'
 
 interface Props {
   url: DocUrl
@@ -43,7 +44,7 @@ export default function DocView({ url }: Props) {
   )
 }
 
-function renderClock(clock: any) {
+function renderClock(clock: Clock | undefined) {
   if (!clock) return null
   return hidden(`${Object.keys(clock).length} actors...`, () => clock)
 }
