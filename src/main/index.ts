@@ -194,6 +194,14 @@ function createMenu() {
           },
         },
         {
+          label: 'Relaunch App',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: (_item, _focusedWindow) => {
+            app.relaunch()
+            app.exit(0)
+          },
+        },
+        {
           label: 'Toggle Background Window',
           accelerator: 'CmdOrCtrl+Option+B',
           click: (_item, _focusedWindow) => {
