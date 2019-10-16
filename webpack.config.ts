@@ -147,6 +147,7 @@ export default [
     name: 'freeze-dry-preload',
     entry: { 'freeze-dry-preload': './src/freeze-dry-preload' },
     target: 'electron-renderer',
+    devtool: false,
     plugins: [
       new ForkTsCheckerPlugin({
         formatter: 'codeframe',
