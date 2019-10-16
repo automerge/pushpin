@@ -15,8 +15,7 @@ export default function ReplicationView() {
     >
       <Info
         log={replication}
-        known={hidden(
-          `${replication.discoveryIds.size} feeds`,
+        known={hidden(`${replication.discoveryIds.size} feeds`, () =>
           Array.from(replication.discoveryIds.values())
         )}
       />

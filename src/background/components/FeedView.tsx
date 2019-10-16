@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Feed, FeedId } from 'hypermerge/dist/FeedStore'
+import * as Block from 'hypermerge/dist/Block'
 import { useImmer } from 'use-immer'
 import { toDiscoveryId } from 'hypermerge/dist/Misc'
+import classnames from 'classnames'
 
 import { useRepo } from '../BackgroundHooks'
 import Info, { humanBytes } from './Info'
 import Card from './Card'
+import Expandable from './Expandable'
+import './FeedView.css'
 
 interface Props {
   feedId: FeedId
@@ -16,11 +20,32 @@ interface BlockInfo {
   data: Uint8Array
 }
 
+const BLOCK_LIMIT = 1000
+
 export default function FeedView({ feedId }: Props) {
   const { feeds } = useRepo()
   const feed = useFeed(feedId)
   const info = useFeedInfo(feedId)
   const [selectedBlock, setBlock] = useState<BlockInfo | null>(null)
+
+  function renderBlock(hasBlock: boolean, index: number) {
+    const isSelected = selectedBlock && index === selectedBlock.index
+    return (
+      <div
+        key={String(index)}
+        title={`Block ${index}`}
+        className={classnames('FeedView_Block', {
+          FeedView_Block__selected: isSelected,
+          FeedView_Block__downloaded: hasBlock,
+        })}
+        onClick={() => feeds.read(feedId, index).then((data) => setBlock({ index, data }))}
+      />
+    )
+  }
+
+  function renderBlocks(blocks: boolean[]) {
+    return <div className="FeedView_Blocks">{blocks.map(renderBlock)}</div>
+  }
 
   return (
     <div>
@@ -33,30 +58,13 @@ export default function FeedView({ feedId }: Props) {
         blocks={`${info.downloaded} / ${info.total}`}
       />
 
-      <div
-        style={{
-          marginTop: 10,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 8px)',
-          gridAutoRows: '8px',
-          gridGap: 1,
-        }}
-      >
-        {info.blocks.map((hasBlock, index) => {
-          const isSelected = selectedBlock && index === selectedBlock.index
-          return (
-            <div
-              key={String(index)}
-              title={`Block ${index}`}
-              style={{
-                backgroundColor: isSelected ? 'skyblue' : hasBlock ? 'green' : 'red', // eslint-disable-line
-                cursor: 'pointer',
-              }}
-              onClick={() => feeds.read(feedId, index).then((data) => setBlock({ index, data }))}
-            />
-          )
-        })}
-      </div>
+      {renderBlocks(info.blocks.slice(0, BLOCK_LIMIT))}
+
+      {info.blocks.length > BLOCK_LIMIT ? (
+        <Expandable summary={`${info.blocks.length - BLOCK_LIMIT} more...`}>
+          {() => renderBlocks(info.blocks.slice(100))}
+        </Expandable>
+      ) : null}
 
       {selectedBlock ? (
         <Card
@@ -71,7 +79,7 @@ export default function FeedView({ feedId }: Props) {
             log={selectedBlock.data}
             block={selectedBlock.index}
             bytes={humanBytes(selectedBlock.data.length)}
-            data={selectedBlock.data}
+            data={parseBlockData(selectedBlock.data)}
           />
         </Card>
       ) : null}
@@ -161,4 +169,12 @@ function useFeed(feedId: FeedId): Feed | null {
   }, [feedId])
 
   return feed
+}
+
+function parseBlockData(data: Uint8Array): Uint8Array | object {
+  try {
+    return Block.unpack(data)
+  } catch (e) {
+    return data
+  }
 }

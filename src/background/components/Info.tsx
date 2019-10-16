@@ -1,5 +1,6 @@
 import React from 'react'
 import LogLink from './LogLink'
+import Expandable from './Expandable'
 
 type Value =
   | string
@@ -80,12 +81,9 @@ export function hexDump(buffer: Uint8Array, blockSize = 16) {
   return lines.join('\n')
 }
 
-export function hidden(summary: Value, details: Value): Value {
+export function hidden(summary: Value, details: () => Value): Value {
   return (
-    <details>
-      <summary>{renderValue(summary)}</summary>
-      {renderValue(details)}
-    </details>
+    <Expandable summary={renderValue(summary)}>{() => <>{renderValue(details())}</>}</Expandable>
   )
 }
 
