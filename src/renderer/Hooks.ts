@@ -140,6 +140,18 @@ export function useHyperfile(url: HyperfileUrl | null): [Header, Readable] | [nu
   return header
 }
 
+export function useHyperfileHeader(url: HyperfileUrl | null): Header | null {
+  const [header, setHeader] = useState<Header | null>(null)
+  const { files } = useRepo()
+
+  useEffect(() => {
+    header && setHeader(null)
+    url && files.header(url).then(setHeader)
+  }, [url])
+
+  return header
+}
+
 export function useInterval(ms: number, cb: () => void, deps: any[]) {
   useEffect(() => {
     const id = setInterval(cb, ms)
@@ -280,11 +292,18 @@ export function useEvent<K extends keyof DocumentEventMap>(
   cb: (this: Document, ev: DocumentEventMap[K]) => any
 ): void
 export function useEvent<K extends string>(
-  target: Node,
+  target: EventTarget | null,
   type: K,
-  cb: (this: Node, ev: Event) => void
+  cb: (this: HTMLElement, ev: any) => void
+): void
+export function useEvent<K extends string>(
+  target: EventTarget | null,
+  type: K,
+  cb: (this: EventTarget, ev: Event) => void
 ): void {
   useEffect(() => {
+    if (target == null) return () => {}
+
     target.addEventListener(type, cb)
 
     return () => {

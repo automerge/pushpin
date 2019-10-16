@@ -1,7 +1,7 @@
 import React from 'react'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
-import { useDocument, useHyperfile } from '../../../Hooks'
+import { useDocument, useHyperfileHeader } from '../../../Hooks'
 import { createDocumentLink } from '../../../ShareLink'
 import { FileDoc } from '.'
 
@@ -17,7 +17,7 @@ export default function FileContent({ hypermergeUrl, context }: ContentProps) {
 
   const { title = '', hyperfileUrl = null } = doc || {}
 
-  const [header] = useHyperfile(hyperfileUrl)
+  const header = useHyperfileHeader(hyperfileUrl)
 
   if (!hyperfileUrl || !header) {
     return null

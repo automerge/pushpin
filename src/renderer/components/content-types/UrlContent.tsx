@@ -4,12 +4,12 @@ import Unfluff from 'unfluff'
 import Debug from 'debug'
 import { IpcMessageEvent } from 'electron'
 
-import { Handle } from 'hypermerge'
+import { Handle, HyperfileUrl } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
 import * as Hyperfile from '../../hyperfile'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
-import { ChangeFn, useDocument } from '../../Hooks'
+import { ChangeFn, useDocument, useEvent } from '../../Hooks'
 import { HypermergeUrl } from '../../ShareLink'
 import './UrlContent.css'
 import SecondaryText from '../SecondaryText'
@@ -30,8 +30,8 @@ interface UrlData {
 interface UrlDoc {
   url: string
   data?: UrlData | { error: string } // TODO: move error to top-level
-  html?: string // not yet implemented, see clipper branch
-  imageHyperfileUrl?: string
+  htmlHyperfileUrl?: HyperfileUrl
+  imageHyperfileUrl?: HyperfileUrl
   capturedAt?: string
 }
 
@@ -45,25 +45,25 @@ UrlContent.maxHeight = 32
 export default function UrlContent(props: ContentProps) {
   const [doc, changeDoc] = useRefreshedDocument(props.hypermergeUrl)
   const [webview, setWebview] = useState<HTMLWebViewElement | null>(null)
-  useEffect(() => {
-    if (!webview) return () => {}
 
-    function onMessage({ channel, args }: IpcMessageEvent) {
-      if (channel !== 'freeze-dry') return
-      const [html] = args as [string]
-      console.log('captured new html')
-      changeDoc((doc) => {
-        doc.html = html
-        doc.capturedAt = new Date().toISOString()
-      })
-    }
+  useEvent(webview, 'ipc-message', ({ channel, args }: IpcMessageEvent) => {
+    if (channel !== 'freeze-dry') return
 
-    ;(webview as any).addEventListener('ipc-message', onMessage)
+    const [hyperfileUrl] = args as [HyperfileUrl]
+    changeDoc((doc) => {
+      doc.htmlHyperfileUrl = hyperfileUrl
+      doc.capturedAt = new Date().toISOString()
+    })
+  })
 
-    return () => {
-      ;(webview as any).removeEventListener('ipc-message', onMessage)
-    }
-  }, [webview])
+  useEvent(webview, 'dom-ready', () => {
+    console.log('dom-ready', webview)
+    webview && (webview as any).send('freeze-dry', { type: 'Ready' })
+  })
+
+  useEvent(webview, 'console-message', ({ message }: { message: string }) => {
+    console.log('webview.log:', message) // eslint-disable-line
+  })
 
   if (!doc) {
     return null
@@ -71,11 +71,13 @@ export default function UrlContent(props: ContentProps) {
 
   function refreshContent() {
     changeDoc((doc) => {
-      delete doc.html
+      delete doc.htmlHyperfileUrl
       delete doc.capturedAt
     })
   }
-  const { data, url, html, capturedAt } = doc
+  const { data, url, htmlHyperfileUrl, capturedAt } = doc
+
+  console.log({ htmlHyperfileUrl })
 
   if (!data) {
     return (
@@ -108,8 +110,8 @@ export default function UrlContent(props: ContentProps) {
       <div className="UrlCardWorkspace">
         <div className="UrlCard UrlCard--workspace">
           <div>{capturedAt}</div>
-          {html ? (
-            <iframe frameBorder="0" title={data.title} srcDoc={html} />
+          {htmlHyperfileUrl ? (
+            <iframe frameBorder="0" title={data.title} src={htmlHyperfileUrl} />
           ) : (
             <webview
               ref={setWebview}
@@ -128,7 +130,7 @@ export default function UrlContent(props: ContentProps) {
           >
             <i className="fa fa-external-link" />
           </a>
-          {html ? (
+          {htmlHyperfileUrl ? (
             <a className="UrlCard-iconLink" title="Refresh" href="#" onClick={refreshContent}>
               <i className="fa fa-refresh" />
             </a>
