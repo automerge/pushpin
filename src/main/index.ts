@@ -11,6 +11,7 @@ const log = Debug('pushpin:electron')
 let mainWindow: BrowserWindow | null = null
 let backgroundWindow: BrowserWindow | null = null
 const isDevelopment = process.env.NODE_ENV !== 'production'
+let isQuitting = false
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -20,6 +21,10 @@ app.on('ready', () => {
   registerProtocolHandlers()
   createMenu()
   createWindow()
+})
+
+app.once('will-quit', () => {
+  isQuitting = true
 })
 
 protocol.registerSchemesAsPrivileged([
@@ -149,6 +154,16 @@ function createBackgroundWindow() {
   } else {
     backgroundWindow.loadFile('dist/background.html')
   }
+
+  backgroundWindow.on('close', (e) => {
+    if (!backgroundWindow) return
+    if (isQuitting) return
+
+    if (mainWindow && backgroundWindow.isVisible()) {
+      e.preventDefault()
+      backgroundWindow.hide()
+    }
+  })
 
   backgroundWindow.once('closed', () => {
     backgroundWindow = null
