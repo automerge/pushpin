@@ -13,7 +13,7 @@ export default function FeedStoreView(_props: Props) {
 
   return (
     <div style={{ display: 'grid', gridGap: 10 }}>
-      <Info feeds={opened.size} />
+      <Info opened={opened.size} />
       {Array.from(opened.keys()).map((feedId) => (
         <Card key={feedId}>
           <FeedView feedId={feedId} />

@@ -31,11 +31,9 @@ initialCompiler.run((err, stats) => {
     return
   }
 
-  proc
-    .spawn(electron as any, [path.resolve(__dirname, '..')], {
-      stdio: ['ignore', 'inherit', 'inherit'],
-    })
-    .on('close', (code) => {
-      process.exit(code)
-    })
+  proc.spawn(electron as any, [path.resolve(__dirname, '..')], {
+    stdio: ['ignore', 'inherit', 'inherit'],
+  })
+
+  mainCompiler.watch({}, () => {})
 })

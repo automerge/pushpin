@@ -1,15 +1,12 @@
 import React from 'react'
-import { DocUrl } from 'hypermerge'
 import { useRepo, useSample } from '../BackgroundHooks'
 import Card from './Card'
 import Info, { hidden } from './Info'
 import PeerView from './PeerView'
 
-interface Props {
-  url?: DocUrl
-}
+interface Props {}
 
-export default function NetworkView(props: Props) {
+export default function NetworkView(_props: Props) {
   useSample(3000)
 
   const { network } = useRepo()
@@ -26,7 +23,7 @@ export default function NetworkView(props: Props) {
       <Info
         log={network}
         selfId={network.selfId}
-        joined={hidden(`${network.joined.size} discoveryIds`, Array.from(network.joined))}
+        joined={hidden(`${network.joined.size} discoveryIds`, () => Array.from(network.joined))}
         closedConnections={network.closedConnectionCount}
       />
       <hr />

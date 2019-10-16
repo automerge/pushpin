@@ -11,6 +11,7 @@ const log = Debug('pushpin:electron')
 let mainWindow: BrowserWindow | null = null
 let backgroundWindow: BrowserWindow | null = null
 const isDevelopment = process.env.NODE_ENV !== 'production'
+let isQuitting = false
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -22,8 +23,22 @@ app.on('ready', () => {
   createWindow()
 })
 
+app.once('will-quit', () => {
+  isQuitting = true
+})
+
 protocol.registerSchemesAsPrivileged([
   { scheme: 'pushpin', privileges: { standard: true, bypassCSP: true } },
+  {
+    scheme: 'hyperfile',
+    privileges: {
+      bypassCSP: true,
+      supportFetchAPI: true,
+      allowServiceWorkers: true,
+      secure: true,
+      corsEnabled: true,
+    },
+  },
 ])
 
 async function createWindow() {
@@ -140,6 +155,16 @@ function createBackgroundWindow() {
     backgroundWindow.loadFile('dist/background.html')
   }
 
+  backgroundWindow.on('close', (e) => {
+    if (!backgroundWindow) return
+    if (isQuitting) return
+
+    if (mainWindow && backgroundWindow.isVisible()) {
+      e.preventDefault()
+      backgroundWindow.hide()
+    }
+  })
+
   backgroundWindow.once('closed', () => {
     backgroundWindow = null
   })
@@ -181,6 +206,14 @@ function createMenu() {
           click: (_item, _focusedWindow) => {
             mainWindow && mainWindow.reload()
             backgroundWindow && backgroundWindow.reload()
+          },
+        },
+        {
+          label: 'Relaunch App',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: (_item, _focusedWindow) => {
+            app.relaunch()
+            app.exit(0)
           },
         },
         {

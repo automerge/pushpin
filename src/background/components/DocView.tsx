@@ -45,5 +45,5 @@ export default function DocView({ url }: Props) {
 
 function renderClock(clock: any) {
   if (!clock) return null
-  return hidden(`${Object.keys(clock).length} actors...`, clock)
+  return hidden(`${Object.keys(clock).length} actors...`, () => clock)
 }
