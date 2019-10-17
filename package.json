@@ -6,8 +6,8 @@
   "repository": "https://github.com/inkandswitch/pushpin",
   "scripts": {
     "build-deps": "electron-builder install-app-deps",
-    "install-clipper-host": "yarn build-clipper-host && ts-node ./scripts/install-clipper-host.ts",
-    "build-clipper-host": "tsc --p tsconfig.clipper-host.json && chmod +x ./clipper-host/dist/host.js",
+    "build:clipper-host": "tsc --p ./clipper-host/tsconfig.json && ts-node ./clipper-host/scripts/build.ts",
+    "install:clipper-host": "ts-node ./clipper-host/scripts/install.ts",
     "compile": "webpack",
     "dev:server": "webpack-dev-server --watch",
     "dev:app": "electron .",
@@ -48,6 +48,7 @@
     "mkdirp": "0.5.1",
     "native-messaging": "^1.0.0",
     "node-ipc": "^9.1.1",
+    "pump": "^3.0.0",
     "quill": "^1.3.6",
     "quill-delta": "^3.6.2",
     "react": "16.8.6",

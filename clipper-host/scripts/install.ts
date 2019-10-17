@@ -5,27 +5,24 @@ import fs from 'fs'
 import os from 'os'
 
 type OS = 'windows' | 'mac' | 'unsupported'
-const SRC_DIR = path.resolve(__dirname, '../clipper-host/src')
-const DIST_DIR = path.resolve(__dirname, '../clipper-host/dist')
+const SRC_DIR = path.resolve(__dirname, '../src')
+const DIST_DIR = path.resolve(__dirname, '../dist')
 
 const osName = getOs()
 const hostPath = getHostPath(osName)
 const extensionId = process.argv[2]
 
-// Render the manifest file
-console.log('Creating manifest file...')
+if (!extensionId) throw new Error('Extension id required')
+
 const template = fs.readFileSync(path.join(SRC_DIR, 'template.com.pushpin.pushpin.json'), {
   encoding: 'utf8',
 })
 const manifest = replace(template, { '{HOST_PATH}': hostPath, '{EXTENSION_ID}': extensionId })
-fs.writeFileSync(path.join(SRC_DIR, 'com.pushpin.pushpin.json'), manifest)
-console.log('Manifest file created.')
+fs.writeFileSync(path.join(DIST_DIR, 'com.pushpin.pushpin.json'), manifest)
 
 // Register the manifest file with Chrome native hosts.
-console.log('Registering native host...')
-registerNativeHost(osName)
 // TODO: errors
-console.log('Native host registered.')
+registerNativeHost(osName)
 
 function getOs(): OS {
   if (os.type() === 'Darwin') return 'mac'
@@ -33,20 +30,20 @@ function getOs(): OS {
   throw new Error('Unsupported operating system')
 }
 
-function getHostPath(osName) {
+function getHostPath(osName: OS) {
   if (osName === 'mac') return path.join(DIST_DIR, 'host.js')
   if (osName === 'windows') return 'host.bat'
   throw new Error('Unsupported Operating System')
 }
 
-function replace(template, values) {
+function replace(template: string, values: { [find: string]: string }) {
   const search = new RegExp(Object.keys(values).join('|'), 'g')
   return template.replace(search, (matched) => {
     return values[matched]
   })
 }
 
-function registerNativeHost(osName) {
+function registerNativeHost(osName: OS) {
   const registrationScript = getRegistrationScript(osName)
   exec(registrationScript, (err, stdout, stderr) => {
     if (err) {
@@ -57,7 +54,7 @@ function registerNativeHost(osName) {
   })
 }
 
-function getRegistrationScript(osName) {
+function getRegistrationScript(osName: OS) {
   if (osName === 'mac') return path.join(SRC_DIR, './register.sh')
   if (osName === 'windows') return path.join(SRC_DIR, './register.bat')
   throw new Error('Unsupported Operating System')

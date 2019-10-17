@@ -1,9 +1,0 @@
-{
-  "name": "com.pushpin.pushpin",
-  "description": "PushPin",
-  "path": "/Users/matt/Workspace/ink_and_switch/pushpin/clipper-host/dist/host.js",
-  "type": "stdio",
-  "allowed_origins": [
-    "chrome-extension://gjahgokhipneeeegakbigbbbocbgddcc/"
-  ]
-}

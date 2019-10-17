@@ -23,7 +23,7 @@ export class InboundTransform extends Transform {
     if (this.messageSize && this.bufferSize >= this.messageSize) {
       const message = this.slice(this.messageSize)
       this.messageSize = undefined
-      this.push(JSON.parse(message.toString()))
+      this.push(message)
       this.parse() // Parse the rest of the buffer
     }
   }
@@ -42,9 +42,8 @@ export class OutboundTransform extends Transform {
     super({ writableObjectMode: true })
   }
   _transform(chunk: any, _encoding: string, callback: TransformCallback) {
-    const message = Buffer.from(JSON.stringify(chunk))
     const length = Buffer.alloc(4)
-    length.writeUInt32LE(message.length, 0)
-    callback(null, Buffer.concat([length, message]))
+    length.writeUInt32LE(chunk.length, 0)
+    callback(null, Buffer.concat([length, chunk]))
   }
 }

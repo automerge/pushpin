@@ -8,5 +8,3 @@
 /data
 *.DS_Store
 .cache
-/clipper-host/com.pushpin.pushpin.json
-/clipper-host/dist
