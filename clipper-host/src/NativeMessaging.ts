@@ -1,31 +1,39 @@
 import { Transform, TransformCallback } from 'stream'
 
 export class InboundTransform extends Transform {
-  size?: number
-  buffer: Buffer
+  messageSize?: number
+  buffers: Buffer[]
+  bufferSize: number
   constructor() {
     super({ readableObjectMode: true })
-    this.buffer = Buffer.alloc(0)
+    this.buffers = []
+    this.bufferSize = 0
   }
   _transform(chunk: Buffer, _encoding: string, callback: TransformCallback) {
-    // TODO: what are the performance characteristics of this?
-    this.buffer = Buffer.concat([this.buffer, chunk])
+    this.buffers.push(chunk)
+    this.bufferSize += chunk.length
     this.parse()
     callback()
   }
-  parse() {
-    if (this.size === undefined && this.buffer.length >= 4) {
-      this.size = this.buffer.readUInt32LE(0)
-      this.buffer = this.buffer.slice(4)
+  private parse() {
+    if (this.messageSize === undefined && this.bufferSize >= 4) {
+      const header = this.slice(4)
+      this.messageSize = header.readUInt32LE(0)
     }
-
-    if (this.size && this.buffer.length >= this.size) {
-      const message = this.buffer.slice(0, this.size)
-      this.buffer = this.buffer.slice(this.size)
-      this.size = undefined
+    if (this.messageSize && this.bufferSize >= this.messageSize) {
+      const message = this.slice(this.messageSize)
+      this.messageSize = undefined
       this.push(JSON.parse(message.toString()))
       this.parse() // Parse the rest of the buffer
     }
+  }
+  private slice(length: number) {
+    const buffer = Buffer.concat(this.buffers)
+    const sliced = buffer.slice(0, length)
+    const remaining = buffer.slice(length)
+    this.buffers = [remaining]
+    this.bufferSize = remaining.length
+    return sliced
   }
 }
 
