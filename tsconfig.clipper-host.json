@@ -8,13 +8,15 @@
     "lib": [
       "es2015",
       "es2017",
-      "dom",
-      "webworker"
     ],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "jsx": "react",
     "pretty": true,
-    "experimentalDecorators": true
-  }
+    "experimentalDecorators": true,
+    "outDir": "./clipper-host/dist/",
+    "importHelpers": true,
+  },
+  "files": [
+    "./clipper-host/src/host.ts"
+  ]
 }

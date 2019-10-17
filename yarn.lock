@@ -1192,7 +1192,6 @@ atomic-batcher@^1.0.2:
 
 automerge@^0.12.1, "automerge@github:automerge/automerge#opaque-strings":
   version "0.12.1"
-  uid "90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   resolved "https://codeload.github.com/automerge/automerge/tar.gz/90b2fa1666a3d9824e7f9c799dda5b4cddda0da6"
   dependencies:
     immutable "^3.8.2"
@@ -5781,6 +5780,11 @@ napi-macros@^1.8.1, napi-macros@^1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/napi-macros/-/napi-macros-1.8.2.tgz#299265c1d8aa401351ad0675107d751228c03eda"
   integrity sha512-Tr0DNY4RzTaBG2W2m3l7ZtFuJChTH6VZhXVhkGGjF/4cZTt+i8GcM9ozD+30Lmr4mDoZ5Xx34t2o4GJqYWDGcg==
+
+native-messaging@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/native-messaging/-/native-messaging-1.0.0.tgz#c9ad62f9f7cd818c711d334139cb5198fce15ee5"
+  integrity sha512-9L4ntTIbNdEbBIrWxc0yxrxWwncL3O+tqcVZcIZf86S8m8SjB5wTyFCpKha2NSmuYbfhCYoP1liPJwzey4Bucg==
 
 natural-compare@^1.4.0:
   version "1.4.0"

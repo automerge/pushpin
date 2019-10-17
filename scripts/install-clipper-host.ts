@@ -5,7 +5,8 @@ import fs from 'fs'
 import os from 'os'
 
 type OS = 'windows' | 'mac' | 'unsupported'
-const SRC_DIR = path.resolve(__dirname, '../clipper-host')
+const SRC_DIR = path.resolve(__dirname, '../clipper-host/src')
+const DIST_DIR = path.resolve(__dirname, '../clipper-host/dist')
 
 const osName = getOs()
 const hostPath = getHostPath(osName)
@@ -33,7 +34,7 @@ function getOs(): OS {
 }
 
 function getHostPath(osName) {
-  if (osName === 'mac') return path.join(SRC_DIR, 'host.js')
+  if (osName === 'mac') return path.join(DIST_DIR, 'host.js')
   if (osName === 'windows') return 'host.bat'
   throw new Error('Unsupported Operating System')
 }
