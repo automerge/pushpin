@@ -2,7 +2,7 @@ import React from 'react'
 
 type Props = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
 
-export default function Card(props: Props) {
+export default function Card({ style, ...props }: Props) {
   return (
     <div
       {...props}
@@ -10,6 +10,7 @@ export default function Card(props: Props) {
         padding: 10,
         border: '1px solid silver',
         borderRadius: 2,
+        ...style,
       }}
     />
   )

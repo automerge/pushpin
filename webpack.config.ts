@@ -144,6 +144,29 @@ export default [
   })),
 
   config(({ isDev }) => ({
+    name: 'freeze-dry-preload',
+    entry: { 'freeze-dry-preload': './src/freeze-dry-preload' },
+    target: 'electron-renderer',
+    devtool: false,
+    plugins: [
+      new ForkTsCheckerPlugin({
+        formatter: 'codeframe',
+      }),
+      ...(isDev
+        ? [
+            new HardSourcePlugin({
+              cacheDirectory,
+              info: {
+                level: 'warn',
+                mode: 'none',
+              },
+            }),
+          ]
+        : []),
+    ],
+  })),
+
+  config(({ isDev }) => ({
     name: 'renderer',
     entry: {
       renderer: './src/renderer',

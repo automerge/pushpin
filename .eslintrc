@@ -8,6 +8,7 @@
     "__static": true
   },
   "parser": "@typescript-eslint/parser",
+  "plugins": ["react-hooks"],
   "extends": [
     "airbnb-typescript",
     "plugin:@typescript-eslint/recommended",
@@ -62,6 +63,9 @@
     "jsx-a11y/no-autofocus": "off",
     "jsx-a11y/media-has-caption": "off", // randomly sourced audio doesn't come captioned
 
+    // This isn't really useful
+    "@typescript-eslint/no-empty-interface": "off",
+
     // we might want to do this, but there are 97 cases where we don't
     "@typescript-eslint/explicit-member-accessibility": "off",
 
@@ -84,6 +88,9 @@
         "args": "none"
       }
     ],
+
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
 
     // import-specific rulings
     // we probably want to enable this, and it's violated 23 times

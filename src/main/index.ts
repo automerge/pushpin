@@ -1,5 +1,3 @@
-import './DataMigration'
-import './HyperfileMigration'
 import { app, protocol, BrowserWindow, Menu, shell, MenuItemConstructorOptions } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import Debug from 'debug'
@@ -13,6 +11,7 @@ const log = Debug('pushpin:electron')
 let mainWindow: BrowserWindow | null = null
 let backgroundWindow: BrowserWindow | null = null
 const isDevelopment = process.env.NODE_ENV !== 'production'
+let isQuitting = false
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -24,8 +23,22 @@ app.on('ready', () => {
   createWindow()
 })
 
+app.once('will-quit', () => {
+  isQuitting = true
+})
+
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'pushpin', privileges: { standard: true, bypassCSP: true } },
+  { scheme: 'hypermerge', privileges: { standard: false, bypassCSP: true } },
+  {
+    scheme: 'hyperfile',
+    privileges: {
+      bypassCSP: true,
+      supportFetchAPI: true,
+      allowServiceWorkers: true,
+      secure: true,
+      corsEnabled: true,
+    },
+  },
 ])
 
 async function createWindow() {
@@ -36,6 +49,7 @@ async function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
+      webviewTag: true,
     },
   })
 
@@ -74,7 +88,7 @@ async function createWindow() {
       return
     }
 
-    if (!url.startsWith('pushpin://')) {
+    if (!url.match('pushpinContentType')) {
       event.preventDefault()
     }
     if (isSafeishURL(url)) {
@@ -88,7 +102,7 @@ async function createWindow() {
     // or URLs within the app and getting stranded there
     // NB: i don't think we actually use new-window pushpin links, but
     //     this will hopefully guard it if for some reason we do in the future
-    if (!url.startsWith('pushpin://')) {
+    if (!url.match('pushpinContentType')) {
       event.preventDefault()
     }
     if (isSafeishURL(url)) {
@@ -141,6 +155,16 @@ function createBackgroundWindow() {
     backgroundWindow.loadFile('dist/background.html')
   }
 
+  backgroundWindow.on('close', (e) => {
+    if (!backgroundWindow) return
+    if (isQuitting) return
+
+    if (mainWindow && backgroundWindow.isVisible()) {
+      e.preventDefault()
+      backgroundWindow.hide()
+    }
+  })
+
   backgroundWindow.once('closed', () => {
     backgroundWindow = null
   })
@@ -185,6 +209,14 @@ function createMenu() {
           },
         },
         {
+          label: 'Relaunch App',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: (_item, _focusedWindow) => {
+            app.relaunch()
+            app.exit(0)
+          },
+        },
+        {
           label: 'Toggle Background Window',
           accelerator: 'CmdOrCtrl+Option+B',
           click: (_item, _focusedWindow) => {
@@ -216,7 +248,7 @@ function createMenu() {
 }
 
 function registerProtocolHandlers() {
-  protocol.registerHttpProtocol('pushpin', (req, _cb) => {
+  protocol.registerStringProtocol('hypermerge', (req, _cb) => {
     // we don't want to use loadURL because we don't want to reset the whole app state
     // so we use the workspace manipulation function here
     sendSystemMsg({ type: 'IncomingUrl', url: req.url })
@@ -229,9 +261,9 @@ function registerProtocolHandlers() {
     async (request, callback) => {
       try {
         if (Hyperfile.isHyperfileUrl(request.url)) {
-          const [stream] = await Hyperfile.fetch(request.url)
-          const buffer = await Hyperfile.streamToBuffer(stream)
-          callback(buffer)
+          const [{ mimeType }, stream] = await Hyperfile.fetch(request.url)
+          const data = await Hyperfile.streamToBuffer(stream)
+          callback({ mimeType, data })
         }
       } catch (e) {
         log(e)

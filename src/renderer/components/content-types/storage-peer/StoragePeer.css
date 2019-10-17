@@ -1,0 +1,11 @@
+.StoragePeer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid var(--colorPaleGrey);
+}

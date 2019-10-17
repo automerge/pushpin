@@ -11,7 +11,12 @@ import { ContactDoc } from '../contact'
 
 import './Workspace.css'
 import { useDocument } from '../../../Hooks'
-import { useAllHeartbeats, useHeartbeat } from '../../../PresenceHooks'
+import {
+  useAllHeartbeats,
+  useHeartbeat,
+  useContactOnlineStatus,
+  useDeviceOnlineStatus,
+} from '../../../PresenceHooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
@@ -43,10 +48,17 @@ export default function Workspace(props: WorkspaceContentProps) {
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
   const [self, changeSelf] = useDocument<ContactDoc>(selfId)
+  const currentDeviceId = currentDeviceUrl
+    ? parseDocumentLink(currentDeviceUrl).hypermergeUrl
+    : null
 
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
+  useHeartbeat(currentDeviceId)
   useHeartbeat(currentDocUrl)
+
+  useDeviceOnlineStatus(currentDeviceId)
+  useContactOnlineStatus(selfId)
 
   const sendToSystem = useSystem(
     (msg) => {
@@ -74,7 +86,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   useEffect(() => {
     // For background debugging:
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
-  }, [currentDocUrl])
+  }, [currentDocUrl, sendToSystem])
 
   useEffect(() => {
     if (!currentDeviceUrl || !self) {
@@ -90,17 +102,10 @@ export default function Workspace(props: WorkspaceContentProps) {
         doc.devices.push(hypermergeUrl)
       })
     }
-  }, [currentDeviceUrl, self])
+  }, [changeSelf, currentDeviceUrl, self])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
-      return
-    }
-
-    try {
-      parseDocumentLink(docUrl)
-    } catch (e) {
-      // if we can't parse the document, don't navigate
       return
     }
 

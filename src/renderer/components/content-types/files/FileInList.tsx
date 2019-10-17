@@ -13,7 +13,7 @@ interface Props extends ContentProps {
 
 export default function FileInList(props: Props) {
   const [doc] = useDocument<FileDoc>(props.hypermergeUrl)
-  const badgeRef = useRef<HTMLElement>(null)
+  const badgeRef = useRef<HTMLDivElement>(null)
 
   if (!doc) {
     return null

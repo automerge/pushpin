@@ -1,10 +1,13 @@
 import React from 'react'
 import { DocUrl } from 'hypermerge'
 import { validateDocURL } from 'hypermerge/dist/Metadata'
+import { toDiscoveryId } from 'hypermerge/dist/Misc'
 import { useRepo } from '../BackgroundHooks'
 import FeedView from './FeedView'
 import Card from './Card'
-import Info from './Info'
+import Info, { hidden } from './Info'
+import PeersView from './PeersView'
+import { Clock } from 'hypermerge/dist/Clock'
 
 interface Props {
   url: DocUrl
@@ -14,7 +17,9 @@ export default function DocView({ url }: Props) {
   const repo = useRepo()
   const id = validateDocURL(url)
 
-  const actorIds = repo.meta.actors(id)
+  const clock = repo.cursors.get(repo.id, id)
+  const actorIds = Object.keys(clock) as any[]
+  const doc = repo.docs.get(id)
 
   return (
     <div
@@ -23,12 +28,23 @@ export default function DocView({ url }: Props) {
         gridGap: 8,
       }}
     >
-      <Info docUrl={url} feeds={String(actorIds.length)} />
+      <Info log={doc} docUrl={url} clock={renderClock(doc && doc.clock)} />
+
+      <hr />
+      <Info feeds={actorIds.length} />
       {actorIds.map((actorId) => (
         <Card key={actorId}>
           <FeedView feedId={actorId} />
         </Card>
       ))}
+
+      <hr />
+      <PeersView discoveryId={toDiscoveryId(id)} />
     </div>
   )
+}
+
+function renderClock(clock: Clock | undefined) {
+  if (!clock) return null
+  return hidden(`${Object.keys(clock).length} actors...`, () => clock)
 }

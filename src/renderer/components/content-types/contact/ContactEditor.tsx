@@ -1,10 +1,8 @@
-import React, { useContext } from 'react'
-import { remote } from 'electron'
-import Debug from 'debug'
+import React, { useContext, useRef } from 'react'
+import { DocUrl } from 'hypermerge'
 
 import Automerge from 'automerge'
 import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
-import * as Hyperfile from '../../../hyperfile'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
@@ -19,12 +17,8 @@ import SecondaryText from '../../SecondaryText'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 
 import './ContactEditor.css'
-import ContentTypes from '../../../ContentTypes'
 import { CurrentDeviceContext } from '../workspace/Device'
-import { DocUrl } from 'hypermerge'
-
-const { dialog } = remote
-const log = Debug('pushpin:settings')
+import { importFileList } from '../../../ImportData'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -50,40 +44,10 @@ export const USER_COLORS = {
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
   const currentDeviceId = useContext(CurrentDeviceContext)
+  const hiddenFileInput = useRef<HTMLInputElement>(null)
 
   if (!doc) {
     return null
-  }
-
-  // XXX - this should probably use the new File stuff?
-  function chooseAvatar() {
-    dialog.showOpenDialog(
-      {
-        properties: ['openFile'],
-        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
-      },
-      (paths) => {
-        // User aborted.
-        if (!paths) {
-          return
-        }
-        if (paths.length !== 1) {
-          throw new Error('Expected exactly one path?')
-        }
-
-        Hyperfile.writeFromPath(paths[0])
-          .then((hyperfileUrl) => {
-            ContentTypes.create('image', { hyperfileUrl }, (hypermergeUrl) => {
-              changeDoc((d) => {
-                d.avatarDocId = hypermergeUrl
-              })
-            })
-          })
-          .catch((err) => {
-            log(err)
-          })
-      }
-    )
   }
 
   function setName(e: React.ChangeEvent<HTMLInputElement>) {
@@ -105,6 +69,21 @@ export default function ContactEditor(props: ContentProps) {
     avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
   } else {
     avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
+  }
+
+  const onImportClick = (e) => {
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.click()
+    }
+  }
+  // xxx: only allow images & only one
+  const onFilesChanged = (e) => {
+    importFileList(e.target.files, (url, i) =>
+      changeDoc((doc) => {
+        const { hypermergeUrl } = parseDocumentLink(url)
+        doc.avatarDocId = hypermergeUrl
+      })
+    )
   }
 
   function removeDevice(url: PushpinUrl) {
@@ -154,8 +133,8 @@ export default function ContactEditor(props: ContentProps) {
   }
 
   return (
-    <div className="ContactEditor-frame">
-      <div className="ContactEditor">
+    <div className="ContactEditor">
+      <div className="ContactEditor-content">
         <div className="ContactEditor-heading">
           <Heading>Edit Profile...</Heading>
         </div>
@@ -178,7 +157,15 @@ export default function ContactEditor(props: ContentProps) {
                 <div className="Avatar">{avatar}</div>
               </div>
               <Label>
-                <button type="button" onClick={chooseAvatar}>
+                <input
+                  type="file"
+                  id="hiddenImporter"
+                  accept="image/*"
+                  onChange={onFilesChanged}
+                  ref={hiddenFileInput}
+                  style={{ display: 'none' }}
+                />
+                <button type="button" onClick={onImportClick}>
                   Choose from file...
                 </button>
               </Label>

@@ -68,22 +68,6 @@ function Board(props: ContentProps) {
   const boardRef = useRef<HTMLDivElement>(null)
   const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>()
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      // this event can be consumed by a card if it wants to keep control of backspace
-      // for example, see text-content.jsx onKeyDown
-      if (e.key === 'Backspace') {
-        dispatch({ type: 'DeleteCards', selection })
-      }
-    },
-    [selection]
-  )
-
-  const onClick = useCallback((e: React.MouseEvent) => {
-    log('onClick')
-    selectNone()
-  }, [])
-
   const [doc, dispatch] = useDocumentReducer<BoardDoc, BoardAction>(
     props.hypermergeUrl,
     (doc, action) => {
@@ -115,6 +99,25 @@ function Board(props: ContentProps) {
       }
     },
     [selection]
+  )
+
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      // this event can be consumed by a card if it wants to keep control of backspace
+      // for example, see text-content.jsx onKeyDown
+      if (e.key === 'Backspace') {
+        dispatch({ type: 'DeleteCards', selection })
+      }
+    },
+    [dispatch, selection]
+  )
+
+  const onClick = useCallback(
+    (e: React.MouseEvent) => {
+      log('onClick')
+      selectNone()
+    },
+    [selectNone]
   )
 
   // xxx: this one is tricky because it feels like it should be in boardDocManipulation
@@ -175,6 +178,31 @@ function Board(props: ContentProps) {
     e.stopPropagation()
   }, [])
 
+  const onDropInternal = (e: React.DragEvent) => {
+    e.dataTransfer.dropEffect = 'move'
+    // do nothing (for now)
+  }
+
+  const onDropExternal = useCallback(
+    (e: React.DragEvent) => {
+      if (!boardRef.current) {
+        return
+      }
+
+      // Otherwise consttruct the drop point and import the data.
+      const { pageX, pageY } = e
+      const dropPosition = {
+        x: pageX - boardRef.current.offsetLeft,
+        y: pageY - boardRef.current.offsetTop,
+      }
+      ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
+        const position = gridOffset(dropPosition, i)
+        dispatch({ type: 'AddCardForContent', position, url })
+      })
+    },
+    [dispatch]
+  )
+
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault()
@@ -188,30 +216,8 @@ function Board(props: ContentProps) {
         onDropExternal(e)
       }
     },
-    [props.hypermergeUrl, selection]
+    [onDropExternal, props.hypermergeUrl]
   )
-
-  const onDropInternal = (e: React.DragEvent) => {
-    e.dataTransfer.dropEffect = 'move'
-    // do nothing (for now)
-  }
-
-  const onDropExternal = (e: React.DragEvent) => {
-    if (!boardRef.current) {
-      return
-    }
-
-    // Otherwise consttruct the drop point and import the data.
-    const { pageX, pageY } = e
-    const dropPosition = {
-      x: pageX - boardRef.current.offsetLeft,
-      y: pageY - boardRef.current.offsetTop,
-    }
-    ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
-      const position = gridOffset(dropPosition, i)
-      dispatch({ type: 'AddCardForContent', position, url })
-    })
-  }
 
   const onPaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {

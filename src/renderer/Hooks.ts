@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
 import { Handle, RepoFrontend, HyperfileUrl, Doc } from 'hypermerge'
+import { Header } from 'hypermerge/dist/FileStore'
+import { Readable } from 'stream'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 import SelfContext from './components/SelfContext'
@@ -127,32 +129,27 @@ export function useMessaging<M>(
   return sendObj.send
 }
 
-export function useHyperfile(url: HyperfileUrl | null): Hyperfile.HyperfileResult | null {
-  const [data, setData] = useState<Hyperfile.HyperfileResult | null>(null)
+export function useHyperfile(url: HyperfileUrl | null): [Header, Readable] | [null, null] {
+  const [header, setHeader] = useState<[Header, Readable] | [null, null]>([null, null])
 
   useEffect(() => {
-    data && setData(null)
-    url && Hyperfile.fetch(url).then(([data, mimeType, size]) => setData({ data, mimeType, size }))
+    header && setHeader([null, null])
+    url && Hyperfile.fetch(url).then(([header, readable]) => setHeader([header, readable]))
   }, [url])
 
-  return data
+  return header
 }
 
-export function useHyperfileBuffer(
-  url: HyperfileUrl | null
-): Hyperfile.BufferedHyperfileResult | null {
-  const [buffered, setBuffered] = useState<Hyperfile.BufferedHyperfileResult | null>(null)
-  const data = useHyperfile(url)
+export function useHyperfileHeader(url: HyperfileUrl | null): Header | null {
+  const [header, setHeader] = useState<Header | null>(null)
+  const { files } = useRepo()
 
   useEffect(() => {
-    buffered && setBuffered(null)
-    data &&
-      Hyperfile.streamToBuffer(data.data).then((buffer) =>
-        setBuffered({ data: buffer, mimeType: data.mimeType })
-      )
-  }, [data])
+    header && setHeader(null)
+    url && files.header(url).then(setHeader)
+  }, [url])
 
-  return buffered
+  return header
 }
 
 export function useInterval(ms: number, cb: () => void, deps: any[]) {
@@ -295,11 +292,18 @@ export function useEvent<K extends keyof DocumentEventMap>(
   cb: (this: Document, ev: DocumentEventMap[K]) => any
 ): void
 export function useEvent<K extends string>(
-  target: Node,
+  target: EventTarget | null,
   type: K,
-  cb: (this: Node, ev: Event) => void
+  cb: (this: HTMLElement, ev: any) => void
+): void
+export function useEvent<K extends string>(
+  target: EventTarget | null,
+  type: K,
+  cb: (this: EventTarget, ev: Event) => void
 ): void {
   useEffect(() => {
+    if (target == null) return () => {}
+
     target.addEventListener(type, cb)
 
     return () => {

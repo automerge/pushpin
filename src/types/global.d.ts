@@ -13,4 +13,8 @@ declare global {
     (error: null, value: T): void
     (error: Error): void
   }
+
+  interface Blob {
+    stream(): ReadableStream<Uint8Array>
+  }
 }

@@ -47,7 +47,7 @@ console:
 
 ```javascript
 > require('./constants').USER_PATH
-"/Users/mmcgrana/Library/Application Support/pushpin/pushpin-v10/mark"
+"/Users/mmcgrana/Library/Application Support/pushpin/pushpin-v11/mark"
 ```
 
 You can remove a user directory to reset a user's data, or remove the entire data directory to reset all user data.

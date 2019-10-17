@@ -1,7 +1,7 @@
 import React from 'react'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
-import { useDocument, useHyperfile } from '../../../Hooks'
+import { useDocument, useHyperfileHeader } from '../../../Hooks'
 import { createDocumentLink } from '../../../ShareLink'
 import { FileDoc } from '.'
 
@@ -13,26 +13,17 @@ function humanFileSize(size: number) {
 }
 
 export default function FileContent({ hypermergeUrl, context }: ContentProps) {
-  const [doc, changeDoc] = useDocument<FileDoc>(hypermergeUrl)
+  const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
-  const { title = '', mimeType = null, hyperfileUrl = null } = doc || {}
+  const { title = '', hyperfileUrl = null } = doc || {}
 
-  const fileData = useHyperfile(hyperfileUrl)
+  const header = useHyperfileHeader(hyperfileUrl)
 
-  if (!hyperfileUrl) {
+  if (!hyperfileUrl || !header) {
     return null
   }
 
-  // Write mimetypes from files in if we don't have them.
-  // This is essentially a migration, but we can throw it out
-  // if we have fast file metadata lookup in the future.
-  if (fileData && fileData.mimeType && !mimeType) {
-    changeDoc((doc) => {
-      doc.mimeType = fileData.mimeType
-    })
-  }
-
-  const size = fileData ? fileData.size : null
+  const { size, mimeType } = header
 
   function renderUnidentifiedFile() {
     return (
