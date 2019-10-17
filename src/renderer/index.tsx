@@ -80,7 +80,7 @@ function initSystem(): System {
   })
 
   ipc.serve(() => {
-    ipc.server.on('message', (data, socket) => {
+    ipc.server.on('clipper', (data, socket) => {
       system.fromSystemQ.push({ type: 'IncomingClip', payload: data })
     })
   })

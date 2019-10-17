@@ -58,7 +58,10 @@ export default function UrlContent(props: ContentProps) {
 
   useEvent(webview, 'dom-ready', () => {
     console.log('dom-ready', webview)
-    webview && (webview as any).send('freeze-dry', { type: 'Ready' })
+    doc &&
+      !doc.htmlHyperfileUrl &&
+      webview &&
+      (webview as any).send('freeze-dry', { type: 'Ready' })
   })
 
   useEvent(webview, 'console-message', ({ message }: { message: string }) => {
@@ -121,14 +124,14 @@ export default function UrlContent(props: ContentProps) {
           {htmlHyperfileUrl ? (
             <webview className="UrlCard-webview" title={data.title} src={htmlHyperfileUrl} />
           ) : (
-            <webview
-              ref={setWebview}
-              className="UrlCard-webview"
-              title={data.title}
-              src={data.canonicalLink || url}
-              preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
-            />
-          )}
+              <webview
+                ref={setWebview}
+                className="UrlCard-webview"
+                title={data.title}
+                src={data.canonicalLink || url}
+                preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
+              />
+            )}
         </div>
         <div className="UrlCard-buttons">
           <a
@@ -264,9 +267,15 @@ function removeEmpty(obj: object) {
   })
 }
 
-function create({ url }, handle: Handle<UrlDoc>, callback) {
+function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>, callback) {
   handle.change((doc) => {
-    doc.url = url
+    doc.url = url || src
+    if (hyperfileUrl) {
+      doc.htmlHyperfileUrl = hyperfileUrl
+    }
+    if (capturedAt) {
+      doc.capturedAt = capturedAt
+    }
   })
   callback()
 }
@@ -303,8 +312,8 @@ function UrlContentInList(props: ContentProps) {
             </SecondaryText>
           </>
         ) : (
-          <Heading>{url}</Heading>
-        )}
+            <Heading>{url}</Heading>
+          )}
       </div>
     </div>
   )

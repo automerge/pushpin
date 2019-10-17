@@ -135,28 +135,27 @@ export default function Workspace(props: WorkspaceContentProps) {
 
   function importClip(payload: any) {
     console.log('importing', payload)
-    const { contentType, content } = payload
-    if (!contentType || !content) {
-      throw new Error('bad clip message')
-    }
-
-    const creationCallback = (importedUrl) =>
+    const creationCallback = (importedUrl) => {
       changeWorkspace((d) => {
         if (!d.clips) {
           d.clips = []
         }
         d.clips.unshift(importedUrl)
       })
+    }
 
-    switch (contentType) {
+    switch (payload.type) {
       case 'Text':
-        importPlainText(content, creationCallback)
+        importPlainText(payload.content, creationCallback)
         break
-      case 'HTML':
+      case 'Html':
         ContentTypes.create('url', payload, creationCallback)
         break
+      case 'Image':
+        ContentTypes.create('file', payload, creationCallback)
+        break
       default:
-        throw new Error(`no idea how to deal with ${payload.contentType}`)
+        throw new Error(`no idea how to deal with ${payload.type}`)
     }
   }
 

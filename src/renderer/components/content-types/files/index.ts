@@ -17,6 +17,15 @@ export interface FileDoc {
   hyperfileUrl: HyperfileUrl
 }
 
+function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>, callback) {
+  handle.change((doc) => {
+    doc.title = title
+    doc.extension = extension
+    doc.hyperfileUrl = hyperfileUrl
+  })
+  callback()
+}
+
 function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
   const { name = 'Unnamed File' } = entry
 
@@ -49,5 +58,6 @@ ContentTypes.register({
     board: FileContent,
     list: FileInList,
   },
+  create,
   createFromFile,
 })
