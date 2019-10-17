@@ -59,15 +59,15 @@ pipeline(process.stdin, inboundStream, onMessageTransform, outboundStream, proce
 async function onMessage(message: InboundMessage): Promise<OutboundMessage> {
   switch (message.contentType) {
     case 'HTML': {
-      await sendToPushpin({ html: true })
+      await sendToPushpin(message)
       break
     }
     case 'Text': {
-      await sendToPushpin({ html: true })
+      await sendToPushpin(message)
       break
     }
     case 'Image': {
-      await sendToPushpin({ html: true })
+      await sendToPushpin(message)
       break
     }
   }
@@ -79,7 +79,7 @@ function sendToPushpin(msg): Promise<void> {
     ipc.connectTo('renderer', () => {
       ipc.of.renderer.on('connect', () => {
         ipc.of.renderer.emit('message', msg)
-        ipc.disconnect('renderer')
+        // ipc.disconnect('renderer')
         res()
       })
     })

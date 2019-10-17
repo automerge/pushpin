@@ -56,15 +56,15 @@ function onMessage(message) {
                         case 'Image': return [3 /*break*/, 5];
                     }
                     return [3 /*break*/, 7];
-                case 1: return [4 /*yield*/, sendToPushpin({ html: true })];
+                case 1: return [4 /*yield*/, sendToPushpin(message)];
                 case 2:
                     _b.sent();
                     return [3 /*break*/, 7];
-                case 3: return [4 /*yield*/, sendToPushpin({ html: true })];
+                case 3: return [4 /*yield*/, sendToPushpin(message)];
                 case 4:
                     _b.sent();
                     return [3 /*break*/, 7];
-                case 5: return [4 /*yield*/, sendToPushpin({ html: true })];
+                case 5: return [4 /*yield*/, sendToPushpin(message)];
                 case 6:
                     _b.sent();
                     return [3 /*break*/, 7];
@@ -78,7 +78,7 @@ function sendToPushpin(msg) {
         node_ipc_1["default"].connectTo('renderer', function () {
             node_ipc_1["default"].of.renderer.on('connect', function () {
                 node_ipc_1["default"].of.renderer.emit('message', msg);
-                node_ipc_1["default"].disconnect('renderer');
+                // ipc.disconnect('renderer')
                 res();
             });
         });
