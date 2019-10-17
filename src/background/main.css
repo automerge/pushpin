@@ -7,3 +7,7 @@ hr {
   border: 0;
   border-bottom: 1px solid silver;
 }
+
+:link {
+  color: var(--colorLink);
+}

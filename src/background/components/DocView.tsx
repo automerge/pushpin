@@ -2,18 +2,19 @@ import React from 'react'
 import { DocUrl } from 'hypermerge'
 import { validateDocURL } from 'hypermerge/dist/Metadata'
 import { toDiscoveryId } from 'hypermerge/dist/Misc'
-import { useRepo } from '../BackgroundHooks'
+import { Clock } from 'hypermerge/dist/Clock'
+import { useRepo, useSample } from '../BackgroundHooks'
 import FeedView from './FeedView'
 import Card from './Card'
 import Info, { hidden } from './Info'
 import PeersView from './PeersView'
-import { Clock } from 'hypermerge/dist/Clock'
 
 interface Props {
   url: DocUrl
 }
 
 export default function DocView({ url }: Props) {
+  useSample(2000)
   const repo = useRepo()
   const id = validateDocURL(url)
 

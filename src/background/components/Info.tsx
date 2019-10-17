@@ -99,7 +99,7 @@ function renderValue(v: Value) {
     return (
       <>
         {v.map((v2, i) => (
-          <div key={String(i)}>{renderValue(v2)}</div>
+          <Info key={String(i)} {...{ [i]: renderValue(v2) }} />
         ))}
       </>
     )
