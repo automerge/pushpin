@@ -3,37 +3,41 @@ import { exec } from 'child_process'
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
+import { DIST_DIR, SCRIPT_DIR } from './shared'
 
-type OS = 'windows' | 'mac' | 'unsupported'
-const SRC_DIR = path.resolve(__dirname, '../src')
-const DIST_DIR = path.resolve(__dirname, '../dist')
-
-const osName = getOs()
-const hostPath = getHostPath(osName)
-const extensionId = process.argv[2]
-
-if (!extensionId) throw new Error('Extension id required')
-
-const template = fs.readFileSync(path.join(SRC_DIR, 'template.com.pushpin.pushpin.json'), {
-  encoding: 'utf8',
-})
-const manifest = replace(template, { '{HOST_PATH}': hostPath, '{EXTENSION_ID}': extensionId })
-fs.writeFileSync(path.join(DIST_DIR, 'com.pushpin.pushpin.json'), manifest)
-
-// Register the manifest file with Chrome native hosts.
-// TODO: errors
-registerNativeHost(osName)
-
-function getOs(): OS {
-  if (os.type() === 'Darwin') return 'mac'
-  if (os.type() === 'Windows_NT') return 'windows'
-  throw new Error('Unsupported operating system')
+const CONFIG = {
+  Darwin: {
+    host: 'index.js',
+    registration: 'register.sh',
+  },
+  // Linux: {
+  //   host: 'index.js',
+  //   registration: 'registration.sh',
+  // },
+  Windows_NT: {
+    host: 'host.bat',
+    registration: 'register.bat',
+  },
 }
 
-function getHostPath(osName: OS) {
-  if (osName === 'mac') return path.join(DIST_DIR, 'host.js')
-  if (osName === 'windows') return 'host.bat'
-  throw new Error('Unsupported Operating System')
+const extensionId = process.argv[2]
+if (!extensionId) throw new Error('Extension id required')
+
+const config = CONFIG[os.type()]
+if (!config) throw new Error('Unsupported operating system')
+
+renderManifest()
+registerNativeHost()
+
+function renderManifest() {
+  const template = fs.readFileSync(path.join(__dirname, 'template.com.pushpin.pushpin.json'), {
+    encoding: 'utf8',
+  })
+  const manifest = replace(template, {
+    '{HOST_PATH}': path.join(DIST_DIR, config.host),
+    '{EXTENSION_ID}': extensionId,
+  })
+  fs.writeFileSync(path.join(DIST_DIR, 'com.pushpin.pushpin.json'), manifest)
 }
 
 function replace(template: string, values: { [find: string]: string }) {
@@ -43,19 +47,13 @@ function replace(template: string, values: { [find: string]: string }) {
   })
 }
 
-function registerNativeHost(osName: OS) {
-  const registrationScript = getRegistrationScript(osName)
-  exec(registrationScript, (err, stdout, stderr) => {
+function registerNativeHost() {
+  const script = path.join(SCRIPT_DIR, config.registration)
+  exec(script, (err, stdout, stderr) => {
     if (err) {
       console.error(err)
       return
     }
     console.log(stdout)
   })
-}
-
-function getRegistrationScript(osName: OS) {
-  if (osName === 'mac') return path.join(SRC_DIR, './register.sh')
-  if (osName === 'windows') return path.join(SRC_DIR, './register.bat')
-  throw new Error('Unsupported Operating System')
 }
