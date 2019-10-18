@@ -16,7 +16,7 @@ const CONFIG = {
   // },
   Windows_NT: {
     host: 'host.bat',
-    registration: 'register.bat',
+    registration: 'register.bat ./clipper-host/dist/',
   },
 }
 
@@ -33,7 +33,7 @@ function renderManifest() {
     encoding: 'utf8',
   })
   const manifest = replace(template, {
-    '{HOST_PATH}': path.join(DIST_DIR, config.host),
+    '{HOST_PATH}': path.join(DIST_DIR, config.host).replace(/\\/g, '\\\\'),
     '{EXTENSION_ID}': extensionId,
   })
   fs.writeFileSync(path.join(DIST_DIR, 'com.pushpin.pushpin.json'), manifest)
