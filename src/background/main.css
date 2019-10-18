@@ -11,3 +11,7 @@ hr {
 :link {
   color: var(--colorLink);
 }
+
+summary {
+  outline: none;
+}

@@ -1,6 +1,7 @@
 import React from 'react'
 import LogLink from './LogLink'
 import Expandable from './Expandable'
+import './Info.css'
 
 type Value =
   | string
@@ -21,15 +22,7 @@ interface Props {
 
 export default function Info({ log, ...info }: Props) {
   return (
-    <code
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr',
-        gridGap: '0 5px',
-        whiteSpace: 'pre-wrap',
-        position: 'relative',
-      }}
-    >
+    <code className="Info">
       {log ? (
         <div style={{ position: 'absolute', top: 0, right: 0, height: '100%' }}>
           <div style={{ position: 'sticky', top: 10 }}>
@@ -85,24 +78,15 @@ export function hexDump(buffer: Uint8Array, blockSize = 16) {
   return lines.join('\n')
 }
 
-export function hidden(summary: Value, details: () => Value): Value {
-  return (
-    <Expandable summary={renderValue(summary)}>{() => <>{renderValue(details())}</>}</Expandable>
-  )
+export function hidden(summary: string, details: () => Value): Value {
+  return <Expandable summary={summary}>{() => <>{renderValue(details())}</>}</Expandable>
 }
 
 function renderValue(v: Value) {
   if (v == null) return ''
   if (typeof v === 'boolean') return v ? 'yes' : 'no'
   if (React.isValidElement(v)) return v
-  if (Array.isArray(v))
-    return (
-      <>
-        {v.map((v2, i) => (
-          <Info key={String(i)} {...{ [i]: renderValue(v2) }} />
-        ))}
-      </>
-    )
+  if (Array.isArray(v)) return <Info {...v} />
   if (v instanceof Uint8Array) return hexDump(v)
   if (typeof v === 'object') return <Info {...v} />
 

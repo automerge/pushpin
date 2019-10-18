@@ -8,8 +8,7 @@ interface Props {
 export default function LogLink({ v, children }: Props) {
   function onClick(e: React.SyntheticEvent) {
     e.preventDefault()
-    ;(window as any).temp = v
-    console.log('temp =', v) // eslint-disable-line
+    log(v)
   }
 
   return (
@@ -24,4 +23,16 @@ export default function LogLink({ v, children }: Props) {
       </small>
     </Fragment>
   )
+}
+
+function log(v: any): boolean {
+  if (typeof v === 'function') return log(v())
+  if ('then' in v && typeof v.then === 'function') {
+    v.then(log)
+    return false
+  }
+
+  ;(window as any).temp = v
+  console.log('temp =', v) // eslint-disable-line
+  return true
 }

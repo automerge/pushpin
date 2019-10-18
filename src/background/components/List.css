@@ -1,0 +1,4 @@
+.List {
+  display: grid;
+  grid-gap: 8px;
+}

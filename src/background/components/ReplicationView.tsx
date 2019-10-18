@@ -1,25 +1,33 @@
 import React from 'react'
+import { joinSets } from 'hypermerge/dist/Misc'
 import { useSample, useRepo } from '../BackgroundHooks'
 import Info, { hidden } from './Info'
+import PeerView from './PeerView'
+import Card from './Card'
+import List from './List'
 
 export default function ReplicationView() {
   useSample(3000)
+
   const { replication } = useRepo()
+  const { replicating } = replication
+  const allReplicating = joinSets(replicating.values())
+  const peers = replicating.keys()
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridGap: 8,
-      }}
-    >
+    <List>
       <Info
         log={replication}
-        known={hidden(`${replication.discoveryIds.size} feeds`, () =>
-          Array.from(replication.discoveryIds.values())
+        replicating={hidden(`${allReplicating.size} feeds`, () =>
+          Array.from(allReplicating.values())
         )}
       />
-      Nothing here yet
-    </div>
+      <Info peers={peers.length} />
+      {peers.map((peer) => (
+        <Card key={peer.id}>
+          <PeerView peerId={peer.id} />
+        </Card>
+      ))}
+    </List>
   )
 }

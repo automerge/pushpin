@@ -3,6 +3,7 @@ import { useRepo, useSample } from '../BackgroundHooks'
 import Card from './Card'
 import Info, { hidden } from './Info'
 import PeerView from './PeerView'
+import List from './List'
 
 interface Props {}
 
@@ -14,12 +15,7 @@ export default function NetworkView(_props: Props) {
   const peers = Array.from(network.peers.values())
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridGap: 8,
-      }}
-    >
+    <List>
       <Info
         log={network}
         selfId={network.selfId}
@@ -33,6 +29,6 @@ export default function NetworkView(_props: Props) {
           <PeerView peerId={peer.id} />
         </Card>
       ))}
-    </div>
+    </List>
   )
 }

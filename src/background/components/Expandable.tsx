@@ -5,6 +5,7 @@ interface Props {
   children: () => React.ReactNode
 }
 
+/* eslint-disable */
 declare global {
   namespace React {
     interface DetailsHTMLAttributes<T> {
@@ -12,6 +13,7 @@ declare global {
     }
   }
 }
+/* eslint-enable */
 
 export default function Expandable({ summary, children }: Props) {
   const [isOpen, setOpen] = useState(false)
