@@ -20,8 +20,7 @@ const CONFIG = {
   },
 }
 
-const extensionId = process.argv[2]
-if (!extensionId) throw new Error('Extension id required')
+const extensionId = process.argv[2] || 'kdnhjinccidgfopcfckekiihpjakjhng'
 
 const config = CONFIG[os.type()]
 if (!config) throw new Error('Unsupported operating system')

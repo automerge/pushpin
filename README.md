@@ -68,12 +68,14 @@ You can also see who's online in the top right corner of your workspace.
 
 ## Clipper Chrome Extension
 
-Pushpin integrates with the [Clipper chrome extension](https://github.com/pvh/eleanor) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension. Make special note of the chrome extension id. You can find the chrome extension id by visiting `chrome://extensions` in your Chrome browser, finding the Pushpin Clipper extension, and copying the 'ID:' value.
+Pushpin integrates with the [Clipper chrome extension](https://github.com/pvh/eleanor) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
+
+PushPin is configured to expect a clipper extension with the 'kdnhjinccidgfopcfckekiihpjakjhng' id. If you are experimenting with a different ID you can supply that as an argument to the install script. 
 
 To build and install the Clipper extension:
 ```
 yarn build:clipper-host
-yarn install:clipper-host <extension id you copied above>
+yarn install:clipper-host
 ```
 
 You should now be able to clip content using the Clipper extension and have it show up in your Omnibox!
