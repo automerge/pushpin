@@ -319,39 +319,71 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   /* begin actions */
   view = {
     name: 'view',
-    callback: (url) => () => this.navigate(url),
     faIcon: 'fa-compass',
     label: 'View',
     shortcut: '⏎',
     keysForActionPressed: (e) => e.key === 'Enter',
+    callback: (url) => () => this.navigate(url),
   }
 
   invite = {
     name: 'invite',
-    callback: (url) => () => this.offerDocumentToIdentity(url),
     faIcon: 'fa-share-alt',
     label: 'Invite',
     shortcut: '⏎',
     keysForActionPressed: (e) => e.key === 'Enter',
+    callback: (url) => () => this.offerDocumentToIdentity(url),
   }
 
   archive = {
     name: 'archive',
     destructive: true,
-    callback: (url) => () => this.archiveDocument(url),
     faIcon: 'fa-trash',
     label: 'Archive',
     shortcut: '⌘+⌫',
     keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    callback: (url) => () => this.archiveDocument(url),
   }
 
   unarchive = {
     name: 'unarchive',
-    callback: (url) => () => this.unarchiveDocument(url),
     faIcon: 'fa-trash-restore',
     label: 'Unarchive',
     shortcut: '⌘+⌫',
     keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    callback: (url) => () => this.unarchiveDocument(url),
+  }
+
+  place = {
+    name: 'place',
+    faIcon: 'fa-download',
+    label: 'Place',
+    shortcut: '⏎',
+    keysForActionPressed: (e) => e.key === 'Enter',
+    callback: (url) => () => {
+      alert('nope\n' + url)
+    }
+  }
+
+  archiveClip = {
+    name: 'archive',
+    faIcon: 'fa-trash',
+    label: 'Archive',
+    shortcut: '⌘+⌫',
+    destructive: true,
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    callback: (url) => () => {
+      if (!this.handle) { return }
+      this.handle.change((doc) => {
+        if (!doc.clips) {
+          return
+        }
+        const clipIndex = doc.clips.findIndex((i) => i === url)
+        if (clipIndex >= 0) {
+          delete doc.clips[clipIndex]
+        }
+      })
+    },
   }
   /* end actions */
 
@@ -360,7 +392,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     {
       name: 'clips',
       label: 'Clipped Items',
-      actions: [this.view, this.archive],
+      actions: [this.place, this.archiveClip],
       items: (state, props) =>
         !(this.state.doc && this.state.doc.clips)
           ? []
@@ -390,10 +422,10 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
         props.search === '' || !state.doc
           ? [] // don't show archived URLs unless there's a current search term
           : (state.doc.archivedDocUrls || [])
-              .map((url) => [url, this.state.viewedDocs[url]])
-              .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
-              .filter(([url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
-              .map(([url, doc]) => ({ url })),
+            .map((url) => [url, this.state.viewedDocs[url]])
+            .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
+            .filter(([url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
+            .map(([url, doc]) => ({ url })),
     },
     {
       name: 'docUrls',
