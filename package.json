@@ -121,7 +121,6 @@
   "resolutions": {
     "automerge": "github:automerge/automerge#opaque-strings",
     "sharp": "^0.23.1",
-    "utp-native": "^2.1.4",
     "iltorb": "^2.4.3"
   }
 }
