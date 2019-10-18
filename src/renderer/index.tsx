@@ -8,8 +8,6 @@ import ipc from '../ipc'
 import Root from './components/Root'
 
 import './app.css'
-import './react-toggle-override.css'
-import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 import System, { FromSystemMsg } from './System'

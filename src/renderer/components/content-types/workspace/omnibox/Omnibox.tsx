@@ -8,6 +8,7 @@ import { HypermergeUrl, parseDocumentLink, PushpinUrl } from '../../../../ShareL
 import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
 import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
+import { useEvent } from '../../../../Hooks'
 
 const log = Debug('pushpin:omnibox')
 
@@ -20,13 +21,21 @@ export interface Props {
 }
 
 export default function Omnibox(props: Props) {
-  const { active, workspaceUrlsContext } = props
+  const { active, workspaceUrlsContext, omniboxFinished, onContent } = props
   const omniboxInput = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState('')
 
   const onInputChange = useCallback((e) => {
     setSearch(e.target.value)
   }, [])
+
+  const omniboxRef = useRef<HTMLDivElement>(null)
+  useEvent(window, 'click', (event) => {
+    if (!omniboxRef.current) { return }
+    if (event.target !== omniboxRef.current && !omniboxRef.current.contains(event.target)) {
+      omniboxFinished()
+    }
+  })
 
   useEffect(() => {
     if (active && omniboxInput.current) {
@@ -43,7 +52,7 @@ export default function Omnibox(props: Props) {
   const { workspaceUrls } = workspaceUrlsContext
 
   return (
-    <div className="Omnibox">
+    <div className="Omnibox" ref={omniboxRef}>
       <div className="Omnibox-header">
         <input
           className="Omnibox-input"
@@ -61,8 +70,8 @@ export default function Omnibox(props: Props) {
             <OmniboxWorkspace
               key={url}
               viewContents={i === 0}
-              onContent={props.onContent}
-              omniboxFinished={props.omniboxFinished}
+              onContent={onContent}
+              omniboxFinished={omniboxFinished}
               hypermergeUrl={hypermergeUrl}
               search={search}
               active={active}
