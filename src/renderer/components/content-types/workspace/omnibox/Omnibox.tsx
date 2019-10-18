@@ -4,7 +4,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react'
 import Debug from 'debug'
 
-import { HypermergeUrl, parseDocumentLink } from '../../../../ShareLink'
+import { HypermergeUrl, parseDocumentLink, PushpinUrl } from '../../../../ShareLink'
 import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
 import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
@@ -16,6 +16,7 @@ export interface Props {
   hypermergeUrl: HypermergeUrl
   omniboxFinished: Function
   workspaceUrlsContext: WorkspaceUrlsApi | null
+  onContent: (url: PushpinUrl) => boolean
 }
 
 export default function Omnibox(props: Props) {
@@ -60,6 +61,7 @@ export default function Omnibox(props: Props) {
             <OmniboxWorkspace
               key={url}
               viewContents={i === 0}
+              onContent={props.onContent}
               omniboxFinished={props.omniboxFinished}
               hypermergeUrl={hypermergeUrl}
               search={search}

@@ -16,6 +16,7 @@ import { ContactDoc } from '../contact'
 export interface Props {
   hypermergeUrl: HypermergeUrl
   openDoc: Function
+  onContent: (url: PushpinUrl) => boolean
 }
 
 export default function TitleBar(props: Props) {
@@ -128,6 +129,7 @@ export default function TitleBar(props: Props) {
                 active={activeOmnibox}
                 hypermergeUrl={props.hypermergeUrl}
                 omniboxFinished={deactivateOmnibox}
+                onContent={props.onContent}
                 workspaceUrlsContext={workspaceUrlsContext}
               />
             )}

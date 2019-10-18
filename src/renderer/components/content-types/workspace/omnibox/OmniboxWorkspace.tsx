@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { DocUrl } from 'hypermerge'
 import { clipboard } from 'electron'
-import { createDocumentLink } from '../../../../ShareLink'
+import { createDocumentLink, PushpinUrl } from '../../../../ShareLink'
 import { useDocument } from '../../../../Hooks'
 import Content from '../../../Content'
 import { Doc as WorkspaceDoc } from '../Workspace'
@@ -18,10 +18,11 @@ export interface Props {
   search: string
   hypermergeUrl: DocUrl
   omniboxFinished: Function
+  onContent: (url: PushpinUrl) => boolean
 }
 
 export default function OmniboxWorkspace(props: Props) {
-  const { active, search, hypermergeUrl, omniboxFinished, viewContents } = props
+  const { active, search, hypermergeUrl, omniboxFinished, viewContents, onContent } = props
   const [workspaceDoc] = useDocument<WorkspaceDoc>(hypermergeUrl)
   const [selfDoc] = useDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)
 
@@ -66,6 +67,7 @@ export default function OmniboxWorkspace(props: Props) {
           <OmniboxWorkspaceListMenu
             active={active}
             search={search}
+            onContent={onContent}
             hypermergeUrl={hypermergeUrl}
             omniboxFinished={omniboxFinished}
           />

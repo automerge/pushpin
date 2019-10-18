@@ -34,6 +34,7 @@ export interface Props {
   search: string
   hypermergeUrl: DocUrl
   omniboxFinished: Function
+  onContent: (url: PushpinUrl) => boolean
 }
 
 interface State {
@@ -361,7 +362,8 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     shortcut: '⏎',
     keysForActionPressed: (e) => e.key === 'Enter',
     callback: (url) => () => {
-      alert('nope\n' + url)
+      const landed = this.props.onContent(url)
+      if (landed) { this.delistClip(url) }
     }
   }
 
@@ -372,18 +374,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     shortcut: '⌘+⌫',
     destructive: true,
     keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
-    callback: (url) => () => {
-      if (!this.handle) { return }
-      this.handle.change((doc) => {
-        if (!doc.clips) {
-          return
-        }
-        const clipIndex = doc.clips.findIndex((i) => i === url)
-        if (clipIndex >= 0) {
-          delete doc.clips[clipIndex]
-        }
-      })
-    },
+    callback: (url) => () => this.delistClip(url),
   }
   /* end actions */
 
@@ -514,6 +505,19 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           delete doc.archivedDocUrls[unarchiveIndex]
         }
       })
+  }
+
+  delistClip = (url) => {
+    if (!this.handle) { return }
+    this.handle.change((doc) => {
+      if (!doc.clips) {
+        return
+      }
+      const clipIndex = doc.clips.findIndex((i) => i === url)
+      if (clipIndex >= 0) {
+        delete doc.clips[clipIndex]
+      }
+    })
   }
 
   renderNothingFound = () => {

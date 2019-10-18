@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
 
@@ -159,50 +159,61 @@ export default function Workspace(props: WorkspaceContentProps) {
     }
   }
 
+  const contentRef = useRef<any>() // hmmm
+
+  function onContent(url: PushpinUrl) {
+    if (contentRef.current) {
+      return contentRef.current.onContent(url)
+    }
+    return false
+  }
+
   log('render')
   if (!workspace) {
     return null
   }
 
+
+  function renderContent(currentDocUrl?: PushpinUrl) {
+    if (!currentDocUrl) {
+      return null
+    }
+
+    const { type } = parseDocumentLink(currentDocUrl)
+    return (
+      <div className={`Workspace__container Workspace__container--${type}`}>
+        <Content ref={contentRef} context="workspace" url={currentDocUrl} />
+      </div>
+    )
+  }
+
   const content = renderContent(workspace.currentDocUrl)
+
   return (
     <SelfContext.Provider value={workspace.selfId}>
       <div className="Workspace">
-        <TitleBar hypermergeUrl={props.hypermergeUrl} openDoc={openDoc} />
+        <TitleBar hypermergeUrl={props.hypermergeUrl} openDoc={openDoc} onContent={onContent} />
         {content}
       </div>
     </SelfContext.Provider>
   )
 }
 
-function renderContent(currentDocUrl?: PushpinUrl) {
-  if (!currentDocUrl) {
-    return null
-  }
-
-  const { type } = parseDocumentLink(currentDocUrl)
-  return (
-    <div className={`Workspace__container Workspace__container--${type}`}>
-      <Content context="workspace" url={currentDocUrl} />
-    </div>
-  )
-}
-
 const WELCOME_TEXT = `Welcome to PushPin!
-
-We've created your first text card for you.
-You can edit it, or make more by double-clicking the background.
-
-You can drag or paste images, text, and URLs onto the board. They'll be stored for offline usage.
-If you right-click, you can choose the kind of card to make.
-You can make new boards from the right-click menu or with Ctrl-N.
-
-To edit the title of a board, click the pencil.
-To share a board with another person, click the clipboard, then have them paste that value into the omnibox.
-
-Quick travel around by clicking the Omnibox. Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
-
-To create links to boards or contacts, drag them from the title bar or the omnibox.`
+    
+    We've created your first text card for you.
+    You can edit it, or make more by double-clicking the background.
+    
+    You can drag or paste images, text, and URLs onto the board. They'll be stored for offline usage.
+    If you right-click, you can choose the kind of card to make.
+    You can make new boards from the right-click menu or with Ctrl-N.
+    
+    To edit the title of a board, click the pencil.
+    To share a board with another person, click the clipboard, then have them paste that value into the omnibox.
+    
+    Quick travel around by clicking the Omnibox. Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
+    
+    To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
 function create(attrs, handle, callback) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {

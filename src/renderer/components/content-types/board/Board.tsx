@@ -1,11 +1,11 @@
-import React, { useRef, useCallback, memo, useMemo } from 'react'
+import React, { useRef, useCallback, memo, useMemo, ForwardRefExoticComponent, RefForwardingComponent, forwardRef, useImperativeHandle } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
 import { PushpinUrl } from '../../../ShareLink'
-import { ContentProps } from '../../Content'
+import { ContentProps, ContentHandle } from '../../Content'
 import { BoardDoc, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
@@ -64,7 +64,11 @@ export interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
-function Board(props: ContentProps) {
+const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: ContentProps, ref) => {
+  useImperativeHandle(ref, () => ({
+    onContent: (url: PushpinUrl) => onContent(url),
+  }));
+
   const boardRef = useRef<HTMLDivElement>(null)
   const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>()
 
@@ -246,6 +250,25 @@ function Board(props: ContentProps) {
     [dispatch]
   )
 
+  const onContent = useCallback(
+    (url: PushpinUrl) => {
+      log('onContent')
+
+      /* onContent currently comes from the omnibox sending us a clipper item,
+         which doesn't know where it should go, so let's just stick it mid-page
+         since this is also what we do for paste 
+      */
+      const position = {
+        x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
+        y: window.pageYOffset + window.innerHeight / 2,
+      }
+
+      dispatch({ type: 'AddCardForContent', position, url })
+      return true
+    },
+    [dispatch]
+  )
+
   const docTitle = doc && doc.title ? doc.title : ''
   const contentTypes = useMemo(() => ContentTypes.list({ context: 'board' }), [])
   const { backgroundColor = '#fff' } = doc || {}
@@ -313,4 +336,4 @@ function Board(props: ContentProps) {
   )
 }
 
-export default memo(Board)
+export default memo(forwardRef(Board))
