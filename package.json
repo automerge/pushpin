@@ -120,7 +120,6 @@
   },
   "resolutions": {
     "automerge": "github:automerge/automerge#opaque-strings",
-    "sharp": "^0.23.1",
-    "iltorb": "^2.4.3"
+    "sharp": "^0.23.1"
   }
 }
