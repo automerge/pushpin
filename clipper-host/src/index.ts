@@ -80,9 +80,8 @@ function sendToPushpin(msg): Promise<void> {
     ipc.connectTo('renderer', () => {
       ipc.of.renderer.on('connect', () => {
         ipc.of.renderer.emit('clipper', msg)
-        // Note: disconnecting immediately is causing pushpin to not always
-        // the message.
-        // ipc.disconnect('renderer')
+        // Note: we delay a little while here to give the message time to send.
+        setTimeout(() => ipc.disconnect('renderer'), 250)
         res()
       })
     })
