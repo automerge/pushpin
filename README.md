@@ -66,14 +66,12 @@ You can navigate new places quickly by pressing "/" and then typing part of the 
 
 You can also see who's online in the top right corner of your workspace.
 
-
 ## Keeping Your Data Available
 
 [pushpin-peer](https://github.com/mjtognetti/pushpin-peer) is a simple data peer you can use to ensure your pushpin data is available. You can run pushpin peer on a server or in the cloud.
 
 **Important note:**
 Due to hypermerge limitations (which we're working on!), syncing between pushpin and pushpin-peer may not work exactly as you would expect. Pushpin will only replicate documents to pushpin-peer which you have actively opened within the pushpin app (i.e. loaded onto a board or navigated to). We're working on improving replication to remove this constraint!
-
 
 ## Hacking on PushPin
 
@@ -114,6 +112,11 @@ Special thanks to Martin Kleppmann (automerge) and Mathias Buus (hypercore) for 
 
 Compiling sodium-native is a pain. Go into node_modules/sodium-native and run `node preinstall` if you have trouble.
 
-### automerge
+### package.json resolutions
 
-There's a regression in Automerge where types are being wrapped in a proxy preventing instanceof Text from working correctly. Until a fix arrives, edit node_modules/hypermerge/node_modules/automerge/frontend/context.js#69 and change value instanceof Text to value.constructor.name === "Text".
+- `"automerge": "github:automerge/automerge#opaque-strings"`
+  - Automerge's typescript declarations mess up opaque string types (`string & { foo: bar }`) when
+    freezing objects, so we have a branch that supports it. Can remove after that branch is merged
+    to automerge.
+- `"sharp": "^0.23.1"`
+  - `"icon-tool-mac": "^1.3.1"` depends on a version of `sharp` that is incompatible with node v12. `sharp@^0.23.1` supports node 12. Can remove if `icon-tool-mac` updates its dependencies.
