@@ -30,6 +30,7 @@ export default function Omnibox(props: Props) {
   useEffect(() => {
     if (active && omniboxInput.current) {
       omniboxInput.current.focus()
+      omniboxInput.current.select()
     }
   }, [active])
 
