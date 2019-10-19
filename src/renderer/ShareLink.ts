@@ -13,7 +13,7 @@ export function isHypermergeUrl(str: string): str is HypermergeUrl {
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  return /^hypermerge:\/.+\/?\?pushpinContentType=(\w+)$/.test(str)
+  return /^hypermerge:\/.+\/?\?pushpinContentType=([^&=]+)$/.test(str)
 }
 
 export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl {
@@ -76,7 +76,7 @@ export function parts(str: string) {
 export const encodedParts = (str: string) => {
   // ugly
   const [, /* whole match */ scheme, docId, type] = str.match(
-    /^(\w+):\/(\w+)\?pushpinContentType=(\w+)$/
+    /^(\w+):\/(\w+)\?pushpinContentType=([^&=]+)$/
   ) || [undefined, undefined, undefined, undefined]
   return { scheme, type, docId }
 }
