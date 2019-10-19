@@ -246,7 +246,7 @@ function BoardCard(props: BoardCardProps) {
     height: resize ? resize.height : height,
     position: 'absolute',
     willChange: selected ? 'transform' : '',
-    transform: `translate3d(${x}px, ${y}px, 0) translate(var(--drag-x, 0), var(--drag-y, 0))`,
+    transform: `translate(${x}px, ${y}px) translate(var(--drag-x, 0), var(--drag-y, 0))`,
   }
 
   const { type } = parseDocumentLink(url)
