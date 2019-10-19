@@ -106,11 +106,11 @@ function useQuill({
     const q = new Quill(container, { scrollingContainer: container, ...config })
     quill.current = q
 
-    if (textDelta) q.setContents(textDelta)
+    if (textDelta) q.setContents(textDelta, 'silent')
     if (selected) q.focus()
 
     const onChange: TextChangeHandler = (changeDelta, _oldContents, source) => {
-      if (source !== 'user') return
+      // if (source !== 'user') return
 
       makeChange((content) => {
         applyDeltaToText(content, changeDelta)
@@ -154,7 +154,7 @@ function useQuill({
 
     const diff = quill.current.getContents().diff(textDelta)
 
-    quill.current.updateContents(diff)
+    quill.current.updateContents(diff, 'silent')
   }, [textDelta])
 
   return [ref, quill.current]

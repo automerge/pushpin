@@ -3,13 +3,13 @@ import Delta from 'quill-delta'
 
 export function textToDelta(text: Automerge.Text): Delta {
   const ops: any[] = []
-  let controlState: any = {}
+  let controlState: any = []
   let currentString: any = ''
   let attributes: any = {}
 
   text.toSpans().forEach((span: any) => {
     if (isControlMarker(span)) {
-      controlState = accumulateAttributes(span.attributes, controlState)
+      controlState = accumulateAttributes(span, controlState)
     } else {
       const next = attributeStateToAttributes(controlState)
 
@@ -76,10 +76,10 @@ function applyDeleteOp(text, offset, op) {
 
 function applyRetainOp(text, offset, op) {
   let length = op.retain
+  const spanUuid = Automerge.uuid()
 
   if (op.attributes) {
-    console.log(op)
-    text.insertAt(offset, { attributes: op.attributes })
+    text.insertAt(offset, { spanUuid, attributes: op.attributes })
     offset += 1
   }
 
@@ -92,7 +92,7 @@ function applyRetainOp(text, offset, op) {
   }
 
   if (op.attributes) {
-    text.insertAt(offset, { attributes: inverseAttributes(op.attributes) })
+    text.insertAt(offset, { spanUuid, end: true })
     offset += 1
   }
 
@@ -111,37 +111,29 @@ function applyInsertOp(text, offset, op) {
     offset += 1
   }
 
+  // XXX optimize this
+  const spanUuid = Automerge.uuid()
+
   if (op.attributes) {
-    text.insertAt(originalOffset, { attributes: op.attributes })
+    text.insertAt(originalOffset, { spanUuid, attributes: op.attributes })
     offset += 1
   }
   if (op.attributes) {
-    text.insertAt(offset, { attributes: inverseAttributes(op.attributes) })
+    text.insertAt(offset, { spanUuid, end: true })
     offset += 1
   }
   return [text, offset]
 }
 
-function inverseAttributes(attributes: any) {
-  const invertedAttributes = {}
-  Object.keys(attributes).forEach((key) => {
-    invertedAttributes[key] = null
-  })
-  return invertedAttributes
-}
-
 function accumulateAttributes(span, accumulatedAttributes) {
-  Object.entries(span).forEach(([key, value]) => {
-    if (!accumulatedAttributes[key]) {
-      accumulatedAttributes[key] = []
-    }
-    if (value === null) {
-      accumulatedAttributes[key].shift()
-    } else {
-      accumulatedAttributes[key].unshift(value)
-    }
-  })
-  return accumulatedAttributes
+  if (span.end) {
+    const newAttrs = accumulatedAttributes.filter(({ spanUuid, attributes }) => {
+      return spanUuid !== span.spanUuid
+    })
+    return newAttrs
+  }
+
+  return [...accumulatedAttributes, span]
 }
 
 function opFrom(text: any, attributes: any) {
@@ -153,7 +145,7 @@ function opFrom(text: any, attributes: any) {
 }
 
 function isControlMarker(pseudoCharacter) {
-  return typeof pseudoCharacter === 'object' && pseudoCharacter.attributes
+  return typeof pseudoCharacter === 'object' && pseudoCharacter.spanUuid
 }
 
 function isEquivalent(a: any, b: any) {
@@ -177,12 +169,12 @@ function isEquivalent(a: any, b: any) {
 }
 
 function attributeStateToAttributes(accumulatedAttributes: any) {
-  const attributes = {}
-  Object.entries(accumulatedAttributes).forEach(([key, values]: [any, any]) => {
-    if (values.length) {
-      const [value] = values
-      attributes[key] = value
-    }
-  })
-  return attributes
+  const fullAttributes = accumulatedAttributes.reduce(
+    (accum, { spanUuid, attributes }) => ({
+      ...accum,
+      ...attributes,
+    }),
+    {}
+  )
+  return fullAttributes
 }
