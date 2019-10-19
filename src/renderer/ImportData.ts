@@ -2,7 +2,7 @@ import { isPushpinUrl, PushpinUrl } from './ShareLink'
 import ContentTypes from './ContentTypes'
 import { Dimension } from './components/content-types/board/BoardGrid';
 
-export type CreatedContentCallback = (contentUrl: PushpinUrl, index: number, dimension?: Dimension) => void
+export type CreatedContentCallback = (contentUrl: PushpinUrl, index: number, dimensionHint?: Dimension) => void
 
 export function importDataTransfer(dataTransfer: DataTransfer, callback: CreatedContentCallback) {
   const url = dataTransfer.getData('application/pushpin-url')
@@ -36,7 +36,7 @@ export function importFileList(files: FileList, callback: CreatedContentCallback
   // hence the oldschool iteration code
   for (let i = 0; i < length; i += 1) {
     const entry = files[i]
-    ContentTypes.createFromFile(entry, (url) => callback(url, i))
+    ContentTypes.createFromFile(entry, (url, dimensionHint) => callback(url, i, dimensionHint))
   }
 }
 
@@ -89,7 +89,7 @@ function determineUrlContents(url: string, callback: CreatedContentCallback) {
       }
       // XXX: come back and look at this
       const file = new File([blob], url, { type: blob.type, lastModified: Date.now() })
-      ContentTypes.createFromFile(file, (contentUrl, dimension) => callback(contentUrl, 0, dimension))
+      ContentTypes.createFromFile(file, (contentUrl, dimensionHint) => callback(contentUrl, 0, dimensionHint))
     })
     .catch((error) => {
       // this is fine, really -- the URL upgrade to content is optional.

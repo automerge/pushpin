@@ -77,6 +77,28 @@ export const snapDimensionToGrid = ({ width, height }: Dimension): Dimension => 
 })
 
 /**
+ * Returns a dimension that fits within |maxDimension|, maintaining aspect ratio.
+ */
+export function limitDimension(dimension?: Dimension, maxDimension: Dimension = { width: GRID_SIZE * 20, height: GRID_SIZE * 20 }): Dimension | undefined {
+  if (!dimension) return
+  if (dimension.height === 0)
+    return { width: Math.min(dimension.width, maxDimension.width), height: 0 }
+  if (dimension.width === 0)
+    return { height: Math.min(dimension.height, maxDimension.height), width: 0 }
+  const aspect = dimension.width / dimension.height
+  if (aspect >= 1) {
+    const width = Math.min(dimension.width, maxDimension.width)
+    const height = width / aspect
+    return { width, height }
+  } else {
+    const height = Math.min(dimension.height, maxDimension.height)
+    const width = height * aspect
+    return { width, height }
+  }
+}
+
+
+/**
  * measure the distance from a start point over time
  */
 export function useDistance(): {
