@@ -1,13 +1,22 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import * as path from 'path'
+import React, { useEffect, useState } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
+import { IpcMessageEvent } from 'electron'
 
 import { Handle, HyperfileUrl } from 'hypermerge'
+import { Header } from 'hypermerge/dist/FileStore'
 import * as Hyperfile from '../../hyperfile'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
-import { ChangeFn, useDocument } from '../../Hooks'
+import { ChangeFn, useDocument, useEvent } from '../../Hooks'
 import { HypermergeUrl } from '../../ShareLink'
+import './UrlContent.css'
+import SecondaryText from '../SecondaryText'
+import Badge from '../Badge'
+import Heading from '../Heading'
+import { toNodeReadable } from '../../../NodeReadable'
+import { APP_PATH } from '../../constants'
 
 const log = Debug('pushpin:url')
 
@@ -19,9 +28,11 @@ interface UrlData {
 }
 
 interface UrlDoc {
-  url?: string
+  url: string
   data?: UrlData | { error: string } // TODO: move error to top-level
-  imageHyperfileUrl?: string
+  htmlHyperfileUrl?: HyperfileUrl
+  imageHyperfileUrl?: HyperfileUrl
+  capturedAt?: string
 }
 
 UrlContent.minWidth = 9
@@ -32,71 +43,46 @@ UrlContent.maxWidth = 24
 UrlContent.maxHeight = 32
 
 export default function UrlContent(props: ContentProps) {
-  const [urlInput, setUrl] = useState('')
   const [doc, changeDoc] = useRefreshedDocument(props.hypermergeUrl)
-  const onDoubleClick = useCallback(
-    (e: React.MouseEvent) => {
-      // TODO: we must stop propagation to prevent board from fullscreening :(
-      e.stopPropagation()
-      if (!doc) return
-      window.open(doc.url, '_blank') // todo extract
-    },
-    [doc]
-  )
-  const onInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setUrl(e.target.value)
-    },
-    [setUrl]
-  )
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      e.stopPropagation()
+  const [webview, setWebview] = useState<HTMLWebViewElement | null>(null)
 
-      if (e.key === 'Enter') {
-        e.preventDefault()
+  useEvent(webview, 'ipc-message', ({ channel, args }: IpcMessageEvent) => {
+    if (channel !== 'freeze-dry') return
 
-        const url = urlInput.indexOf('://') === -1 ? `http://${urlInput}` : urlInput
+    const [hyperfileUrl] = args as [HyperfileUrl]
+    changeDoc((doc) => {
+      doc.htmlHyperfileUrl = hyperfileUrl
+      doc.capturedAt = new Date().toISOString()
+    })
+  })
 
-        changeDoc((doc: UrlDoc) => {
-          doc.url = url
-        })
-      }
-    },
-    [urlInput, changeDoc]
-  )
+  useEvent(webview, 'dom-ready', () => {
+    console.log('dom-ready', webview)
+    webview && (webview as any).send('freeze-dry', { type: 'Ready' })
+  })
+
+  useEvent(webview, 'console-message', ({ message }: { message: string }) => {
+    console.log('webview.log:', message) // eslint-disable-line
+  })
 
   if (!doc) {
     return null
   }
-  const { data, url } = doc
 
-  if (!url) {
-    return (
-      <div style={css.urlCard}>
-        <div style={css.inputGroup}>
-          <i style={css.inputGroupIcon} className="fa fa-link" />
-          <input
-            autoFocus
-            type="text"
-            style={css.urlInput}
-            value={urlInput}
-            onChange={onInputChange}
-            onKeyDown={onKeyDown}
-            onPaste={onPaste}
-            placeholder="Enter a URL..."
-          />
-        </div>
-      </div>
-    )
+  function refreshContent() {
+    changeDoc((doc) => {
+      delete doc.htmlHyperfileUrl
+      delete doc.capturedAt
+    })
   }
+  const { data, url, htmlHyperfileUrl, capturedAt } = doc
 
   if (!data) {
     return (
-      <div style={css.urlCard}>
-        <p style={css.title}>Fetching...</p>
-        <p style={css.link}>
-          <a style={css.titleAnchor} href={url}>
+      <div className="UrlCard">
+        <p className="UrlCard-title">Fetching...</p>
+        <p className="UrlCard-link">
+          <a className="UrlCard-titleAnchor" href={url}>
             {url}
           </a>
         </p>
@@ -106,32 +92,80 @@ export default function UrlContent(props: ContentProps) {
 
   if ('error' in data) {
     return (
-      <div style={css.urlCard}>
-        <p style={css.error}>(URL did not load.)</p>
+      <div className="UrlCard">
+        <p className="UrlCard-error">(URL did not load.)</p>
+        <p className="UrlCard-link">
+          <a className="UrlCard-titleAnchor" href={url}>
+            {url}
+          </a>
+        </p>
+      </div>
+    )
+  }
+
+  if (props.context === 'workspace') {
+    return (
+      <div className="UrlCardWorkspace">
+        <div className="UrlCard-info">
+          {capturedAt ? (
+            <span>
+              Captured:{' '}
+              {new Date(capturedAt).toLocaleString(undefined, {
+                dateStyle: 'long',
+                timeStyle: 'short',
+              } as any)}
+            </span>
+          ) : null}
+        </div>
+        <div className="UrlCard UrlCard--workspace">
+          {htmlHyperfileUrl ? (
+            <webview className="UrlCard-webview" title={data.title} src={htmlHyperfileUrl} />
+          ) : (
+            <webview
+              ref={setWebview}
+              className="UrlCard-webview"
+              title={data.title}
+              src={data.canonicalLink || url}
+              preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
+            />
+          )}
+        </div>
+        <div className="UrlCard-buttons">
+          <a
+            className="UrlCard-iconLink"
+            title="Open in browser..."
+            href={data.canonicalLink || url}
+          >
+            <i className="fa fa-external-link" />
+          </a>
+          {htmlHyperfileUrl ? (
+            <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={refreshContent}>
+              <i className="fa fa-refresh" />
+            </a>
+          ) : null}
+        </div>
       </div>
     )
   }
 
   return (
-    <div style={css.urlCard} onDoubleClick={onDoubleClick}>
+    <div className="UrlCard">
       {doc.imageHyperfileUrl ? (
-        <img style={css.img} src={doc.imageHyperfileUrl} alt={data.description} />
+        <img className="UrlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
       ) : null}
 
-      <p style={css.title}>
-        <span style={css.titleAnchor}>{data.title}</span>
+      <p className="UrlCard-title">
+        <span className="titleAnchor">{data.title}</span>
       </p>
 
-      <p style={css.text}>{data.description}</p>
-      <p style={css.link}>
-        <span style={css.titleAnchor}>{data.canonicalLink || url}</span>
+      <p className="UrlCard-text">{data.description}</p>
+      <p className="UrlCard-link">
+        <span className="UrlCard-titleAnchor">
+          <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+        </span>
       </p>
     </div>
   )
-}
-
-function onPaste(e: React.ClipboardEvent) {
-  e.stopPropagation()
 }
 
 function useRefreshedDocument(url: HypermergeUrl): [null | UrlDoc, ChangeFn<UrlDoc>] {
@@ -141,13 +175,13 @@ function useRefreshedDocument(url: HypermergeUrl): [null | UrlDoc, ChangeFn<UrlD
     if (doc) {
       refreshContent(doc, change)
     }
-  }, [doc && doc.url])
+  }, [change, doc])
 
   useEffect(() => {
     if (doc) {
       refreshImageContent(doc, change)
     }
-  }, [doc && doc.data])
+  }, [change, doc])
 
   return [doc, change]
 }
@@ -157,6 +191,7 @@ function refreshContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
     return
   }
 
+  // XXX TODO: this stuff should be part of the freeze-dry cycle
   unfluffUrl(doc.url)
     .then((data) => {
       change((doc: UrlDoc) => {
@@ -187,9 +222,9 @@ function refreshImageContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
     return
   }
 
-  uploadImageUrl(image).then((hyperfileUrl) => {
+  importImageUrl(image).then(({ url }: Header) => {
     change((doc: UrlDoc) => {
-      doc.imageHyperfileUrl = hyperfileUrl
+      doc.imageHyperfileUrl = url
     })
   })
 }
@@ -209,10 +244,14 @@ function unfluffUrl(url: string): Promise<UrlData> {
     })
 }
 
-function uploadImageUrl(url: string): Promise<HyperfileUrl> {
-  return fetch(url)
-    .then((response) => response.arrayBuffer())
-    .then((buffer) => Hyperfile.writeBuffer(new Uint8Array(buffer)))
+function importImageUrl(url: string): Promise<Header> {
+  return fetch(url).then((response) => {
+    if (!response.body) {
+      throw new Error('image fetch failed')
+    }
+    const contentType = response.headers.get('content-type') || 'application/octet-stream'
+    return Hyperfile.write(toNodeReadable(response.body), contentType)
+  })
 }
 
 function removeEmpty(obj: object) {
@@ -226,14 +265,50 @@ function removeEmpty(obj: object) {
 }
 
 function create({ url }, handle: Handle<UrlDoc>, callback) {
-  if (url) {
-    handle.change((doc) => {
-      doc.url = url
-    })
-  }
+  handle.change((doc) => {
+    doc.url = url
+  })
   callback()
 }
 
+function UrlContentInList(props: ContentProps) {
+  const [doc] = useDocument<UrlDoc>(props.hypermergeUrl)
+  function onDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('application/pushpin-url', props.url)
+  }
+
+  if (!doc) return null
+
+  const { data, url } = doc
+
+  return (
+    <div className="UrlListItem">
+      <span draggable onDragStart={onDragStart}>
+        <Badge icon="chain" />
+      </span>
+      {doc.imageHyperfileUrl ? (
+        <img
+          className="UrlListItem-icon"
+          src={doc.imageHyperfileUrl}
+          alt={data && !('error' in data) ? data.description : ''}
+        />
+      ) : null}
+
+      <div className="UrlListItem-title">
+        {data && !('error' in data) && data.title ? (
+          <>
+            <Heading>{data.title}</Heading>
+            <SecondaryText>
+              <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+            </SecondaryText>
+          </>
+        ) : (
+          <Heading>{url}</Heading>
+        )}
+      </div>
+    </div>
+  )
+}
 ContentTypes.register({
   type: 'url',
   name: 'URL',
@@ -241,90 +316,8 @@ ContentTypes.register({
   contexts: {
     workspace: UrlContent,
     board: UrlContent,
+    list: UrlContentInList,
   },
   create,
+  unlisted: true,
 })
-
-// Should be { [name: string]: React.CSSProperties }
-const css: any = {
-  urlCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: 'white',
-    boxSizing: 'border-box',
-    overflow: 'auto',
-    position: 'relative',
-    padding: 12,
-    flex: '1 1 auto',
-    border: '1px solid var(--colorPaleGrey)',
-  },
-  img: {
-    WebkitUserDrag: 'none',
-    height: '192px',
-    display: 'block',
-    objectFit: 'cover',
-    marginBottom: 12,
-    marginLeft: -12,
-    marginTop: -12,
-    marginRight: -12,
-  },
-  title: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '18px',
-    lineHeight: '24px',
-    color: 'black',
-    textDecoration: 'none',
-    marginBottom: 12,
-    maxHeight: 72,
-    overflowY: 'hidden',
-    textOverflow: 'ellipsis',
-    flexShrink: 0,
-  },
-  titleAnchor: {
-    WebkitUserDrag: 'none',
-    color: 'inherit',
-    textDecoration: 'none',
-  },
-  text: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '12px',
-    lineHeight: '16px',
-    color: '#637389',
-    marginBottom: 12,
-    flex: 1,
-  },
-  error: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '10px',
-    lineHeight: 1.2,
-    color: '#637389',
-  },
-  link: {
-    fontFamily: 'IBM Plex Sans',
-    fontSize: '10px',
-    lineHeight: 1.2,
-    color: '#637389',
-    justifySelf: 'flex-end',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    flexShrink: 0,
-  },
-  urlInput: {
-    backgroundColor: 'white',
-    padding: '4px',
-    height: 20,
-    flex: 1,
-    width: 'calc(100% -32px)',
-  },
-  inputGroup: {
-    display: 'flex',
-    flex: '1 0 auto',
-    alignItems: 'center',
-  },
-  inputGroupIcon: {
-    fontSize: 24,
-    flex: 'none',
-    color: '#637389',
-  },
-}

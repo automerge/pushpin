@@ -8,26 +8,64 @@ import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
 import './Device.css'
+import TitleEditor from '../../TitleEditor'
+import { useDeviceOnlineStatus } from '../../../PresenceHooks'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
   name: string
 }
 
-function Device(props: ContentProps) {
+interface Props extends ContentProps {
+  editable: boolean
+}
+
+function Device(props: Props) {
   const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
+  const isOnline = useDeviceOnlineStatus(props.hypermergeUrl)
   if (!doc) return null
-  return (
-    <div className="DeviceListItem">
-      <Badge icon={doc.icon || 'desktop'} shape="square" />
-      <div className="DeviceListItem__title">{doc.name}</div>
-    </div>
-  )
+  const { icon = 'desktop', name } = doc
+
+  switch (props.context) {
+    case 'title-bar':
+      return (
+        <div className={isOnline ? 'Device Device--online' : 'Device Device--offline'}>
+          <Badge
+            icon={doc.icon || 'desktop'}
+            shape="circle"
+            size="large"
+            backgroundColor={`var(${isOnline ? '--online-color' : '--offline-color'})`}
+          />
+        </div>
+      )
+    default:
+      return (
+        <div className={isOnline ? 'DeviceListItem DeviceListItem--online' : 'DeviceListItem'}>
+          <div className="DeviceListItem-badge">
+            <Badge
+              icon={icon}
+              shape="circle"
+              backgroundColor={`var(${isOnline ? '--online-color' : '--offline-color'})`}
+            />
+          </div>
+          {props.editable ? (
+            <TitleEditor field="name" url={props.hypermergeUrl} />
+          ) : (
+            <div className="DocLink__title">{name}</div>
+          )}
+        </div>
+      )
+  }
 }
 
 function create(deviceAttrs, handle, callback) {
-  handle.change((doc: DeviceDoc) => {
-    doc.name = Os.hostname()
+  ;(navigator as any).getBattery().then((b) => {
+    const isLaptop = b.chargingTime !== 0
+    const icon = isLaptop ? 'laptop' : 'desktop'
+    handle.change((doc: DeviceDoc) => {
+      doc.name = Os.hostname()
+      doc.icon = icon
+    })
   })
   callback()
 }
@@ -37,7 +75,9 @@ ContentTypes.register({
   name: 'Device',
   icon: 'desktop',
   contexts: {
+    list: Device,
     'title-bar': Device,
+    contact: Device,
     board: Device,
   },
   resizable: false,

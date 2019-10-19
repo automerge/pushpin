@@ -1,9 +1,8 @@
-import React from 'react'
-import { remote } from 'electron'
-import Debug from 'debug'
+import React, { useContext, useRef } from 'react'
+import { DocUrl } from 'hypermerge'
 
-import { createDocumentLink } from '../../../ShareLink'
-import * as Hyperfile from '../../../hyperfile'
+import Automerge from 'automerge'
+import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
@@ -15,11 +14,11 @@ import { useDocument } from '../../../Hooks'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
 
-import './ContactEditor.css'
-import ContentTypes from '../../../ContentTypes'
+import ActionListItem from '../workspace/omnibox/ActionListItem'
 
-const { dialog } = remote
-const log = Debug('pushpin:settings')
+import './ContactEditor.css'
+import { CurrentDeviceContext } from '../workspace/Device'
+import { importFileList } from '../../../ImportData'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -44,40 +43,11 @@ export const USER_COLORS = {
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
+  const currentDeviceId = useContext(CurrentDeviceContext)
+  const hiddenFileInput = useRef<HTMLInputElement>(null)
 
   if (!doc) {
     return null
-  }
-
-  // XXX - this should probably use the new File stuff?
-  function chooseAvatar() {
-    dialog.showOpenDialog(
-      {
-        properties: ['openFile'],
-        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
-      },
-      (paths) => {
-        // User aborted.
-        if (!paths) {
-          return
-        }
-        if (paths.length !== 1) {
-          throw new Error('Expected exactly one path?')
-        }
-
-        Hyperfile.writeFromPath(paths[0])
-          .then((hyperfileUrl) => {
-            ContentTypes.create('image', { hyperfileUrl }, (hypermergeUrl) => {
-              changeDoc((d) => {
-                d.avatarDocId = hypermergeUrl
-              })
-            })
-          })
-          .catch((err) => {
-            log(err)
-          })
-      }
-    )
   }
 
   function setName(e: React.ChangeEvent<HTMLInputElement>) {
@@ -101,18 +71,70 @@ export default function ContactEditor(props: ContentProps) {
     avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   }
 
+  const onImportClick = (e) => {
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.click()
+    }
+  }
+  // xxx: only allow images & only one
+  const onFilesChanged = (e) => {
+    importFileList(e.target.files, (url, i) =>
+      changeDoc((doc) => {
+        const { hypermergeUrl } = parseDocumentLink(url)
+        doc.avatarDocId = hypermergeUrl
+      })
+    )
+  }
+
+  function removeDevice(url: PushpinUrl) {
+    const { hypermergeUrl } = parseDocumentLink(url)
+    changeDoc((d) => {
+      const devices = d.devices as Automerge.List<DocUrl>
+      if (!devices) {
+        return
+      }
+      const dPos = devices.findIndex((u) => u === hypermergeUrl)
+      if (!dPos) {
+        return
+      }
+      // the automerge type for deleteAt is wrong
+      devices.deleteAt!(dPos)
+    })
+  }
+
+  const deviceActions = [
+    {
+      name: 'remove',
+      destructive: true,
+      callback: (url: PushpinUrl) => () => removeDevice(url),
+      faIcon: 'fa-trash',
+      label: 'Remove',
+      shortcut: '⌘+⌫',
+      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    },
+  ]
+
   let renderedDevices
   if (devices) {
-    renderedDevices = devices.map((d) => (
-      <Content key={d} context="board" url={createDocumentLink('device', d)} />
-    ))
+    renderedDevices = devices
+      .map((d) => createDocumentLink('device', d))
+      .map((d) => (
+        <ActionListItem
+          key={d}
+          contentUrl={d}
+          actions={d === currentDeviceId ? [] : deviceActions}
+          selected={false}
+        >
+          <Content context="list" url={d} editable />
+        </ActionListItem>
+      ))
   } else {
     renderedDevices = <SecondaryText>No devices registered...</SecondaryText>
   }
 
   return (
-    <div className="ContactEditor-frame">
-      <div className="ContactEditor">
+    <div className="ContactEditor">
+      <div className="ContactEditor-content">
         <div className="ContactEditor-heading">
           <Heading>Edit Profile...</Heading>
         </div>
@@ -135,7 +157,15 @@ export default function ContactEditor(props: ContentProps) {
                 <div className="Avatar">{avatar}</div>
               </div>
               <Label>
-                <button type="button" onClick={chooseAvatar}>
+                <input
+                  type="file"
+                  id="hiddenImporter"
+                  accept="image/*"
+                  onChange={onFilesChanged}
+                  ref={hiddenFileInput}
+                  style={{ display: 'none' }}
+                />
+                <button type="button" onClick={onImportClick}>
                   Choose from file...
                 </button>
               </Label>

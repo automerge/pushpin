@@ -17,7 +17,9 @@ export default function Action(props: Props) {
       onClick={props.callback}
       className={`Action ${props.destructive ? 'Action--destructive' : 'Action--primary'}`}
     >
-      <i className={`Action-icon fa ${props.faIcon}`} />
+      <span className="Action-icon">
+        <i className={`fa ${props.faIcon}`} />
+      </span>
       <div className="Action-label">
         <SecondaryText style={{ color: 'inherit' }}>
           {props.label}

@@ -3,9 +3,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width:100%;
+  width: 100%;
   box-sizing: border-box;
-  padding:10px;
+  padding: 10px;
   background-color: white;
   border: 1px solid var(--colorPaleGrey);
 }
@@ -22,7 +22,29 @@
   text-overflow: ellipsis;
 }
 
-.Contact-avatar {
+.Contact-name {
   flex: none;
   margin-right: 8px;
+}
+
+.Contact-avatar {
+  position: relative;
+}
+
+.Contact-status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  width: 8px;
+}
+
+.Contact-user {
+  display: flex;
+}
+
+.Contact-username {
+  padding-left: 8px;
+  font-size: 12px;
+  color: var(--colorBlueBlack);
 }

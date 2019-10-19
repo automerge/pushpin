@@ -1,0 +1,16 @@
+.Info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 0 5px;
+  white-space: pre-wrap;
+  position: relative;
+}
+
+.Info_Value__string {
+  color: green;
+}
+
+.Info_Value__string::before,
+.Info_Value__string::after {
+  content: '"';
+}

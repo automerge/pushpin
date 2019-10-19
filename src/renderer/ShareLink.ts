@@ -1,5 +1,4 @@
 import Base58 from 'bs58'
-import { crc16 } from 'js-crc'
 
 /** share link helper functions
  * lifted and adapted from pixelpusher
@@ -11,18 +10,18 @@ export type HypermergeUrl = DocUrl
 export type PushpinUrl = string & Freeze<{ pushpin: true }>
 
 export function isHypermergeUrl(str: string): str is HypermergeUrl {
-  return /^hypermerge:\/\/\w+$/.test(str)
+  return /^hypermerge:\/\w+$/.test(str)
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  return /^pushpin:\/\/.+\/\w+\/\w{1,4}$/.test(str)
+  return /^hypermerge:\/.+\/?\?pushpinContentType=(\w+)$/.test(str)
 }
 
 export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl {
   if (!url.match('hypermerge:/')) {
     throw new Error('expecting a hypermerge URL as input')
   }
-  if (url.match('pushpin')) {
+  if (url.match('pushpinContentType')) {
     throw new Error('so-called ID contains "pushpin". you appear to have passed a URL as an ID')
   }
 
@@ -31,7 +30,7 @@ export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl
   if (!type) {
     throw new Error('no type when creating URL')
   }
-  return withCrc(`pushpin://${type}/${id}`) as PushpinUrl
+  return `hypermerge:/${id}?pushpinContentType=${type}` as PushpinUrl
 }
 
 interface Parts {
@@ -46,14 +45,10 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error('Cannot parse an empty value as a link.')
   }
 
-  const { nonCrc, crc, scheme, type, docId } = parts(link)
+  const { scheme, type, docId } = parts(link)
 
-  if (!nonCrc || !crc || !isValidCRCShareLink(nonCrc, crc)) {
-    throw new Error(`Failed CRC check: ${crc16(nonCrc as string)} should have been ${crc}`)
-  }
-
-  if (scheme !== 'pushpin') {
-    throw new Error(`Invalid url scheme: ${scheme} (expected pushpin)`)
+  if (scheme !== 'hypermerge') {
+    throw new Error(`Invalid url scheme: ${scheme} (expected hypermerge)`)
   }
 
   if (!type) {
@@ -69,9 +64,6 @@ export function parseDocumentLink(link: string): Parts {
   return { scheme, type, docId, hypermergeUrl }
 }
 
-export const isValidCRCShareLink = (nonCrc: string, crc: string) =>
-  Boolean(nonCrc) && Boolean(crc) && crc16(nonCrc) === crc
-
 export function parts(str: string) {
   const p = encodedParts(str)
 
@@ -79,20 +71,16 @@ export function parts(str: string) {
     scheme: p.scheme,
     type: p.type,
     docId: p.docId,
-    nonCrc: p.nonCrc,
-    crc: p.crc && decode(p.crc),
   }
 }
 
 export const encodedParts = (str: string) => {
   // ugly
-  const [, /* whole match */ nonCrc, scheme, type, docId, crc] = str.match(
-    /^((\w+):\/\/(.+)\/(\w+))\/(\w{1,4})$/
-  ) || [undefined, undefined, undefined, undefined, undefined, undefined]
-  return { nonCrc, scheme, type, docId, crc }
+  const [, /* whole match */ scheme, docId, type] = str.match(
+    /^(\w+):\/(\w+)\?pushpinContentType=(\w+)$/
+  ) || [undefined, undefined, undefined, undefined]
+  return { scheme, type, docId }
 }
-
-export const withCrc = (str: string) => `${str}/${encode(crc16(str))}`
 
 export const encode = (str: string) => Base58.encode(hexToBuffer(str))
 

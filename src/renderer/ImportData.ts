@@ -14,6 +14,11 @@ export function importDataTransfer(dataTransfer: DataTransfer, callback: Created
     importFileList(dataTransfer.files, callback)
     return
   }
+  // If we can identify html that's a simple image, import the image.
+  const html = dataTransfer.getData('text/html')
+  if (html) {
+    importImagesFromHTML(html, callback)
+  }
 
   // If we can't get the item as a bunch of files, let's hope it works as plaintext.
   const plainText = dataTransfer.getData('text/plain')
@@ -31,6 +36,21 @@ export function importFileList(files: FileList, callback: CreatedContentCallback
   for (let i = 0; i < length; i += 1) {
     const entry = files[i]
     ContentTypes.createFromFile(entry, (url) => callback(url, i))
+  }
+}
+
+function importImagesFromHTML(html: string, callback: CreatedContentCallback) {
+  const iframe = document.createElement('iframe')
+  iframe.setAttribute('sandbox', '')
+  try {
+    document.body.appendChild(iframe)
+    iframe.contentDocument!.documentElement.innerHTML = html
+    const images = iframe.contentDocument!.getElementsByTagName('img')
+    if (images.length > 0) {
+      determineUrlContents(images[0].src, callback)
+    }
+  } finally {
+    iframe.remove()
   }
 }
 
@@ -66,6 +86,7 @@ function determineUrlContents(url, callback: CreatedContentCallback) {
       if (!blob) {
         return
       }
+      // XXX: come back and look at this
       const file = new File([blob], url, { type: blob.type, lastModified: Date.now() })
       ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
     })

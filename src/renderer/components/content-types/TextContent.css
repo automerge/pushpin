@@ -1,5 +1,22 @@
 @import '../../../../node_modules/quill/dist/quill.snow.css';
 
+.Workspace__container.Workspace__container--text {
+  box-sizing: border-box;
+  padding: 40px;
+  background: var(--colorInputGrey);
+  display: flex;
+  justify-content: center;
+}
+.Workspace__container.Workspace__container--text > * {
+  padding: 40px;
+  height: auto;
+  max-width: 720px;
+  background-color: white;
+}
+.Workspace__container.Workspace__container--text > *::-webkit-scrollbar-track {
+  margin: 0;
+}
+
 .TextContent {
   background-color: white;
   position: relative;

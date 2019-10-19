@@ -2,13 +2,7 @@ import React, { useEffect, useContext } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
 
-import {
-  parseDocumentLink,
-  PushpinUrl,
-  HypermergeUrl,
-  isPushpinUrl,
-  createDocumentLink,
-} from '../../../ShareLink'
+import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
 import ContentTypes from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
@@ -17,7 +11,12 @@ import { ContactDoc } from '../contact'
 
 import './Workspace.css'
 import { useDocument } from '../../../Hooks'
-import { useAllHeartbeats, useHeartbeat } from '../../../PresenceHooks'
+import {
+  useAllHeartbeats,
+  useHeartbeat,
+  useContactOnlineStatus,
+  useDeviceOnlineStatus,
+} from '../../../PresenceHooks'
 import { BoardDoc, CardId } from '../board'
 import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
@@ -47,10 +46,17 @@ export default function Workspace(props: WorkspaceContentProps) {
   const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
   const [self, changeSelf] = useDocument<ContactDoc>(selfId)
+  const currentDeviceId = currentDeviceUrl
+    ? parseDocumentLink(currentDeviceUrl).hypermergeUrl
+    : null
 
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
+  useHeartbeat(currentDeviceId)
   useHeartbeat(currentDocUrl)
+
+  useDeviceOnlineStatus(currentDeviceId)
+  useContactOnlineStatus(selfId)
 
   const sendToSystem = useSystem(
     (msg) => {
@@ -76,7 +82,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   useEffect(() => {
     // For background debugging:
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
-  }, [currentDocUrl])
+  }, [currentDocUrl, sendToSystem])
 
   useEffect(() => {
     if (!currentDeviceUrl || !self) {
@@ -92,17 +98,10 @@ export default function Workspace(props: WorkspaceContentProps) {
         doc.devices.push(hypermergeUrl)
       })
     }
-  }, [currentDeviceUrl, self])
+  }, [changeSelf, currentDeviceUrl, self])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
-      return
-    }
-
-    try {
-      parseDocumentLink(docUrl)
-    } catch (e) {
-      // if we can't parse the document, don't navigate
       return
     }
 
@@ -214,34 +213,12 @@ function create(attrs, handle, callback) {
   callback()
 }
 
-function WorkspaceInTitleBar(props: WorkspaceContentProps) {
-  const [workspace] = useDocument<Doc>(props.hypermergeUrl)
-
-  const selfId = workspace && workspace.selfId
-
-  if (!selfId) {
-    return null
-  }
-  return (
-    <div className="Workspace--TitleBar">
-      <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-      <div className="Workspace--Badge">
-        <i
-          className="Badge Badge--square fa fa-briefcase"
-          style={{ background: 'var(--colorInputGrey)', fontSize: '12px' }}
-        />
-      </div>
-    </div>
-  )
-}
-
 ContentTypes.register({
   type: 'workspace',
   name: 'Workspace',
   icon: 'briefcase',
   contexts: {
     root: Workspace,
-    'title-bar': WorkspaceInTitleBar,
     list: WorkspaceInList,
     board: WorkspaceInList,
   },

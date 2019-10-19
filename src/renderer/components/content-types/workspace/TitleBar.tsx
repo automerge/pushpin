@@ -5,26 +5,25 @@ import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdow
 import Omnibox from './omnibox/Omnibox'
 import Content from '../../Content'
 import Authors from './Authors'
-import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
+import { HypermergeUrl, PushpinUrl, createDocumentLink } from '../../../ShareLink'
 
 import './TitleBar.css'
 import { useDocument, useEvent } from '../../../Hooks'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
+import { Doc as WorkspaceDoc } from './Workspace'
+import { ContactDoc } from '../contact'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl
   openDoc: Function
 }
 
-interface Doc {
-  currentDocUrl?: PushpinUrl
-}
-
 export default function TitleBar(props: Props) {
   const [sessionHistory, setHistory] = useState<PushpinUrl[]>([])
   const [historyIndex, setIndex] = useState(0)
   const [activeOmnibox, setActive] = useState(false)
-  const [doc] = useDocument<Doc>(props.hypermergeUrl)
+  const [doc] = useDocument<WorkspaceDoc>(props.hypermergeUrl)
+  const [selfDoc] = useDocument<ContactDoc>(doc && doc.selfId)
 
   const dropdownRef = useRef<Dropdown>(null)
 
@@ -105,14 +104,17 @@ export default function TitleBar(props: Props) {
     return null
   }
 
+  const workspaceColor = selfDoc ? selfDoc.color : 'white'
+
   return (
     <div className="TitleBar">
-      <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar__menuItem">
+      <div className="TitleBar-overlay" style={{ '--workspace-color': workspaceColor } as any} />
+      <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar-menuItem">
         <i className="fa fa-angle-left" />
       </button>
       <Dropdown
         ref={dropdownRef}
-        className="TitleBar__menuItem TitleBar__right"
+        className="TitleBar-menuItem TitleBar-right"
         onShow={onShow}
         onHide={onHide}
       >
@@ -137,16 +139,19 @@ export default function TitleBar(props: Props) {
         disabled={forwardDisabled}
         type="button"
         onClick={goForward}
-        className="TitleBar__menuItem"
+        className="TitleBar-menuItem"
       >
         <i className="fa fa-angle-right" />
       </button>
 
       <Content url={doc.currentDocUrl} context="list" editable />
       <Authors hypermergeUrl={props.hypermergeUrl} />
+      <div className="TitleBar-self">
+        <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" />
+      </div>
 
       <button
-        className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar__menuItem"
+        className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar-menuItem"
         type="button"
         onClick={copyLink}
       >

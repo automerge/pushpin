@@ -1,53 +1,84 @@
 import React, { useEffect, useState } from 'react'
-import { Feed } from 'hypermerge/dist/hypercore'
+import { Feed, FeedId } from 'hypermerge/dist/FeedStore'
+import * as Block from 'hypermerge/dist/Block'
 import { useImmer } from 'use-immer'
+import { toDiscoveryId } from 'hypermerge/dist/Misc'
+import classnames from 'classnames'
+
 import { useRepo } from '../BackgroundHooks'
-import Info from './Info'
+import Info, { humanBytes, humanNumber } from './Info'
+import Card from './Card'
+import './FeedView.css'
+import LimitedList from './LimitedList'
 
 interface Props {
-  feedId: string
+  feedId: FeedId
 }
 
-export default function FeedView(props: Props) {
-  const info = useFeedInfo(props.feedId)
+interface BlockInfo {
+  index: number
+  data: Uint8Array
+}
+
+export default React.memo(FeedView)
+
+function FeedView({ feedId }: Props) {
+  const { feeds } = useRepo()
+  const feed = useFeed(feedId)
+  const info = useFeedInfo(feedId)
+  const [selectedBlock, setBlock] = useState<BlockInfo | null>(null)
+
+  function renderBlock(hasBlock: boolean, index: number) {
+    const isSelected = selectedBlock && index === selectedBlock.index
+    return (
+      <div
+        key={String(index)}
+        title={`Block ${humanNumber(index)}`}
+        className={classnames('FeedView_Block', {
+          FeedView_Block__selected: isSelected,
+          FeedView_Block__downloaded: hasBlock,
+        })}
+        onClick={() => feeds.read(feedId, index).then((data) => setBlock({ index, data }))}
+      />
+    )
+  }
 
   return (
     <div>
       <Info
-        feedId={props.feedId}
-        writable={String(info.writable)}
-        blocks={`${info.downloaded} / ${info.total}`}
+        log={feed}
+        feedId={feedId}
+        discoveryId={toDiscoveryId(feedId)}
+        isWritable={info.writable}
+        bytes={humanBytes(info.bytes)}
+        blocks={`${humanNumber(info.downloaded)} / ${humanNumber(info.total)}`}
       />
 
-      <div
-        style={{
-          marginTop: 10,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 8px)',
-          gridAutoRows: '8px',
-          gridGap: 1,
+      <LimitedList limit={1000} items={info.blocks}>
+        {(blocks) => {
+          return <div className="FeedView_Blocks">{blocks.map(renderBlock)}</div>
         }}
-      >
-        {info.blocks.map((block, index) => (
-          <div
-            key={String(index)}
-            title={`Block ${index}`}
-            style={{
-              backgroundColor: block ? 'green' : 'red',
-            }}
+      </LimitedList>
+
+      {selectedBlock ? (
+        <Card
+          style={{
+            marginTop: 10,
+          }}
+        >
+          <a href="#" onClick={() => setBlock(null)} style={{ position: 'sticky', top: 10 }}>
+            Hide
+          </a>
+          <Info
+            log={selectedBlock.data}
+            block={selectedBlock.index}
+            bytes={humanBytes(selectedBlock.data.length)}
+            data={parseBlockData(selectedBlock.data)}
           />
-        ))}
-      </div>
+        </Card>
+      ) : null}
     </div>
   )
-}
-
-declare module 'hypermerge/dist/hypercore' {
-  // The hypermerge Feed type is not quite correct:
-  interface Feed<T> {
-    on(event: 'append', cb: () => void): this
-    off(event: string, cb: Function): this
-  }
 }
 
 interface FeedInfo {
@@ -55,14 +86,16 @@ interface FeedInfo {
   downloaded: number
   total: number
   blocks: boolean[]
+  bytes: number
 }
 
-function useFeedInfo(feedId: string): FeedInfo {
+function useFeedInfo(feedId: FeedId): FeedInfo {
   const feed = useFeed(feedId)
   const [info, update] = useImmer<FeedInfo>({
     writable: false,
     downloaded: 0,
     total: 0,
+    bytes: 0,
     blocks: [],
   })
 
@@ -72,6 +105,7 @@ function useFeedInfo(feedId: string): FeedInfo {
     function setTotals(info: FeedInfo) {
       if (!feed) return
       info.total = feed.length
+      info.bytes = feed.byteLength
       info.downloaded = feed.downloaded()
     }
 
@@ -113,20 +147,28 @@ function useFeedInfo(feedId: string): FeedInfo {
         .off('append', onAppend)
         .off('download', onDownload)
     }
-  }, [feed])
+  }, [feed, update])
 
   return info
 }
 
-function useFeed(feedId: string): Feed<Uint8Array> | null {
-  const [feed, setFeed] = useState<Feed<Uint8Array> | null>(null)
+function useFeed(feedId: FeedId): Feed | null {
+  const [feed, setFeed] = useState<Feed | null>(null)
   const repo = useRepo()
 
   useEffect(() => {
-    repo.store.getFeed(feedId as any).then((fd) => {
+    repo.feeds.getFeed(feedId).then((fd) => {
       setFeed(fd)
     })
-  }, [feedId])
+  }, [feedId, repo.feeds])
 
   return feed
+}
+
+function parseBlockData(data: Uint8Array): Uint8Array | object {
+  try {
+    return Block.unpack(data)
+  } catch (e) {
+    return data
+  }
 }

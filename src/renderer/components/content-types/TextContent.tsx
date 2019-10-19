@@ -10,6 +10,7 @@ import { ContentProps } from '../Content'
 import { useDocument, useStaticCallback } from '../../Hooks'
 import './TextContent.css'
 import { textToDelta, applyDeltaToText } from '../../TextDelta'
+import Badge from '../Badge'
 
 interface TextDoc {
   text: Automerge.Text
@@ -119,6 +120,11 @@ function useQuill({
     function onKeyDown(e: KeyboardEvent) {
       if (e.key !== 'Backspace') return
 
+      if (e.metaKey || e.ctrlKey) {
+        e.preventDefault()
+        return
+      }
+
       const str = q.getText()
       if (str !== '' && str !== '\n') {
         e.stopPropagation()
@@ -141,7 +147,7 @@ function useQuill({
       q.off('text-change', onChange)
       // Quill gets garbage collected automatically
     }
-  }, [ref.current])
+  }, [ref.current]) // eslint-disable-line
 
   useEffect(() => {
     if (!textDelta || !quill.current) return
@@ -193,6 +199,29 @@ function create({ text = '' }, handle: Handle<TextDoc>, callback) {
   callback()
 }
 
+function TextInList(props: ContentProps) {
+  const [doc] = useDocument<TextDoc>(props.hypermergeUrl)
+  function onDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('application/pushpin-url', props.url)
+  }
+
+  if (!doc) return null
+
+  const textPreview = doc.text
+    .join('')
+    .split('\n')
+    .filter((l) => l.length > 0)
+    .shift()
+  return (
+    <div className="DocLink">
+      <span draggable onDragStart={onDragStart}>
+        <Badge icon="sticky-note" />
+      </span>
+      <div className="DocLink__title">{textPreview}</div>
+    </div>
+  )
+}
+
 const supportsMimeType = (mimeType) => !!mimeType.match('text/')
 
 ContentTypes.register({
@@ -202,6 +231,7 @@ ContentTypes.register({
   contexts: {
     board: TextContent,
     workspace: TextContent,
+    list: TextInList,
   },
   create,
   createFromFile,
