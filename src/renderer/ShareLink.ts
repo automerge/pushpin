@@ -1,4 +1,6 @@
 import Base58 from 'bs58'
+import * as url from 'url'
+import * as querystring from 'querystring'
 
 /** share link helper functions
  * lifted and adapted from pixelpusher
@@ -9,11 +11,12 @@ export type HypermergeUrl = DocUrl
 export type PushpinUrl = string & { pushpin: true }
 
 export function isHypermergeUrl(str: string): str is HypermergeUrl {
-  return /^hypermerge:\/\w+$/.test(str)
+  return url.parse(str).protocol === 'hypermerge'
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  return /^hypermerge:\/.+\/?\?pushpinContentType=([^&=]+)$/.test(str)
+  const { protocol, query } = url.parse(str)
+  return protocol === 'hypermerge:' && /^pushpinContentType=/.test(query || '')
 }
 
 export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl {
@@ -64,21 +67,12 @@ export function parseDocumentLink(link: string): Parts {
 }
 
 export function parts(str: string) {
-  const p = encodedParts(str)
-
+  const { protocol, pathname, query } = url.parse(str)
   return {
-    scheme: p.scheme,
-    type: p.type,
-    docId: p.docId,
+    scheme: protocol ? protocol.substr(0, protocol.length - 1) : '',
+    type: querystring.parse(query || '').pushpinContentType.toString(),
+    docId: (pathname || '').substr(1),
   }
-}
-
-export const encodedParts = (str: string) => {
-  // ugly
-  const [, /* whole match */ scheme, docId, type] = str.match(
-    /^(\w+):\/(\w+)\?pushpinContentType=([^&=]+)$/
-  ) || [undefined, undefined, undefined, undefined]
-  return { scheme, type, docId }
 }
 
 export const encode = (str: string) => Base58.encode(hexToBuffer(str))
