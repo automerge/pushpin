@@ -26,13 +26,19 @@ export default function OmniboxWorkspace(props: Props) {
   const [workspaceDoc] = useDocument<WorkspaceDoc>(hypermergeUrl)
   const [selfDoc] = useDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)
 
-  const onClickWorkspace = useCallback((e) => {
-    omniboxFinished()
-  }, [])
+  const onClickWorkspace = useCallback(
+    (e) => {
+      omniboxFinished()
+    },
+    [omniboxFinished]
+  )
 
-  const onClickWorkspaceCopy = useCallback((e) => {
-    clipboard.writeText(createDocumentLink('workspace', hypermergeUrl))
-  }, [])
+  const onClickWorkspaceCopy = useCallback(
+    (e) => {
+      clipboard.writeText(createDocumentLink('workspace', hypermergeUrl))
+    },
+    [hypermergeUrl]
+  )
 
   if (!selfDoc || !workspaceDoc) {
     return null

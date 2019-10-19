@@ -1,4 +1,14 @@
-import React, { useState, useCallback, useContext, useEffect, forwardRef, memo, RefForwardingComponent, useImperativeHandle, useRef } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useContext,
+  useEffect,
+  forwardRef,
+  memo,
+  RefForwardingComponent,
+  useImperativeHandle,
+  useRef,
+} from 'react'
 
 import ContentTypes, { Context } from '../ContentTypes'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
@@ -27,25 +37,22 @@ export interface ContentHandle {
 }
 
 const Content: RefForwardingComponent<ContentHandle, Props> = (props: Props, ref) => {
-
   const contentRef = useRef<any>() // yikes
   useImperativeHandle(ref, () => ({
     canReceiveContent: () => {
       if (contentRef.current && contentRef.current.canReceiveContent) {
         return contentRef.current.canReceiveContent()
-      } else {
-        return false
       }
+      return false
     },
     onContent: (url: PushpinUrl) => {
       if (contentRef.current && contentRef.current.onContent) {
         return contentRef.current.onContent(url)
       }
-      else {
-        throw new Error("no onContent defined for " + ref)
-      }
+
+      throw new Error(`no onContent defined for ${ref}`)
     },
-  }));
+  }))
 
   const { context, url } = props
 

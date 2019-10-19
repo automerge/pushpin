@@ -24,6 +24,12 @@
   z-index: -1;
 }
 
+.TitleBar-Map-ColorBadgePlacer {
+  position: absolute;
+  right: -4px;
+  bottom: 0px;
+}
+
 button[disabled].TitleBar-menuItem .fa {
   color: #ccc;
 }
@@ -55,6 +61,7 @@ button[disabled].TitleBar-menuItem .fa {
   margin: none;
   border: none;
   outline: none;
+  position: relative;
 }
 
 .TitleBar-menuItem:active,

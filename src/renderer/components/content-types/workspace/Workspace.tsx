@@ -134,7 +134,6 @@ export default function Workspace(props: WorkspaceContentProps) {
   }
 
   function importClip(payload: any) {
-    console.log('importing', payload)
     const creationCallback = (importedUrl) => {
       changeWorkspace((d) => {
         if (!d.clips) {
@@ -172,7 +171,6 @@ export default function Workspace(props: WorkspaceContentProps) {
   if (!workspace) {
     return null
   }
-
 
   function renderContent(currentDocUrl?: PushpinUrl) {
     if (!currentDocUrl) {

@@ -31,7 +31,9 @@ export default function Omnibox(props: Props) {
 
   const omniboxRef = useRef<HTMLDivElement>(null)
   useEvent(window, 'click', (event) => {
-    if (!omniboxRef.current) { return }
+    if (!omniboxRef.current) {
+      return
+    }
     if (event.target !== omniboxRef.current && !omniboxRef.current.contains(event.target)) {
       omniboxFinished()
     }

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { clipboard } from 'electron'
 
 import Omnibox from './omnibox/Omnibox'
@@ -11,6 +11,7 @@ import { useDocument, useEvent } from '../../../Hooks'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 import { Doc as WorkspaceDoc } from './Workspace'
 import { ContactDoc } from '../contact'
+import Badge from '../../Badge'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl
@@ -56,7 +57,7 @@ export default function TitleBar(props: Props) {
       setHistory([doc.currentDocUrl, ...sessionHistory.slice(historyIndex)])
       setIndex(0)
     }
-  }, [doc && doc.currentDocUrl])
+  }, [doc, historyIndex, sessionHistory])
 
   function goBack() {
     if (backDisabled) {
@@ -103,7 +104,12 @@ export default function TitleBar(props: Props) {
         <i className="fa fa-angle-left" />
       </button>
       <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
-        <i className="fa fa-map" />
+        <Badge icon="map" backgroundColor="#00000000" />
+        {doc.clips.length > 0 ? (
+          <div className="TitleBar-Map-ColorBadgePlacer">
+            <Badge backgroundColor="#00000000" size="medium" icon="paperclip" />
+          </div>
+        ) : null}
       </button>
 
       <button
@@ -129,7 +135,7 @@ export default function TitleBar(props: Props) {
         <i className="fa fa-clipboard" />
       </button>
 
-      {activeOmnibox ?
+      {activeOmnibox ? (
         <WorkspaceUrlsContext.Consumer>
           {(workspaceUrlsContext) => (
             <Omnibox
@@ -141,7 +147,7 @@ export default function TitleBar(props: Props) {
             />
           )}
         </WorkspaceUrlsContext.Consumer>
-        : null}
+      ) : null}
     </div>
   )
 }

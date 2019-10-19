@@ -1,4 +1,12 @@
-import React, { useRef, useCallback, memo, useMemo, ForwardRefExoticComponent, RefForwardingComponent, forwardRef, useImperativeHandle } from 'react'
+import React, {
+  useRef,
+  useCallback,
+  memo,
+  useMemo,
+  RefForwardingComponent,
+  forwardRef,
+  useImperativeHandle,
+} from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
@@ -67,7 +75,7 @@ export interface AddCardArgs extends CardArgs {
 const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: ContentProps, ref) => {
   useImperativeHandle(ref, () => ({
     onContent: (url: PushpinUrl) => onContent(url),
-  }));
+  }))
 
   const boardRef = useRef<HTMLDivElement>(null)
   const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>()

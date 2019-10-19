@@ -363,8 +363,10 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     keysForActionPressed: (e) => e.key === 'Enter',
     callback: (url) => () => {
       const landed = this.props.onContent(url)
-      if (landed) { this.delistClip(url) }
-    }
+      if (landed) {
+        this.delistClip(url)
+      }
+    },
   }
 
   archiveClip = {
@@ -413,10 +415,10 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
         props.search === '' || !state.doc
           ? [] // don't show archived URLs unless there's a current search term
           : (state.doc.archivedDocUrls || [])
-            .map((url) => [url, this.state.viewedDocs[url]])
-            .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
-            .filter(([url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
-            .map(([url, doc]) => ({ url })),
+              .map((url) => [url, this.state.viewedDocs[url]])
+              .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
+              .filter(([url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
+              .map(([url, doc]) => ({ url })),
     },
     {
       name: 'docUrls',
@@ -508,7 +510,9 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   delistClip = (url) => {
-    if (!this.handle) { return }
+    if (!this.handle) {
+      return
+    }
     this.handle.change((doc) => {
       if (!doc.clips) {
         return
