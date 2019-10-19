@@ -387,9 +387,9 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       label: 'Clipped Items',
       actions: [this.place, this.archiveClip],
       items: (state, props) =>
-        !(this.state.doc && this.state.doc.clips)
+        !(!props.search && state.doc && state.doc.clips)
           ? []
-          : this.state.doc.clips.map((url) => ({ url: url as PushpinUrl })),
+          : state.doc.clips.map((url) => ({ url: url as PushpinUrl })),
     },
     {
       name: 'viewedDocUrls',
