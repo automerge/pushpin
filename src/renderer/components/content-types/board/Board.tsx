@@ -74,7 +74,7 @@ function Board(props: ContentProps) {
       switch (action.type) {
         // board actions
         case 'AddCardForContent':
-          addAndSelectCard(doc, action.position, action.url, action.selectOnly)
+          addAndSelectCard(doc, action.position, action.dimension, action.url, action.selectOnly)
           break
         case 'ChangeBackgroundColor':
           changeBackgroundColor(doc, action.color)
@@ -125,10 +125,11 @@ function Board(props: ContentProps) {
   function addAndSelectCard(
     doc: BoardDoc,
     position: Position,
+    dimension: Dimension | undefined,
     url: PushpinUrl,
     shouldSelect?: boolean
   ) {
-    const cardId = addCardForContent(doc, { position, url })
+    const cardId = addCardForContent(doc, { position, dimension, url })
     if (shouldSelect) {
       selectOnly(cardId)
     }
@@ -195,9 +196,9 @@ function Board(props: ContentProps) {
         x: pageX - boardRef.current.offsetLeft,
         y: pageY - boardRef.current.offsetTop,
       }
-      ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
+      ImportData.importDataTransfer(e.dataTransfer, (url, i, dimension) => {
         const position = gridOffset(dropPosition, i)
-        dispatch({ type: 'AddCardForContent', position, url })
+        dispatch({ type: 'AddCardForContent', position, url, dimension })
       })
     },
     [dispatch]
