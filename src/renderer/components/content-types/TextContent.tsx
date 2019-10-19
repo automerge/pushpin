@@ -147,7 +147,7 @@ function useQuill({
       q.off('text-change', onChange)
       // Quill gets garbage collected automatically
     }
-  }, [ref.current]) // eslint-disable-line
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (!textDelta || !quill.current) return
