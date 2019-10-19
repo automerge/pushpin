@@ -47,6 +47,7 @@
   min-height: 100%;
   cursor: text;
   overflow: hidden;
+  line-height: inherit;
 }
 
 .ql-clipboard {
@@ -62,6 +63,14 @@
 .ql-toolbar {
   position: absolute;
   z-index: 1;
+}
+
+.ql-container {
+  font-size: inherit;
+}
+
+.ql-container.ql-snow {
+  border: 0;
 }
 
 /* Scrollbar */
