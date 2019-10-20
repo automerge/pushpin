@@ -1,4 +1,10 @@
 /* TODO: These should go into the CSS file for the Action component */
+.Actions {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
 .Action {
   box-sizing: border-box;
   color: var(--colorSecondaryGrey);
