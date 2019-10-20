@@ -1,0 +1,76 @@
+.threadWrapper {
+  display: flex;
+  background-color: white;
+  width: 100%;
+  overflow: auto;
+  height: 100%;
+  padding: 1px 1px 0px 1px;
+}
+
+.messageWrapper {
+  padding: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: scroll;
+  margin-bottom: 49px;
+  flex-grow: 1;
+}
+
+.messageGroup {
+  margin-bottom: -24px;
+  padding-top: 12px;
+}
+
+.groupedMessages {
+  position: relative;
+  top: -20px;
+  padding-left: 48px;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex-grow: 1;
+}
+
+.message {
+  color: black;
+  display: flex;
+  line-height: 20px;
+  padding: 2px 0;
+}
+
+.user {
+  display: flex;
+}
+
+.username {
+  padding-left: 8px;
+  font-size: 12px;
+  color: var(--colorBlueBlack);
+}
+
+.time {
+  flex: none;
+  position: absolute;
+  right: 0px;
+  font-size: 12px;
+  color: var(--colorSecondaryGrey);
+  margin-top: -22px;
+}
+
+.inputWrapper {
+  box-sizing: border-box;
+  width: calc(100% - 2px);
+  border-top: 1px solid var(--colorInputGrey);
+  position: absolute;
+  bottom: 1px;
+  background-color: white;
+  padding: 8px;
+}
+
+.messageInput {
+  width: 100%;
+}
