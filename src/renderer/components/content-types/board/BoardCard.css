@@ -7,7 +7,7 @@
   box-sizing: border-box;
   display: flex;
   user-select: none;
-  background: whitesmoke;
+  background: var(--colorPaleGrey);
 }
 
 .BoardCard:focus,
