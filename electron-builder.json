@@ -2,5 +2,14 @@
   "files": ["dist/**/*"],
   "directories": {
     "output": "out"
+  },
+  "mac": {
+    "target": ["dmg"]
+  },
+  "win": {
+    "target": ["nsis"]
+  },
+  "linux": {
+    "target": ["AppImage"]
   }
 }
