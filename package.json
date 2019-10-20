@@ -32,6 +32,7 @@
     "automerge": "github:automerge/automerge#opaque-strings",
     "bs58": "^4.0.1",
     "classnames": "^2.2.6",
+    "data-urls": "^1.1.0",
     "diff-match-patch": "^1.0.4",
     "discovery-cloud-client": "^0.0.3",
     "electron-devtools-installer": "^2.2.4",

@@ -1,13 +1,15 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
+import parseDataUrl from 'data-urls'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
-import ContentTypes from '../../../ContentTypes'
+import ContentTypes, { createFrom } from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
+import * as ContentData from '../../../ContentData'
 
 import './Workspace.css'
 import { useDocument } from '../../../Hooks'
@@ -143,19 +145,14 @@ export default function Workspace(props: WorkspaceContentProps) {
       })
     }
 
-    switch (payload.type) {
-      case 'Text':
-        importPlainText(payload.content, creationCallback)
-        break
-      case 'Html':
-        ContentTypes.create('url', payload, creationCallback)
-        break
-      case 'Image':
-        ContentTypes.create('file', payload, creationCallback)
-        break
-      default:
-        throw new Error(`no idea how to deal with ${payload.type}`)
+    const { mimeType, data } = parseDataUrl(payload.dataUrl)
+    const contentData = {
+      mimeType,
+      data: ContentData.stringToStream(data),
+      src: payload.src,
     }
+
+    createFrom(contentData, creationCallback)
   }
 
   const contentRef = useRef<any>() // hmmm

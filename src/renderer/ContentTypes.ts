@@ -2,6 +2,7 @@ import Debug from 'debug'
 import { ComponentType } from 'react'
 import { Handle } from 'hypermerge'
 import { HypermergeUrl, createDocumentLink } from './ShareLink'
+import { ContentData } from './ContentData'
 
 const log = Debug('pushpin:content-types')
 
@@ -26,7 +27,7 @@ interface ContentType {
   resizable?: boolean
   contexts: Contexts
   create?: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
-  createFromFile?: (file: File, handle: Handle<any>, callback: () => void) => void
+  createFrom?: (contentData: ContentData, handle: Handle<any>, callback: () => void) => void
   supportsMimeType?: (type: string) => boolean
 }
 
@@ -97,33 +98,21 @@ function mimeTypeToContentType(mimeType: string | null): string {
   return supportingType.type
 }
 
-function createFromFile(file, callback): void {
-  // normally we just create a file -- but we treat plain-text specially
-  const type = ((mimeType) => {
-    if (mimeType && mimeType.match('text/')) {
-      return 'text'
-    }
-
-    return 'file'
-  })(file.type)
-
-  const entry = registry[type]
-  if (!entry) {
-    return
-  }
-
-  if (!entry.createFromFile) {
-    throw Error(`The ${type} content type cannot be created from a file directly.`)
-  }
-
+export function createFrom(contentData: ContentData, callback): void {
+  // importFromText
+  // TODO: use the mimetype to determine the entry.
+  const contentType = contentData.mimeType.match('text/') ? 'text' : 'file'
+  const entry = registry[contentType]
+  if (!entry) return
+  if (!entry.createFrom) throw new Error('Cannot be created from file')
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.createFromFile(file, handle, () => {
-    callback(createDocumentLink(type, url))
+  entry.createFrom(contentData, handle, () => {
+    callback(createDocumentLink(contentType, url))
   })
 }
 
-function create(type, attrs = {}, callback): void {
+export function create(type, attrs = {}, callback): void {
   const entry = registry[type]
   if (!entry) {
     return
@@ -162,8 +151,8 @@ export default {
   registerDefault,
   lookup,
   list,
-  createFromFile,
   create,
+  createFrom,
   mimeTypeToContentType, // move this too?
 }
 

@@ -1,5 +1,6 @@
 import { isPushpinUrl, PushpinUrl } from './ShareLink'
-import ContentTypes from './ContentTypes'
+import * as ContentTypes from './ContentTypes'
+import * as ContentData from './ContentData'
 
 export type CreatedContentCallback = (contentUrl: PushpinUrl, index: number) => void
 
@@ -34,8 +35,8 @@ export function importFileList(files: FileList, callback: CreatedContentCallback
   // fun fact: as of this writing, onDrop dataTransfer doesn't support iterators, but onPaste does
   // hence the oldschool iteration code
   for (let i = 0; i < length; i += 1) {
-    const entry = files[i]
-    ContentTypes.createFromFile(entry, (url) => callback(url, i))
+    const file = files[i]
+    ContentTypes.createFrom(ContentData.fromFile(file), (url) => callback(url, i))
   }
 }
 
@@ -66,7 +67,7 @@ export function importPlainText(plainText: string, callback: CreatedContentCallb
     }
   } catch (e) {
     // i guess it's not a URL after all, we'lll just make a text card
-    ContentTypes.create('text', { text: plainText }, (url) => callback(url, 0))
+    ContentTypes.createFrom(ContentData.fromString(plainText), (url) => callback(url, 0))
   }
 }
 
@@ -88,7 +89,7 @@ function determineUrlContents(url, callback: CreatedContentCallback) {
       }
       // XXX: come back and look at this
       const file = new File([blob], url, { type: blob.type, lastModified: Date.now() })
-      ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
+      ContentTypes.createFrom(ContentData.fromFile(file), (contentUrl) => callback(contentUrl, 0))
     })
     .catch((error) => {
       // this is fine, really -- the URL upgrade to content is optional.

@@ -1,13 +1,11 @@
 import Debug from 'debug'
 import { Handle, HyperfileUrl } from 'hypermerge'
-import mime from 'mime-types'
 import path from 'path'
 import ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
 import FileInList from './FileInList'
 
-import * as Hyperfile from '../../../hyperfile'
-import { toNodeReadable } from '../../../../NodeReadable'
+import * as ContentData from '../../../ContentData'
 
 const log = Debug('pushpin:filecontent')
 
@@ -17,6 +15,7 @@ export interface FileDoc {
   hyperfileUrl: HyperfileUrl
 }
 
+// TODO: when is this ever called?
 function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>, callback) {
   handle.change((doc) => {
     doc.title = title
@@ -26,26 +25,17 @@ function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>, cal
   callback()
 }
 
-function createFromFile(entry: File, handle: Handle<FileDoc>, callback) {
-  const { name = 'Unnamed File' } = entry
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<FileDoc>, callback) {
+  const name = contentData.name || 'Unnamed File'
+  const hyperfileUrl = await ContentData.toHyperfileUrl(contentData)
 
-  // XXX: fix this any type
-  const fileStream = toNodeReadable((entry as any).stream())
-  const mimeType = mime.contentType(entry.type) || 'application/octet-stream'
-
-  Hyperfile.write(fileStream, mimeType)
-    .then(({ url }) => {
-      handle.change((doc: FileDoc) => {
-        const parsed = path.parse(name)
-        doc.hyperfileUrl = url
-        doc.title = parsed.name
-        doc.extension = parsed.ext.slice(1)
-      })
-      callback()
-    })
-    .catch((err) => {
-      log(err)
-    })
+  handle.change((doc: FileDoc) => {
+    const parsed = path.parse(name)
+    doc.hyperfileUrl = hyperfileUrl
+    doc.title = parsed.name
+    doc.extension = parsed.ext.slice(1)
+  })
+  callback()
 }
 
 ContentTypes.register({
@@ -59,5 +49,5 @@ ContentTypes.register({
     list: FileInList,
   },
   create,
-  createFromFile,
+  createFrom,
 })
