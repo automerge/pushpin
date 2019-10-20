@@ -1,7 +1,7 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
 import { Handle } from 'hypermerge'
-import { HypermergeUrl, createDocumentLink } from './ShareLink'
+import { HypermergeUrl, createDocumentLink, PushpinUrl } from './ShareLink'
 import { ContentData } from './ContentData'
 
 const log = Debug('pushpin:content-types')
@@ -98,7 +98,9 @@ function mimeTypeToContentType(mimeType: string | null): string {
   return supportingType.type
 }
 
-export function createFrom(contentData: ContentData, callback): void {
+export type CreateCallback = (url: PushpinUrl) => void
+
+export function createFrom(contentData: ContentData, callback: CreateCallback): void {
   // importFromText
   // TODO: use the mimetype to determine the entry.
   const contentType = contentData.mimeType.match('text/') ? 'text' : 'file'
@@ -112,7 +114,7 @@ export function createFrom(contentData: ContentData, callback): void {
   })
 }
 
-export function create(type, attrs = {}, callback): void {
+export function create(type, attrs = {}, callback: CreateCallback): void {
   const entry = registry[type]
   if (!entry) {
     return

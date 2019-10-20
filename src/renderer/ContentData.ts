@@ -1,6 +1,5 @@
 import mime from 'mime-types'
 import { HyperfileUrl } from 'hypermerge'
-import path from 'path'
 import * as Hyperfile from './hyperfile'
 import { toNodeReadable } from '../NodeReadable'
 
@@ -42,9 +41,12 @@ async function streamToString(readable: ReadableStream): Promise<string> {
     const chunks: string[] = []
     const reader = readable.getReader()
     reader.read().then(function readValue({ done, value }) {
-      chunks.push(value)
-      if (done) res(chunks.join())
-      else reader.read().then(readValue)
+      if (done) {
+        res(chunks.join())
+      } else {
+        chunks.push(value)
+        reader.read().then(readValue)
+      }
     })
   })
 }
@@ -53,6 +55,7 @@ export function stringToStream(str: string): ReadableStream {
   return new ReadableStream({
     start(controller: ReadableStreamDefaultController) {
       controller.enqueue(str)
+      controller.close()
     },
   })
 }

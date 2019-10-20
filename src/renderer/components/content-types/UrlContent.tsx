@@ -124,14 +124,14 @@ export default function UrlContent(props: ContentProps) {
           {htmlHyperfileUrl ? (
             <webview className="UrlCard-webview" title={data.title} src={htmlHyperfileUrl} />
           ) : (
-              <webview
-                ref={setWebview}
-                className="UrlCard-webview"
-                title={data.title}
-                src={data.canonicalLink || url}
-                preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
-              />
-            )}
+            <webview
+              ref={setWebview}
+              className="UrlCard-webview"
+              title={data.title}
+              src={data.canonicalLink || url}
+              preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
+            />
+          )}
         </div>
         <div className="UrlCard-buttons">
           <a
@@ -312,8 +312,8 @@ function UrlContentInList(props: ContentProps) {
             </SecondaryText>
           </>
         ) : (
-            <Heading>{url}</Heading>
-          )}
+          <Heading>{url}</Heading>
+        )}
       </div>
     </div>
   )
