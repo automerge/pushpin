@@ -7,4 +7,9 @@
 *.swo
 /data
 *.DS_Store
+<<<<<<< HEAD
 .cache
+=======
+.cache
+/build
+>>>>>>> master

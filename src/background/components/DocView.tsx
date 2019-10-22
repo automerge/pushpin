@@ -2,18 +2,22 @@ import React from 'react'
 import { DocUrl } from 'hypermerge'
 import { validateDocURL } from 'hypermerge/dist/Metadata'
 import { toDiscoveryId } from 'hypermerge/dist/Misc'
-import { useRepo } from '../BackgroundHooks'
+import { Clock } from 'hypermerge/dist/Clock'
+import { useRepo, useSample } from '../BackgroundHooks'
 import FeedView from './FeedView'
 import Card from './Card'
 import Info, { hidden } from './Info'
 import PeersView from './PeersView'
-import { Clock } from 'hypermerge/dist/Clock'
+import List from './List'
 
 interface Props {
   url: DocUrl
 }
 
-export default function DocView({ url }: Props) {
+export default React.memo(DocView)
+
+function DocView({ url }: Props) {
+  useSample(2000)
   const repo = useRepo()
   const id = validateDocURL(url)
 
@@ -22,14 +26,8 @@ export default function DocView({ url }: Props) {
   const doc = repo.docs.get(id)
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridGap: 8,
-      }}
-    >
+    <List>
       <Info log={doc} docUrl={url} clock={renderClock(doc && doc.clock)} />
-
       <hr />
       <Info feeds={actorIds.length} />
       {actorIds.map((actorId) => (
@@ -40,7 +38,7 @@ export default function DocView({ url }: Props) {
 
       <hr />
       <PeersView discoveryId={toDiscoveryId(id)} />
-    </div>
+    </List>
   )
 }
 

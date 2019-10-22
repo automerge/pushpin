@@ -83,6 +83,11 @@ function useQuill({
     function onKeyDown(e: KeyboardEvent) {
       if (e.key !== 'Backspace') return
 
+      if (e.metaKey || e.ctrlKey) {
+        e.preventDefault()
+        return
+      }
+
       const str = q.getText()
       if (str !== '' && str !== '\n') {
         e.stopPropagation()
@@ -105,7 +110,7 @@ function useQuill({
       q.off('text-change', onChange)
       // Quill gets garbage collected automatically
     }
-  }, [ref.current])
+  }, [ref.current]) // eslint-disable-line
 
   useEffect(() => {
     if (!textString || !quill.current) return

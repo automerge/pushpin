@@ -20,7 +20,9 @@ interface BlockInfo {
   data: Uint8Array
 }
 
-export default function FeedView({ feedId }: Props) {
+export default React.memo(FeedView)
+
+function FeedView({ feedId }: Props) {
   const { feeds } = useRepo()
   const feed = useFeed(feedId)
   const info = useFeedInfo(feedId)
@@ -145,7 +147,7 @@ function useFeedInfo(feedId: FeedId): FeedInfo {
         .off('append', onAppend)
         .off('download', onDownload)
     }
-  }, [feed])
+  }, [feed, update])
 
   return info
 }
@@ -158,7 +160,7 @@ function useFeed(feedId: FeedId): Feed | null {
     repo.feeds.getFeed(feedId).then((fd) => {
       setFeed(fd)
     })
-  }, [feedId])
+  }, [feedId, repo.feeds])
 
   return feed
 }

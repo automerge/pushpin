@@ -1,19 +1,26 @@
 import React from 'react'
 import { PeerId } from 'hypermerge/dist/NetworkPeer'
 import PeerConnection from 'hypermerge/dist/PeerConnection'
-import Info, { humanBytes } from './Info'
+import Info, { humanBytes, hidden } from './Info'
+import List from './List'
 import { useSample, useRepo } from '../BackgroundHooks'
+import Card from './Card'
+import FeedView from './FeedView'
 
 interface Props {
   peerId: PeerId
 }
+export default React.memo(PeerView)
 
-export default function PeerView({ peerId }: Props) {
+function PeerView({ peerId }: Props) {
   useSample(1000)
-  const repo = useRepo()
-  const peer = repo.network.peers.get(peerId)
+
+  const { network, feeds, replication } = useRepo()
+  const peer = network.peers.get(peerId)
 
   if (!peer) return <div>Peer not found: {peerId}</div>
+
+  const shared = replication.replicating.get(peer)
 
   return (
     <div>
@@ -26,6 +33,17 @@ export default function PeerView({ peerId }: Props) {
       {Array.from(peer.pendingConnections).map((conn, i) => (
         <Info key={String(i)} log={conn} {...connectionInfo(conn)} />
       ))}
+      <Info
+        shared={hidden(`${shared.size} feeds...`, () => (
+          <List>
+            {Array.from(shared).map((discoveryId) => (
+              <Card key={discoveryId}>
+                <FeedView feedId={feeds.info.getPublicId(discoveryId)!} />
+              </Card>
+            ))}
+          </List>
+        ))}
+      />
     </div>
   )
 }
