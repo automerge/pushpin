@@ -3,10 +3,11 @@ import { useOnlineDevicesForContact } from '../../../PresenceHooks'
 import { useDocument } from '../../../Hooks'
 import { ContactDoc } from '.'
 import { HypermergeUrl } from '../../../ShareLink'
-import ColorBadge from '../../ColorBadge'
+import Badge, { BadgeSize } from '../../Badge'
 
 export interface Props {
   contactId: HypermergeUrl
+  size?: BadgeSize
 }
 
 type NoDevices = 'no-devices' // No other devices are available to connect to.
@@ -20,13 +21,35 @@ function useConnectionStatus(contactId: HypermergeUrl | null): ConnectionStatus 
   return onlineDevices.length > 1 ? 'connected' : 'not-connected'
 }
 
-const STATUS_CLASS = {
-  'no-devices': 'grey',
-  'not-connected': 'orange',
-  connected: 'green',
+const STATUS = {
+  'no-devices': {
+    color: 'grey',
+    icon: ['cloud', 'warning'] as [string, string],
+    hover: 'Nothing to sync with.',
+  },
+  'not-connected': {
+    color: 'orange',
+    icon: ['cloud', 'times'] as [string, string],
+    hover: 'Your other devices are unreachable.',
+  },
+  connected: {
+    color: 'green',
+    icon: 'undefined',
+    hover: 'Syncing active.',
+  },
 }
 
 export default function OwnDeviceConnectionStatus(props: Props) {
   const status = useConnectionStatus(props.contactId)
-  return <ColorBadge color={STATUS_CLASS[status]} />
+  return (
+    // xxx: fix this style
+    <div className="TitleBar-Map-ColorBadgePlacer">
+      <Badge
+        backgroundColor={STATUS[status].color}
+        size={props.size || 'tiny'}
+        icon={STATUS[status].icon}
+        hover={STATUS[status].hover}
+      />
+    </div>
+  )
 }

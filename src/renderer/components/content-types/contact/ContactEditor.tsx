@@ -14,11 +14,13 @@ import { useDocument } from '../../../Hooks'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
 
+import ListItem from '../../ListMenuItem'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 
 import './ContactEditor.css'
 import { CurrentDeviceContext } from '../workspace/Device'
 import { importFileList } from '../../../ImportData'
+import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -45,6 +47,8 @@ export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
   const currentDeviceId = useContext(CurrentDeviceContext)
   const hiddenFileInput = useRef<HTMLInputElement>(null)
+
+  const { hypermergeUrl } = props
 
   if (!doc) {
     return null
@@ -114,9 +118,11 @@ export default function ContactEditor(props: ContentProps) {
     },
   ]
 
-  let renderedDevices
-  if (devices) {
-    renderedDevices = devices
+  const renderDevices = () => {
+    if (!devices) {
+      return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
+    }
+    const renderedDevices = devices
       .map((d) => createDocumentLink('device', d))
       .map((d) => (
         <ActionListItem
@@ -128,8 +134,24 @@ export default function ContactEditor(props: ContentProps) {
           <Content context="list" url={d} editable />
         </ActionListItem>
       ))
-  } else {
-    renderedDevices = <SecondaryText>No devices registered...</SecondaryText>
+
+    return (
+      <div className="ContactEditor-section">
+        <div className="ContactEditor-sectionLabel">Devices</div>
+        <div className="ContactEditor-sectionContent">{renderedDevices}</div>
+        {devices && devices.length < 5 ? (
+          <div className="ContactEditor-sectionLabel">
+            <ListItem>
+              <OwnDeviceConnectionStatus size="medium" contactId={hypermergeUrl} />
+              <SecondaryText>
+                You should <a href="https://github.com/mjtognetti/pushpin-peer">add a cloud peer</a>
+                !
+              </SecondaryText>
+            </ListItem>
+          </div>
+        ) : null}
+      </div>
+    )
   }
 
   return (
@@ -188,10 +210,7 @@ export default function ContactEditor(props: ContentProps) {
             </div>
           </div>
         </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Devices</div>
-          <div className="ContactEditor-sectionContent">{renderedDevices}</div>
-        </div>
+        {renderDevices()}
       </div>
     </div>
   )

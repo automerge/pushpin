@@ -12,23 +12,28 @@ type Huge = 'huge'
 type Large = 'large'
 type Medium = 'medium'
 type Small = 'small'
-export type BadgeSize = Huge | Large | Medium | Small
+type Tiny = 'tiny'
+export type BadgeSize = Huge | Large | Medium | Small | Tiny
 
 export interface Props {
   icon?: string
   img?: string
+  hover?: string
   backgroundColor?: string
   shape?: BadgeShape
   size?: BadgeSize
 }
 
 export default React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) => {
-  const { icon, backgroundColor, size = 'large', shape = 'circle', img } = props
+  const { icon, backgroundColor, size = 'large', shape = 'circle', img, hover } = props
   return (
     <div
       ref={ref}
-      className={`Badge Badge--${size} Badge--${shape} ${img ? 'Badge--image' : null}`}
+      className={`Badge Badge--${size} Badge--${shape} ${img ? 'Badge--image' : null} ${
+        hover ? 'Badge--hover' : null
+      }`}
       style={{ backgroundColor, backgroundImage: img ? `url(${img})` : undefined }}
+      data-hover={hover}
     >
       <i className={`fa fa-${icon}`} />
     </div>

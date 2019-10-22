@@ -12,6 +12,10 @@
   font-size: calc(var(--size) * 0.625);
 }
 
+.Badge--tiny {
+  --size: 10px;
+}
+
 .Badge--small {
   --size: 20px;
 }
@@ -40,6 +44,7 @@
   display: inline-block;
   transform: translate(2%, -3%);
 }
+<<<<<<< HEAD
 .Badge .fa.fa-files-o:before {
   display: inline-block;
   transform: translate(4%, 11%);
@@ -49,3 +54,26 @@
   display: inline-block;
   transform: translate(4%, 9%);
 }
+=======
+
+.Badge--hover:hover::after {
+  display: block;
+  position: absolute;
+  white-space: nowrap;
+  max-width: 204px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  padding: 2px 4px;
+  background-color: white;
+  border-radius: 4px;
+  content: attr(data-hover);
+  top: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--colorBlueBlack)
+}
+>>>>>>> WIP patch
