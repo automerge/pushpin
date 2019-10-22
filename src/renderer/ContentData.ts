@@ -1,7 +1,6 @@
 import mime from 'mime-types'
 import { HyperfileUrl } from 'hypermerge'
 import * as Hyperfile from './hyperfile'
-import { toNodeReadable } from '../NodeReadable'
 
 export interface ContentData {
   mimeType: string
@@ -27,8 +26,7 @@ export function fromString(str: string, mimeType: string = 'text/plain') {
 }
 
 export async function toHyperfileUrl(contentData: ContentData): Promise<HyperfileUrl> {
-  const fileStream = toNodeReadable(contentData.data)
-  const header = await Hyperfile.write(fileStream, contentData.mimeType)
+  const header = await Hyperfile.write(contentData.data, contentData.mimeType)
   return header.url
 }
 

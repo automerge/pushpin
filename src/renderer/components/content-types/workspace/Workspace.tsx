@@ -25,6 +25,7 @@ import { CurrentDeviceContext } from './Device'
 
 import WorkspaceInList from './WorkspaceInList'
 import { importPlainText } from '../../../ImportData'
+import * as DataUrl from '../../../../DataUrl'
 
 const log = Debug('pushpin:workspace')
 
@@ -145,14 +146,21 @@ export default function Workspace(props: WorkspaceContentProps) {
       })
     }
 
-    const { mimeType, data } = parseDataUrl(payload.dataUrl)
+    const dataUrlInfo = DataUrl.parse(payload.dataUrl)
+    if (!dataUrlInfo) return
+    const { mimeType, data, isBase64 } = dataUrlInfo
+
     const contentData = {
       mimeType,
-      data: ContentData.stringToStream(data),
+      data: ContentData.stringToStream(isBase64 ? btoa(data) : data),
       src: payload.src,
     }
 
-    createFrom(contentData, creationCallback)
+    if (mimeType.includes('text/plain')) {
+      importPlainText(data, creationCallback)
+    } else {
+      createFrom(contentData, creationCallback)
+    }
   }
 
   const contentRef = useRef<any>() // hmmm

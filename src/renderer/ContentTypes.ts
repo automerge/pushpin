@@ -102,8 +102,15 @@ export type CreateCallback = (url: PushpinUrl) => void
 
 export function createFrom(contentData: ContentData, callback: CreateCallback): void {
   // importFromText
-  // TODO: use the mimetype to determine the entry.
-  const contentType = contentData.mimeType.match('text/') ? 'text' : 'file'
+  // TODO: the different content types should include mime type tests.
+  let contentType
+  if (contentData.mimeType === 'text/html') {
+    contentType = 'url'
+  } else if (contentData.mimeType.includes('text/')) {
+    contentType = 'text'
+  } else {
+    contentType = 'file'
+  }
   const entry = registry[contentType]
   if (!entry) return
   if (!entry.createFrom) throw new Error('Cannot be created from file')

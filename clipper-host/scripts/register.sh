@@ -10,9 +10,14 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   echo "Linux is not supported" >&2
   exit 1
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  # TODO: support system-wide native host when installing as admin
-  mkdir -p ~/Library/Application\ Support/Google/Chrome/NativeMessagingHosts
-  cp ../dist/com.pushpin.pushpin.json ~/Library/Application\ Support/Google/Chrome/NativeMessagingHosts
+  if [ "$(whoami)" = "root" ]; then
+    TARGET_DIR="/Library/Google/Chrome/NativeMessagingHosts"
+  else
+    TARGET_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
+  fi
+
+  mkdir -p "$TARGET_DIR"
+  cp ../dist/com.pushpin.pushpin.json "$TARGET_DIR"
 else
   echo "Unsupport OS: ${OSTYPE}" >&2
   exit 1

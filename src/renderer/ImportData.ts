@@ -52,7 +52,7 @@ function importImagesFromHTML(html: string, callback: CreatedContentCallback) {
     iframe.contentDocument!.documentElement.innerHTML = html
     const images = iframe.contentDocument!.getElementsByTagName('img')
     if (images.length > 0) {
-      determineUrlContents(images[0].src, callback)
+      importUrl(images[0].src, (contentUrl: PushpinUrl) => callback(contentUrl, 0))
     }
   } finally {
     iframe.remove()
