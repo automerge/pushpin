@@ -247,6 +247,7 @@ function create(attrs, handle, callback) {
           handle.change((workspace) => {
             workspace.selfId = selfHypermergeUrl
             workspace.contactIds = []
+            workspace.clips = []
             workspace.currentDocUrl = boardUrl
             workspace.viewedDocUrls = [boardUrl]
           })
