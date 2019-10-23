@@ -4,6 +4,7 @@ import ContentTypes from '../../ContentTypes'
 import Content, { ContentProps } from '../Content'
 import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
 import { useDocument } from '../../Hooks'
+import './ThreadContent.css'
 
 interface Message {
   authorId: HypermergeUrl
@@ -65,15 +66,15 @@ export default function ThreadContent(props: ContentProps) {
   }
 
   return (
-    <div style={css.threadWrapper}>
-      <div style={css.messageWrapper}>
-        <div style={css.messages} onScroll={stopPropagation}>
+    <div className="threadWrapper">
+      <div className="messageWrapper">
+        <div className="messages" onScroll={stopPropagation}>
           {groupedMessages.map(renderGroupedMessages)}
         </div>
       </div>
-      <div style={css.inputWrapper}>
+      <div className="inputWrapper">
         <input
-          style={css.input}
+          className="messageInput"
           value={message}
           onKeyDown={onKeyDown}
           onChange={onInput}
@@ -94,18 +95,18 @@ function renderMessage({ content, time }: Message, idx: number) {
   date.setTime(time)
 
   return (
-    <div style={css.message} key={idx}>
-      <div style={css.content}>{content}</div>
-      {idx === 0 ? <div style={css.time}>{dateFormatter.format(date)}</div> : null}
+    <div className="message" key={idx}>
+      <div className="content">{content}</div>
+      {idx === 0 ? <div className="time">{dateFormatter.format(date)}</div> : null}
     </div>
   )
 }
 
 function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
   return (
-    <div style={css.messageGroup} key={idx}>
+    <div className="messageGroup" key={idx}>
       <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
-      <div style={css.groupedMessages}>{groupOfMessages.map(renderMessage)}</div>
+      <div className="groupedMessages">{groupOfMessages.map(renderMessage)}</div>
     </div>
   )
 }
@@ -124,77 +125,6 @@ function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
   })
 
   return grouped
-}
-
-const css: { [k: string]: React.CSSProperties } = {
-  threadWrapper: {
-    display: 'flex',
-    backgroundColor: 'white',
-    width: '100%',
-    overflow: 'auto',
-    height: '100%',
-    padding: '1px 1px 0px 1px',
-  },
-  messageWrapper: {
-    padding: 12,
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    overflowY: 'scroll',
-    marginBottom: 49,
-    flexGrow: 1,
-  },
-  messageGroup: {
-    marginBottom: -24,
-    paddingTop: 12,
-  },
-  groupedMessages: {
-    position: 'relative',
-    top: -20,
-    paddingLeft: 40 + 8,
-  },
-  messages: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    flexGrow: 1,
-  },
-  message: {
-    color: 'black',
-    display: 'flex',
-    lineHeight: '20px',
-    padding: '2px 0',
-  },
-  user: {
-    display: 'flex',
-  },
-  username: {
-    paddingLeft: 8,
-    fontSize: 12,
-    color: 'var(--colorBlueBlack)',
-  },
-  avatar: {},
-  time: {
-    flex: 'none',
-    position: 'absolute',
-    right: 0,
-    fontSize: 12,
-    color: 'var(--colorSecondaryGrey)',
-    marginTop: -22,
-  },
-  content: {},
-  inputWrapper: {
-    boxSizing: 'border-box',
-    width: 'calc(100% - 2px)',
-    borderTop: '1px solid var(--colorInputGrey)',
-    position: 'absolute',
-    bottom: 1,
-    backgroundColor: 'white',
-    padding: 8,
-  },
-  input: {
-    width: '100%',
-  },
 }
 
 function create(unusedAttrs, handle, callback) {

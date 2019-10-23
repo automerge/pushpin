@@ -25,7 +25,7 @@ export default function Actions(props: Props) {
   }
 
   return (
-    <div className="actions" style={css.actions}>
+    <div className="Actions">
       {props.children}
 
       {props.actions.map((action) => (
@@ -40,12 +40,4 @@ export default function Actions(props: Props) {
       ))}
     </div>
   )
-}
-
-const css: { [name: string]: React.CSSProperties } = {
-  actions: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-  },
 }
