@@ -69,6 +69,17 @@ export default function StoragePeerEditor(props: ContentProps) {
       <SecondaryText>No workspaces currently stored...</SecondaryText>
     )
 
+  const registration =
+    selfDoc &&
+    selfDoc.devices &&
+    (selfDoc.devices.includes(hypermergeUrl) ? (
+      'Registered with storage peer'
+    ) : (
+      <button type="button" onClick={registerWithStoragePeer}>
+        Register with Storage Peer
+      </button>
+    ))
+
   return (
     <div className="StoragePeerEditor">
       <div className="StoragePeerEditor-content">
@@ -85,9 +96,7 @@ export default function StoragePeerEditor(props: ContentProps) {
           <div className="StoragePeerEditor-sectionLabel">Stored Workspaces</div>
           <div className="StoragePeerEditor-sectionContent">{renderedUrls}</div>
         </div>
-        <button type="button" onClick={registerWithStoragePeer}>
-          Register with Storage Peer
-        </button>
+        {registration}
       </div>
     </div>
   )
