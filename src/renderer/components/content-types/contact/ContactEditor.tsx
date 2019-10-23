@@ -22,6 +22,7 @@ import { CurrentDeviceContext } from '../workspace/Device'
 import { importFileList } from '../../../ImportData'
 import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
 import { useConnectionStatus } from '../../../PresenceHooks'
+import Badge from '../../Badge'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -139,12 +140,17 @@ export default function ContactEditor(props: ContentProps) {
 
     return (
       <div className="ContactEditor-section">
-        <div className="ContactEditor-sectionLabel">Devices</div>
+        <div className="ContactEditor-sectionLabel">
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <OwnDeviceConnectionStatus size="medium" contactId={hypermergeUrl} />
+            Devices
+          </div>
+        </div>
         <div className="ContactEditor-sectionContent">{renderedDevices}</div>
         {status !== 'connected' ? (
           <div className="ContactEditor-sectionLabel">
             <ListItem>
-              <OwnDeviceConnectionStatus size="medium" contactId={hypermergeUrl} />
+              <Badge backgroundColor="#00000000" size="medium" icon={['cloud', 'close']} />
               <SecondaryText>
                 You should <a href="https://github.com/mjtognetti/pushpin-peer">add a cloud peer</a>
                 !
