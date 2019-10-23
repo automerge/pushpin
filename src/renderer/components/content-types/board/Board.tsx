@@ -10,7 +10,7 @@ import { BoardDoc, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
-import { Position, Dimension, gridOffset, GRID_SIZE } from './BoardGrid'
+import { Position, Dimension, gridOffset, GRID_SIZE, limitDimension } from './BoardGrid'
 import { useSelection } from './BoardSelection'
 import {
   deleteCards,
@@ -74,7 +74,7 @@ function Board(props: ContentProps) {
       switch (action.type) {
         // board actions
         case 'AddCardForContent':
-          addAndSelectCard(doc, action.position, action.url, action.selectOnly)
+          addAndSelectCard(doc, action.position, action.dimension, action.url, action.selectOnly)
           break
         case 'ChangeBackgroundColor':
           changeBackgroundColor(doc, action.color)
@@ -125,10 +125,11 @@ function Board(props: ContentProps) {
   function addAndSelectCard(
     doc: BoardDoc,
     position: Position,
+    dimension: Dimension | undefined,
     url: PushpinUrl,
     shouldSelect?: boolean
   ) {
-    const cardId = addCardForContent(doc, { position, url })
+    const cardId = addCardForContent(doc, { position, dimension, url })
     if (shouldSelect) {
       selectOnly(cardId)
     }
@@ -195,9 +196,10 @@ function Board(props: ContentProps) {
         x: pageX - boardRef.current.offsetLeft,
         y: pageY - boardRef.current.offsetTop,
       }
-      ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
+      ImportData.importDataTransfer(e.dataTransfer, (url, i, dimensionHint) => {
         const position = gridOffset(dropPosition, i)
-        dispatch({ type: 'AddCardForContent', position, url })
+        const dimension = limitDimension(dimensionHint)
+        dispatch({ type: 'AddCardForContent', position, url, dimension })
       })
     },
     [dispatch]
@@ -229,18 +231,24 @@ function Board(props: ContentProps) {
         return
       }
 
-      /* We can't get the mouse position on a paste event,
-         so we just stick the card in the middle of the current scrolled position screen.
-         (We bump it a bit to the left too to pretend we're really centering, but doing that
-         would require knowledge of the card's ) */
-      const position = {
-        x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
+      // We can't get the mouse position on a paste event, so we just stick
+      // the card in the middle of the current scrolled position screen.
+      // Save the center of the window at the time of paste, in case the user
+      // scrolls before the import finishes.
+      const center = {
+        x: window.pageXOffset + window.innerWidth / 2,
         y: window.pageYOffset + window.innerHeight / 2,
       }
 
-      ImportData.importDataTransfer(e.clipboardData, (url, i) => {
+      ImportData.importDataTransfer(e.clipboardData, (url, i, dimensionHint) => {
+        const dimension = limitDimension(dimensionHint)
+        const { width = GRID_SIZE * 12, height = GRID_SIZE * 12 } = dimension || {}
+        const position = {
+          x: center.x - width / 2,
+          y: center.y - height / 2
+        }
         const offsetPosition = gridOffset(position, i)
-        dispatch({ type: 'AddCardForContent', position: offsetPosition, url })
+        dispatch({ type: 'AddCardForContent', position: offsetPosition, url, dimension })
       })
     },
     [dispatch]

@@ -1,7 +1,8 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
 import { Handle } from 'hypermerge'
-import { HypermergeUrl, createDocumentLink } from './ShareLink'
+import { HypermergeUrl, createDocumentLink, PushpinUrl } from './ShareLink'
+import { Dimension } from './components/content-types/board/BoardGrid';
 
 const log = Debug('pushpin:content-types')
 
@@ -26,7 +27,7 @@ interface ContentType {
   resizable?: boolean
   contexts: Contexts
   create?: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
-  createFromFile?: (file: File, handle: Handle<any>, callback: () => void) => void
+  createFromFile?: (file: File, handle: Handle<any>, callback: (dimension?: Dimension) => void) => void
   supportsMimeType?: (type: string) => boolean
 }
 
@@ -97,15 +98,9 @@ function mimeTypeToContentType(mimeType: string | null): string {
   return supportingType.type
 }
 
-function createFromFile(file, callback): void {
+function createFromFile(file: File, callback: (url: PushpinUrl, dimension?: Dimension) => void): void {
   // normally we just create a file -- but we treat plain-text specially
-  const type = ((mimeType) => {
-    if (mimeType && mimeType.match('text/')) {
-      return 'text'
-    }
-
-    return 'file'
-  })(file.type)
+  const type = file.type && file.type.match('text/') ? 'text' : 'file'
 
   const entry = registry[type]
   if (!entry) {
@@ -118,8 +113,8 @@ function createFromFile(file, callback): void {
 
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.createFromFile(file, handle, () => {
-    callback(createDocumentLink(type, url))
+  entry.createFromFile(file, handle, (dimension?: Dimension) => {
+    callback(createDocumentLink(type, url), dimension)
   })
 }
 

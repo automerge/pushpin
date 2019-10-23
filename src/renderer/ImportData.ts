@@ -1,7 +1,8 @@
 import { isPushpinUrl, PushpinUrl } from './ShareLink'
 import ContentTypes from './ContentTypes'
+import { Dimension } from './components/content-types/board/BoardGrid';
 
-export type CreatedContentCallback = (contentUrl: PushpinUrl, index: number) => void
+export type CreatedContentCallback = (contentUrl: PushpinUrl, index: number, dimensionHint?: Dimension) => void
 
 export function importDataTransfer(dataTransfer: DataTransfer, callback: CreatedContentCallback) {
   const url = dataTransfer.getData('application/pushpin-url')
@@ -35,7 +36,7 @@ export function importFileList(files: FileList, callback: CreatedContentCallback
   // hence the oldschool iteration code
   for (let i = 0; i < length; i += 1) {
     const entry = files[i]
-    ContentTypes.createFromFile(entry, (url) => callback(url, i))
+    ContentTypes.createFromFile(entry, (url, dimensionHint) => callback(url, i, dimensionHint))
   }
 }
 
@@ -62,7 +63,7 @@ function importPlainText(plainText: string, callback: CreatedContentCallback) {
     if (isPushpinUrl(plainText)) {
       callback(plainText, 0)
     } else {
-      determineUrlContents(url, callback)
+      determineUrlContents(url.toString(), callback)
     }
   } catch (e) {
     // i guess it's not a URL after all, we'lll just make a text card
@@ -70,7 +71,7 @@ function importPlainText(plainText: string, callback: CreatedContentCallback) {
   }
 }
 
-function determineUrlContents(url, callback: CreatedContentCallback) {
+function determineUrlContents(url: string, callback: CreatedContentCallback) {
   fetch(url)
     .then((response) => {
       if (!response.ok) throw Error('Fetch failed, just make a URL card.')
@@ -88,7 +89,7 @@ function determineUrlContents(url, callback: CreatedContentCallback) {
       }
       // XXX: come back and look at this
       const file = new File([blob], url, { type: blob.type, lastModified: Date.now() })
-      ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
+      ContentTypes.createFromFile(file, (contentUrl, dimensionHint) => callback(contentUrl, 0, dimensionHint))
     })
     .catch((error) => {
       // this is fine, really -- the URL upgrade to content is optional.
