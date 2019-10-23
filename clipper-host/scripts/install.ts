@@ -7,7 +7,7 @@ import { DIST_DIR, SCRIPT_DIR } from './shared'
 
 const CONFIG = {
   Darwin: {
-    host: 'index.js',
+    host: 'host.sh',
     registration: 'register.sh',
   },
   // Linux: {

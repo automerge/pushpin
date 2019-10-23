@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import ipc from 'node-ipc'
 import pump from 'pump'
 import * as NativeMessaging from './NativeMessaging'
