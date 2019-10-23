@@ -70,8 +70,6 @@ You can also see who's online in the top right corner of your workspace.
 
 Pushpin integrates with the [Clipper chrome extension](https://github.com/pvh/eleanor) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
 
-PushPin is configured to expect a clipper extension with the 'kdnhjinccidgfopcfckekiihpjakjhng' id. If you are experimenting with a different ID you can supply that as an argument to the install script. 
-
 To build and install the Clipper extension:
 ```
 yarn build:clipper-host
