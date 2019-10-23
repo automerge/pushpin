@@ -77,7 +77,12 @@ function initSystem(): System {
     ipcRenderer.send('system.msg', msg)
   })
 
-  ipc.serve(() => {
+  // there's only one web-clipper possible system-wide
+  // and if someone already has it, we won't get clips anyway
+  // so we strip out the ENV[USER] part of the name here
+  const WEBCLIPPER_SOCKET_LOCATION = `${ipc.config.socketRoot}.pushpin.web-clipper`
+
+  ipc.serve(WEBCLIPPER_SOCKET_LOCATION, () => {
     ipc.server.on('clipper', (data, socket) => {
       system.fromSystemQ.push({ type: 'IncomingClip', payload: data })
       ipc.server.emit(socket, 'renderer', { type: 'Ack' })
