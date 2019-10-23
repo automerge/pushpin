@@ -21,6 +21,7 @@ import './ContactEditor.css'
 import { CurrentDeviceContext } from '../workspace/Device'
 import { importFileList } from '../../../ImportData'
 import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
+import { useConnectionStatus } from '../../../PresenceHooks'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -47,6 +48,7 @@ export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
   const currentDeviceId = useContext(CurrentDeviceContext)
   const hiddenFileInput = useRef<HTMLInputElement>(null)
+  const status = useConnectionStatus(props.hypermergeUrl)
 
   const { hypermergeUrl } = props
 
@@ -139,7 +141,7 @@ export default function ContactEditor(props: ContentProps) {
       <div className="ContactEditor-section">
         <div className="ContactEditor-sectionLabel">Devices</div>
         <div className="ContactEditor-sectionContent">{renderedDevices}</div>
-        {devices && devices.length < 5 ? (
+        {status !== 'connected' ? (
           <div className="ContactEditor-sectionLabel">
             <ListItem>
               <OwnDeviceConnectionStatus size="medium" contactId={hypermergeUrl} />

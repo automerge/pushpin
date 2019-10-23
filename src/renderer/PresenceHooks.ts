@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import { HypermergeUrl, parseDocumentLink, createDocumentLink, PushpinUrl } from './ShareLink'
-import { useTimeouts, useMessaging, useRepo, useSelfId } from './Hooks'
+import { useTimeouts, useMessaging, useRepo, useSelfId, useDocument } from './Hooks'
 import { CurrentDeviceContext } from './components/content-types/workspace/Device'
 
 /**
@@ -89,7 +89,7 @@ export function useAllHeartbeats(contact: HypermergeUrl | null) {
       // heartbeats can't have HypermergeUrls as keys, so we do this
       Object.entries(heartbeats).forEach(([url]) => depart(url as HypermergeUrl))
     }
-  }, [contact, device])
+  }, [contact, device, repo])
 }
 
 export function useHeartbeat(docUrl: HypermergeUrl | null) {
@@ -158,7 +158,7 @@ export function usePresence<P>(
     return () => {
       delete myPresence[url][key]
     }
-  }, [key, presence])
+  }, [key, presence, url])
 
   return Object.values(remote)
     .filter((presence) => presence.data)
@@ -201,4 +201,15 @@ export function useDeviceOnlineStatus(deviceId: HypermergeUrl | null): boolean {
     currentDeviceUrl && parseDocumentLink(currentDeviceUrl).hypermergeUrl === deviceId
   const presence = usePresence(deviceId, {}, 'onlineStatus')
   return isCurrentDevice || presence.some((p) => p.device === deviceId)
+}
+
+type NoDevices = 'no-devices' // No other devices are available to connect to.
+type NotConnected = 'not-connected' // There are other devices to connect to, but not connected to any of them.
+type Connected = 'connected' // There are other devices to connect to, and connected to at least one.
+type ConnectionStatus = NoDevices | NotConnected | Connected
+export function useConnectionStatus(contactId: HypermergeUrl | null): ConnectionStatus {
+  const [contact] = useDocument<ContactDoc>(contactId)
+  const onlineDevices = useOnlineDevicesForContact(contactId)
+  if (!contact || !contact.devices || contact.devices.length <= 1) return 'no-devices'
+  return onlineDevices.length > 1 ? 'connected' : 'not-connected'
 }
