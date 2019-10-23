@@ -20,8 +20,6 @@ const CONFIG = {
   },
 }
 
-const extensionId = process.argv[2] || 'kdnhjinccidgfopcfckekiihpjakjhng'
-
 const config = CONFIG[os.type()]
 if (!config) throw new Error('Unsupported operating system')
 
@@ -34,7 +32,6 @@ function renderManifest() {
   })
   const manifest = replace(template, {
     '{HOST_PATH}': path.join(DIST_DIR, config.host).replace(/\\/g, '\\\\'),
-    '{EXTENSION_ID}': extensionId,
   })
   fs.writeFileSync(path.join(DIST_DIR, 'com.pushpin.pushpin.json'), manifest)
 }
