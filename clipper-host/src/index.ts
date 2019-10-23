@@ -32,16 +32,18 @@ pump(
 
 function sendToPushpin(msg): Promise<any> {
   return new Promise((res, rej) => {
+    const timer = setTimeout(() => {
+      ipc.disconnect('renderer')
+      res({ type: 'Failed', details: 'Timed out.' })
+    }, 2500)
     ipc.connectTo('renderer', () => {
       ipc.of.renderer.on('connect', () => {
         ipc.of.renderer.emit('clipper', msg)
         // Note: we give pushpin a couple seconds to handle the message
-        const timer = setTimeout(() => {
-          ipc.disconnect('renderer')
-          res({ type: 'Failed', details: 'Timed out.' })
-        }, 2500)
+
         ipc.of.renderer.on('renderer', (msg) => {
           res(msg)
+          ipc.disconnect('renderer')
           clearTimeout(timer)
         })
       })
