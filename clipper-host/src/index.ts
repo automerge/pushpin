@@ -10,7 +10,6 @@ const USER = process.env.NAME || process.env.USER || process.env.USERNAME
 
 ipc.config.silent = true
 ipc.config.appspace = `pushpin.${USER}.`
-// ipc.config.maxRetries = 2
 ipc.config.maxConnections = 1
 ipc.config.id = 'clipper'
 
@@ -31,19 +30,20 @@ pump(
   process.stdout
 )
 
-// async function onMessage(message: InboundMessage): Promise<any> {
-//   await sendToPushpin(message)
-//   return { type: 'Ack2' }
-// }
-
 function sendToPushpin(msg): Promise<any> {
   return new Promise((res, rej) => {
     ipc.connectTo('renderer', () => {
       ipc.of.renderer.on('connect', () => {
         ipc.of.renderer.emit('clipper', msg)
-        // Note: we delay a little while here to give the message time to send.
-        setTimeout(() => ipc.disconnect('renderer'), 250)
-        res({ type: 'Ack' })
+        // Note: we give pushpin a couple seconds to handle the message
+        const timer = setTimeout(() => {
+          ipc.disconnect('renderer')
+          res({ type: 'Failed', details: 'Timed out.' })
+        }, 2500)
+        ipc.of.renderer.on('renderer', (msg) => {
+          res(msg)
+          clearTimeout(timer)
+        })
       })
     })
   })
