@@ -5,6 +5,9 @@ import HtmlPlugin from 'html-webpack-plugin'
 import nodeExternals from 'webpack-node-externals'
 import HardSourcePlugin from 'hard-source-webpack-plugin'
 import ForkTsCheckerPlugin from 'fork-ts-checker-webpack-plugin'
+import CopyPlugin from 'copy-webpack-plugin'
+import OnBuildPlugin from 'on-build-webpack'
+import fs from 'fs'
 
 interface Options {
   isDev: boolean
@@ -151,6 +154,53 @@ export default [
     plugins: [
       new ForkTsCheckerPlugin({
         formatter: 'codeframe',
+      }),
+      ...(isDev
+        ? [
+            new HardSourcePlugin({
+              cacheDirectory,
+              info: {
+                level: 'warn',
+                mode: 'none',
+              },
+            }),
+          ]
+        : []),
+    ],
+  })),
+
+  config(({ isDev }) => ({
+    name: 'clipper-host',
+    entry: { 'clipper-host': './src/apps/clipper-host' },
+    target: 'node',
+    devtool: false,
+    output: {
+      path: path.resolve(__dirname, 'dist/clipper-host'),
+      filename: `[name].js`,
+      globalObject: 'this',
+    },
+    plugins: [
+      new ForkTsCheckerPlugin({
+        formatter: 'codeframe',
+      }),
+      new CopyPlugin([
+        {
+          from: 'src/apps/clipper-host/*.+(sh|bat)',
+          flatten: true,
+          transform: (content: Buffer, filePath: string) => {
+            const electronPath = isDev
+              ? path.resolve(__dirname, 'node_modules/.bin/electron')
+              : './PushPin' // TODO: windows: ./Pushpin.exe
+            const interpolated = content.toString().replace('__ELECTRON_PATH__', electronPath)
+            return Buffer.from(interpolated)
+          },
+        },
+      ]),
+      new OnBuildPlugin(() => {
+        // set permissions on the clipper-host scripts
+        const clipperHostDir = path.resolve(__dirname, 'dist/clipper-host')
+        fs.chmodSync(path.join(clipperHostDir, 'clipper-host.js'), 0o755)
+        fs.chmodSync(path.join(clipperHostDir, 'clipper-host.sh'), 0o755)
       }),
       ...(isDev
         ? [
