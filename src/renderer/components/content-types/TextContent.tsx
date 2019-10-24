@@ -111,7 +111,7 @@ function useQuill({
       q.off('text-change', onChange)
       // Quill gets garbage collected automatically
     }
-  }, [config, makeChange, selected, textString])
+  }, [ref.current]) // eslint-disable-line
 
   useEffect(() => {
     if (!textString || !quill.current) return
