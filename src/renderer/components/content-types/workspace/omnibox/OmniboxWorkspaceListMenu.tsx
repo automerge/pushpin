@@ -149,9 +149,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             // into this.state.viewedDocs[url]
             const handle = window.repo.watch(hypermergeUrl, (doc) => {
               this.setState((state) => {
-                const { viewedDocs } = state
-                viewedDocs[url] = doc
-                return { viewedDocs }
+                return { viewedDocs: { ...state.viewedDocs, [url]: doc } }
               })
             })
             this.viewedDocHandles[url] = handle
@@ -168,9 +166,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
               (contactId as unknown) as HypermergeUrl, // XXX: this is... wrong?
               (doc: ContactDoc) => {
                 this.setState((state) => {
-                  const { contacts } = state
-                  contacts[contactId] = doc
-                  return { contacts }
+                  return { contacts: { ...state.contacts, [contactId]: doc } }
                 })
               }
             )
@@ -415,10 +411,10 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
         props.search === '' || !state.doc
           ? [] // don't show archived URLs unless there's a current search term
           : (state.doc.archivedDocUrls || [])
-              .map((url) => [url, this.state.viewedDocs[url]])
-              .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
-              .filter(([url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
-              .map(([url, doc]) => ({ url })),
+            .map((url) => [url, this.state.viewedDocs[url]])
+            .filter(([url, doc]) => parseDocumentLink(url).type === 'board')
+            .filter(([url, doc]) => doc && doc.title.match(new RegExp(props.search, 'i')))
+            .map(([url, doc]) => ({ url })),
     },
     {
       name: 'docUrls',
