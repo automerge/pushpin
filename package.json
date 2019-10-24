@@ -63,7 +63,8 @@
     "to-buffer": "^1.1.1",
     "unfluff": "^3.2.0",
     "use-immer": "^0.3.3",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "winreg": "^1.2.4"
   },
   "devDependencies": {
     "@ibm/plex": "^1.4.1",

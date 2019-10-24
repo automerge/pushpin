@@ -2,6 +2,7 @@ import path from 'path'
 import { app } from 'electron'
 import os from 'os'
 import fs from 'fs'
+import Registry from 'winreg'
 
 type OsType = 'mac' | 'windows' | 'linux' | 'unsupported'
 const EXTENSION_ID = 'kdnhjinccidgfopcfckekiihpjakjhng'
@@ -66,7 +67,21 @@ function writeManifest(osType: OsType, manifest) {
       break
     }
     case 'windows': {
-      // TODO: write to the registry
+      const nativeHostManifestPath = path.resolve(
+        app.getPath('userData'),
+        'clipper-host',
+        MANIFEST_FILE
+      )
+      ensureDirectoryExists(nativeHostManifestPath)
+      fs.writeFileSync(nativeHostManifestPath, JSON.stringify(manifest))
+      // childProcess.execSync(
+      //   `reg add HKCU\\SOFTWARE\\Google\\Chrome\\NativeMessagingHosts\\com.pushpin.pushpin /f /ve /t REG_SZ /d ${nativeHostManifestPath}`
+      // )
+      const registry = new Registry({
+        hive: Registry.HKCU,
+        key: 'SOFTWARE\\Google\\Chrome\\NativeMessagingHosts\\com.pushpin.pushpin',
+      })
+      registry.set('', Registry.REG_SZ, nativeHostManifestPath, () => {})
       break
     }
     default: {
