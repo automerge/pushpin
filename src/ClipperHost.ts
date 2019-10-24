@@ -72,16 +72,20 @@ function writeManifest(osType: OsType, manifest) {
         'clipper-host',
         MANIFEST_FILE
       )
-      ensureDirectoryExists(nativeHostManifestPath)
+      ensureDirectoryExists(path.dirname(nativeHostManifestPath))
       fs.writeFileSync(nativeHostManifestPath, JSON.stringify(manifest))
       // childProcess.execSync(
       //   `reg add HKCU\\SOFTWARE\\Google\\Chrome\\NativeMessagingHosts\\com.pushpin.pushpin /f /ve /t REG_SZ /d ${nativeHostManifestPath}`
       // )
       const registry = new Registry({
         hive: Registry.HKCU,
-        key: 'SOFTWARE\\Google\\Chrome\\NativeMessagingHosts\\com.pushpin.pushpin',
+        key: '\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.pushpin.pushpin',
       })
-      registry.set('', Registry.REG_SZ, nativeHostManifestPath, () => {})
+      registry.set(Registry.DEFAULT_VALUE, Registry.REG_SZ, nativeHostManifestPath, (err) => {
+        if (err) {
+          throw new Error(`registry failed: ${err}`)
+        }
+      })
       break
     }
     default: {
