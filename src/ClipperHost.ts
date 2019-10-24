@@ -67,7 +67,14 @@ function writeManifest(osType: OsType, manifest) {
       break
     }
     case 'linux': {
-      console.error('unsupported')
+      // TODO: deal with root user and system-wide installation
+      const nativeHostManifestPath = path.resolve(
+        os.homedir(),
+        '.config/google-chrome/NativeMessagingHosts',
+        MANIFEST_FILE
+      )
+      ensureDirectoryExists(path.dirname(nativeHostManifestPath))
+      fs.writeFileSync(nativeHostManifestPath, JSON.stringify(manifest))
       break
     }
     case 'windows': {
