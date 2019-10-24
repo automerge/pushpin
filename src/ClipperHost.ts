@@ -10,13 +10,17 @@ const HOST_NAME = 'com.pushpin.pushpin'
 const MANIFEST_FILE = `${HOST_NAME}.json`
 
 export function install() {
-  const isDev = true //! !process.env.PRODUCTION
+  const isDev = getIsDev()
   const osType = getOsType()
   const manifest = getManifest({
     hostPath: getClipperHostPath(osType, isDev),
     extensionId: EXTENSION_ID,
   })
   writeManifest(osType, manifest)
+}
+
+function getIsDev() {
+  return process.env.NODE_ENV !== 'production'
 }
 
 // Note: Should this use os.platform() instead?

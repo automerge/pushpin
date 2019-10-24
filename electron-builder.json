@@ -8,7 +8,7 @@
   },
   "mac": {
     "target": [
-      "dmgf"
+      "dmg"
     ],
     "extraFiles": {
       "from": "dist/clipper-host/",
