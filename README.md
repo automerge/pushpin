@@ -66,6 +66,18 @@ You can navigate new places quickly by pressing "/" and then typing part of the 
 
 You can also see who's online in the top right corner of your workspace.
 
+## Clipper Chrome Extension
+
+Pushpin integrates with the [Clipper chrome extension](https://github.com/pvh/eleanor) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
+
+To build and install the Clipper extension:
+```
+yarn build:clipper-host
+yarn install:clipper-host
+```
+
+You should now be able to clip content using the Clipper extension and have it show up in your Omnibox!
+
 ## Keeping Your Data Available
 
 [pushpin-peer](https://github.com/mjtognetti/pushpin-peer) is a simple data peer you can use to ensure your pushpin data is available. You can run pushpin peer on a server or in the cloud.

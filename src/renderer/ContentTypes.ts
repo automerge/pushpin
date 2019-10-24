@@ -1,7 +1,8 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
 import { Handle } from 'hypermerge'
-import { HypermergeUrl, createDocumentLink } from './ShareLink'
+import { HypermergeUrl, createDocumentLink, PushpinUrl } from './ShareLink'
+import { ContentData } from './ContentData'
 
 const log = Debug('pushpin:content-types')
 
@@ -26,7 +27,7 @@ interface ContentType {
   resizable?: boolean
   contexts: Contexts
   create?: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
-  createFromFile?: (file: File, handle: Handle<any>, callback: () => void) => void
+  createFrom?: (contentData: ContentData, handle: Handle<any>, callback: () => void) => void
   supportsMimeType?: (type: string) => boolean
 }
 
@@ -97,33 +98,30 @@ function mimeTypeToContentType(mimeType: string | null): string {
   return supportingType.type
 }
 
-function createFromFile(file, callback): void {
-  // normally we just create a file -- but we treat plain-text specially
-  const type = ((mimeType) => {
-    if (mimeType && mimeType.match('text/')) {
-      return 'text'
-    }
+export type CreateCallback = (url: PushpinUrl) => void
 
-    return 'file'
-  })(file.type)
-
-  const entry = registry[type]
-  if (!entry) {
-    return
+export function createFrom(contentData: ContentData, callback: CreateCallback): void {
+  // importFromText
+  // TODO: the different content types should include mime type tests.
+  let contentType
+  if (contentData.mimeType === 'text/html') {
+    contentType = 'url'
+  } else if (contentData.mimeType.includes('text/')) {
+    contentType = 'text'
+  } else {
+    contentType = 'file'
   }
-
-  if (!entry.createFromFile) {
-    throw Error(`The ${type} content type cannot be created from a file directly.`)
-  }
-
+  const entry = registry[contentType]
+  if (!entry) return
+  if (!entry.createFrom) throw new Error('Cannot be created from file')
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.createFromFile(file, handle, () => {
-    callback(createDocumentLink(type, url))
+  entry.createFrom(contentData, handle, () => {
+    callback(createDocumentLink(contentType, url))
   })
 }
 
-function create(type, attrs = {}, callback): void {
+export function create(type, attrs = {}, callback: CreateCallback): void {
   const entry = registry[type]
   if (!entry) {
     return
@@ -162,8 +160,8 @@ export default {
   registerDefault,
   lookup,
   list,
-  createFromFile,
   create,
+  createFrom,
   mimeTypeToContentType, // move this too?
 }
 

@@ -9,6 +9,7 @@ import { ContentProps } from '../Content'
 import { useDocument, useStaticCallback } from '../../Hooks'
 import './TextContent.css'
 import Badge from '../Badge'
+import * as ContentData from '../../ContentData'
 
 interface TextDoc {
   text: Automerge.Text
@@ -110,7 +111,7 @@ function useQuill({
       q.off('text-change', onChange)
       // Quill gets garbage collected automatically
     }
-  }, [ref.current]) // eslint-disable-line
+  }, [config, makeChange, selected, textString])
 
   useEffect(() => {
     if (!textString || !quill.current) return
@@ -146,25 +147,19 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-function createFromFile(entry: File, handle: Handle<TextDoc>, callback) {
-  const reader = new FileReader()
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<TextDoc>, callback) {
+  const text = await ContentData.toString(contentData)
+  handle.change((doc) => {
+    doc.text = new Automerge.Text()
+    if (text) {
+      doc.text.insertAt!(0, ...text.split(''))
 
-  reader.onload = () => {
-    handle.change((doc) => {
-      doc.text = new Automerge.Text()
-      if (reader.result) {
-        const text = reader.result as string
-        doc.text.insertAt!(0, ...text.split(''))
-
-        if (!text || !text.endsWith('\n')) {
-          doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
-        }
+      if (!text || !text.endsWith('\n')) {
+        doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
       }
-    })
-    callback()
-  }
-
-  reader.readAsText(entry)
+    }
+  })
+  callback()
 }
 
 function create({ text }, handle: Handle<TextDoc>, callback) {
@@ -213,6 +208,6 @@ ContentTypes.register({
     list: TextInList,
   },
   create,
-  createFromFile,
+  createFrom,
   supportsMimeType,
 })

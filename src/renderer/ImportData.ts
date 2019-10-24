@@ -1,9 +1,14 @@
 import { isPushpinUrl, PushpinUrl } from './ShareLink'
-import ContentTypes from './ContentTypes'
+import * as ContentTypes from './ContentTypes'
+import * as ContentData from './ContentData'
 
+// TODO: Convert these functions to be async rather than accepting a callback.
 export type CreatedContentCallback = (contentUrl: PushpinUrl, index: number) => void
 
-export function importDataTransfer(dataTransfer: DataTransfer, callback: CreatedContentCallback) {
+export async function importDataTransfer(
+  dataTransfer: DataTransfer,
+  callback: CreatedContentCallback
+) {
   const url = dataTransfer.getData('application/pushpin-url')
   if (url) {
     callback(url as PushpinUrl, 0)
@@ -23,7 +28,7 @@ export function importDataTransfer(dataTransfer: DataTransfer, callback: Created
   // If we can't get the item as a bunch of files, let's hope it works as plaintext.
   const plainText = dataTransfer.getData('text/plain')
   if (plainText) {
-    importPlainText(plainText, callback)
+    importPlainText(plainText, (contentUrl: PushpinUrl) => callback(contentUrl, 0))
   }
 }
 
@@ -34,8 +39,8 @@ export function importFileList(files: FileList, callback: CreatedContentCallback
   // fun fact: as of this writing, onDrop dataTransfer doesn't support iterators, but onPaste does
   // hence the oldschool iteration code
   for (let i = 0; i < length; i += 1) {
-    const entry = files[i]
-    ContentTypes.createFromFile(entry, (url) => callback(url, i))
+    const file = files[i]
+    ContentTypes.createFrom(ContentData.fromFile(file), (url) => callback(url, i))
   }
 }
 
@@ -47,52 +52,78 @@ function importImagesFromHTML(html: string, callback: CreatedContentCallback) {
     iframe.contentDocument!.documentElement.innerHTML = html
     const images = iframe.contentDocument!.getElementsByTagName('img')
     if (images.length > 0) {
-      determineUrlContents(images[0].src, callback)
+      importUrl(images[0].src, (contentUrl: PushpinUrl) => callback(contentUrl, 0))
     }
   } finally {
     iframe.remove()
   }
 }
 
-function importPlainText(plainText: string, callback: CreatedContentCallback) {
-  try {
-    // wait!? is this some kind of URL?
-    const url = new URL(plainText)
-    // for pushpin URLs pasted in, let's turn them into cards
-    if (isPushpinUrl(plainText)) {
-      callback(plainText, 0)
-    } else {
-      determineUrlContents(url, callback)
-    }
-  } catch (e) {
-    // i guess it's not a URL after all, we'lll just make a text card
-    ContentTypes.create('text', { text: plainText }, (url) => callback(url, 0))
+/**
+ * Import plain text into pushpin.
+ * The text may represent a url, in which case we want to attempt to create a more specific
+ * content type, depending on what the url represents.
+ *
+ * If the text is a pushpin url, invoke the callback to turn the text into a card.
+ * NOTE: this code should not know about cards - what is this really doing?
+ */
+export function importPlainText(plainText: string, callback: ContentTypes.CreateCallback) {
+  if (isPushpinUrl(plainText)) {
+    callback(plainText)
+  } else if (isUrl(plainText)) {
+    importUrl(plainText, callback)
+  } else {
+    ContentTypes.createFrom(ContentData.fromString(plainText), callback)
   }
 }
 
-function determineUrlContents(url, callback: CreatedContentCallback) {
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) throw Error('Fetch failed, just make a URL card.')
-      const contentType = response.headers.get('Content-Type')
-      if (contentType && contentType.indexOf('text/html') !== -1) {
-        // looks like we got ourselves a website
-        throw Error('Found text/html, just make a URL card.')
-        // XXX: this is bad
-      }
-      return response.blob()
-    })
-    .then((blob) => {
-      if (!blob) {
-        return
-      }
-      // XXX: come back and look at this
-      const file = new File([blob], url, { type: blob.type, lastModified: Date.now() })
-      ContentTypes.createFromFile(file, (contentUrl) => callback(contentUrl, 0))
-    })
-    .catch((error) => {
-      // this is fine, really -- the URL upgrade to content is optional.
-      // it'd be nice to do something more sophisticated, perhaps
-      ContentTypes.create('url', { url: url.toString() }, (contentUrl) => callback(contentUrl, 0))
-    })
+function isUrl(str: string) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const url = new URL(str)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Import content from a url.
+ * Attempts to fetch the contents of the url and create a more specific content type
+ * based on the response (e.g. a pdf or a jpg). If there response is html or the request fails,
+ * fall back to creating url content.
+ *
+ * TODO: This doesn't feel like the right place to be making mime type content decisions.
+ * That should be happening in ContentTypes.createFrom.
+ *
+ * TODO: Can we use the 'text/uri-list' mime type to use createFrom for creating urls?
+ * Notably, there is some precedent for this: https://html.spec.whatwg.org/multipage/dnd.html#dom-datatransfer-types
+ * Alternatively, we could use something like 'text/vnd.pushpin.url'.
+ */
+async function importUrl(url: string, callback: ContentTypes.CreateCallback) {
+  const response = await fetchOk(url)
+  if (!response) {
+    ContentTypes.create('url', { url }, callback)
+    return
+  }
+  const mimeType = response.headers.get('Content-Type') || 'application/octet-stream'
+  if (mimeType.includes('text/html')) {
+    ContentTypes.create('url', { url }, callback)
+    return
+  }
+  const contentData: ContentData.ContentData = {
+    name: url, // XXX: This mimics the legacy behavior of creating a blob and file.
+    mimeType,
+    data: response.body!, // XXX: I believe this is ok. I think response.body is only null if !response.ok
+  }
+  ContentTypes.createFrom(contentData, callback)
+}
+
+async function fetchOk(url: string): Promise<Response | null> {
+  try {
+    const response = await fetch(url)
+    return response.ok ? response : null
+  } catch {
+    return null
+  }
 }

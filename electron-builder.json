@@ -1,15 +1,39 @@
 {
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*",
+    "!dist/clipper-host/*"
+  ],
   "directories": {
     "output": "out"
   },
   "mac": {
-    "target": ["dmg"]
+    "target": [
+      "dmgf"
+    ],
+    "extraFiles": {
+      "from": "dist/clipper-host/",
+      "to": "MacOS",
+      "filter": [
+        "clipper-host.js",
+        "clipper-host.sh"
+      ]
+    }
   },
   "win": {
-    "target": ["nsis"]
+    "target": [
+      "nsis"
+    ],
+    "extraFiles": {
+      "from": "dist/clipper-host/",
+      "filter": [
+        "clipper-host.js",
+        "clipper-host.bat"
+      ]
+    }
   },
   "linux": {
-    "target": ["AppImage"]
+    "target": [
+      "AppImage"
+    ]
   }
 }

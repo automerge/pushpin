@@ -1,7 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { clipboard } from 'electron'
 
-import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown/dropdown'
 import Omnibox from './omnibox/Omnibox'
 import Content from '../../Content'
 import Authors from './Authors'
@@ -12,10 +11,12 @@ import { useDocument, useEvent } from '../../../Hooks'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 import { Doc as WorkspaceDoc } from './Workspace'
 import { ContactDoc } from '../contact'
+import Badge from '../../Badge'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl
   openDoc: Function
+  onContent: (url: PushpinUrl) => boolean
 }
 
 export default function TitleBar(props: Props) {
@@ -25,18 +26,16 @@ export default function TitleBar(props: Props) {
   const [doc] = useDocument<WorkspaceDoc>(props.hypermergeUrl)
   const [selfDoc] = useDocument<ContactDoc>(doc && doc.selfId)
 
-  const dropdownRef = useRef<Dropdown>(null)
-
   useEvent(document, 'keydown', (e) => {
     if (e.key === '/' && document.activeElement === document.body) {
       if (!activeOmnibox) {
-        activateOmnibox()
+        showOmnibox()
         e.preventDefault()
       }
     }
 
     if (e.key === 'Escape' && activeOmnibox) {
-      deactivateOmnibox()
+      hideOmnibox()
       e.preventDefault()
     }
   })
@@ -58,15 +57,7 @@ export default function TitleBar(props: Props) {
       setHistory([doc.currentDocUrl, ...sessionHistory.slice(historyIndex)])
       setIndex(0)
     }
-  }, [doc && doc.currentDocUrl])
-
-  function activateOmnibox() {
-    dropdownRef.current && dropdownRef.current.show()
-  }
-
-  function deactivateOmnibox() {
-    dropdownRef.current && dropdownRef.current.hide()
-  }
+  }, [doc, historyIndex, sessionHistory])
 
   function goBack() {
     if (backDisabled) {
@@ -92,11 +83,11 @@ export default function TitleBar(props: Props) {
     }
   }
 
-  function onShow() {
+  function showOmnibox() {
     setActive(true)
   }
 
-  function onHide() {
+  function hideOmnibox() {
     setActive(false)
   }
 
@@ -112,28 +103,14 @@ export default function TitleBar(props: Props) {
       <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar-menuItem">
         <i className="fa fa-angle-left" />
       </button>
-      <Dropdown
-        ref={dropdownRef}
-        className="TitleBar-menuItem TitleBar-right"
-        onShow={onShow}
-        onHide={onHide}
-      >
-        <DropdownTrigger>
-          <i className="fa fa-map" />
-        </DropdownTrigger>
-        <DropdownContent>
-          <WorkspaceUrlsContext.Consumer>
-            {(workspaceUrlsContext) => (
-              <Omnibox
-                active={activeOmnibox}
-                hypermergeUrl={props.hypermergeUrl}
-                omniboxFinished={deactivateOmnibox}
-                workspaceUrlsContext={workspaceUrlsContext}
-              />
-            )}
-          </WorkspaceUrlsContext.Consumer>
-        </DropdownContent>
-      </Dropdown>
+      <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
+        <Badge icon="map" backgroundColor="#00000000" />
+        {doc.clips && doc.clips.length > 0 ? (
+          <div className="TitleBar-Map-ColorBadgePlacer">
+            <Badge backgroundColor="#00000000" size="medium" icon="paperclip" />
+          </div>
+        ) : null}
+      </button>
 
       <button
         disabled={forwardDisabled}
@@ -157,6 +134,20 @@ export default function TitleBar(props: Props) {
       >
         <i className="fa fa-clipboard" />
       </button>
+
+      {activeOmnibox ? (
+        <WorkspaceUrlsContext.Consumer>
+          {(workspaceUrlsContext) => (
+            <Omnibox
+              active={activeOmnibox}
+              hypermergeUrl={props.hypermergeUrl}
+              omniboxFinished={hideOmnibox}
+              onContent={props.onContent}
+              workspaceUrlsContext={workspaceUrlsContext}
+            />
+          )}
+        </WorkspaceUrlsContext.Consumer>
+      ) : null}
     </div>
   )
 }

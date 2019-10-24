@@ -15,8 +15,8 @@ import './UrlContent.css'
 import SecondaryText from '../SecondaryText'
 import Badge from '../Badge'
 import Heading from '../Heading'
-import { toNodeReadable } from '../../../NodeReadable'
 import { APP_PATH } from '../../constants'
+import * as ContentData from '../../ContentData'
 
 const log = Debug('pushpin:url')
 
@@ -58,7 +58,10 @@ export default function UrlContent(props: ContentProps) {
 
   useEvent(webview, 'dom-ready', () => {
     console.log('dom-ready', webview)
-    webview && (webview as any).send('freeze-dry', { type: 'Ready' })
+    doc &&
+      !doc.htmlHyperfileUrl &&
+      webview &&
+      (webview as any).send('freeze-dry', { type: 'Ready' })
   })
 
   useEvent(webview, 'console-message', ({ message }: { message: string }) => {
@@ -250,7 +253,7 @@ function importImageUrl(url: string): Promise<Header> {
       throw new Error('image fetch failed')
     }
     const contentType = response.headers.get('content-type') || 'application/octet-stream'
-    return Hyperfile.write(toNodeReadable(response.body), contentType)
+    return Hyperfile.write(response.body, contentType)
   })
 }
 
@@ -264,9 +267,40 @@ function removeEmpty(obj: object) {
   })
 }
 
-function create({ url }, handle: Handle<UrlDoc>, callback) {
+/**
+ * Assumes we are creating from a content data object with mimetype equal to 'text/html'.
+ * This function should also probably handle a mimeType equal to 'text/uri-list'.
+ */
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>, callback) {
+  // Yikes. We need to decode the encoded html. This needs to be rethought to be more
+  // ergonomic.
+  const { url } = await Hyperfile.write(
+    contentData.data.pipeThrough(
+      new window.TransformStream({
+        start() {},
+        transform(chunk, controller) {
+          controller.enqueue(decodeURIComponent(chunk))
+        },
+      })
+    ),
+    contentData.mimeType
+  )
   handle.change((doc) => {
-    doc.url = url
+    doc.url = contentData.src! // TODO: we need per-content typing on ContentData
+    doc.htmlHyperfileUrl = url
+  })
+  callback()
+}
+
+function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>, callback) {
+  handle.change((doc) => {
+    doc.url = url || src
+    if (hyperfileUrl) {
+      doc.htmlHyperfileUrl = hyperfileUrl
+    }
+    if (capturedAt) {
+      doc.capturedAt = capturedAt
+    }
   })
   callback()
 }
@@ -319,5 +353,6 @@ ContentTypes.register({
     list: UrlContentInList,
   },
   create,
+  createFrom,
   unlisted: true,
 })

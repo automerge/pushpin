@@ -8,8 +8,6 @@ import ipc from '../ipc'
 import Root from './components/Root'
 
 import './app.css'
-import './react-toggle-override.css'
-import 'react-simple-dropdown/dropdown.css'
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 import System, { FromSystemMsg } from './System'
@@ -78,6 +76,19 @@ function initSystem(): System {
     ipc.of.background.emit('system.msg', msg)
     ipcRenderer.send('system.msg', msg)
   })
+
+  // there's only one web-clipper possible system-wide
+  // and if someone already has it, we won't get clips anyway
+  // so we strip out the ENV[USER] part of the name here
+  const WEBCLIPPER_SOCKET_LOCATION = `${ipc.config.socketRoot}.pushpin.web-clipper`
+
+  ipc.serve(WEBCLIPPER_SOCKET_LOCATION, () => {
+    ipc.server.on('clipper', (data, socket) => {
+      system.fromSystemQ.push({ type: 'IncomingClip', payload: data })
+      ipc.server.emit(socket, 'renderer', { type: 'Ack' })
+    })
+  })
+  ipc.server.start()
 
   return system
 }

@@ -1,4 +1,14 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useContext,
+  useEffect,
+  forwardRef,
+  memo,
+  RefForwardingComponent,
+  useImperativeHandle,
+  useRef,
+} from 'react'
 
 import ContentTypes, { Context } from '../ContentTypes'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
@@ -22,9 +32,28 @@ interface Props {
   [arbitraryProp: string]: any
 }
 
-export default React.memo(Content)
+export interface ContentHandle {
+  onContent: (PushpinUrl) => void
+}
 
-function Content(props: Props) {
+const Content: RefForwardingComponent<ContentHandle, Props> = (props: Props, ref) => {
+  const contentRef = useRef<any>() // yikes
+  useImperativeHandle(ref, () => ({
+    canReceiveContent: () => {
+      if (contentRef.current && contentRef.current.canReceiveContent) {
+        return contentRef.current.canReceiveContent()
+      }
+      return false
+    },
+    onContent: (url: PushpinUrl) => {
+      if (contentRef.current && contentRef.current.onContent) {
+        return contentRef.current.onContent(url)
+      }
+
+      throw new Error(`no onContent defined for ${ref}`)
+    },
+  }))
+
   const { context, url } = props
 
   const [isCrashed, setCrashed] = useState(false)
@@ -57,6 +86,7 @@ function Content(props: Props) {
     <Crashable onCatch={onCatch}>
       <contentType.component
         {...props}
+        ref={contentRef}
         key={url}
         type={type}
         hypermergeUrl={hypermergeUrl}
@@ -82,3 +112,5 @@ function renderMissingType(type: string, context: Context) {
     </div>
   )
 }
+
+export default memo(forwardRef(Content))

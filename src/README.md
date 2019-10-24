@@ -12,5 +12,5 @@ The majority of the code for Pushpin lives here, including all the UI and the fr
 
 ## background/
 
-Not a webworker but a stand-alone node process, running independently of all other aspects of the project. This process is designed for and intended to handle expensive system work like networking, encryption, compression, and CRDT application operations away from the main thread.
+Not a webworker but a hidden Chrome window, running independently of all other aspects of the project. This process is designed for and intended to handle expensive system work like networking, encryption, compression, and CRDT application operations away from the main thread.
 
