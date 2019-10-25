@@ -180,7 +180,7 @@ function createMenu() {
       label: 'File',
       submenu: [
         {
-          label: 'New...',
+          label: 'New Board...',
           accelerator: 'CmdOrCtrl+N',
           click: (_item, _focusedWindow) => {
             sendSystemMsg({ type: 'NewDocument' })
