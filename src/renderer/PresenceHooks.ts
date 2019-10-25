@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import { HypermergeUrl, parseDocumentLink, createDocumentLink, PushpinUrl } from './ShareLink'
 import { useTimeouts, useMessaging, useRepo, useSelfId, useDocument } from './Hooks'
 import { CurrentDeviceContext } from './components/content-types/workspace/Device'
+import { ContactDoc } from './components/content-types/contact'
 
 /**
  * heartbeats are an accumulated list of the URLs we have "open" and so should
