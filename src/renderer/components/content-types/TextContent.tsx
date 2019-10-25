@@ -147,7 +147,7 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<TextDoc>, callback) {
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<TextDoc>) {
   const text = await ContentData.toString(contentData)
   handle.change((doc) => {
     doc.text = new Automerge.Text()
@@ -159,7 +159,6 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<T
       }
     }
   })
-  callback()
 }
 
 function create({ text }, handle: Handle<TextDoc>, callback) {

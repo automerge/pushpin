@@ -27,7 +27,7 @@ interface ContentType {
   resizable?: boolean
   contexts: Contexts
   create?: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
-  createFrom?: (contentData: ContentData, handle: Handle<any>, callback: () => void) => void
+  createFrom?: (contentData: ContentData, handle: Handle<any>) => Promise<void>
   supportsMimeType?: (type: string) => boolean
 }
 
@@ -116,9 +116,9 @@ export function createFrom(contentData: ContentData, callback: CreateCallback): 
   if (!entry.createFrom) throw new Error('Cannot be created from file')
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.createFrom(contentData, handle, () => {
+  entry.createFrom(contentData, handle).then(() => {
     callback(createDocumentLink(contentType, url))
-  })
+  }).catch(log)
 }
 
 export function create(type, attrs = {}, callback: CreateCallback): void {

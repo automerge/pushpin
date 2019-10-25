@@ -25,7 +25,7 @@ function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>, cal
   callback()
 }
 
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<FileDoc>, callback) {
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<FileDoc>) {
   const name = contentData.name || 'Unnamed File'
   const hyperfileUrl = await ContentData.toHyperfileUrl(contentData)
 
@@ -35,7 +35,6 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<F
     doc.title = parsed.name
     doc.extension = parsed.ext.slice(1)
   })
-  callback()
 }
 
 ContentTypes.register({
