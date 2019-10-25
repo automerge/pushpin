@@ -51,6 +51,8 @@ function PeerView({ peerId }: Props) {
 export function connectionInfo(conn: PeerConnection) {
   const rawConn = conn as any
 
+  if (!conn) return 'No connection'
+
   return {
     type: conn.type,
     isConnected: conn.isOpen,
