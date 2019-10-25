@@ -48,9 +48,8 @@ function initializeBoard(
   })
 }
 
-function create(typeAttrs, handle, callback) {
+function create(typeAttrs, handle) {
   initializeBoard(typeAttrs, handle)
-  callback()
 }
 
 ContentTypes.register({

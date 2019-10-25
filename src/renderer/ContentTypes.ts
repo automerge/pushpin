@@ -26,8 +26,8 @@ interface ContentType {
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
-  create?: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
-  createFrom?: (contentData: ContentData, handle: Handle<any>) => Promise<void>
+  create?: (typeAttrs: any, handle: Handle<any>) => Promise<void> | void
+  createFrom?: (contentData: ContentData, handle: Handle<any>) => Promise<void> | void
   supportsMimeType?: (type: string) => boolean
 }
 
@@ -116,7 +116,7 @@ export function createFrom(contentData: ContentData, callback: CreateCallback): 
   if (!entry.createFrom) throw new Error('Cannot be created from file')
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.createFrom(contentData, handle).then(() => {
+  Promise.resolve(entry.createFrom(contentData, handle)).then(() => {
     callback(createDocumentLink(contentType, url))
   }).catch(log)
 }
@@ -133,9 +133,9 @@ export function create(type, attrs = {}, callback: CreateCallback): void {
   if (!entry.create) {
     throw Error(`The ${type} content type cannot be created directly.`)
   }
-  entry.create(attrs, handle, () => {
+  Promise.resolve(entry.create(attrs, handle)).then(() => {
     callback(createDocumentLink(type, url))
-  })
+  }).catch(log)
 }
 
 export interface ListQuery {

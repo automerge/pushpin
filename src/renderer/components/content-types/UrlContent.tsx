@@ -291,7 +291,7 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<U
   })
 }
 
-function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>, callback) {
+function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
   handle.change((doc) => {
     doc.url = url || src
     if (hyperfileUrl) {
@@ -301,7 +301,6 @@ function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>, 
       doc.capturedAt = capturedAt
     }
   })
-  callback()
 }
 
 function UrlContentInList(props: ContentProps) {

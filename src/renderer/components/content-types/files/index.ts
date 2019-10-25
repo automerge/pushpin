@@ -16,13 +16,12 @@ export interface FileDoc {
 }
 
 // TODO: when is this ever called?
-function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>, callback) {
+function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>) {
   handle.change((doc) => {
     doc.title = title
     doc.extension = extension
     doc.hyperfileUrl = hyperfileUrl
   })
-  callback()
 }
 
 async function createFrom(contentData: ContentData.ContentData, handle: Handle<FileDoc>) {

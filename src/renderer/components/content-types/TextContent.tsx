@@ -161,15 +161,13 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<T
   })
 }
 
-function create({ text }, handle: Handle<TextDoc>, callback) {
+function create({ text }, handle: Handle<TextDoc>) {
   handle.change((doc) => {
     doc.text = new Automerge.Text(text)
     if (!text || !text.endsWith('\n')) {
       doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
     }
   })
-
-  callback()
 }
 
 function TextInList(props: ContentProps) {
