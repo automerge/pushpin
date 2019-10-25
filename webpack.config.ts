@@ -188,10 +188,8 @@ export default [
           from: 'src/apps/clipper-host/*.+(sh|bat)',
           flatten: true,
           transform: (content: Buffer, filePath: string) => {
-            const electronPath = isDev
-              ? path.resolve(__dirname, 'node_modules/.bin/electron')
-              : './PushPin' // TODO: windows: ./Pushpin.exe
-            const interpolated = content.toString().replace('__ELECTRON_PATH__', electronPath)
+            const nodePath = isDev ? process.execPath : './PushPin' // TODO: windows: ./Pushpin.exe
+            const interpolated = content.toString().replace('__NODE_PATH__', nodePath)
             return Buffer.from(interpolated)
           },
         },
