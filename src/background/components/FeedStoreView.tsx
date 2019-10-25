@@ -5,6 +5,7 @@ import Info, { hidden } from './Info'
 import Card from './Card'
 import FeedView from './FeedView'
 import List from './List'
+import LimitedList from './LimitedList'
 
 interface Props {}
 
@@ -24,14 +25,19 @@ export default function FeedStoreView(_props: Props) {
             ...info.byPublicId(feedId),
           }))
         )}
-        loaded={`${loaded.size} feeds...`}
+        loaded={`${loaded.size} feeds`}
       />
-
-      {Array.from(loaded.keys()).map((feedId) => (
-        <Card key={feedId}>
-          <FeedView feedId={feedId} />
-        </Card>
-      ))}
+      <LimitedList items={Array.from(loaded.keys())} limit={50}>
+        {(loaded) => (
+          <>
+            {loaded.map((feedId) => (
+              <Card key={feedId}>
+                <FeedView feedId={feedId} />
+              </Card>
+            ))}
+          </>
+        )}
+      </LimitedList>
     </List>
   )
 }

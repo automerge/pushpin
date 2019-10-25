@@ -6,6 +6,7 @@ import List from './List'
 import { useSample, useRepo } from '../BackgroundHooks'
 import Card from './Card'
 import FeedView from './FeedView'
+import LimitedList from './LimitedList'
 
 interface Props {
   peerId: PeerId
@@ -35,13 +36,17 @@ function PeerView({ peerId }: Props) {
       ))}
       <Info
         shared={hidden(`${shared.size} feeds...`, () => (
-          <List>
-            {Array.from(shared).map((discoveryId) => (
-              <Card key={discoveryId}>
-                <FeedView feedId={feeds.info.getPublicId(discoveryId)!} />
-              </Card>
-            ))}
-          </List>
+          <LimitedList limit={30} items={Array.from(shared)}>
+            {(items) => (
+              <List>
+                {items.map((discoveryId) => (
+                  <Card key={discoveryId}>
+                    <FeedView feedId={feeds.info.getPublicId(discoveryId)!} />
+                  </Card>
+                ))}
+              </List>
+            )}
+          </LimitedList>
         ))}
       />
     </div>

@@ -18,14 +18,15 @@ declare global {
 export default function Expandable({ summary, children }: Props) {
   const [isOpen, setOpen] = useState(false)
 
-  function onToggle() {
+  function onToggle(e: React.SyntheticEvent) {
+    if (e.currentTarget !== e.target) return
     setOpen(!isOpen)
   }
 
   return (
     <details open={isOpen} onToggle={onToggle}>
       <summary>{summary}</summary>
-      {children()}
+      {isOpen ? children() : null}
     </details>
   )
 }
