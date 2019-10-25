@@ -15,6 +15,16 @@ export async function importDataTransfer(
     return
   }
 
+  // this is Old Magick from the early web, but we use it to move around
+  // multiple cards at a time
+  const uriList = dataTransfer.getData('text/uri-list')
+  if (uriList) {
+    const uris = uriList.split('\n').filter((s) => s && s[0] !== '#')
+    uris.forEach((uri, i) =>
+      importPlainText(uri, (contentUrl: PushpinUrl) => callback(contentUrl, i))
+    )
+  }
+
   if (dataTransfer.files.length > 0) {
     importFileList(dataTransfer.files, callback)
     return

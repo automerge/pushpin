@@ -6,13 +6,14 @@ import React, {
   RefForwardingComponent,
   forwardRef,
   useImperativeHandle,
+  useEffect,
 } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
-import { PushpinUrl } from '../../../ShareLink'
+import { PushpinUrl, HypermergeUrl } from '../../../ShareLink'
 import { ContentProps, ContentHandle } from '../../Content'
 import { BoardDoc, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
@@ -185,6 +186,12 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
     [boardRef, dispatch]
   )
 
+  /*  const onDragStart = useCallback((e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }, [])
+  */
+
   const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -258,6 +265,45 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
     [dispatch]
   )
 
+  const selectedCardUrls = useCallback((selection: CardId[], cards): PushpinUrl[] => {
+    return selection.map((c) => cards[c].url)
+  }, [])
+
+  const { cards = [] } = doc || {}
+
+  const onCopy = useCallback(
+    (e: ClipboardEvent) => {
+      log('onCopy')
+      e.preventDefault()
+      e.stopPropagation()
+      if (!e.clipboardData) {
+        return
+      }
+
+      const urlList = selectedCardUrls(selection, cards).join('\n')
+      console.log('onCopy', selection, urlList)
+      e.clipboardData.setData('text/uri-list', urlList)
+    },
+    [cards, selectedCardUrls, selection]
+  )
+
+  const onCut = useCallback(
+    (e: ClipboardEvent) => {
+      onCopy(e)
+      dispatch({ type: 'DeleteCards', selection })
+    },
+    [dispatch, onCopy, selection]
+  )
+
+  useEffect(() => {
+    document.addEventListener('copy', onCopy)
+    document.addEventListener('cut', onCut)
+    return () => {
+      document.removeEventListener('copy', onCopy)
+      document.removeEventListener('cut', onCut)
+    }
+  }, [onCopy, onCut])
+
   const onContent = useCallback(
     (url: PushpinUrl) => {
       log('onContent')
@@ -294,8 +340,10 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
    * at long last, render begins here
    */
   log('render')
+  if (!doc) {
+    return null
+  }
 
-  const { cards = [] } = doc || {}
   const cardChildren = Object.entries(cards).map(([id, card]) => {
     const isSelected = selection.includes(id as CardId) // sadly we can't have IDs as non-string types
     const uniquelySelected = isSelected && selection.length === 1
