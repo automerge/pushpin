@@ -44,7 +44,15 @@ export default function TextContent(props: Props) {
     },
   })
 
-  return <div className="TextContent" ref={ref} onPaste={stopPropagation} />
+  return (
+    <div
+      className="TextContent"
+      ref={ref}
+      onCopy={stopPropagation}
+      onCut={stopPropagation}
+      onPaste={stopPropagation}
+    />
+  )
 }
 
 interface QuillOpts {

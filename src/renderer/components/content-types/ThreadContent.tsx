@@ -79,6 +79,8 @@ export default function ThreadContent(props: ContentProps) {
           onKeyDown={onKeyDown}
           onChange={onInput}
           onPaste={stopPropagation}
+          onCut={stopPropagation}
+          onCopy={stopPropagation}
           placeholder="Enter your message..."
         />
       </div>
@@ -88,6 +90,7 @@ export default function ThreadContent(props: ContentProps) {
 
 function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
+  e.nativeEvent.stopImmediatePropagation()
 }
 
 function renderMessage({ content, time }: Message, idx: number) {
