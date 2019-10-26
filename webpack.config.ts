@@ -1,4 +1,5 @@
 import * as path from 'path'
+import os from 'os'
 import webpack from 'webpack'
 import { Configuration as DevServerConfig } from 'webpack-dev-server'
 import HtmlPlugin from 'html-webpack-plugin'
@@ -123,6 +124,12 @@ function config(cb: (opts: Options) => webpack.Configuration) {
 
 const cacheDirectory = path.resolve(__dirname, '.cache/hard-source/[confighash]')
 
+// Get node path for clipper host.
+function getNodePath(isDev: boolean) {
+  if (isDev) return process.execPath
+  return os.platform() === 'win32' ? './PushPin.exe' : './PushPin'
+}
+
 export default [
   config(({ isDev }) => ({
     name: 'main',
@@ -188,7 +195,7 @@ export default [
           from: 'src/apps/clipper-host/*.+(sh|bat)',
           flatten: true,
           transform: (content: Buffer, filePath: string) => {
-            const nodePath = isDev ? process.execPath : './PushPin' // TODO: windows: ./Pushpin.exe
+            const nodePath = getNodePath(isDev)
             const interpolated = content.toString().replace('__NODE_PATH__', nodePath)
             return Buffer.from(interpolated)
           },
