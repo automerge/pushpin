@@ -13,9 +13,9 @@ import { ContextMenuTrigger } from 'react-contextmenu'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
-import { PushpinUrl, HypermergeUrl } from '../../../ShareLink'
+import { PushpinUrl } from '../../../ShareLink'
 import { ContentProps, ContentHandle } from '../../Content'
-import { BoardDoc, CardId } from '.'
+import { BoardDoc, CardId, BoardDocCard } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
@@ -266,7 +266,24 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
   )
 
   const selectedCardUrls = useCallback((selection: CardId[], cards): PushpinUrl[] => {
-    return selection.map((c) => cards[c].url)
+    function addPlacementHintsToSearchParams(card: BoardDocCard, offset: Position) {
+      const searchParams = new URLSearchParams()
+      const { x, y, width, height } = card
+      searchParams.set('x', (x - offset.x).toString())
+      searchParams.set('y', (y - offset.y).toString())
+      if (width) searchParams.set('width', width.toString())
+      if (height) searchParams.set('height', height.toString())
+      return searchParams.toString()
+    }
+
+    const offset = {
+      x: Math.round(window.pageXOffset),
+      y: Math.round(window.pageYOffset),
+    }
+
+    return selection.map(
+      (c) => `${cards[c].url}&${addPlacementHintsToSearchParams(cards[c], offset)}` as PushpinUrl
+    )
   }, [])
 
   const { cards = [] } = doc || {}
@@ -276,12 +293,12 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
       log('onCopy')
       e.preventDefault()
       e.stopPropagation()
+
       if (!e.clipboardData) {
         return
       }
 
       const urlList = selectedCardUrls(selection, cards).join('\n')
-      console.log('onCopy', selection, urlList)
       e.clipboardData.setData('text/uri-list', urlList)
     },
     [cards, selectedCardUrls, selection]

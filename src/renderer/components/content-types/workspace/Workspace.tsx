@@ -1,7 +1,6 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
-import parseDataUrl from 'data-urls'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'

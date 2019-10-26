@@ -32,8 +32,7 @@ export async function importDataTransfer(
   // If we can identify html that's a simple image, import the image.
   const html = dataTransfer.getData('text/html')
   if (html) {
-    if (importImagesFromHTML(html, callback))
-      return
+    if (importImagesFromHTML(html, callback)) return
   }
 
   // If we can't get the item as a bunch of files, let's hope it works as plaintext.
