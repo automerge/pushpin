@@ -1,5 +1,6 @@
 import mime from 'mime-types'
 import { HyperfileUrl } from 'hypermerge'
+import base64 from 'base64-js'
 import * as Hyperfile from './hyperfile'
 
 export interface ContentData {
@@ -49,11 +50,19 @@ async function streamToString(readable: ReadableStream): Promise<string> {
   })
 }
 
-export function stringToStream(str: string): ReadableStream {
+export function stringToStream(str: string): ReadableStream<string> {
   return new ReadableStream({
     start(controller: ReadableStreamDefaultController) {
       controller.enqueue(str)
       controller.close()
     },
   })
+}
+
+export function base64ToStream(b64: string): ReadableStream<Uint8Array> {
+  const byteArray = base64.toByteArray(b64)
+  // TODO(matt): Consider making our own readable stream instead of using
+  // blob.
+  const blob = new Blob([byteArray])
+  return blob.stream()
 }
