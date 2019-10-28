@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
-import parseDataUrl from 'data-urls'
+import base64 from 'base64-js'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
@@ -152,7 +152,7 @@ export default function Workspace(props: WorkspaceContentProps) {
 
     const contentData = {
       mimeType,
-      data: ContentData.stringToStream(isBase64 ? btoa(data) : data),
+      data: isBase64 ? ContentData.base64ToStream(data) : ContentData.stringToStream(data),
       src: payload.src,
     }
 
