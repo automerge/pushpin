@@ -90,7 +90,8 @@
     ],
 
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    // this rule caused bugs when it was automatically applied
+    "react-hooks/exhaustive-deps": "off",
 
     // import-specific rulings
     // we probably want to enable this, and it's violated 23 times
