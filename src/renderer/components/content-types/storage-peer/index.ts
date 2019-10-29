@@ -1,4 +1,4 @@
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { HypermergeUrl } from '../../../ShareLink'
 
 import StoragePeerWorkspace from './StoragePeerWorkspace'

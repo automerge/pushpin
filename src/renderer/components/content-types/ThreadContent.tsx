@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import ContentTypes from '../../ContentTypes'
+import * as ContentTypes from '../../ContentTypes'
 import Content, { ContentProps } from '../Content'
 import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
 import { useDocument } from '../../Hooks'

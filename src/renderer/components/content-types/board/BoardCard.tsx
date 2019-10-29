@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import mime from 'mime-types'
 
 import Content from '../../Content'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard, CardId } from '.'
@@ -58,8 +58,8 @@ function BoardCard(props: BoardCardProps) {
     props.boardUrl,
     props.selected && self
       ? {
-          color: self.color,
-        }
+        color: self.color,
+      }
       : undefined,
     id
   )
@@ -202,7 +202,7 @@ function BoardCard(props: BoardCardProps) {
     const heightC = height || cardRef.current.clientHeight
     setOriginalSize({ width: widthC, height: heightC })
     setResize({ width: widthC, height: heightC })
-    ;(event.target as Element).setPointerCapture(event.pointerId)
+      ; (event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
   }
@@ -230,7 +230,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerUp = (e: React.PointerEvent) => {
-    ;(e.target as Element).releasePointerCapture(e.pointerId)
+    ; (e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }

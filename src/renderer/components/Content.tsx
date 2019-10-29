@@ -10,7 +10,7 @@ import React, {
   useRef,
 } from 'react'
 
-import ContentTypes, { Context } from '../ContentTypes'
+import * as ContentTypes from '../ContentTypes'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
 import SelfContext from './SelfContext'
 import Crashable from './Crashable'
@@ -18,7 +18,7 @@ import { useHeartbeat } from '../PresenceHooks'
 
 // this is the interface imported by Content types
 export interface ContentProps {
-  context: Context
+  context: ContentTypes.Context
   url: PushpinUrl
   type: string
   hypermergeUrl: HypermergeUrl
@@ -28,7 +28,7 @@ export interface ContentProps {
 // These are the props the generic Content wrapper receives
 interface Props {
   url: PushpinUrl
-  context: Context
+  context: ContentTypes.Context
   [arbitraryProp: string]: any
 }
 
@@ -104,7 +104,7 @@ function renderError(type: string) {
   )
 }
 
-function renderMissingType(type: string, context: Context) {
+function renderMissingType(type: string, context: ContentTypes.Context) {
   return (
     <div>
       <i className="fa fa-exclamation-triangle" />

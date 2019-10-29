@@ -7,7 +7,7 @@ import { IpcMessageEvent } from 'electron'
 import { Handle, HyperfileUrl } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
 import * as Hyperfile from '../../hyperfile'
-import ContentTypes from '../../ContentTypes'
+import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument, useEvent } from '../../Hooks'
 import { HypermergeUrl } from '../../ShareLink'
@@ -267,44 +267,6 @@ function removeEmpty(obj: object) {
   })
 }
 
-/**
- * Assumes we are creating from a content data object with mimetype equal to 'text/html'.
- * This function should also probably handle a mimeType equal to 'text/uri-list'.
- */
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>, callback) {
-  // Yikes. We need to decode the encoded html. This needs to be rethought to be more
-  // ergonomic.
-  const { url } = await Hyperfile.write(
-    contentData.data.pipeThrough(
-      new window.TransformStream({
-        start() {},
-        transform(chunk, controller) {
-          controller.enqueue(decodeURIComponent(chunk))
-        },
-      })
-    ),
-    contentData.mimeType
-  )
-  handle.change((doc) => {
-    doc.url = contentData.src! // TODO: we need per-content typing on ContentData
-    doc.htmlHyperfileUrl = url
-  })
-  callback()
-}
-
-function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>, callback) {
-  handle.change((doc) => {
-    doc.url = url || src
-    if (hyperfileUrl) {
-      doc.htmlHyperfileUrl = hyperfileUrl
-    }
-    if (capturedAt) {
-      doc.capturedAt = capturedAt
-    }
-  })
-  callback()
-}
-
 function UrlContentInList(props: ContentProps) {
   const [doc] = useDocument<UrlDoc>(props.hypermergeUrl)
   function onDragStart(e: React.DragEvent) {
@@ -343,6 +305,45 @@ function UrlContentInList(props: ContentProps) {
     </div>
   )
 }
+
+/**
+ * Assumes we are creating from a content data object with mimetype equal to 'text/html'.
+ * This function should also probably handle a mimeType equal to 'text/uri-list'.
+ */
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>, callback) {
+  // Yikes. We need to decode the encoded html. This needs to be rethought to be more
+  // ergonomic.
+  const { url } = await Hyperfile.write(
+    contentData.data.pipeThrough(
+      new window.TransformStream({
+        start() {},
+        transform(chunk, controller) {
+          controller.enqueue(decodeURIComponent(chunk))
+        },
+      })
+    ),
+    contentData.mimeType
+  )
+  handle.change((doc) => {
+    doc.url = contentData.src! // TODO: we need per-content typing on ContentData
+    doc.htmlHyperfileUrl = url
+  })
+  callback()
+}
+
+function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>, callback) {
+  handle.change((doc) => {
+    doc.url = url || src
+    if (hyperfileUrl) {
+      doc.htmlHyperfileUrl = hyperfileUrl
+    }
+    if (capturedAt) {
+      doc.capturedAt = capturedAt
+    }
+  })
+  callback()
+}
+
 ContentTypes.register({
   type: 'url',
   name: 'URL',

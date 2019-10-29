@@ -1,5 +1,5 @@
 import { Handle } from 'hypermerge'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 
 // board in various contexts
 import Board, { BOARD_COLORS } from './Board'

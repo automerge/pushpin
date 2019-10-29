@@ -1,7 +1,7 @@
 import { BoardDoc, CardId, BoardDocCard } from '.'
 import { AddCardArgs } from './Board'
 import { parseDocumentLink } from '../../../ShareLink'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import {
   gridCellsToPixels,
   snapPositionToGrid,
