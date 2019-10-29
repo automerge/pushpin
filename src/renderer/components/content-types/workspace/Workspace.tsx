@@ -1,10 +1,9 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
-import base64 from 'base64-js'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
-import Content, { ContentProps } from '../../Content'
+import Content, { ContentProps, ContentHandle } from '../../Content'
 import ContentTypes, { createFrom } from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
 import TitleBar from './TitleBar'
@@ -163,7 +162,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     }
   }
 
-  const contentRef = useRef<any>() // hmmm
+  const contentRef = useRef<ContentHandle>(null) // hmmm
 
   function onContent(url: PushpinUrl) {
     if (contentRef.current) {
