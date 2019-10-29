@@ -19,6 +19,9 @@ import ColorBadge from '../../ColorBadge'
 
 const log = Debug('pushpin:settings')
 
+ContactInVarious.minWidth = 4
+ContactInVarious.minHeight = 5
+
 export default function ContactInVarious(props: ContentProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
   const selfId = useSelfId()
