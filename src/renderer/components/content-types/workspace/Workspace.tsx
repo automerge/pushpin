@@ -217,7 +217,7 @@ const WELCOME_TEXT = `Welcome to PushPin!
     
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-function create(attrs, handle, callback) {
+function create(attrs, handle) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
     const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
     // this is, uh, a nasty hack.
@@ -254,7 +254,6 @@ function create(attrs, handle, callback) {
       }
     )
   })
-  callback()
 }
 
 ContentTypes.register({
