@@ -18,7 +18,7 @@ import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
 import { PushpinUrl, parseDocumentLink, createDocumentLink } from '../../../ShareLink'
 import { ContentProps } from '../../Content'
-import { BoardDoc, CardId, BoardDocCard } from '.'
+import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
@@ -90,7 +90,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       switch (action.type) {
         // board actions
         case 'AddCardForContent':
-          addAndSelectCard(doc, action.position, action.url, action.selectOnly)
+          addAndSelectCard(doc, action.card, action.selectOnly)
           break
         case 'ChangeBackgroundColor':
           changeBackgroundColor(doc, action.color)
@@ -138,13 +138,8 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
 
   // xxx: this one is tricky because it feels like it should be in boardDocManipulation
   // but there isn't really a good way to get the cardId back from the dispatch
-  function addAndSelectCard(
-    doc: BoardDoc,
-    position: Position,
-    url: PushpinUrl,
-    shouldSelect?: boolean
-  ) {
-    const cardId = addCardForContent(doc, { position, url })
+  function addAndSelectCard(doc: BoardDoc, card: BoardDocCard, shouldSelect?: boolean) {
+    const cardId = addCardForContent(doc, card)
     if (shouldSelect) {
       selectOnly(cardId)
     }
@@ -177,13 +172,11 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         return
       }
 
-      const position = {
-        x: e.pageX - boardRef.current.offsetLeft,
-        y: e.pageY - boardRef.current.offsetTop,
-      }
+      const x = e.pageX - boardRef.current.offsetLeft
+      const y = e.pageY - boardRef.current.offsetTop
 
       ContentTypes.create('text', { text: '' }, (url) => {
-        dispatch({ type: 'AddCardForContent', position, url })
+        dispatch({ type: 'AddCardForContent', card: { x, y, url } })
       })
     },
     [boardRef, dispatch]
@@ -220,7 +213,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
 
       ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
         const position = gridOffset(dropPosition, i)
-        dispatch({ type: 'AddCardForContent', position, url })
+        dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
       })
     },
     [dispatch]
@@ -288,41 +281,28 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         return
       }
 
-      const scrollPosition = {
-        x: window.pageXOffset,
-        y: window.pageYOffset,
+      const offset = {
+        x: Math.round(window.pageXOffset),
+        y: Math.round(window.pageYOffset),
+      }
+
+      const jsonData = e.clipboardData.getData('application/x-pushpin-board-cards')
+      if (jsonData) {
+        JSON.parse(jsonData)
+          .map((c) => ({ ...c, x: c.x + offset.x, y: c.y + offset.y }))
+          .forEach((card) => dispatch({ type: 'AddCardForContent', card }))
+        return
       }
 
       ImportData.importDataTransfer(e.clipboardData, (complicatedUrl, importCount) => {
-        const [position] = positionCardOnBoard(complicatedUrl, scrollPosition, importCount)
+        const [position] = positionCardOnBoard(complicatedUrl, offset, importCount)
         const { hypermergeUrl, type } = parseDocumentLink(complicatedUrl)
         const url = createDocumentLink(type, hypermergeUrl)
-        dispatch({ type: 'AddCardForContent', position, url })
+        dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
       })
     },
     [dispatch]
   )
-
-  const selectedCardUrls = useCallback((selection: CardId[], cards): PushpinUrl[] => {
-    function addPlacementHintsToSearchParams(card: BoardDocCard, offset: Position) {
-      const searchParams = new URLSearchParams()
-      const { x, y, width, height } = card
-      searchParams.set('x', (x - offset.x).toString())
-      searchParams.set('y', (y - offset.y).toString())
-      if (width) searchParams.set('width', width.toString())
-      if (height) searchParams.set('height', height.toString())
-      return searchParams.toString()
-    }
-
-    const offset = {
-      x: Math.round(window.pageXOffset),
-      y: Math.round(window.pageYOffset),
-    }
-
-    return selection.map(
-      (c) => `${cards[c].url}&${addPlacementHintsToSearchParams(cards[c], offset)}` as PushpinUrl
-    )
-  }, [])
 
   const { cards = [] } = doc || {}
 
@@ -336,11 +316,17 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         return
       }
 
-      const urlList = selectedCardUrls(selection, cards).join('\n')
-      console.log(urlList)
-      e.clipboardData.setData('text/uri-list', urlList)
+      const offset = {
+        x: Math.round(window.pageXOffset) + GRID_SIZE, // nudge it over so a paste won't look like nothing happened
+        y: Math.round(window.pageYOffset) + GRID_SIZE,
+      }
+
+      const boardCards = selection
+        .map((c) => cards[c])
+        .map((c) => ({ ...c, x: c.x - offset.x, y: c.y - offset.y }))
+      e.clipboardData.setData('application/x-pushpin-board-cards', JSON.stringify(boardCards))
     },
-    [cards, selectedCardUrls, selection]
+    [cards, selection]
   )
 
   const onCut = useCallback(
@@ -373,7 +359,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         y: window.pageYOffset + window.innerHeight / 2,
       }
 
-      dispatch({ type: 'AddCardForContent', position, url })
+      dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
       return true
     },
     [dispatch]
