@@ -1,19 +1,11 @@
-import React, {
-  useRef,
-  useCallback,
-  memo,
-  useMemo,
-  RefForwardingComponent,
-  forwardRef,
-  useImperativeHandle,
-} from 'react'
+import React, { useRef, useCallback, memo, useMemo, useImperativeHandle, SFC } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
 import { PushpinUrl } from '../../../ShareLink'
-import { ContentProps, ContentHandle } from '../../Content'
+import { ContentProps } from '../../Content'
 import { BoardDoc, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
@@ -72,8 +64,8 @@ export interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
-const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: ContentProps, ref) => {
-  useImperativeHandle(ref, () => ({
+const Board: SFC<ContentProps> = (props: ContentProps) => {
+  useImperativeHandle(props.contentRef, () => ({
     onContent: (url: PushpinUrl) => onContent(url),
   }))
 
@@ -344,4 +336,4 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
   )
 }
 
-export default memo(forwardRef(Board))
+export default memo(Board)
