@@ -11,9 +11,13 @@ import React, {
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
+// xxx: move to sharelink?
+import * as url from 'url'
+import * as querystring from 'querystring'
+
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
-import { PushpinUrl } from '../../../ShareLink'
+import { PushpinUrl, parseDocumentLink, createDocumentLink } from '../../../ShareLink'
 import { ContentProps, ContentHandle } from '../../Content'
 import { BoardDoc, CardId, BoardDocCard } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
@@ -214,6 +218,7 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
         x: pageX - boardRef.current.offsetLeft,
         y: pageY - boardRef.current.offsetTop,
       }
+
       ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
         const position = gridOffset(dropPosition, i)
         dispatch({ type: 'AddCardForContent', position, url })
@@ -238,6 +243,42 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
     [onDropExternal, props.hypermergeUrl]
   )
 
+  const positionCardOnBoard = (
+    urlString,
+    scrollPosition,
+    importCount
+  ): [Position, { width?: number; height?: number }?] => {
+    // XXX: ugh, stupid dimension type ^^^^ fix this
+    const { query } = url.parse(urlString)
+    const { x, y, width, height } = querystring.parse(query || '')
+
+    /* We can't get the mouse position on a paste event,
+         so we just stick the card in the middle of the current scrolled position screen.
+         (We bump it a bit to the left too to pretend we're really centering, but doing that
+         would require knowledge of the card's ) */
+    const centerPosition = {
+      x: scrollPosition.x + window.innerWidth / 2 - GRID_SIZE * 6,
+      y: scrollPosition.y + window.innerHeight / 2,
+    }
+
+    const position =
+      x && y
+        ? {
+            x: scrollPosition.x + parseInt(x.toString(), 10),
+            y: scrollPosition.y + parseInt(y.toString(), 10),
+          }
+        : gridOffset(centerPosition, importCount)
+    const dimension =
+      width || height
+        ? {
+            width: width ? parseInt(width.toString(), 10) : undefined,
+            height: height ? parseInt(height.toString(), 10) : undefined,
+          }
+        : undefined
+
+    return [position, dimension]
+  }
+
   const onPaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       log('onPaste')
@@ -248,18 +289,16 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
         return
       }
 
-      /* We can't get the mouse position on a paste event,
-         so we just stick the card in the middle of the current scrolled position screen.
-         (We bump it a bit to the left too to pretend we're really centering, but doing that
-         would require knowledge of the card's ) */
-      const position = {
-        x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
-        y: window.pageYOffset + window.innerHeight / 2,
+      const scrollPosition = {
+        x: window.pageXOffset,
+        y: window.pageYOffset,
       }
 
-      ImportData.importDataTransfer(e.clipboardData, (url, i) => {
-        const offsetPosition = gridOffset(position, i)
-        dispatch({ type: 'AddCardForContent', position: offsetPosition, url })
+      ImportData.importDataTransfer(e.clipboardData, (complicatedUrl, importCount) => {
+        const [position] = positionCardOnBoard(complicatedUrl, scrollPosition, importCount)
+        const { hypermergeUrl, type } = parseDocumentLink(complicatedUrl)
+        const url = createDocumentLink(type, hypermergeUrl)
+        dispatch({ type: 'AddCardForContent', position, url })
       })
     },
     [dispatch]
@@ -299,6 +338,7 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
       }
 
       const urlList = selectedCardUrls(selection, cards).join('\n')
+      console.log(urlList)
       e.clipboardData.setData('text/uri-list', urlList)
     },
     [cards, selectedCardUrls, selection]
