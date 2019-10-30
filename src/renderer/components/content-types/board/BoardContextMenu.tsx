@@ -37,13 +37,19 @@ function BoardContextMenu(props: Props) {
             title: `Sub-board of ${props.boardTitle}`,
           },
           (url) => {
-            props.dispatch({ type: 'AddCardForContent', position, url })
+            props.dispatch({
+              type: 'AddCardForContent',
+              card: { x: position.x, y: position.y, url },
+            })
           }
         )
         break
       default:
         ContentTypes.create(contentType.type, {}, (url) => {
-          props.dispatch({ type: 'AddCardForContent', position, url })
+          props.dispatch({
+            type: 'AddCardForContent',
+            card: { x: position.x, y: position.y, url },
+          })
         })
     }
   }
@@ -64,13 +70,13 @@ function BoardContextMenu(props: Props) {
     }
   }
   const onFilesChanged = (e) => {
-    importFileList(e.target.files, (url, i) =>
+    importFileList(e.target.files, (url, i) => {
+      const position = gridOffset(contextMenuPosition, i)
       props.dispatch({
         type: 'AddCardForContent',
-        position: gridOffset(contextMenuPosition, i),
-        url,
+        card: { x: position.x, y: position.y, url },
       })
-    )
+    })
   }
 
   const onShowContextMenu = (e) => {
