@@ -162,7 +162,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     }
   }
 
-  const contentRef = useRef<ContentHandle>(null) // hmmm
+  const contentRef = useRef<ContentHandle>(null)
 
   function onContent(url: PushpinUrl) {
     if (contentRef.current) {
