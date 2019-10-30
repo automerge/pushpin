@@ -18,7 +18,7 @@ import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
-import { Position, Dimension, gridOffset, GRID_SIZE } from './BoardGrid'
+import { gridOffset, GRID_SIZE } from './BoardGrid'
 import { useSelection } from './BoardSelection'
 import {
   deleteCards,
@@ -62,15 +62,6 @@ export const BOARD_HEIGHT = 1800
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
 export type BoardAction = BoardDocManipulationAction | BoardCardAction
-
-interface CardArgs {
-  position: Position
-  dimension?: Dimension
-}
-
-export interface AddCardArgs extends CardArgs {
-  url: PushpinUrl
-}
 
 const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   useImperativeHandle(props.contentRef, () => ({
