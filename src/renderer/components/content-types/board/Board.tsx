@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useImperativeHandle,
   useEffect,
-  SFC
+  FunctionComponent,
 } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
@@ -16,15 +16,9 @@ import * as querystring from 'querystring'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
-<<<<<<< HEAD
 import { PushpinUrl, parseDocumentLink, createDocumentLink } from '../../../ShareLink'
-import { ContentProps, ContentHandle } from '../../Content'
-import { BoardDoc, CardId, BoardDocCard } from '.'
-=======
-import { PushpinUrl } from '../../../ShareLink'
 import { ContentProps } from '../../Content'
-import { BoardDoc, CardId } from '.'
->>>>>>> master
+import { BoardDoc, CardId, BoardDocCard } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
@@ -82,7 +76,7 @@ export interface AddCardArgs extends CardArgs {
   url: PushpinUrl
 }
 
-const Board: SFC<ContentProps> = (props: ContentProps) => {
+const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   useImperativeHandle(props.contentRef, () => ({
     onContent: (url: PushpinUrl) => onContent(url),
   }))
