@@ -3,7 +3,7 @@ import Debug from 'debug'
 import uuid from 'uuid'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
-import Content, { ContentProps } from '../../Content'
+import Content, { ContentProps, ContentHandle } from '../../Content'
 import ContentTypes, { createFrom } from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
 import TitleBar from './TitleBar'
@@ -151,7 +151,7 @@ export default function Workspace(props: WorkspaceContentProps) {
 
     const contentData = {
       mimeType,
-      data: ContentData.stringToStream(isBase64 ? btoa(data) : data),
+      data: isBase64 ? ContentData.base64ToStream(data) : ContentData.stringToStream(data),
       src: payload.src,
     }
 
@@ -162,7 +162,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     }
   }
 
-  const contentRef = useRef<any>() // hmmm
+  const contentRef = useRef<ContentHandle>(null)
 
   function onContent(url: PushpinUrl) {
     if (contentRef.current) {
@@ -217,7 +217,7 @@ const WELCOME_TEXT = `Welcome to PushPin!
     
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-function create(attrs, handle, callback) {
+function create(attrs, handle) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
     const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
     // this is, uh, a nasty hack.
@@ -254,7 +254,6 @@ function create(attrs, handle, callback) {
       }
     )
   })
-  callback()
 }
 
 ContentTypes.register({

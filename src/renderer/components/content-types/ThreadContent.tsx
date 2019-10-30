@@ -130,11 +130,10 @@ function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
   return grouped
 }
 
-function create(unusedAttrs, handle, callback) {
+function create(unusedAttrs, handle) {
   handle.change((doc) => {
     doc.messages = []
   })
-  callback()
 }
 
 ContentTypes.register({
