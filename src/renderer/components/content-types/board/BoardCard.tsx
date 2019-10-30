@@ -113,7 +113,6 @@ function BoardCard(props: BoardCardProps) {
     // annotate the drag with the current board's URL so we can tell if this is where we came from
     event.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
-    // xxx: add coordinates
     event.dataTransfer.setData('text/uri-list', url)
 
     // and we'll add a DownloadURL
