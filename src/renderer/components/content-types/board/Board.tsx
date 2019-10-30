@@ -178,12 +178,6 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
     [boardRef, dispatch]
   )
 
-  /*  const onDragStart = useCallback((e: React.DragEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-    }, [])
-  */
-
   const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -206,7 +200,6 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         x: pageX - boardRef.current.offsetLeft,
         y: pageY - boardRef.current.offsetTop,
       }
-
       ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
         const position = gridOffset(dropPosition, i)
         dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
