@@ -29,7 +29,7 @@ import {
   BoardDocManipulationAction,
 } from './BoardDocManipulation'
 
-import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from '../../../constants'
 import { useDocumentReducer } from '../../../Hooks'
 
 const log = Debug('pushpin:board')
@@ -205,7 +205,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       e.stopPropagation()
 
       // If we have an origin board, and it's us, this is a move operation.
-      const originBoard = e.dataTransfer.getData(BOARD_CARD_DRAG_ORIGIN)
+      const originBoard = e.dataTransfer.getData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN)
       if (originBoard === props.hypermergeUrl) {
         onDropInternal(e)
       } else {
@@ -216,7 +216,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   )
 
   const onPaste = useCallback(
-    (e: React.ClipboardEvent<HTMLDivElement>) => {
+    (e: ClipboardEvent) => {
       log('onPaste')
       e.preventDefault()
       e.stopPropagation()
@@ -230,7 +230,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         y: Math.round(window.pageYOffset),
       }
 
-      const jsonData = e.clipboardData.getData('application/x-pushpin-board-cards')
+      const jsonData = e.clipboardData.getData(MIMETYPE_BOARD_CARD_DATA)
       if (jsonData) {
         JSON.parse(jsonData)
           .map((c) => ({ ...c, x: c.x + offset.x, y: c.y + offset.y }))
@@ -268,7 +268,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       const boardCards = selection
         .map((c) => cards[c])
         .map((c) => ({ ...c, x: c.x - offset.x, y: c.y - offset.y }))
-      e.clipboardData.setData('application/x-pushpin-board-cards', JSON.stringify(boardCards))
+      e.clipboardData.setData(MIMETYPE_BOARD_CARD_DATA, JSON.stringify(boardCards))
     },
     [cards, selection]
   )
@@ -284,11 +284,13 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   useEffect(() => {
     document.addEventListener('copy', onCopy)
     document.addEventListener('cut', onCut)
+    document.addEventListener('paste', onPaste)
     return () => {
       document.removeEventListener('copy', onCopy)
       document.removeEventListener('cut', onCut)
+      document.removeEventListener('paste', onPaste)
     }
-  }, [onCopy, onCut])
+  }, [onCopy, onCut, onPaste])
 
   const onContent = useCallback(
     (url: PushpinUrl) => {
@@ -361,7 +363,6 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       onDragOver={onDragOver}
       onDragEnter={onDragOver}
       onDrop={onDrop}
-      onPaste={onPaste}
       role="presentation"
     >
       <BoardContextMenu

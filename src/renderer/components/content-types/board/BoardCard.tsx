@@ -11,7 +11,7 @@ import { Position, Dimension } from './BoardGrid'
 import { useSelf, useDocument } from '../../../Hooks'
 import { usePresence } from '../../../PresenceHooks'
 import './BoardCard.css'
-import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 
 interface CardClicked {
@@ -111,7 +111,7 @@ function BoardCard(props: BoardCardProps) {
     event.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
 
     // annotate the drag with the current board's URL so we can tell if this is where we came from
-    event.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
+    event.dataTransfer.setData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
     event.dataTransfer.setData('text/uri-list', url)
 
