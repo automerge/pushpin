@@ -28,6 +28,7 @@ interface UrlData {
 }
 
 interface UrlDoc {
+  title: string
   url: string
   data?: UrlData | { error: string } // TODO: move error to top-level
   htmlHyperfileUrl?: HyperfileUrl
@@ -79,6 +80,11 @@ export default function UrlContent(props: ContentProps) {
     })
   }
   const { data, url, htmlHyperfileUrl, capturedAt } = doc
+
+  if (!doc.title) {
+    // yeesh. this error type is really a pain here.
+    doc.title = data && !('error' in data) && data.title ? data.title : url
+  }
 
   if (!data) {
     return (
@@ -200,6 +206,9 @@ function refreshContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
       change((doc: UrlDoc) => {
         removeEmpty(data)
         doc.data = data
+        if (data.title) {
+          doc.title = data.title
+        }
       })
     })
     .catch((reason) => {
@@ -287,13 +296,15 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<U
   )
   handle.change((doc) => {
     doc.url = contentData.src! // TODO: we need per-content typing on ContentData
+    doc.title = contentData.src!
     doc.htmlHyperfileUrl = url
   })
 }
 
 function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
   handle.change((doc) => {
-    doc.url = url || src
+    doc.url = url || src // XXX: align eleanor and internal creation
+    doc.title = url // XXX: this should also be replaced by an immediate unfluffing
     if (hyperfileUrl) {
       doc.htmlHyperfileUrl = hyperfileUrl
     }
