@@ -45,14 +45,10 @@ export default function OmniboxWorkspace(props: Props) {
   }
 
   const { selfId } = workspaceDoc
-  const { color, name = [] } = selfDoc
+  const { name = [] } = selfDoc
 
   return (
-    <div
-      className="OmniboxWorkspace"
-      onClick={onClickWorkspace}
-      style={{ '--workspace-color': color } as any}
-    >
+    <div className="OmniboxWorkspace" onClick={onClickWorkspace}>
       <div className="OmniboxWorkspace-overlay">
         <ListMenuHeader>
           <a
