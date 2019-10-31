@@ -47,7 +47,8 @@ export default function Workspace(props: WorkspaceContentProps) {
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
   const selfId = workspace && workspace.selfId
-  const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
+  const currentDocUrl =
+    workspace && workspace.currentDocUrl && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
   const [self, changeSelf] = useDocument<ContactDoc>(selfId)
   const currentDeviceId = currentDeviceUrl
