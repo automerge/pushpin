@@ -242,10 +242,8 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       offset.x += window.innerWidth / 2 - GRID_SIZE * 6
       offset.y += window.innerHeight / 2 - GRID_SIZE * 3
 
-      ImportData.importDataTransfer(e.clipboardData, (complicatedUrl, importCount) => {
+      ImportData.importDataTransfer(e.clipboardData, (url, importCount) => {
         const position = gridOffset(offset, importCount)
-        const { hypermergeUrl, type } = parseDocumentLink(complicatedUrl)
-        const url = createDocumentLink(type, hypermergeUrl)
         dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
       })
     },
