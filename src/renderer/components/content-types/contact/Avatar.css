@@ -16,6 +16,7 @@
   height: 100%;
   border-radius: 999px;
   pointer-events: none;
+  object-fit: cover;
 }
 
 .Avatar--title-bar {
