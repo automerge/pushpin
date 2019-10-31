@@ -49,32 +49,27 @@ export default function OmniboxWorkspace(props: Props) {
 
   return (
     <div className="OmniboxWorkspace" onClick={onClickWorkspace}>
-      <div className="OmniboxWorkspace-overlay">
-        <ListMenuHeader>
-          <a
-            href={createDocumentLink('workspace', hypermergeUrl)}
-            className="OmniboxWorkspace-name"
-          >
-            {name}&apos;s Documents
-          </a>
-          <div className="OmniboxWorkspace-badge" key="contact">
-            <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-          </div>
+      <ListMenuHeader>
+        <a href={createDocumentLink('workspace', hypermergeUrl)} className="OmniboxWorkspace-name">
+          {name}&apos;s Documents
+        </a>
+        <div className="OmniboxWorkspace-badge" key="contact">
+          <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
+        </div>
 
-          <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
-            <Badge shape="circle" icon="clipboard" size="large" />
-          </div>
-        </ListMenuHeader>
-        {!viewContents ? null : (
-          <OmniboxWorkspaceListMenu
-            active={active}
-            search={search}
-            onContent={onContent}
-            hypermergeUrl={hypermergeUrl}
-            omniboxFinished={omniboxFinished}
-          />
-        )}
-      </div>
+        <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
+          <Badge shape="circle" icon="clipboard" size="large" />
+        </div>
+      </ListMenuHeader>
+      {!viewContents ? null : (
+        <OmniboxWorkspaceListMenu
+          active={active}
+          search={search}
+          onContent={onContent}
+          hypermergeUrl={hypermergeUrl}
+          omniboxFinished={omniboxFinished}
+        />
+      )}
     </div>
   )
 }
