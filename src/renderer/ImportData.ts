@@ -1,6 +1,7 @@
 import { isPushpinUrl, PushpinUrl } from './ShareLink'
 import * as ContentTypes from './ContentTypes'
 import * as ContentData from './ContentData'
+import * as URIList from './UriList'
 
 // TODO: Convert these functions to be async rather than accepting a callback.
 export type CreatedContentCallback = (contentUrl: PushpinUrl, index: number) => void
@@ -17,9 +18,9 @@ export async function importDataTransfer(
 
   // this is Old Magick from the early web, but we use it to move around
   // multiple cards at a time
-  const uriList = dataTransfer.getData('text/uri-list')
+  const uriList = dataTransfer.getData(URIList.MIME_TYPE)
   if (uriList) {
-    const uris = uriList.split('\n').filter((s) => s && s[0] !== '#')
+    const uris = URIList.parse(uriList)
     uris.forEach((uri, i) =>
       importPlainText(uri, (contentUrl: PushpinUrl) => callback(contentUrl, i))
     )
