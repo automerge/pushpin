@@ -41,8 +41,8 @@ interface HeartbeatMessage {
 export function useAllHeartbeats(contact: HypermergeUrl | null) {
   const repo = useRepo()
   const currentDeviceId = useContext(CurrentDeviceContext)
-  const parsed = parseDocumentLink(currentDeviceId || '')
-  const device = parsed.hypermergeUrl || null
+  const parsed = currentDeviceId && parseDocumentLink(currentDeviceId)
+  const device = (parsed && parsed.hypermergeUrl) || null
 
   useEffect(() => {
     if (!contact) {
