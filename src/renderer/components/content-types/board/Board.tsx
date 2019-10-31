@@ -12,7 +12,7 @@ import { ContextMenuTrigger } from 'react-contextmenu'
 
 import ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
-import { PushpinUrl, parseDocumentLink, createDocumentLink } from '../../../ShareLink'
+import { PushpinUrl } from '../../../ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
