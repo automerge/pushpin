@@ -46,6 +46,11 @@ export default function Omnibox(props: Props) {
     }
   }, [active])
 
+  const stopPropagation = useCallback((e: React.SyntheticEvent) => {
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+  }, [])
+
   log('render')
 
   if (!workspaceUrlsContext) {
@@ -55,7 +60,7 @@ export default function Omnibox(props: Props) {
   const { workspaceUrls } = workspaceUrlsContext
 
   return (
-    <div className="Omnibox" ref={omniboxRef}>
+    <div className="Omnibox" ref={omniboxRef} onPaste={stopPropagation}>
       <div className="Omnibox-header">
         <input
           className="Omnibox-input"
