@@ -31,7 +31,6 @@ const log = Debug('pushpin:workspace')
 export interface Doc {
   selfId: HypermergeUrl
   contactIds: HypermergeUrl[]
-  clips: PushpinUrl[] // this is a poor design, but fine(ish) for a POC
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
@@ -139,10 +138,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   function importClip(payload: any) {
     const creationCallback = (importedUrl) => {
       changeWorkspace((d) => {
-        if (!d.clips) {
-          d.clips = []
-        }
-        d.clips.unshift(importedUrl)
+        d.viewedDocUrls.unshift(importedUrl)
       })
     }
 

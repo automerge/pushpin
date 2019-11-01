@@ -100,11 +100,6 @@ export default function TitleBar(props: Props) {
       </button>
       <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
         <Badge icon="map" backgroundColor="#00000000" />
-        {doc.clips && doc.clips.length > 0 ? (
-          <div className="TitleBar-Map-ColorBadgePlacer">
-            <Badge backgroundColor="#00000000" size="medium" icon="paperclip" />
-          </div>
-        ) : null}
       </button>
 
       <button
