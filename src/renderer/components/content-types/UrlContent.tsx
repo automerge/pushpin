@@ -1,16 +1,14 @@
 import * as path from 'path'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Unfluff from 'unfluff'
 import Debug from 'debug'
 import { IpcMessageEvent } from 'electron'
 
 import { Handle, HyperfileUrl } from 'hypermerge'
-import { Header } from 'hypermerge/dist/FileStore'
 import * as Hyperfile from '../../hyperfile'
 import ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument, useEvent } from '../../Hooks'
-import { HypermergeUrl } from '../../ShareLink'
 import './UrlContent.css'
 import SecondaryText from '../SecondaryText'
 import Badge from '../Badge'
@@ -44,7 +42,7 @@ UrlContent.maxWidth = 24
 UrlContent.maxHeight = 32
 
 export default function UrlContent(props: ContentProps) {
-  const [doc, changeDoc] = useRefreshedDocument(props.hypermergeUrl)
+  const [doc, changeDoc] = useDocument<UrlDoc>(props.hypermergeUrl)
   const [webview, setWebview] = useState<HTMLWebViewElement | null>(null)
 
   useEvent(webview, 'ipc-message', ({ channel, args }: IpcMessageEvent) => {
@@ -58,7 +56,7 @@ export default function UrlContent(props: ContentProps) {
   })
 
   useEvent(webview, 'dom-ready', () => {
-    console.log('dom-ready', webview)
+    console.log('dom-ready', webview) // eslint-disable-line
     doc &&
       !doc.htmlHyperfileUrl &&
       webview &&
@@ -77,14 +75,29 @@ export default function UrlContent(props: ContentProps) {
     changeDoc((doc) => {
       delete doc.htmlHyperfileUrl
       delete doc.capturedAt
+      delete doc.data
+    })
+
+    if (!doc || !doc.url || !changeDoc) {
+      return
+    }
+
+    fetchContent(doc, changeDoc).catch((reason) => {
+      log('refreshContent.caught', reason)
+      changeDoc((doc: UrlDoc) => {
+        doc.data = { error: reason }
+      })
     })
   }
-  const { data, url, htmlHyperfileUrl, capturedAt } = doc
+  const { data, title, url, htmlHyperfileUrl, capturedAt } = doc
 
-  if (!doc.title) {
-    // yeesh. this error type is really a pain here.
-    doc.title = data && !('error' in data) && data.title ? data.title : url
-  }
+  const hiddenWebView = doc.htmlHyperfileUrl ? (
+    <webview
+      ref={setWebview}
+      className="UrlCard-hiddenWebview"
+      preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
+    />
+  ) : null
 
   if (!data) {
     return (
@@ -95,6 +108,7 @@ export default function UrlContent(props: ContentProps) {
             {url}
           </a>
         </p>
+        {hiddenWebView}
       </div>
     )
   }
@@ -103,11 +117,17 @@ export default function UrlContent(props: ContentProps) {
     return (
       <div className="UrlCard">
         <p className="UrlCard-error">(URL did not load.)</p>
+        <p>{JSON.stringify(data.error)}</p>
         <p className="UrlCard-link">
           <a className="UrlCard-titleAnchor" href={url}>
             {url}
           </a>
+
+          <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={refreshContent}>
+            <i className="fa fa-refresh" />
+          </a>
         </p>
+        {hiddenWebView}
       </div>
     )
   }
@@ -128,15 +148,9 @@ export default function UrlContent(props: ContentProps) {
         </div>
         <div className="UrlCard UrlCard--workspace">
           {htmlHyperfileUrl ? (
-            <webview className="UrlCard-webview" title={data.title} src={htmlHyperfileUrl} />
+            <webview className="UrlCard-webview" title={title} src={htmlHyperfileUrl} />
           ) : (
-            <webview
-              ref={setWebview}
-              className="UrlCard-webview"
-              title={data.title}
-              src={data.canonicalLink || url}
-              preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
-            />
+            <div className="UrlCard-loading">Loading...</div>
           )}
         </div>
         <div className="UrlCard-buttons">
@@ -147,12 +161,12 @@ export default function UrlContent(props: ContentProps) {
           >
             <i className="fa fa-external-link" />
           </a>
-          {htmlHyperfileUrl ? (
-            <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={refreshContent}>
-              <i className="fa fa-refresh" />
-            </a>
-          ) : null}
+
+          <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={refreshContent}>
+            <i className="fa fa-refresh" />
+          </a>
         </div>
+        {hiddenWebView}
       </div>
     )
   }
@@ -173,97 +187,64 @@ export default function UrlContent(props: ContentProps) {
           <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
         </span>
       </p>
+      {hiddenWebView}
     </div>
   )
 }
 
-function useRefreshedDocument(url: HypermergeUrl): [null | UrlDoc, ChangeFn<UrlDoc>] {
-  const [doc, change] = useDocument<UrlDoc>(url)
+async function fetchContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
+  const response = await fetch(doc.url)
+  if (!response.body) throw new Error('no response from fetch')
 
-  useEffect(() => {
-    if (doc) {
-      refreshContent(doc, change)
-    }
-  }, [change, doc])
+  const headers = await Hyperfile.write(
+    response.body,
+    response.headers.get('content-type') || 'text/html'
+  )
 
-  useEffect(() => {
-    if (doc) {
-      refreshImageContent(doc, change)
-    }
-  }, [change, doc])
-
-  return [doc, change]
-}
-
-function refreshContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
-  if (!doc.url || doc.data) {
-    return
-  }
-
-  // XXX TODO: this stuff should be part of the freeze-dry cycle
-  unfluffUrl(doc.url)
-    .then((data) => {
-      change((doc: UrlDoc) => {
-        removeEmpty(data)
-        doc.data = data
-        if (data.title) {
-          doc.title = data.title
-        }
-      })
-    })
-    .catch((reason) => {
-      log('refreshContent.caught', reason)
-      change((doc: UrlDoc) => {
-        doc.data = { error: reason }
-      })
-    })
-}
-
-function refreshImageContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
-  if (doc.imageHyperfileUrl) {
-    return
-  }
-
-  if (!doc.data || !('image' in doc.data)) {
-    return
-  }
-
-  const { image } = doc.data
-
-  if (!image) {
-    return
-  }
-
-  importImageUrl(image).then(({ url }: Header) => {
-    change((doc: UrlDoc) => {
-      doc.imageHyperfileUrl = url
-    })
+  change((doc: UrlDoc) => {
+    doc.htmlHyperfileUrl = headers.url
+    unfluffContent(doc, change)
   })
 }
 
-function unfluffUrl(url: string): Promise<UrlData> {
-  return fetch(url)
-    .then((response) => response.text())
-    .then<UrlData>(Unfluff)
-    .then((data) => {
-      removeEmpty(data)
+async function unfluffContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
+  if (!doc.htmlHyperfileUrl) throw new Error("can't unfluff without content")
+  const [, /* header */ content] = await Hyperfile.fetch(doc.htmlHyperfileUrl)
+  const data = await Unfluff(content)
 
-      if (data.image) {
-        data.image = new URL(data.image, url).toString()
-      }
+  removeEmpty(data)
 
-      return data
-    })
+  if (data.image) {
+    data.image = new URL(data.image, doc.url).toString()
+  }
+
+  change((doc: UrlDoc) => {
+    doc.data = data
+    if (data.image) {
+      fetchImageContent(doc, change)
+    }
+  })
 }
 
-function importImageUrl(url: string): Promise<Header> {
-  return fetch(url).then((response) => {
-    if (!response.body) {
-      throw new Error('image fetch failed')
-    }
-    const contentType = response.headers.get('content-type') || 'application/octet-stream'
-    return Hyperfile.write(response.body, contentType)
+async function fetchImageContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
+  if (!(doc && doc.data && !('error' in doc.data) && doc.data.image))
+    throw new Error("can't fetch no image")
+
+  const response = await fetch(doc.data.image)
+
+  if (!response.body) {
+    throw new Error('image fetch failed')
+  }
+
+  const contentType = response.headers.get('content-type') || 'application/octet-stream'
+
+  const header = await Hyperfile.write(response.body, contentType)
+
+  change((doc: UrlDoc) => {
+    doc.imageHyperfileUrl = header.url
   })
+
+  /* and we're finished! */
 }
 
 function removeEmpty(obj: object) {
@@ -294,17 +275,13 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<U
     ),
     contentData.mimeType
   )
-  handle.change((doc) => {
-    doc.url = contentData.src! // TODO: we need per-content typing on ContentData
-    doc.title = contentData.src!
-    doc.htmlHyperfileUrl = url
-  })
+
+  create({ url: contentData.src!, hyperfileUrl: url, capturedAt: Date.now() }, handle)
 }
 
-function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
+function create({ url, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
   handle.change((doc) => {
-    doc.url = url || src // XXX: align eleanor and internal creation
-    doc.title = url // XXX: this should also be replaced by an immediate unfluffing
+    doc.url = url
     if (hyperfileUrl) {
       doc.htmlHyperfileUrl = hyperfileUrl
     }
@@ -312,6 +289,16 @@ function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) 
       doc.capturedAt = capturedAt
     }
   })
+
+  if (!handle.state) {
+    throw new Error('no handle.state available during change')
+  }
+
+  if (hyperfileUrl) {
+    unfluffContent(handle.state, handle.change)
+  } else {
+    fetchContent(handle.state, handle.change)
+  }
 }
 
 function UrlContentInList(props: ContentProps) {
@@ -352,6 +339,7 @@ function UrlContentInList(props: ContentProps) {
     </div>
   )
 }
+
 ContentTypes.register({
   type: 'url',
   name: 'URL',
