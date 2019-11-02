@@ -222,6 +222,13 @@ export function useTimeouts<K>(
     [onTimeout]
   )
 
+  useEffect(() => {
+    return () => {
+      timeoutIds.current.forEach((id) => clearTimeout(id))
+      timeoutIds.current.clear()
+    }
+  }, [])
+
   return [bump, timedOut]
 }
 
