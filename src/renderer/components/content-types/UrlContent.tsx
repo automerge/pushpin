@@ -1,7 +1,6 @@
 import * as path from 'path'
 import React, { useState } from 'react'
 import Unfluff from 'unfluff'
-import Debug from 'debug'
 import { IpcMessageEvent } from 'electron'
 
 import { Handle, HyperfileUrl } from 'hypermerge'
@@ -15,8 +14,6 @@ import Badge from '../Badge'
 import Heading from '../Heading'
 import { APP_PATH } from '../../constants'
 import * as ContentData from '../../ContentData'
-
-const log = Debug('pushpin:url')
 
 interface UrlData {
   title?: string
@@ -52,6 +49,7 @@ export default function UrlContent(props: ContentProps) {
     changeDoc((doc) => {
       doc.htmlHyperfileUrl = hyperfileUrl
       doc.capturedAt = new Date().toISOString()
+      unfluffContent(doc, changeDoc)
     })
   })
 
@@ -71,33 +69,27 @@ export default function UrlContent(props: ContentProps) {
     return null
   }
 
+  console.log(doc.data)
   function refreshContent() {
     changeDoc((doc) => {
       delete doc.htmlHyperfileUrl
       delete doc.capturedAt
       delete doc.data
     })
-
-    if (!doc || !doc.url || !changeDoc) {
-      return
-    }
-
-    fetchContent(doc, changeDoc).catch((reason) => {
-      log('refreshContent.caught', reason)
-      changeDoc((doc: UrlDoc) => {
-        doc.data = { error: reason }
-      })
-    })
   }
+
   const { data, title, url, htmlHyperfileUrl, capturedAt } = doc
 
-  const hiddenWebView = doc.htmlHyperfileUrl ? (
+  // if we have no hyperfile, that means we should render an invisible webview
+  // which will give us a callback at dom-ready to request a freeze-drying
+  const hiddenWebView = doc.htmlHyperfileUrl ? null : (
     <webview
       ref={setWebview}
       className="UrlCard-hiddenWebview"
+      src={data && !('error' in data) && data.canonicalLink ? data.canonicalLink : url}
       preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
     />
-  ) : null
+  )
 
   if (!data) {
     return (
@@ -192,25 +184,11 @@ export default function UrlContent(props: ContentProps) {
   )
 }
 
-async function fetchContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
-  const response = await fetch(doc.url)
-  if (!response.body) throw new Error('no response from fetch')
-
-  const headers = await Hyperfile.write(
-    response.body,
-    response.headers.get('content-type') || 'text/html'
-  )
-
-  change((doc: UrlDoc) => {
-    doc.htmlHyperfileUrl = headers.url
-    unfluffContent(doc, change)
-  })
-}
-
 async function unfluffContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
   if (!doc.htmlHyperfileUrl) throw new Error("can't unfluff without content")
   const [, /* header */ content] = await Hyperfile.fetch(doc.htmlHyperfileUrl)
-  const data = await Unfluff(content)
+  const html = await Hyperfile.streamToBuffer(content)
+  const data = await Unfluff(html)
 
   removeEmpty(data)
 
@@ -297,7 +275,7 @@ function create({ url, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
   if (hyperfileUrl) {
     unfluffContent(handle.state, handle.change)
   } else {
-    fetchContent(handle.state, handle.change)
+    // do nothing; this will automatically populate when the component renders
   }
 }
 

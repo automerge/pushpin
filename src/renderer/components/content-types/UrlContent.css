@@ -132,6 +132,10 @@
   flex: 1;
 }
 
+.UrlCard-hiddenWebview {
+  display: none;
+}
+
 .UrlCard-img {
   -webkit-user-drag: none;
   height: 192px;
