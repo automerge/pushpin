@@ -69,7 +69,6 @@ export default function UrlContent(props: ContentProps) {
     return null
   }
 
-  console.log(doc.data)
   function refreshContent() {
     changeDoc((doc) => {
       delete doc.htmlHyperfileUrl
