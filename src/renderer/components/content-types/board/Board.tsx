@@ -55,8 +55,8 @@ export const BOARD_COLORS = {
   BLACK: '#2b2b2b',
 }
 
-export const BOARD_WIDTH = 3600
-export const BOARD_HEIGHT = 1800
+export const BOARD_WIDTH = 5000
+export const BOARD_HEIGHT = 5000
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
