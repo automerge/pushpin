@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* our unfluff images don't have meaningful alt-text aside from the title */
 import * as path from 'path'
 import React, { useState } from 'react'
 import Unfluff from 'unfluff'
@@ -25,7 +27,7 @@ interface UrlData {
 interface UrlDoc {
   title: string
   url: string
-  data?: UrlData | { error: string } // TODO: move error to top-level
+  data?: UrlData
   htmlHyperfileUrl?: HyperfileUrl
   imageHyperfileUrl?: HyperfileUrl
   capturedAt?: string
@@ -38,9 +40,36 @@ UrlContent.defaultWidth = 12
 UrlContent.maxWidth = 24
 UrlContent.maxHeight = 32
 
+/**
+ * UrlContent -- preserves and unfluffs a URL for posterity
+ *
+ * URL content can arrive pre-cooked from the browser via the web clipper, or through pasting a
+ * URL into the application in which case we want to fetch that content.
+ *
+ * We use a hidden webview combined with the NPM freeze-dry library to snapshot it.
+ * Once downloaded, the content is stored as a single big string in a hyperfile, and any metadata
+ * we can successfully extract from node-unfluff is preserved as well.
+ *
+ * On the whole this is a fragile process: things can 500, or go away, and we don't account for
+ * recovering from failed refreshes or other things that can go wrong along the way.
+ *
+ * There's also a ton of metadata in node-unfluff we're not using yet, but we are paying the
+ * storage cost for.
+ */
 export default function UrlContent(props: ContentProps) {
   const [doc, changeDoc] = useDocument<UrlDoc>(props.hypermergeUrl)
   const [webview, setWebview] = useState<HTMLWebViewElement | null>(null)
+
+  /*
+   * freeze-dry helpers
+   */
+  useEvent(webview, 'dom-ready', () => {
+    console.log('dom-ready', webview) // eslint-disable-line
+    doc &&
+      !doc.htmlHyperfileUrl &&
+      webview &&
+      (webview as any).send('freeze-dry', { type: 'Ready' })
+  })
 
   useEvent(webview, 'ipc-message', ({ channel, args }: IpcMessageEvent) => {
     if (channel !== 'freeze-dry') return
@@ -53,23 +82,25 @@ export default function UrlContent(props: ContentProps) {
     })
   })
 
-  useEvent(webview, 'dom-ready', () => {
-    console.log('dom-ready', webview) // eslint-disable-line
-    doc &&
-      !doc.htmlHyperfileUrl &&
-      webview &&
-      (webview as any).send('freeze-dry', { type: 'Ready' })
-  })
-
   useEvent(webview, 'console-message', ({ message }: { message: string }) => {
     console.log('webview.log:', message) // eslint-disable-line
   })
+  /*
+   * end freeze-dry helpers
+   */
 
   if (!doc) {
     return null
   }
 
-  function refreshContent() {
+  const { data, title, url, htmlHyperfileUrl, capturedAt } = doc
+  const resolvedUrl = data && data.canonicalLink ? data.canonicalLink : url
+  const description = data && data.description ? data.description : ''
+
+  /* clearing content causes the hidden webview to be rendered, which will eventually kick off
+   * a freeze-dry and subsequent unfluffing
+   */
+  function clearContent() {
     changeDoc((doc) => {
       delete doc.htmlHyperfileUrl
       delete doc.capturedAt
@@ -77,110 +108,108 @@ export default function UrlContent(props: ContentProps) {
     })
   }
 
-  const { data, title, url, htmlHyperfileUrl, capturedAt } = doc
-
   // if we have no hyperfile, that means we should render an invisible webview
   // which will give us a callback at dom-ready to request a freeze-drying
+  // we always secretly embed this if we don't have a hyperfile for this URL already.
+  // a more robust solution would have some kind of registry of URLs to avoid
+  // requesting the same thing over and over.
   const hiddenWebView = doc.htmlHyperfileUrl ? null : (
     <webview
       ref={setWebview}
       className="UrlCard-hiddenWebview"
-      src={data && !('error' in data) && data.canonicalLink ? data.canonicalLink : url}
+      src={resolvedUrl}
       preload={`file://${path.resolve(APP_PATH, 'dist/freeze-dry-preload.js')}`}
     />
   )
 
-  if (!data) {
-    return (
-      <div className="UrlCard">
-        <p className="UrlCard-title">Fetching...</p>
-        <p className="UrlCard-link">
-          <a className="UrlCard-titleAnchor" href={url}>
-            {url}
-          </a>
-        </p>
-        {hiddenWebView}
+  const renderWorkspace = () => (
+    <div className="UrlCardWorkspace">
+      <div className="UrlCard-info">
+        {capturedAt ? (
+          <span>
+            Captured:{' '}
+            {new Date(capturedAt).toLocaleString(undefined, {
+              dateStyle: 'long',
+              timeStyle: 'short',
+            } as any)}
+          </span>
+        ) : null}
       </div>
-    )
-  }
-
-  if ('error' in data) {
-    return (
-      <div className="UrlCard">
-        <p className="UrlCard-error">(URL did not load.)</p>
-        <p>{JSON.stringify(data.error)}</p>
-        <p className="UrlCard-link">
-          <a className="UrlCard-titleAnchor" href={url}>
-            {url}
-          </a>
-
-          <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={refreshContent}>
-            <i className="fa fa-refresh" />
-          </a>
-        </p>
-        {hiddenWebView}
+      <div className="UrlCard UrlCard--workspace">
+        {htmlHyperfileUrl ? (
+          <webview className="UrlCard-webview" title={title} src={htmlHyperfileUrl} />
+        ) : (
+          <div className="UrlCard-loading">Loading...</div>
+        )}
       </div>
-    )
-  }
+      <div className="UrlCard-buttons">
+        <a className="UrlCard-iconLink" title="Open in browser..." href={resolvedUrl}>
+          <i className="fa fa-external-link" />
+        </a>
 
-  if (props.context === 'workspace') {
-    return (
-      <div className="UrlCardWorkspace">
-        <div className="UrlCard-info">
-          {capturedAt ? (
-            <span>
-              Captured:{' '}
-              {new Date(capturedAt).toLocaleString(undefined, {
-                dateStyle: 'long',
-                timeStyle: 'short',
-              } as any)}
-            </span>
-          ) : null}
-        </div>
-        <div className="UrlCard UrlCard--workspace">
-          {htmlHyperfileUrl ? (
-            <webview className="UrlCard-webview" title={title} src={htmlHyperfileUrl} />
-          ) : (
-            <div className="UrlCard-loading">Loading...</div>
-          )}
-        </div>
-        <div className="UrlCard-buttons">
-          <a
-            className="UrlCard-iconLink"
-            title="Open in browser..."
-            href={data.canonicalLink || url}
-          >
-            <i className="fa fa-external-link" />
-          </a>
-
-          <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={refreshContent}>
-            <i className="fa fa-refresh" />
-          </a>
-        </div>
-        {hiddenWebView}
+        <a className="UrlCard-iconLink" title="Capture Again" href="#" onClick={clearContent}>
+          <i className="fa fa-refresh" />
+        </a>
       </div>
-    )
-  }
+      {hiddenWebView}
+    </div>
+  )
 
-  return (
+  const renderCard = () => (
     <div className="UrlCard">
-      {doc.imageHyperfileUrl ? (
-        <img className="UrlCard-img" src={doc.imageHyperfileUrl} alt={data.description} />
-      ) : null}
-
+      {doc.imageHyperfileUrl ? <img className="UrlCard-img" src={doc.imageHyperfileUrl} /> : null}
       <p className="UrlCard-title">
-        <span className="titleAnchor">{data.title}</span>
+        <span className="titleAnchor">{title}</span>
       </p>
-
-      <p className="UrlCard-text">{data.description}</p>
+      {description ? <p className="UrlCard-text">{description}</p> : null}
       <p className="UrlCard-link">
         <span className="UrlCard-titleAnchor">
-          <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
+          <a href={resolvedUrl}>{resolvedUrl}</a>
         </span>
       </p>
       {hiddenWebView}
     </div>
   )
+
+  // per conversations with jeff, we want to remove responsibility for this from list
+  function onDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('application/pushpin-url', props.url)
+  }
+
+  const renderList = () => (
+    <div className="UrlListItem">
+      <span draggable onDragStart={onDragStart}>
+        <Badge icon="chain" />
+      </span>
+      {doc.imageHyperfileUrl ? (
+        <img className="UrlListItem-icon" src={doc.imageHyperfileUrl} />
+      ) : null}
+
+      <div className="UrlListItem-title">
+        {title ? (
+          <>
+            <Heading>{title}</Heading>
+            <SecondaryText>
+              <a href={resolvedUrl}>{resolvedUrl}</a>
+            </SecondaryText>
+          </>
+        ) : (
+          <Heading>{resolvedUrl}</Heading>
+        )}
+      </div>
+    </div>
+  )
+
+  switch (props.context) {
+    case 'list':
+      return renderList()
+    case 'board':
+      return renderCard()
+    case 'workspace':
+      return renderWorkspace()
+    default:
+      return renderCard()
+  }
 }
 
 async function unfluffContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
@@ -189,11 +218,9 @@ async function unfluffContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
   const html = await Hyperfile.streamToBuffer(content)
   const data = await Unfluff(html)
 
+  // when we wrote this, hypermerge would crash if you sent it undefined values
+  // which you can sometimes get back from unfluff if it doesn't find a more useful response
   removeEmpty(data)
-
-  if (data.image) {
-    data.image = new URL(data.image, doc.url).toString()
-  }
 
   change((doc: UrlDoc) => {
     doc.data = data
@@ -207,21 +234,21 @@ async function unfluffContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
 }
 
 async function fetchImageContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
-  if (!(doc && doc.data && !('error' in doc.data) && doc.data.image))
-    throw new Error("can't fetch no image")
+  if (!(doc && doc.data && doc.data.image)) throw new Error("can't fetch without an image")
 
-  const response = await fetch(doc.data.image)
+  // images here are often relative URLs which fail when we fetch them below
+  const resolvedImage = new URL(doc.data.image, doc.url).toString()
+  const response = await fetch(resolvedImage)
 
   if (!response.body) {
     throw new Error('image fetch failed')
   }
 
   const contentType = response.headers.get('content-type') || 'application/octet-stream'
-
-  const header = await Hyperfile.write(response.body, contentType)
+  const hyperfile = await Hyperfile.write(response.body, contentType)
 
   change((doc: UrlDoc) => {
-    doc.imageHyperfileUrl = header.url
+    doc.imageHyperfileUrl = hyperfile.url
   })
 
   /* and we're finished! */
@@ -281,45 +308,6 @@ function create({ url, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
   }
 }
 
-function UrlContentInList(props: ContentProps) {
-  const [doc] = useDocument<UrlDoc>(props.hypermergeUrl)
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', props.url)
-  }
-
-  if (!doc) return null
-
-  const { data, url } = doc
-
-  return (
-    <div className="UrlListItem">
-      <span draggable onDragStart={onDragStart}>
-        <Badge icon="chain" />
-      </span>
-      {doc.imageHyperfileUrl ? (
-        <img
-          className="UrlListItem-icon"
-          src={doc.imageHyperfileUrl}
-          alt={data && !('error' in data) ? data.description : ''}
-        />
-      ) : null}
-
-      <div className="UrlListItem-title">
-        {data && !('error' in data) && data.title ? (
-          <>
-            <Heading>{data.title}</Heading>
-            <SecondaryText>
-              <a href={data.canonicalLink || url}>{data.canonicalLink || url}</a>
-            </SecondaryText>
-          </>
-        ) : (
-          <Heading>{url}</Heading>
-        )}
-      </div>
-    </div>
-  )
-}
-
 ContentTypes.register({
   type: 'url',
   name: 'URL',
@@ -327,7 +315,7 @@ ContentTypes.register({
   contexts: {
     workspace: UrlContent,
     board: UrlContent,
-    list: UrlContentInList,
+    list: UrlContent,
   },
   create,
   createFrom,
