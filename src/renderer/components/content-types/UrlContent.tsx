@@ -197,6 +197,9 @@ async function unfluffContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
 
   change((doc: UrlDoc) => {
     doc.data = data
+    if (data.title) {
+      doc.title = data.title
+    }
     if (data.image) {
       fetchImageContent(doc, change)
     }
