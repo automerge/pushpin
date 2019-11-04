@@ -1,7 +1,7 @@
 import Debug from 'debug'
 import { Handle, HyperfileUrl } from 'hypermerge'
 import path from 'path'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
 import FileInList from './FileInList'
 

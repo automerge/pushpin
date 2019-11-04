@@ -2,7 +2,7 @@ import { useEffect, useState, createContext, useCallback } from 'react'
 import Fs from 'fs'
 import { WORKSPACE_URL_PATH } from './constants'
 import { PushpinUrl } from './ShareLink'
-import ContentTypes from './ContentTypes'
+import * as ContentTypes from './ContentTypes'
 
 function loadWorkspaceUrls(): PushpinUrl[] {
   if (Fs.existsSync(WORKSPACE_URL_PATH)) {

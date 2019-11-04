@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { Document, Page } from 'react-pdf/dist/entry.webpack'
 import { FileDoc } from '.'
 
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { ContentProps } from '../../Content'
 import { useDocument, useConfirmableInput, useHyperfile } from '../../../Hooks'
 import { streamToBuffer } from '../../../hyperfile'

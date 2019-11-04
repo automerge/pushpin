@@ -1,4 +1,4 @@
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { USER } from '../../../constants'
 import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 

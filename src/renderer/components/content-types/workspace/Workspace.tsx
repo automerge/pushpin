@@ -4,7 +4,7 @@ import uuid from 'uuid'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
-import ContentTypes, { createFrom } from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
@@ -155,7 +155,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     if (mimeType.includes('text/plain')) {
       importPlainText(data, creationCallback)
     } else {
-      createFrom(contentData, creationCallback)
+      ContentTypes.createFrom(contentData, creationCallback)
     }
   }
 

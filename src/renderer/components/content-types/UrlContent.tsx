@@ -7,7 +7,7 @@ import { IpcMessageEvent } from 'electron'
 import { Handle, HyperfileUrl } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
 import * as Hyperfile from '../../hyperfile'
-import ContentTypes from '../../ContentTypes'
+import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument, useEvent } from '../../Hooks'
 import { HypermergeUrl } from '../../ShareLink'
@@ -352,6 +352,7 @@ function UrlContentInList(props: ContentProps) {
     </div>
   )
 }
+
 ContentTypes.register({
   type: 'url',
   name: 'URL',

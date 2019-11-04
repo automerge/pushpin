@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Fs from 'fs'
 import Os from 'os'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { PushpinUrl } from '../../../ShareLink'
 import { DEVICE_URL_PATH } from '../../../constants'
 import { ContentProps } from '../../Content'

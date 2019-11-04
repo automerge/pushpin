@@ -10,7 +10,7 @@ import React, {
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
 import { PushpinUrl } from '../../../ShareLink'
 import { ContentProps } from '../../Content'

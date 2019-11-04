@@ -4,13 +4,13 @@ import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
 import ColorPicker from '../../ColorPicker'
 import './ContextMenu.css'
-import ContentTypes, { LookupResult } from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { importFileList } from '../../../ImportData'
 import { BoardAction } from './Board'
 import { gridOffset, Position } from './BoardGrid'
 
 interface Props {
-  contentTypes: LookupResult[]
+  contentTypes: ContentTypes.LookupResult[]
   boardTitle: string
   backgroundColor: string
   backgroundColors: string[]
