@@ -38,7 +38,6 @@ export function createDocumentLink(type: string, url: HypermergeUrl): PushpinUrl
 interface Parts {
   scheme: string
   type: string
-  docId: string
   hypermergeUrl: HypermergeUrl
 }
 
@@ -63,7 +62,7 @@ export function parseDocumentLink(link: string): Parts {
 
   const hypermergeUrl = `hypermerge:/${docId}` as HypermergeUrl
 
-  return { scheme, type, docId, hypermergeUrl }
+  return { scheme, type, hypermergeUrl }
 }
 
 export function parts(str: string) {

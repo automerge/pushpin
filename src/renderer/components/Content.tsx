@@ -4,10 +4,9 @@ import React, {
   useContext,
   useEffect,
   forwardRef,
+  Ref,
   memo,
   RefForwardingComponent,
-  useImperativeHandle,
-  useRef,
 } from 'react'
 
 import * as ContentTypes from '../ContentTypes'
@@ -23,6 +22,7 @@ export interface ContentProps {
   type: string
   hypermergeUrl: HypermergeUrl
   selfId: HypermergeUrl
+  contentRef?: Ref<ContentHandle>
 }
 
 // These are the props the generic Content wrapper receives
@@ -33,27 +33,13 @@ interface Props {
 }
 
 export interface ContentHandle {
-  onContent: (PushpinUrl) => void
+  onContent: (url: PushpinUrl) => boolean
 }
 
-const Content: RefForwardingComponent<ContentHandle, Props> = (props: Props, ref) => {
-  const contentRef = useRef<any>() // yikes
-  useImperativeHandle(ref, () => ({
-    canReceiveContent: () => {
-      if (contentRef.current && contentRef.current.canReceiveContent) {
-        return contentRef.current.canReceiveContent()
-      }
-      return false
-    },
-    onContent: (url: PushpinUrl) => {
-      if (contentRef.current && contentRef.current.onContent) {
-        return contentRef.current.onContent(url)
-      }
-
-      throw new Error(`no onContent defined for ${ref}`)
-    },
-  }))
-
+const Content: RefForwardingComponent<ContentHandle, Props> = (
+  props: Props,
+  ref: Ref<ContentHandle>
+) => {
   const { context, url } = props
 
   const [isCrashed, setCrashed] = useState(false)
@@ -86,7 +72,7 @@ const Content: RefForwardingComponent<ContentHandle, Props> = (props: Props, ref
     <Crashable onCatch={onCatch}>
       <contentType.component
         {...props}
-        ref={contentRef}
+        contentRef={ref}
         key={url}
         type={type}
         hypermergeUrl={hypermergeUrl}

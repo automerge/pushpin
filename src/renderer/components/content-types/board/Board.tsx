@@ -3,9 +3,9 @@ import React, {
   useCallback,
   memo,
   useMemo,
-  RefForwardingComponent,
-  forwardRef,
   useImperativeHandle,
+  useEffect,
+  FunctionComponent,
 } from 'react'
 import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
@@ -13,12 +13,12 @@ import { ContextMenuTrigger } from 'react-contextmenu'
 import * as ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
 import { PushpinUrl } from '../../../ShareLink'
-import { ContentProps, ContentHandle } from '../../Content'
-import { BoardDoc, CardId } from '.'
+import { ContentProps } from '../../Content'
+import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
 import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
-import { Position, Dimension, gridOffset, GRID_SIZE } from './BoardGrid'
+import { gridOffset, GRID_SIZE } from './BoardGrid'
 import { useSelection } from './BoardSelection'
 import {
   deleteCards,
@@ -29,7 +29,7 @@ import {
   BoardDocManipulationAction,
 } from './BoardDocManipulation'
 
-import { BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from '../../../constants'
 import { useDocumentReducer } from '../../../Hooks'
 
 const log = Debug('pushpin:board')
@@ -55,25 +55,16 @@ export const BOARD_COLORS = {
   BLACK: '#2b2b2b',
 }
 
-export const BOARD_WIDTH = 3600
-export const BOARD_HEIGHT = 1800
+export const BOARD_WIDTH = 5000
+export const BOARD_HEIGHT = 5000
 
 // We don't want to compute a new array in every render.
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
 export type BoardAction = BoardDocManipulationAction | BoardCardAction
 
-interface CardArgs {
-  position: Position
-  dimension?: Dimension
-}
-
-export interface AddCardArgs extends CardArgs {
-  url: PushpinUrl
-}
-
-const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: ContentProps, ref) => {
-  useImperativeHandle(ref, () => ({
+const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
+  useImperativeHandle(props.contentRef, () => ({
     onContent: (url: PushpinUrl) => onContent(url),
   }))
 
@@ -86,7 +77,7 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
       switch (action.type) {
         // board actions
         case 'AddCardForContent':
-          addAndSelectCard(doc, action.position, action.url, action.selectOnly)
+          addAndSelectCard(doc, action.card, action.selectOnly)
           break
         case 'ChangeBackgroundColor':
           changeBackgroundColor(doc, action.color)
@@ -134,13 +125,8 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
 
   // xxx: this one is tricky because it feels like it should be in boardDocManipulation
   // but there isn't really a good way to get the cardId back from the dispatch
-  function addAndSelectCard(
-    doc: BoardDoc,
-    position: Position,
-    url: PushpinUrl,
-    shouldSelect?: boolean
-  ) {
-    const cardId = addCardForContent(doc, { position, url })
+  function addAndSelectCard(doc: BoardDoc, card: BoardDocCard, shouldSelect?: boolean) {
+    const cardId = addCardForContent(doc, card)
     if (shouldSelect) {
       selectOnly(cardId)
     }
@@ -173,13 +159,11 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
         return
       }
 
-      const position = {
-        x: e.pageX - boardRef.current.offsetLeft,
-        y: e.pageY - boardRef.current.offsetTop,
-      }
+      const x = e.pageX - boardRef.current.offsetLeft
+      const y = e.pageY - boardRef.current.offsetTop
 
       ContentTypes.create('text', { text: '' }, (url) => {
-        dispatch({ type: 'AddCardForContent', position, url })
+        dispatch({ type: 'AddCardForContent', card: { x, y, url } })
       })
     },
     [boardRef, dispatch]
@@ -209,7 +193,7 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
       }
       ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
         const position = gridOffset(dropPosition, i)
-        dispatch({ type: 'AddCardForContent', position, url })
+        dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
       })
     },
     [dispatch]
@@ -221,7 +205,7 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
       e.stopPropagation()
 
       // If we have an origin board, and it's us, this is a move operation.
-      const originBoard = e.dataTransfer.getData(BOARD_CARD_DRAG_ORIGIN)
+      const originBoard = e.dataTransfer.getData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN)
       if (originBoard === props.hypermergeUrl) {
         onDropInternal(e)
       } else {
@@ -232,7 +216,7 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
   )
 
   const onPaste = useCallback(
-    (e: React.ClipboardEvent<HTMLDivElement>) => {
+    (e: ClipboardEvent) => {
       log('onPaste')
       e.preventDefault()
       e.stopPropagation()
@@ -241,22 +225,74 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
         return
       }
 
-      /* We can't get the mouse position on a paste event,
-         so we just stick the card in the middle of the current scrolled position screen.
-         (We bump it a bit to the left too to pretend we're really centering, but doing that
-         would require knowledge of the card's ) */
-      const position = {
-        x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
-        y: window.pageYOffset + window.innerHeight / 2,
+      const offset = {
+        x: Math.round(window.pageXOffset),
+        y: Math.round(window.pageYOffset),
       }
 
-      ImportData.importDataTransfer(e.clipboardData, (url, i) => {
-        const offsetPosition = gridOffset(position, i)
-        dispatch({ type: 'AddCardForContent', position: offsetPosition, url })
+      const jsonData = e.clipboardData.getData(MIMETYPE_BOARD_CARD_DATA)
+      if (jsonData) {
+        JSON.parse(jsonData)
+          .map((c) => ({ ...c, x: c.x + offset.x, y: c.y + offset.y }))
+          .forEach((card) => dispatch({ type: 'AddCardForContent', card }))
+        return
+      }
+
+      // import data doesn't have positioning, so just bump it into somewhere centerish
+      offset.x += window.innerWidth / 2 - GRID_SIZE * 6
+      offset.y += window.innerHeight / 2 - GRID_SIZE * 3
+
+      ImportData.importDataTransfer(e.clipboardData, (url, importCount) => {
+        const position = gridOffset(offset, importCount)
+        dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
       })
     },
     [dispatch]
   )
+
+  const { cards = [] } = doc || {}
+
+  const onCopy = useCallback(
+    (e: ClipboardEvent) => {
+      log('onCopy')
+      e.preventDefault()
+      e.stopPropagation()
+
+      if (!e.clipboardData) {
+        return
+      }
+
+      const offset = {
+        x: Math.round(window.pageXOffset) + GRID_SIZE, // nudge it over so a paste won't look like nothing happened
+        y: Math.round(window.pageYOffset) + GRID_SIZE,
+      }
+
+      const boardCards = selection
+        .map((c) => cards[c])
+        .map((c) => ({ ...c, x: c.x - offset.x, y: c.y - offset.y }))
+      e.clipboardData.setData(MIMETYPE_BOARD_CARD_DATA, JSON.stringify(boardCards))
+    },
+    [cards, selection]
+  )
+
+  const onCut = useCallback(
+    (e: ClipboardEvent) => {
+      onCopy(e)
+      dispatch({ type: 'DeleteCards', selection })
+    },
+    [dispatch, onCopy, selection]
+  )
+
+  useEffect(() => {
+    document.addEventListener('copy', onCopy)
+    document.addEventListener('cut', onCut)
+    document.addEventListener('paste', onPaste)
+    return () => {
+      document.removeEventListener('copy', onCopy)
+      document.removeEventListener('cut', onCut)
+      document.removeEventListener('paste', onPaste)
+    }
+  }, [onCopy, onCut, onPaste])
 
   const onContent = useCallback(
     (url: PushpinUrl) => {
@@ -271,7 +307,7 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
         y: window.pageYOffset + window.innerHeight / 2,
       }
 
-      dispatch({ type: 'AddCardForContent', position, url })
+      dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
       return true
     },
     [dispatch]
@@ -294,8 +330,10 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
    * at long last, render begins here
    */
   log('render')
+  if (!doc) {
+    return null
+  }
 
-  const { cards = [] } = doc || {}
   const cardChildren = Object.entries(cards).map(([id, card]) => {
     const isSelected = selection.includes(id as CardId) // sadly we can't have IDs as non-string types
     const uniquelySelected = isSelected && selection.length === 1
@@ -327,7 +365,6 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
       onDragOver={onDragOver}
       onDragEnter={onDragOver}
       onDrop={onDrop}
-      onPaste={onPaste}
       role="presentation"
     >
       <BoardContextMenu
@@ -344,4 +381,4 @@ const Board: RefForwardingComponent<ContentHandle, ContentProps> = (props: Conte
   )
 }
 
-export default memo(forwardRef(Board))
+export default memo(Board)

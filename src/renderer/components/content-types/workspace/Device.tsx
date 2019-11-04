@@ -51,15 +51,15 @@ function Device(props: Props) {
           {props.editable ? (
             <TitleEditor field="name" url={props.hypermergeUrl} />
           ) : (
-              <div className="DocLink__title">{name}</div>
-            )}
+            <div className="DocLink__title">{name}</div>
+          )}
         </div>
       )
   }
 }
 
-function create(deviceAttrs, handle, callback) {
-  ; (navigator as any).getBattery().then((b) => {
+function create(deviceAttrs, handle) {
+  ;(navigator as any).getBattery().then((b) => {
     const isLaptop = b.chargingTime !== 0
     const icon = isLaptop ? 'laptop' : 'desktop'
     handle.change((doc: DeviceDoc) => {
@@ -67,7 +67,6 @@ function create(deviceAttrs, handle, callback) {
       doc.icon = icon
     })
   })
-  callback()
 }
 
 ContentTypes.register({

@@ -16,14 +16,13 @@ export interface ContactDoc {
   devices?: HypermergeUrl[]
 }
 
-function create(typeAttrs, handle, callback) {
+function create(typeAttrs, handle) {
   handle.change((doc) => {
     doc.name = USER
     const USER_COLOR_VALUES = Object.values(USER_COLORS)
     const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
     doc.color = color
   })
-  callback()
 }
 
 ContentTypes.register({

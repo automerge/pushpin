@@ -28,6 +28,7 @@ interface UrlData {
 }
 
 interface UrlDoc {
+  title: string
   url: string
   data?: UrlData | { error: string } // TODO: move error to top-level
   htmlHyperfileUrl?: HyperfileUrl
@@ -79,6 +80,11 @@ export default function UrlContent(props: ContentProps) {
     })
   }
   const { data, url, htmlHyperfileUrl, capturedAt } = doc
+
+  if (!doc.title) {
+    // yeesh. this error type is really a pain here.
+    doc.title = data && !('error' in data) && data.title ? data.title : url
+  }
 
   if (!data) {
     return (
@@ -200,6 +206,9 @@ function refreshContent(doc: UrlDoc, change: ChangeFn<UrlDoc>) {
       change((doc: UrlDoc) => {
         removeEmpty(data)
         doc.data = data
+        if (data.title) {
+          doc.title = data.title
+        }
       })
     })
     .catch((reason) => {
@@ -267,6 +276,44 @@ function removeEmpty(obj: object) {
   })
 }
 
+/**
+ * Assumes we are creating from a content data object with mimetype equal to 'text/html'.
+ * This function should also probably handle a mimeType equal to 'text/uri-list'.
+ */
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>) {
+  // Yikes. We need to decode the encoded html. This needs to be rethought to be more
+  // ergonomic.
+  const { url } = await Hyperfile.write(
+    contentData.data.pipeThrough(
+      new window.TransformStream({
+        start() {},
+        transform(chunk, controller) {
+          controller.enqueue(decodeURIComponent(chunk))
+        },
+      })
+    ),
+    contentData.mimeType
+  )
+  handle.change((doc) => {
+    doc.url = contentData.src! // TODO: we need per-content typing on ContentData
+    doc.title = contentData.src!
+    doc.htmlHyperfileUrl = url
+  })
+}
+
+function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
+  handle.change((doc) => {
+    doc.url = url || src // XXX: align eleanor and internal creation
+    doc.title = url // XXX: this should also be replaced by an immediate unfluffing
+    if (hyperfileUrl) {
+      doc.htmlHyperfileUrl = hyperfileUrl
+    }
+    if (capturedAt) {
+      doc.capturedAt = capturedAt
+    }
+  })
+}
+
 function UrlContentInList(props: ContentProps) {
   const [doc] = useDocument<UrlDoc>(props.hypermergeUrl)
   function onDragStart(e: React.DragEvent) {
@@ -304,44 +351,6 @@ function UrlContentInList(props: ContentProps) {
       </div>
     </div>
   )
-}
-
-/**
- * Assumes we are creating from a content data object with mimetype equal to 'text/html'.
- * This function should also probably handle a mimeType equal to 'text/uri-list'.
- */
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>, callback) {
-  // Yikes. We need to decode the encoded html. This needs to be rethought to be more
-  // ergonomic.
-  const { url } = await Hyperfile.write(
-    contentData.data.pipeThrough(
-      new window.TransformStream({
-        start() {},
-        transform(chunk, controller) {
-          controller.enqueue(decodeURIComponent(chunk))
-        },
-      })
-    ),
-    contentData.mimeType
-  )
-  handle.change((doc) => {
-    doc.url = contentData.src! // TODO: we need per-content typing on ContentData
-    doc.htmlHyperfileUrl = url
-  })
-  callback()
-}
-
-function create({ url, src, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>, callback) {
-  handle.change((doc) => {
-    doc.url = url || src
-    if (hyperfileUrl) {
-      doc.htmlHyperfileUrl = hyperfileUrl
-    }
-    if (capturedAt) {
-      doc.capturedAt = capturedAt
-    }
-  })
-  callback()
 }
 
 ContentTypes.register({

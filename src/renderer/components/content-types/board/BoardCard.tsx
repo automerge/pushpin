@@ -11,7 +11,7 @@ import { Position, Dimension } from './BoardGrid'
 import { useSelf, useDocument } from '../../../Hooks'
 import { usePresence } from '../../../PresenceHooks'
 import './BoardCard.css'
-import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 
 interface CardClicked {
@@ -111,10 +111,9 @@ function BoardCard(props: BoardCardProps) {
     event.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
 
     // annotate the drag with the current board's URL so we can tell if this is where we came from
-    event.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
+    event.dataTransfer.setData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
-    // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
-    event.dataTransfer.setData(PUSHPIN_DRAG_TYPE, url)
+    event.dataTransfer.setData('text/uri-list', url)
 
     // and we'll add a DownloadURL
     if (hyperfileUrl) {
