@@ -21,7 +21,7 @@ interface Props extends ContentProps {
 
 TextContent.minWidth = 6
 TextContent.minHeight = 2
-TextContent.defaultWidth = 12
+TextContent.defaultWidth = 15
 
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
