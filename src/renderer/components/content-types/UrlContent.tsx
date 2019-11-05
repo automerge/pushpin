@@ -16,6 +16,7 @@ import Badge from '../Badge'
 import Heading from '../Heading'
 import { APP_PATH } from '../../constants'
 import * as ContentData from '../../ContentData'
+import * as WebStreamLogic from '../../../WebStreamLogic'
 
 interface UrlData {
   title?: string
@@ -269,17 +270,10 @@ function removeEmpty(obj: object) {
  * This function should also probably handle a mimeType equal to 'text/uri-list'.
  */
 async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>) {
-  // Yikes. We need to decode the encoded html. This needs to be rethought to be more
-  // ergonomic.
   const { url } = await Hyperfile.write(
-    contentData.data.pipeThrough(
-      new window.TransformStream({
-        start() {},
-        transform(chunk, controller) {
-          controller.enqueue(decodeURIComponent(chunk))
-        },
-      })
-    ),
+    contentData.data
+      .pipeThrough(WebStreamLogic.textDecoderStream())
+      .pipeThrough(WebStreamLogic.decodeUriComponentStream()),
     contentData.mimeType
   )
 
