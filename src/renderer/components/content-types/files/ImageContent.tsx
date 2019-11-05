@@ -10,6 +10,11 @@ import Badge from '../../Badge'
 import TitleEditor from '../../TitleEditor'
 import SecondaryText from '../../SecondaryText'
 
+function humanFileSize(size: number) {
+  const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
+  return `${(size / 1024 ** i).toFixed(1)} ${['B', 'kB', 'MB', 'GB', 'TB'][i]}`
+}
+
 export default function ImageContent({ hypermergeUrl }: ContentProps) {
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
@@ -48,6 +53,8 @@ function ImageInList(props: Props) {
     }
   }
 
+  const { size, mimeType } = header
+
   return (
     <div className="UrlListItem">
       <span draggable onDragStart={onDragStart}>
@@ -57,7 +64,9 @@ function ImageInList(props: Props) {
 
       <div className="UrlListItem-title">
         {editable ? <TitleEditor url={hypermergeUrl} /> : <div className="Heading">{title}</div>}
-        <SecondaryText>Put image details here</SecondaryText>
+        <SecondaryText>
+          {`${size !== null ? humanFileSize(size) : 'unknown size'}`} ({mimeType})
+        </SecondaryText>
       </div>
     </div>
   )

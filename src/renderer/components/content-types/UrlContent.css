@@ -127,6 +127,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 0;
+  flex: auto;
 }
 
 .UrlCard-webview {
