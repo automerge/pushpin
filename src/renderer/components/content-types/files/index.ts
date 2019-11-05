@@ -3,7 +3,6 @@ import { Handle, HyperfileUrl } from 'hypermerge'
 import path from 'path'
 import * as ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
-import FileInList from './FileInList'
 
 import * as ContentData from '../../../ContentData'
 
@@ -44,7 +43,7 @@ ContentTypes.register({
   contexts: {
     workspace: FileContent,
     board: FileContent,
-    list: FileInList,
+    list: FileContent,
   },
   create,
   createFrom,
