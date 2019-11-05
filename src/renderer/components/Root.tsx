@@ -19,6 +19,7 @@ import './content-types/files'
 import './content-types/storage-peer'
 
 // other single-context components
+import './content-types/Inspector'
 import './content-types/TextContent'
 import './content-types/ThreadContent'
 import './content-types/UrlContent'
