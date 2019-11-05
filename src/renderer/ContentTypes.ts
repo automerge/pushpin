@@ -26,8 +26,8 @@ interface ContentType {
   unlisted?: boolean
   resizable?: boolean
   contexts: Contexts
-  create?: (typeAttrs: any, handle: Handle<any>, callback: () => void) => void
-  createFrom?: (contentData: ContentData, handle: Handle<any>, callback: () => void) => void
+  create?: (typeAttrs: any, handle: Handle<any>) => Promise<void> | void
+  createFrom?: (contentData: ContentData, handle: Handle<any>) => Promise<void> | void
   supportsMimeType?: (type: string) => boolean
 }
 
@@ -36,7 +36,7 @@ const defaultRegistry: {
   [K in Context]?: Component
 } = {}
 
-function register(contentType: ContentType) {
+export function register(contentType: ContentType) {
   const { type } = contentType
   const entry = { unlisted: false, resiable: true, ...contentType }
 
@@ -50,7 +50,7 @@ function register(contentType: ContentType) {
   registry[type] = entry
 }
 
-function registerDefault(contentType: { component: Component; context: Context }) {
+export function registerDefault(contentType: { component: Component; context: Context }) {
   const { component, context } = contentType
   defaultRegistry[context] = component
 }
@@ -69,7 +69,7 @@ export interface LookupResult {
   component: Component
 }
 
-function lookup({ type, context }: LookupQuery): LookupResult | null {
+export function lookup({ type, context }: LookupQuery): LookupResult | null {
   const entry = registry[type]
   const component = (entry && entry.contexts[context]) || defaultRegistry[context]
 
@@ -82,7 +82,7 @@ function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
-function mimeTypeToContentType(mimeType: string | null): string {
+export function mimeTypeToContentType(mimeType: string | null): string {
   if (!mimeType) {
     return 'file'
   } // don't guess.
@@ -116,9 +116,11 @@ export function createFrom(contentData: ContentData, callback: CreateCallback): 
   if (!entry.createFrom) throw new Error('Cannot be created from file')
   const url = window.repo.create() as HypermergeUrl
   const handle = window.repo.open(url)
-  entry.createFrom(contentData, handle, () => {
-    callback(createDocumentLink(contentType, url))
-  })
+  Promise.resolve(entry.createFrom(contentData, handle))
+    .then(() => {
+      callback(createDocumentLink(contentType, url))
+    })
+    .catch(log)
 }
 
 export function create(type, attrs = {}, callback: CreateCallback): void {
@@ -133,9 +135,11 @@ export function create(type, attrs = {}, callback: CreateCallback): void {
   if (!entry.create) {
     throw Error(`The ${type} content type cannot be created directly.`)
   }
-  entry.create(attrs, handle, () => {
-    callback(createDocumentLink(type, url))
-  })
+  Promise.resolve(entry.create(attrs, handle))
+    .then(() => {
+      callback(createDocumentLink(type, url))
+    })
+    .catch(log)
 }
 
 export interface ListQuery {
@@ -143,7 +147,7 @@ export interface ListQuery {
   withUnlisted?: boolean
 }
 
-function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
+export function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
   const allTypes = Object.keys(registry)
     .map((type) => lookup({ type, context }))
     .filter((ct) => ct) as LookupResult[]
@@ -153,16 +157,6 @@ function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
   }
 
   return allTypes.filter((ct) => ct && !ct.unlisted)
-}
-
-export default {
-  register,
-  registerDefault,
-  lookup,
-  list,
-  create,
-  createFrom,
-  mimeTypeToContentType, // move this too?
 }
 
 // Not yet included in / drive from the generic ContentTypes registry:

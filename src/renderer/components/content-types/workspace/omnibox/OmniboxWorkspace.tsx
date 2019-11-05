@@ -45,40 +45,31 @@ export default function OmniboxWorkspace(props: Props) {
   }
 
   const { selfId } = workspaceDoc
-  const { color, name = [] } = selfDoc
+  const { name = [] } = selfDoc
 
   return (
-    <div
-      className="OmniboxWorkspace"
-      onClick={onClickWorkspace}
-      style={{ '--workspace-color': color } as any}
-    >
-      <div className="OmniboxWorkspace-overlay">
-        <ListMenuHeader>
-          <a
-            href={createDocumentLink('workspace', hypermergeUrl)}
-            className="OmniboxWorkspace-name"
-          >
-            {name}&apos;s Documents
-          </a>
-          <div className="OmniboxWorkspace-badge" key="contact">
-            <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-          </div>
+    <div className="OmniboxWorkspace" onClick={onClickWorkspace}>
+      <ListMenuHeader>
+        <a href={createDocumentLink('workspace', hypermergeUrl)} className="OmniboxWorkspace-name">
+          {name}&apos;s Documents
+        </a>
+        <div className="OmniboxWorkspace-badge" key="contact">
+          <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
+        </div>
 
-          <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
-            <Badge shape="circle" icon="clipboard" size="large" />
-          </div>
-        </ListMenuHeader>
-        {!viewContents ? null : (
-          <OmniboxWorkspaceListMenu
-            active={active}
-            search={search}
-            onContent={onContent}
-            hypermergeUrl={hypermergeUrl}
-            omniboxFinished={omniboxFinished}
-          />
-        )}
-      </div>
+        <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
+          <Badge shape="circle" icon="clipboard" size="large" />
+        </div>
+      </ListMenuHeader>
+      {!viewContents ? null : (
+        <OmniboxWorkspaceListMenu
+          active={active}
+          search={search}
+          onContent={onContent}
+          hypermergeUrl={hypermergeUrl}
+          omniboxFinished={omniboxFinished}
+        />
+      )}
     </div>
   )
 }

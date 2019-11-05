@@ -2,7 +2,7 @@ import React from 'react'
 
 import { FileDoc } from '.'
 import { ContentProps } from '../../Content'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { useDocument } from '../../../Hooks'
 import './VideoContent.css'
 

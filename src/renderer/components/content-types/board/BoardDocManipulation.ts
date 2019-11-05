@@ -1,7 +1,6 @@
 import { BoardDoc, CardId, BoardDocCard } from '.'
-import { AddCardArgs } from './Board'
 import { parseDocumentLink } from '../../../ShareLink'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import {
   gridCellsToPixels,
   snapPositionToGrid,
@@ -18,17 +17,18 @@ import uuid = require('uuid')
  * Card manipulation functions
  * all the functions in this section call changeDoc
  */
-export const addCardForContent = (b: BoardDoc, { position, dimension, url }: AddCardArgs) => {
+export const addCardForContent = (b: BoardDoc, card: BoardDocCard) => {
   const id = uuid() as CardId // ehhhhh
+  const { url } = card
 
   const { type } = parseDocumentLink(url)
   const { component = {} } = ContentTypes.lookup({ type, context: 'board' }) as any
 
-  if (!dimension)
-    dimension = {
-      width: gridCellsToPixels(component.defaultWidth),
-      height: gridCellsToPixels(component.defaultHeight),
-    }
+  if (!card.width) card.width = gridCellsToPixels(component.defaultWidth)
+  if (!card.height) card.height = gridCellsToPixels(component.defaultHeight)
+
+  const position = { x: card.x, y: card.y }
+  const dimension = { width: card.width, height: card.height }
 
   const { x, y } = snapPositionToGrid(position)
   const { width, height } = snapDimensionToGrid(dimension)
@@ -118,8 +118,9 @@ interface MoveCardsBy {
   selection: Selection<CardId>
   distance: Position
 }
-interface AddCardForContent extends AddCardArgs {
+interface AddCardForContent {
   type: 'AddCardForContent'
+  card: BoardDocCard
   selectOnly?: boolean
 }
 

@@ -4,13 +4,13 @@ import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
 import ColorPicker from '../../ColorPicker'
 import './ContextMenu.css'
-import ContentTypes, { LookupResult } from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { importFileList } from '../../../ImportData'
 import { BoardAction } from './Board'
 import { gridOffset, Position } from './BoardGrid'
 
 interface Props {
-  contentTypes: LookupResult[]
+  contentTypes: ContentTypes.LookupResult[]
   boardTitle: string
   backgroundColor: string
   backgroundColors: string[]
@@ -37,13 +37,19 @@ function BoardContextMenu(props: Props) {
             title: `Sub-board of ${props.boardTitle}`,
           },
           (url) => {
-            props.dispatch({ type: 'AddCardForContent', position, url })
+            props.dispatch({
+              type: 'AddCardForContent',
+              card: { x: position.x, y: position.y, url },
+            })
           }
         )
         break
       default:
         ContentTypes.create(contentType.type, {}, (url) => {
-          props.dispatch({ type: 'AddCardForContent', position, url })
+          props.dispatch({
+            type: 'AddCardForContent',
+            card: { x: position.x, y: position.y, url },
+          })
         })
     }
   }
@@ -64,13 +70,13 @@ function BoardContextMenu(props: Props) {
     }
   }
   const onFilesChanged = (e) => {
-    importFileList(e.target.files, (url, i) =>
+    importFileList(e.target.files, (url, i) => {
+      const position = gridOffset(contextMenuPosition, i)
       props.dispatch({
         type: 'AddCardForContent',
-        position: gridOffset(contextMenuPosition, i),
-        url,
+        card: { x: position.x, y: position.y, url },
       })
-    )
+    })
   }
 
   const onShowContextMenu = (e) => {

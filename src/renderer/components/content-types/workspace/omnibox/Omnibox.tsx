@@ -9,6 +9,7 @@ import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
 import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
 import { useEvent } from '../../../../Hooks'
+import ListMenuSection from '../../../ListMenuSection'
 
 const log = Debug('pushpin:omnibox')
 
@@ -46,6 +47,11 @@ export default function Omnibox(props: Props) {
     }
   }, [active])
 
+  const stopPropagation = useCallback((e: React.SyntheticEvent) => {
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+  }, [])
+
   log('render')
 
   if (!workspaceUrlsContext) {
@@ -55,7 +61,7 @@ export default function Omnibox(props: Props) {
   const { workspaceUrls } = workspaceUrlsContext
 
   return (
-    <div className="Omnibox" ref={omniboxRef}>
+    <div className="Omnibox" ref={omniboxRef} onPaste={stopPropagation}>
       <div className="Omnibox-header">
         <input
           className="Omnibox-input"
@@ -67,12 +73,12 @@ export default function Omnibox(props: Props) {
         />
       </div>
       <div className="Omnibox-Workspaces">
-        {workspaceUrls.map((url, i) => {
+        {workspaceUrls.slice(0, 1).map((url, i) => {
           const { hypermergeUrl } = parseDocumentLink(url)
           return (
             <OmniboxWorkspace
               key={url}
-              viewContents={i === 0}
+              viewContents
               onContent={onContent}
               omniboxFinished={omniboxFinished}
               hypermergeUrl={hypermergeUrl}
@@ -81,6 +87,24 @@ export default function Omnibox(props: Props) {
             />
           )
         })}
+        {workspaceUrls.length > 1 ? (
+          <ListMenuSection title="Other Accounts">
+            {workspaceUrls.slice(1).map((url, i) => {
+              const { hypermergeUrl } = parseDocumentLink(url)
+              return (
+                <OmniboxWorkspace
+                  key={url}
+                  viewContents={false}
+                  onContent={onContent}
+                  omniboxFinished={omniboxFinished}
+                  hypermergeUrl={hypermergeUrl}
+                  search={search}
+                  active={active}
+                />
+              )
+            })}
+          </ListMenuSection>
+        ) : null}
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import React from 'react'
 import Content, { ContentProps } from '../../Content'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { useDocument, useHyperfileHeader } from '../../../Hooks'
 import { createDocumentLink } from '../../../ShareLink'
 import { FileDoc } from '.'

@@ -1,11 +1,10 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
-import base64 from 'base64-js'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
-import Content, { ContentProps } from '../../Content'
-import ContentTypes, { createFrom } from '../../../ContentTypes'
+import Content, { ContentProps, ContentHandle } from '../../Content'
+import * as ContentTypes from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
@@ -32,7 +31,6 @@ const log = Debug('pushpin:workspace')
 export interface Doc {
   selfId: HypermergeUrl
   contactIds: HypermergeUrl[]
-  clips: PushpinUrl[] // this is a poor design, but fine(ish) for a POC
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
@@ -48,7 +46,8 @@ export default function Workspace(props: WorkspaceContentProps) {
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
   const selfId = workspace && workspace.selfId
-  const currentDocUrl = workspace && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
+  const currentDocUrl =
+    workspace && workspace.currentDocUrl && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
 
   const [self, changeSelf] = useDocument<ContactDoc>(selfId)
   const currentDeviceId = currentDeviceUrl
@@ -139,10 +138,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   function importClip(payload: any) {
     const creationCallback = (importedUrl) => {
       changeWorkspace((d) => {
-        if (!d.clips) {
-          d.clips = []
-        }
-        d.clips.unshift(importedUrl)
+        d.viewedDocUrls.unshift(importedUrl)
       })
     }
 
@@ -159,11 +155,11 @@ export default function Workspace(props: WorkspaceContentProps) {
     if (mimeType.includes('text/plain')) {
       importPlainText(data, creationCallback)
     } else {
-      createFrom(contentData, creationCallback)
+      ContentTypes.createFrom(contentData, creationCallback)
     }
   }
 
-  const contentRef = useRef<any>() // hmmm
+  const contentRef = useRef<ContentHandle>(null)
 
   function onContent(url: PushpinUrl) {
     if (contentRef.current) {
@@ -218,7 +214,7 @@ const WELCOME_TEXT = `Welcome to PushPin!
     
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-function create(attrs, handle, callback) {
+function create(attrs, handle) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
     const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
     // this is, uh, a nasty hack.
@@ -255,7 +251,6 @@ function create(attrs, handle, callback) {
       }
     )
   })
-  callback()
 }
 
 ContentTypes.register({

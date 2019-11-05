@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Fs from 'fs'
 import Os from 'os'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { PushpinUrl } from '../../../ShareLink'
 import { DEVICE_URL_PATH } from '../../../constants'
 import { ContentProps } from '../../Content'
@@ -58,7 +58,7 @@ function Device(props: Props) {
   }
 }
 
-function create(deviceAttrs, handle, callback) {
+function create(deviceAttrs, handle) {
   ;(navigator as any).getBattery().then((b) => {
     const isLaptop = b.chargingTime !== 0
     const icon = isLaptop ? 'laptop' : 'desktop'
@@ -67,7 +67,6 @@ function create(deviceAttrs, handle, callback) {
       doc.icon = icon
     })
   })
-  callback()
 }
 
 ContentTypes.register({

@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import mime from 'mime-types'
 
 import Content from '../../Content'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { parseDocumentLink, HypermergeUrl } from '../../../ShareLink'
 
 import { BoardDocCard, CardId } from '.'
@@ -11,7 +11,7 @@ import { Position, Dimension } from './BoardGrid'
 import { useSelf, useDocument } from '../../../Hooks'
 import { usePresence } from '../../../PresenceHooks'
 import './BoardCard.css'
-import { PUSHPIN_DRAG_TYPE, BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 
 interface CardClicked {
@@ -58,8 +58,8 @@ function BoardCard(props: BoardCardProps) {
     props.boardUrl,
     props.selected && self
       ? {
-          color: self.color,
-        }
+        color: self.color,
+      }
       : undefined,
     id
   )
@@ -111,10 +111,9 @@ function BoardCard(props: BoardCardProps) {
     event.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
 
     // annotate the drag with the current board's URL so we can tell if this is where we came from
-    event.dataTransfer.setData(BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
+    event.dataTransfer.setData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
-    // we'll add the PUSHPIN_DRAG_TYPE to support dropping into non-board places
-    event.dataTransfer.setData(PUSHPIN_DRAG_TYPE, url)
+    event.dataTransfer.setData('text/uri-list', url)
 
     // and we'll add a DownloadURL
     if (hyperfileUrl) {
@@ -202,7 +201,7 @@ function BoardCard(props: BoardCardProps) {
     const heightC = height || cardRef.current.clientHeight
     setOriginalSize({ width: widthC, height: heightC })
     setResize({ width: widthC, height: heightC })
-    ;(event.target as Element).setPointerCapture(event.pointerId)
+      ; (event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
   }
@@ -230,7 +229,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerUp = (e: React.PointerEvent) => {
-    ;(e.target as Element).releasePointerCapture(e.pointerId)
+    ; (e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }

@@ -25,6 +25,6 @@ export const HYPERFILE_PATH = Path.join(USER_PATH, 'hyperfile')
 
 export const FILE_SERVER_PATH = `/tmp/pushpin-${USER}.files`
 
-// this next one should maybe just be URL list
-export const PUSHPIN_DRAG_TYPE = 'application/pushpin-url'
-export const BOARD_CARD_DRAG_ORIGIN = 'application/x-pushpin-board-source'
+// this bonus dnd metadata is used to keep track of the board a drag operation starts on
+export const MIMETYPE_BOARD_CARD_DRAG_ORIGIN = 'application/x-pushpin-board-source'
+export const MIMETYPE_BOARD_CARD_DATA = 'application/x-pushpin-board-cards'

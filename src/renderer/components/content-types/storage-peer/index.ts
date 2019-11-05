@@ -1,4 +1,4 @@
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import { HypermergeUrl } from '../../../ShareLink'
 
 import StoragePeerWorkspace from './StoragePeerWorkspace'
@@ -9,7 +9,7 @@ export interface StoragePeerDoc extends DeviceDoc {
   storedUrls: { [contact: string /* HypermergeUrl */]: HypermergeUrl }
 }
 
-function create(typeAttrs, handle, callback) {
+function create(typeAttrs, handle) {
   throw new Error('we cannot (meaningfully) create storage peer documents inside pushpin')
 }
 

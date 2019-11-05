@@ -1,7 +1,7 @@
 import Debug from 'debug'
 import { Handle, HyperfileUrl } from 'hypermerge'
 import path from 'path'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
 import FileInList from './FileInList'
 
@@ -16,16 +16,15 @@ export interface FileDoc {
 }
 
 // TODO: when is this ever called?
-function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>, callback) {
+function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>) {
   handle.change((doc) => {
     doc.title = title
     doc.extension = extension
     doc.hyperfileUrl = hyperfileUrl
   })
-  callback()
 }
 
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<FileDoc>, callback) {
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<FileDoc>) {
   const name = contentData.name || 'Unnamed File'
   const hyperfileUrl = await ContentData.toHyperfileUrl(contentData)
 
@@ -35,7 +34,6 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<F
     doc.title = parsed.name
     doc.extension = parsed.ext.slice(1)
   })
-  callback()
 }
 
 ContentTypes.register({

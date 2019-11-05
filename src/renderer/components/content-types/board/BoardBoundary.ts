@@ -4,7 +4,7 @@
 import { BOARD_HEIGHT, BOARD_WIDTH } from './Board'
 import { Dimension, Position, gridCellsToPixels } from './BoardGrid'
 import { PushpinUrl, parseDocumentLink } from '../../../ShareLink'
-import ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../../ContentTypes'
 
 export const boundPosition = (
   { x, y }: Position,

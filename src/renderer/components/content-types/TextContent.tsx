@@ -4,7 +4,7 @@ import { Handle } from 'hypermerge'
 import Automerge from 'automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
 import Delta from 'quill-delta'
-import ContentTypes from '../../ContentTypes'
+import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument, useStaticCallback } from '../../Hooks'
 import './TextContent.css'
@@ -21,7 +21,7 @@ interface Props extends ContentProps {
 
 TextContent.minWidth = 6
 TextContent.minHeight = 2
-TextContent.defaultWidth = 12
+TextContent.defaultWidth = 15
 
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.hypermergeUrl)
@@ -44,7 +44,15 @@ export default function TextContent(props: Props) {
     },
   })
 
-  return <div className="TextContent" ref={ref} onPaste={stopPropagation} />
+  return (
+    <div
+      className="TextContent"
+      ref={ref}
+      onCopy={stopPropagation}
+      onCut={stopPropagation}
+      onPaste={stopPropagation}
+    />
+  )
 }
 
 interface QuillOpts {
@@ -147,7 +155,7 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<TextDoc>, callback) {
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<TextDoc>) {
   const text = await ContentData.toString(contentData)
   handle.change((doc) => {
     doc.text = new Automerge.Text()
@@ -159,18 +167,15 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<T
       }
     }
   })
-  callback()
 }
 
-function create({ text }, handle: Handle<TextDoc>, callback) {
+function create({ text }, handle: Handle<TextDoc>) {
   handle.change((doc) => {
     doc.text = new Automerge.Text(text)
     if (!text || !text.endsWith('\n')) {
       doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
     }
   })
-
-  callback()
 }
 
 function TextInList(props: ContentProps) {
