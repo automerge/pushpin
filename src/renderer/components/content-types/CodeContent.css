@@ -1,3 +1,5 @@
+@import '../../../../node_modules/codemirror/lib/codemirror.css';
+
 .CodeMirrorEditor {
   cursor: text;
   text-align: left;

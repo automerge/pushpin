@@ -2,13 +2,12 @@ import React, { useRef, useEffect } from 'react'
 import CodeMirror from 'codemirror'
 import 'codemirror/addon/mode/loadmode'
 import 'codemirror/mode/meta'
-import '../../../../node_modules/codemirror/lib/codemirror.css'
 import './CodeContent.css'
 import DiffMatchPatch from 'diff-match-patch'
 import Debug from 'debug'
 import Automerge from 'automerge'
 import { Handle } from 'hypermerge'
-import ContentTypes from '../../ContentTypes'
+import * as ContentTypes from '../../ContentTypes'
 import Badge from '../Badge'
 import TitleEditor from '../TitleEditor'
 import * as ContentData from '../../ContentData'
@@ -43,7 +42,7 @@ const log = Debug('pushpin:code-mirror-editor')
 
 interface CodeDoc {
   title: string
-  text: Automerge.Text
+  source: Automerge.Text
 }
 
 interface Props extends ContentProps {
@@ -51,7 +50,7 @@ interface Props extends ContentProps {
 }
 
 interface CodeMirrorProps {
-  text: Automerge.Text | null
+  source: Automerge.Text | null
   title: string | null
   selected?: boolean
   change(cb: (doc: CodeDoc) => void): void
@@ -70,12 +69,12 @@ export default function CodeContent(props: Props) {
   const [doc, changeDoc] = useDocument<CodeDoc>(props.hypermergeUrl)
 
   const [ref] = useCodeMirror({
-    text: doc && doc.text,
+    source: doc && doc.source,
     title: doc && doc.title,
     selected: props.uniquelySelected,
     change(cb) {
       changeDoc((doc) => {
-        doc.text && cb(doc)
+        doc.source && cb(doc)
       })
     },
   })
@@ -110,12 +109,10 @@ function CodeInList(props: ContentProps) {
   )
 }
 
-function useCodeMirror({ text, title, change, selected }: CodeMirrorProps) {
+function useCodeMirror({ source, title, change, selected }: CodeMirrorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const codeMirrorRef = useRef<CodeMirror | null>(null)
   const makeChange = useStaticCallback(change)
-
-  log(title)
 
   useEffect(() => {
     // Observe changes to the editor and make corresponding updates to the
@@ -133,13 +130,13 @@ function useCodeMirror({ text, title, change, selected }: CodeMirrorProps) {
       const removedLength = change.removed.join('\n').length
       const addedText: string = change.text.join('\n')
 
-      makeChange(({ text }) => {
+      makeChange(({ source }) => {
         if (removedLength > 0) {
-          text.deleteAt!(at, removedLength)
+          source.deleteAt!(at, removedLength)
         }
 
         if (addedText.length > 0) {
-          text.insertAt!(at, ...addedText.split(''))
+          source.insertAt!(at, ...addedText.split(''))
         }
       })
     }
@@ -152,8 +149,8 @@ function useCodeMirror({ text, title, change, selected }: CodeMirrorProps) {
 
       // we normally prevent deletion by stopping event propagation
       // but if the card is already empty and we hit delete, allow it
-      const text = codeMirror.getValue()
-      if (text.length !== 0) {
+      const source = codeMirror.getValue()
+      if (source.length !== 0) {
         e.stopPropagation()
       }
     }
@@ -184,26 +181,15 @@ function useCodeMirror({ text, title, change, selected }: CodeMirrorProps) {
   useEffect(() => {
     const codeMirror = codeMirrorRef.current
 
-    // Short circuit if the text has not loaded yet.
-    if (!text || !codeMirror) {
+    // Short circuit if the source has not loaded yet.
+    if (!source || !codeMirror) {
       return
     }
 
-    if (title) {
-      const offset = title.lastIndexOf('.')
-      const extension = offset >= 0 ? title.slice(offset + 1) : null
-      const info = extension && CodeMirror.findModeByExtension(extension)
-      const mode = codeMirror.getOption('mode')
-      if (info && info.mime !== mode) {
-        codeMirror.setOption('mode', info.mime)
-        CodeMirror.autoLoadMode(codeMirror, info.mode)
-      }
-    }
-
     // Short circuit if we don't need to apply any changes to the editor. This
-    // happens when we get a text update based on our own local edits.
+    // happens when we get a source update based on our own local edits.
     const oldStr = codeMirror.getValue()
-    const newStr = text.join('')
+    const newStr = source.join('')
     if (oldStr === newStr) {
       return
     }
@@ -247,7 +233,27 @@ function useCodeMirror({ text, title, change, selected }: CodeMirrorProps) {
         }
       }
     })
-  }, [text])
+  }, [source])
+
+  useEffect(() => {
+    const codeMirror = codeMirrorRef.current
+
+    if (!codeMirror || !title) {
+      return
+    }
+
+    const offset = title.lastIndexOf('.')
+    const extension = offset >= 0 ? title.slice(offset + 1) : null
+    const info = extension && CodeMirror.findModeByExtension(extension)
+    const mode = codeMirror.getOption('mode')
+    if (info && info.mime !== mode) {
+      codeMirror.setOption('mode', info.mime)
+      try {
+        CodeMirror.autoLoadMode(codeMirror, info.mode)
+        // eslint-disable-next-line no-empty
+      } catch (_) {}
+    }
+  }, [title])
 
   // Ensure the CodeMirror editor is focused if we expect it to be.
   useEffect(() => {
@@ -269,26 +275,23 @@ function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
 }
 
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<CodeDoc>, callback) {
-  const text = await ContentData.toString(contentData)
+async function createFrom(contentData: ContentData.ContentData, handle: Handle<CodeDoc>) {
+  const source = await ContentData.toString(contentData)
   handle.change((doc) => {
-    const { name = '', extension } = contentData
+    const { name = '', extension = null } = contentData
     doc.title = extension ? `${name}.${extension}` : name
-    doc.text = new Automerge.Text()
-    if (text) {
-      doc.text.insertAt!(0, ...text.split(''))
+    doc.source = new Automerge.Text()
+    if (source) {
+      doc.source.insertAt!(0, ...source.split(''))
     }
   })
-  callback()
 }
 
-function create({ text, name, extension }, handle: Handle<CodeDoc>, callback) {
+function create({ source = '', name = 'note', extension = 'md' }, handle: Handle<CodeDoc>) {
   handle.change((doc) => {
     doc.title = extension ? `${name}.${extension}` : name
-    doc.text = new Automerge.Text(text)
+    doc.source = new Automerge.Text(source)
   })
-
-  callback()
 }
 
 const ICON = 'code'
