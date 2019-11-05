@@ -10,6 +10,7 @@ import { useDocument, useStaticCallback } from '../../Hooks'
 import './TextContent.css'
 import Badge from '../Badge'
 import * as ContentData from '../../ContentData'
+import * as WebStreamLogic from '../../../WebStreamLogic'
 
 interface TextDoc {
   text: Automerge.Text
@@ -156,7 +157,7 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
 }
 
 async function createFrom(contentData: ContentData.ContentData, handle: Handle<TextDoc>) {
-  const text = await ContentData.toString(contentData)
+  const text = await WebStreamLogic.toString(contentData.data)
   handle.change((doc) => {
     doc.text = new Automerge.Text()
     if (text) {

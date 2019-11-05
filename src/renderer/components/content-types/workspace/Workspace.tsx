@@ -8,7 +8,7 @@ import * as ContentTypes from '../../../ContentTypes'
 import SelfContext from '../../SelfContext'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
-import * as ContentData from '../../../ContentData'
+import * as WebStreamLogic from '../../../../WebStreamLogic'
 
 import './Workspace.css'
 import { useDocument } from '../../../Hooks'
@@ -148,7 +148,7 @@ export default function Workspace(props: WorkspaceContentProps) {
 
     const contentData = {
       mimeType,
-      data: isBase64 ? ContentData.base64ToStream(data) : ContentData.stringToStream(data),
+      data: isBase64 ? WebStreamLogic.fromBase64(data) : WebStreamLogic.fromString(data),
       src: payload.src,
     }
 
