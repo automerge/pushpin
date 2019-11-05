@@ -152,8 +152,8 @@ a {
   visibility: hidden;
 }
 
-*[draggable] {
-  cursor: pointer;
+*[draggable='true'] {
+  cursor: grab;
 }
 
 /* App Styles */
