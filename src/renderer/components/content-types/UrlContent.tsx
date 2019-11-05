@@ -282,7 +282,6 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<U
 
 function create({ url, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {
   handle.change((doc) => {
-    doc.title = url
     doc.url = url
     if (hyperfileUrl) {
       doc.htmlHyperfileUrl = hyperfileUrl

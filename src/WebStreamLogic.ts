@@ -3,39 +3,39 @@
  * *Not* Node streams!
  * https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
  *
- * TODO: Use a polyfill for browser compatibility (e.g. https://github.com/MattiasBuelens/web-streams-polyfill)
+ * TODO: Use a stream polyfill for browser compatibility (e.g. https://github.com/MattiasBuelens/web-streams-polyfill)
  */
 import base64 from 'base64-js'
 
+export function textEncoderStream() {
+  if (window.TextDecoderStream) return new window.TextEncoderStream()
+  return new window.TransformStream(new PolyfillTextEncoderTransformer())
+}
 class PolyfillTextEncoderTransformer implements Transformer {
   encoder = new TextEncoder()
   transform(chunk, controller) {
     controller.enqueue(this.encoder.encode(chunk))
   }
 }
-export function textEncoderStream() {
-  if (window.TextDecoderStream) return new window.TextEncoderStream()
-  return new window.TransformStream(new PolyfillTextEncoderTransformer())
-}
 
+export function textDecoderStream() {
+  if (window.TextDecoderStream) return new window.TextDecoderStream()
+  return new window.TransformStream(new PolyfillTextDecoderTransformer())
+}
 class PolyfillTextDecoderTransformer implements Transformer {
   decoder: TextDecoder = new TextDecoder()
   transform(chunk, controller) {
     controller.enqueue(this.decoder.decode(chunk))
   }
 }
-export function textDecoderStream() {
-  if (window.TextDecoderStream) return new window.TextDecoderStream()
-  return new window.TransformStream(new PolyfillTextDecoderTransformer())
-}
 
+export function decodeUriComponentStream() {
+  return new window.TransformStream(new DecodeUriComponentTransformer())
+}
 export class DecodeUriComponentTransformer implements Transformer {
   transform(chunk, controller) {
     controller.enqueue(decodeURIComponent(chunk))
   }
-}
-export function decodeUriComponentStream() {
-  return new window.TransformStream(new DecodeUriComponentTransformer())
 }
 
 export async function toString(readable: ReadableStream<Uint8Array>): Promise<string> {
