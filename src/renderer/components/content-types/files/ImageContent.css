@@ -5,14 +5,6 @@
   width: 100%;
 }
 
-.ImageListItem-icon {
-  height: 40px;
-  margin-left: 8px;
-  -webkit-user-drag: none;
-  display: block;
-  object-fit: cover;
-}
-
 .ImageListItem-title {
   display: flex;
   flex-direction: column;

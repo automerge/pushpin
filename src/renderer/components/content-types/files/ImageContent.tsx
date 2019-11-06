@@ -9,6 +9,7 @@ import { useDocument, useHyperfileHeader } from '../../../Hooks'
 import Badge from '../../Badge'
 import TitleEditor from '../../TitleEditor'
 import SecondaryText from '../../SecondaryText'
+import './ImageContent.css'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -56,7 +57,7 @@ function ImageInList(props: Props) {
   const { size = null } = header || {}
 
   return (
-    <div className="UrlListItem">
+    <div className="ImageListItem">
       <span draggable onDragStart={onDragStart}>
         <Badge
           shape="square"
@@ -65,7 +66,7 @@ function ImageInList(props: Props) {
         />
       </span>
 
-      <div className="UrlListItem-title">
+      <div className="ImageListItem-title">
         {editable ? <TitleEditor url={hypermergeUrl} /> : <div className="Heading">{title}</div>}
         <SecondaryText>{`${size !== null ? humanFileSize(size) : 'unknown size'}`}</SecondaryText>
       </div>

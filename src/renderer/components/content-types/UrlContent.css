@@ -106,14 +106,6 @@
   width: 100%;
 }
 
-.UrlListItem-icon {
-  height: 40px;
-  margin-left: 8px;
-  -webkit-user-drag: none;
-  display: block;
-  object-fit: cover;
-}
-
 .UrlListItem-title {
   display: flex;
   flex-direction: column;
