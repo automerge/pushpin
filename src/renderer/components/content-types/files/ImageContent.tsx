@@ -38,7 +38,7 @@ function ImageInList(props: Props) {
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
   const badgeRef = useRef<HTMLDivElement>(null)
 
-  const { title = '', hyperfileUrl = null, capturedAt } = doc || {}
+  const { title = '', hyperfileUrl = null } = doc || {}
 
   const header = useHyperfileHeader(hyperfileUrl)
 
