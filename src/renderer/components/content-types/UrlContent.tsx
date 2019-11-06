@@ -179,11 +179,12 @@ export default function UrlContent(props: ContentProps) {
   const renderList = () => (
     <div className="UrlListItem">
       <span draggable onDragStart={onDragStart}>
-        <Badge icon="chain" />
+        <Badge
+          shape="square"
+          icon={doc.imageHyperfileUrl ? undefined : 'chain'}
+          img={doc.imageHyperfileUrl}
+        />
       </span>
-      {doc.imageHyperfileUrl ? (
-        <img className="UrlListItem-icon" src={doc.imageHyperfileUrl} />
-      ) : null}
 
       <div className="UrlListItem-title">
         {title ? (

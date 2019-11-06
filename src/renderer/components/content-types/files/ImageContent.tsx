@@ -53,21 +53,17 @@ function ImageInList(props: Props) {
     }
   }
 
-  const { size, mimeType } = header
+  const { size } = header
 
   return (
     <div className="UrlListItem">
       <span draggable onDragStart={onDragStart}>
-        <Badge shape="square" icon="file-image-o" />
+        <Badge shape="square" img={hyperfileUrl} />
       </span>
-      {hyperfileUrl ? <img className="UrlListItem-icon" src={hyperfileUrl} /> : null}
 
       <div className="UrlListItem-title">
         {editable ? <TitleEditor url={hypermergeUrl} /> : <div className="Heading">{title}</div>}
-        <SecondaryText>
-          {`${size !== null ? humanFileSize(size) : 'unknown size'}`} ({mimeType})
-          {capturedAt ? `, captured ${new Date(capturedAt)}` : null}
-        </SecondaryText>
+        <SecondaryText>{`${size !== null ? humanFileSize(size) : 'unknown size'}`}</SecondaryText>
       </div>
     </div>
   )
