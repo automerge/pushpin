@@ -11,6 +11,8 @@ import './TextContent.css'
 import Badge from '../Badge'
 import * as ContentData from '../../ContentData'
 import * as WebStreamLogic from '../../../WebStreamLogic'
+import Heading from '../Heading'
+import SecondaryText from '../SecondaryText'
 
 interface TextDoc {
   text: Automerge.Text
@@ -187,17 +189,23 @@ function TextInList(props: ContentProps) {
 
   if (!doc) return null
 
-  const textPreview = doc.text
+  const lines = doc.text
     .join('')
     .split('\n')
     .filter((l) => l.length > 0)
-    .shift()
+
+  const title = lines.shift() || '[empty text note]'
+  const subtitle = lines.slice(0, 2).join('\n')
   return (
-    <div className="DocLink">
+    <div className="UrlListItem">
       <span draggable onDragStart={onDragStart}>
         <Badge icon="sticky-note" />
       </span>
-      <div className="DocLink__title">{textPreview}</div>
+
+      <div className="UrlListItem-title">
+        <Heading>{title}</Heading>
+        <SecondaryText>{subtitle}</SecondaryText>
+      </div>
     </div>
   )
 }
