@@ -1,0 +1,30 @@
+.ImageListItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.ImageListItem-icon {
+  height: 40px;
+  margin-left: 8px;
+  -webkit-user-drag: none;
+  display: block;
+  object-fit: cover;
+}
+
+.ImageListItem-title {
+  display: flex;
+  flex-direction: column;
+  font-family: IBM Plex Sans;
+  font-size: 10px;
+  margin-left: 8px;
+  line-height: 1.2;
+  color: #637389;
+  justify-self: flex-end;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  flex: auto;
+}

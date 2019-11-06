@@ -75,13 +75,6 @@
   padding: 0;
 }
 
-.UrlListItem {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-}
-
 .UrlCard-info {
   grid-area: info;
   align-self: center;
@@ -104,6 +97,13 @@
   color: var(--colorBlueBlack);
   padding: 0 4px;
   margin-bottom: 10px;
+}
+
+.UrlListItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 }
 
 .UrlListItem-icon {
