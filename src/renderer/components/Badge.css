@@ -1,6 +1,7 @@
 .Badge {
   background-color: #d5dfe5;
   background-size: cover;
+  background-position: center;
   line-height: 1;
 }
 
