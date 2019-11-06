@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
 import './Badge.css'
 
@@ -13,16 +14,21 @@ type Small = 'small'
 export type BadgeSize = Large | Medium | Small
 
 export interface Props {
-  icon: string
+  icon?: string
+  img?: string
   backgroundColor?: string
   shape?: BadgeShape
   size?: BadgeSize
 }
 
 export default React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) => {
-  const { icon, backgroundColor, size = 'large', shape = 'circle' } = props
+  const { icon, backgroundColor, size = 'large', shape = 'circle', img } = props
   return (
-    <div ref={ref} className={`Badge Badge--${size} Badge--${shape}`} style={{ backgroundColor }}>
+    <div
+      ref={ref}
+      className={`Badge Badge--${size} Badge--${shape} ${img ? 'Badge--image' : null}`}
+      style={{ backgroundColor, backgroundImage: `url(${img})` }}
+    >
       <i className={`fa fa-${icon}`} />
     </div>
   )

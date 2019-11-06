@@ -82,9 +82,9 @@ export function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
-export function mimeTypeToContentType(mimeType: string | null): string {
+export function mimeTypeToContentType(mimeType: string | null): ContentType {
   if (!mimeType) {
-    return 'file'
+    return registry.file
   } // don't guess.
 
   const types = Object.values(registry)
@@ -92,10 +92,10 @@ export function mimeTypeToContentType(mimeType: string | null): string {
     (type) => type.supportsMimeType && type.supportsMimeType(mimeType)
   )
   if (!supportingType) {
-    return 'file'
+    return registry.file
   }
 
-  return supportingType.type
+  return supportingType
 }
 
 export type CreateCallback = (url: PushpinUrl) => void

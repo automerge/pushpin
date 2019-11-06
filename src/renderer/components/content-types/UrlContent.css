@@ -75,13 +75,6 @@
   padding: 0;
 }
 
-.UrlListItem {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-}
-
 .UrlCard-info {
   grid-area: info;
   align-self: center;
@@ -106,12 +99,11 @@
   margin-bottom: 10px;
 }
 
-.UrlListItem-icon {
-  height: 40px;
-  margin-left: 8px;
-  -webkit-user-drag: none;
-  display: block;
-  object-fit: cover;
+.UrlListItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 }
 
 .UrlListItem-title {
@@ -127,6 +119,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 0;
+  flex: auto;
 }
 
 .UrlCard-webview {

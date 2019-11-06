@@ -1,21 +1,30 @@
 .Badge {
   background-color: #d5dfe5;
+  background-size: cover;
+  background-position: center;
   line-height: 1;
+}
+
+.Badge--image {
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }
 
 .Badge--large {
   padding: 6px;
   font-size: 20px;
+  width: 20px;
 }
 
 .Badge--medium {
   padding: 4px;
   font-size: 15px;
+  width: 15px;
 }
 
 .Badge--small {
   padding: 2px;
   font-size: 10px;
+  width: 10px;
 }
 
 .Badge--blue {

@@ -41,6 +41,12 @@ interface WorkspaceContentProps extends ContentProps {
   createWorkspace: () => void
 }
 
+interface ClipperPayload {
+  src: string
+  dataUrl: string
+  capturedAt: string
+}
+
 export default function Workspace(props: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
@@ -135,21 +141,23 @@ export default function Workspace(props: WorkspaceContentProps) {
     })
   }
 
-  function importClip(payload: any) {
+  function importClip(payload: ClipperPayload) {
     const creationCallback = (importedUrl) => {
       changeWorkspace((d) => {
         d.viewedDocUrls.unshift(importedUrl)
       })
     }
 
-    const dataUrlInfo = DataUrl.parse(payload.dataUrl)
+    const { dataUrl, src, capturedAt } = payload
+
+    const dataUrlInfo = DataUrl.parse(dataUrl)
     if (!dataUrlInfo) return
     const { mimeType, data, isBase64 } = dataUrlInfo
-
     const contentData = {
       mimeType,
       data: isBase64 ? WebStreamLogic.fromBase64(data) : WebStreamLogic.fromString(data),
-      src: payload.src,
+      src,
+      capturedAt,
     }
 
     if (mimeType.includes('text/plain')) {

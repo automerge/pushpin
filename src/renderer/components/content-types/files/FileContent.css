@@ -49,3 +49,15 @@
   color: var(--colorBlueBlack);
   font-weight: 600;
 }
+
+.FileListItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.FileListItem__title {
+  margin-left: 10px;
+  -webkit-user-drag: none;
+  user-select: none;
+}
