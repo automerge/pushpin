@@ -41,7 +41,7 @@ function ImageInList(props: Props) {
 
   const header = useHyperfileHeader(hyperfileUrl)
 
-  if (!hyperfileUrl || !header) {
+  if (!hyperfileUrl) {
     return null
   }
 
@@ -53,12 +53,16 @@ function ImageInList(props: Props) {
     }
   }
 
-  const { size } = header
+  const { size = null } = header || {}
 
   return (
     <div className="UrlListItem">
       <span draggable onDragStart={onDragStart}>
-        <Badge shape="square" img={hyperfileUrl} />
+        <Badge
+          shape="square"
+          icon={size ? undefined : 'file-image-o'}
+          img={size ? hyperfileUrl : undefined}
+        />
       </span>
 
       <div className="UrlListItem-title">
