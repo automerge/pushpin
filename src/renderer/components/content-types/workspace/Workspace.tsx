@@ -44,7 +44,7 @@ interface WorkspaceContentProps extends ContentProps {
 interface ClipperPayload {
   src: string
   dataUrl: string
-  capturedAt: Date
+  capturedAt: string
 }
 
 export default function Workspace(props: WorkspaceContentProps) {
