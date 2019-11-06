@@ -9,6 +9,7 @@ export interface ContentData {
   src?: string
   name?: string
   extension?: string
+  capturedAt?: string // Date().toISOString()
 }
 
 export function fromFile(file: File) {

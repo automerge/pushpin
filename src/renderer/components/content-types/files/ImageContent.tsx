@@ -37,7 +37,7 @@ function ImageInList(props: Props) {
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
   const badgeRef = useRef<HTMLDivElement>(null)
 
-  const { title = '', hyperfileUrl = null } = doc || {}
+  const { title = '', hyperfileUrl = null, capturedAt } = doc || {}
 
   const header = useHyperfileHeader(hyperfileUrl)
 
@@ -66,6 +66,7 @@ function ImageInList(props: Props) {
         {editable ? <TitleEditor url={hypermergeUrl} /> : <div className="Heading">{title}</div>}
         <SecondaryText>
           {`${size !== null ? humanFileSize(size) : 'unknown size'}`} ({mimeType})
+          {capturedAt ? `, captured ${new Date(capturedAt)}` : null}
         </SecondaryText>
       </div>
     </div>

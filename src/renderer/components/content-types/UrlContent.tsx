@@ -271,6 +271,7 @@ function removeEmpty(obj: object) {
 async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>) {
   // Yikes. We need to decode the encoded html. This needs to be rethought to be more
   // ergonomic.
+  const { capturedAt } = contentData
   const { url } = await Hyperfile.write(
     contentData.data.pipeThrough(
       new window.TransformStream({
@@ -283,7 +284,7 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<U
     contentData.mimeType
   )
 
-  create({ url: contentData.src!, hyperfileUrl: url, capturedAt: Date.now() }, handle)
+  create({ url: contentData.src!, hyperfileUrl: url, capturedAt }, handle)
 }
 
 function create({ url, hyperfileUrl, capturedAt }, handle: Handle<UrlDoc>) {

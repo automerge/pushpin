@@ -12,6 +12,7 @@ export interface FileDoc {
   title: string // names are editable and not an intrinsic part of the file
   extension: string
   hyperfileUrl: HyperfileUrl
+  capturedAt: string
 }
 
 // TODO: when is this ever called?
@@ -24,14 +25,18 @@ function create({ title, extension, hyperfileUrl }, handle: Handle<FileDoc>) {
 }
 
 async function createFrom(contentData: ContentData.ContentData, handle: Handle<FileDoc>) {
-  const name = contentData.name || 'Unnamed File'
+  const name = contentData.name || contentData.src || 'Nameless File'
   const hyperfileUrl = await ContentData.toHyperfileUrl(contentData)
+  const { capturedAt } = contentData
 
   handle.change((doc: FileDoc) => {
     const parsed = path.parse(name)
     doc.hyperfileUrl = hyperfileUrl
     doc.title = parsed.name
     doc.extension = parsed.ext.slice(1)
+    if (capturedAt) {
+      doc.capturedAt = capturedAt
+    }
   })
 }
 
