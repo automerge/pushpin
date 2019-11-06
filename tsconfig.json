@@ -11,6 +11,8 @@
       "dom",
       "webworker"
     ],
+    "target": "es2016",
+    "module": "CommonJS",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react",

@@ -272,8 +272,8 @@ function removeEmpty(obj: object) {
 async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>) {
   const { url } = await Hyperfile.write(
     contentData.data
-      .pipeThrough(WebStreamLogic.textDecoderStream())
-      .pipeThrough(WebStreamLogic.decodeUriComponentStream()),
+      .pipeThrough(new window.TextDecoderStream())
+      .pipeThrough(new WebStreamLogic.DecodeUriComponentStream()),
     contentData.mimeType
   )
 
