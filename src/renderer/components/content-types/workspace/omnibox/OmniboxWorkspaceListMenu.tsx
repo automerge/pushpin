@@ -379,7 +379,13 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
               !state.doc.archivedDocUrls.includes(url as PushpinUrl)
           )
           .filter(
-            ([_url, doc]) => doc && doc.title && doc.title.match(new RegExp(props.search, 'i'))
+            ([_url, doc]) =>
+              doc &&
+              ((doc.title && doc.title.match(new RegExp(props.search, 'i'))) ||
+                ((doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))) ||
+                  (doc.data &&
+                    doc.data.text &&
+                    doc.data.text.match(new RegExp(props.search, 'i')))))
           )
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
