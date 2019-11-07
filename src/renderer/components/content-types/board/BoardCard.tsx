@@ -58,8 +58,8 @@ function BoardCard(props: BoardCardProps) {
     props.boardUrl,
     props.selected && self
       ? {
-        color: self.color,
-      }
+          color: self.color,
+        }
       : undefined,
     id
   )
@@ -201,7 +201,7 @@ function BoardCard(props: BoardCardProps) {
     const heightC = height || cardRef.current.clientHeight
     setOriginalSize({ width: widthC, height: heightC })
     setResize({ width: widthC, height: heightC })
-      ; (event.target as Element).setPointerCapture(event.pointerId)
+    ;(event.target as Element).setPointerCapture(event.pointerId)
     event.preventDefault()
     event.stopPropagation()
   }
@@ -229,7 +229,7 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const resizePointerUp = (e: React.PointerEvent) => {
-    ; (e.target as Element).releasePointerCapture(e.pointerId)
+    ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
       dispatch({ type: 'CardResized', cardId: id, dimension: resize })
     }

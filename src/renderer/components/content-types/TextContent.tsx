@@ -55,6 +55,7 @@ export default function TextContent(props: Props) {
       onCopy={stopPropagation}
       onCut={stopPropagation}
       onPaste={stopPropagation}
+      onDoubleClick={stopPropagation}
     />
   )
 }
