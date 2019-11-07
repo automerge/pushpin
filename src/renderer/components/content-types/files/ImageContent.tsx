@@ -38,7 +38,7 @@ function ImageInList(props: Props) {
   const { hypermergeUrl, editable, url } = props
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
 
-  const { title = '', hyperfileUrl = null } = doc || {}
+  const { title = '', hyperfileUrl = null, extension } = doc || {}
   const header = useHyperfileHeader(hyperfileUrl)
 
   if (!hyperfileUrl) {
@@ -51,7 +51,12 @@ function ImageInList(props: Props) {
 
   return (
     <ListItem>
-      <ContentDragHandle url={url}>
+      <ContentDragHandle
+        url={url}
+        filename={title}
+        extension={extension}
+        hyperfileUrl={hyperfileUrl}
+      >
         <Badge
           shape="square"
           icon={size ? undefined : 'file-image-o'}

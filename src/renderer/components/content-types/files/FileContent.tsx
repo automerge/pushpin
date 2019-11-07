@@ -24,9 +24,9 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
   const badgeRef = useRef<HTMLDivElement>(null)
 
-  const { title = '', hyperfileUrl = null } = doc || {}
+  const { title = '', extension, hyperfileUrl } = doc || {}
 
-  const header = useHyperfileHeader(hyperfileUrl)
+  const header = useHyperfileHeader(hyperfileUrl || null)
 
   if (!hyperfileUrl || !header) {
     return null
@@ -38,7 +38,12 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
       case 'list':
         return (
           <ListItem>
-            <ContentDragHandle url={url}>
+            <ContentDragHandle
+              url={url}
+              filename={title}
+              extension={extension}
+              hyperfileUrl={hyperfileUrl}
+            >
               <Badge shape="square" icon="files-o" />
             </ContentDragHandle>
             <TitleWithSubtitle
