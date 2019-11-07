@@ -1,12 +1,9 @@
-import Debug from 'debug'
 import { Handle, HyperfileUrl } from 'hypermerge'
 import path from 'path'
 import * as ContentTypes from '../../../ContentTypes'
 import FileContent from './FileContent'
 
 import * as ContentData from '../../../ContentData'
-
-const log = Debug('pushpin:filecontent')
 
 export interface FileDoc {
   title: string // names are editable and not an intrinsic part of the file

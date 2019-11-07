@@ -6,8 +6,10 @@ import { createDocumentLink } from '../../../ShareLink'
 import { FileDoc } from '.'
 
 import './FileContent.css'
-import TitleEditor from '../../TitleEditor'
 import Badge from '../../Badge'
+import ListItem from '../../ListItem'
+import ContentDragHandle from '../../ContentDragHandle'
+import TitleWithSubtitle from '../../TitleWithSubtitle'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -22,36 +24,35 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
   const badgeRef = useRef<HTMLDivElement>(null)
 
-  const { title = '', hyperfileUrl = null } = doc || {}
+  const { title = '', extension, hyperfileUrl } = doc || {}
 
-  const header = useHyperfileHeader(hyperfileUrl)
+  const header = useHyperfileHeader(hyperfileUrl || null)
 
   if (!hyperfileUrl || !header) {
     return null
   }
-
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', url)
-
-    if (badgeRef.current) {
-      e.dataTransfer.setDragImage(badgeRef.current, 0, 0)
-    }
-  }
-
   const { size, mimeType } = header
 
   function renderUnidentifiedFile() {
     switch (context) {
       case 'list':
         return (
-          <div draggable onDragStart={onDragStart} className="FileListItem">
-            <Badge ref={badgeRef} shape="square" icon="files-o" />
-            {editable ? (
-              <TitleEditor url={hypermergeUrl} />
-            ) : (
-              <div className="FileListItem__title">{title}</div>
-            )}
-          </div>
+          <ListItem>
+            <ContentDragHandle
+              url={url}
+              filename={title}
+              extension={extension}
+              hyperfileUrl={hyperfileUrl}
+            >
+              <Badge shape="square" icon="files-o" />
+            </ContentDragHandle>
+            <TitleWithSubtitle
+              title={title}
+              subtitle={`${size !== null ? humanFileSize(size) : 'unknown size'}`}
+              hypermergeUrl={hypermergeUrl}
+              editable={editable}
+            />
+          </ListItem>
         )
       default:
         return (

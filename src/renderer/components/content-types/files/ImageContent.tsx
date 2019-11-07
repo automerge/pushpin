@@ -1,15 +1,15 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* our unfluff images don't have meaningful alt-text aside from the title */
-import React, { useRef } from 'react'
+import React from 'react'
 import { FileDoc } from '.'
 
 import { ContentProps } from '../../Content'
 import * as ContentTypes from '../../../ContentTypes'
 import { useDocument, useHyperfileHeader } from '../../../Hooks'
 import Badge from '../../Badge'
-import TitleEditor from '../../TitleEditor'
-import SecondaryText from '../../SecondaryText'
-import './ImageContent.css'
+import ListItem from '../../ListItem'
+import ContentDragHandle from '../../ContentDragHandle'
+import TitleWithSubtitle from '../../TitleWithSubtitle'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -36,41 +36,39 @@ interface Props extends ContentProps {
 function ImageInList(props: Props) {
   const { hypermergeUrl, editable, url } = props
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
-  const badgeRef = useRef<HTMLDivElement>(null)
 
-  const { title = '', hyperfileUrl = null } = doc || {}
-
+  const { title = '', hyperfileUrl = null, extension } = doc || {}
   const header = useHyperfileHeader(hyperfileUrl)
 
   if (!hyperfileUrl) {
     return null
   }
 
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', url)
-
-    if (badgeRef.current) {
-      e.dataTransfer.setDragImage(badgeRef.current, 0, 0)
-    }
-  }
-
   const { size = null } = header || {}
 
+  const subtitle = `${size !== null ? humanFileSize(size) : 'unknown size'}`
+
   return (
-    <div className="ImageListItem">
-      <span draggable onDragStart={onDragStart}>
+    <ListItem>
+      <ContentDragHandle
+        url={url}
+        filename={title}
+        extension={extension}
+        hyperfileUrl={hyperfileUrl}
+      >
         <Badge
           shape="square"
           icon={size ? undefined : 'file-image-o'}
           img={size ? hyperfileUrl : undefined}
         />
-      </span>
-
-      <div className="ImageListItem-title">
-        {editable ? <TitleEditor url={hypermergeUrl} /> : <div className="Heading">{title}</div>}
-        <SecondaryText>{`${size !== null ? humanFileSize(size) : 'unknown size'}`}</SecondaryText>
-      </div>
-    </div>
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        title={title}
+        subtitle={subtitle}
+        hypermergeUrl={hypermergeUrl}
+        editable={editable}
+      />
+    </ListItem>
   )
 }
 

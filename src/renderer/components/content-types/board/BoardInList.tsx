@@ -1,40 +1,46 @@
-import React, { useRef } from 'react'
-import TitleEditor from '../../TitleEditor'
+import React from 'react'
 import { BoardDoc } from '.'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
-import Badge from '../../Badge'
+import Badge, { Props as BadgeProps } from '../../Badge'
+import ListItem from '../../ListItem'
+import TitleWithSubtitle from '../../TitleWithSubtitle'
+import ContentDragHandle from '../../ContentDragHandle'
 
 interface Props extends ContentProps {
   editable: boolean
 }
 
 export default function BoardInList(props: Props) {
-  const [doc] = useDocument<BoardDoc>(props.hypermergeUrl)
-  const badgeRef = useRef<HTMLDivElement>(null)
+  const { hypermergeUrl, url, editable } = props
+  const [doc] = useDocument<BoardDoc>(hypermergeUrl)
 
   if (!doc) {
     return null
   }
 
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', props.url)
+  const { title, backgroundColor, cards } = doc
+  const icon = 'files-o'
 
-    if (badgeRef.current) {
-      e.dataTransfer.setDragImage(badgeRef.current, 0, 0)
-    }
+  const cardLength = Object.keys(cards).length
+  const subtitle = `${cardLength} item${cardLength !== 1 ? 's' : ''}`
+
+  const badgeProps: BadgeProps = {
+    icon,
+    backgroundColor,
   }
 
-  const { title, backgroundColor } = doc
-
   return (
-    <div draggable onDragStart={onDragStart} className="DocLink">
-      <Badge ref={badgeRef} icon="files-o" backgroundColor={backgroundColor} />
-      {props.editable ? (
-        <TitleEditor url={props.hypermergeUrl} />
-      ) : (
-        <div className="DocLink__title">{title}</div>
-      )}
-    </div>
+    <ListItem>
+      <ContentDragHandle url={url}>
+        <Badge {...badgeProps} />
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        title={title}
+        subtitle={subtitle}
+        hypermergeUrl={hypermergeUrl}
+        editable={editable}
+      />
+    </ListItem>
   )
 }

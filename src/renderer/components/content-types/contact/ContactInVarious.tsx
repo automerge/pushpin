@@ -8,14 +8,15 @@ import { FileDoc } from '../files'
 
 import { createDocumentLink } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
-import Text from '../../Text'
-import Label from '../../Label'
 
 import './ContactInVarious.css'
 import { useSelfId, useDocument, useHyperfile } from '../../../Hooks'
 import { useContactOnlineStatus } from '../../../PresenceHooks'
 import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
 import ColorBadge from '../../ColorBadge'
+import ListItem from '../../ListItem'
+import ContentDragHandle from '../../ContentDragHandle'
+import TitleWithSubtitle from '../../TitleWithSubtitle'
 
 const log = Debug('pushpin:settings')
 
@@ -59,7 +60,7 @@ export default function ContactInVarious(props: ContentProps) {
     return null
   }
 
-  const { context } = props
+  const { context, url, hypermergeUrl } = props
   const { color } = contact
 
   const avatarImage = avatarDocId ? (
@@ -91,12 +92,10 @@ export default function ContactInVarious(props: ContentProps) {
   switch (context) {
     case 'list':
       return (
-        <div draggable onDragStart={onDragStart} className="DocLink">
-          <div className="Contact-name">{avatar}</div>
-          <Label>
-            <Text>{name}</Text>
-          </Label>
-        </div>
+        <ListItem>
+          <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
+          <TitleWithSubtitle title={name || 'Unknown Contact'} hypermergeUrl={hypermergeUrl} />
+        </ListItem>
       )
 
     case 'thread':

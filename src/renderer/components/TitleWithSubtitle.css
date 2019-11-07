@@ -1,11 +1,4 @@
-.ImageListItem {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-}
-
-.ImageListItem-title {
+.TitleWithSubtitle {
   display: flex;
   flex-direction: column;
   font-family: IBM Plex Sans;
@@ -19,4 +12,5 @@
   text-overflow: ellipsis;
   flex-shrink: 0;
   flex: auto;
+  width: 0px;
 }

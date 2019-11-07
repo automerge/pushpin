@@ -5,12 +5,14 @@ import Badge from '../../Badge'
 import { Doc } from './Workspace'
 import { createDocumentLink } from '../../../ShareLink'
 import { ContactDoc } from '../contact'
-import Text from '../../Text'
-import SecondaryText from '../../SecondaryText'
 import './WorkspaceInList.css'
+import ListItem from '../../ListItem'
+import ContentDragHandle from '../../ContentDragHandle'
+import TitleWithSubtitle from '../../TitleWithSubtitle'
 
 export default function WorkspaceListItem(props: ContentProps) {
-  const [doc] = useDocument<Doc>(props.hypermergeUrl)
+  const { url, hypermergeUrl } = props
+  const [doc] = useDocument<Doc>(hypermergeUrl)
   const [selfDoc] = useDocument<ContactDoc>(doc && doc.selfId)
 
   if (!doc || !selfDoc) {
@@ -19,26 +21,17 @@ export default function WorkspaceListItem(props: ContentProps) {
 
   const { selfId, viewedDocUrls } = doc
 
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', props.url)
-  }
-
+  const title = `Workspace for ${selfDoc.name}`
+  const subtitle = `${viewedDocUrls.length} item${viewedDocUrls.length !== 1 ? 's' : ''}`
   return (
-    <div className="DocLink">
-      <div className="WorkspaceLink-Badge" draggable onDragStart={onDragStart}>
+    <ListItem>
+      <ContentDragHandle url={url}>
         <Badge icon="briefcase" backgroundColor={selfDoc.color} />
         <div className="WorkspaceLink-ContactOverlay">
           <Content url={createDocumentLink('contact', selfId)} context="title-bar" />
         </div>
-      </div>
-      <div className="DocLink__title">
-        <div className="WorkspaceLink-words">
-          <Text>Workspace for {selfDoc.name}</Text>
-          <SecondaryText>
-            {viewedDocUrls.length} item{viewedDocUrls.length !== 1 ? 's' : ''}
-          </SecondaryText>
-        </div>
-      </div>
-    </div>
+      </ContentDragHandle>
+      <TitleWithSubtitle title={title} subtitle={subtitle} hypermergeUrl={hypermergeUrl} />
+    </ListItem>
   )
 }

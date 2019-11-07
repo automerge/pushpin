@@ -11,12 +11,13 @@ import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument, useEvent } from '../../Hooks'
 import './UrlContent.css'
-import SecondaryText from '../SecondaryText'
 import Badge from '../Badge'
-import Heading from '../Heading'
 import { APP_PATH } from '../../constants'
 import * as ContentData from '../../ContentData'
 import * as WebStreamLogic from '../../../WebStreamLogic'
+import ContentDragHandle from '../ContentDragHandle'
+import TitleWithSubtitle from '../TitleWithSubtitle'
+import ListItem from '../ListItem'
 
 interface UrlData {
   title?: string
@@ -172,34 +173,25 @@ export default function UrlContent(props: ContentProps) {
     </div>
   )
 
-  // per conversations with jeff, we want to remove responsibility for this from list
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', props.url)
-  }
-
+  // xxx this was <a> resolvedURL a second ago
+  const subtitle = resolvedUrl
+  const { url: pushpinUrl, hypermergeUrl } = props
   const renderList = () => (
-    <div className="UrlListItem">
-      <span draggable onDragStart={onDragStart}>
+    <ListItem>
+      <ContentDragHandle url={pushpinUrl}>
         <Badge
           shape="square"
           icon={doc.imageHyperfileUrl ? undefined : 'chain'}
           img={doc.imageHyperfileUrl}
         />
-      </span>
-
-      <div className="UrlListItem-title">
-        {title ? (
-          <>
-            <Heading>{title}</Heading>
-            <SecondaryText>
-              <a href={resolvedUrl}>{resolvedUrl}</a>
-            </SecondaryText>
-          </>
-        ) : (
-          <Heading>{resolvedUrl}</Heading>
-        )}
-      </div>
-    </div>
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        title={title}
+        subtitle={subtitle}
+        href={resolvedUrl} // gross
+        hypermergeUrl={hypermergeUrl}
+      />
+    </ListItem>
   )
 
   switch (props.context) {

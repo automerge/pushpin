@@ -11,8 +11,9 @@ import './TextContent.css'
 import Badge from '../Badge'
 import * as ContentData from '../../ContentData'
 import * as WebStreamLogic from '../../../WebStreamLogic'
-import Heading from '../Heading'
-import SecondaryText from '../SecondaryText'
+import ListItem from '../ListItem'
+import ContentDragHandle from '../ContentDragHandle'
+import TitleWithSubtitle from '../TitleWithSubtitle'
 
 interface TextDoc {
   text: Automerge.Text
@@ -182,11 +183,8 @@ function create({ text }, handle: Handle<TextDoc>) {
 }
 
 function TextInList(props: ContentProps) {
-  const [doc] = useDocument<TextDoc>(props.hypermergeUrl)
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', props.url)
-  }
-
+  const { hypermergeUrl, url } = props
+  const [doc] = useDocument<TextDoc>(hypermergeUrl)
   if (!doc) return null
 
   const lines = doc.text
@@ -196,17 +194,19 @@ function TextInList(props: ContentProps) {
 
   const title = lines.shift() || '[empty text note]'
   const subtitle = lines.slice(0, 2).join('\n')
-  return (
-    <div className="UrlListItem">
-      <span draggable onDragStart={onDragStart}>
-        <Badge icon="sticky-note" />
-      </span>
 
-      <div className="UrlListItem-title">
-        <Heading>{title}</Heading>
-        <SecondaryText>{subtitle}</SecondaryText>
-      </div>
-    </div>
+  return (
+    <ListItem>
+      <ContentDragHandle url={url}>
+        <Badge icon="sticky-note" />
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        title={title}
+        subtitle={subtitle}
+        hypermergeUrl={hypermergeUrl}
+        editable={false}
+      />
+    </ListItem>
   )
 }
 

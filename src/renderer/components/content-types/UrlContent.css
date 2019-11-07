@@ -99,30 +99,6 @@
   margin-bottom: 10px;
 }
 
-.UrlListItem {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-}
-
-.UrlListItem-title {
-  display: flex;
-  flex-direction: column;
-  font-family: IBM Plex Sans;
-  font-size: 10px;
-  margin-left: 8px;
-  line-height: 1.2;
-  color: #637389;
-  justify-self: flex-end;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-shrink: 0;
-  flex: auto;
-  width: 0px;
-}
-
 .UrlCard-webview {
   flex: 1;
 }

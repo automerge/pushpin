@@ -199,23 +199,6 @@ em {
 
 /* End globals */
 
-.DocLink {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-width: 0; /* this prevents title overflow */
-}
-
-.DocLink__title {
-  margin-left: 10px;
-  -webkit-user-drag: none;
-  user-select: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 70%;
-}
-
 .NothingFound .fa {
   font-size: 24px;
 }
