@@ -1,4 +1,5 @@
-.Device, .DeviceListItem {
+.Device,
+.DeviceListItem {
   --online-color: #33ab77;
   --offline-color: lightgray;
 }

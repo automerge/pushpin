@@ -10,6 +10,7 @@ import Badge from '../../Badge'
 import './Device.css'
 import TitleEditor from '../../TitleEditor'
 import { useDeviceOnlineStatus } from '../../../PresenceHooks'
+import Heading from '../../Heading'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
@@ -51,7 +52,7 @@ function Device(props: Props) {
           {props.editable ? (
             <TitleEditor field="name" url={props.hypermergeUrl} />
           ) : (
-            <div className="DocLink__title">{name}</div>
+            <Heading>{name}</Heading>
           )}
         </div>
       )
