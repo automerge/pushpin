@@ -1,15 +1,6 @@
-.WorkspaceLink-Badge {
-  position: relative;
-}
 .WorkspaceLink-ContactOverlay {
   position: absolute;
   right: 0px;
   bottom: 0px;
   transform: translate(8px, 8px) scale(0.5);
-}
-
-.WorkspaceLink-words {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
 }

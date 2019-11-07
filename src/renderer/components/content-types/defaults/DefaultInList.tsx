@@ -3,36 +3,35 @@ import * as ContentTypes from '../../../ContentTypes'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
+import ContentDragHandle from '../../ContentDragHandle'
+import TitleWithSubtitle from '../../TitleWithSubtitle'
+import ListItem from '../../ListItem'
 
 interface Doc {
   title?: string
 }
 
-export default function ListItem(props: ContentProps) {
-  const [doc] = useDocument<Doc>(props.hypermergeUrl)
+export default function DefaultInList(props: ContentProps) {
+  const { url, hypermergeUrl } = props
+  const [doc] = useDocument<Doc>(hypermergeUrl)
 
   if (!doc) {
     return null
   }
 
-  function onDragStart(e: React.DragEvent) {
-    e.dataTransfer.setData('application/pushpin-url', props.url)
-  }
-
   const { type } = props
-
   const contentType = ContentTypes.lookup({ type, context: 'list' })
 
   const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
   // TODO: pick background color based on url
   return (
-    <div className="DocLink">
-      <span draggable onDragStart={onDragStart}>
-        <Badge size="large" icon={icon} />
-      </span>
-      <div className="DocLink__title">{doc.title || name}</div>
-    </div>
+    <ListItem>
+      <ContentDragHandle url={url}>
+        <Badge icon={icon} />
+      </ContentDragHandle>
+      <TitleWithSubtitle title={doc.title || name} hypermergeUrl={hypermergeUrl} />
+    </ListItem>
   )
 }
 
