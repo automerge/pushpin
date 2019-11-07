@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-// todo import './ListItem.css'
+import './ListItem.css'
 
 export interface Props {
   children: ReactNode
@@ -10,5 +10,5 @@ export interface Props {
  * A standard form for list items to render with a badge, a title, and a subtitle.
  * */
 export default function ListItem(props: Props) {
-  return <div className="UrlListItem">{props.children}</div>
+  return <div className="ListItem">{props.children}</div>
 }
