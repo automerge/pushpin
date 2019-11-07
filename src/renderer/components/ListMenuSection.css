@@ -6,5 +6,9 @@
   padding: 4px 8px;
   color: var(--colorSecondaryGrey);
   line-height: 16px;
-  border-bottom:1px solid var(--colorPaleGrey);
+  border-bottom: 1px solid var(--colorPaleGrey);
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 1;
 }
