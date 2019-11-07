@@ -64,7 +64,7 @@ button[disabled].TitleBar-menuItem .fa {
 
 .TitleBar-self {
   padding-left: 4px;
-  border-left: 1px solid var(--colorSecondaryGrey);
+  border-left: 1px solid var(--colorPaleGrey);
 }
 
 @keyframes color-flash {
