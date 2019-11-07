@@ -1,7 +1,7 @@
 .ListMenuItem {
   padding: 4px 8px;
   color: var(--colorBlueBlack);
-  line-height:16px;
+  line-height: 16px;
   min-height: 32px;
   box-sizing: border-box;
   position: relative;
@@ -19,7 +19,7 @@
 }
 
 .ListMenuItem-thumbnail {
-  flex:none;
+  flex: none;
   margin-right: 8px;
 }
 
@@ -28,5 +28,11 @@
   overflow: hidden;
 }
 
-.ListMenuItem-actions {
+.ListMenuItem .Actions {
+  display: none;
+}
+
+.ListMenuItem:hover .Actions,
+.ListMenuItem--selected .Actions {
+  display: flex;
 }
