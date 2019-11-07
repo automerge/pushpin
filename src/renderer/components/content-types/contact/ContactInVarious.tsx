@@ -107,11 +107,7 @@ export default function ContactInVarious(props: ContentProps) {
       )
 
     case 'title-bar':
-      return (
-        <div draggable onDragStart={onDragStart}>
-          {avatar}
-        </div>
-      )
+      return <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
 
     case 'board':
       return (

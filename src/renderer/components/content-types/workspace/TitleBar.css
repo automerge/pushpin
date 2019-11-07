@@ -62,34 +62,9 @@ button[disabled].TitleBar-menuItem .fa {
   color: var(--colorBlueBlack);
 }
 
-.TitleBar-right .dropdown__trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-}
-
-.TitleBar-right .dropdown.dropdown--active {
-  background-color: var(--colorInputGrey);
-}
-
-.TitleBar-right .dropdown__content {
-  top: 48px;
-  right: 0px;
-}
-
-.TitleBar-left .dropdown__content {
-  left: 0px;
-  top: 48px;
-}
-
-.TitleBar-logo {
-  margin-right: 8px;
-}
-
 .TitleBar-self {
   padding-left: 4px;
+  border-left: 1px solid var(--colorSecondaryGrey);
 }
 
 @keyframes color-flash {

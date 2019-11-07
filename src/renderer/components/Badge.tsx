@@ -27,7 +27,7 @@ export default React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) =
     <div
       ref={ref}
       className={`Badge Badge--${size} Badge--${shape} ${img ? 'Badge--image' : null}`}
-      style={{ backgroundColor, backgroundImage: `url(${img})` }}
+      style={{ backgroundColor, backgroundImage: img ? `url(${img})` : undefined }}
     >
       <i className={`fa fa-${icon}`} />
     </div>

@@ -4,8 +4,9 @@
   justify-content: center;
   box-sizing: border-box;
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 33px;
+  height: 33px;
+
   border-radius: 999px;
   box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.27);
   padding: 2px;
@@ -20,8 +21,8 @@
 }
 
 .Avatar--title-bar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   padding: 1px;
 }
 
