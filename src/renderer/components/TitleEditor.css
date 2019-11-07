@@ -1,4 +1,5 @@
 .TitleEditor {
   font-size: 1.25em;
   width: 100%;
+  padding: 0px; /* someone (me?) put padding on all inputs */
 }
