@@ -1,12 +1,14 @@
+import { Crypto } from 'hypermerge'
 import * as ContentTypes from '../../../ContentTypes'
-import { HypermergeUrl } from '../../../ShareLink'
 
 import StoragePeerWorkspace from './StoragePeerWorkspace'
 import StoragePeer from './StoragePeer'
 import { DeviceDoc } from '../workspace/Device'
 
 export interface StoragePeerDoc extends DeviceDoc {
-  storedUrls: { [contact: string /* HypermergeUrl */]: HypermergeUrl }
+  publicKey: Crypto.EncodedPublicEncryptionKey
+  publicKeySignature: Crypto.EncodedSignature
+  storedUrls: { [contact: string /* HypermergeUrl */]: Crypto.EncodedSealedBox }
 }
 
 function create(typeAttrs, handle) {
