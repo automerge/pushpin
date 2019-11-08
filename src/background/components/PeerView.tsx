@@ -1,7 +1,7 @@
 import React from 'react'
 import { PeerId } from 'hypermerge/dist/NetworkPeer'
 import PeerConnection from 'hypermerge/dist/PeerConnection'
-import Info, { humanBytes, hidden } from './Info'
+import Info, { humanBytes, hidden, hiddenList } from './Info'
 import List from './List'
 import { useSample, useRepo } from '../BackgroundHooks'
 import Card from './Card'
@@ -28,12 +28,12 @@ function PeerView({ peerId }: Props) {
       <Info
         log={peer}
         peerId={peerId}
+        weHaveAuthority={peer.weHaveAuthority}
         connection={connectionInfo(peer.connection)}
-        closedConnections={peer.closedConnectionCount}
+        closed={`${peer.closedConnectionCount} connections`}
+        pending={hiddenList(peer.pendingConnections, 'connection', connectionInfo)}
       />
-      {Array.from(peer.pendingConnections).map((conn, i) => (
-        <Info key={String(i)} log={conn} {...connectionInfo(conn)} />
-      ))}
+
       <Info
         shared={hidden(`${shared.size} feeds...`, () => (
           <LimitedList limit={30} items={Array.from(shared)}>

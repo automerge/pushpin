@@ -21,16 +21,21 @@ interface Props {
 }
 
 export default function Info({ log, ...info }: Props) {
+  const keys = Object.keys(info)
+
+  if (keys.length === 0) return null
+
   return (
     <code className="Info">
       {log ? (
-        <div style={{ position: 'absolute', top: 0, right: 0, height: '100%' }}>
-          <div style={{ position: 'sticky', top: 10 }}>
+        <div className="Info_Log">
+          <div className="Info_Log_Inner">
             <LogLink v={log} />
           </div>
         </div>
       ) : null}
-      {Object.keys(info).map((k) => (
+
+      {keys.map((k) => (
         <React.Fragment key={k}>
           <div>{k}:</div>
           <div>{renderValue(info[k])}</div>
@@ -80,6 +85,19 @@ export function hexDump(buffer: Uint8Array, blockSize = 16) {
 
 export function hidden(summary: string, details: () => Value): Value {
   return <Expandable summary={summary}>{() => <>{renderValue(details())}</>}</Expandable>
+}
+
+export function pluralize(n: number, singular: string, plural = `${singular}s`): string {
+  return `${n} ${n === 1 ? singular : plural}`
+}
+
+export function hiddenList<T>(
+  items: Iterable<T>,
+  singular: string,
+  mapItem: (item: T) => Value
+): Value {
+  const itemsArray = Array.from(items)
+  return hidden(`${pluralize(itemsArray.length, singular)}...`, () => itemsArray.map(mapItem))
 }
 
 function renderValue(v: Value) {
