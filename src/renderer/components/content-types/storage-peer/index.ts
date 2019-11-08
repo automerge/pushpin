@@ -8,7 +8,7 @@ import { DeviceDoc } from '../workspace/Device'
 export interface StoragePeerDoc extends DeviceDoc {
   publicKey: Crypto.EncodedPublicEncryptionKey
   publicKeySignature: Crypto.EncodedSignature
-  storedUrls: { [contact: string /* HypermergeUrl */]: Crypto.EncodedSealedBox }
+  registry: { [contact: string /* HypermergeUrl */]: Crypto.EncodedSealedBox }
 }
 
 function create(typeAttrs, handle) {

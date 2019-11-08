@@ -25,7 +25,7 @@ export function useStoragePeer(
   const currentWorkspace = workspaceUrlsContext && workspaceUrlsContext.workspaceUrls[0]
   const workspaceUrl = currentWorkspace && parseDocumentLink(currentWorkspace).hypermergeUrl
 
-  const isRegistered = doc && !!doc.storedUrls[selfId]
+  const isRegistered = doc && !!doc.registry[selfId]
 
   const register = useCallback(async () => {
     if (!doc || !workspaceUrl || isRegistered) return
@@ -33,7 +33,7 @@ export function useStoragePeer(
 
     const sealedWorkspace = await repo.crypto.sealedBox(doc.publicKey, workspaceUrl)
     changeDoc((doc) => {
-      doc.storedUrls[selfId] = sealedWorkspace
+      doc.registry[selfId] = sealedWorkspace
     })
 
     changeSelfDoc((selfDoc) => {
@@ -49,7 +49,7 @@ export function useStoragePeer(
   const unregister = useCallback(() => {
     if (!doc || !workspaceUrl || !isRegistered) return
     changeDoc((doc) => {
-      delete doc.storedUrls[selfId]
+      delete doc.registry[selfId]
     })
 
     changeSelfDoc((selfDoc) => {
