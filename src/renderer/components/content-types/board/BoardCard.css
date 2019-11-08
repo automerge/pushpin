@@ -10,6 +10,14 @@
   background: var(--colorPaleGrey);
 }
 
+.BoardCard > * {
+  pointer-events: none;
+}
+
+.BoardCard--uniquelySelected > * {
+  pointer-events: auto;
+}
+
 .BoardCard:focus,
 .BoardCard:active {
   outline: none;

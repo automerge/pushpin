@@ -74,7 +74,8 @@ function BoardCard(props: BoardCardProps) {
 
   const [resizeStart, setResizeStart] = useState<Position | null>(null)
 
-  const selected = props.selected || highlightColor
+  const selected = props.selected || highlightColor // XXX fixme here
+  const { uniquelySelected } = props
   const [resize, setResize] = useState<Dimension | null>(null)
   const [originalSize, setOriginalSize] = useState<Dimension | null>(null)
 
@@ -103,6 +104,12 @@ function BoardCard(props: BoardCardProps) {
   function onDragStart(event: React.DragEvent) {
     if (!selected) {
       dispatch({ type: 'CardClicked', cardId: id, event })
+    }
+
+    if (uniquelySelected && cardRef.current && cardRef.current.contains(document.activeElement)) {
+      console.log(cardRef.current, document.activeElement)
+      event.preventDefault()
+      return
     }
 
     setDragStart({ x: event.pageX, y: event.pageY })
@@ -254,10 +261,13 @@ function BoardCard(props: BoardCardProps) {
 
   return (
     <div
-      tabIndex={-1}
       ref={cardRef}
       id={`card-${id}`}
-      className={classNames('BoardCard', selected && 'BoardCard--selected')}
+      className={classNames(
+        'BoardCard',
+        selected && 'BoardCard--selected',
+        uniquelySelected && 'BoardCard--uniquelySelected'
+      )}
       style={style}
       onClick={onCardClicked}
       onDoubleClick={onCardDoubleClicked}
@@ -267,7 +277,7 @@ function BoardCard(props: BoardCardProps) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <Content context="board" url={url} uniquelySelected={props.uniquelySelected} />
+      <Content context="board" url={url} />
       {contentType && contentType.resizable !== false && (
         <span
           onPointerDown={resizePointerDown}
