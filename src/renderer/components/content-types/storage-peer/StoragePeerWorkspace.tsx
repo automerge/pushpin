@@ -1,10 +1,12 @@
 import React from 'react'
-import { createDocumentLink } from '../../../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
 import Heading from '../../Heading'
 
 import './StoragePeerWorkspace.css'
 import { useStoragePeer } from './StoragePeerHooks'
+import ActionListItem from '../workspace/omnibox/ActionListItem'
+import SecondaryText from '../../SecondaryText'
 
 export default function StoragePeerEditor(props: ContentProps) {
   const { hypermergeUrl } = props
@@ -13,6 +15,24 @@ export default function StoragePeerEditor(props: ContentProps) {
   if (!doc) {
     return null
   }
+
+  const registeredContacts = Object.keys(doc.registry)
+
+  const renderedContacts =
+    registeredContacts.length > 0 ? (
+      registeredContacts.map((contact) => {
+        const contactUrl = createDocumentLink('contact', contact as HypermergeUrl)
+        return (
+          <ActionListItem key={contact} contentUrl={contactUrl} actions={[]} selected={false}>
+            <div className="StoragePeerEditor-row">
+              <Content context="list" url={contactUrl} />
+            </div>
+          </ActionListItem>
+        )
+      })
+    ) : (
+      <SecondaryText>No one is currently registered with this storage peer...</SecondaryText>
+    )
 
   return (
     <div className="StoragePeerEditor">
@@ -26,6 +46,11 @@ export default function StoragePeerEditor(props: ContentProps) {
             <Content context="list" url={createDocumentLink('device', hypermergeUrl)} editable />
           </div>
         </div>
+        <div className="StoragePeerEditor-section">
+          <div className="StoragePeerEditor-sectionLabel">Registered Contacts</div>
+          <div className="StoragePeerEditor-sectionContent">{renderedContacts}</div>
+        </div>
+
         {isRegistered ? (
           <button type="button" onClick={unregister}>
             Unregister with Storage Peer

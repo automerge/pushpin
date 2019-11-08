@@ -6,8 +6,8 @@ import StoragePeer from './StoragePeer'
 import { DeviceDoc } from '../workspace/Device'
 
 export interface StoragePeerDoc extends DeviceDoc {
-  publicKey: Crypto.EncodedPublicEncryptionKey
-  publicKeySignature: Crypto.EncodedSignature
+  encryptionKey: Crypto.EncodedPublicEncryptionKey
+  encryptionKeySignature: Crypto.EncodedSignature
   registry: { [contact: string /* HypermergeUrl */]: Crypto.EncodedSealedBox }
 }
 

@@ -31,7 +31,7 @@ export function useStoragePeer(
     if (!doc || !workspaceUrl || isRegistered) return
     if (!(await verifyPublicKey(repo, storagePeerUrl, doc))) return
 
-    const sealedWorkspace = await repo.crypto.sealedBox(doc.publicKey, workspaceUrl)
+    const sealedWorkspace = await repo.crypto.sealedBox(doc.encryptionKey, workspaceUrl)
     changeDoc((doc) => {
       doc.registry[selfId] = sealedWorkspace
     })
@@ -66,10 +66,10 @@ async function verifyPublicKey(
   docUrl: DocUrl,
   doc: FreezeObject<StoragePeerDoc>
 ): Promise<boolean> {
-  if (!doc.publicKey || !doc.publicKeySignature) {
+  if (!doc.encryptionKey || !doc.encryptionKeySignature) {
     return false
   }
-  return repo.crypto.verify(docUrl, doc.publicKey, doc.publicKeySignature)
+  return repo.crypto.verify(docUrl, doc.encryptionKey, doc.encryptionKeySignature)
 }
 
 /**
