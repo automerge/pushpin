@@ -1,5 +1,5 @@
 import { useCallback, useContext } from 'react'
-import { RepoFrontend, DocUrl } from 'hypermerge'
+import { RepoFrontend, DocUrl, Crypto } from 'hypermerge'
 import Automerge, { FreezeObject } from 'automerge'
 import { StoragePeerDoc } from '.'
 import { useRepo, useDocument, useSelfId } from '../../../Hooks'
@@ -29,9 +29,11 @@ export function useStoragePeer(
 
   const register = useCallback(async () => {
     if (!doc || !workspaceUrl || isRegistered) return
-    if (!(await verifyPublicKey(repo, storagePeerUrl, doc))) return
 
-    const sealedWorkspace = await repo.crypto.sealedBox(doc.encryptionKey, workspaceUrl)
+    const encryptionKey = await getVerifiedEncryptionKey(repo, storagePeerUrl, doc)
+    if (!encryptionKey) return
+
+    const sealedWorkspace = await repo.crypto.sealedBox(encryptionKey, workspaceUrl)
     changeDoc((doc) => {
       doc.registry[selfId] = sealedWorkspace
     })
@@ -61,15 +63,15 @@ export function useStoragePeer(
   return [doc, isRegistered, register, unregister]
 }
 
-async function verifyPublicKey(
+async function getVerifiedEncryptionKey(
   repo: RepoFrontend,
   docUrl: DocUrl,
   doc: FreezeObject<StoragePeerDoc>
-): Promise<boolean> {
-  if (!doc.encryptionKey || !doc.encryptionKeySignature) {
-    return false
-  }
-  return repo.crypto.verify(docUrl, doc.encryptionKey, doc.encryptionKeySignature)
+): Promise<Crypto.EncodedPublicEncryptionKey | null> {
+  // The encryptionKey and signature may be missing from the doc.
+  if (!doc.encryptionKey || !doc.encryptionKeySignature) return null
+  const isValid = repo.crypto.verify(docUrl, doc.encryptionKey, doc.encryptionKeySignature)
+  return isValid ? doc.encryptionKey : null
 }
 
 /**
