@@ -19,7 +19,7 @@
   min-height: calc(var(--cellSize) * 2 + 1px);
   outline: 0;
   box-sizing: border-box;
-  overflow: auto;
+  overflow: hidden;
   border: solid 1px var(--colorPaleGrey);
   padding: var(--halfCellSize);
 }

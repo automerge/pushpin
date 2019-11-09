@@ -15,6 +15,10 @@
   margin: 0;
 }
 
+.TextContent {
+  overflow: auto;
+}
+
 .ql-editor {
   box-sizing: border-box;
   outline: 0;
