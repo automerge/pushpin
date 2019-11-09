@@ -18,6 +18,10 @@ import * as WebStreamLogic from '../../../WebStreamLogic'
 import ContentDragHandle from '../ContentDragHandle'
 import TitleWithSubtitle from '../TitleWithSubtitle'
 import ListItem from '../ListItem'
+import CenteredVerticalStack from '../CenteredVerticalStack'
+import Heading from '../Heading'
+import SecondaryText from '../SecondaryText'
+import Blurb from '../Blurb'
 
 interface UrlData {
   title?: string
@@ -157,9 +161,26 @@ export default function UrlContent(props: ContentProps) {
     </div>
   )
 
+  const cardSubtitle = description
+
   const renderCard = () => (
-    <div className="UrlCard">
-      {doc.imageHyperfileUrl ? <img className="UrlCard-img" src={doc.imageHyperfileUrl} /> : null}
+    <div className="BoardCard--standard">
+      <CenteredVerticalStack>
+        {doc.imageHyperfileUrl ? (
+          <Badge size="huge" shape="square" icon="chain" img={doc.imageHyperfileUrl} />
+        ) : (
+          <Badge size="huge" shape="square" icon="chain" />
+        )}
+
+        <Heading>{title}</Heading>
+        <Blurb>{cardSubtitle}</Blurb>
+        <SecondaryText>{capturedAt}</SecondaryText>
+        <SecondaryText>{resolvedUrl}</SecondaryText>
+      </CenteredVerticalStack>
+      {hiddenWebView}
+    </div>
+  )
+  /* <div className="UrlCard">
       <p className="UrlCard-title">
         <span className="titleAnchor">{title}</span>
       </p>
@@ -169,11 +190,8 @@ export default function UrlContent(props: ContentProps) {
           <a href={resolvedUrl}>{resolvedUrl}</a>
         </span>
       </p>
-      {hiddenWebView}
-    </div>
-  )
+    </div> */
 
-  // xxx this was <a> resolvedURL a second ago
   const subtitle = resolvedUrl
   const { url: pushpinUrl, hypermergeUrl } = props
   const renderList = () => (
