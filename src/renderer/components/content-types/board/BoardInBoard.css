@@ -1,14 +1,3 @@
-.BoardInBoard-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  flex: none;
-}
-
 .BoardInBoard-caption {
   color: var(--colorSecondaryGrey);
   margin-top: 2px;
@@ -21,20 +10,11 @@
   overflow: hidden;
 }
 
-.BoardInBoard-title {
-  color: var(--colorBlueBlack);
-  font-weight: 600;
-}
-
-.BoardInBoard-wrapper {
+.BoardInBoard {
   box-sizing: border-box;
   border: 1px solid var(--colorPaleGrey);
   overflow: hidden;
   padding: 10px;
   background-color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 100%;
 }
