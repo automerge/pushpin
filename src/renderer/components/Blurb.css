@@ -1,0 +1,9 @@
+.Blurb {
+  font-size: var(--halfCellSize);
+  font-weight: light;
+  color: var(--colorSecondaryGrey);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: var(--halfCellSize);
+  padding: 5px;
+}
