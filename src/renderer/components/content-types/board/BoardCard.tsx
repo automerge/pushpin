@@ -74,6 +74,7 @@ function BoardCard(props: BoardCardProps) {
 
   const [resizeStart, setResizeStart] = useState<Position | null>(null)
 
+  const mySelected = props.selected
   const selected = props.selected || highlightColor
   const [resize, setResize] = useState<Dimension | null>(null)
   const [originalSize, setOriginalSize] = useState<Dimension | null>(null)
@@ -157,7 +158,7 @@ function BoardCard(props: BoardCardProps) {
     previousDistance.current = distance
 
     // we want to skip expensive React recalculations, so we'll just update the style directly here
-    selectedCardsRef.current = document.querySelectorAll('.BoardCard--selected')
+    selectedCardsRef.current = document.querySelectorAll('.BoardCard--mySelected')
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
         element.style.setProperty('--drag-x', `${distance.x}px`)
@@ -257,7 +258,11 @@ function BoardCard(props: BoardCardProps) {
       tabIndex={-1}
       ref={cardRef}
       id={`card-${id}`}
-      className={classNames('BoardCard', selected && 'BoardCard--selected')}
+      className={classNames(
+        'BoardCard',
+        selected && 'BoardCard--selected',
+        mySelected && 'BoardCard--mySelected'
+      )}
       style={style}
       onClick={onCardClicked}
       onDoubleClick={onCardDoubleClicked}
