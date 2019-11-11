@@ -7,6 +7,7 @@ import './StoragePeerWorkspace.css'
 import { useStoragePeer } from './StoragePeerHooks'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 import SecondaryText from '../../SecondaryText'
+import Text from '../../Text'
 
 export default function StoragePeerEditor(props: ContentProps) {
   const { hypermergeUrl } = props
@@ -47,6 +48,16 @@ export default function StoragePeerEditor(props: ContentProps) {
           </div>
         </div>
         <div className="StoragePeerEditor-section">
+          <div className="StoragePeerEditor-sectionLabel">Disclaimer</div>
+          <div className="StoragePeerEditor-sectionContent">
+            If you register with a storage peer, whoever has access to the server where the storage
+            peer is running will have full access to your data. Additionally, when you unregister
+            from a storage peer your data is not deleted from the storage peer's server and will
+            continue to be replicated until the storage peer is restarted.
+          </div>
+        </div>
+
+        <div className="StoragePeerEditor-section">
           <div className="StoragePeerEditor-sectionLabel">Registered Contacts</div>
           <div className="StoragePeerEditor-sectionContent">{renderedContacts}</div>
         </div>
@@ -58,7 +69,7 @@ export default function StoragePeerEditor(props: ContentProps) {
         ) : (
           <button type="button" onClick={register}>
             Register with Storage Peer
-          </button>
+            </button>
         )}
       </div>
     </div>
