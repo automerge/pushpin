@@ -14,17 +14,18 @@ import { useStoragePeer } from './StoragePeerHooks'
 const log = Debug('pushpin:settings')
 
 export default function StoragePeer(props: ContentProps) {
-  const [doc, isRegistered] = useStoragePeer(props.hypermergeUrl)
+  const [doc] = useStoragePeer(props.hypermergeUrl)
 
   if (!doc) {
     return null
   }
 
   const { context, url, hypermergeUrl } = props
-  const { name } = doc
+  const { name, registry } = doc
+  const countRegistered = Object.keys(registry).length
 
   const title = name
-  const subtitle = isRegistered ? 'registered' : 'not registered'
+  const subtitle = `${countRegistered} stored workspace${countRegistered === 1 ? '' : 's'}`
 
   switch (context) {
     case 'list':
