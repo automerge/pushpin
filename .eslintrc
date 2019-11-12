@@ -8,12 +8,13 @@
     "__static": true
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["react-hooks"],
+  "plugins": ["react-hooks", "css-modules"],
   "extends": [
     "airbnb-typescript",
     "plugin:@typescript-eslint/recommended",
     "prettier/@typescript-eslint",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:css-modules/recommended"
   ],
   "rules": {
     // we agreed we don't like semicolons
