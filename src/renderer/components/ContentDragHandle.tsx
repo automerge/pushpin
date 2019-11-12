@@ -4,6 +4,7 @@ import { HyperfileUrl } from 'hypermerge'
 import mime from 'mime-types'
 import { PushpinUrl } from '../ShareLink'
 import { useHyperfileHeader } from '../Hooks'
+import * as UriList from '../UriList'
 
 interface SimpleProps {
   url: PushpinUrl
@@ -28,7 +29,7 @@ export default function ContentDragHandle(props: Props) {
       event.dataTransfer.setDragImage(ref.current, 0, 0)
     }
 
-    event.dataTransfer.setData('text/uri-list', url)
+    event.dataTransfer.setData(UriList.MIME_TYPE, url)
 
     // and we'll add a DownloadURL if we need to
     if ('hyperfileUrl' in props && header) {
