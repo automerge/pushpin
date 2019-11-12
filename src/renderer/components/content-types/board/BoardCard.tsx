@@ -13,6 +13,7 @@ import { usePresence } from '../../../PresenceHooks'
 import './BoardCard.css'
 import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
+import * as UriList from '../../../UriList'
 
 interface CardClicked {
   type: 'CardClicked'
@@ -114,7 +115,7 @@ function BoardCard(props: BoardCardProps) {
     // annotate the drag with the current board's URL so we can tell if this is where we came from
     event.dataTransfer.setData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
 
-    event.dataTransfer.setData('text/uri-list', url)
+    event.dataTransfer.setData(UriList.MIME_TYPE, url)
 
     // and we'll add a DownloadURL
     if (hyperfileUrl) {

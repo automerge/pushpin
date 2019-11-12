@@ -260,7 +260,7 @@ function removeEmpty(obj: object) {
 
 /**
  * Assumes we are creating from a content data object with mimetype equal to 'text/html'.
- * This function should also probably handle a mimeType equal to 'text/uri-list'.
+ * This function should also probably handle a mimeType equal to 'application/uri-list'.
  */
 async function createFrom(contentData: ContentData.ContentData, handle: Handle<UrlDoc>) {
   const { capturedAt } = contentData

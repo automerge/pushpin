@@ -108,10 +108,6 @@ function isUrl(str: string) {
  *
  * TODO: This doesn't feel like the right place to be making mime type content decisions.
  * That should be happening in ContentTypes.createFrom.
- *
- * TODO: Can we use the 'text/uri-list' mime type to use createFrom for creating urls?
- * Notably, there is some precedent for this: https://html.spec.whatwg.org/multipage/dnd.html#dom-datatransfer-types
- * Alternatively, we could use something like 'text/vnd.pushpin.url'.
  */
 async function importUrl(url: string, callback: ContentTypes.CreateCallback) {
   const response = await fetchOk(url)
