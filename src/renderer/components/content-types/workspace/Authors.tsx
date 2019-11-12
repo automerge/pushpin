@@ -7,11 +7,12 @@ import Author from './Author'
 
 import './Authors.css'
 import { useDocument, useSelfId } from '../../../Hooks'
+import { usePresence } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:authors')
 
 interface Props {
-  hypermergeUrl: HypermergeUrl
+  workspaceHypermergeUrl: HypermergeUrl
 }
 
 interface DocWithAuthors {
@@ -20,13 +21,21 @@ interface DocWithAuthors {
 }
 
 export default function Authors(props: Props) {
-  const authorIds = useAuthors(props.hypermergeUrl)
+  const authorIds = useAuthors(props.workspaceHypermergeUrl)
+
+  const [workspace] = useDocument<WorkspaceDoc>(props.workspaceHypermergeUrl)
+  const { hypermergeUrl = null } = workspace ? parseDocumentLink(workspace.currentDocUrl) : {}
+
+  const presence = usePresence(hypermergeUrl)
+
   // Remove self from the authors list.
   const selfId = useSelfId()
   const authors = authorIds
     .filter((authorId) => authorId !== selfId)
     .filter((id, i, a) => a.indexOf(id) === i)
-    .map((id) => <Author key={id} contactId={id} />)
+    .map((id) => (
+      <Author key={id} contactId={id} isPresent={presence.some((p) => p.contact === id)} />
+    ))
 
   return <div className="Authors">{authors}</div>
 }
