@@ -20,7 +20,8 @@ export default function VideoContent({ hypermergeUrl }: ContentProps) {
   )
 }
 
-const supportsMimeType = (mimeType) => !!mimeType.match('video/')
+const supportsMimeType = (mimeType) =>
+  !!(mimeType.match('video/') || mimeType.match('application/ogg'))
 
 ContentTypes.register({
   type: 'video',
