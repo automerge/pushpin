@@ -11,6 +11,7 @@ A project initiated by [Ink & Switch](https://inkandswitch.com/).
 ## Running from Source
 
 ```console
+$ nvm use 12
 $ yarn
 $ yarn start
 ```
