@@ -11,12 +11,12 @@ export interface Props {
 const STATUS = {
   'no-devices': {
     color: 'grey',
-    icon: ['cloud', 'warning'] as [string, string],
+    icon: 'cloud',
     hover: 'Nothing to sync with.',
   },
   'not-connected': {
     color: 'orange',
-    icon: ['cloud', 'times'] as [string, string],
+    icon: 'cloud',
     hover: 'Your other devices are unreachable.',
   },
   connected: {

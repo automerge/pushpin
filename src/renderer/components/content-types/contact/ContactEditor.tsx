@@ -150,7 +150,7 @@ export default function ContactEditor(props: ContentProps) {
         {status !== 'connected' ? (
           <div className="ContactEditor-sectionLabel">
             <ListItem>
-              <Badge backgroundColor="#00000000" size="medium" icon={['cloud', 'question']} />
+              <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
               <SecondaryText>
                 You should <a href="https://github.com/mjtognetti/pushpin-peer">add a cloud peer</a>
                 !
