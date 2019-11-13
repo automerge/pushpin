@@ -4,7 +4,12 @@ import { clipboard } from 'electron'
 import Omnibox from './omnibox/Omnibox'
 import Content from '../../Content'
 import Authors from './Authors'
-import { HypermergeUrl, PushpinUrl, createDocumentLink } from '../../../ShareLink'
+import {
+  HypermergeUrl,
+  PushpinUrl,
+  createDocumentLink,
+  parseDocumentLink,
+} from '../../../ShareLink'
 
 import './TitleBar.css'
 import { useDocument, useEvent } from '../../../Hooks'
@@ -93,6 +98,8 @@ export default function TitleBar(props: Props) {
     return null
   }
 
+  const { hypermergeUrl: currentDocHypermergeUrl } = parseDocumentLink(doc.currentDocUrl)
+
   return (
     <div className="TitleBar">
       <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar-menuItem">
@@ -112,7 +119,7 @@ export default function TitleBar(props: Props) {
       </button>
 
       <Content url={doc.currentDocUrl} context="list" editable />
-      <Authors hypermergeUrl={props.hypermergeUrl} />
+      <Authors currentDocUrl={currentDocHypermergeUrl} workspaceUrl={props.hypermergeUrl} />
       <div className="TitleBar-self">
         <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" />
       </div>

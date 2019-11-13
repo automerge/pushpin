@@ -50,7 +50,7 @@ export default function TextContent(props: Props) {
 
   return (
     <div
-      className="TextContent"
+      className="TextContent BoardCard--standard"
       ref={ref}
       onCopy={stopPropagation}
       onCut={stopPropagation}

@@ -2,32 +2,30 @@ import React from 'react'
 import Debug from 'debug'
 
 import { ContentProps } from '../../Content'
-import { StoragePeerDoc } from '.'
 import Badge from '../../Badge'
 
 import './StoragePeer.css'
-import { useDocument } from '../../../Hooks'
 import TitleEditor from '../../TitleEditor'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
+import { useStoragePeer } from './StoragePeerHooks'
 
 const log = Debug('pushpin:settings')
 
 export default function StoragePeer(props: ContentProps) {
-  const [doc] = useDocument<StoragePeerDoc>(props.hypermergeUrl)
+  const [doc] = useStoragePeer(props.hypermergeUrl)
 
   if (!doc) {
     return null
   }
 
   const { context, url, hypermergeUrl } = props
-  const { name, storedUrls } = doc
+  const { name, registry } = doc
+  const countRegistered = Object.keys(registry).length
 
   const title = name
-  const subtitle = `${storedUrls.length} URL${
-    Object.keys(storedUrls).length === 1 ? '' : 's'
-  } stored`
+  const subtitle = `${countRegistered} stored workspace${countRegistered === 1 ? '' : 's'}`
 
   switch (context) {
     case 'list':

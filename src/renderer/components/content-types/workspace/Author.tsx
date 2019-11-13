@@ -7,6 +7,7 @@ import './Author.css'
 
 interface Props {
   contactId: HypermergeUrl
+  isPresent: boolean
 }
 
 export default function Author(props: Props) {
@@ -14,7 +15,11 @@ export default function Author(props: Props) {
   if (!contact) return null
   return (
     <div className="Author" data-name={contact.name}>
-      <Content context="title-bar" url={createDocumentLink('contact', props.contactId)} />
+      <Content
+        context="title-bar"
+        url={createDocumentLink('contact', props.contactId)}
+        isPresent={props.isPresent}
+      />
     </div>
   )
 }

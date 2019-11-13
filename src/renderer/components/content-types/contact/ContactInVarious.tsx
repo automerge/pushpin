@@ -4,7 +4,7 @@ import Debug from 'debug'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import { createDocumentLink } from '../../../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 
 import './ContactInVarious.css'
@@ -15,13 +15,20 @@ import ColorBadge from '../../ColorBadge'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
+import classNames from 'classnames'
+import CenteredVerticalStack from '../../CenteredVerticalStack'
+import Heading from '../../Heading'
 
 const log = Debug('pushpin:settings')
 
 ContactInVarious.minWidth = 4
 ContactInVarious.minHeight = 5
 
-export default function ContactInVarious(props: ContentProps) {
+export interface ContactProps extends ContentProps {
+  isPresent?: boolean
+}
+
+export default function ContactInVarious(props: ContactProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
   const selfId = useSelfId()
 
@@ -35,7 +42,7 @@ export default function ContactInVarious(props: ContentProps) {
     return null
   }
 
-  const { context, url, hypermergeUrl } = props
+  const { context, url, hypermergeUrl, isPresent } = props
   const { color } = contact
 
   const avatarImage = avatarDocId ? (
@@ -46,21 +53,19 @@ export default function ContactInVarious(props: ContentProps) {
 
   const avatar = (
     <div className="Contact-avatar">
-      <a href={props.url}>
-        <div
-          className={`Avatar Avatar--${context}`}
-          style={{ ['--highlight-color' as any]: color }}
-        >
-          {avatarImage}
-        </div>
-        <div className="Contact-status">
-          {isSelf ? (
-            <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
-          ) : (
-            isOnline && <ColorBadge color="green" />
-          )}
-        </div>
-      </a>
+      <div
+        className={classNames('Avatar', `Avatar--${context}`, isPresent && 'Avatar--present')}
+        style={{ ['--highlight-color' as any]: color }}
+      >
+        {avatarImage}
+      </div>
+      <div className="Contact-status">
+        {isSelf ? (
+          <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
+        ) : (
+          isOnline && <ColorBadge color="green" />
+        )}
+      </div>
     </div>
   )
 
@@ -86,9 +91,11 @@ export default function ContactInVarious(props: ContentProps) {
 
     case 'board':
       return (
-        <div className="Contact--board">
-          {avatar}
-          <div className="Contact-boardLabel">{name}</div>
+        <div className="Contact--board BoardCard--standard">
+          <CenteredVerticalStack>
+            {avatar}
+            <Heading wrap>{name || ''}</Heading>
+          </CenteredVerticalStack>
         </div>
       )
 

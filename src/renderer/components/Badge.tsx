@@ -8,10 +8,11 @@ type Circle = 'circle'
 type Square = 'square'
 export type BadgeShape = Circle | Square
 
+type Huge = 'huge'
 type Large = 'large'
 type Medium = 'medium'
 type Small = 'small'
-export type BadgeSize = Large | Medium | Small
+export type BadgeSize = Huge | Large | Medium | Small
 
 export interface Props {
   icon?: string

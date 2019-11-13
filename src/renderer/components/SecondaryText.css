@@ -5,4 +5,5 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 12px;
+  width: 100%;
 }
