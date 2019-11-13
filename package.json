@@ -127,6 +127,7 @@
   },
   "resolutions": {
     "automerge": "github:automerge/automerge#opaque-strings",
-    "sharp": "^0.23.1"
+    "sharp": "^0.23.1",
+    "memory-pager": "1.4.0"
   }
 }
