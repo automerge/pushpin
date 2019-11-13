@@ -9,10 +9,8 @@ import { createDocumentLink } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 
 import './ContactInVarious.css'
-import { useSelfId, useDocument } from '../../../Hooks'
-import { useContactOnlineStatus } from '../../../PresenceHooks'
-import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
-import ColorBadge from '../../ColorBadge'
+import { useDocument } from '../../../Hooks'
+import ConnectionStatusBadge from './ConnectionStatusBadge'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
@@ -30,13 +28,9 @@ export interface ContactProps extends ContentProps {
 
 export default function ContactInVarious(props: ContactProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
-  const selfId = useSelfId()
 
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
-
-  const isSelf = selfId === props.hypermergeUrl
-  const isOnline = useContactOnlineStatus(props.hypermergeUrl)
 
   if (!contact) {
     return null
@@ -60,11 +54,7 @@ export default function ContactInVarious(props: ContactProps) {
         {avatarImage}
       </div>
       <div className="Contact-status">
-        {isSelf ? (
-          <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
-        ) : (
-          isOnline && <ColorBadge color="green" />
-        )}
+        <ConnectionStatusBadge contactId={props.hypermergeUrl} />
       </div>
     </div>
   )

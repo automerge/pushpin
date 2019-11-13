@@ -35,7 +35,7 @@ function Device(props: Props) {
             icon={doc.icon || 'desktop'}
             shape="circle"
             size="large"
-            backgroundColor={`var(${isOnline ? '--online-color' : '--offline-color'})`}
+            backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
           />
         </div>
       )
@@ -46,7 +46,7 @@ function Device(props: Props) {
             <Badge
               icon={icon}
               shape="circle"
-              backgroundColor={`var(${isOnline ? '--online-color' : '--offline-color'})`}
+              backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
             />
           </div>
           {props.editable ? (

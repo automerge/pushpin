@@ -20,7 +20,7 @@ import ActionListItem from '../workspace/omnibox/ActionListItem'
 import './ContactEditor.css'
 import { CurrentDeviceContext } from '../workspace/Device'
 import { importFileList } from '../../../ImportData'
-import OwnDeviceConnectionStatus from './OwnDeviceConnectionStatus'
+import ConnectionStatusBadge from './ConnectionStatusBadge'
 import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../Badge'
 
@@ -141,8 +141,8 @@ export default function ContactEditor(props: ContentProps) {
     return (
       <div className="ContactEditor-section">
         <div className="ContactEditor-sectionLabel">
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <OwnDeviceConnectionStatus size="medium" contactId={hypermergeUrl} />
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <ConnectionStatusBadge size="medium" contactId={hypermergeUrl} />
             Devices
           </div>
         </div>

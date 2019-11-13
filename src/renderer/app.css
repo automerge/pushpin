@@ -133,7 +133,9 @@ table {
   --colorSecondaryGrey: #637389;
   --colorPaleGrey: #d5dfe5;
   --colorInputGrey: #e9edf0;
-  --colorOnline: rgb(113, 227, 65);
+  --colorOnline: #33ab77;
+  --colorOffline: lightgray;
+  --colorWarning: #ffbb33; /* material design warning */
   --colorLink: #0645ad;
   --colorDestructive: #f87060;
 
