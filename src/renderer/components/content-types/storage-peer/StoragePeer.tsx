@@ -10,11 +10,15 @@ import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
 import { useStoragePeer } from './StoragePeerHooks'
+import CenteredStack from '../../CenteredStack'
+import SecondaryText from '../../SecondaryText'
+import { useDeviceOnlineStatus } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:settings')
 
 export default function StoragePeer(props: ContentProps) {
   const [doc] = useStoragePeer(props.hypermergeUrl)
+  const isOnline = useDeviceOnlineStatus(props.hypermergeUrl)
 
   if (!doc) {
     return null
@@ -32,7 +36,11 @@ export default function StoragePeer(props: ContentProps) {
       return (
         <ListItem>
           <ContentDragHandle url={url}>
-            <Badge icon="cloud" shape="circle" />
+            <Badge
+              icon="cloud"
+              shape="circle"
+              backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
+            />
           </ContentDragHandle>
           <TitleWithSubtitle
             title={title}
@@ -45,9 +53,17 @@ export default function StoragePeer(props: ContentProps) {
 
     case 'board':
       return (
-        <div className="StoragePeer">
-          <Badge icon="cloud" size="large" />
-          <TitleEditor field="name" url={props.hypermergeUrl} />
+        <div className="StoragePeer BoardCard--standard">
+          <CenteredStack>
+            <Badge
+              icon="cloud"
+              shape="circle"
+              size="huge"
+              backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
+            />
+            <TitleEditor field="name" url={props.hypermergeUrl} />
+            <SecondaryText>{subtitle}</SecondaryText>
+          </CenteredStack>
         </div>
       )
 
