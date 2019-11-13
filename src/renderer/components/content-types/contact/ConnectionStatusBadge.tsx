@@ -7,6 +7,7 @@ import './ConnectionStatusBadge.css'
 export interface Props {
   contactId: HypermergeUrl
   size?: BadgeSize
+  hover?: boolean
 }
 
 const STATUS = {
@@ -33,8 +34,8 @@ const STATUS = {
   },
 }
 
-export default function ConnectionStatusBadge(props: Props) {
-  const status = useConnectionStatus(props.contactId)
+export default function ConnectionStatusBadge({ contactId, size = 'tiny', hover = true }: Props) {
+  const status = useConnectionStatus(contactId)
   if (status === 'not-connected') {
     return null
   }
@@ -45,9 +46,9 @@ export default function ConnectionStatusBadge(props: Props) {
         shape="square"
         color={STATUS[status].color}
         backgroundColor={STATUS[status].backgroundColor}
-        size={props.size || 'tiny'}
+        size={size}
         icon={STATUS[status].icon}
-        hover={STATUS[status].hover}
+        hover={hover ? STATUS[status].hover : undefined}
       />
     </div>
   )

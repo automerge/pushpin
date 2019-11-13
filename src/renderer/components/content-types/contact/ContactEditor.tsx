@@ -142,7 +142,7 @@ export default function ContactEditor(props: ContentProps) {
       <div className="ContactEditor-section">
         <div className="ContactEditor-sectionLabel">
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <ConnectionStatusBadge size="medium" contactId={hypermergeUrl} />
+            <ConnectionStatusBadge size="medium" hover={false} contactId={hypermergeUrl} />
             Devices
           </div>
         </div>
@@ -152,11 +152,9 @@ export default function ContactEditor(props: ContentProps) {
             <ListItem>
               <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
               <SecondaryText>
-                You should{' '}
-                <a href="https://github.com/mjtognetti/pushpin-peer">
-                  add a storage peer to keep your data online when PushPin is offline or closed.
-                </a>
-                !
+                Consider adding{' '}
+                <a href="https://github.com/mjtognetti/pushpin-peer">a storage peer</a> to keep your
+                data online when PushPin is offline or closed.
               </SecondaryText>
             </ListItem>
           </div>
