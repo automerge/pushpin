@@ -10,6 +10,9 @@ import Badge from '../../Badge'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
+import CenteredVerticalStack from '../../CenteredVerticalStack'
+import SecondaryText from '../../SecondaryText'
+import Heading from '../../Heading'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -33,6 +36,7 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
   }
   const { size, mimeType } = header
 
+  const subtitle = `${size !== null ? humanFileSize(size) : 'unknown size'}`
   function renderUnidentifiedFile() {
     switch (context) {
       case 'list':
@@ -44,11 +48,11 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
               extension={extension}
               hyperfileUrl={hyperfileUrl}
             >
-              <Badge shape="square" icon="files-o" />
+              <Badge shape="square" icon="file-o" />
             </ContentDragHandle>
             <TitleWithSubtitle
               title={title}
-              subtitle={`${size !== null ? humanFileSize(size) : 'unknown size'}`}
+              subtitle={subtitle}
               hypermergeUrl={hypermergeUrl}
               editable={editable}
             />
@@ -56,13 +60,12 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
         )
       default:
         return (
-          <div className="FileContent">
-            <Badge ref={badgeRef} size="large" shape="square" icon="files-o" />
-            <div className="Caption">
-              <span className="Title">{title}</span>
-              <br />
-              {`${size !== null ? humanFileSize(size) : 'unknown size'}`}
-            </div>
+          <div className="BoardCard--standard">
+            <CenteredVerticalStack>
+              <Badge ref={badgeRef} size="huge" shape="square" icon="file-o" />
+              <Heading>{title}</Heading>
+              <SecondaryText>{subtitle}</SecondaryText>
+            </CenteredVerticalStack>
           </div>
         )
     }

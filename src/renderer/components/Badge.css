@@ -2,53 +2,30 @@
   background-color: #d5dfe5;
   background-size: cover;
   background-position: center;
-  line-height: 1;
-}
 
-.Badge--image {
-  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
-}
+  text-align: center;
+  vertical-align: bottom;
 
-.Badge--large {
-  padding: 6px;
-  font-size: 20px;
-  width: 20px;
-}
-
-.Badge--medium {
-  padding: 4px;
-  font-size: 15px;
-  width: 15px;
+  width: var(--size);
+  height: var(--size);
+  line-height: var(--size);
+  font-size: calc(var(--size) * 0.625);
 }
 
 .Badge--small {
-  padding: 2px;
-  font-size: 10px;
-  width: 10px;
+  --size: 20px;
 }
 
-.Badge--blue {
-  background: #8edce6;
+.Badge--medium {
+  --size: 28px;
 }
 
-.Badge--red {
-  background: #f87060;
+.Badge--large {
+  --size: 32px;
 }
 
-.Badge--purple {
-  background: #c7abff;
-}
-
-.Badge--yellow {
-  background: #ffe17e;
-}
-
-.Badge--green {
-  background: #b5e6a1;
-}
-
-.Badge--pink {
-  background: #ff84cd;
+.Badge--huge {
+  --size: 60px;
 }
 
 .Badge--circle {
@@ -58,8 +35,17 @@
   border-radius: 10%;
 }
 
-/* The clipboard icon is offset, so we have to counteroffset manually. */
+/* Several icons are offset, so we have to counteroffset manually. */
 .Badge .fa.fa-clipboard:before {
   display: inline-block;
   transform: translate(2%, -3%);
+}
+.Badge .fa.fa-files-o:before {
+  display: inline-block;
+  transform: translate(4%, 11%);
+}
+
+.Badge .fa.fa-file-o:before {
+  display: inline-block;
+  transform: translate(4%, 9%);
 }

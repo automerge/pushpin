@@ -2,19 +2,23 @@ import React from 'react'
 
 import { ContentProps } from '../../Content'
 import { BoardDoc } from '.'
-import { createDocumentLink } from '../../../ShareLink'
 import { useDocument } from '../../../Hooks'
 import './BoardInBoard.css'
+import Badge from '../../Badge'
+import SecondaryText from '../../SecondaryText'
+import Heading from '../../Heading'
+import CenteredVerticalStack from '../../CenteredVerticalStack'
 
-BoardInBoard.minWidth = 4
+BoardInBoard.minWidth = 5
 BoardInBoard.minHeight = 6
 BoardInBoard.defaultWidth = 6
-BoardInBoard.defaultHeight = 6
+BoardInBoard.defaultHeight = 9
 BoardInBoard.maxWidth = 9
-BoardInBoard.maxHeight = 9
+BoardInBoard.maxHeight = 10
 
 export default function BoardInBoard(props: ContentProps) {
-  const [doc] = useDocument<BoardDoc>(props.hypermergeUrl)
+  const { hypermergeUrl } = props
+  const [doc] = useDocument<BoardDoc>(hypermergeUrl)
 
   if (!doc) {
     return null
@@ -23,22 +27,15 @@ export default function BoardInBoard(props: ContentProps) {
   const { title, backgroundColor, cards } = doc
 
   const childCardCount = Object.keys(cards || {}).length
-
-  function handleDoubleClick(e: React.MouseEvent) {
-    e.stopPropagation()
-    window.location.href = createDocumentLink('board', props.hypermergeUrl)
-  }
+  const subTitle = `${childCardCount} card${childCardCount === 1 ? '' : 's'}`
 
   return (
-    <div className="BoardLink BoardInBoard-wrapper" onDoubleClick={handleDoubleClick}>
-      <div className="BoardInBoard-icon" style={{ background: backgroundColor }}>
-        <i className="fa fa-files-o" />
-      </div>
-      <div className="BoardInBoard-caption">
-        <span className="BoardInBoard-title">{title}</span>
-        <br />
-        {`${childCardCount} card${childCardCount === 1 ? '' : 's'}`}
-      </div>
+    <div className="BoardInBoard BoardCard--standard">
+      <CenteredVerticalStack>
+        <Badge size="huge" icon="files-o" backgroundColor={backgroundColor} />
+        <Heading wrap>{title}</Heading>
+        <SecondaryText>{subTitle}</SecondaryText>
+      </CenteredVerticalStack>
     </div>
   )
 }

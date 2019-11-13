@@ -16,6 +16,8 @@ import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
 import classNames from 'classnames'
+import CenteredVerticalStack from '../../CenteredVerticalStack'
+import Heading from '../../Heading'
 
 const log = Debug('pushpin:settings')
 
@@ -51,21 +53,19 @@ export default function ContactInVarious(props: ContactProps) {
 
   const avatar = (
     <div className="Contact-avatar">
-      <a href={props.url}>
-        <div
-          className={classNames('Avatar', `Avatar--${context}`, isPresent && 'Avatar--present')}
-          style={{ ['--highlight-color' as any]: color }}
-        >
-          {avatarImage}
-        </div>
-        <div className="Contact-status">
-          {isSelf ? (
-            <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
-          ) : (
-            isOnline && <ColorBadge color="green" />
-          )}
-        </div>
-      </a>
+      <div
+        className={classNames('Avatar', `Avatar--${context}`, isPresent && 'Avatar--present')}
+        style={{ ['--highlight-color' as any]: color }}
+      >
+        {avatarImage}
+      </div>
+      <div className="Contact-status">
+        {isSelf ? (
+          <OwnDeviceConnectionStatus contactId={props.hypermergeUrl} />
+        ) : (
+          isOnline && <ColorBadge color="green" />
+        )}
+      </div>
     </div>
   )
 
@@ -91,9 +91,11 @@ export default function ContactInVarious(props: ContactProps) {
 
     case 'board':
       return (
-        <div className="Contact--board">
-          {avatar}
-          <div className="Contact-boardLabel">{name}</div>
+        <div className="Contact--board BoardCard--standard">
+          <CenteredVerticalStack>
+            {avatar}
+            <Heading wrap>{name || ''}</Heading>
+          </CenteredVerticalStack>
         </div>
       )
 
