@@ -13,12 +13,6 @@
   background-color: white;
 }
 
-.TitleBar-Map-ColorBadgePlacer {
-  position: absolute;
-  right: -4px;
-  bottom: 0px;
-}
-
 button[disabled].TitleBar-menuItem .fa {
   color: #ccc;
 }

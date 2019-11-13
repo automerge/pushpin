@@ -1,10 +1,11 @@
 import React from 'react'
 import Debug from 'debug'
+import classNames from 'classnames'
 
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
+import { createDocumentLink } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 
 import './ContactInVarious.css'
@@ -15,7 +16,6 @@ import ColorBadge from '../../ColorBadge'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
-import classNames from 'classnames'
 import CenteredVerticalStack from '../../CenteredVerticalStack'
 import Heading from '../../Heading'
 

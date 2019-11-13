@@ -13,7 +13,9 @@
 }
 
 .Badge--tiny {
-  --size: 10px;
+  --size: 12px;
+  font-size: 12px;
+  /* tiny badge needs a bump in size */
 }
 
 .Badge--small {

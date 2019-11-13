@@ -2,6 +2,7 @@ import React from 'react'
 import { HypermergeUrl } from '../../../ShareLink'
 import Badge, { BadgeSize } from '../../Badge'
 import { useConnectionStatus } from '../../../PresenceHooks'
+import './OwnDeviceConnectionStatus.css'
 
 export interface Props {
   contactId: HypermergeUrl
@@ -10,29 +11,32 @@ export interface Props {
 
 const STATUS = {
   'no-devices': {
-    color: 'grey',
-    icon: 'cloud',
-    hover: 'Nothing to sync with.',
+    color: 'black',
+    icon: 'wifi',
+    hover: 'No other devices to sync with.',
   },
   'not-connected': {
-    color: 'orange',
-    icon: 'cloud',
-    hover: 'Your other devices are unreachable.',
+    backgroundColor: 'orange',
+    icon: 'wifi',
+    hover: 'Cannot reach your other devices.',
   },
   connected: {
-    color: 'green',
-    icon: 'undefined',
+    backgroundColor: 'darkseagreen',
+    color: 'black',
+    icon: 'wifi',
     hover: 'Syncing active.',
   },
 }
 
 export default function OwnDeviceConnectionStatus(props: Props) {
-  const status = useConnectionStatus(props.contactId)
+  const status = 'not-connected' // useConnectionStatus(props.contactId)
   return (
     // xxx: fix this style
-    <div className="TitleBar-Map-ColorBadgePlacer">
+    <div className="OwnDevice-ConnectionStatus">
       <Badge
-        backgroundColor={STATUS[status].color}
+        shape="square"
+        color={STATUS[status].color}
+        backgroundColor={STATUS[status].backgroundColor}
         size={props.size || 'tiny'}
         icon={STATUS[status].icon}
         hover={STATUS[status].hover}

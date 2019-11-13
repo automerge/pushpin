@@ -19,20 +19,21 @@ export interface Props {
   icon?: string
   img?: string
   hover?: string
+  color?: string
   backgroundColor?: string
   shape?: BadgeShape
   size?: BadgeSize
 }
 
 export default React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) => {
-  const { icon, backgroundColor, size = 'large', shape = 'circle', img, hover } = props
+  const { icon, color, backgroundColor, size = 'large', shape = 'circle', img, hover } = props
   return (
     <div
       ref={ref}
       className={`Badge Badge--${size} Badge--${shape} ${img ? 'Badge--image' : null} ${
         hover ? 'Badge--hover' : null
       }`}
-      style={{ backgroundColor, backgroundImage: img ? `url(${img})` : undefined }}
+      style={{ color, backgroundColor, backgroundImage: img ? `url(${img})` : undefined }}
       data-hover={hover}
     >
       <i className={`fa fa-${icon}`} />
