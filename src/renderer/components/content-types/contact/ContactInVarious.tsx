@@ -4,7 +4,7 @@ import Debug from 'debug'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import { createDocumentLink } from '../../../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 
 import './ContactInVarious.css'
@@ -15,13 +15,18 @@ import ColorBadge from '../../ColorBadge'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
+import classNames from 'classnames'
 
 const log = Debug('pushpin:settings')
 
 ContactInVarious.minWidth = 4
 ContactInVarious.minHeight = 5
 
-export default function ContactInVarious(props: ContentProps) {
+export interface ContactProps extends ContentProps {
+  isPresent?: boolean
+}
+
+export default function ContactInVarious(props: ContactProps) {
   const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
   const selfId = useSelfId()
 
@@ -35,7 +40,7 @@ export default function ContactInVarious(props: ContentProps) {
     return null
   }
 
-  const { context, url, hypermergeUrl } = props
+  const { context, url, hypermergeUrl, isPresent } = props
   const { color } = contact
 
   const avatarImage = avatarDocId ? (
@@ -48,7 +53,7 @@ export default function ContactInVarious(props: ContentProps) {
     <div className="Contact-avatar">
       <a href={props.url}>
         <div
-          className={`Avatar Avatar--${context}`}
+          className={classNames('Avatar', `Avatar--${context}`, isPresent && 'Avatar--present')}
           style={{ ['--highlight-color' as any]: color }}
         >
           {avatarImage}

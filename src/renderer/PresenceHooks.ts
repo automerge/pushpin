@@ -14,7 +14,7 @@ const heartbeats: { [url: string]: number } = {} // url: HypermergeUrl
  */
 const myPresence: { [url: string /* HypermergeUrl */]: { [key: string]: any } } = {}
 
-const HEARTBEAT_INTERVAL = 1000 // ms
+const HEARTBEAT_INTERVAL = 5000 // ms
 
 export interface RemotePresence<P> {
   contact: HypermergeUrl
@@ -126,7 +126,7 @@ export function usePresence<P>(
       [remotePresenceToLookupKey(presence)]: { ...presence },
     }))
   }
-  const [bumpTimeout, depart] = useTimeouts(5000, (key: string) => {
+  const [bumpTimeout, depart] = useTimeouts(HEARTBEAT_INTERVAL * 2, (key: string) => {
     const [contact, device] = lookupKeyToPresencePieces(key)
     setSingleRemote({ contact, device, data: undefined })
   })
@@ -134,7 +134,7 @@ export function usePresence<P>(
   useMessaging<any>(url, (msg: HeartbeatMessage) => {
     const { contact, device, heartbeat, departing, data } = msg
     const presence = { contact, device, data }
-    if (heartbeat || data) {
+    if (heartbeat || data !== undefined) {
       bumpTimeout(remotePresenceToLookupKey(presence))
       setSingleRemote(presence)
     } else if (departing) {
