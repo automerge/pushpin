@@ -219,5 +219,5 @@ export function useConnectionStatus(contactId: HypermergeUrl | null): Connection
 
   if (!contact || !contact.devices || contact.devices.length <= 1) return 'self-no-devices'
 
-  return onlineDevices.length > 1 ? 'connected' : 'not-connected'
+  return onlineDevices.length > 1 ? 'connected' : 'self-unreachable'
 }
