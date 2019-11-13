@@ -40,7 +40,6 @@ export default function ConnectionStatusBadge({ contactId, size = 'tiny', hover 
     return null
   }
   return (
-    // xxx: fix this style
     <div className="OwnDevice-ConnectionStatus">
       <Badge
         shape="square"
