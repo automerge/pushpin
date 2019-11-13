@@ -45,8 +45,13 @@ export default function ContactInVarious(props: ContactProps) {
     <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   )
 
+  const onDoubleClick = (e: React.MouseEvent) => {
+    window.location.href = url as string
+    e.stopPropagation()
+  }
+
   const avatar = (
-    <div className="Contact-avatar">
+    <div className="Contact-avatar" onDoubleClick={onDoubleClick}>
       <div
         className={classNames('Avatar', `Avatar--${context}`, isPresent && 'Avatar--present')}
         style={{ ['--highlight-color' as any]: color }}
