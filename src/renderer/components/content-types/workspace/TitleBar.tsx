@@ -132,19 +132,17 @@ export default function TitleBar(props: Props) {
         <i className="fa fa-clipboard" />
       </button>
 
-      {activeOmnibox ? (
-        <WorkspaceUrlsContext.Consumer>
-          {(workspaceUrlsContext) => (
-            <Omnibox
-              active={activeOmnibox}
-              hypermergeUrl={props.hypermergeUrl}
-              omniboxFinished={hideOmnibox}
-              onContent={props.onContent}
-              workspaceUrlsContext={workspaceUrlsContext}
-            />
-          )}
-        </WorkspaceUrlsContext.Consumer>
-      ) : null}
+      <WorkspaceUrlsContext.Consumer>
+        {(workspaceUrlsContext) => (
+          <Omnibox
+            active={activeOmnibox}
+            hypermergeUrl={props.hypermergeUrl}
+            omniboxFinished={hideOmnibox}
+            onContent={props.onContent}
+            workspaceUrlsContext={workspaceUrlsContext}
+          />
+        )}
+      </WorkspaceUrlsContext.Consumer>
     </div>
   )
 }

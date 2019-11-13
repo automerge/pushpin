@@ -17,6 +17,10 @@
   flex-direction: column;
 }
 
+.Omnibox--inactive {
+  display: none;
+}
+
 .Omnibox-header {
   display: flex;
   flex-direction: row;

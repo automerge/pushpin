@@ -3,6 +3,7 @@
 
 import React, { useRef, useState, useCallback, useEffect } from 'react'
 import Debug from 'debug'
+import classNames from 'classnames'
 
 import { HypermergeUrl, parseDocumentLink, PushpinUrl } from '../../../../ShareLink'
 import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
@@ -35,7 +36,11 @@ export default function Omnibox(props: Props) {
     if (!omniboxRef.current) {
       return
     }
-    if (event.target !== omniboxRef.current && !omniboxRef.current.contains(event.target)) {
+    if (
+      active &&
+      event.target !== omniboxRef.current &&
+      !omniboxRef.current.contains(event.target)
+    ) {
       omniboxFinished()
     }
   })
@@ -61,7 +66,11 @@ export default function Omnibox(props: Props) {
   const { workspaceUrls } = workspaceUrlsContext
 
   return (
-    <div className="Omnibox" ref={omniboxRef} onPaste={stopPropagation}>
+    <div
+      className={classNames(`Omnibox`, active ? 'Omnibox--active' : 'Omnibox--inactive')}
+      ref={omniboxRef}
+      onPaste={stopPropagation}
+    >
       <div className="Omnibox-header">
         <input
           className="Omnibox-input"
