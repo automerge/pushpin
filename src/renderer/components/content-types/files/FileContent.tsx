@@ -10,7 +10,7 @@ import Badge from '../../Badge'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
-import CenteredVerticalStack from '../../CenteredVerticalStack'
+import CenteredStack from '../../CenteredStack'
 import SecondaryText from '../../SecondaryText'
 import Heading from '../../Heading'
 
@@ -61,11 +61,11 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
       default:
         return (
           <div className="BoardCard--standard">
-            <CenteredVerticalStack>
+            <CenteredStack>
               <Badge ref={badgeRef} size="huge" shape="square" icon="file-o" />
               <Heading>{title}</Heading>
               <SecondaryText>{subtitle}</SecondaryText>
-            </CenteredVerticalStack>
+            </CenteredStack>
           </div>
         )
     }

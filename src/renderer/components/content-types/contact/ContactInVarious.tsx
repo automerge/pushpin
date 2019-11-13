@@ -14,7 +14,7 @@ import ConnectionStatusBadge from './ConnectionStatusBadge'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
-import CenteredVerticalStack from '../../CenteredVerticalStack'
+import CenteredStack from '../../CenteredStack'
 import Heading from '../../Heading'
 
 const log = Debug('pushpin:settings')
@@ -88,10 +88,10 @@ export default function ContactInVarious(props: ContactProps) {
     case 'board':
       return (
         <div className="Contact--board BoardCard--standard">
-          <CenteredVerticalStack>
+          <CenteredStack>
             {avatar}
             <Heading wrap>{name || ''}</Heading>
-          </CenteredVerticalStack>
+          </CenteredStack>
         </div>
       )
 

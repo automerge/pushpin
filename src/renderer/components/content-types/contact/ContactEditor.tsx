@@ -23,6 +23,7 @@ import { importFileList } from '../../../ImportData'
 import ConnectionStatusBadge from './ConnectionStatusBadge'
 import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../Badge'
+import CenteredStack from '../../CenteredStack'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -141,10 +142,10 @@ export default function ContactEditor(props: ContentProps) {
     return (
       <div className="ContactEditor-section">
         <div className="ContactEditor-sectionLabel">
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <CenteredStack direction="row">
             <ConnectionStatusBadge size="medium" hover={false} contactId={hypermergeUrl} />
             Devices
-          </div>
+          </CenteredStack>
         </div>
         <div className="ContactEditor-sectionContent">{renderedDevices}</div>
         {status !== 'connected' ? (

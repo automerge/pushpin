@@ -72,4 +72,5 @@
   font-size: 12px;
   line-height: 16px;
   color: var(--colorBlueBlack);
+  z-index: 3;
 }

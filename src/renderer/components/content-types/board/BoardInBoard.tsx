@@ -7,7 +7,7 @@ import './BoardInBoard.css'
 import Badge from '../../Badge'
 import SecondaryText from '../../SecondaryText'
 import Heading from '../../Heading'
-import CenteredVerticalStack from '../../CenteredVerticalStack'
+import CenteredStack from '../../CenteredStack'
 
 BoardInBoard.minWidth = 5
 BoardInBoard.minHeight = 6
@@ -31,11 +31,11 @@ export default function BoardInBoard(props: ContentProps) {
 
   return (
     <div className="BoardInBoard BoardCard--standard">
-      <CenteredVerticalStack>
+      <CenteredStack>
         <Badge size="huge" icon="files-o" backgroundColor={backgroundColor} />
         <Heading wrap>{title}</Heading>
         <SecondaryText>{subTitle}</SecondaryText>
-      </CenteredVerticalStack>
+      </CenteredStack>
     </div>
   )
 }
