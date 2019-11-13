@@ -143,7 +143,7 @@ export default function ContactEditor(props: ContentProps) {
       <div className="ContactEditor-section">
         <div className="ContactEditor-sectionLabel">
           <CenteredStack direction="row">
-            <ConnectionStatusBadge size="medium" hover={false} contactId={hypermergeUrl} />
+            <ConnectionStatusBadge size="small" hover={false} contactId={hypermergeUrl} />
             Devices
           </CenteredStack>
         </div>
