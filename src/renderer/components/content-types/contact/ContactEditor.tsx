@@ -152,7 +152,10 @@ export default function ContactEditor(props: ContentProps) {
             <ListItem>
               <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
               <SecondaryText>
-                You should <a href="https://github.com/mjtognetti/pushpin-peer">add a cloud peer</a>
+                You should{' '}
+                <a href="https://github.com/mjtognetti/pushpin-peer">
+                  add a storage peer to keep your data online when PushPin is offline or closed.
+                </a>
                 !
               </SecondaryText>
             </ListItem>
