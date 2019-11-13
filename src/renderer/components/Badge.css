@@ -44,7 +44,6 @@
   display: inline-block;
   transform: translate(2%, -3%);
 }
-<<<<<<< HEAD
 .Badge .fa.fa-files-o:before {
   display: inline-block;
   transform: translate(4%, 11%);
@@ -54,7 +53,6 @@
   display: inline-block;
   transform: translate(4%, 9%);
 }
-=======
 
 .Badge--hover:hover::after {
   display: block;
@@ -71,6 +69,5 @@
   transform: translateX(-50%);
   font-size: 12px;
   line-height: 16px;
-  color: var(--colorBlueBlack)
+  color: var(--colorBlueBlack);
 }
->>>>>>> WIP patch
