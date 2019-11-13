@@ -14,7 +14,11 @@ import { ToSystemMsg } from '../renderer/System'
 window._debug = {}
 
 const back = new RepoBackend({ path: HYPERMERGE_PATH })
-const swarm = Hyperswarm()
+const swarm = Hyperswarm({
+  queue: {
+    multiplex: true,
+  },
+})
 
 back.setSwarm(swarm)
 back.startFileServer(FILE_SERVER_PATH)
