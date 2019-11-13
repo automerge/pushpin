@@ -10,13 +10,16 @@ export interface Props {
 }
 
 const STATUS = {
-  'no-devices': {
+  'not-connected': {
+    /* nothing, we return null */
+  },
+  'self-no-devices': {
     backgroundColor: 'var(--colorOffline)',
     color: 'black',
     icon: 'wifi',
     hover: 'No other devices to sync with.',
   },
-  'not-connected': {
+  'self-unreachable': {
     backgroundColor: 'var(--colorWarning)',
     color: 'black',
     icon: 'wifi',
@@ -32,6 +35,9 @@ const STATUS = {
 
 export default function ConnectionStatusBadge(props: Props) {
   const status = useConnectionStatus(props.contactId)
+  if (status === 'not-connected') {
+    return null
+  }
   return (
     // xxx: fix this style
     <div className="OwnDevice-ConnectionStatus">

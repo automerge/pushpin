@@ -50,6 +50,7 @@ export default function ContactInVarious(props: ContactProps) {
       <div
         className={classNames('Avatar', `Avatar--${context}`, isPresent && 'Avatar--present')}
         style={{ ['--highlight-color' as any]: color }}
+        data-name={name}
       >
         {avatarImage}
       </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import { HypermergeUrl, parseDocumentLink, createDocumentLink, PushpinUrl } from './ShareLink'
-import { useTimeouts, useMessaging, useRepo, useSelfId, useDocument } from './Hooks'
+import { useTimeouts, useMessaging, useRepo, useSelfId, useDocument, useSelf } from './Hooks'
 import { CurrentDeviceContext } from './components/content-types/workspace/Device'
 import { ContactDoc } from './components/content-types/contact'
 
@@ -204,13 +204,20 @@ export function useDeviceOnlineStatus(deviceId: HypermergeUrl | null): boolean {
   return isCurrentDevice || presence.some((p) => p.device === deviceId)
 }
 
-type NoDevices = 'no-devices' // No other devices are available to connect to.
-type NotConnected = 'not-connected' // There are other devices to connect to, but not connected to any of them.
+type NotConnected = 'not-connected' // There are other devices to connect to, and connected to at least one.
+type NoDevices = 'self-no-devices' // No other devices are available to connect to.
+type Unreachable = 'self-unreachable' // There are other devices to connect to, but not connected to any of them.
 type Connected = 'connected' // There are other devices to connect to, and connected to at least one.
-type ConnectionStatus = NoDevices | NotConnected | Connected
+type ConnectionStatus = NotConnected | NoDevices | Unreachable | Connected
 export function useConnectionStatus(contactId: HypermergeUrl | null): ConnectionStatus {
   const [contact] = useDocument<ContactDoc>(contactId)
+  const selfId = useSelfId()
   const onlineDevices = useOnlineDevicesForContact(contactId)
-  if (!contact || !contact.devices || contact.devices.length <= 1) return 'no-devices'
+  if (selfId !== contactId) {
+    return onlineDevices.length > 0 ? 'connected' : 'not-connected'
+  }
+
+  if (!contact || !contact.devices || contact.devices.length <= 1) return 'self-no-devices'
+
   return onlineDevices.length > 1 ? 'connected' : 'not-connected'
 }

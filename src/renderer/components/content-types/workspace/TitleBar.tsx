@@ -121,7 +121,7 @@ export default function TitleBar(props: Props) {
       <Content url={doc.currentDocUrl} context="list" editable />
       <Authors currentDocUrl={currentDocHypermergeUrl} workspaceUrl={props.hypermergeUrl} />
       <div className="TitleBar-self">
-        <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" />
+        <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" isPresent />
       </div>
 
       <button
