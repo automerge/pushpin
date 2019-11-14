@@ -5,13 +5,17 @@ import * as querystring from 'querystring'
 /** share link helper functions
  * lifted and adapted from pixelpusher
  */
-import { DocUrl } from 'hypermerge'
+import { DocUrl, HyperfileUrl } from 'hypermerge'
 
 export type HypermergeUrl = DocUrl
 export type PushpinUrl = string & { pushpin: true }
 
 export function isHypermergeUrl(str: string): str is HypermergeUrl {
-  return url.parse(str).protocol === 'hypermerge'
+  return url.parse(str).protocol === 'hypermerge:'
+}
+
+export function isHyperfileUrl(str: string): str is HyperfileUrl {
+  return url.parse(str).protocol === 'hyperfile:'
 }
 
 export function isPushpinUrl(str: string): str is PushpinUrl {

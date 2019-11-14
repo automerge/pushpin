@@ -25,6 +25,7 @@ import { CurrentDeviceContext } from './Device'
 import WorkspaceInList from './WorkspaceInList'
 import { importPlainText } from '../../../ImportData'
 import * as DataUrl from '../../../../DataUrl'
+import { usePreload } from '../../../Preload'
 
 const log = Debug('pushpin:workspace')
 
@@ -50,6 +51,8 @@ interface ClipperPayload {
 export default function Workspace(props: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
+
+  usePreload(props.hypermergeUrl)
 
   const selfId = workspace && workspace.selfId
   const currentDocUrl =

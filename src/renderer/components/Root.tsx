@@ -39,6 +39,7 @@ export default function Root({ repo, system }: Props) {
   const currentDeviceUrl = useCurrentDeviceUrl()
 
   const { workspaceUrls, addWorkspaceUrl, createWorkspace } = workspaceUrlsContextData
+
   if (!workspaceUrls[0]) {
     return <div>No workspace urls</div>
   }
