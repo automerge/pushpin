@@ -40,7 +40,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "freeze-dry": "^0.2.4",
     "html-webpack-plugin": "^3.2.0",
-    "hypermerge": "github:automerge/hypermerge",
+    "hypermerge": "github:automerge/hypermerge#crawler",
     "hyperswarm": "^2.3.1",
     "immer": "^4.0.0",
     "immutable": "^3.8.2",
