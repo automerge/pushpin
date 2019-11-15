@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
-import { Handle, RepoFrontend, HyperfileUrl, Doc, Crawler } from 'hypermerge'
+import { Handle, RepoFrontend, HyperfileUrl, Doc } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
 import { Readable } from 'stream'
 import * as Hyperfile from './hyperfile'
@@ -21,19 +21,6 @@ export function useRepo(): RepoFrontend {
   }
 
   return repo
-}
-
-export function useCrawler(workspaceUrl?: HypermergeUrl) {
-  const repo = useRepo()
-  useEffect(() => {
-    if (!repo || !workspaceUrl) return () => {}
-    const crawler = new Crawler(repo)
-    crawler.crawl(workspaceUrl)
-
-    return () => {
-      crawler.close()
-    }
-  }, [repo, workspaceUrl])
 }
 
 export function useSelfId(): HypermergeUrl {

@@ -4541,7 +4541,7 @@ hypercore@^8.2.5:
 
 "hypermerge@github:automerge/hypermerge#crawler":
   version "2.0.0-beta.17"
-  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/216bc50dd5ef5ae1091d97e6748d55c6cab9a355"
+  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/d50d24ef50e7b5cf8c03966b293e07df6c8a74b7"
   dependencies:
     automerge "github:automerge/automerge#opaque-strings"
     better-sqlite3 "^5.4.3"

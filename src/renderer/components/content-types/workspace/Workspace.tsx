@@ -11,7 +11,7 @@ import { ContactDoc } from '../contact'
 import * as WebStreamLogic from '../../../../WebStreamLogic'
 
 import './Workspace.css'
-import { useDocument, useCrawler } from '../../../Hooks'
+import { useDocument } from '../../../Hooks'
 import {
   useAllHeartbeats,
   useHeartbeat,
@@ -50,8 +50,6 @@ interface ClipperPayload {
 export default function Workspace(props: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
-
-  useCrawler(props.hypermergeUrl)
 
   const selfId = workspace && workspace.selfId
   const currentDocUrl =
