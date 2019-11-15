@@ -4540,8 +4540,8 @@ hypercore@^8.2.5:
     fd-lock "^1.0.2"
 
 "hypermerge@github:automerge/hypermerge":
-  version "2.0.0-beta.15"
-  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/764727484584ae90695a56907fef443a6c0dd471"
+  version "2.0.0-beta.17"
+  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/a418fbe51ed99b380ddac9dcfdb139198e61a6c7"
   dependencies:
     automerge "github:automerge/automerge#opaque-strings"
     better-sqlite3 "^5.4.3"
