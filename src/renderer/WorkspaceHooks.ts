@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext, useCallback } from 'react'
 import Fs from 'fs'
 import { WORKSPACE_URL_PATH } from './constants'
-import { PushpinUrl, parseDocumentLink } from './ShareLink'
+import { PushpinUrl } from './ShareLink'
 import * as ContentTypes from './ContentTypes'
 
 export interface WorkspaceUrlsApi {
