@@ -1,26 +1,8 @@
 import { useEffect, useState, createContext, useCallback } from 'react'
 import Fs from 'fs'
 import { WORKSPACE_URL_PATH } from './constants'
-import { PushpinUrl } from './ShareLink'
+import { PushpinUrl, parseDocumentLink } from './ShareLink'
 import * as ContentTypes from './ContentTypes'
-
-function loadWorkspaceUrls(): PushpinUrl[] {
-  if (Fs.existsSync(WORKSPACE_URL_PATH)) {
-    const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
-    if (json.workspaceUrl) {
-      return [json.workspaceUrl]
-    }
-    if (json.workspaceUrls) {
-      return json.workspaceUrls
-    }
-  }
-  return []
-}
-
-function saveWorkspaceUrls(workspaceUrls: PushpinUrl[]): void {
-  const workspaceUrlData = { workspaceUrls }
-  Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
-}
 
 export interface WorkspaceUrlsApi {
   workspaceUrls: PushpinUrl[]
@@ -28,6 +10,8 @@ export interface WorkspaceUrlsApi {
   removeWorkspaceUrl: (url: PushpinUrl) => void
   createWorkspace: () => void
 }
+
+export const WorkspaceUrlsContext = createContext<WorkspaceUrlsApi | null>(null)
 
 /**
  * useWorkspaceUrls
@@ -77,4 +61,20 @@ export function useWorkspaceUrls(): WorkspaceUrlsApi {
   return { workspaceUrls, addWorkspaceUrl, removeWorkspaceUrl, createWorkspace }
 }
 
-export const WorkspaceUrlsContext = createContext<WorkspaceUrlsApi | null>(null)
+function loadWorkspaceUrls(): PushpinUrl[] {
+  if (Fs.existsSync(WORKSPACE_URL_PATH)) {
+    const json = JSON.parse(Fs.readFileSync(WORKSPACE_URL_PATH, { encoding: 'utf-8' }))
+    if (json.workspaceUrl) {
+      return [json.workspaceUrl]
+    }
+    if (json.workspaceUrls) {
+      return json.workspaceUrls
+    }
+  }
+  return []
+}
+
+function saveWorkspaceUrls(workspaceUrls: PushpinUrl[]): void {
+  const workspaceUrlData = { workspaceUrls }
+  Fs.writeFileSync(WORKSPACE_URL_PATH, JSON.stringify(workspaceUrlData))
+}

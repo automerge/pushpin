@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
+import { Handle } from 'hypermerge'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
@@ -25,6 +26,7 @@ import { CurrentDeviceContext } from './Device'
 import WorkspaceInList from './WorkspaceInList'
 import { importPlainText } from '../../../ImportData'
 import * as DataUrl from '../../../../DataUrl'
+import * as Crypto from '../../../Crypto'
 
 const log = Debug('pushpin:workspace')
 
@@ -34,6 +36,7 @@ export interface Doc {
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
+  secretKey?: Crypto.SignedValue<Crypto.EncodedSecretEncryptionKey>
 }
 
 interface WorkspaceContentProps extends ContentProps {
@@ -96,6 +99,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
   }, [currentDocUrl, sendToSystem])
 
+  // Add devices if not already on doc.
   useEffect(() => {
     if (!currentDeviceUrl || !self) {
       return
@@ -111,6 +115,19 @@ export default function Workspace(props: WorkspaceContentProps) {
       })
     }
   }, [changeSelf, currentDeviceUrl, self])
+
+  // Add encryption keys if not already on doc.
+  useEffect(() => {
+    if (workspace && workspace.selfId && !workspace.secretKey) {
+      try {
+        encryptedSharingMigration(props.hypermergeUrl)
+      } catch {
+        console.log(
+          'Unable to set encryption keys on workspace. Must be on the device which created the workspace.'
+        )
+      }
+    }
+  }, [workspace])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
@@ -225,42 +242,73 @@ const WELCOME_TEXT = `Welcome to PushPin!
 
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-function create(attrs, handle) {
-  ContentTypes.create('contact', {}, (selfContentUrl) => {
-    const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
-    // this is, uh, a nasty hack.
-    // we should refactor not to require the hypermergeUrl on the contact
-    // but i don't want to pull that in scope right now
-    window.repo.change(selfHypermergeUrl, (doc: ContactDoc) => {
-      doc.hypermergeUrl = selfHypermergeUrl
-    })
+async function create(_attrs: any, handle: Handle<Doc>) {
+  // Encryption key pair for encrypted sharing. The public key will be signed by and
+  // placed on the self contact doc and the secret key will be signed by and placed
+  // on the workspace.
+  const encryptionKeyPair = await Crypto.encryptionKeyPair()
 
-    ContentTypes.create(
-      'board',
-      { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
-      (boardUrl) => {
-        ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
-          const id = uuid() as CardId
-          window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
-            doc.cards[id] = {
-              url: textDocUrl,
-              x: 20,
-              y: 20,
-              width: 320,
-              height: 540,
-            }
+  ContentTypes.create(
+    'contact',
+    { encryptionKey: encryptionKeyPair.publicKey },
+    (selfContentUrl) => {
+      const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
+      // this is, uh, a nasty hack.
+      // we should refactor not to require the hypermergeUrl on the contact
+      // but i don't want to pull that in scope right now
+      window.repo.change(selfHypermergeUrl, (doc: ContactDoc) => {
+        doc.hypermergeUrl = selfHypermergeUrl
+      })
+
+      ContentTypes.create(
+        'board',
+        { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
+        (boardUrl) => {
+          ContentTypes.create('text', { text: WELCOME_TEXT }, async (textDocUrl) => {
+            const id = uuid() as CardId
+            window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
+              doc.cards[id] = {
+                url: textDocUrl,
+                x: 20,
+                y: 20,
+                width: 320,
+                height: 540,
+              }
+            })
+
+            const signedSecretKey = await Crypto.sign(handle.url, encryptionKeyPair.secretKey)
+            handle.change((workspace) => {
+              workspace.selfId = selfHypermergeUrl
+              workspace.contactIds = []
+              workspace.currentDocUrl = boardUrl
+              workspace.viewedDocUrls = [boardUrl]
+              workspace.secretKey = signedSecretKey
+            })
           })
-          // Then make changes to workspace doc.
-          handle.change((workspace) => {
-            workspace.selfId = selfHypermergeUrl
-            workspace.contactIds = []
-            workspace.clips = []
-            workspace.currentDocUrl = boardUrl
-            workspace.viewedDocUrls = [boardUrl]
-          })
-        })
-      }
-    )
+        }
+      )
+    }
+  )
+}
+
+/**
+ * Migrate an existing workspace to support encrypted sharing.
+ * NOTE: races abound.
+ */
+async function encryptedSharingMigration(workspaceUrl: HypermergeUrl) {
+  window.repo.doc<Doc>(workspaceUrl, (workspace) => {
+    if (workspace.secretKey || !workspace.selfId) return
+    window.repo.doc<ContactDoc>(workspace.selfId, async (contact) => {
+      const encryptionKeyPair = await Crypto.encryptionKeyPair()
+      const signedPublicKey = await Crypto.sign(workspace.selfId, encryptionKeyPair.publicKey)
+      const signedSecretKey = await Crypto.sign(workspaceUrl, encryptionKeyPair.secretKey)
+      window.repo.change(workspace.selfId, (doc: ContactDoc) => {
+        doc.encryptionKey = signedPublicKey
+      })
+      window.repo.change(workspaceUrl, (doc: Doc) => {
+        doc.secretKey = signedSecretKey
+      })
+    })
   })
 }
 
