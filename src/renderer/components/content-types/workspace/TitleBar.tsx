@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { clipboard } from 'electron'
 
 import Omnibox from './omnibox/Omnibox'
@@ -102,47 +103,62 @@ export default function TitleBar(props: Props) {
 
   return (
     <div className="TitleBar">
-      <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar-menuItem">
-        <i className="fa fa-angle-left" />
-      </button>
-      <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
-        <Badge icon="map" backgroundColor="#00000000" />
-      </button>
+      <div className="TitleBar-main">
+        <button
+          disabled={backDisabled}
+          type="button"
+          onClick={goBack}
+          className="TitleBar-menuItem"
+        >
+          <i className="fa fa-angle-left" />
+        </button>
+        <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
+          <Badge icon="map" backgroundColor="#00000000" />
+        </button>
 
-      <button
-        disabled={forwardDisabled}
-        type="button"
-        onClick={goForward}
-        className="TitleBar-menuItem"
-      >
-        <i className="fa fa-angle-right" />
-      </button>
+        <button
+          disabled={forwardDisabled}
+          type="button"
+          onClick={goForward}
+          className="TitleBar-menuItem"
+        >
+          <i className="fa fa-angle-right" />
+        </button>
 
-      <Content url={doc.currentDocUrl} context="list" editable />
-      <Authors currentDocUrl={currentDocHypermergeUrl} workspaceUrl={props.hypermergeUrl} />
-      <div className="TitleBar-self">
-        <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" isPresent />
+        <Content url={doc.currentDocUrl} context="list" editable />
+        <Authors currentDocUrl={currentDocHypermergeUrl} workspaceUrl={props.hypermergeUrl} />
+        <div className="TitleBar-self">
+          <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" isPresent />
+        </div>
+
+        <button
+          className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar-menuItem"
+          type="button"
+          onClick={copyLink}
+        >
+          <i className="fa fa-clipboard" />
+        </button>
+
+        <WorkspaceUrlsContext.Consumer>
+          {(workspaceUrlsContext) => (
+            <Omnibox
+              active={activeOmnibox}
+              hypermergeUrl={props.hypermergeUrl}
+              omniboxFinished={hideOmnibox}
+              onContent={props.onContent}
+              workspaceUrlsContext={workspaceUrlsContext}
+            />
+          )}
+        </WorkspaceUrlsContext.Consumer>
       </div>
-
-      <button
-        className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar-menuItem"
-        type="button"
-        onClick={copyLink}
-      >
-        <i className="fa fa-clipboard" />
-      </button>
-
-      <WorkspaceUrlsContext.Consumer>
-        {(workspaceUrlsContext) => (
-          <Omnibox
-            active={activeOmnibox}
-            hypermergeUrl={props.hypermergeUrl}
-            omniboxFinished={hideOmnibox}
-            onContent={props.onContent}
-            workspaceUrlsContext={workspaceUrlsContext}
-          />
-        )}
-      </WorkspaceUrlsContext.Consumer>
+      <div id="TitleBar_Controls" />
     </div>
   )
+}
+
+export function TitleBarControls(props: { children: React.ReactNode }) {
+  const container = document.getElementById('TitleBar_Controls')
+  return container
+    ? createPortal(<div className="TitleBar-controls">{props.children}</div>, container)
+    : null
 }

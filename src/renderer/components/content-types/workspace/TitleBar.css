@@ -1,16 +1,26 @@
 .TitleBar {
-  display: flex;
   box-sizing: border-box;
   position: fixed;
   top: 0px;
-  height: 40px;
   width: 100%;
-  align-items: center;
-  align-content: space-between;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
   user-select: none;
   background-color: white;
+}
+
+.TitleBar-main {
+  display: flex;
+  box-sizing: border-box;
+  height: 40px;
+  width: 100%;
+  align-items: center;
+  align-content: space-between;
+  user-select: none;
+}
+
+.TitleBar-controls {
+  border-top: 1px solid var(--colorPaleGrey);
 }
 
 button[disabled].TitleBar-menuItem .fa {

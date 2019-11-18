@@ -8,6 +8,7 @@ import { ContentProps } from '../../Content'
 import { useDocument, useConfirmableInput, useHyperfile } from '../../../Hooks'
 import { streamToBuffer } from '../../../hyperfile'
 import './PdfContent.css'
+import { TitleBarControls } from '../workspace/TitleBar'
 
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<FileDoc>(props.hypermergeUrl)
@@ -104,7 +105,7 @@ export default function PdfContent(props: ContentProps) {
 
   return (
     <div className="PdfContent">
-      {header}
+      <TitleBarControls>{header}</TitleBarControls>
       {buffer ? (
         <Document file={{ data: buffer }} onLoadSuccess={onDocumentLoadSuccess}>
           <Page
