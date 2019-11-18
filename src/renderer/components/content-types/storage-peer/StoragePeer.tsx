@@ -5,7 +5,6 @@ import { ContentProps } from '../../Content'
 import Badge from '../../Badge'
 
 import './StoragePeer.css'
-import TitleEditor from '../../TitleEditor'
 import ListItem from '../../ListItem'
 import ContentDragHandle from '../../ContentDragHandle'
 import TitleWithSubtitle from '../../TitleWithSubtitle'
@@ -13,6 +12,7 @@ import { useStoragePeer } from './StoragePeerHooks'
 import CenteredStack from '../../CenteredStack'
 import SecondaryText from '../../SecondaryText'
 import { useDeviceOnlineStatus } from '../../../PresenceHooks'
+import Heading from '../../Heading'
 
 const log = Debug('pushpin:settings')
 
@@ -39,6 +39,7 @@ export default function StoragePeer(props: ContentProps) {
             <Badge
               icon="cloud"
               shape="circle"
+              color={isOnline ? 'white' : 'black'}
               backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
             />
           </ContentDragHandle>
@@ -59,9 +60,10 @@ export default function StoragePeer(props: ContentProps) {
               icon="cloud"
               shape="circle"
               size="huge"
+              color={isOnline ? 'white' : 'black'}
               backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
             />
-            <TitleEditor field="name" url={props.hypermergeUrl} />
+            <Heading wrap>{title}</Heading>
             <SecondaryText>{subtitle}</SecondaryText>
           </CenteredStack>
         </div>
