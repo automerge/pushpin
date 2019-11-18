@@ -39,6 +39,7 @@ export default function StoragePeer(props: ContentProps) {
             <Badge
               icon="cloud"
               shape="circle"
+              color={isOnline ? 'white' : 'black'}
               backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
             />
           </ContentDragHandle>
@@ -59,6 +60,7 @@ export default function StoragePeer(props: ContentProps) {
               icon="cloud"
               shape="circle"
               size="huge"
+              color={isOnline ? 'white' : 'black'}
               backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
             />
             <TitleEditor field="name" url={props.hypermergeUrl} />
