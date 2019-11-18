@@ -1,13 +1,12 @@
+import React, { useCallback, useImperativeHandle } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
-
-import React, { useState, useCallback } from 'react'
+import uuid from 'uuid'
 
 import * as ContentTypes from '../../ContentTypes'
 import Content, { ContentProps } from '../Content'
-import { createDocumentLink, HypermergeUrl, PushpinUrl } from '../../ShareLink'
+import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
 import { useDocument } from '../../Hooks'
 import './ListContent.css'
-import { string } from 'prop-types'
 
 export type CardId = string & { cardId: true }
 
@@ -33,27 +32,6 @@ ListContent.maxHeight = 36
 
 /* demo helpers */
 
-// fake data generator
-const getItems = (count): ListItem[] =>
-  Array.from({ length: count }, (v, k) => k).map((k) => ({
-    id: `item-${k}`,
-    content: `item ${k}`,
-  }))
-
-interface ListItem {
-  id: string
-  content: string
-}
-
-// a little function to help us with reordering the result
-const reorder = (list: ListItem[], startIndex, endIndex): ListItem[] => {
-  const result = Array.from(list)
-  const [removed] = result.splice(startIndex, 1)
-  result.splice(endIndex, 0, removed)
-
-  return result
-}
-
 const grid = 8
 
 const getItemStyle = (draggableStyle, isDragging) => ({
@@ -78,8 +56,21 @@ const getListStyle = (isDraggingOver) => ({
 /* demo helpers end */
 
 export default function ListContent(props: ContentProps) {
-  const [items, setItems] = useState<ListItem[]>(getItems(10))
+  useImperativeHandle(props.contentRef, () => ({
+    onContent: (url: PushpinUrl) => onContent(url),
+  }))
   const [doc, changeDoc] = useDocument<ListDoc>(props.hypermergeUrl)
+
+  const onContent = useCallback(
+    (url: PushpinUrl) => {
+      changeDoc((doc) => {
+        const id = uuid() as CardId
+        doc.cards.unshift({ id, url })
+      })
+      return true
+    },
+    [doc]
+  )
 
   const onDragEnd = useCallback(
     (result) => {
@@ -87,10 +78,14 @@ export default function ListContent(props: ContentProps) {
       if (!result.destination) {
         return
       }
-
-      setItems(reorder(items, result.source.index, result.destination.index))
+      changeDoc((doc) => {
+        const from = result.source.index
+        const to = result.destination.index
+        const [removed] = doc.cards.splice(from, 1)
+        doc.cards.splice(to, 0, removed)
+      })
     },
-    [items]
+    [doc]
   )
 
   if (!doc) {
@@ -106,7 +101,7 @@ export default function ListContent(props: ContentProps) {
             style={getListStyle(snapshot.isDraggingOver)}
             {...provided.droppableProps}
           >
-            {items.map((item, index) => (
+            {doc.cards.map((item, index) => (
               <Draggable key={item.id} draggableId={item.id} index={index}>
                 {(provided, snapshot) => (
                   <div>
@@ -116,7 +111,7 @@ export default function ListContent(props: ContentProps) {
                       {...provided.draggableProps}
                       style={getItemStyle(provided.draggableProps.style, snapshot.isDragging)}
                     >
-                      {item.content}
+                      <Content context="list" url={item.url} />
                     </div>
                     {provided.placeholder}
                   </div>
@@ -133,7 +128,7 @@ export default function ListContent(props: ContentProps) {
 
 function create(unusedAttrs, handle) {
   handle.change((doc) => {
-    doc.cards = {}
+    doc.cards = []
   })
 }
 
