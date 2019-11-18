@@ -11,6 +11,7 @@ import * as Crypto from './Crypto'
 //     debugger
 //   })
 //
+// Pending invitations is an adhoc loading mechanism
 
 interface Invitation {
   hypermergeUrl: HypermergeUrl
@@ -45,6 +46,55 @@ export default class InvitationsView {
     })
   }
 
+  watchContact = async (contactId: HypermergeUrl) => {
+    if (this.contactHandles[contactId]) {
+      return
+    }
+    const workspace = await getDoc<Doc>(this.repo, this.workspaceHandle.url)
+    const recipientSecretKey = await Crypto.verifiedValue(
+      this.workspaceHandle.url,
+      workspace.secretKey
+    )
+    if (!recipientSecretKey) {
+      return
+    }
+
+    this.contactHandles[contactId] = this.repo.watch(contactId, async (sender) => {
+      const senderUrl = contactId
+      if (!sender.invites) {
+        return
+      }
+      const senderPublicKey = await Crypto.verifiedValue(senderUrl, sender.publicKey)
+      if (!senderPublicKey) {
+        return
+      }
+
+      const invitations = (this.selfId && sender.invites[this.selfId]) || []
+
+      invitations.forEach(async ({ box, nonce }) => {
+        const documentUrl = await window.repo.crypto.openBox(
+          senderPublicKey,
+          recipientSecretKey,
+          box,
+          nonce
+        )
+        const { hypermergeUrl } = parseDocumentLink(documentUrl)
+        const matchOffer = (offer: Invitation) =>
+          offer.documentUrl === documentUrl && offer.offererId === senderUrl
+
+        if (!this.pendingInvitations.some(matchOffer)) {
+          this.pendingInvitations.push({
+            documentUrl: documentUrl as PushpinUrl,
+            offererId: senderUrl,
+            sender,
+            hypermergeUrl,
+          })
+          this.watchDoc(hypermergeUrl)
+        }
+      })
+    })
+  }
+
   watchDoc = (hypermergeUrl: HypermergeUrl) => {
     if (this.docHandles[hypermergeUrl]) {
       return
@@ -65,53 +115,5 @@ export default class InvitationsView {
       }
     })
     this.docHandles[hypermergeUrl] = handle
-  }
-
-  watchContact = async (contactId: HypermergeUrl) => {
-    if (this.contactHandles[contactId]) {
-      return
-    }
-    const workspace = await getDoc<Doc>(this.repo, this.workspaceHandle.url)
-    if (!workspace.secretKey) {
-      // TODO: note
-      return
-    }
-    if (!Crypto.verify(this.workspaceHandle.url, workspace.secretKey)) {
-      return
-    }
-    const secretKey = workspace.secretKey.value
-
-    this.contactHandles[contactId] = this.repo.watch(contactId, async (sender) => {
-      const senderUrl = contactId
-      if (!sender.invites) {
-        return
-      }
-      if (!sender.publicKey) {
-        return
-      }
-      if (!Crypto.verify(senderUrl, sender.publicKey)) {
-        return
-      }
-      const senderPublicKey = sender.publicKey.value
-
-      const invitations = (this.selfId && sender.invites[this.selfId]) || []
-
-      invitations.forEach(async ({ box, nonce }) => {
-        const documentUrl = await window.repo.crypto.openBox(senderPublicKey, secretKey, box, nonce)
-        const { hypermergeUrl } = parseDocumentLink(documentUrl)
-        const matchOffer = (offer: Invitation) =>
-          offer.documentUrl === documentUrl && offer.offererId === senderUrl
-
-        if (!this.pendingInvitations.some(matchOffer)) {
-          this.pendingInvitations.push({
-            documentUrl: documentUrl as PushpinUrl,
-            offererId: senderUrl,
-            sender,
-            hypermergeUrl,
-          })
-          this.watchDoc(hypermergeUrl)
-        }
-      })
-    })
   }
 }

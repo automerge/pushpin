@@ -1,7 +1,7 @@
 import { Handle } from 'hypermerge'
 import * as ContentTypes from '../../../ContentTypes'
 import { USER } from '../../../constants'
-import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
+import { HypermergeUrl } from '../../../ShareLink'
 
 import ContactEditor, { USER_COLORS } from './ContactEditor'
 import ContactInVarious from './ContactInVarious'
@@ -9,18 +9,12 @@ import * as Crypto from '../../../Crypto'
 
 import './Avatar.css'
 
-export interface Box {
-  box: Crypto.EncodedBox
-  nonce: Crypto.EncodedBoxNonce
-}
-
 export interface ContactDoc {
   name: string
   color: string
   avatarDocId: HypermergeUrl
   hypermergeUrl: HypermergeUrl // Used by workspace
-  offeredUrls?: { [url: string]: PushpinUrl[] } // Used by share, a map of contact id to documents offered.
-  invites?: { [url: string]: Box[] }
+  invites: { [url: string]: Crypto.Box[] }
   devices?: HypermergeUrl[]
   publicKey?: Crypto.SignedValue<Crypto.EncodedPublicEncryptionKey>
 }

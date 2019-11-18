@@ -433,18 +433,12 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     this.props.omniboxFinished()
   }
 
-  offerDocumentToIdentity = async (contactUrl) => {
+  offerDocumentToIdentity = async (recipientPushpinUrl: PushpinUrl) => {
     // XXX out of scope RN but consider if we should change the key for consistency?
-    const { type, hypermergeUrl } = parseDocumentLink(contactUrl)
+    const { type, hypermergeUrl: recipientUrl } = parseDocumentLink(recipientPushpinUrl)
     const { doc: workspace } = this.state
 
     if (!workspace || !workspace.selfId) {
-      return
-    }
-    if (!workspace.secretKey) {
-      console.log(
-        'Workspace is missing encryption key. Sharing is disabled until the workspace is migrated to support encrypted sharing. Open the workspace on the device on which it was first created to migrate the workspace.'
-      )
       return
     }
 
@@ -454,23 +448,25 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       )
     }
 
-    const recipient = await getDoc<ContactDoc>(window.repo, contactUrl)
-    if (!recipient.publicKey) {
-      console.log('Unable to share with the recipient - they do not support encrypted sharing.')
-      return
+    const senderSecretKey = await Crypto.verifiedValue(
+      this.props.hypermergeUrl,
+      workspace.secretKey
+    )
+    if (!senderSecretKey) {
+      throw new Error(
+        'Workspace is missing encryption key. Sharing is disabled until the workspace is migrated to support encrypted sharing. Open the workspace on the device on which it was first created to migrate the workspace.'
+      )
     }
 
-    if (!Crypto.verify(contactUrl, recipient.publicKey)) {
-      console.log("Unable to verify recipient's encryption key - something is wrong!")
-      return
+    const recipient = await getDoc<ContactDoc>(window.repo, recipientUrl)
+    const recipientPublicKey = await Crypto.verifiedValue(recipientUrl, recipient.publicKey)
+    if (!recipientPublicKey) {
+      throw new Error('Unable to share with the recipient - they do not support encrypted sharing.')
     }
-    if (!Crypto.verify(this.props.hypermergeUrl, workspace.secretKey)) {
-      console.log('Unable to verify your workspace secret key - something is wrong!')
-      return
-    }
+
     const [box, nonce] = await window.repo.crypto.box(
-      workspace.secretKey.value,
-      recipient.publicKey.value,
+      senderSecretKey,
+      recipientPublicKey,
       workspace.currentDocUrl
     )
 
@@ -482,12 +478,12 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       // XXX right now this code leaks identity documents and document URLs to
       //     every single person who knows you
       // TODO: encrypt identity
-      if (!s.invites[hypermergeUrl]) {
-        s.invites[hypermergeUrl] = []
+      if (!s.invites[recipientUrl]) {
+        s.invites[recipientUrl] = []
       }
 
       // TODO: prevent duplicate shares.
-      s.invites[hypermergeUrl].push({ box, nonce })
+      s.invites[recipientUrl].push({ box, nonce })
     })
   }
 
@@ -504,7 +500,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       })
   }
 
-  unarchiveDocument = (url) => {
+  unarchiveDocument = (url: PushpinUrl) => {
     this.handle &&
       this.handle.change((doc) => {
         if (!doc.archivedDocUrls) {
