@@ -108,7 +108,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
     (e: React.KeyboardEvent) => {
       // this event can be consumed by a card if it wants to keep control of backspace
       // for example, see text-content.jsx onKeyDown
-      if (e.key === 'Backspace') {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
         dispatch({ type: 'DeleteCards', selection })
       }
     },

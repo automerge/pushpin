@@ -95,7 +95,7 @@ function useQuill({
     }
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'Backspace') return
+      if (e.key !== 'Backspace' && e.key !== 'Delete') return
 
       const str = q.getText()
       if (str !== '' && str !== '\n') {
