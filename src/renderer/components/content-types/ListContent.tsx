@@ -50,10 +50,11 @@ const getItemStyle = (draggableStyle, isDragging) => ({
 })
 
 const getListStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? 'lightblue' : 'lightgrey',
+  background: isDraggingOver ? 'lightblue' : 'white',
   padding: grid,
   position: 'relative',
   width: '100%',
+  overflowY: 'auto',
 })
 
 /* demo helpers end */
@@ -128,6 +129,7 @@ export default function ListContent(props: ContentProps) {
       <Droppable droppableId="droppable">
         {(provided, snapshot) => (
           <div
+            className="BoardCard--standard"
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
             {...provided.droppableProps}
