@@ -25,7 +25,6 @@ import ListMenuItem from '../../../ListMenuItem'
 import ListMenu from '../../../ListMenu'
 import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
 import { Doc as WorkspaceDoc } from '../Workspace'
-import * as Crypto from '../../../../Crypto'
 
 import './OmniboxWorkspaceListMenu.css'
 
@@ -448,10 +447,9 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       )
     }
 
-    const senderSecretKey = await Crypto.verifiedValue(
-      this.props.hypermergeUrl,
-      workspace.secretKey
-    )
+    const senderSecretKey =
+      workspace.secretKey &&
+      (await window.repo.crypto.verifiedMessage(this.props.hypermergeUrl, workspace.secretKey))
     if (!senderSecretKey) {
       throw new Error(
         'Workspace is missing encryption key. Sharing is disabled until the workspace is migrated to support encrypted sharing. Open the workspace on the device on which it was first created to migrate the workspace.'
@@ -459,12 +457,14 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     }
 
     const recipient = await getDoc<ContactDoc>(window.repo, recipientUrl)
-    const recipientPublicKey = await Crypto.verifiedValue(recipientUrl, recipient.encryptionKey)
+    const recipientPublicKey =
+      recipient.encryptionKey &&
+      (await window.repo.crypto.verifiedMessage(recipientUrl, recipient.encryptionKey))
     if (!recipientPublicKey) {
       throw new Error('Unable to share with the recipient - they do not support encrypted sharing.')
     }
 
-    const [box, nonce] = await window.repo.crypto.box(
+    const box = await window.repo.crypto.box(
       senderSecretKey,
       recipientPublicKey,
       workspace.currentDocUrl
@@ -483,7 +483,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       }
 
       // TODO: prevent duplicate shares.
-      s.invites[recipientUrl].push({ box, nonce })
+      s.invites[recipientUrl].push(box)
     })
   }
 

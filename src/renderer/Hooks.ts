@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from 'react'
-import { Handle, RepoFrontend, HyperfileUrl, Doc } from 'hypermerge'
+import { Handle, RepoFrontend, HyperfileUrl, Doc, CryptoClient } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
 import { Readable } from 'stream'
 import * as Hyperfile from './hyperfile'
@@ -21,6 +21,11 @@ export function useRepo(): RepoFrontend {
   }
 
   return repo
+}
+
+export function useCrypto(): CryptoClient.default {
+  const repo = useRepo()
+  return repo.crypto
 }
 
 export function useSelfId(): HypermergeUrl {

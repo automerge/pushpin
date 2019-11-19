@@ -12,7 +12,7 @@ import { ContactDoc } from '../contact'
 import * as WebStreamLogic from '../../../../WebStreamLogic'
 
 import './Workspace.css'
-import { useDocument } from '../../../Hooks'
+import { useDocument, useCrypto } from '../../../Hooks'
 import {
   useAllHeartbeats,
   useHeartbeat,
@@ -26,7 +26,6 @@ import { CurrentDeviceContext } from './Device'
 import WorkspaceInList from './WorkspaceInList'
 import { importPlainText } from '../../../ImportData'
 import * as DataUrl from '../../../../DataUrl'
-import { getDoc } from '../../../Misc'
 
 const log = Debug('pushpin:workspace')
 
@@ -51,6 +50,7 @@ interface ClipperPayload {
 }
 
 export default function Workspace(props: WorkspaceContentProps) {
+  const crypto = useCrypto()
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
@@ -118,16 +118,29 @@ export default function Workspace(props: WorkspaceContentProps) {
 
   // Add encryption keys if not already on doc.
   useEffect(() => {
-    if (workspace && workspace.selfId && !workspace.secretKey) {
-      try {
-        encryptedSharingMigration(props.hypermergeUrl)
-      } catch {
-        console.log(
-          'Unable to set encryption keys on workspace. Must be on the device which created the workspace.'
-        )
-      }
+    if (!workspace || !selfId || workspace.secretKey) return
+
+    try {
+      migrateEncryptionKeys()
+    } catch {
+      console.log(
+        'Unable to set encryption keys on workspace. Must be on the device which created the workspace.'
+      )
     }
-  }, [workspace])
+
+    async function migrateEncryptionKeys() {
+      if (!workspace || !selfId || workspace.secretKey) return
+      const encryptionKeyPair = await crypto.encryptionKeyPair()
+      const signedPublicKey = await crypto.sign(selfId, encryptionKeyPair.publicKey)
+      const signedSecretKey = await crypto.sign(props.hypermergeUrl, encryptionKeyPair.secretKey)
+      changeSelf((doc: ContactDoc) => {
+        doc.encryptionKey = signedPublicKey
+      })
+      changeWorkspace((doc: Doc) => {
+        doc.secretKey = signedSecretKey
+      })
+    }
+  }, [workspace, selfId, workspace && workspace.secretKey])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
@@ -292,26 +305,6 @@ async function create(_attrs: any, handle: Handle<Doc>) {
       )
     }
   )
-}
-
-/**
- * Migrate an existing workspace to support encrypted sharing.
- * NOTE: races abound.
- */
-async function encryptedSharingMigration(workspaceUrl: HypermergeUrl) {
-  const workspace = await getDoc<Doc>(window.repo, workspaceUrl)
-  const { secretKey, selfId } = workspace
-  if (secretKey || !selfId) return
-
-  const encryptionKeyPair = await window.repo.crypto.encryptionKeyPair()
-  const signedPublicKey = await window.repo.crypto.sign(selfId, encryptionKeyPair.publicKey)
-  const signedSecretKey = await window.repo.crypto.sign(workspaceUrl, encryptionKeyPair.secretKey)
-  window.repo.change(selfId, (doc: ContactDoc) => {
-    doc.encryptionKey = signedPublicKey
-  })
-  window.repo.change(workspaceUrl, (doc: Doc) => {
-    doc.secretKey = signedSecretKey
-  })
 }
 
 ContentTypes.register({
