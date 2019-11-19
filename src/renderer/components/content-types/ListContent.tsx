@@ -124,9 +124,11 @@ export default function ListContent(props: ContentProps) {
     return null
   }
 
+  // TODO: droppableId must be unique, but if you have two instances of the
+  //    same list on a board this will probably fail in creative ways
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable">
+      <Droppable droppableId={`droppable-${props.hypermergeUrl}`}>
         {(provided, snapshot) => (
           <div
             className="BoardCard--standard"
