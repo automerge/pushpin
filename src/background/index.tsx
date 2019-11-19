@@ -16,7 +16,7 @@ window._debug = {}
 
 const back = new RepoBackend({ path: HYPERMERGE_PATH })
 
-const cloud = new Client({ host: 'fierce-beyond-42837.herokuapp.com', port: 80 })
+const cloud = new Client({ host: 'pushpin-relay.herokuapp.com', port: 80 })
 const swarm = Hyperswarm({
   queue: {
     multiplex: true,
