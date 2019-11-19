@@ -41,8 +41,12 @@ export default class InvitationsView {
     this.onChangeCb = onChange
 
     this.workspaceHandle = this.repo.watch(workspaceId, (doc) => {
-      this.selfId = doc.selfId
-      doc.contactIds.forEach((id) => this.watchContact(id))
+      // Note: This watch callback is invoked synchronously, so `this.workspaceHandle` wouldn't
+      // actually be set in `watchContact` unless we cause a tick.
+      setTimeout(() => {
+        this.selfId = doc.selfId
+        doc.contactIds.forEach((id) => this.watchContact(id))
+      }, 0)
     })
   }
 

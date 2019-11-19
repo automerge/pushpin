@@ -21,11 +21,11 @@ export interface ContactDoc {
 
 // TODO: Enforce this type in `ContentTypes`.
 export interface TypeAttrs {
-  publicKey: Crypto.EncodedPublicEncryptionKey
+  encryptionKey: Crypto.EncodedPublicEncryptionKey
 }
 
 async function create(typeAttrs: TypeAttrs, handle: Handle<ContactDoc>) {
-  const signedEncryptionKey = await Crypto.sign(handle.url, typeAttrs.publicKey)
+  const signedEncryptionKey = await Crypto.sign(handle.url, typeAttrs.encryptionKey)
   handle.change((doc) => {
     doc.name = USER!
     const USER_COLOR_VALUES = Object.values(USER_COLORS)
