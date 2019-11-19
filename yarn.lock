@@ -4020,9 +4020,9 @@ glob@^7.0.3, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4:
     path-is-absolute "^1.0.0"
 
 glob@^7.0.5:
-  version "7.1.5"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.5.tgz#6714c69bee20f3c3e64c4dd905553e532b40cdc0"
-  integrity sha512-J9dlskqUXK1OeTOYBEn5s8aMukWMwWfs+rPTn/jn50Ux4MNXVhubL1wu/j2t+H4NVI+cXEcCaYellqaPVGXNqQ==
+  version "7.1.6"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.6.tgz#141f33b81a7c2492e125594307480c46679278a6"
+  integrity sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
   dependencies:
     fs.realpath "^1.0.0"
     inflight "^1.0.4"
@@ -4449,16 +4449,16 @@ hypercore-crypto@^1.0.0:
     uint64be "^2.0.2"
 
 hypercore-protocol@^7.1.0, hypercore-protocol@^7.6.0:
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/hypercore-protocol/-/hypercore-protocol-7.6.0.tgz#bcf08620e034a861f6e25caf65266108725500c4"
-  integrity sha512-mOE/ufd8RmqRE0zUnA97U830oudcEzZoQ/ROV77hacYh/m5953biaxwL6hUQn8PHE0wXnJerjbmgFDffznG7+w==
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/hypercore-protocol/-/hypercore-protocol-7.7.0.tgz#0a82cc4d40503492ffc91c6fe71859dd7fa1b6cf"
+  integrity sha512-SojjFXnMD2n3L12NMHWtkGgPvtcBs+eUneFIf8HWMHHL8a0TvO/z24rB1AohHVUB7q+b2NYtyKm3sszJSfYQbw==
   dependencies:
     abstract-extension "^3.0.1"
     hypercore-crypto "^1.0.0"
     inspect-custom-symbol "^1.1.0"
     nanoguard "^1.2.1"
     pretty-hash "^1.0.1"
-    simple-hypercore-protocol "^1.3.0"
+    simple-hypercore-protocol "^1.4.0"
     streamx "^2.1.0"
     timeout-refresh "^1.0.0"
 
@@ -4497,8 +4497,8 @@ hypercore@^8.2.5:
     fd-lock "^1.0.2"
 
 "hypermerge@github:automerge/hypermerge":
-  version "2.0.0-beta.21"
-  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/56a43eee46fe7110ac6009f073bc996535d347ae"
+  version "2.0.0-beta.22"
+  resolved "https://codeload.github.com/automerge/hypermerge/tar.gz/87bc946f40c542a86aa290e811cf4d6d4589b8d8"
   dependencies:
     automerge "github:automerge/automerge#opaque-strings"
     better-sqlite3 "^5.4.3"
@@ -4688,9 +4688,9 @@ inquirer@^6.2.2:
     through "^2.3.6"
 
 inspect-custom-symbol@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/inspect-custom-symbol/-/inspect-custom-symbol-1.1.0.tgz#21d7d5cc9b183e6bacfb89566ae3496b57f5bf1a"
-  integrity sha512-vtI2YXBRZBkU6DlfHfd0GtZENfiEiTacAXUd0ZY6HA+X7aPznpFfPmzSC+tHKXAkz9KDSdI4AYfwAMXR5t+isg==
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/inspect-custom-symbol/-/inspect-custom-symbol-1.1.1.tgz#18dae2ed4537f3d8e1708626d3756c10d7edf782"
+  integrity sha512-GOucsp9EcdlLdhPUyOTvQDnbFJtp2WBWZV1Jqe+mVnkJQBL3w96+fB84C+JL+EKXOspMdB0eMDQPDp5w9fkfZA==
 
 integer@^2.1.0:
   version "2.1.0"
@@ -5977,9 +5977,9 @@ nanoassert@^2.0.0:
   integrity sha512-7vO7n28+aYO4J+8w96AzhmU8G+Y/xpPDJz/se19ICsqj/momRbb9mh9ZUtkoJ5X3nTnPdhEJyc0qnM6yAsHBaA==
 
 nanoguard@^1.2.0, nanoguard@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/nanoguard/-/nanoguard-1.2.1.tgz#944c6c8d11a20cf882d0d82062e1f2761103167b"
-  integrity sha512-XowCxURA68arCQEypYKAxyIvBUP2EkqA8mZCXqJ2yzLpFblxSjiP06PUUpVK2no3cgGhsbRlBrsEuYIflxu79w==
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/nanoguard/-/nanoguard-1.2.2.tgz#a2069c563600a1853fd3ec31ed11e9681aa3dd80"
+  integrity sha512-IMVIZkHP7Ep01foXurcJR59Hj/0yyApNK3JWpVHq2QVdLgo8wGU/ZsodlpL7jJ/m24+lxT0eyavrLCEuYQK2fg==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -8077,10 +8077,10 @@ simple-handshake@^1.2.0, simple-handshake@^1.3.1:
     nanoassert "^1.1.0"
     noise-protocol "^1.0.0"
 
-simple-hypercore-protocol@^1.3.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/simple-hypercore-protocol/-/simple-hypercore-protocol-1.3.1.tgz#8ea3654904b05773d9458fe49092c7bb0cb26929"
-  integrity sha512-VYzagn2NzlMFscn7gwSVpboe9DzJcvoKC3ft3OR7x/ovs/XllF9WgPk3/+365ZnLSsou05ivJCTepSO3NeBnDw==
+simple-hypercore-protocol@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/simple-hypercore-protocol/-/simple-hypercore-protocol-1.4.0.tgz#43957d7b1b0a045a346f1f566845d2a79d4e4d0c"
+  integrity sha512-an2jCnYD4e/saLb4vqD8FnIus2wP6wa+C+rI2uC8DBDFok7h41wz0DOOol7h+6+9VXu7Rb2cmkyXaqvkuJDFaA==
   dependencies:
     protocol-buffers-encodings "^1.1.0"
     simple-handshake "^1.3.1"
@@ -9588,9 +9588,9 @@ xregexp@~2.0.0:
   integrity sha1-UqY+VsoLhKfzpfPWGHLxJq16WUM=
 
 xsalsa20@^1.0.0:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/xsalsa20/-/xsalsa20-1.0.2.tgz#46cc53439d543d88782e42dfada5c5a69ab6314d"
-  integrity sha512-g1DFmZ5JJ9Qzvt4dMw6m9IydqoCSP381ucU5zm46Owbk3bwmqAr8eEJirOPc7PrXRn45drzOpAyDp8jsnoyXyw==
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/xsalsa20/-/xsalsa20-1.1.0.tgz#bee27174af1913aaec0fe677d8ba161ec12bf87d"
+  integrity sha512-zd3ytX2cm+tcSndRU+krm0eL4TMMpZE7evs5hLRAoOy6gviqLfe3qOlkjF3i5SeAkQUCeJk0lJZrEU56kHRfWw==
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"
