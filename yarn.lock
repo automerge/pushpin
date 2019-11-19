@@ -2636,10 +2636,10 @@ discontinuous-range@1.0.0:
   resolved "https://registry.yarnpkg.com/discontinuous-range/-/discontinuous-range-1.0.0.tgz#e38331f0844bba49b9a9cb71c771585aab1bc65a"
   integrity sha1-44Mx8IRLukm5qctxx3FYWqsbxlo=
 
-discovery-cloud@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/discovery-cloud/-/discovery-cloud-1.0.4.tgz#7bc9679f875438861a48259e392cc118514e71fb"
-  integrity sha512-W6IsWDEtidOfqLzC+fIqZeRjawIkecO4f9c4EtNCjRBdHEJBJXDhoWocIARiDrJGyvoZtj+I5NMni5vYOPaSwA==
+discovery-cloud@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/discovery-cloud/-/discovery-cloud-1.0.5.tgz#5002a5ee0c0ef6f69f8b4cf8f631c709322ee0fa"
+  integrity sha512-14g3qD2APxqoE//gjLc4CA42SpKhetOzCJQ4x2UCKbV81+ONHEiVFys3ZdaMZ6gUQA0nOX4Nus5BEmcnRvzk8Q==
   dependencies:
     bs58 "^4.0.1"
     debug "^4.1.0"
