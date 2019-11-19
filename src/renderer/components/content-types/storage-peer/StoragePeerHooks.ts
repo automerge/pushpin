@@ -70,11 +70,10 @@ async function getVerifiedEncryptionKey(
 ): Promise<Crypto.EncodedPublicEncryptionKey | null> {
   // The encryptionKey and signature may be missing from the doc.
   if (!doc.encryptionKey || !doc.encryptionKeySignature) return null
-  const isValid = repo.crypto.verify(docUrl, {
+  return repo.crypto.verifiedMessage(docUrl, {
     message: doc.encryptionKey,
     signature: doc.encryptionKeySignature,
   })
-  return isValid ? doc.encryptionKey : null
 }
 
 /**
