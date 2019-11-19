@@ -1,11 +1,10 @@
-import { Handle } from 'hypermerge'
+import { Handle, Crypto } from 'hypermerge'
 import * as ContentTypes from '../../../ContentTypes'
 import { USER } from '../../../constants'
 import { HypermergeUrl } from '../../../ShareLink'
 
 import ContactEditor, { USER_COLORS } from './ContactEditor'
 import ContactInVarious from './ContactInVarious'
-import * as Crypto from '../../../Crypto'
 
 import './Avatar.css'
 
@@ -16,7 +15,7 @@ export interface ContactDoc {
   hypermergeUrl: HypermergeUrl // Used by workspace
   invites: { [url: string]: Crypto.Box[] }
   devices?: HypermergeUrl[]
-  encryptionKey?: Crypto.SignedValue<Crypto.EncodedPublicEncryptionKey>
+  encryptionKey?: Crypto.SignedMessage<Crypto.EncodedPublicEncryptionKey>
 }
 
 // TODO: Enforce this type in `ContentTypes`.
@@ -25,7 +24,7 @@ export interface TypeAttrs {
 }
 
 async function create(typeAttrs: TypeAttrs, handle: Handle<ContactDoc>) {
-  const signedEncryptionKey = await Crypto.sign(handle.url, typeAttrs.encryptionKey)
+  const signedEncryptionKey = await window.repo.crypto.sign(handle.url, typeAttrs.encryptionKey)
   handle.change((doc) => {
     doc.name = USER!
     const USER_COLOR_VALUES = Object.values(USER_COLORS)

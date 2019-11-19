@@ -3,7 +3,6 @@ import { parseDocumentLink, HypermergeUrl, PushpinUrl } from './ShareLink'
 import { ContactDoc } from './components/content-types/contact'
 import { Doc } from './components/content-types/workspace/Workspace'
 import { getDoc } from './Misc'
-import * as Crypto from './Crypto'
 
 //
 // Example:
@@ -55,10 +54,9 @@ export default class InvitationsView {
       return
     }
     const workspace = await getDoc<Doc>(this.repo, this.workspaceHandle.url)
-    const recipientSecretKey = await Crypto.verifiedValue(
-      this.workspaceHandle.url,
-      workspace.secretKey
-    )
+    const recipientSecretKey =
+      workspace.secretKey &&
+      (await window.repo.crypto.verifiedMessage(this.workspaceHandle.url, workspace.secretKey))
     if (!recipientSecretKey) {
       return
     }
@@ -68,19 +66,20 @@ export default class InvitationsView {
       if (!sender.invites) {
         return
       }
-      const senderPublicKey = await Crypto.verifiedValue(senderUrl, sender.encryptionKey)
+      const senderPublicKey =
+        sender.encryptionKey &&
+        (await window.repo.crypto.verifiedMessage(senderUrl, sender.encryptionKey))
       if (!senderPublicKey) {
         return
       }
 
       const invitations = (this.selfId && sender.invites[this.selfId]) || []
 
-      invitations.forEach(async ({ box, nonce }) => {
+      invitations.forEach(async (box) => {
         const documentUrl = await window.repo.crypto.openBox(
           senderPublicKey,
           recipientSecretKey,
-          box,
-          nonce
+          box
         )
         const { hypermergeUrl } = parseDocumentLink(documentUrl)
         const matchOffer = (offer: Invitation) =>

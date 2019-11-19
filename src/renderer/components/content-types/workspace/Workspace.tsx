@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
-import { Handle } from 'hypermerge'
+import { Handle, Crypto } from 'hypermerge'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
@@ -26,7 +26,6 @@ import { CurrentDeviceContext } from './Device'
 import WorkspaceInList from './WorkspaceInList'
 import { importPlainText } from '../../../ImportData'
 import * as DataUrl from '../../../../DataUrl'
-import * as Crypto from '../../../Crypto'
 
 const log = Debug('pushpin:workspace')
 
@@ -36,7 +35,7 @@ export interface Doc {
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
-  secretKey?: Crypto.SignedValue<Crypto.EncodedSecretEncryptionKey>
+  secretKey?: Crypto.SignedMessage<Crypto.EncodedSecretEncryptionKey>
 }
 
 interface WorkspaceContentProps extends ContentProps {
@@ -276,7 +275,10 @@ async function create(_attrs: any, handle: Handle<Doc>) {
               }
             })
 
-            const signedSecretKey = await Crypto.sign(handle.url, encryptionKeyPair.secretKey)
+            const signedSecretKey = await window.repo.crypto.sign(
+              handle.url,
+              encryptionKeyPair.secretKey
+            )
             handle.change((workspace) => {
               workspace.selfId = selfHypermergeUrl
               workspace.contactIds = []
@@ -300,8 +302,14 @@ async function encryptedSharingMigration(workspaceUrl: HypermergeUrl) {
     if (workspace.secretKey || !workspace.selfId) return
     window.repo.doc<ContactDoc>(workspace.selfId, async (contact) => {
       const encryptionKeyPair = await Crypto.encryptionKeyPair()
-      const signedPublicKey = await Crypto.sign(workspace.selfId, encryptionKeyPair.publicKey)
-      const signedSecretKey = await Crypto.sign(workspaceUrl, encryptionKeyPair.secretKey)
+      const signedPublicKey = await window.repo.crypto.sign(
+        workspace.selfId,
+        encryptionKeyPair.publicKey
+      )
+      const signedSecretKey = await window.repo.crypto.sign(
+        workspaceUrl,
+        encryptionKeyPair.secretKey
+      )
       window.repo.change(workspace.selfId, (doc: ContactDoc) => {
         doc.encryptionKey = signedPublicKey
       })
