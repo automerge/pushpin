@@ -26,6 +26,7 @@ import { CurrentDeviceContext } from './Device'
 import WorkspaceInList from './WorkspaceInList'
 import { importPlainText } from '../../../ImportData'
 import * as DataUrl from '../../../../DataUrl'
+import { getDoc } from '../../../Misc'
 
 const log = Debug('pushpin:workspace')
 
@@ -298,25 +299,18 @@ async function create(_attrs: any, handle: Handle<Doc>) {
  * NOTE: races abound.
  */
 async function encryptedSharingMigration(workspaceUrl: HypermergeUrl) {
-  window.repo.doc<Doc>(workspaceUrl, (workspace) => {
-    if (workspace.secretKey || !workspace.selfId) return
-    window.repo.doc<ContactDoc>(workspace.selfId, async (contact) => {
-      const encryptionKeyPair = await Crypto.encryptionKeyPair()
-      const signedPublicKey = await window.repo.crypto.sign(
-        workspace.selfId,
-        encryptionKeyPair.publicKey
-      )
-      const signedSecretKey = await window.repo.crypto.sign(
-        workspaceUrl,
-        encryptionKeyPair.secretKey
-      )
-      window.repo.change(workspace.selfId, (doc: ContactDoc) => {
-        doc.encryptionKey = signedPublicKey
-      })
-      window.repo.change(workspaceUrl, (doc: Doc) => {
-        doc.secretKey = signedSecretKey
-      })
-    })
+  const workspace = await getDoc<Doc>(window.repo, workspaceUrl)
+  const { secretKey, selfId } = workspace
+  if (secretKey || !selfId) return
+
+  const encryptionKeyPair = await window.repo.crypto.encryptionKeyPair()
+  const signedPublicKey = await window.repo.crypto.sign(selfId, encryptionKeyPair.publicKey)
+  const signedSecretKey = await window.repo.crypto.sign(workspaceUrl, encryptionKeyPair.secretKey)
+  window.repo.change(selfId, (doc: ContactDoc) => {
+    doc.encryptionKey = signedPublicKey
+  })
+  window.repo.change(workspaceUrl, (doc: Doc) => {
+    doc.secretKey = signedSecretKey
   })
 }
 
