@@ -6,6 +6,7 @@ import { RepoBackend, DocUrl } from 'hypermerge'
 
 import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { Socket } from 'net'
+import Client from 'discovery-cloud'
 import ipc from '../ipc'
 import { HYPERMERGE_PATH, FILE_SERVER_PATH } from '../renderer/constants'
 import Root from './components/Root'
@@ -14,13 +15,17 @@ import { ToSystemMsg } from '../renderer/System'
 window._debug = {}
 
 const back = new RepoBackend({ path: HYPERMERGE_PATH })
+
+const cloud = new Client({ host: 'fierce-beyond-42837.herokuapp.com', port: 80 })
 const swarm = Hyperswarm({
   queue: {
     multiplex: true,
   },
 })
 
-back.setSwarm(swarm)
+back.addSwarm(swarm)
+back.addSwarm(cloud)
+
 back.startFileServer(FILE_SERVER_PATH)
 window._debug.repo = back
 window._debug.swarm = swarm
