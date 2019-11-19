@@ -1,4 +1,4 @@
-import React, { useCallback, useImperativeHandle } from 'react'
+import React, { useCallback, useImperativeHandle, useEffect } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import uuid from 'uuid'
 
@@ -6,6 +6,8 @@ import * as ContentTypes from '../../ContentTypes'
 import Content, { ContentProps } from '../Content'
 import { HypermergeUrl, PushpinUrl } from '../../ShareLink'
 import { useDocument } from '../../Hooks'
+import * as ImportData from '../../ImportData'
+
 import './ListContent.css'
 
 export type CardId = string & { cardId: true }
@@ -32,7 +34,7 @@ ListContent.maxHeight = 36
 
 /* demo helpers */
 
-const grid = 8
+const grid = 10
 
 const getItemStyle = (draggableStyle, isDragging) => ({
   // some basic styles to make the items look a bit nicer
@@ -41,7 +43,7 @@ const getItemStyle = (draggableStyle, isDragging) => ({
   margin: `0 0 ${grid}px 0`,
 
   // change background colour if dragging
-  background: isDragging ? 'lightgreen' : 'grey',
+  background: isDragging && 'lightgreen',
 
   // styles we need to apply on draggables
   ...draggableStyle,
@@ -50,7 +52,8 @@ const getItemStyle = (draggableStyle, isDragging) => ({
 const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? 'lightblue' : 'lightgrey',
   padding: grid,
-  width: 250,
+  position: 'relative',
+  width: '100%',
 })
 
 /* demo helpers end */
@@ -71,6 +74,34 @@ export default function ListContent(props: ContentProps) {
     },
     [doc]
   )
+
+  const onPaste = useCallback(
+    (e: ClipboardEvent) => {
+      console.log('onPaste', e)
+      e.preventDefault()
+      e.stopPropagation()
+
+      if (!e.clipboardData) {
+        return
+      }
+
+      ImportData.importDataTransfer(e.clipboardData, (url, importCount) => {
+        console.log('imported', url)
+        changeDoc((doc) => {
+          const id = uuid() as CardId
+          doc.cards.unshift({ id, url })
+        })
+      })
+    },
+    [doc]
+  )
+
+  useEffect(() => {
+    document.addEventListener('paste', onPaste)
+    return () => {
+      document.removeEventListener('paste', onPaste)
+    }
+  }, [onPaste])
 
   const onDragEnd = useCallback(
     (result) => {
@@ -111,7 +142,7 @@ export default function ListContent(props: ContentProps) {
                       {...provided.draggableProps}
                       style={getItemStyle(provided.draggableProps.style, snapshot.isDragging)}
                     >
-                      <Content context="list" url={item.url} />
+                      <Content context="board" url={item.url} />
                     </div>
                     {provided.placeholder}
                   </div>
