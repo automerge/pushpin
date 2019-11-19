@@ -68,7 +68,7 @@ export default class InvitationsView {
       if (!sender.invites) {
         return
       }
-      const senderPublicKey = await Crypto.verifiedValue(senderUrl, sender.publicKey)
+      const senderPublicKey = await Crypto.verifiedValue(senderUrl, sender.encryptionKey)
       if (!senderPublicKey) {
         return
       }

@@ -16,7 +16,7 @@ export interface ContactDoc {
   hypermergeUrl: HypermergeUrl // Used by workspace
   invites: { [url: string]: Crypto.Box[] }
   devices?: HypermergeUrl[]
-  publicKey?: Crypto.SignedValue<Crypto.EncodedPublicEncryptionKey>
+  encryptionKey?: Crypto.SignedValue<Crypto.EncodedPublicEncryptionKey>
 }
 
 // TODO: Enforce this type in `ContentTypes`.
@@ -31,7 +31,7 @@ async function create(typeAttrs: TypeAttrs, handle: Handle<ContactDoc>) {
     const USER_COLOR_VALUES = Object.values(USER_COLORS)
     const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
     doc.color = color
-    doc.publicKey = signedEncryptionKey
+    doc.encryptionKey = signedEncryptionKey
   })
 }
 

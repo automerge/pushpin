@@ -303,7 +303,7 @@ async function encryptedSharingMigration(workspaceUrl: HypermergeUrl) {
       const signedPublicKey = await Crypto.sign(workspace.selfId, encryptionKeyPair.publicKey)
       const signedSecretKey = await Crypto.sign(workspaceUrl, encryptionKeyPair.secretKey)
       window.repo.change(workspace.selfId, (doc: ContactDoc) => {
-        doc.publicKey = signedPublicKey
+        doc.encryptionKey = signedPublicKey
       })
       window.repo.change(workspaceUrl, (doc: Doc) => {
         doc.secretKey = signedSecretKey

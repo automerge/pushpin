@@ -459,7 +459,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     }
 
     const recipient = await getDoc<ContactDoc>(window.repo, recipientUrl)
-    const recipientPublicKey = await Crypto.verifiedValue(recipientUrl, recipient.publicKey)
+    const recipientPublicKey = await Crypto.verifiedValue(recipientUrl, recipient.encryptionKey)
     if (!recipientPublicKey) {
       throw new Error('Unable to share with the recipient - they do not support encrypted sharing.')
     }
