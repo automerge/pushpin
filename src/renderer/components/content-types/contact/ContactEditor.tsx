@@ -1,8 +1,13 @@
 import React, { useContext, useRef } from 'react'
-import { DocUrl } from 'hypermerge'
+import { DocUrl, RepoFrontend } from 'hypermerge'
 
 import Automerge from 'automerge'
-import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
+import {
+  createDocumentLink,
+  PushpinUrl,
+  parseDocumentLink,
+  HypermergeUrl,
+} from '../../../ShareLink'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
@@ -10,7 +15,7 @@ import { ContactDoc } from '.'
 
 import ColorPicker from '../../ColorPicker'
 import Label from '../../Label'
-import { useDocument } from '../../../Hooks'
+import { useDocument, useRepo } from '../../../Hooks'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
 
@@ -24,6 +29,8 @@ import ConnectionStatusBadge from './ConnectionStatusBadge'
 import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../Badge'
 import CenteredStack from '../../CenteredStack'
+import { getDoc, without } from '../../../Misc'
+import { StoragePeerDoc } from '../storage-peer'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -47,12 +54,13 @@ export const USER_COLORS = {
 }
 
 export default function ContactEditor(props: ContentProps) {
+  const repo = useRepo()
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
   const currentDeviceId = useContext(CurrentDeviceContext)
   const hiddenFileInput = useRef<HTMLInputElement>(null)
   const status = useConnectionStatus(props.hypermergeUrl)
 
-  const { hypermergeUrl } = props
+  const { hypermergeUrl: selfUrl } = props
 
   if (!doc) {
     return null
@@ -94,19 +102,22 @@ export default function ContactEditor(props: ContentProps) {
     )
   }
 
-  function removeDevice(url: PushpinUrl) {
-    const { hypermergeUrl } = parseDocumentLink(url)
+  async function removeDevice(url: PushpinUrl) {
+    const { hypermergeUrl: deviceUrl } = parseDocumentLink(url)
+
+    // XXX: We want to unregister from the storage peer when we remove it as a device.
+    // We need a better way to do this, but for now just hack it here.
+    const storagePeer = await isStoragePeer(repo, deviceUrl)
+    if (storagePeer) {
+      removeFromStoragePeer(repo, selfUrl, deviceUrl)
+    }
+
     changeDoc((d) => {
       const devices = d.devices as Automerge.List<DocUrl>
       if (!devices) {
         return
       }
-      const dPos = devices.findIndex((u) => u === hypermergeUrl)
-      if (!dPos) {
-        return
-      }
-      // the automerge type for deleteAt is wrong
-      devices.deleteAt!(dPos)
+      without(deviceUrl, devices)
     })
   }
 
@@ -143,7 +154,7 @@ export default function ContactEditor(props: ContentProps) {
       <div className="ContactEditor-section">
         <div className="ContactEditor-sectionLabel">
           <CenteredStack direction="row">
-            <ConnectionStatusBadge size="small" hover={false} contactId={hypermergeUrl} />
+            <ConnectionStatusBadge size="small" hover={false} contactId={selfUrl} />
             Devices
           </CenteredStack>
         </div>
@@ -224,4 +235,19 @@ export default function ContactEditor(props: ContentProps) {
       </div>
     </div>
   )
+}
+
+async function isStoragePeer(repo: RepoFrontend, url: HypermergeUrl): Promise<boolean> {
+  const doc = await getDoc(repo, url)
+  return !!(doc as any).registry
+}
+
+function removeFromStoragePeer(
+  repo: RepoFrontend,
+  selfUrl: HypermergeUrl,
+  storagePeerUrl: HypermergeUrl
+) {
+  repo.change<StoragePeerDoc>(storagePeerUrl, (doc) => {
+    delete doc.registry[selfUrl]
+  })
 }
