@@ -435,11 +435,6 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   offerDocumentToIdentity = (contactUrl) => {
-    // TODO: Designer Pink! This is a quick-n-dirty way to prevent accidentally
-    // sharing the current document when clicking on a contact in the omnibox.
-    // eslint-disable-next-line no-alert
-    if (!window.confirm('Share the current document?')) return
-
     // XXX out of scope RN but consider if we should change the key for consistency?
     const { type, hypermergeUrl } = parseDocumentLink(contactUrl)
     const { doc } = this.state
