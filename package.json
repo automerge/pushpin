@@ -10,7 +10,7 @@
     "compile": "webpack",
     "dev:server": "webpack-dev-server --watch",
     "dev:app": "electron .",
-    "start": "yarn build:clipper-host && ts-node ./scripts/start.ts",
+    "start": "ts-node ./scripts/start.ts",
     "start2": "NAME=userA yarn start & NAME=userB yarn dev:app",
     "start3": "NAME=userA yarn start & NAME=userB yarn dev:app & NAME=userC yarn dev:app",
     "dist": "yarn compile --mode=production && yarn make-icon && electron-builder",
