@@ -2,7 +2,12 @@ import React, { useContext, useRef } from 'react'
 import { DocUrl } from 'hypermerge'
 
 import Automerge from 'automerge'
-import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
+import {
+  createDocumentLink,
+  PushpinUrl,
+  parseDocumentLink,
+  HypermergeUrl,
+} from '../../../ShareLink'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
@@ -15,7 +20,6 @@ import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
 
 import ListItem from '../../ListMenuItem'
-import ActionListItem from '../workspace/omnibox/ActionListItem'
 
 import './ContactEditor.css'
 import { CurrentDeviceContext } from '../workspace/Device'
@@ -24,6 +28,8 @@ import ConnectionStatusBadge from './ConnectionStatusBadge'
 import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../Badge'
 import CenteredStack from '../../CenteredStack'
+import { without } from '../../../Misc'
+import ContactEditorDevice from './ContactEditorDevice'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -52,7 +58,7 @@ export default function ContactEditor(props: ContentProps) {
   const hiddenFileInput = useRef<HTMLInputElement>(null)
   const status = useConnectionStatus(props.hypermergeUrl)
 
-  const { hypermergeUrl } = props
+  const { hypermergeUrl: selfUrl } = props
 
   if (!doc) {
     return null
@@ -79,14 +85,14 @@ export default function ContactEditor(props: ContentProps) {
     avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   }
 
-  const onImportClick = (e) => {
+  const onImportClick = () => {
     if (hiddenFileInput.current) {
       hiddenFileInput.current.click()
     }
   }
   // xxx: only allow images & only one
   const onFilesChanged = (e) => {
-    importFileList(e.target.files, (url, i) =>
+    importFileList(e.target.files, (url) =>
       changeDoc((doc) => {
         const { hypermergeUrl } = parseDocumentLink(url)
         doc.avatarDocId = hypermergeUrl
@@ -95,55 +101,37 @@ export default function ContactEditor(props: ContentProps) {
   }
 
   function removeDevice(url: PushpinUrl) {
-    const { hypermergeUrl } = parseDocumentLink(url)
+    const { hypermergeUrl: deviceUrl } = parseDocumentLink(url)
     changeDoc((d) => {
       const devices = d.devices as Automerge.List<DocUrl>
       if (!devices) {
         return
       }
-      const dPos = devices.findIndex((u) => u === hypermergeUrl)
-      if (!dPos) {
-        return
-      }
-      // the automerge type for deleteAt is wrong
-      devices.deleteAt!(dPos)
+      without(deviceUrl, devices)
     })
   }
-
-  const deviceActions = [
-    {
-      name: 'remove',
-      destructive: true,
-      callback: (url: PushpinUrl) => () => removeDevice(url),
-      faIcon: 'fa-trash',
-      label: 'Remove',
-      shortcut: '⌘+⌫',
-      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
-    },
-  ]
 
   const renderDevices = () => {
     if (!devices) {
       return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
     }
     const renderedDevices = devices
-      .map((d) => createDocumentLink('device', d))
-      .map((d) => (
-        <ActionListItem
-          key={d}
-          contentUrl={d}
-          actions={d === currentDeviceId ? [] : deviceActions}
-          selected={false}
-        >
-          <Content context="list" url={d} editable />
-        </ActionListItem>
+      .map((deviceUrl: HypermergeUrl) => createDocumentLink('device', deviceUrl))
+      .map((deviceId: PushpinUrl) => (
+        <ContactEditorDevice
+          key={deviceId}
+          selfUrl={selfUrl}
+          deviceId={deviceId}
+          onRemoveDevice={removeDevice}
+          isCurrentDevice={deviceId === currentDeviceId}
+        />
       ))
 
     return (
       <div className="ContactEditor-section">
         <div className="ContactEditor-sectionLabel">
           <CenteredStack direction="row">
-            <ConnectionStatusBadge size="small" hover={false} contactId={hypermergeUrl} />
+            <ConnectionStatusBadge size="small" hover={false} contactId={selfUrl} />
             Devices
           </CenteredStack>
         </div>
