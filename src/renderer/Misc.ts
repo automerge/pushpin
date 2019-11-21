@@ -1,12 +1,4 @@
 import * as Automerge from 'automerge'
-import { RepoFrontend } from 'hypermerge'
-import { HypermergeUrl } from './ShareLink'
-
-export function getDoc<T>(repo: RepoFrontend, url: HypermergeUrl): Promise<Automerge.Doc<T>> {
-  return new Promise((res, rej) => {
-    repo.doc<T>(url, res)
-  })
-}
 
 /**
  * Helper function for removing an item from an Automerge list.
