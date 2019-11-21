@@ -4,9 +4,9 @@
   height: 100%;
 }
 
-.Workspace__container {
+/* .Workspace__container {
   margin-top: 40px;
-}
+} */
 
 .Workspace__container > *::-webkit-scrollbar-track {
   margin: 0;

@@ -30,7 +30,7 @@ export default React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) =
   return (
     <div
       ref={ref}
-      className={`Badge Badge--${size} Badge--${shape} ${img ? 'Badge--image' : null} ${
+      className={`Badge Badge--${size} Badge--${'circle'} ${img ? 'Badge--image' : null} ${
         hover ? 'Badge--hover' : null
       }`}
       style={{ color, backgroundColor, backgroundImage: img ? `url(${img})` : undefined }}

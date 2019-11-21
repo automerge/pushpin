@@ -12,5 +12,5 @@
   text-overflow: ellipsis;
   flex-shrink: 0;
   flex: auto;
-  width: 0px;
+  /* width: 0px; */
 }

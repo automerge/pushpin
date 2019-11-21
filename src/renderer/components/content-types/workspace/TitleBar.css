@@ -3,18 +3,55 @@
   box-sizing: border-box;
   position: fixed;
   top: 0px;
-  height: 40px;
-  width: 100%;
   align-items: center;
   align-content: space-between;
-  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   z-index: 3;
   user-select: none;
-  background-color: white;
+  margin: 0 8px;
+  right: 0;
+  left: 0;
 }
 
 button[disabled].TitleBar-menuItem .fa {
   color: #ccc;
+}
+
+.TitleBar-controls {
+  position: fixed;
+  bottom: 40px;
+  display: flex;
+  left: 0;
+  right: 0;
+}
+
+.TitleBar-controls-inner {
+  background-color: white;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  margin: auto;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.TitleBar-section {
+  background-color: white;
+  border-radius: 999px;
+  display: flex;
+  margin: 8px auto;
+  height: 40px;
+  align-items: center;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  padding: 0 6px;
+}
+
+.TitleBar-section.left {
+  margin-left: 0;
+}
+
+.TitleBar-section.right {
+  margin-right: 0;
 }
 
 .TitleBar-center {
@@ -57,8 +94,8 @@ button[disabled].TitleBar-menuItem .fa {
 }
 
 .TitleBar-self {
-  padding-left: 4px;
-  border-left: 1px solid var(--colorPaleGrey);
+  padding-right: 8px;
+  border-right: 1px solid var(--colorPaleGrey);
 }
 
 @keyframes color-flash {
