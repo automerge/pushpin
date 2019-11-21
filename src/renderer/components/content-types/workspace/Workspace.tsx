@@ -259,7 +259,7 @@ async function create(_attrs: any, handle: Handle<Doc>) {
   // Encryption key pair for encrypted sharing. The public key will be signed by and
   // placed on the self contact doc and the secret key will be signed by and placed
   // on the workspace.
-  const encryptionKeyPair = await Crypto.encryptionKeyPair()
+  const encryptionKeyPair = await window.repo.crypto.encryptionKeyPair()
 
   ContentTypes.create(
     'contact',
