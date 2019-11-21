@@ -8,6 +8,7 @@ import { ContentProps } from '../../Content'
 import { useDocument, useConfirmableInput, useHyperfile } from '../../../Hooks'
 import { streamToBuffer } from '../../../hyperfile'
 import './PdfContent.css'
+import { TitleBarControls } from '../workspace/TitleBar'
 
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<FileDoc>(props.hypermergeUrl)
@@ -72,34 +73,36 @@ export default function PdfContent(props: ContentProps) {
 
   const header =
     context === 'workspace' ? (
-      <div className="PdfContent-header">
-        <button
-          disabled={backDisabled}
-          type="button"
-          onClick={goBack}
-          className="PdfContent-navButton"
-        >
-          <i className="fa fa-angle-left" />
-        </button>
-        <input
-          className="PdfContent-headerInput"
-          value={pageInputValue}
-          type="number"
-          min={1}
-          max={numPages}
-          onChange={onPageInput}
-          onKeyDown={onPageInput}
-        />
-        <div className="PdfContent-headerNumPages">/ {numPages}</div>
-        <button
-          disabled={forwardDisabled}
-          type="button"
-          onClick={goForward}
-          className="PdfContent-navButton"
-        >
-          <i className="fa fa-angle-right" />
-        </button>
-      </div>
+      <TitleBarControls>
+        <div className="PdfContent-header">
+          <button
+            disabled={backDisabled}
+            type="button"
+            onClick={goBack}
+            className="PdfContent-navButton"
+          >
+            <i className="fa fa-angle-left" />
+          </button>
+          <input
+            className="PdfContent-headerInput"
+            value={pageInputValue}
+            type="number"
+            min={1}
+            max={numPages}
+            onChange={onPageInput}
+            onKeyDown={onPageInput}
+          />
+          <div className="PdfContent-headerNumPages">/ {numPages}</div>
+          <button
+            disabled={forwardDisabled}
+            type="button"
+            onClick={goForward}
+            className="PdfContent-navButton"
+          >
+            <i className="fa fa-angle-right" />
+          </button>
+        </div>
+      </TitleBarControls>
     ) : null
 
   return (

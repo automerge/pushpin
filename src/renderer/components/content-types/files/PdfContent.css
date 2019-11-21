@@ -19,11 +19,8 @@
   align-items: center;
   justify-content: center;
   padding: 2px;
-  position: sticky;
-  top: 40px;
   z-index: 1;
   background-color: white;
-  border-bottom: 1px solid var(--colorPaleGrey);
 }
 
 .PdfContent-headerInput {
