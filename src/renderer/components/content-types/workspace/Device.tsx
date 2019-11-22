@@ -8,9 +8,8 @@ import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
 import Badge from '../../Badge'
 import './Device.css'
-import TitleEditor from '../../TitleEditor'
 import { useDeviceOnlineStatus } from '../../../PresenceHooks'
-import Heading from '../../Heading'
+import TitleWithSubtitle from '../../TitleWithSubtitle'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
@@ -49,11 +48,12 @@ function Device(props: Props) {
               backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
             />
           </div>
-          {props.editable ? (
-            <TitleEditor field="name" url={props.hypermergeUrl} />
-          ) : (
-            <Heading>{name}</Heading>
-          )}
+          <TitleWithSubtitle
+            title={name}
+            titleEditorField="name"
+            editable={props.editable}
+            hypermergeUrl={props.hypermergeUrl}
+          />
         </div>
       )
   }

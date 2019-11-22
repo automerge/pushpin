@@ -1,5 +1,17 @@
 .CenteredStack {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.CenteredStack--centerText {
   text-align: center;
+}
+
+.CenteredStack--column {
+  flex-direction: column;
+}
+
+.CenteredStack--row {
+  flex-direction: row;
 }
