@@ -53,7 +53,7 @@ function PeerView({ peerId }: Props) {
   )
 }
 
-export function connectionInfo(conn: PeerConnection) {
+export function connectionInfo(conn?: PeerConnection) {
   const rawConn = conn as any
 
   if (!conn) return 'No connection'
@@ -61,9 +61,11 @@ export function connectionInfo(conn: PeerConnection) {
   return {
     type: conn.type,
     isConnected: conn.isOpen,
+    id: conn.id,
     host: rawConn.rawSocket.remoteAddress,
     port: rawConn.rawSocket.remotePort,
     sent: humanBytes(rawConn.rawSocket.bytesWritten),
     received: humanBytes(rawConn.rawSocket.bytesRead),
+    isClient: conn.isClient,
   }
 }

@@ -28,6 +28,9 @@
     // we agreed we don't require default cases
     "default-case": "off",
 
+    // doesn't really make sense when targeting electron
+    "no-restricted-syntax": "off",
+
     // we agreed that we're okay with idiomatic short-circuits
     "no-unused-expressions": [
       "error",

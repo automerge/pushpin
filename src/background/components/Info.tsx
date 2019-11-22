@@ -21,28 +21,7 @@ interface Props {
 }
 
 export default function Info({ log, ...info }: Props) {
-  const keys = Object.keys(info)
-
-  if (keys.length === 0) return null
-
-  return (
-    <code className="Info">
-      {log ? (
-        <div className="Info_Log">
-          <div className="Info_Log_Inner">
-            <LogLink v={log} />
-          </div>
-        </div>
-      ) : null}
-
-      {keys.map((k) => (
-        <React.Fragment key={k}>
-          <div>{k}:</div>
-          <div>{renderValue(info[k])}</div>
-        </React.Fragment>
-      ))}
-    </code>
-  )
+  return renderInfo(info, log)
 }
 
 const mags = ['', 'KB', 'MB', 'GB']
@@ -100,13 +79,38 @@ export function hiddenList<T>(
   return hidden(`${pluralize(itemsArray.length, singular)}...`, () => itemsArray.map(mapItem))
 }
 
+function renderInfo(info: any, log?: any) {
+  const keys = Object.keys(info)
+
+  if (keys.length === 0) return null
+
+  return (
+    <code className="Info">
+      {log ? (
+        <div className="Info_Log">
+          <div className="Info_Log_Inner">
+            <LogLink v={log} />
+          </div>
+        </div>
+      ) : null}
+
+      {keys.map((k) => (
+        <React.Fragment key={k}>
+          <div>{k}:</div>
+          <div>{renderValue(info[k])}</div>
+        </React.Fragment>
+      ))}
+    </code>
+  )
+}
+
 function renderValue(v: Value) {
   if (v == null) return ''
   if (typeof v === 'boolean') return v ? 'yes' : 'no'
   if (React.isValidElement(v)) return v
-  if (Array.isArray(v)) return <Info {...v} />
+  if (Array.isArray(v)) return renderInfo(v)
   if (v instanceof Uint8Array) return hexDump(v)
-  if (typeof v === 'object') return <Info {...v} />
+  if (typeof v === 'object') return renderInfo(v)
 
   return String(v)
 }
