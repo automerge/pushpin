@@ -3,14 +3,14 @@ import './ListMenuSection.css'
 
 export interface Props {
   children: React.ReactNode
-  title?: string
+  title?: string | React.ReactNode
 }
 
-export default function ListMenuSection(props: Props) {
+export default function ListMenuSection({ title, children }: Props) {
   return (
     <div className="ListMenuSection">
-      {props.title && <div className="ListMenuSection-title">{props.title}</div>}
-      {props.children}
+      {title && <div className="ListMenuSection-title">{title}</div>}
+      {children}
     </div>
   )
 }

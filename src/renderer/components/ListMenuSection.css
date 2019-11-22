@@ -2,6 +2,8 @@
 }
 
 .ListMenuSection-title {
+  display: flex;
+  align-items: center;
   font-size: 12px;
   padding: 4px 8px;
   color: var(--colorSecondaryGrey);
