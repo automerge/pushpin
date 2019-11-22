@@ -1,11 +1,12 @@
 import { useCallback, useContext } from 'react'
 import { RepoFrontend, DocUrl, Crypto } from 'hypermerge'
-import Automerge, { FreezeObject } from 'automerge'
+import { FreezeObject } from 'automerge'
 import { StoragePeerDoc } from '.'
 import { useRepo, useDocument, useSelfId } from '../../../Hooks'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 import { ContactDoc } from '../contact'
 import { parseDocumentLink } from '../../../ShareLink'
+import { without } from '../../../Misc'
 
 export type RegistrationFn = () => void
 export type UnregistrationFn = () => void
@@ -74,14 +75,4 @@ async function getVerifiedEncryptionKey(
     message: doc.encryptionKey,
     signature: doc.encryptionKeySignature,
   })
-}
-
-/**
- * Helper function for removing an item from an Automerge list.
- */
-function without<T>(val: T, list: Automerge.List<T>) {
-  const pos = list.findIndex((item) => item === val)
-  if (!pos) return
-  // The Automerge type for deleteAt is wrong.
-  list.deleteAt!(pos)
 }

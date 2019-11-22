@@ -8,7 +8,9 @@ import configFns from '../webpack.config'
 const configs = configFns.map((c) => c(null, { mode: 'development' }))
 
 /** These configs will be run before electron is started. */
-const initialConfigs = configs.filter((c) => ['main', 'freeze-dry-preload'].includes(c.name!))
+const initialConfigs = configs.filter((c) =>
+  ['main', 'freeze-dry-preload', 'clipper-host'].includes(c.name!)
+)
 
 /** This config is run by the webpack-dev-server. */
 const renderConfig = configs.filter((c) => c.name === 'renderer')[0]
