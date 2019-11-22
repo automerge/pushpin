@@ -1,33 +1,29 @@
 import React from 'react'
-import ListMenuItem, { Stretch } from '../../../ListMenuItem'
 import Badge from '../../../Badge'
-import Text from '../../../Text'
-import SecondaryText from '../../../SecondaryText'
+import ListItem from '../../../ListItem'
+import { PushpinUrl, HypermergeUrl } from '../../../../ShareLink'
+import ContentDragHandle from '../../../ContentDragHandle'
+import TitleWithSubtitle from '../../../TitleWithSubtitle'
 
 export interface Props {
+  url: PushpinUrl
+  hypermergeUrl: HypermergeUrl
   invitation: any
   selected?: boolean
 }
 
 export default function InvitationListItem(props: Props) {
-  const { invitation, selected } = props
+  const { invitation, url, hypermergeUrl } = props
+
+  const title = invitation.doc.title || 'Untitled'
+  const subtitle = `From ${invitation.sender.name}`
+
   return (
-    <ListMenuItem selected={selected}>
-      <Stretch>
-        <div className="Invitation">
-          <Badge
-            icon="envelope"
-            backgroundColor={invitation.doc && invitation.doc.backgroundColor}
-          />
-          <div className="Invitation__body">
-            <Text>{invitation.doc.title || 'Untitled'}</Text>
-            <SecondaryText>From {invitation.sender.name}</SecondaryText>
-          </div>
-        </div>
-      </Stretch>
-      <div>
-        <SecondaryText>⏎ View</SecondaryText>
-      </div>
-    </ListMenuItem>
+    <ListItem>
+      <ContentDragHandle url={url}>
+        <Badge icon="envelope" backgroundColor={invitation.doc && invitation.doc.backgroundColor} />
+      </ContentDragHandle>
+      <TitleWithSubtitle title={title} subtitle={subtitle} hypermergeUrl={hypermergeUrl} />
+    </ListItem>
   )
 }

@@ -27,6 +27,7 @@ import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
 import { Doc as WorkspaceDoc } from '../Workspace'
 
 import './OmniboxWorkspaceListMenu.css'
+import ActionListItem from './ActionListItem'
 
 const log = Debug('pushpin:omnibox')
 
@@ -380,10 +381,8 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             ([_url, doc]) =>
               doc &&
               ((doc.title && doc.title.match(new RegExp(props.search, 'i'))) ||
-                ((doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))) ||
-                  (doc.data &&
-                    doc.data.text &&
-                    doc.data.text.match(new RegExp(props.search, 'i')))))
+                (doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))) ||
+                (doc.data && doc.data.text && doc.data.text.match(new RegExp(props.search, 'i'))))
           )
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
@@ -534,18 +533,24 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   renderInvitationsSection = () => {
+    const actions = [this.view, this.place, this.archive]
+
     const invitations = this.sectionItems('invitations').map((item) => {
       const invitation = item.object
 
-      // XXX: it seems to me that we should register an invitation as a kind of unlisted "type"
-      //      and make this a list context renderer for that type
-      // ... i'm not really sure how we ought approach that
+      const url = invitation.documentUrl
+      const { hypermergeUrl } = parseDocumentLink(url)
+
       return (
-        <InvitationListItem
-          invitation={invitation}
+        <ActionListItem
           key={`${invitation.sender.hypermergeUrl}-${invitation.documentUrl}`}
+          contentUrl={url}
+          defaultAction={actions[0]}
+          actions={actions}
           selected={item.selected}
-        />
+        >
+          <InvitationListItem invitation={invitation} url={url} hypermergeUrl={hypermergeUrl} />
+        </ActionListItem>
       )
     })
 
