@@ -2,11 +2,16 @@ import React, { useContext, useRef } from 'react'
 import { DocUrl } from 'hypermerge'
 
 import Automerge from 'automerge'
-import { createDocumentLink, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
+import {
+  createDocumentLink,
+  PushpinUrl,
+  parseDocumentLink,
+  HypermergeUrl,
+} from '../../../ShareLink'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
-import { ContactDoc } from '.'
+import { ContactDoc, ContactDocInvites } from '.'
 
 import ColorPicker from '../../ColorPicker'
 import Label from '../../Label'
@@ -14,16 +19,22 @@ import { useDocument } from '../../../Hooks'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
 
-import ListItem from '../../ListMenuItem'
-import ActionListItem from '../workspace/omnibox/ActionListItem'
-
-import './ContactEditor.css'
 import { CurrentDeviceContext } from '../workspace/Device'
 import { importFileList } from '../../../ImportData'
 import ConnectionStatusBadge from './ConnectionStatusBadge'
 import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../Badge'
 import CenteredStack from '../../CenteredStack'
+import { without } from '../../../Misc'
+import ContactEditorDevice from './ContactEditorDevice'
+import ListMenuSection from '../../ListMenuSection'
+import ListMenuItem from '../../ListMenuItem'
+import TitleEditor from '../../TitleEditor'
+import ListItem from '../../ListItem'
+
+import './ContactEditor.css'
+import ListMenu from '../../ListMenu'
+import MaxWidth from '../../MaxWidth'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -52,16 +63,10 @@ export default function ContactEditor(props: ContentProps) {
   const hiddenFileInput = useRef<HTMLInputElement>(null)
   const status = useConnectionStatus(props.hypermergeUrl)
 
-  const { hypermergeUrl } = props
+  const { hypermergeUrl: selfUrl } = props
 
   if (!doc) {
     return null
-  }
-
-  function setName(e: React.ChangeEvent<HTMLInputElement>) {
-    changeDoc((d) => {
-      d.name = e.target.value
-    })
   }
 
   function setColor(color: { hex: string }) {
@@ -70,7 +75,7 @@ export default function ContactEditor(props: ContentProps) {
     })
   }
 
-  const { avatarDocId, name, color, devices } = doc
+  const { avatarDocId, color, devices, invites } = doc
 
   let avatar
   if (avatarDocId) {
@@ -79,14 +84,15 @@ export default function ContactEditor(props: ContentProps) {
     avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   }
 
-  const onImportClick = (e) => {
+  const onImportClick = () => {
     if (hiddenFileInput.current) {
       hiddenFileInput.current.click()
     }
   }
+
   // xxx: only allow images & only one
   const onFilesChanged = (e) => {
-    importFileList(e.target.files, (url, i) =>
+    importFileList(e.target.files, (url) =>
       changeDoc((doc) => {
         const { hypermergeUrl } = parseDocumentLink(url)
         doc.avatarDocId = hypermergeUrl
@@ -95,133 +101,137 @@ export default function ContactEditor(props: ContentProps) {
   }
 
   function removeDevice(url: PushpinUrl) {
-    const { hypermergeUrl } = parseDocumentLink(url)
+    const { hypermergeUrl: deviceUrl } = parseDocumentLink(url)
     changeDoc((d) => {
       const devices = d.devices as Automerge.List<DocUrl>
       if (!devices) {
         return
       }
-      const dPos = devices.findIndex((u) => u === hypermergeUrl)
-      if (!dPos) {
-        return
-      }
-      // the automerge type for deleteAt is wrong
-      devices.deleteAt!(dPos)
+      without(deviceUrl, devices)
     })
   }
 
-  const deviceActions = [
-    {
-      name: 'remove',
-      destructive: true,
-      callback: (url: PushpinUrl) => () => removeDevice(url),
-      faIcon: 'fa-trash',
-      label: 'Remove',
-      shortcut: '⌘+⌫',
-      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
-    },
-  ]
-
-  const renderDevices = () => {
-    if (!devices) {
-      return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
-    }
-    const renderedDevices = devices
-      .map((d) => createDocumentLink('device', d))
-      .map((d) => (
-        <ActionListItem
-          key={d}
-          contentUrl={d}
-          actions={d === currentDeviceId ? [] : deviceActions}
-          selected={false}
-        >
-          <Content context="list" url={d} editable />
-        </ActionListItem>
-      ))
-
-    return (
-      <div className="ContactEditor-section">
-        <div className="ContactEditor-sectionLabel">
-          <CenteredStack direction="row">
-            <ConnectionStatusBadge size="small" hover={false} contactId={hypermergeUrl} />
-            Devices
-          </CenteredStack>
-        </div>
-        <div className="ContactEditor-sectionContent">{renderedDevices}</div>
-        {status !== 'connected' ? (
-          <div className="ContactEditor-sectionLabel">
-            <ListItem>
-              <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
-              <SecondaryText>
-                Consider adding{' '}
-                <a href="https://github.com/mjtognetti/pushpin-peer">a storage peer</a> to keep your
-                data online when PushPin is offline or closed.
-              </SecondaryText>
-            </ListItem>
+  return (
+    <CenteredStack centerText={false}>
+      <MaxWidth>
+        <ListMenu>
+          <div className="ContactEditor-heading">
+            <Heading>Edit Profile...</Heading>
           </div>
-        ) : null}
+          {renderNameEditor(props.hypermergeUrl)}
+          {renderAvatarEditor(avatar, onFilesChanged, hiddenFileInput, onImportClick)}
+          {renderPresenceColorSelector(color, setColor)}
+          {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
+          {renderShares(invites)}
+        </ListMenu>
+      </MaxWidth>
+    </CenteredStack>
+  )
+}
+
+const renderNameEditor = (hypermergeUrl) => (
+  <ListMenuSection title="Display Name">
+    <ListMenuItem>
+      <TitleEditor field="name" url={hypermergeUrl} />
+    </ListMenuItem>
+  </ListMenuSection>
+)
+
+const renderAvatarEditor = (avatar, onFilesChanged, hiddenFileInput, onImportClick) => (
+  <ListMenuSection title="Avatar">
+    <ListMenuItem>
+      <div className="ContactEditor-avatar">
+        <div className="Avatar">{avatar}</div>
       </div>
-    )
+      <Label>
+        <input
+          type="file"
+          id="hiddenImporter"
+          accept="image/*"
+          onChange={onFilesChanged}
+          ref={hiddenFileInput}
+          style={{ display: 'none' }}
+        />
+        <button type="button" onClick={onImportClick}>
+          Choose from file...
+        </button>
+      </Label>
+    </ListMenuItem>
+  </ListMenuSection>
+)
+
+const renderPresenceColorSelector = (color, setColor) => (
+  <ListMenuSection title="Presence Color">
+    <ListMenuItem>
+      <ColorPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
+    </ListMenuItem>
+    <ListMenuItem>
+      <div className="ContactEditor-colorCopy">
+        <SecondaryText>
+          Your presence colour will be used to by other authors identify you when you are active on
+          a board.
+        </SecondaryText>
+      </div>
+    </ListMenuItem>
+  </ListMenuSection>
+)
+
+const renderDevices = (devices, status, selfUrl, removeDevice, currentDeviceId) => {
+  if (!devices) {
+    return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
   }
+  const renderedDevices = devices
+    .map((deviceUrl: HypermergeUrl) => createDocumentLink('device', deviceUrl))
+    .map((deviceId: PushpinUrl) => (
+      <ContactEditorDevice
+        key={deviceId}
+        selfUrl={selfUrl}
+        deviceId={deviceId}
+        onRemoveDevice={removeDevice}
+        isCurrentDevice={deviceId === currentDeviceId}
+      />
+    ))
 
   return (
-    <div className="ContactEditor">
-      <div className="ContactEditor-content">
-        <div className="ContactEditor-heading">
-          <Heading>Edit Profile...</Heading>
-        </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Display Name</div>
-          <div className="ContactEditor-sectionContent">
-            <input
-              className="ContactEditor-input"
-              type="text"
-              onChange={setName}
-              value={name || ''}
-            />
-          </div>
-        </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Avatar</div>
-          <div className="ContactEditor-sectionContent">
-            <div className="ContactEditor-row">
-              <div className="ContactEditor-avatar">
-                <div className="Avatar">{avatar}</div>
-              </div>
-              <Label>
-                <input
-                  type="file"
-                  id="hiddenImporter"
-                  accept="image/*"
-                  onChange={onFilesChanged}
-                  ref={hiddenFileInput}
-                  style={{ display: 'none' }}
-                />
-                <button type="button" onClick={onImportClick}>
-                  Choose from file...
-                </button>
-              </Label>
-            </div>
-          </div>
-        </div>
-        <div className="ContactEditor-section">
-          <div className="ContactEditor-sectionLabel">Presence Color</div>
-          <div className="ContactEditor-sectionContent">
-            <ColorPicker
-              color={color}
-              colors={Object.values(USER_COLORS)}
-              onChangeComplete={setColor}
-            />
-            <div className="ContactEditor-colorCopy">
-              <SecondaryText>
-                Your presence colour will be used to by other authors identify you when you are
-                active on a board.
-              </SecondaryText>
-            </div>
-          </div>
-        </div>
-        {renderDevices()}
+    <div className="ListMenuSection">
+      <div className="ListMenuSection-title">
+        <CenteredStack direction="row">
+          <ConnectionStatusBadge size="small" hover={false} contactId={selfUrl} />
+          Devices
+        </CenteredStack>
       </div>
+      {renderedDevices}
+      {status !== 'connected' ? (
+        <ListMenuItem key="storage-peer-hint">
+          <ListItem>
+            <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
+            <SecondaryText>
+              Consider adding{' '}
+              <a href="https://github.com/mjtognetti/pushpin-peer">a storage peer</a> to keep your
+              data online when PushPin is offline or closed.
+            </SecondaryText>
+          </ListItem>
+        </ListMenuItem>
+      ) : null}
     </div>
+  )
+}
+
+const renderShares = (invites: ContactDocInvites) => {
+  return (
+    <ListMenuSection title="Shares">
+      {invites ? (
+        Object.entries(invites).map(([contact, shares]) => (
+          <ListMenuItem key={contact}>
+            <Content context="list" url={createDocumentLink('contact', contact as DocUrl)} />
+            <SecondaryText>{shares.length} items shared</SecondaryText>
+          </ListMenuItem>
+        ))
+      ) : (
+        <ListMenuItem>
+          <Heading>No shares...</Heading>
+        </ListMenuItem>
+      )}
+    </ListMenuSection>
   )
 }

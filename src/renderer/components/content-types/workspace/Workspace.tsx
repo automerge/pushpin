@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
+import { Handle, Crypto } from 'hypermerge'
 
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
@@ -11,7 +12,7 @@ import { ContactDoc } from '../contact'
 import * as WebStreamLogic from '../../../../WebStreamLogic'
 
 import './Workspace.css'
-import { useDocument } from '../../../Hooks'
+import { useDocument, useCrypto } from '../../../Hooks'
 import {
   useAllHeartbeats,
   useHeartbeat,
@@ -34,6 +35,7 @@ export interface Doc {
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
+  secretKey?: Crypto.SignedMessage<Crypto.EncodedSecretEncryptionKey>
 }
 
 interface WorkspaceContentProps extends ContentProps {
@@ -48,6 +50,7 @@ interface ClipperPayload {
 }
 
 export default function Workspace(props: WorkspaceContentProps) {
+  const crypto = useCrypto()
   const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
@@ -96,6 +99,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
   }, [currentDocUrl, sendToSystem])
 
+  // Add devices if not already on doc.
   useEffect(() => {
     if (!currentDeviceUrl || !self) {
       return
@@ -111,6 +115,32 @@ export default function Workspace(props: WorkspaceContentProps) {
       })
     }
   }, [changeSelf, currentDeviceUrl, self])
+
+  // Add encryption keys if not already on doc.
+  useEffect(() => {
+    if (!workspace || !selfId || workspace.secretKey) return
+
+    try {
+      migrateEncryptionKeys()
+    } catch {
+      console.log(
+        'Unable to set encryption keys on workspace. Must be on the device which created the workspace.'
+      )
+    }
+
+    async function migrateEncryptionKeys() {
+      if (!workspace || !selfId || workspace.secretKey) return
+      const encryptionKeyPair = await crypto.encryptionKeyPair()
+      const signedPublicKey = await crypto.sign(selfId, encryptionKeyPair.publicKey)
+      const signedSecretKey = await crypto.sign(props.hypermergeUrl, encryptionKeyPair.secretKey)
+      changeSelf((doc: ContactDoc) => {
+        doc.encryptionKey = signedPublicKey
+      })
+      changeWorkspace((doc: Doc) => {
+        doc.secretKey = signedSecretKey
+      })
+    }
+  }, [workspace, selfId, workspace && workspace.secretKey])
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
@@ -225,7 +255,7 @@ const WELCOME_TEXT = `Welcome to PushPin!
 
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-function create(attrs, handle) {
+function create(_attrs: any, handle: Handle<Doc>) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
     const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
     // this is, uh, a nasty hack.
@@ -250,11 +280,10 @@ function create(attrs, handle) {
               height: 540,
             }
           })
-          // Then make changes to workspace doc.
+
           handle.change((workspace) => {
             workspace.selfId = selfHypermergeUrl
             workspace.contactIds = []
-            workspace.clips = []
             workspace.currentDocUrl = boardUrl
             workspace.viewedDocUrls = [boardUrl]
           })

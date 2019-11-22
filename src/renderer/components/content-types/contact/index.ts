@@ -1,24 +1,27 @@
+import { Handle, Crypto } from 'hypermerge'
 import * as ContentTypes from '../../../ContentTypes'
 import { USER } from '../../../constants'
-import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
+import { HypermergeUrl } from '../../../ShareLink'
 
 import ContactEditor, { USER_COLORS } from './ContactEditor'
 import ContactInVarious from './ContactInVarious'
 
 import './Avatar.css'
 
+export type ContactDocInvites = { [url: string]: Crypto.Box[] }
 export interface ContactDoc {
   name: string
   color: string
   avatarDocId: HypermergeUrl
   hypermergeUrl: HypermergeUrl // Used by workspace
-  offeredUrls?: { [url: string]: PushpinUrl[] } // Used by share, a map of contact id to documents offered.
+  invites: ContactDocInvites
   devices?: HypermergeUrl[]
+  encryptionKey?: Crypto.SignedMessage<Crypto.EncodedPublicEncryptionKey>
 }
 
-function create(typeAttrs, handle) {
+function create(_typeAttrs, handle: Handle<ContactDoc>) {
   handle.change((doc) => {
-    doc.name = USER
+    doc.name = USER!
     const USER_COLOR_VALUES = Object.values(USER_COLORS)
     const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
     doc.color = color

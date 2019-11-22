@@ -11,7 +11,7 @@ export interface StoragePeerDoc extends DeviceDoc {
   registry: { [contact: string /* HypermergeUrl */]: Crypto.EncodedSealedBoxCiphertext }
 }
 
-function create(typeAttrs, handle) {
+function create(_typeAttrs, _handle) {
   throw new Error('we cannot (meaningfully) create storage peer documents inside pushpin')
 }
 
