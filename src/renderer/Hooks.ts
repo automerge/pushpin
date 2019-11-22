@@ -23,7 +23,7 @@ export function useRepo(): RepoFrontend {
   return repo
 }
 
-export function useCrypto(): CryptoClient.default {
+export function useCrypto(): CryptoClient {
   const repo = useRepo()
   return repo.crypto
 }
