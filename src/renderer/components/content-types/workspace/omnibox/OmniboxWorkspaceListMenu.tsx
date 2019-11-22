@@ -12,6 +12,7 @@ import {
   HypermergeUrl,
   PushpinUrl,
 } from '../../../../ShareLink'
+import { getDoc } from '../../../../Misc'
 
 import InvitationsView from '../../../../InvitationsView'
 import { ContactDoc } from '../../contact'
@@ -40,8 +41,8 @@ export interface Props {
 interface State {
   selectedIndex: number
   invitations: any[]
-  viewedDocs: { [docUrl: string]: any } // PushpinUrl
-  contacts: { [contactId: string]: ContactDoc } // HypermergeUrl
+  viewedDocs: { [docUrl: string]: Doc<any> } // PushpinUrl
+  contacts: { [contactId: string]: Doc<ContactDoc> } // HypermergeUrl
   doc?: Doc<WorkspaceDoc>
 }
 
@@ -162,14 +163,11 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           if (!this.contactHandles[contactId]) {
             // when it changes, put it into this.state.contacts[contactId]
 
-            const handle = window.repo.watch(
-              (contactId as unknown) as HypermergeUrl, // XXX: this is... wrong?
-              (doc: ContactDoc) => {
-                this.setState((state) => {
-                  return { contacts: { ...state.contacts, [contactId]: doc } }
-                })
-              }
-            )
+            const handle = window.repo.watch<ContactDoc>(contactId, (doc) => {
+              this.setState((state) => {
+                return { contacts: { ...state.contacts, [contactId]: doc } }
+              })
+            })
             this.contactHandles[contactId] = handle
           }
         })
@@ -397,7 +395,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
         props.search === '' || !state.doc
           ? [] // don't show archived URLs unless there's a current search term
           : (state.doc.archivedDocUrls || [])
-              .map((url) => [url, this.state.viewedDocs[url]])
+              .map((url): [PushpinUrl, Doc<any>] => [url, this.state.viewedDocs[url]])
               .filter(
                 ([_url, doc]) => doc && doc.title && doc.title.match(new RegExp(props.search, 'i'))
               )
@@ -434,12 +432,12 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     this.props.omniboxFinished()
   }
 
-  offerDocumentToIdentity = (contactUrl) => {
+  offerDocumentToIdentity = async (recipientPushpinUrl: PushpinUrl) => {
     // XXX out of scope RN but consider if we should change the key for consistency?
-    const { type, hypermergeUrl } = parseDocumentLink(contactUrl)
-    const { doc } = this.state
+    const { type, hypermergeUrl: recipientUrl } = parseDocumentLink(recipientPushpinUrl)
+    const { doc: workspace } = this.state
 
-    if (!doc || !doc.selfId) {
+    if (!workspace || !workspace.selfId) {
       return
     }
 
@@ -449,20 +447,43 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       )
     }
 
-    window.repo.change(doc.selfId, (s: ContactDoc) => {
-      if (!s.offeredUrls) {
-        s.offeredUrls = {}
+    const senderSecretKey =
+      workspace.secretKey &&
+      (await window.repo.crypto.verifiedMessage(this.props.hypermergeUrl, workspace.secretKey))
+    if (!senderSecretKey) {
+      throw new Error(
+        'Workspace is missing encryption key. Sharing is disabled until the workspace is migrated to support encrypted sharing. Open the workspace on the device on which it was first created to migrate the workspace.'
+      )
+    }
+
+    const recipient = await getDoc<ContactDoc>(window.repo, recipientUrl)
+    const recipientPublicKey =
+      recipient.encryptionKey &&
+      (await window.repo.crypto.verifiedMessage(recipientUrl, recipient.encryptionKey))
+    if (!recipientPublicKey) {
+      throw new Error('Unable to share with the recipient - they do not support encrypted sharing.')
+    }
+
+    const box = await window.repo.crypto.box(
+      senderSecretKey,
+      recipientPublicKey,
+      workspace.currentDocUrl
+    )
+
+    window.repo.change(workspace.selfId, (s: ContactDoc) => {
+      if (!s.invites) {
+        s.invites = {}
       }
 
       // XXX right now this code leaks identity documents and document URLs to
       //     every single person who knows you
-      if (!s.offeredUrls[hypermergeUrl]) {
-        s.offeredUrls[hypermergeUrl] = []
+      // TODO: encrypt identity
+      if (!s.invites[recipientUrl]) {
+        s.invites[recipientUrl] = []
       }
 
-      if (!s.offeredUrls[hypermergeUrl].includes(doc.currentDocUrl)) {
-        s.offeredUrls[hypermergeUrl].push(doc.currentDocUrl)
-      }
+      // TODO: prevent duplicate shares.
+      s.invites[recipientUrl].push(box)
     })
   }
 
@@ -479,7 +500,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       })
   }
 
-  unarchiveDocument = (url) => {
+  unarchiveDocument = (url: PushpinUrl) => {
     this.handle &&
       this.handle.change((doc) => {
         if (!doc.archivedDocUrls) {

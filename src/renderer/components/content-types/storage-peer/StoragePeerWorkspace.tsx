@@ -7,7 +7,6 @@ import './StoragePeerWorkspace.css'
 import { useStoragePeer } from './StoragePeerHooks'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 import SecondaryText from '../../SecondaryText'
-import Text from '../../Text'
 
 export default function StoragePeerEditor(props: ContentProps) {
   const { hypermergeUrl } = props
@@ -69,7 +68,7 @@ export default function StoragePeerEditor(props: ContentProps) {
         ) : (
           <button type="button" onClick={register}>
             Register with Storage Peer
-            </button>
+          </button>
         )}
       </div>
     </div>
