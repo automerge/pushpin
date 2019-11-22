@@ -1,7 +1,6 @@
 .CenteredStack {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .CenteredStack--centerText {
