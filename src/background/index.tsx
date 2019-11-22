@@ -16,7 +16,7 @@ window._debug = {}
 
 const back = new RepoBackend({ path: HYPERMERGE_PATH })
 
-const cloud = new Client({ host: 'pushpin-relay.herokuapp.com', port: 80 })
+const cloud = new Client({ url: 'wss://pushpin-relay.herokuapp.com' })
 const swarm = Hyperswarm({
   queue: {
     multiplex: true,
