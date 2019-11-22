@@ -18,7 +18,7 @@ export interface ContactDoc {
   encryptionKey?: Crypto.SignedMessage<Crypto.EncodedPublicEncryptionKey>
 }
 
-async function create(_typeAttrs, handle: Handle<ContactDoc>) {
+function create(_typeAttrs, handle: Handle<ContactDoc>) {
   handle.change((doc) => {
     doc.name = USER!
     const USER_COLOR_VALUES = Object.values(USER_COLORS)

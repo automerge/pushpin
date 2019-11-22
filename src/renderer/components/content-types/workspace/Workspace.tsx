@@ -255,7 +255,7 @@ const WELCOME_TEXT = `Welcome to PushPin!
 
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
-async function create(_attrs: any, handle: Handle<Doc>) {
+function create(_attrs: any, handle: Handle<Doc>) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
     const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
     // this is, uh, a nasty hack.
@@ -269,7 +269,7 @@ async function create(_attrs: any, handle: Handle<Doc>) {
       'board',
       { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
       (boardUrl) => {
-        ContentTypes.create('text', { text: WELCOME_TEXT }, async (textDocUrl) => {
+        ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
           const id = uuid() as CardId
           window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
             doc.cards[id] = {
