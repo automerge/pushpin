@@ -256,55 +256,41 @@ const WELCOME_TEXT = `Welcome to PushPin!
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
 async function create(_attrs: any, handle: Handle<Doc>) {
-  // Encryption key pair for encrypted sharing. The public key will be signed by and
-  // placed on the self contact doc and the secret key will be signed by and placed
-  // on the workspace.
-  const encryptionKeyPair = await window.repo.crypto.encryptionKeyPair()
+  ContentTypes.create('contact', {}, (selfContentUrl) => {
+    const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
+    // this is, uh, a nasty hack.
+    // we should refactor not to require the hypermergeUrl on the contact
+    // but i don't want to pull that in scope right now
+    window.repo.change(selfHypermergeUrl, (doc: ContactDoc) => {
+      doc.hypermergeUrl = selfHypermergeUrl
+    })
 
-  ContentTypes.create(
-    'contact',
-    { encryptionKey: encryptionKeyPair.publicKey },
-    (selfContentUrl) => {
-      const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
-      // this is, uh, a nasty hack.
-      // we should refactor not to require the hypermergeUrl on the contact
-      // but i don't want to pull that in scope right now
-      window.repo.change(selfHypermergeUrl, (doc: ContactDoc) => {
-        doc.hypermergeUrl = selfHypermergeUrl
-      })
-
-      ContentTypes.create(
-        'board',
-        { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
-        (boardUrl) => {
-          ContentTypes.create('text', { text: WELCOME_TEXT }, async (textDocUrl) => {
-            const id = uuid() as CardId
-            window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
-              doc.cards[id] = {
-                url: textDocUrl,
-                x: 20,
-                y: 20,
-                width: 320,
-                height: 540,
-              }
-            })
-
-            const signedSecretKey = await window.repo.crypto.sign(
-              handle.url,
-              encryptionKeyPair.secretKey
-            )
-            handle.change((workspace) => {
-              workspace.selfId = selfHypermergeUrl
-              workspace.contactIds = []
-              workspace.currentDocUrl = boardUrl
-              workspace.viewedDocUrls = [boardUrl]
-              workspace.secretKey = signedSecretKey
-            })
+    ContentTypes.create(
+      'board',
+      { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
+      (boardUrl) => {
+        ContentTypes.create('text', { text: WELCOME_TEXT }, async (textDocUrl) => {
+          const id = uuid() as CardId
+          window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
+            doc.cards[id] = {
+              url: textDocUrl,
+              x: 20,
+              y: 20,
+              width: 320,
+              height: 540,
+            }
           })
-        }
-      )
-    }
-  )
+
+          handle.change((workspace) => {
+            workspace.selfId = selfHypermergeUrl
+            workspace.contactIds = []
+            workspace.currentDocUrl = boardUrl
+            workspace.viewedDocUrls = [boardUrl]
+          })
+        })
+      }
+    )
+  })
 }
 
 ContentTypes.register({

@@ -18,19 +18,12 @@ export interface ContactDoc {
   encryptionKey?: Crypto.SignedMessage<Crypto.EncodedPublicEncryptionKey>
 }
 
-// TODO: Enforce this type in `ContentTypes`.
-export interface TypeAttrs {
-  encryptionKey: Crypto.EncodedPublicEncryptionKey
-}
-
-async function create(typeAttrs: TypeAttrs, handle: Handle<ContactDoc>) {
-  const signedEncryptionKey = await window.repo.crypto.sign(handle.url, typeAttrs.encryptionKey)
+async function create(_typeAttrs, handle: Handle<ContactDoc>) {
   handle.change((doc) => {
     doc.name = USER!
     const USER_COLOR_VALUES = Object.values(USER_COLORS)
     const color = USER_COLOR_VALUES[Math.floor(Math.random() * USER_COLOR_VALUES.length)]
     doc.color = color
-    doc.encryptionKey = signedEncryptionKey
   })
 }
 
