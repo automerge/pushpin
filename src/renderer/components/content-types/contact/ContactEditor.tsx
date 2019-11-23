@@ -12,6 +12,7 @@ import {
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc, ContactDocInvites } from '.'
+import { FileDoc } from '../files'
 
 import ColorPicker from '../../ColorPicker'
 import Label from '../../Label'
@@ -59,6 +60,9 @@ export const USER_COLORS = {
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
+  const [avatarImageDoc] = useDocument<FileDoc>(doc && doc.avatarDocId)
+  const { hyperfileUrl: avatarHyperfileUrl = null } = avatarImageDoc || {}
+
   const currentDeviceId = useContext(CurrentDeviceContext)
   const hiddenFileInput = useRef<HTMLInputElement>(null)
   const status = useConnectionStatus(props.hypermergeUrl)
@@ -75,14 +79,7 @@ export default function ContactEditor(props: ContentProps) {
     })
   }
 
-  const { avatarDocId, color, devices, invites } = doc
-
-  let avatar
-  if (avatarDocId) {
-    avatar = <Content context="workspace" url={createDocumentLink('image', avatarDocId)} />
-  } else {
-    avatar = <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
-  }
+  const { color, devices, invites } = doc
 
   const onImportClick = () => {
     if (hiddenFileInput.current) {
@@ -119,7 +116,7 @@ export default function ContactEditor(props: ContentProps) {
             <Heading>Edit Profile...</Heading>
           </div>
           {renderNameEditor(props.hypermergeUrl)}
-          {renderAvatarEditor(avatar, onFilesChanged, hiddenFileInput, onImportClick)}
+          {renderAvatarEditor(avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick)}
           {renderPresenceColorSelector(color, setColor)}
           {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
           {renderShares(invites)}
@@ -137,28 +134,28 @@ const renderNameEditor = (hypermergeUrl) => (
   </ListMenuSection>
 )
 
-const renderAvatarEditor = (avatar, onFilesChanged, hiddenFileInput, onImportClick) => (
-  <ListMenuSection title="Avatar">
-    <ListMenuItem>
-      <div className="ContactEditor-avatar">
-        <div className="Avatar">{avatar}</div>
-      </div>
-      <Label>
-        <input
-          type="file"
-          id="hiddenImporter"
-          accept="image/*"
-          onChange={onFilesChanged}
-          ref={hiddenFileInput}
-          style={{ display: 'none' }}
-        />
-        <button type="button" onClick={onImportClick}>
-          Choose from file...
-        </button>
-      </Label>
-    </ListMenuItem>
-  </ListMenuSection>
-)
+const renderAvatarEditor = (avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick) => {
+  return (
+    <ListMenuSection title="Avatar">
+      <ListMenuItem>
+        <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
+        <Label>
+          <input
+            type="file"
+            id="hiddenImporter"
+            accept="image/*"
+            onChange={onFilesChanged}
+            ref={hiddenFileInput}
+            style={{ display: 'none' }}
+          />
+          <button type="button" onClick={onImportClick}>
+            Choose from file...
+          </button>
+        </Label>
+      </ListMenuItem>
+    </ListMenuSection>
+  )
+}
 
 const renderPresenceColorSelector = (color, setColor) => (
   <ListMenuSection title="Presence Color">
@@ -168,8 +165,8 @@ const renderPresenceColorSelector = (color, setColor) => (
     <ListMenuItem>
       <div className="ContactEditor-colorCopy">
         <SecondaryText>
-          Your presence colour will be used to by other authors identify you when you are active on
-          a board.
+          Your presence colour will be used by other authors to identify you when you are present
+          within a document.
         </SecondaryText>
       </div>
     </ListMenuItem>
@@ -192,14 +189,15 @@ const renderDevices = (devices, status, selfUrl, removeDevice, currentDeviceId) 
       />
     ))
 
+  const title = (
+    <>
+      <ConnectionStatusBadge size="small" hover={false} contactId={selfUrl} />
+      Devices
+    </>
+  )
+
   return (
-    <div className="ListMenuSection">
-      <div className="ListMenuSection-title">
-        <CenteredStack direction="row">
-          <ConnectionStatusBadge size="small" hover={false} contactId={selfUrl} />
-          Devices
-        </CenteredStack>
-      </div>
+    <ListMenuSection title={title}>
       {renderedDevices}
       {status !== 'connected' ? (
         <ListMenuItem key="storage-peer-hint">
@@ -213,7 +211,7 @@ const renderDevices = (devices, status, selfUrl, removeDevice, currentDeviceId) 
           </ListItem>
         </ListMenuItem>
       ) : null}
-    </div>
+    </ListMenuSection>
   )
 }
 
