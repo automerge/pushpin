@@ -433,7 +433,8 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
   offerDocumentToIdentity = async (recipientPushpinUrl: PushpinUrl) => {
     if (
-      !confirm(
+      // eslint-disable-next-line
+      !window.confirm(
         'Are you sure you want to share the currently viewed document ' +
           '(and all its linked documents) with this user?'
       )
