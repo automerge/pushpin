@@ -416,7 +416,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     {
       name: 'contacts',
       label: 'Contacts',
-      actions: [this.invite, this.place, this.archive],
+      actions: [this.invite, this.place],
       items: (state, props) =>
         Object.entries(this.state.contacts)
           .filter(([id, doc]) => doc.name)
@@ -432,6 +432,15 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   offerDocumentToIdentity = async (recipientPushpinUrl: PushpinUrl) => {
+    if (
+      !confirm(
+        'Are you sure you want to share the currently viewed document ' +
+          '(and all its linked documents) with this user?'
+      )
+    ) {
+      return
+    }
+
     // XXX out of scope RN but consider if we should change the key for consistency?
     const { type, hypermergeUrl: recipientUrl } = parseDocumentLink(recipientPushpinUrl)
     const { doc: workspace } = this.state
