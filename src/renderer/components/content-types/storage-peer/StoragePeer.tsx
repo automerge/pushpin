@@ -26,7 +26,7 @@ export default function StoragePeer(props: ContentProps) {
 
   const { context, url, hypermergeUrl } = props
   const { name, registry } = doc
-  const countRegistered = Object.keys(registry).length
+  const countRegistered = Object.keys(registry || {}).length
 
   const title = name
   const subtitle = `${countRegistered} stored workspace${countRegistered === 1 ? '' : 's'}`
