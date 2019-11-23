@@ -6,7 +6,7 @@ import { RepoBackend, DocUrl } from 'hypermerge'
 
 import { ToBackendRepoMsg } from 'hypermerge/dist/RepoMsg'
 import { Socket } from 'net'
-import Client from 'discovery-cloud'
+// import Client from 'discovery-cloud'
 import ipc from '../ipc'
 import { HYPERMERGE_PATH, FILE_SERVER_PATH } from '../renderer/constants'
 import Root from './components/Root'
@@ -16,7 +16,7 @@ window._debug = {}
 
 const back = new RepoBackend({ path: HYPERMERGE_PATH })
 
-const cloud = new Client({ url: 'wss://pushpin-relay.herokuapp.com' })
+// const cloud = new Client({ url: 'wss://pushpin-relay.herokuapp.com' })
 const swarm = Hyperswarm({
   queue: {
     multiplex: true,
@@ -24,7 +24,7 @@ const swarm = Hyperswarm({
 })
 
 back.addSwarm(swarm)
-back.addSwarm(cloud)
+// back.addSwarm(cloud)
 
 back.startFileServer(FILE_SERVER_PATH)
 window._debug.repo = back
