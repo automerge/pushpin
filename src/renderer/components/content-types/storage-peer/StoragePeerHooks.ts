@@ -26,7 +26,7 @@ export function useStoragePeer(
   const currentWorkspace = workspaceUrlsContext && workspaceUrlsContext.workspaceUrls[0]
   const workspaceUrl = currentWorkspace && parseDocumentLink(currentWorkspace).hypermergeUrl
 
-  const isRegistered = doc && !!doc.registry[selfId]
+  const isRegistered = doc && doc.registry && !!doc.registry[selfId]
 
   const register = useCallback(async () => {
     if (!doc || !workspaceUrl || isRegistered) return
