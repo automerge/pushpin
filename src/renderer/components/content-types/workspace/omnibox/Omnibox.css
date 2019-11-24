@@ -24,8 +24,6 @@
 
 .Omnibox-input {
   font-size: 20px;
-  color: var(--colorBlueBlack);
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   background: var(--colorInputGrey);
   border: 0px;
   outline: none;

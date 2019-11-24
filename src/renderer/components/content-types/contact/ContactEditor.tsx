@@ -163,12 +163,10 @@ const renderPresenceColorSelector = (color, setColor) => (
       <ColorPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
     </ListMenuItem>
     <ListMenuItem>
-      <div className="ContactEditor-colorCopy">
-        <SecondaryText>
-          Your presence colour will be used by other authors to identify you when you are present
-          within a document.
-        </SecondaryText>
-      </div>
+      <SecondaryText>
+        Your presence colour will be used by other authors to identify you when you are present
+        within a document.
+      </SecondaryText>
     </ListMenuItem>
   </ListMenuSection>
 )
