@@ -139,7 +139,7 @@ const renderAvatarEditor = (avatarHyperfileUrl, onFilesChanged, hiddenFileInput,
     <ListMenuSection title="Avatar">
       <ListMenuItem>
         <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
-        <Label>
+        <CenteredStack direction="row">
           <input
             type="file"
             id="hiddenImporter"
@@ -151,7 +151,7 @@ const renderAvatarEditor = (avatarHyperfileUrl, onFilesChanged, hiddenFileInput,
           <button type="button" onClick={onImportClick}>
             Choose from file...
           </button>
-        </Label>
+        </CenteredStack>
       </ListMenuItem>
     </ListMenuSection>
   )
