@@ -69,7 +69,7 @@
   top: calc(100% + 3px);
   left: 50%;
   transform: translateX(-50%);
-  font-size: 12px;
+  font-size: 10px;
   line-height: 16px;
   color: var(--colorBlueBlack);
   z-index: 3;
