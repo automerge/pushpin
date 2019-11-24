@@ -1,22 +1,3 @@
-.VideoContent {
-  background-color: white;
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  min-height: calc(var(--cellSize) * 2 + 1px);
-  outline: 0;
-  padding: 10px;
-  box-sizing: border-box;
-  overflow: hidden;
-  border: solid 1px var(--colorPaleGrey);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
 .VideoContent video {
   width: 100%;
   object-fit: scale-down;

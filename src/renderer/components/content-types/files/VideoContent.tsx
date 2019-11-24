@@ -14,7 +14,7 @@ export default function VideoContent({ hypermergeUrl }: ContentProps) {
   }
 
   return (
-    <div className="VideoContent">
+    <div className="VideoContent BoardCard--standard">
       <video controls src={doc.hyperfileUrl} />
     </div>
   )

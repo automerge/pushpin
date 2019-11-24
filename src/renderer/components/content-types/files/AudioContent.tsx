@@ -13,7 +13,7 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
     return null
   }
   return (
-    <div className="AudioContent">
+    <div className="AudioContent BoardCard--standard">
       <audio controls src={doc.hyperfileUrl} />
     </div>
   )
