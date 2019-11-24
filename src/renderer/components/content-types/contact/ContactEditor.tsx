@@ -15,7 +15,6 @@ import { ContactDoc, ContactDocInvites } from '.'
 import { FileDoc } from '../files'
 
 import ColorPicker from '../../ColorPicker'
-import Label from '../../Label'
 import { useDocument } from '../../../Hooks'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
