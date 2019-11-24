@@ -33,7 +33,7 @@ export default function BoardInBoard(props: ContentProps) {
     <div className="BoardInBoard BoardCard--standard">
       <CenteredStack>
         <Badge size="huge" icon="files-o" backgroundColor={backgroundColor} />
-        <Heading wrap>{title}</Heading>
+        <Heading>{title}</Heading>
         <SecondaryText>{subTitle}</SecondaryText>
       </CenteredStack>
     </div>
