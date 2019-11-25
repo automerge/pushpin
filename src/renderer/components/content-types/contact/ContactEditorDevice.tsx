@@ -15,6 +15,8 @@ export interface Props {
   onRemoveDevice: (url: PushpinUrl) => void
 }
 
+export type OnRemoveDevice = (url: PushpinUrl) => void
+
 export default function ContactEditorDevice(props: Props) {
   const { selfUrl, deviceId, onRemoveDevice, isCurrentDevice } = props
   const { hypermergeUrl: deviceHypermergeUrl } = parseDocumentLink(deviceId)
