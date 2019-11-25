@@ -20,7 +20,6 @@ import ListMenuItem from '../../ListMenuItem'
 
 import './ContactEditor.css'
 import ListMenu from '../../ListMenu'
-import FillParent from '../../FillParent'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -56,22 +55,20 @@ export default function ContactViewer(props: ContentProps) {
 
   return (
     <CenteredStack centerText={false}>
-      <FillParent maxWidth={600}>
-        <ListMenu>
-          <ListMenuSection title="Display Name">
-            <ListMenuItem>
-              <Heading>{doc.name}</Heading>
-            </ListMenuItem>
-          </ListMenuSection>
-          <ListMenuSection title="Avatar">
-            <ListMenuItem>
-              <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
-            </ListMenuItem>
-          </ListMenuSection>
-          {renderDevices(devices, contactUrl)}
-          {renderShares(invites)}
-        </ListMenu>
-      </FillParent>
+      <ListMenu>
+        <ListMenuSection title="Display Name">
+          <ListMenuItem>
+            <Heading>{doc.name}</Heading>
+          </ListMenuItem>
+        </ListMenuSection>
+        <ListMenuSection title="Avatar">
+          <ListMenuItem>
+            <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
+          </ListMenuItem>
+        </ListMenuSection>
+        {renderDevices(devices, contactUrl)}
+        {renderShares(invites)}
+      </ListMenu>
     </CenteredStack>
   )
 }

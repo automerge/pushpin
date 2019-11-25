@@ -34,7 +34,6 @@ import ListItem from '../../ListItem'
 
 import './ContactEditor.css'
 import ListMenu from '../../ListMenu'
-import FillParent from '../../FillParent'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -109,18 +108,16 @@ export default function ContactEditor(props: ContentProps) {
 
   return (
     <CenteredStack centerText={false}>
-      <FillParent maxWidth={600}>
-        <ListMenu>
-          <div className="ContactEditor-heading">
-            <Heading>Edit Profile...</Heading>
-          </div>
-          {renderNameEditor(props.hypermergeUrl)}
-          {renderAvatarEditor(avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick)}
-          {renderPresenceColorSelector(color, setColor)}
-          {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
-          {renderShares(invites)}
-        </ListMenu>
-      </FillParent>
+      <ListMenu>
+        <div className="ContactEditor-heading">
+          <Heading>Edit Profile...</Heading>
+        </div>
+        {renderNameEditor(props.hypermergeUrl)}
+        {renderAvatarEditor(avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick)}
+        {renderPresenceColorSelector(color, setColor)}
+        {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
+        {renderShares(invites)}
+      </ListMenu>
     </CenteredStack>
   )
 }
