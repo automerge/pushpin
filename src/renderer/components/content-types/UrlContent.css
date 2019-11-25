@@ -119,7 +119,6 @@
 }
 
 .UrlCard-title {
-  font-family: IBM Plex Sans;
   font-size: 18px;
   line-height: 24px;
   color: black;
@@ -138,7 +137,6 @@
 }
 
 .UrlCard-text {
-  font-family: IBM Plex Sans;
   font-size: 12px;
   line-height: 16px;
   color: #637389;
@@ -147,14 +145,12 @@
 }
 
 .UrlCard-error {
-  font-family: IBM Plex Sans;
   font-size: 10px;
   line-height: 1.2;
   color: #637389;
 }
 
 .UrlCard-link {
-  font-family: IBM Plex Sans;
   font-size: 10px;
   line-height: 1.2;
   color: #637389;

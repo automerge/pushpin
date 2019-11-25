@@ -17,7 +17,6 @@ import { getDoc } from '../../../../Misc'
 import InvitationsView from '../../../../InvitationsView'
 import { ContactDoc } from '../../contact'
 import Badge from '../../../Badge'
-import Text from '../../../Text'
 import './Omnibox.css'
 import InvitationListItem from './InvitationListItem'
 import ListMenuSection from '../../../ListMenuSection'
@@ -28,6 +27,7 @@ import { Doc as WorkspaceDoc } from '../Workspace'
 
 import './OmniboxWorkspaceListMenu.css'
 import ActionListItem from './ActionListItem'
+import Heading from '../../../Heading'
 
 const log = Debug('pushpin:omnibox')
 
@@ -529,12 +529,8 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       return (
         <ListMenuSection title="Oops..." key="nothingFound">
           <ListMenuItem>
-            <div className="Omnibox-nothingFound">
-              <span className="Omnibox-nothingFoundBadge">
-                <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
-              </span>
-              <Text>Nothing Found</Text>
-            </div>
+            <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
+            <Heading>Nothing Found</Heading>
           </ListMenuItem>
         </ListMenuSection>
       )

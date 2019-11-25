@@ -1,13 +1,3 @@
-.ContactEditor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.ContactEditor-content {
-  color: var(--colorBlueBlack);
-}
-
 .ContactEditor-heading {
   display: flex;
   align-items: center;
@@ -17,43 +7,4 @@
   height: 40px;
   border-bottom: 1px solid var(--colorPaleGrey);
   margin-bottom: 8px;
-}
-
-.ContactEditor-section {
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--colorPaleGrey);
-}
-
-.ContactEditor-sectionLabel {
-  padding: 0 8px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: var(--colorSecondaryGrey);
-  line-height: 16px;
-}
-
-.ContactEditor-sectionContent {
-  padding: 0 8px;
-}
-
-.ContactEditor-row {
-  display: flex;
-  align-items: center;
-}
-
-.ContactEditor-avatar {
-  flex: none;
-  margin-right: 8px;
-}
-
-.ContactEditor-input {
-  width: 100%;
-}
-
-.ContactEditor-colorCopy {
-  margin-top: 4px;
-  font-size: 14px;
-  color: var(--colorSecondaryGrey);
-  line-height: 16px;
 }

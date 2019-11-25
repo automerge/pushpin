@@ -6,7 +6,7 @@
 
 .StoragePeerEditor-content {
   color: var(--colorBlueBlack);
-  max-width:  600px;
+  max-width: 600px;
 }
 
 .StoragePeerEditor-heading {
@@ -50,11 +50,4 @@
 
 .StoragePeerEditor-input {
   width: 100%;
-}
-
-.StoragePeerEditor-colorCopy {
-  margin-top: 4px;
-  font-size: 14px;
-  color: var(--colorSecondaryGrey);
-  line-height: 16px;
 }

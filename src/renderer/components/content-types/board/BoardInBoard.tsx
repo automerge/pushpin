@@ -12,7 +12,6 @@ import CenteredStack from '../../CenteredStack'
 BoardInBoard.minWidth = 5
 BoardInBoard.minHeight = 6
 BoardInBoard.defaultWidth = 6
-BoardInBoard.defaultHeight = 9
 BoardInBoard.maxWidth = 9
 BoardInBoard.maxHeight = 10
 

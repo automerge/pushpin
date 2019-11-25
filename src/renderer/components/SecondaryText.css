@@ -1,9 +1,9 @@
 .SecondaryText {
-  font-size: 12px;
+  font-size: 10px;
+  line-height: 10px;
   font-weight: 500;
   color: var(--colorSecondaryGrey);
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 12px;
   width: 100%;
 }

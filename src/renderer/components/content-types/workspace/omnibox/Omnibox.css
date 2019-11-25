@@ -1,8 +1,4 @@
 .Omnibox {
-  /* We manually set the font-size here to 14px, because the Omnibox is actually a child
-   * of one of the title bar dropdowns, which sets a large font-size.
-   */
-  font-size: 14px;
   border-radius: 4px;
   overflow: hidden;
   background-color: #ffffff;
@@ -27,9 +23,7 @@
 }
 
 .Omnibox-input {
-  font-size: 18px;
-  color: var(--colorBlueBlack);
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 20px;
   background: var(--colorInputGrey);
   border: 0px;
   outline: none;

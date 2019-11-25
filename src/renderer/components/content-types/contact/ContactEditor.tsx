@@ -15,7 +15,6 @@ import { ContactDoc, ContactDocInvites } from '.'
 import { FileDoc } from '../files'
 
 import ColorPicker from '../../ColorPicker'
-import Label from '../../Label'
 import { useDocument } from '../../../Hooks'
 import Heading from '../../Heading'
 import SecondaryText from '../../SecondaryText'
@@ -139,7 +138,7 @@ const renderAvatarEditor = (avatarHyperfileUrl, onFilesChanged, hiddenFileInput,
     <ListMenuSection title="Avatar">
       <ListMenuItem>
         <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
-        <Label>
+        <CenteredStack direction="row">
           <input
             type="file"
             id="hiddenImporter"
@@ -151,7 +150,7 @@ const renderAvatarEditor = (avatarHyperfileUrl, onFilesChanged, hiddenFileInput,
           <button type="button" onClick={onImportClick}>
             Choose from file...
           </button>
-        </Label>
+        </CenteredStack>
       </ListMenuItem>
     </ListMenuSection>
   )
@@ -163,12 +162,10 @@ const renderPresenceColorSelector = (color, setColor) => (
       <ColorPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
     </ListMenuItem>
     <ListMenuItem>
-      <div className="ContactEditor-colorCopy">
-        <SecondaryText>
-          Your presence colour will be used by other authors to identify you when you are present
-          within a document.
-        </SecondaryText>
-      </div>
+      <SecondaryText>
+        Your presence colour will be used by other authors to identify you when you are present
+        within a document.
+      </SecondaryText>
     </ListMenuItem>
   </ListMenuSection>
 )
