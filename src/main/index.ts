@@ -194,7 +194,7 @@ function createMenu() {
             sendSystemMsg({ type: 'NewWorkspace' })
           },
         },
-        isMac ? { role: 'close' } : { role: 'quit' },
+        ...(isMac ? [] : [{ role: 'quit' }]),
       ],
     },
 
