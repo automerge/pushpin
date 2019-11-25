@@ -59,7 +59,9 @@ const renderDevices = (devices: DocUrl[] | undefined, contactUrl: HypermergeUrl)
   const renderedDevices = devices
     .map((deviceUrl: HypermergeUrl) => createDocumentLink('device', deviceUrl))
     .map((deviceId: PushpinUrl) => (
-      <Content key={deviceId} context="list" url={deviceId} editable />
+      <ListMenuItem key={deviceId}>
+        <Content context="list" url={deviceId} editable />
+      </ListMenuItem>
     ))
 
   const title = (
