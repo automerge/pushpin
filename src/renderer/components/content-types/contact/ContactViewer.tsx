@@ -1,11 +1,10 @@
 import React from 'react'
-import { DocUrl } from 'hypermerge'
 
 import { createDocumentLink, PushpinUrl, HypermergeUrl } from '../../../ShareLink'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import Content, { ContentProps } from '../../Content'
-import { ContactDoc, ContactDocInvites } from '.'
+import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
 import { useDocument } from '../../../Hooks'
@@ -17,6 +16,7 @@ import Badge from '../../Badge'
 import CenteredStack from '../../CenteredStack'
 import ListMenuSection from '../../ListMenuSection'
 import ListMenuItem from '../../ListMenuItem'
+import SharesSection from './SharesSection'
 
 import './ContactEditor.css'
 import ListMenu from '../../ListMenu'
@@ -46,13 +46,13 @@ export default function ContactViewer(props: ContentProps) {
           </ListMenuItem>
         </ListMenuSection>
         {renderDevices(devices, contactUrl)}
-        {renderShares(invites)}
+        <SharesSection invites={invites} />
       </ListMenu>
     </CenteredStack>
   )
 }
 
-const renderDevices = (devices: DocUrl[] | undefined, contactUrl: HypermergeUrl) => {
+const renderDevices = (devices: HypermergeUrl[] | undefined, contactUrl: HypermergeUrl) => {
   if (!devices) {
     return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
   }
@@ -72,23 +72,4 @@ const renderDevices = (devices: DocUrl[] | undefined, contactUrl: HypermergeUrl)
   )
 
   return <ListMenuSection title={title}>{renderedDevices}</ListMenuSection>
-}
-
-const renderShares = (invites: ContactDocInvites) => {
-  return (
-    <ListMenuSection title="Shares">
-      {invites ? (
-        Object.entries(invites).map(([contact, shares]) => (
-          <ListMenuItem key={contact}>
-            <Content context="list" url={createDocumentLink('contact', contact as DocUrl)} />
-            <SecondaryText>{shares.length} items shared</SecondaryText>
-          </ListMenuItem>
-        ))
-      ) : (
-        <ListMenuItem>
-          <Heading>No shares...</Heading>
-        </ListMenuItem>
-      )}
-    </ListMenuSection>
-  )
 }

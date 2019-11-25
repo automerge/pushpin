@@ -1,5 +1,5 @@
-import React, { useContext, useRef } from 'react'
-import { DocUrl } from 'hypermerge'
+import React, { useContext, useRef, Ref, ChangeEvent } from 'react'
+import { HyperfileUrl } from 'hypermerge'
 
 import Automerge from 'automerge'
 import {
@@ -10,8 +10,8 @@ import {
 } from '../../../ShareLink'
 
 import { DEFAULT_AVATAR_PATH } from '../../../constants'
-import Content, { ContentProps } from '../../Content'
-import { ContactDoc, ContactDocInvites } from '.'
+import { ContentProps } from '../../Content'
+import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
 import ColorPicker from '../../ColorPicker'
@@ -26,13 +26,14 @@ import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../Badge'
 import CenteredStack from '../../CenteredStack'
 import { without } from '../../../Misc'
-import ContactEditorDevice from './ContactEditorDevice'
+import ContactEditorDevice, { OnRemoveDevice } from './ContactEditorDevice'
 import ListMenuSection from '../../ListMenuSection'
 import ListMenuItem from '../../ListMenuItem'
 import TitleEditor from '../../TitleEditor'
 import ListItem from '../../ListItem'
 import ListMenu from '../../ListMenu'
 import { USER_COLORS } from './Constants'
+import SharesSection from './SharesSection'
 import './ContactEditor.css'
 
 export default function ContactEditor(props: ContentProps) {
@@ -65,7 +66,8 @@ export default function ContactEditor(props: ContentProps) {
   }
 
   // xxx: only allow images & only one
-  const onFilesChanged = (e) => {
+  const onFilesChanged = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
     importFileList(e.target.files, (url) =>
       changeDoc((doc) => {
         const { hypermergeUrl } = parseDocumentLink(url)
@@ -77,7 +79,7 @@ export default function ContactEditor(props: ContentProps) {
   function removeDevice(url: PushpinUrl) {
     const { hypermergeUrl: deviceUrl } = parseDocumentLink(url)
     changeDoc((d) => {
-      const devices = d.devices as Automerge.List<DocUrl>
+      const devices = d.devices as Automerge.List<HypermergeUrl>
       if (!devices) {
         return
       }
@@ -95,13 +97,13 @@ export default function ContactEditor(props: ContentProps) {
         {renderAvatarEditor(avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick)}
         {renderPresenceColorSelector(color, setColor)}
         {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
-        {renderShares(invites)}
+        <SharesSection invites={invites} />
       </ListMenu>
     </CenteredStack>
   )
 }
 
-const renderNameEditor = (hypermergeUrl) => (
+const renderNameEditor = (hypermergeUrl: HypermergeUrl) => (
   <ListMenuSection title="Display Name">
     <ListMenuItem>
       <TitleEditor field="name" url={hypermergeUrl} />
@@ -109,7 +111,12 @@ const renderNameEditor = (hypermergeUrl) => (
   </ListMenuSection>
 )
 
-const renderAvatarEditor = (avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick) => {
+const renderAvatarEditor = (
+  avatarHyperfileUrl: HyperfileUrl | null,
+  onFilesChanged: (e: ChangeEvent<HTMLInputElement>) => void,
+  hiddenFileInput: Ref<HTMLInputElement>,
+  onImportClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+) => {
   return (
     <ListMenuSection title="Avatar">
       <ListMenuItem>
@@ -132,7 +139,7 @@ const renderAvatarEditor = (avatarHyperfileUrl, onFilesChanged, hiddenFileInput,
   )
 }
 
-const renderPresenceColorSelector = (color, setColor) => (
+const renderPresenceColorSelector = (color: string, setColor: (color: { hex: string }) => void) => (
   <ListMenuSection title="Presence Color">
     <ListMenuItem>
       <ColorPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
@@ -146,7 +153,13 @@ const renderPresenceColorSelector = (color, setColor) => (
   </ListMenuSection>
 )
 
-const renderDevices = (devices, status, selfUrl, removeDevice, currentDeviceId) => {
+const renderDevices = (
+  devices: HypermergeUrl[] | undefined,
+  status: string,
+  selfUrl: HypermergeUrl,
+  removeDevice: OnRemoveDevice,
+  currentDeviceId: PushpinUrl | null
+) => {
   if (!devices) {
     return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
   }
@@ -184,25 +197,6 @@ const renderDevices = (devices, status, selfUrl, removeDevice, currentDeviceId) 
           </ListItem>
         </ListMenuItem>
       ) : null}
-    </ListMenuSection>
-  )
-}
-
-const renderShares = (invites: ContactDocInvites) => {
-  return (
-    <ListMenuSection title="Shares">
-      {invites ? (
-        Object.entries(invites).map(([contact, shares]) => (
-          <ListMenuItem key={contact}>
-            <Content context="list" url={createDocumentLink('contact', contact as DocUrl)} />
-            <SecondaryText>{shares.length} items shared</SecondaryText>
-          </ListMenuItem>
-        ))
-      ) : (
-        <ListMenuItem>
-          <Heading>No shares...</Heading>
-        </ListMenuItem>
-      )}
     </ListMenuSection>
   )
 }
