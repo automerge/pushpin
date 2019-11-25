@@ -13,7 +13,7 @@ It's possible our collaboration engine will inadvertantly share access with othe
 # Your IP address will be shared with any users you encounter. 
 Because PushPin is peer-to-peer software, it aggressively connects to other peers with whom you share documents in common, including, for example, identity documents. 
 
-# You cannot unshare documents or block contributions from other users.
+# You cannot unshare documents.
 Once a key is published we do not support rotation or rescinding that key. Anyone with that key will be able to follow progress on that document forever.
 
 # Performance may degrade over time.
