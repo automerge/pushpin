@@ -4,7 +4,7 @@
 
 [Join our Slack to ask questions, share ideas, or meet other users!](https://communityinviter.com/apps/automerge/automerge)
 
-Built with Electron, React, automerge and the Dat p2p stack.
+Built with Electron, React, automerge and [hypermerge](https://github.com/automerge/hypermerge).
 
 A project initiated by [Ink & Switch](https://inkandswitch.com/).
 
@@ -70,13 +70,6 @@ You can navigate new places quickly by pressing "/" and then typing part of the 
 ## Clipper Chrome Extension
 
 PushPin integrates with the [Clipper chrome extension](https://chrome.google.com/webstore/detail/pushpin-clipper/kdnhjinccidgfopcfckekiihpjakjhng) [(repo)](https://github.com/pvh/pushpin-clipper) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
-
-To build and install the Clipper extension:
-
-```
-yarn build:clipper-host
-yarn install:clipper-host
-```
 
 You should now be able to clip content using the Clipper extension and have it show up in your Omnibox!
 
