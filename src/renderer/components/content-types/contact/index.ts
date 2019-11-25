@@ -3,8 +3,9 @@ import * as ContentTypes from '../../../ContentTypes'
 import { USER } from '../../../constants'
 import { HypermergeUrl } from '../../../ShareLink'
 
-import ContactEditor, { USER_COLORS } from './ContactEditor'
+import ContactWorkspace from './ContactWorkspace'
 import ContactInVarious from './ContactInVarious'
+import { USER_COLORS } from './ContactEditor'
 
 import './Avatar.css'
 
@@ -36,7 +37,7 @@ ContentTypes.register({
   unlisted: true,
   create,
   contexts: {
-    workspace: ContactEditor,
+    workspace: ContactWorkspace,
     board: ContactInVarious,
     list: ContactInVarious,
     thread: ContactInVarious,

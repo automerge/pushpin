@@ -34,7 +34,7 @@ import ListItem from '../../ListItem'
 
 import './ContactEditor.css'
 import ListMenu from '../../ListMenu'
-import MaxWidth from '../../MaxWidth'
+import FillParent from '../../FillParent'
 
 export const USER_COLORS = {
   // RUST: '#D96767',
@@ -109,7 +109,7 @@ export default function ContactEditor(props: ContentProps) {
 
   return (
     <CenteredStack centerText={false}>
-      <MaxWidth>
+      <FillParent maxWidth={600}>
         <ListMenu>
           <div className="ContactEditor-heading">
             <Heading>Edit Profile...</Heading>
@@ -120,7 +120,7 @@ export default function ContactEditor(props: ContentProps) {
           {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
           {renderShares(invites)}
         </ListMenu>
-      </MaxWidth>
+      </FillParent>
     </CenteredStack>
   )
 }
