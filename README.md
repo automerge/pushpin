@@ -112,7 +112,7 @@ To update the docs, edit `docs.html`, run `yarn run build-docs`, and push to Git
 
 ## Contributing
 
-Please do! Bug reports and pull requests are welcome.
+Please do! Bug reports and pull requests are welcome. Contributions will generally be considered and assessed following our [DESIGN](DESIGN.md) guidelines, though we may accept or reject a patch for any reason.
 
 ## Credits
 
