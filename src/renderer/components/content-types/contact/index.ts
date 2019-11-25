@@ -5,7 +5,7 @@ import { HypermergeUrl } from '../../../ShareLink'
 
 import ContactWorkspace from './ContactWorkspace'
 import ContactInVarious from './ContactInVarious'
-import { USER_COLORS } from './ContactEditor'
+import { USER_COLORS } from './Constants'
 
 import './Avatar.css'
 

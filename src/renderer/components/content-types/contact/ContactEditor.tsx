@@ -31,30 +31,9 @@ import ListMenuSection from '../../ListMenuSection'
 import ListMenuItem from '../../ListMenuItem'
 import TitleEditor from '../../TitleEditor'
 import ListItem from '../../ListItem'
-
-import './ContactEditor.css'
 import ListMenu from '../../ListMenu'
-
-export const USER_COLORS = {
-  // RUST: '#D96767',
-  // ENGINEER: '#FFE283',
-  // KEYLIME: '#A1E991',
-  // PINE: '#63D2A5',
-  // SOFT: '#64BCDF',
-  // BIGBLUE: '#3A66A3',
-  // ROYAL: '#A485E2',
-  // KAWAII: '#ED77AB',
-  // BLACK: '#2b2b2b',
-  RED: '#F87060',
-  VORANGE: '#FFC919',
-  DARKGRE: '#6CCB44',
-  PINETO: '#00CA7B',
-  VBLAU: '#3395E8',
-  CHILBLAU: '#004098',
-  OPTIROYA: '#4700D8',
-  MAGEGENTA: '#E80FA7',
-  GRAU: '#626262',
-}
+import { USER_COLORS } from './Constants'
+import './ContactEditor.css'
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
