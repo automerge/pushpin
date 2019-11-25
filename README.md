@@ -8,6 +8,14 @@ Built with Electron, React, automerge and the Dat p2p stack.
 
 A project initiated by [Ink & Switch](https://inkandswitch.com/).
 
+## WARNING
+
+PushPin is experimental software and currently implements an extremely open and permissive sharing system!
+
+You should be extremely cautious about putting private personal data into PushPin. Data put into PushPin cannot be unshared or redacted!
+
+See [WARNINGS](WARNINGS.md) for more details, and feel free to ask questions in Slack or GitHub issues.
+
 ## Running from Source
 
 ```console
@@ -61,7 +69,7 @@ You can navigate new places quickly by pressing "/" and then typing part of the 
 
 ## Clipper Chrome Extension
 
-Pushpin integrates with the [Clipper chrome extension](https://github.com/pvh/eleanor) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
+PushPin integrates with the [Clipper chrome extension](https://chrome.google.com/webstore/detail/pushpin-clipper/kdnhjinccidgfopcfckekiihpjakjhng) [(repo)](https://github.com/pvh/pushpin-clipper) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
 
 To build and install the Clipper extension:
 
@@ -94,7 +102,7 @@ To update the docs, edit `docs.html`, run `yarn run build-docs`, and push to Git
 
 ## Contributing
 
-Please do! Bug reports and pull requests are welcome.
+Please do! Bug reports and pull requests are welcome. Contributions will generally be considered and assessed following our [DESIGN](DESIGN.md) guidelines, though we may accept or reject a patch for any reason.
 
 ## Credits
 
