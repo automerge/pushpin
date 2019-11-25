@@ -1,4 +1,5 @@
 import React from 'react'
+import { Swatch } from 'react-color/lib/components/common'
 
 import { createDocumentLink, PushpinUrl, HypermergeUrl } from '../../../ShareLink'
 
@@ -43,6 +44,24 @@ export default function ContactViewer(props: ContentProps) {
         <ListMenuSection title="Avatar">
           <ListMenuItem>
             <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
+          </ListMenuItem>
+        </ListMenuSection>
+        <ListMenuSection title="Presence Color">
+          <ListMenuItem>
+            <div className="ColorPicker__swatch">
+              <Swatch
+                color={doc.color}
+                hex={doc.color}
+                onClick={() => {}}
+                focusStyle={{ border: `0 0 4px ${doc.color}` }}
+              />
+            </div>
+          </ListMenuItem>
+          <ListMenuItem>
+            <SecondaryText>
+              {doc.name}&apos;s presence colour can be used to identify them when they are present
+              within a document.
+            </SecondaryText>
           </ListMenuItem>
         </ListMenuSection>
         {renderDevices(devices, contactUrl)}
