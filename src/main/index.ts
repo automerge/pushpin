@@ -174,6 +174,7 @@ function createBackgroundWindow() {
 }
 
 function createMenu() {
+  const isMac = process.platform === 'darwin'
   // Menubar template
   const template: MenuItemConstructorOptions[] = [
     {
@@ -193,6 +194,7 @@ function createMenu() {
             sendSystemMsg({ type: 'NewWorkspace' })
           },
         },
+        isMac ? { role: 'close' } : { role: 'quit' },
       ],
     },
 
