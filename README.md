@@ -61,7 +61,7 @@ You can navigate new places quickly by pressing "/" and then typing part of the 
 
 ## Clipper Chrome Extension
 
-Pushpin integrates with the [Clipper chrome extension](https://github.com/pvh/eleanor) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
+PushPin integrates with the [Clipper chrome extension](https://chrome.google.com/webstore/detail/pushpin-clipper/kdnhjinccidgfopcfckekiihpjakjhng) [(repo)](https://github.com/pvh/pushpin-clipper) to save content from webpages into Pushpin. To set up Clipper, follow the steps in the Clipper README to install the extension.
 
 To build and install the Clipper extension:
 
