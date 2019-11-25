@@ -3,7 +3,7 @@
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
-     viewBox="0 0 660 84"
+     viewBox="0 0 760 84"
      style="background-color: #eee; padding: 10px">
   <style>
     /* <![CDATA[ */
@@ -13,10 +13,10 @@
     }
     /* ]]> */
   </style>
-  <text class="code" x="0" y="18"><tspan>pushpin://</tspan><tspan fill="#7f7fff">board/</tspan><tspan fill="#007fff">5vmhLfwX3J2332pZUtA9QWi1Pu5Dvux9E9xVYWPnnTKc</tspan><tspan>/29J</tspan></text>
-  <path stroke="#93a0b6" strokewidth="1" fill="none" d="M0.5,24 v4.5 h90 v-4.5 m0,4.5 h60 v-4.5 m0,4.5 h425 v-4.5 m0,4.5 h40 v-4.5"></path>
+  hypermerge:/FJ2NEbKxNM69cdsGtqojSFSJm9JjtNjdASHxAZTywjee?
+  <text class="code" x="0" y="18"><tspan>hypermerge:/</tspan><tspan fill="#007fff">BKdwzXtaKh1ms4aPrCzsaN3eNrxFrkjGGAF9Es6NnKHd</tspan><tspan fill="#7f7fff">?pushpinContentType=board</tspan></text>
+  <path stroke="#93a0b6" strokewidth="1" fill="none" d="M0.5,24 v4.5 h105 v-4.5 m0,4.5 h390 v-4.5 m0,4.5 h217 v-4.5"></path>
   <text y="44" text-anchor="middle"><tspan x="40">protocol</tspan><tspan x="40" dy="1.2em">identifier</tspan></text>
-  <text y="44" text-anchor="middle"><tspan x="125">content type</tspan></text>
-  <text y="44" text-anchor="middle"><tspan x="365">docId</tspan><tspan x="365" dy="1.2em">(base58)</tspan></text>
-  <text y="44" text-anchor="middle"><tspan x="595">CRC</tspan></text>
+  <text y="44" text-anchor="middle"><tspan x="325">docId</tspan><tspan x="325" dy="1.2em">(base58)</tspan></text>
+  <text y="44" text-anchor="middle"><tspan x="565">content type</tspan></text>
 </svg>
