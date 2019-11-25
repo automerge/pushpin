@@ -194,7 +194,17 @@ function createMenu() {
             sendSystemMsg({ type: 'NewWorkspace' })
           },
         },
-        ...(isMac ? [] : [{ role: 'quit' }]),
+        ...(isMac
+          ? []
+          : [
+              {
+                label: 'Exit',
+                accelerator: 'Ctrl+Q',
+                click: () => {
+                  app.exit(0)
+                },
+              },
+            ]),
       ],
     },
 
