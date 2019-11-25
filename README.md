@@ -8,6 +8,14 @@ Built with Electron, React, automerge and the Dat p2p stack.
 
 A project initiated by [Ink & Switch](https://inkandswitch.com/).
 
+## WARNING
+
+PushPin is experimental software and currently implements an extremely open and permissive sharing system!
+
+You should be extremely cautious about putting private personal data into PushPin. Data put into PushPin cannot be unshared or redacted!
+
+See [WARNINGS](WARNINGS.md) for more details, and feel free to ask questions in Slack or GitHub issues.
+
 ## Running from Source
 
 ```console
