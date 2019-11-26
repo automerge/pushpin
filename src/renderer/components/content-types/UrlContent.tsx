@@ -11,13 +11,13 @@ import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument, useEvent } from '../../Hooks'
 import './UrlContent.css'
-import Badge from '../Badge'
+import Badge from '../ui/Badge'
 import { APP_PATH } from '../../constants'
 import * as ContentData from '../../ContentData'
 import * as WebStreamLogic from '../../../WebStreamLogic'
-import ContentDragHandle from '../ContentDragHandle'
-import TitleWithSubtitle from '../TitleWithSubtitle'
-import ListItem from '../ListItem'
+import ContentDragHandle from '../ui/ContentDragHandle'
+import TitleWithSubtitle from '../ui/TitleWithSubtitle'
+import ListItem from '../ui/ListItem'
 
 interface UrlData {
   title?: string

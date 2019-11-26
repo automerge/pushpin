@@ -1,6 +1,6 @@
 import React from 'react'
 import { HypermergeUrl } from '../../../ShareLink'
-import Badge, { BadgeSize } from '../../Badge'
+import Badge, { BadgeSize } from '../../ui/Badge'
 import { useConnectionStatus } from '../../../PresenceHooks'
 import './ConnectionStatusBadge.css'
 

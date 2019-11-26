@@ -3,10 +3,10 @@ import { DocUrl } from 'hypermerge'
 
 import { createDocumentLink } from '../../../ShareLink'
 import Content from '../../Content'
-import Heading from '../../Heading'
-import SecondaryText from '../../SecondaryText'
-import ListMenuSection from '../../ListMenuSection'
-import ListMenuItem from '../../ListMenuItem'
+import Heading from '../../ui/Heading'
+import SecondaryText from '../../ui/SecondaryText'
+import ListMenuSection from '../../ui/ListMenuSection'
+import ListMenuItem from '../../ui/ListMenuItem'
 import { ContactDocInvites } from '.'
 
 interface Props {

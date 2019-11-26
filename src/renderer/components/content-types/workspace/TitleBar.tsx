@@ -15,7 +15,7 @@ import './TitleBar.css'
 import { useDocument, useEvent } from '../../../Hooks'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 import { Doc as WorkspaceDoc } from './Workspace'
-import Badge from '../../Badge'
+import Badge from '../../ui/Badge'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl

@@ -2,10 +2,10 @@ import React from 'react'
 import * as ContentTypes from '../../../ContentTypes'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
-import Badge from '../../Badge'
-import ContentDragHandle from '../../ContentDragHandle'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
-import ListItem from '../../ListItem'
+import Badge from '../../ui/Badge'
+import ContentDragHandle from '../../ui/ContentDragHandle'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
+import ListItem from '../../ui/ListItem'
 
 interface Doc {
   title?: string

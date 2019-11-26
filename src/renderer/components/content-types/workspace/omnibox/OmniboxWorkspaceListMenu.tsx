@@ -16,18 +16,18 @@ import { getDoc } from '../../../../Misc'
 
 import InvitationsView from '../../../../InvitationsView'
 import { ContactDoc } from '../../contact'
-import Badge from '../../../Badge'
+import Badge from '../../../ui/Badge'
 import './Omnibox.css'
 import InvitationListItem from './InvitationListItem'
-import ListMenuSection from '../../../ListMenuSection'
-import ListMenuItem from '../../../ListMenuItem'
-import ListMenu from '../../../ListMenu'
+import ListMenuSection from '../../../ui/ListMenuSection'
+import ListMenuItem from '../../../ui/ListMenuItem'
+import ListMenu from '../../../ui/ListMenu'
 import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
 import { Doc as WorkspaceDoc } from '../Workspace'
 
 import './OmniboxWorkspaceListMenu.css'
 import ActionListItem from './ActionListItem'
-import Heading from '../../../Heading'
+import Heading from '../../../ui/Heading'
 
 const log = Debug('pushpin:omnibox')
 

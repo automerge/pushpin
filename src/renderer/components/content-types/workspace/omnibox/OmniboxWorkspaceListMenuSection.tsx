@@ -1,6 +1,6 @@
 import React from 'react'
 import ActionListItem from './ActionListItem'
-import ListMenuSection from '../../../ListMenuSection'
+import ListMenuSection from '../../../ui/ListMenuSection'
 import { Action, Item } from './OmniboxWorkspaceListMenu'
 import Content from '../../../Content'
 

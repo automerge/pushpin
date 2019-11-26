@@ -2,10 +2,10 @@ import React from 'react'
 import { BoardDoc } from '.'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
-import Badge, { Props as BadgeProps } from '../../Badge'
-import ListItem from '../../ListItem'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
-import ContentDragHandle from '../../ContentDragHandle'
+import Badge, { Props as BadgeProps } from '../../ui/Badge'
+import ListItem from '../../ui/ListItem'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
+import ContentDragHandle from '../../ui/ContentDragHandle'
 
 interface Props extends ContentProps {
   editable: boolean

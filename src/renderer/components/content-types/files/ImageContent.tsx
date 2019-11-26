@@ -6,10 +6,10 @@ import { FileDoc } from '.'
 import { ContentProps } from '../../Content'
 import * as ContentTypes from '../../../ContentTypes'
 import { useDocument, useHyperfileHeader } from '../../../Hooks'
-import Badge from '../../Badge'
-import ListItem from '../../ListItem'
-import ContentDragHandle from '../../ContentDragHandle'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
+import Badge from '../../ui/Badge'
+import ListItem from '../../ui/ListItem'
+import ContentDragHandle from '../../ui/ContentDragHandle'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
