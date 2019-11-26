@@ -9,8 +9,12 @@ import { useDocument, useConfirmableInput, useHyperfile } from '../../../Hooks'
 import { streamToBuffer } from '../../../hyperfile'
 import './PdfContent.css'
 
+interface PdfDoc extends FileDoc {
+  content: string
+}
+
 export default function PdfContent(props: ContentProps) {
-  const [pdf, changePdf] = useDocument<FileDoc>(props.hypermergeUrl)
+  const [pdf, changePdf] = useDocument<PdfDoc>(props.hypermergeUrl)
   const [, /* fileHeader */ fileStream] = useHyperfile(pdf && pdf.hyperfileUrl)
   const [buffer, setBuffer] = useState<Buffer | null>(null)
   useEffect(() => {
@@ -57,6 +61,14 @@ export default function PdfContent(props: ContentProps) {
           })
         }
       })
+
+      if (pdf && !pdf.content) {
+        getPDFText(result).then((content) => {
+          changePdf((doc) => {
+            doc.content = content
+          })
+        })
+      }
     },
     [changePdf, pdf]
   )
@@ -133,3 +145,20 @@ ContentTypes.register({
   },
   supportsMimeType,
 })
+
+const getPageText = async (pdf, pageNo: number): Promise<string> => {
+  const page = await pdf.getPage(pageNo)
+  const tokenizedText = await page.getTextContent()
+  const pageText = tokenizedText.items.map((token) => token.str).join('')
+  return pageText
+}
+
+export const getPDFText = async (pdf): Promise<string> => {
+  const maxPages = pdf.numPages
+  const pageTextPromises: Promise<string>[] = []
+  for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
+    pageTextPromises.push(getPageText(pdf, pageNo))
+  }
+  const pageTexts = await Promise.all(pageTextPromises)
+  return pageTexts.join(' ')
+}
