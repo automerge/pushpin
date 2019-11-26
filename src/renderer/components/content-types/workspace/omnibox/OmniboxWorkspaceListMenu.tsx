@@ -16,18 +16,18 @@ import { getDoc } from '../../../../Misc'
 
 import InvitationsView from '../../../../InvitationsView'
 import { ContactDoc } from '../../contact'
-import Badge from '../../../Badge'
+import Badge from '../../../ui/Badge'
 import './Omnibox.css'
 import InvitationListItem from './InvitationListItem'
-import ListMenuSection from '../../../ListMenuSection'
-import ListMenuItem from '../../../ListMenuItem'
-import ListMenu from '../../../ListMenu'
+import ListMenuSection from '../../../ui/ListMenuSection'
+import ListMenuItem from '../../../ui/ListMenuItem'
+import ListMenu from '../../../ui/ListMenu'
 import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
 import { Doc as WorkspaceDoc } from '../Workspace'
 
 import './OmniboxWorkspaceListMenu.css'
 import ActionListItem from './ActionListItem'
-import Heading from '../../../Heading'
+import Heading from '../../../ui/Heading'
 
 const log = Debug('pushpin:omnibox')
 
@@ -383,8 +383,21 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
               doc &&
               ((doc.title && doc.title.match(new RegExp(props.search, 'i'))) ||
                 (doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))) ||
+                (doc.content && doc.content.match(new RegExp(props.search, 'i'))) ||
                 (doc.data && doc.data.text && doc.data.text.match(new RegExp(props.search, 'i'))))
           )
+          .reduce(
+            (prev, current) => {
+              if (current[0].match('board')) {
+                prev[0].push(current)
+              } else {
+                prev[1].push(current)
+              }
+              return prev
+            },
+            [[], []] as [any[], any[]]
+          )
+          .flat()
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {

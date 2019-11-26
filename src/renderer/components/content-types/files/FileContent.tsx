@@ -6,13 +6,13 @@ import { createDocumentLink } from '../../../ShareLink'
 import { FileDoc } from '.'
 
 import './FileContent.css'
-import Badge from '../../Badge'
-import ListItem from '../../ListItem'
-import ContentDragHandle from '../../ContentDragHandle'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
-import CenteredStack from '../../CenteredStack'
-import SecondaryText from '../../SecondaryText'
-import Heading from '../../Heading'
+import Badge from '../../ui/Badge'
+import ListItem from '../../ui/ListItem'
+import ContentDragHandle from '../../ui/ContentDragHandle'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
+import CenteredStack from '../../ui/CenteredStack'
+import SecondaryText from '../../ui/SecondaryText'
+import Heading from '../../ui/Heading'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0

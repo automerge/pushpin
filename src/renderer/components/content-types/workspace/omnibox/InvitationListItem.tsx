@@ -1,9 +1,9 @@
 import React from 'react'
-import Badge from '../../../Badge'
-import ListItem from '../../../ListItem'
+import Badge from '../../../ui/Badge'
+import ListItem from '../../../ui/ListItem'
 import { PushpinUrl, HypermergeUrl } from '../../../../ShareLink'
-import ContentDragHandle from '../../../ContentDragHandle'
-import TitleWithSubtitle from '../../../TitleWithSubtitle'
+import ContentDragHandle from '../../../ui/ContentDragHandle'
+import TitleWithSubtitle from '../../../ui/TitleWithSubtitle'
 
 export interface Props {
   url: PushpinUrl

@@ -2,17 +2,17 @@ import React from 'react'
 import Debug from 'debug'
 
 import { ContentProps } from '../../Content'
-import Badge from '../../Badge'
+import Badge from '../../ui/Badge'
 
 import './StoragePeer.css'
-import ListItem from '../../ListItem'
-import ContentDragHandle from '../../ContentDragHandle'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
+import ListItem from '../../ui/ListItem'
+import ContentDragHandle from '../../ui/ContentDragHandle'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 import { useStoragePeer } from './StoragePeerHooks'
-import CenteredStack from '../../CenteredStack'
-import SecondaryText from '../../SecondaryText'
+import CenteredStack from '../../ui/CenteredStack'
+import SecondaryText from '../../ui/SecondaryText'
 import { useDeviceOnlineStatus } from '../../../PresenceHooks'
-import Heading from '../../Heading'
+import Heading from '../../ui/Heading'
 
 const log = Debug('pushpin:settings')
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { HypermergeUrl, parseDocumentLink, createDocumentLink, PushpinUrl } from './ShareLink'
-import { useTimeouts, useMessaging, useRepo, useSelfId, useDocument, useSelf } from './Hooks'
+import { useTimeouts, useMessaging, useRepo, useDocument } from './Hooks'
+import { useSelfId } from './SelfHooks'
 import { CurrentDeviceContext } from './components/content-types/workspace/Device'
 import { ContactDoc } from './components/content-types/contact'
 
@@ -118,7 +119,7 @@ function lookupKeyToPresencePieces(key: string): [HypermergeUrl, HypermergeUrl] 
 export function usePresence<P>(
   url: HypermergeUrl | null,
   presence?: P,
-  key: string = '/'
+  key = '/'
 ): RemotePresence<P>[] {
   const [remote, setRemoteInner] = useState<RemotePresenceCache<P>>({})
   const setSingleRemote = (presence: RemotePresence<P>) => {

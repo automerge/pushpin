@@ -4,10 +4,10 @@ import { ContentProps } from '../../Content'
 import { BoardDoc } from '.'
 import { useDocument } from '../../../Hooks'
 import './BoardInBoard.css'
-import Badge from '../../Badge'
-import SecondaryText from '../../SecondaryText'
-import Heading from '../../Heading'
-import CenteredStack from '../../CenteredStack'
+import Badge from '../../ui/Badge'
+import SecondaryText from '../../ui/SecondaryText'
+import Heading from '../../ui/Heading'
+import CenteredStack from '../../ui/CenteredStack'
 
 BoardInBoard.minWidth = 5
 BoardInBoard.minHeight = 6

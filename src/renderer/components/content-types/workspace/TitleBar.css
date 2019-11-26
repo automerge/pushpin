@@ -17,17 +17,8 @@ button[disabled].TitleBar-menuItem .fa {
   color: #ccc;
 }
 
-.TitleBar-center {
-  display: flex;
-  align-items: center;
-  margin: 0 auto;
-}
-
-.TitleBar-right,
-.TitleBar-left {
-  align-items: center;
-  display: flex;
-  height: 40px;
+.TitleBar-content {
+  flex: 1;
 }
 
 .TitleBar-menuItem {

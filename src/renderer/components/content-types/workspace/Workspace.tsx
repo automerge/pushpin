@@ -6,7 +6,7 @@ import { Handle, Crypto } from 'hypermerge'
 import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
 import * as ContentTypes from '../../../ContentTypes'
-import SelfContext from '../../SelfContext'
+import SelfContext from '../../../SelfHooks'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
 import * as WebStreamLogic from '../../../../WebStreamLogic'
@@ -244,14 +244,17 @@ const WELCOME_TEXT = `Welcome to PushPin!
     We've created your first text card for you.
     You can edit it, or make more by double-clicking the background.
 
-    You can drag or paste images, text, and URLs onto the board. They'll be stored for offline usage.
+    You can drag or paste images, text, PDFs, audio, video, and URLs onto the board. They'll be stored for offline usage.
     If you right-click, you can choose the kind of card to make.
     You can make new boards from the right-click menu or with Ctrl-N.
 
-    To edit the title of a board, click the pencil.
-    To share a board with another person, click the clipboard, then have them paste that value into the omnibox.
+    There's a Chrome plugin that can capture webpages for you. You can find it at github.com/pvh/pushpin-clipper.
 
-    Quick travel around by clicking the Omnibox. Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
+    You can edit the title by clicking on it and typing.
+
+    To share a board with another person, click the clipboard in the upper-right corner, then have them paste that value into the omnibox or onto a board.
+
+    Quick travel around by clicking the Omnibox (map icon). Typing part of a name will show you people and boards that match that. The omnibox can also be opened with '/'.
 
     To create links to boards or contacts, drag them from the title bar or the omnibox.`
 
@@ -262,34 +265,30 @@ function create(_attrs: any, handle: Handle<Doc>) {
     // we should refactor not to require the hypermergeUrl on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create(
-      'board',
-      { title: 'Welcome to PushPin!', selfId: selfHypermergeUrl },
-      (boardUrl) => {
-        ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
-          const id = uuid() as CardId
-          ContentTypes.__getRepo().change(
-            parseDocumentLink(boardUrl).hypermergeUrl,
-            (doc: BoardDoc) => {
-              doc.cards[id] = {
-                url: textDocUrl,
-                x: 20,
-                y: 20,
-                width: 320,
-                height: 540,
-              }
+    ContentTypes.create('board', { title: 'Home', selfId: selfHypermergeUrl }, (boardUrl) => {
+      ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
+        const id = uuid() as CardId
+        ContentTypes.__getRepo().change(
+          parseDocumentLink(boardUrl).hypermergeUrl,
+          (doc: BoardDoc) => {
+            doc.cards[id] = {
+              url: textDocUrl,
+              x: 20,
+              y: 20,
+              width: 320,
+              height: 540,
             }
-          )
+          }
+        )
 
-          handle.change((workspace) => {
-            workspace.selfId = selfHypermergeUrl
-            workspace.contactIds = []
-            workspace.currentDocUrl = boardUrl
-            workspace.viewedDocUrls = [boardUrl]
-          })
+        handle.change((workspace) => {
+          workspace.selfId = selfHypermergeUrl
+          workspace.contactIds = []
+          workspace.currentDocUrl = boardUrl
+          workspace.viewedDocUrls = [boardUrl]
         })
-      }
-    )
+      })
+    })
   })
 }
 

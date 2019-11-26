@@ -1,14 +1,14 @@
 import React from 'react'
 import Content, { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
-import Badge from '../../Badge'
+import Badge from '../../ui/Badge'
 import { Doc } from './Workspace'
 import { createDocumentLink } from '../../../ShareLink'
 import { ContactDoc } from '../contact'
 import './WorkspaceInList.css'
-import ListItem from '../../ListItem'
-import ContentDragHandle from '../../ContentDragHandle'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
+import ListItem from '../../ui/ListItem'
+import ContentDragHandle from '../../ui/ContentDragHandle'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 
 export default function WorkspaceListItem(props: ContentProps) {
   const { url, hypermergeUrl } = props

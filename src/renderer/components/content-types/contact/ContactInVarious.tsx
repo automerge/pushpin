@@ -11,11 +11,11 @@ import { DEFAULT_AVATAR_PATH } from '../../../constants'
 import './ContactInVarious.css'
 import { useDocument } from '../../../Hooks'
 import ConnectionStatusBadge from './ConnectionStatusBadge'
-import ListItem from '../../ListItem'
-import ContentDragHandle from '../../ContentDragHandle'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
-import CenteredStack from '../../CenteredStack'
-import Heading from '../../Heading'
+import ListItem from '../../ui/ListItem'
+import ContentDragHandle from '../../ui/ContentDragHandle'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
+import CenteredStack from '../../ui/CenteredStack'
+import Heading from '../../ui/Heading'
 
 const log = Debug('pushpin:settings')
 

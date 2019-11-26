@@ -6,7 +6,8 @@ import { Doc as WorkspaceDoc } from './Workspace'
 import Author from './Author'
 
 import './Authors.css'
-import { useDocument, useSelfId } from '../../../Hooks'
+import { useDocument } from '../../../Hooks'
+import { useSelfId } from '../../../SelfHooks'
 import { usePresence } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:authors')

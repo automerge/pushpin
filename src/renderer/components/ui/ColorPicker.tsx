@@ -5,6 +5,7 @@ import { Swatch } from 'react-color/lib/components/common'
 import './ColorPicker.css'
 
 interface Props {
+  color?: string
   colors: string[]
   onChange(color: { hex: string; source: 'hex' }, e: React.MouseEvent): void
 }
@@ -27,11 +28,21 @@ function ColorPicker(props: Props) {
     )
   }
 
-  const swatches = props.colors.map((c) => (
-    <div key={c} className="ColorPicker__swatch">
-      <Swatch color={c} hex={c} onClick={handleChange} focusStyle={{ border: `0 0 4px ${c}` }} />
-    </div>
-  ))
+  const swatches = props.colors.map((c) => {
+    const isSelected = props.color && c.toLowerCase() === props.color.toLowerCase()
+    const borderStyle = { border: '1px solid #333' }
+    return (
+      <div key={c} className="ColorPicker__swatch">
+        <Swatch
+          color={c}
+          hex={c}
+          onClick={handleChange}
+          style={isSelected ? borderStyle : { border: '1px solid transparent' }}
+          focusStyle={borderStyle}
+        />
+      </div>
+    )
+  })
 
   return <div className="ColorPicker">{swatches}</div>
 }

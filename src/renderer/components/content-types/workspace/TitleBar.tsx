@@ -15,7 +15,7 @@ import './TitleBar.css'
 import { useDocument, useEvent } from '../../../Hooks'
 import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
 import { Doc as WorkspaceDoc } from './Workspace'
-import Badge from '../../Badge'
+import Badge from '../../ui/Badge'
 
 export interface Props {
   hypermergeUrl: HypermergeUrl
@@ -118,7 +118,9 @@ export default function TitleBar(props: Props) {
         <i className="fa fa-angle-right" />
       </button>
 
-      <Content url={doc.currentDocUrl} context="list" editable />
+      <div className="TitleBar-content">
+        <Content url={doc.currentDocUrl} context="list" editable />
+      </div>
       <Authors currentDocUrl={currentDocHypermergeUrl} workspaceUrl={props.hypermergeUrl} />
       <div className="TitleBar-self">
         <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" isPresent />

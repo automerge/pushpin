@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import Actions, { ActionItem } from './Actions'
 import { PushpinUrl } from '../../../../ShareLink'
-import ListMenuItem, { Stretch } from '../../../ListMenuItem'
+import ListMenuItem, { Stretch } from '../../../ui/ListMenuItem'
 
 export interface Props {
   contentUrl: PushpinUrl
