@@ -4,7 +4,7 @@
 import React from 'react'
 import Debug from 'debug'
 
-import { Handle, Doc, DocUrl } from 'hypermerge'
+import { Handle, Doc, DocUrl, RepoFrontend } from 'hypermerge'
 
 import {
   createDocumentLink,
@@ -35,6 +35,7 @@ export interface Props {
   active: boolean
   search: string
   hypermergeUrl: DocUrl
+  repo: RepoFrontend // this is not a great interface, but beats window.repo
   omniboxFinished: Function
   onContent: (url: PushpinUrl) => boolean
 }
@@ -105,7 +106,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     this.refreshHandle(this.props.hypermergeUrl)
     document.addEventListener('keydown', this.handleCommandKeys)
     this.invitationsView = new InvitationsView(
-      window.repo,
+      this.props.repo,
       this.props.hypermergeUrl,
       this.onInvitationsChange
     )
@@ -131,7 +132,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     if (this.handle) {
       this.handle.close()
     }
-    this.handle = window.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+    this.handle = this.props.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
   }
 
   onInvitationsChange = (invitations: any) => {
@@ -149,7 +150,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             const { hypermergeUrl } = parseDocumentLink(url)
             // when it changes, stick the contents of the document
             // into this.state.viewedDocs[url]
-            const handle = window.repo.watch(hypermergeUrl, (doc) => {
+            const handle = this.props.repo.watch(hypermergeUrl, (doc) => {
               this.setState((state) => {
                 return { viewedDocs: { ...state.viewedDocs, [url]: doc } }
               })
@@ -164,7 +165,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           if (!this.contactHandles[contactId]) {
             // when it changes, put it into this.state.contacts[contactId]
 
-            const handle = window.repo.watch<ContactDoc>(contactId, (doc) => {
+            const handle = this.props.repo.watch<ContactDoc>(contactId, (doc) => {
               this.setState((state) => {
                 return { contacts: { ...state.contacts, [contactId]: doc } }
               })
@@ -471,28 +472,28 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
     const senderSecretKey =
       workspace.secretKey &&
-      (await window.repo.crypto.verifiedMessage(this.props.hypermergeUrl, workspace.secretKey))
+      (await this.props.repo.crypto.verifiedMessage(this.props.hypermergeUrl, workspace.secretKey))
     if (!senderSecretKey) {
       throw new Error(
         'Workspace is missing encryption key. Sharing is disabled until the workspace is migrated to support encrypted sharing. Open the workspace on the device on which it was first created to migrate the workspace.'
       )
     }
 
-    const recipient = await getDoc<ContactDoc>(window.repo, recipientUrl)
+    const recipient = await getDoc<ContactDoc>(this.props.repo, recipientUrl)
     const recipientPublicKey =
       recipient.encryptionKey &&
-      (await window.repo.crypto.verifiedMessage(recipientUrl, recipient.encryptionKey))
+      (await this.props.repo.crypto.verifiedMessage(recipientUrl, recipient.encryptionKey))
     if (!recipientPublicKey) {
       throw new Error('Unable to share with the recipient - they do not support encrypted sharing.')
     }
 
-    const box = await window.repo.crypto.box(
+    const box = await this.props.repo.crypto.box(
       senderSecretKey,
       recipientPublicKey,
       workspace.currentDocUrl
     )
 
-    window.repo.change(workspace.selfId, (s: ContactDoc) => {
+    this.props.repo.change(workspace.selfId, (s: ContactDoc) => {
       if (!s.invites) {
         s.invites = {}
       }
