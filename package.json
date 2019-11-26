@@ -19,7 +19,7 @@
     "format": "concurrently yarn:format:*",
     "format:css": "prettier --write src/**/*.css",
     "format:js": "eslint --cache --color --ext .jsx,.js,.tsx,.ts src",
-    "test": "electron-mocha --renderer test/**/*.{js,jsx,ts,tsx}",
+    "test": "electron-mocha -r ts-node/register --renderer test/**/*.{js,jsx,ts,tsx}",
     "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [],
@@ -78,6 +78,7 @@
     "@types/hard-source-webpack-plugin": "^1.0.1",
     "@types/html-webpack-plugin": "^3.2.0",
     "@types/mime-types": "^2.1.0",
+    "@types/mocha": "^5.2.7",
     "@types/node-ipc": "^9.1.1",
     "@types/prop-types": "^15.7.1",
     "@types/quill": "^2.0.2",
