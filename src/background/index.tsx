@@ -1,3 +1,6 @@
+import fs from 'fs'
+import gracefulFs from 'graceful-fs'
+
 import Hyperswarm from 'hyperswarm'
 import * as ReactDOM from 'react-dom'
 import React from 'react'
@@ -11,6 +14,8 @@ import ipc from '../ipc'
 import { HYPERMERGE_PATH, FILE_SERVER_PATH } from '../renderer/constants'
 import Root from './components/Root'
 import { ToSystemMsg } from '../renderer/System'
+
+gracefulFs.gracefulify(fs)
 
 window._debug = {}
 
