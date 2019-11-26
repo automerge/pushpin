@@ -4,8 +4,6 @@ import { Header } from 'hypermerge/dist/FileStore'
 import { Readable } from 'stream'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
-import SelfContext from './components/SelfContext'
-import { ContactDoc } from './components/content-types/contact'
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -26,15 +24,6 @@ export function useRepo(): RepoFrontend {
 export function useCrypto(): CryptoClient {
   const repo = useRepo()
   return repo.crypto
-}
-
-export function useSelfId(): HypermergeUrl {
-  return useContext(SelfContext)
-}
-
-export function useSelf(): [Readonly<ContactDoc> | null, ChangeFn<ContactDoc>] {
-  const selfId = useSelfId()
-  return useDocument<ContactDoc>(selfId)
 }
 
 /**
@@ -222,7 +211,10 @@ export function useTimeouts<K>(
     (key: K) => {
       const timeoutId = timeoutIds.current.get(key)
       if (timeoutId) clearTimeout(timeoutId)
-      timeoutIds.current.set(key, setTimeout(() => timedOut(key), ms))
+      timeoutIds.current.set(
+        key,
+        setTimeout(() => timedOut(key), ms)
+      )
     },
     [onTimeout]
   )
