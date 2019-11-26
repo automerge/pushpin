@@ -14,7 +14,7 @@
     "start2": "NAME=userA yarn start & NAME=userB yarn dev:app",
     "start3": "NAME=userA yarn start & NAME=userB yarn dev:app & NAME=userC yarn dev:app",
     "dist": "yarn compile --mode=production && yarn make-icon && electron-builder",
-    "make-icon": "svgpng src/renderer/pushpinIcon_Standalone.svg build/icon.png -w 512",
+    "make-icon": "svgpng assets/pushpinIcon_Standalone.svg build/icon.png -w 512",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "format": "concurrently yarn:format:*",
     "format:css": "prettier --write src/**/*.css",
