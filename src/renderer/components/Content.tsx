@@ -1,7 +1,6 @@
 import React, {
   useState,
   useCallback,
-  useContext,
   useEffect,
   forwardRef,
   Ref,
@@ -11,9 +10,9 @@ import React, {
 
 import * as ContentTypes from '../ContentTypes'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
-import SelfContext from './SelfContext'
 import Crashable from './Crashable'
 import { useHeartbeat } from '../PresenceHooks'
+import { useSelfId } from '../Hooks'
 
 // this is the interface imported by Content types
 export interface ContentProps {
@@ -43,7 +42,7 @@ const Content: RefForwardingComponent<ContentHandle, Props> = (
   const { context, url } = props
 
   const [isCrashed, setCrashed] = useState(false)
-  const selfId = useContext(SelfContext)
+  const selfId = useSelfId()
   const onCatch = useCallback(() => setCrashed(true), [])
 
   const { type, hypermergeUrl } = parseDocumentLink(url)
