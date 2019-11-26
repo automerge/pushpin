@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ContentProps } from '../../Content'
 
-import { useSelfId } from '../../../Hooks'
+import { useSelfId } from '../../../SelfHooks'
 
 import ContactViewer from './ContactViewer'
 import ContactEditor from './ContactEditor'
