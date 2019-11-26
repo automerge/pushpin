@@ -4,11 +4,6 @@
   height: unset !important;
 }
 
-.PdfContent {
-  width: 100%;
-  background: white;
-}
-
 .PdfContent--loading {
   /* probably want to eliminate this state eventually */
   text-align: center;

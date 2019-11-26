@@ -87,12 +87,10 @@ export default function ContactInVarious(props: ContactProps) {
 
     case 'board':
       return (
-        <div className="Contact--board BoardCard--standard">
-          <CenteredStack>
-            {avatar}
-            <Heading wrap>{name || ''}</Heading>
-          </CenteredStack>
-        </div>
+        <CenteredStack>
+          {avatar}
+          <Heading wrap>{name || ''}</Heading>
+        </CenteredStack>
       )
 
     default:
