@@ -57,15 +57,7 @@
 }
 
 .UrlCard {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  box-sizing: border-box;
   overflow: auto;
-  position: relative;
-  padding: 12px;
-  flex: 1 1 auto;
-  border: 1px solid var(--colorPaleGrey);
 }
 
 .UrlCard--workspace {
