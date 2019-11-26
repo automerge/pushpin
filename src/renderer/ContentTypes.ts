@@ -1,6 +1,6 @@
 import Debug from 'debug'
 import { ComponentType } from 'react'
-import { Handle } from 'hypermerge'
+import { Handle, RepoFrontend } from 'hypermerge'
 import { HypermergeUrl, createDocumentLink, PushpinUrl } from './ShareLink'
 import { ContentData } from './ContentData'
 
@@ -35,6 +35,12 @@ const registry: { [type: string]: ContentType } = {}
 const defaultRegistry: {
   [K in Context]?: Component
 } = {}
+
+let repo: RepoFrontend
+
+export function initRepo(repoIn: RepoFrontend) {
+  repo = repoIn
+}
 
 export function register(contentType: ContentType) {
   const { type } = contentType
@@ -114,8 +120,8 @@ export function createFrom(contentData: ContentData, callback: CreateCallback): 
   const entry = registry[contentType]
   if (!entry) return
   if (!entry.createFrom) throw new Error('Cannot be created from file')
-  const url = window.repo.create() as HypermergeUrl
-  const handle = window.repo.open(url)
+  const url = repo.create() as HypermergeUrl
+  const handle = repo.open(url)
   Promise.resolve(entry.createFrom(contentData, handle))
     .then(() => {
       callback(createDocumentLink(contentType, url))
@@ -129,8 +135,8 @@ export function create(type, attrs = {}, callback: CreateCallback): void {
     return
   }
 
-  const url = window.repo.create() as HypermergeUrl
-  const handle = window.repo.open(url)
+  const url = repo.create() as HypermergeUrl
+  const handle = repo.open(url)
 
   if (!entry.create) {
     throw Error(`The ${type} content type cannot be created directly.`)
