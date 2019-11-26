@@ -90,12 +90,6 @@ See [HACKING](HACKING.md) for a getting started guide.
 
 Create a package for your platform with `yarn dist`.
 
-## Docs
-
-The source for docs are in `src/docs.html` and hosted on GitHub pages at https://inkandswitch.github.io/pushpin.
-
-To update the docs, edit `docs.html`, run `yarn run build-docs`, and push to GitHub.
-
 ## Contributing
 
 Please do! Bug reports and pull requests are welcome. Contributions will generally be considered and assessed following our [DESIGN](DESIGN.md) guidelines, though we may accept or reject a patch for any reason.
