@@ -41,8 +41,6 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
 
   // const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
 
-  window.repo = front
-
   cb(front)
 }
 
