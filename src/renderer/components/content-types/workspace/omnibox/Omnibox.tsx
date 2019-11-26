@@ -47,6 +47,7 @@ export default function Omnibox(props: Props) {
 
   useEffect(() => {
     if (active && omniboxInput.current) {
+      setSearch('')
       omniboxInput.current.value = ''
       omniboxInput.current.select()
     }
