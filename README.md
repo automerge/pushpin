@@ -50,10 +50,13 @@ console:
 
 ```javascript
 > require('./constants').USER_PATH
-"/Users/mmcgrana/Library/Application Support/pushpin/pushpin-v11/mark"
+"/Users/mmcgrana/Library/Application Support/PushPin/pushpin-v11/mark"
 ```
 
-You can remove a user directory to reset a user's data, or remove the entire data directory to reset all user data.
+On Mac, this is currently: `~/Library/Application Support/pushpin/`.
+On Windows, it is: `~\AppData\Roaming\PushPin`
+
+Per-NAME data is stored under that directory inside `pushpin-v11`. (The number may be higher if you're reading this in the future and we forgot to update the readme.) You can remove a single directory from to reset a user's data, or remove the entire data directory to reset all user data.
 
 ## Using PushPin
 
