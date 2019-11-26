@@ -12,7 +12,7 @@ import * as ContentTypes from '../ContentTypes'
 import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
 import Crashable from './Crashable'
 import { useHeartbeat } from '../PresenceHooks'
-import { useSelfId } from '../Hooks'
+import { useSelfId } from '../SelfHooks'
 
 // this is the interface imported by Content types
 export interface ContentProps {
