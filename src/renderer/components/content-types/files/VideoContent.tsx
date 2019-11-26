@@ -13,11 +13,7 @@ export default function VideoContent({ hypermergeUrl }: ContentProps) {
     return null
   }
 
-  return (
-    <div className="VideoContent BoardCard--standard">
-      <video controls src={doc.hyperfileUrl} />
-    </div>
-  )
+  return <video className="VideoContent" controls src={doc.hyperfileUrl} />
 }
 
 const supportsMimeType = (mimeType) =>

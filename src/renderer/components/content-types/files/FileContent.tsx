@@ -60,13 +60,11 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
         )
       default:
         return (
-          <div className="BoardCard--standard">
-            <CenteredStack>
-              <Badge ref={badgeRef} size="huge" shape="square" icon="file-o" />
-              <Heading>{title}</Heading>
-              <SecondaryText>{subtitle}</SecondaryText>
-            </CenteredStack>
-          </div>
+          <CenteredStack>
+            <Badge ref={badgeRef} size="huge" shape="square" icon="file-o" />
+            <Heading>{title}</Heading>
+            <SecondaryText>{subtitle}</SecondaryText>
+          </CenteredStack>
         )
     }
   }

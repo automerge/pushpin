@@ -29,12 +29,10 @@ export default function BoardInBoard(props: ContentProps) {
   const subTitle = `${childCardCount} card${childCardCount === 1 ? '' : 's'}`
 
   return (
-    <div className="BoardInBoard BoardCard--standard">
-      <CenteredStack>
-        <Badge size="huge" icon="files-o" backgroundColor={backgroundColor} />
-        <Heading wrap>{title}</Heading>
-        <SecondaryText>{subTitle}</SecondaryText>
-      </CenteredStack>
-    </div>
+    <CenteredStack>
+      <Badge size="huge" icon="files-o" backgroundColor={backgroundColor} />
+      <Heading wrap>{title}</Heading>
+      <SecondaryText>{subTitle}</SecondaryText>
+    </CenteredStack>
   )
 }

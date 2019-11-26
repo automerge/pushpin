@@ -103,7 +103,7 @@ export default function PdfContent(props: ContentProps) {
     ) : null
 
   return (
-    <div className="PdfContent">
+    <>
       {header}
       {buffer ? (
         <Document file={{ data: buffer }} onLoadSuccess={onDocumentLoadSuccess}>
@@ -116,7 +116,7 @@ export default function PdfContent(props: ContentProps) {
           />
         </Document>
       ) : null}
-    </div>
+    </>
   )
 }
 

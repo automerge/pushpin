@@ -261,6 +261,7 @@ function BoardCard(props: BoardCardProps) {
       id={`card-${id}`}
       className={classNames(
         'BoardCard',
+        'BoardCard--standard',
         selected && 'BoardCard--selected',
         mySelected && 'BoardCard--mySelected'
       )}

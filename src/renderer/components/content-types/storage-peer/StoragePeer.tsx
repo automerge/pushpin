@@ -54,19 +54,17 @@ export default function StoragePeer(props: ContentProps) {
 
     case 'board':
       return (
-        <div className="StoragePeer BoardCard--standard">
-          <CenteredStack>
-            <Badge
-              icon="cloud"
-              shape="circle"
-              size="huge"
-              color={isOnline ? 'white' : 'black'}
-              backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
-            />
-            <Heading wrap>{title}</Heading>
-            <SecondaryText>{subtitle}</SecondaryText>
-          </CenteredStack>
-        </div>
+        <CenteredStack>
+          <Badge
+            icon="cloud"
+            shape="circle"
+            size="huge"
+            color={isOnline ? 'white' : 'black'}
+            backgroundColor={`var(${isOnline ? '--colorOnline' : '--colorOffline'})`}
+          />
+          <Heading wrap>{title}</Heading>
+          <SecondaryText>{subtitle}</SecondaryText>
+        </CenteredStack>
       )
 
     default:

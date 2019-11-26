@@ -12,11 +12,7 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
   if (!(doc && doc.hyperfileUrl)) {
     return null
   }
-  return (
-    <div className="AudioContent BoardCard--standard">
-      <audio controls src={doc.hyperfileUrl} />
-    </div>
-  )
+  return <audio controls src={doc.hyperfileUrl} />
 }
 
 const supportsMimeType = (mimeType) => !!mimeType.match('audio/')
