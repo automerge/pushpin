@@ -36,13 +36,13 @@ const defaultRegistry: {
   [K in Context]?: Component
 } = {}
 
+// This is a hack to have a reference to the repo without relying on window.repo.
 let repo: RepoFrontend
-
-export function terribleRepoBorrowingForWorkspace() {
+export function __getRepo() {
+  if (!repo) throw new Error('Repo has not been set. Must call __setRepo().')
   return repo
 }
-
-export function initRepo(repoIn: RepoFrontend) {
+export function setRepo(repoIn: RepoFrontend) {
   repo = repoIn
 }
 
@@ -124,7 +124,7 @@ export function createFrom(contentData: ContentData, callback: CreateCallback): 
   const entry = registry[contentType]
   if (!entry) return
   if (!entry.createFrom) throw new Error('Cannot be created from file')
-  const url = repo.create() as HypermergeUrl
+  const url = __getRepo().create() as HypermergeUrl
   const handle = repo.open(url)
   Promise.resolve(entry.createFrom(contentData, handle))
     .then(() => {
@@ -139,8 +139,8 @@ export function create(type, attrs = {}, callback: CreateCallback): void {
     return
   }
 
-  const url = repo.create() as HypermergeUrl
-  const handle = repo.open(url)
+  const url = __getRepo().create() as HypermergeUrl
+  const handle = __getRepo().open(url)
 
   if (!entry.create) {
     throw Error(`The ${type} content type cannot be created directly.`)

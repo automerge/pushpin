@@ -268,7 +268,7 @@ function create(_attrs: any, handle: Handle<Doc>) {
       (boardUrl) => {
         ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
           const id = uuid() as CardId
-          ContentTypes.terribleRepoBorrowingForWorkspace().change(
+          ContentTypes.__getRepo().change(
             parseDocumentLink(boardUrl).hypermergeUrl,
             (doc: BoardDoc) => {
               doc.cards[id] = {

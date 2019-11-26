@@ -52,7 +52,7 @@ function initWorkspace(repo: RepoFrontend) {
   const element = document.createElement('div')
   element.id = 'app'
   document.body.appendChild(element)
-  ContentTypes.initRepo(repo)
+  ContentTypes.setRepo(repo)
   ReactDOM.render(workspace, element)
 
   // HMR
