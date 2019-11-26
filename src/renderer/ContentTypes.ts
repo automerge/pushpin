@@ -38,6 +38,10 @@ const defaultRegistry: {
 
 let repo: RepoFrontend
 
+export function terribleRepoBorrowingForWorkspace() {
+  return repo
+}
+
 export function initRepo(repoIn: RepoFrontend) {
   repo = repoIn
 }

@@ -268,15 +268,18 @@ function create(_attrs: any, handle: Handle<Doc>) {
       (boardUrl) => {
         ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
           const id = uuid() as CardId
-          repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
-            doc.cards[id] = {
-              url: textDocUrl,
-              x: 20,
-              y: 20,
-              width: 320,
-              height: 540,
+          ContentTypes.terribleRepoBorrowingForWorkspace().change(
+            parseDocumentLink(boardUrl).hypermergeUrl,
+            (doc: BoardDoc) => {
+              doc.cards[id] = {
+                url: textDocUrl,
+                x: 20,
+                y: 20,
+                width: 320,
+                height: 540,
+              }
             }
-          })
+          )
 
           handle.change((workspace) => {
             workspace.selfId = selfHypermergeUrl
