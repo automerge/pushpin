@@ -384,6 +384,18 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
                 (doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))) ||
                 (doc.data && doc.data.text && doc.data.text.match(new RegExp(props.search, 'i'))))
           )
+          .reduce(
+            (prev, current) => {
+              if (current[0].match('board')) {
+                prev[0].push(current)
+              } else {
+                prev[1].push(current)
+              }
+              return prev
+            },
+            [[], []] as [any[], any[]]
+          )
+          .flat()
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {

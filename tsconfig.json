@@ -5,12 +5,7 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "noFallthroughCasesInSwitch": true,
-    "lib": [
-      "es2015",
-      "es2017",
-      "dom",
-      "webworker"
-    ],
+    "lib": ["es2015", "es2017", "es2019", "dom", "webworker"],
     "target": "es2016",
     "module": "CommonJS",
     "esModuleInterop": true,
