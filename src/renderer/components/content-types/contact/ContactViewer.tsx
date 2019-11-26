@@ -9,18 +9,18 @@ import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
 import { useDocument } from '../../../Hooks'
-import Heading from '../../Heading'
-import SecondaryText from '../../SecondaryText'
+import Heading from '../../ui/Heading'
+import SecondaryText from '../../ui/SecondaryText'
 
 import ConnectionStatusBadge from './ConnectionStatusBadge'
-import Badge from '../../Badge'
-import CenteredStack from '../../CenteredStack'
-import ListMenuSection from '../../ListMenuSection'
-import ListMenuItem from '../../ListMenuItem'
+import Badge from '../../ui/Badge'
+import CenteredStack from '../../ui/CenteredStack'
+import ListMenuSection from '../../ui/ListMenuSection'
+import ListMenuItem from '../../ui/ListMenuItem'
 import SharesSection from './SharesSection'
 
 import './ContactEditor.css'
-import ListMenu from '../../ListMenu'
+import ListMenu from '../../ui/ListMenu'
 
 export default function ContactViewer(props: ContentProps) {
   const { hypermergeUrl: contactUrl } = props

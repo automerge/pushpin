@@ -1,5 +1,5 @@
 import React from 'react'
-import SecondaryText from '../../../SecondaryText'
+import SecondaryText from '../../../ui/SecondaryText'
 import './Action.css'
 
 interface Props {

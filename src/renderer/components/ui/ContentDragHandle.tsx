@@ -2,9 +2,9 @@ import React, { ReactNode, useRef } from 'react'
 import './Heading.css'
 import { HyperfileUrl } from 'hypermerge'
 import mime from 'mime-types'
-import { PushpinUrl } from '../ShareLink'
-import { useHyperfileHeader } from '../Hooks'
-import * as UriList from '../UriList'
+import { PushpinUrl } from '../../ShareLink'
+import { useHyperfileHeader } from '../../Hooks'
+import * as UriList from '../../UriList'
 
 interface SimpleProps {
   url: PushpinUrl

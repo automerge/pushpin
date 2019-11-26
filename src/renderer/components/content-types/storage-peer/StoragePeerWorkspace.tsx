@@ -1,12 +1,12 @@
 import React from 'react'
 import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
 import Content, { ContentProps } from '../../Content'
-import Heading from '../../Heading'
+import Heading from '../../ui/Heading'
 
 import './StoragePeerWorkspace.css'
 import { useStoragePeer } from './StoragePeerHooks'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
-import SecondaryText from '../../SecondaryText'
+import SecondaryText from '../../ui/SecondaryText'
 
 export default function StoragePeerEditor(props: ContentProps) {
   const { hypermergeUrl } = props

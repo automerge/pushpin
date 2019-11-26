@@ -7,8 +7,8 @@ import Content from '../../../Content'
 import { Doc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
 import OmniboxWorkspaceListMenu from './OmniboxWorkspaceListMenu'
-import ListMenuHeader from '../../../ListMenuHeader'
-import Badge from '../../../Badge'
+import ListMenuHeader from '../../../ui/ListMenuHeader'
+import Badge from '../../../ui/Badge'
 
 import './OmniboxWorkspace.css'
 

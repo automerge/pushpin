@@ -8,12 +8,12 @@ import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument, useStaticCallback } from '../../Hooks'
 import './TextContent.css'
-import Badge from '../Badge'
+import Badge from '../ui/Badge'
 import * as ContentData from '../../ContentData'
 import * as WebStreamLogic from '../../../WebStreamLogic'
-import ListItem from '../ListItem'
-import ContentDragHandle from '../ContentDragHandle'
-import TitleWithSubtitle from '../TitleWithSubtitle'
+import ListItem from '../ui/ListItem'
+import ContentDragHandle from '../ui/ContentDragHandle'
+import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 
 interface TextDoc {
   text: Automerge.Text

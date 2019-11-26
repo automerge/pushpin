@@ -2,8 +2,8 @@ import React from 'react'
 import './Heading.css'
 import Heading from './Heading'
 import SecondaryText from './SecondaryText'
-import TitleEditor from './TitleEditor'
-import { HypermergeUrl } from '../ShareLink'
+import TitleEditor from '../TitleEditor'
+import { HypermergeUrl } from '../../ShareLink'
 import './TitleWithSubtitle.css'
 
 export interface Props {

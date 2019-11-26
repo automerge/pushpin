@@ -2,7 +2,7 @@ import React, { useRef, useState, memo } from 'react'
 import classNames from 'classnames'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
-import ColorPicker from '../../ColorPicker'
+import ColorPicker from '../../ui/ColorPicker'
 import './ContextMenu.css'
 import * as ContentTypes from '../../../ContentTypes'
 import { importFileList } from '../../../ImportData'

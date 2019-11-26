@@ -10,7 +10,7 @@ import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
 import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
 import { useEvent } from '../../../../Hooks'
-import ListMenuSection from '../../../ListMenuSection'
+import ListMenuSection from '../../../ui/ListMenuSection'
 
 const log = Debug('pushpin:omnibox')
 

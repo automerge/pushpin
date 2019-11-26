@@ -6,10 +6,10 @@ import { PushpinUrl } from '../../../ShareLink'
 import { DEVICE_URL_PATH } from '../../../constants'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
-import Badge from '../../Badge'
+import Badge from '../../ui/Badge'
 import './Device.css'
 import { useDeviceOnlineStatus } from '../../../PresenceHooks'
-import TitleWithSubtitle from '../../TitleWithSubtitle'
+import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
