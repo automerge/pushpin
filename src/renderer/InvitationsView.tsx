@@ -56,7 +56,7 @@ export default class InvitationsView {
     const workspace = await getDoc<Doc>(this.repo, this.workspaceHandle.url)
     const recipientSecretKey =
       workspace.secretKey &&
-      (await window.repo.crypto.verifiedMessage(this.workspaceHandle.url, workspace.secretKey))
+      (await this.repo.crypto.verifiedMessage(this.workspaceHandle.url, workspace.secretKey))
     if (!recipientSecretKey) {
       return
     }
@@ -68,7 +68,7 @@ export default class InvitationsView {
       }
       const senderPublicKey =
         sender.encryptionKey &&
-        (await window.repo.crypto.verifiedMessage(senderUrl, sender.encryptionKey))
+        (await this.repo.crypto.verifiedMessage(senderUrl, sender.encryptionKey))
       if (!senderPublicKey) {
         return
       }
@@ -76,11 +76,7 @@ export default class InvitationsView {
       const invitations = (this.selfId && sender.invites[this.selfId]) || []
 
       invitations.forEach(async (box) => {
-        const documentUrl = await window.repo.crypto.openBox(
-          senderPublicKey,
-          recipientSecretKey,
-          box
-        )
+        const documentUrl = await this.repo.crypto.openBox(senderPublicKey, recipientSecretKey, box)
         const { hypermergeUrl } = parseDocumentLink(documentUrl)
         const matchOffer = (offer: Invitation) =>
           offer.documentUrl === documentUrl && offer.offererId === senderUrl

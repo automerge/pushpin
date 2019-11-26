@@ -11,6 +11,7 @@ import './app.css'
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 import System, { FromSystemMsg } from './System'
+import * as ContentTypes from './ContentTypes'
 
 window._debug = {}
 
@@ -41,8 +42,6 @@ function initHypermerge(cb: (repo: RepoFrontend) => void) {
 
   // const discovery = new DiscoverySwarm(defaults({ stream: repo.stream, id: repo.id }))
 
-  window.repo = front
-
   cb(front)
 }
 
@@ -53,6 +52,7 @@ function initWorkspace(repo: RepoFrontend) {
   const element = document.createElement('div')
   element.id = 'app'
   document.body.appendChild(element)
+  ContentTypes.setRepo(repo)
   ReactDOM.render(workspace, element)
 
   // HMR

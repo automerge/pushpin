@@ -14,7 +14,6 @@ export interface ContactDoc {
   name: string
   color: string
   avatarDocId: HypermergeUrl
-  hypermergeUrl: HypermergeUrl // Used by workspace
   invites: ContactDocInvites
   devices?: HypermergeUrl[]
   encryptionKey?: Crypto.SignedMessage<Crypto.EncodedPublicEncryptionKey>

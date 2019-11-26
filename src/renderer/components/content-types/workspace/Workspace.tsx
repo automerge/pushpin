@@ -264,22 +264,22 @@ function create(_attrs: any, handle: Handle<Doc>) {
     // this is, uh, a nasty hack.
     // we should refactor not to require the hypermergeUrl on the contact
     // but i don't want to pull that in scope right now
-    window.repo.change(selfHypermergeUrl, (doc: ContactDoc) => {
-      doc.hypermergeUrl = selfHypermergeUrl
-    })
 
     ContentTypes.create('board', { title: 'Home', selfId: selfHypermergeUrl }, (boardUrl) => {
       ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
         const id = uuid() as CardId
-        window.repo.change(parseDocumentLink(boardUrl).hypermergeUrl, (doc: BoardDoc) => {
-          doc.cards[id] = {
-            url: textDocUrl,
-            x: 20,
-            y: 20,
-            width: 320,
-            height: 540,
+        ContentTypes.__getRepo().change(
+          parseDocumentLink(boardUrl).hypermergeUrl,
+          (doc: BoardDoc) => {
+            doc.cards[id] = {
+              url: textDocUrl,
+              x: 20,
+              y: 20,
+              width: 320,
+              height: 540,
+            }
           }
-        })
+        )
 
         handle.change((workspace) => {
           workspace.selfId = selfHypermergeUrl
