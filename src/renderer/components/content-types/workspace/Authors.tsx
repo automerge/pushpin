@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import Debug from 'debug'
 
-import { HypermergeUrl } from '../../../ShareLink'
+import { HypermergeUrl, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
 import { Doc as WorkspaceDoc } from './Workspace'
 import Author from './Author'
 
@@ -14,7 +14,7 @@ const log = Debug('pushpin:authors')
 
 interface Props {
   workspaceUrl: HypermergeUrl
-  currentDocUrl: HypermergeUrl
+  currentDocUrl: PushpinUrl
 }
 
 interface DocWithAuthors {
@@ -24,7 +24,8 @@ interface DocWithAuthors {
 
 export default function Authors({ workspaceUrl, currentDocUrl }: Props) {
   const authorIds = useAuthors(currentDocUrl, workspaceUrl)
-  const presence = usePresence(currentDocUrl)
+  const currentDocHypermergeUrl = parseDocumentLink(currentDocUrl).hypermergeUrl
+  const presence = usePresence(currentDocHypermergeUrl)
 
   // Remove self from the authors list.
   const selfId = useSelfId()
@@ -39,11 +40,12 @@ export default function Authors({ workspaceUrl, currentDocUrl }: Props) {
 }
 
 export function useAuthors(
-  currentDocUrl: HypermergeUrl,
+  currentDocUrl: PushpinUrl,
   workspaceUrl: HypermergeUrl
 ): HypermergeUrl[] {
+  const { type, hypermergeUrl } = parseDocumentLink(currentDocUrl)
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(workspaceUrl)
-  const [board, changeBoard] = useDocument<DocWithAuthors>(currentDocUrl)
+  const [board, changeBoard] = useDocument<DocWithAuthors>(hypermergeUrl)
   const selfId = useSelfId()
 
   useEffect(() => {
@@ -66,7 +68,7 @@ export function useAuthors(
   }, [selfId, board && board.authorIds])
 
   useEffect(() => {
-    if (!workspace || !board) {
+    if (!workspace || !board || type === 'contact') {
       return
     }
 
