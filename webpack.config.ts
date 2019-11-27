@@ -186,6 +186,7 @@ export default [
       filename: `[name].js`,
       globalObject: 'this',
     },
+    externals: [],
     plugins: [
       new ForkTsCheckerPlugin({
         formatter: 'codeframe',
