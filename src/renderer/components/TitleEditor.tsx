@@ -46,17 +46,22 @@ export default function TitleEditor(props: Props) {
     return null
   }
 
+  // span below input ensures that outer element is resized according
+  // to the content causing input field also grow with it.
   return (
-    <input
-      ref={input}
-      draggable={preventDrag}
-      onDragStart={onDragStart}
-      type="text"
-      className="TitleEditor"
-      value={doc[field]}
-      placeholder={placeholder}
-      onKeyDown={onKeyDown}
-      onChange={onChange}
-    />
+    <>
+      <input
+        ref={input}
+        draggable={preventDrag}
+        onDragStart={onDragStart}
+        type="text"
+        className="TitleEditor"
+        value={doc[field]}
+        placeholder={placeholder}
+        onKeyDown={onKeyDown}
+        onChange={onChange}
+      />
+      <span className="TitleEditor">{doc[field]}</span>
+    </>
   )
 }

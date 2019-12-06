@@ -95,30 +95,38 @@ export default function TitleBar(props: Props) {
 
   return (
     <div className="TitleBar">
-      <button disabled={backDisabled} type="button" onClick={goBack} className="TitleBar-menuItem">
-        <i className="fa fa-angle-left" />
-      </button>
-      <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
-        <Badge icon="map" backgroundColor="#00000000" />
-      </button>
+      <div className="NavigationBar Inline">
+        <button
+          disabled={backDisabled}
+          type="button"
+          onClick={goBack}
+          className="TitleBar-menuItem"
+        >
+          <i className="fa fa-angle-left" />
+        </button>
+        <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
+          <Badge icon="search" backgroundColor="#00000000" />
+        </button>
 
-      <button
-        disabled={forwardDisabled}
-        type="button"
-        onClick={goForward}
-        className="TitleBar-menuItem"
-      >
-        <i className="fa fa-angle-right" />
-      </button>
-
-      <div className="TitleBar-content">
-        <Content url={doc.currentDocUrl} context="list" editable />
+        <button
+          disabled={forwardDisabled}
+          type="button"
+          onClick={goForward}
+          className="TitleBar-menuItem"
+        >
+          <i className="fa fa-angle-right" />
+        </button>
       </div>
-      <Authors currentDocUrl={doc.currentDocUrl} workspaceUrl={props.hypermergeUrl} />
-      <div className="TitleBar-self">
-        <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" isPresent />
-      </div>
 
+      <div className="ContentHeader Group">
+        <Content url={doc.currentDocUrl} context="title-bar" editable />
+      </div>
+      <div className="CollaboratorsBar Inline">
+        <Authors currentDocUrl={doc.currentDocUrl} workspaceUrl={props.hypermergeUrl} />
+        <div className="TitleBar-self">
+          <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" isPresent />
+        </div>
+      </div>
       <button
         className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar-menuItem"
         type="button"

@@ -13,6 +13,17 @@
   background-color: white;
 }
 
+.TitleBar .ContentHeader {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background: inherit;
+}
+
+.Inline {
+  display: inline-flex;
+}
+
 button[disabled].TitleBar-menuItem .fa {
   color: #ccc;
 }

@@ -30,7 +30,7 @@ export default function TitleWithSubtitle(props: Props) {
   return (
     <div className="TitleWithSubtitle">
       {editable ? (
-        <TitleEditor field={titleEditorField} url={hypermergeUrl} />
+        <TitleEditor field={titleEditorField} placeholder={title} url={hypermergeUrl} />
       ) : (
         <Heading wrap={wrapTitle}>{title}</Heading>
       )}

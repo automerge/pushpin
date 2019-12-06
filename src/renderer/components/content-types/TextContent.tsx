@@ -216,6 +216,7 @@ ContentTypes.register({
     board: TextContent,
     workspace: TextContent,
     list: TextInList,
+    'title-bar': TextInList,
   },
   create,
   createFrom,

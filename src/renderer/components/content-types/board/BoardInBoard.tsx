@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { ContentProps } from '../../Content'
-import { BoardDoc } from '.'
+import { BoardDoc, icon } from '.'
 import { useDocument } from '../../../Hooks'
 import './BoardInBoard.css'
 import Badge from '../../ui/Badge'
@@ -30,7 +30,7 @@ export default function BoardInBoard(props: ContentProps) {
 
   return (
     <CenteredStack>
-      <Badge size="huge" icon="files-o" backgroundColor={backgroundColor} />
+      <Badge size="huge" icon={icon} backgroundColor={backgroundColor} />
       <Heading wrap>{title}</Heading>
       <SecondaryText>{subTitle}</SecondaryText>
     </CenteredStack>

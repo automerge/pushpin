@@ -1,5 +1,5 @@
 import React from 'react'
-import { BoardDoc } from '.'
+import { BoardDoc, icon } from '.'
 import { ContentProps } from '../../Content'
 import { useDocument } from '../../../Hooks'
 import Badge, { Props as BadgeProps } from '../../ui/Badge'
@@ -20,7 +20,6 @@ export default function BoardInList(props: Props) {
   }
 
   const { title, backgroundColor, cards } = doc
-  const icon = 'files-o'
 
   const cardLength = Object.keys(cards).length
   const subtitle = `${cardLength} item${cardLength !== 1 ? 's' : ''}`

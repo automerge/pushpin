@@ -4,6 +4,10 @@ import * as ContentTypes from '../../ContentTypes'
 import Content, { ContentProps } from '../Content'
 import { createDocumentLink, HypermergeUrl } from '../../ShareLink'
 import { useDocument } from '../../Hooks'
+import ListItem from '../ui/ListItem'
+import Badge from '../ui/Badge'
+import ContentDragHandle from '../ui/ContentDragHandle'
+import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import './ThreadContent.css'
 
 interface Message {
@@ -13,6 +17,7 @@ interface Message {
 }
 
 interface Doc {
+  title?: string
   messages: Message[]
 }
 
@@ -88,6 +93,31 @@ export default function ThreadContent(props: ContentProps) {
   )
 }
 
+export function ThreadInList(props: ContentProps) {
+  const { hypermergeUrl, url } = props
+  const [doc] = useDocument<Doc>(hypermergeUrl)
+  if (!doc) return null
+
+  const title = doc.title != null && doc.title !== '' ? doc.title : 'Untitled conversation'
+  const subtitle = (doc.messages[doc.messages.length - 1] || { content: '' }).content
+  const editable = true
+
+  return (
+    <ListItem>
+      <ContentDragHandle url={url}>
+        <Badge icon={icon} />
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        titleEditorField="title"
+        title={title}
+        subtitle={subtitle}
+        hypermergeUrl={hypermergeUrl}
+        editable={editable}
+      />
+    </ListItem>
+  )
+}
+
 function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
   e.nativeEvent.stopImmediatePropagation()
@@ -136,13 +166,17 @@ function create(unusedAttrs, handle) {
   })
 }
 
+const icon = 'comments'
+
 ContentTypes.register({
   type: 'thread',
   name: 'Thread',
-  icon: 'comments',
+  icon,
   contexts: {
     workspace: ThreadContent,
     board: ThreadContent,
+    list: ThreadInList,
+    'title-bar': ThreadInList,
   },
   create,
 })
