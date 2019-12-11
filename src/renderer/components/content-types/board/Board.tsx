@@ -69,7 +69,9 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   }))
 
   const boardRef = useRef<HTMLDivElement>(null)
-  const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>()
+  const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>(
+    props.hypermergeUrl
+  )
 
   const [doc, dispatch] = useDocumentReducer<BoardDoc, BoardAction>(
     props.hypermergeUrl,

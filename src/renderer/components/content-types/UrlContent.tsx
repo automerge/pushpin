@@ -306,6 +306,7 @@ ContentTypes.register({
     workspace: UrlContent,
     board: UrlContent,
     list: UrlContent,
+    'title-bar': UrlContent,
   },
   create,
   createFrom,

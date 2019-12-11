@@ -1,6 +1,12 @@
 .TitleEditor {
-  font-size: 14px;
-  line-height: 20px;
-  width: 100%;
+  font-size: 1.25em;
   padding: 0px; /* someone (me?) put padding on all inputs */
+}
+
+/* use hidden text to cause title editor
+input expand with typed text */
+span.TitleEditor {
+  visibility: hidden;
+  z-index: -1;
+  height: 0px;
 }

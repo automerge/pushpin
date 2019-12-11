@@ -46,6 +46,7 @@ ContentTypes.register({
     workspace: FileContent,
     board: FileContent,
     list: FileContent,
+    'title-bar': FileContent,
   },
   create,
   createFrom,

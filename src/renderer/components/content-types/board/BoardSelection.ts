@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useStaticCallback } from '../../../Hooks'
+import { useStaticCallback, useSharedState } from '../../../Hooks'
 
 export type Selection<T> = T[]
 
@@ -7,16 +6,18 @@ export type Selection<T> = T[]
  * Selection manipulation functions
  * these functional control the currently selected set of cards
  */
-export function useSelection<T>(): {
+export function useSelection<T>(
+  id: string
+): {
   selection: Selection<T>
   selectToggle: (id: T) => void
   selectOnly: (id: T) => void
   selectNone: () => void
 } {
-  const [selection, setSelection] = useState<T[]>([])
+  const [selection, setSelection] = useSharedState<T[]>(id, [])
 
   const selectToggle = useStaticCallback((id: T) =>
-    setSelection((selected) =>
+    setSelection((selected: T[]) =>
       selected.includes(id) ? selected.filter((filterId) => filterId !== id) : [...selected, id]
     )
   )

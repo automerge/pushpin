@@ -49,6 +49,10 @@
   background-origin: content-box;
   cursor: se-resize;
   visibility: hidden;
+
+  /* Card content might use z-index as well so use high
+    index here to avoid resizer being covered.*/
+  z-index: 999;
 }
 
 .BoardCard:hover .BoardCard-resizeHandle {

@@ -26,5 +26,6 @@ ContentTypes.register({
     workspace: StoragePeerWorkspace,
     board: StoragePeer,
     list: StoragePeer,
+    'title-bar': StoragePeer,
   },
 })

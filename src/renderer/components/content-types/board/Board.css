@@ -3,3 +3,30 @@
   background-image: url('../../../images/grid.svg');
   background-blend-mode: exclusion;
 }
+
+.ActiveCard {
+  overflow: hidden;
+  margin: 0 3px;
+  border-radius: 16px;
+  box-shadow: -6px 1px 3px -3px rgba(0, 0, 0, 0.3);
+  background: inherit;
+  flex: 1;
+  border-radius: 25px;
+  margin-left: -6px;
+  padding: 2px;
+  background: inherit;
+}
+
+.BoardSelection {
+  display: flex;
+  flex-flow: row;
+  background: inherit;
+}
+
+.BoardSelection .ActiveCard:not(:first-child) {
+  margin-left: -16px;
+}
+
+.BoardSelection .Badge {
+  --size: 22px;
+}

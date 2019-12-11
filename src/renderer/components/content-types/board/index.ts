@@ -5,6 +5,7 @@ import * as ContentTypes from '../../../ContentTypes'
 import Board, { BOARD_COLORS } from './Board'
 import BoardInBoard from './BoardInBoard'
 import BoardInList from './BoardInList'
+import BoardInTitleBar from './BoardInTitleBar'
 import { HypermergeUrl, PushpinUrl } from '../../../ShareLink'
 
 export type CardId = string & { cardId: true }
@@ -52,14 +53,17 @@ function create(typeAttrs, handle) {
   initializeBoard(typeAttrs, handle)
 }
 
+export const icon = 'sitemap'
+
 ContentTypes.register({
   type: 'board',
   contexts: {
     workspace: Board,
     board: BoardInBoard,
     list: BoardInList,
+    'title-bar': BoardInTitleBar,
   },
   name: 'Board',
-  icon: 'copy',
+  icon,
   create,
 })

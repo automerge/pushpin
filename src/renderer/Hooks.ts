@@ -331,3 +331,68 @@ export function useStaticCallback<T extends (...args: any[]) => any>(callback: T
 
   return useCallback((...args: any[]) => cb.current(...args), []) as T
 }
+
+type Setter<T> = ((state: T) => T) | T
+/**
+ * Provides access to shared mutable state via hook interface. Provided
+ * handle object used as key to which shared state is associated with
+ * there for thing wishing to share the state will need to share the handle.
+ */
+export function useSharedState<T>(id: string, defaultValue: T): [T, (v: Setter<T>) => void] {
+  const atom = Atom.new(id, defaultValue)
+  const [state, setState] = useState(atom.value)
+  useEffect((): (() => void) => {
+    atom.watch(setState)
+    return () => atom.unwatch(setState)
+  }, [])
+
+  const setSharedState: any = (t: any) => {
+    if (typeof t === 'function') {
+      atom.transact(t as any)
+    } else {
+      atom.swap(t)
+    }
+  }
+
+  return [state, setSharedState]
+}
+
+class Atom<T> {
+  value: T
+  watchers: ((state: T) => any)[]
+  static new<T>(id: string, value: T): Atom<T> {
+    if (atoms.has(id)) {
+      return atoms.get(id)
+    }
+    const atom = new Atom(value)
+    atoms.set(id, atom)
+    return atom
+  }
+  constructor(value: T) {
+    this.value = value
+    this.watchers = []
+  }
+  transact(f: (inn: T) => T) {
+    this.value = f(this.value)
+    this.notify()
+  }
+  swap(value: T) {
+    this.value = value
+    this.notify()
+  }
+  notify() {
+    const { value, watchers } = this
+    watchers.forEach((watcher) => watcher(value))
+  }
+  watch(watcher: (state: T) => any) {
+    this.watchers.push(watcher)
+  }
+  unwatch(watcher: (state: T) => any) {
+    const index = this.watchers.indexOf(watcher)
+    if (index >= 0) {
+      this.watchers.splice(index, index + 1)
+    }
+  }
+}
+
+const atoms = new Map()
