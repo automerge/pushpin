@@ -196,6 +196,7 @@ export default function UrlContent(props: ContentProps) {
 
   switch (props.context) {
     case 'list':
+    case 'title-bar':
       return renderList()
     case 'board':
       return renderCard()
