@@ -7,14 +7,13 @@
 .ActiveCard {
   overflow: hidden;
   margin: 0 3px;
-  border-radius: 16px;
-  box-shadow: -6px 1px 3px -3px rgba(0, 0, 0, 0.3);
-  background: inherit;
   flex: 1;
-  border-radius: 25px;
-  margin-left: -6px;
+  margin-left: -15px;
   padding: 2px;
-  background: inherit;
+}
+
+.ActiveCard .Badge {
+  box-shadow: -6px 1px 3px -3px rgba(0, 0, 0, 0.3);
 }
 
 .BoardSelection {
