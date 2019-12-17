@@ -5,6 +5,7 @@ import mime from 'mime-types'
 import { PushpinUrl } from '../../ShareLink'
 import { useHyperfileHeader } from '../../Hooks'
 import * as UriList from '../../UriList'
+import './ContentDragHandle.css'
 
 interface SimpleProps {
   url: PushpinUrl
@@ -44,7 +45,7 @@ export default function ContentDragHandle(props: Props) {
   }
 
   return (
-    <span draggable ref={ref} onDragStart={onDragStart}>
+    <span draggable ref={ref} onDragStart={onDragStart} className="ContentDragHandle">
       {children}
     </span>
   )

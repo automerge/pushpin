@@ -1,0 +1,6 @@
+/* force the drag handle to a separate layer to preserve transparencies */
+.ContentDragHandle {
+  will-change: transform;
+  transform: translate(0, 0);
+  background-color: transparent;
+}
