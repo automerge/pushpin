@@ -246,19 +246,17 @@ const WELCOME_TEXT = `Welcome to PushPin!
 
     You can drag or paste images, text, PDFs, audio, video, and URLs onto the board. They'll be stored for offline usage.
 
-    Right-clicking on the board opens a menu that allows you to insert any kind of card.
-
-    You can make new boards from the right-click menu or with Ctrl-N.
+    Right-clicking on the board opens a menu that allows you to insert any kind of card. You can also make new boards from the right-click menu or with Ctrl-N.
 
     There's a Chrome plugin that can capture webpages for you. You can find it at github.com/pvh/pushpin-clipper.
 
-    You can edit the title by clicking on it and typing.
+    You can edit a card's title (visible in the titlebar when the card is selected) by clicking on it and typing.
 
-    Quick travel around by clicking magnifying glass icon in the title bar– this opens the omnibox. Typing part of a name will show you corresponding people and boards. The omnibox can also be opened with '/'.
+    Quick travel around your workspace by clicking the magnifying glass icon in the title bar– this opens the omnibox. Typing part of a name will show you corresponding people and boards. The omnibox can also be opened with '/'.
 
-    To share a board with another person, click the clipboard in the upper-right corner, then have them paste that value into the omnibox (will send them to your board) or onto a board (will link your board to their current board).
+    To share a board with another person, click the clipboard in the upper-right corner, then have them paste that value into the omnibox (will open your board in their workspace) or onto a board (will link your board to their current board).
 
-    To create links to boards or contacts, drag them from the title bar or the omnibox.`
+    To create links to boards or contacts, drag them from the title bar or the omnibox or press the 'place on board' (Shift + Enter) next to the corresponding object in the omnibox.`
 
 function create(_attrs: any, handle: Handle<Doc>) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
