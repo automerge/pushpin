@@ -47,7 +47,7 @@
   background-position: bottom right;
   background-repeat: no-repeat;
   background-origin: content-box;
-  cursor: se-resize;
+  cursor: nwse-resize;
   visibility: hidden;
 
   /* Card content might use z-index as well so use high
