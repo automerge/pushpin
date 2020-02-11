@@ -20,7 +20,6 @@
   box-sizing: border-box;
   overflow: hidden;
   border: solid 1px var(--colorPaleGrey);
-  padding: var(--halfCellSize);
 }
 
 .BoardCard:focus,
