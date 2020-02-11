@@ -18,14 +18,13 @@
 }
 
 .messageGroup {
-  margin-bottom: -24px;
   padding-top: 12px;
+  display: flex;
+  align-items: flex-start;
 }
 
 .groupedMessages {
-  position: relative;
-  top: -20px;
-  padding-left: 48px;
+  padding-left: 32px;
 }
 
 .messages {
@@ -47,7 +46,6 @@
 }
 
 .username {
-  padding-left: 8px;
   font-size: 12px;
   color: var(--colorBlueBlack);
 }
