@@ -48,7 +48,7 @@ export function setRepo(repoIn: RepoFrontend) {
 
 export function register(contentType: ContentType) {
   const { type } = contentType
-  const entry = { unlisted: false, resiable: true, ...contentType }
+  const entry: ContentType = { unlisted: false, resizable: true, ...contentType }
 
   log('register', entry)
 
