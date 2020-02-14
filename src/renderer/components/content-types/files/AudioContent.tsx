@@ -57,11 +57,10 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
     if (audioElement.current) updateTime(audioElement.current.currentTime)
   }
   function handleScrubClick(e: React.MouseEvent) {
-    if (audioElement.current && progressElement.current) {
-      const position = e.nativeEvent.offsetX / progressElement.current.offsetWidth
-      const time = position * audioElement.current.duration
-      scrubToTime(time)
-    }
+    if (!audioElement.current || !progressElement.current) return
+    const position = e.nativeEvent.offsetX / progressElement.current.offsetWidth
+    const time = position * audioElement.current.duration
+    scrubToTime(time)
   }
 
   return (
