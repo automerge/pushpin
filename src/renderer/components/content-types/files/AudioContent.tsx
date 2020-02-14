@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useRef, useState } from 'react'
 import { FileDoc } from '.'
 
@@ -13,7 +12,8 @@ interface AudioState {
 }
 export default function AudioContent({ hypermergeUrl }: ContentProps) {
   const audioElement = useRef<HTMLAudioElement>(null)
-  const progressElement = useRef<HTMLProgressElement>(null)
+  const progressElement = useRef<HTMLDivElement>(null)
+  const progressBarElement = useRef<HTMLDivElement>(null)
   const [audioState, setAudioState] = useState<AudioState>({ paused: true, time: 0 })
 
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
@@ -37,8 +37,8 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
     audioElement.current.currentTime = time
   }
   function updateTime(time: number) {
-    if (!audioElement.current || !progressElement.current) return
-    progressElement.current.value = time
+    if (!audioElement.current || !progressBarElement.current) return
+    progressBarElement.current.style.width = `${(time / audioElement.current.duration) * 100}%`
     setAudioState({ ...audioState, time })
   }
   function handlePlayPause() {
@@ -52,10 +52,6 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
     if (!audioElement.current) return
     setAudioState({ paused: true, time: 0 })
     audioElement.current.currentTime = 0
-  }
-  function setMaxLength() {
-    if (audioElement.current && progressElement.current)
-      progressElement.current.setAttribute('max', String(audioElement.current.duration))
   }
   function handleAudioProgress() {
     if (audioElement.current) updateTime(audioElement.current.currentTime)
@@ -73,7 +69,6 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
       <audio
         src={doc.hyperfileUrl}
         ref={audioElement}
-        onLoadedMetadata={setMaxLength}
         onTimeUpdate={handleAudioProgress}
         onEnded={handleEnd}
       />
@@ -82,12 +77,9 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
           onClick={handlePlayPause}
           className={`playPause fa fa-${audioState.paused ? 'play' : 'pause'}`}
         />
-        <progress
-          className="progressBar"
-          value="0"
-          ref={progressElement}
-          onClick={handleScrubClick}
-        />
+        <div className="progressContainer" ref={progressElement} onClick={handleScrubClick}>
+          <div className="progressBar" ref={progressBarElement} />
+        </div>
       </div>
     </div>
   )
