@@ -15,6 +15,7 @@
 }
 .progressBar::-webkit-progress-bar {
   background-color: var(--colorPaleGrey);
+  cursor: pointer;
 }
 .progressBar::-webkit-progress-value {
   background-color: var(--colorSecondaryGrey);
@@ -22,4 +23,5 @@
 .playPause::before {
   margin-right: var(--halfCellSize);
   font-size: var(--cellSize);
+  cursor: pointer;
 }
