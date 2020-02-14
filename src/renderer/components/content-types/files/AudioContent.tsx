@@ -1,4 +1,5 @@
-import React from 'react'
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+import React, { useRef, useState } from 'react'
 import { FileDoc } from '.'
 
 import { ContentProps } from '../../Content'
@@ -6,13 +7,90 @@ import * as ContentTypes from '../../../ContentTypes'
 import { useDocument } from '../../../Hooks'
 import './AudioContent.css'
 
+interface AudioState {
+  paused: boolean
+  time: number
+}
 export default function AudioContent({ hypermergeUrl }: ContentProps) {
-  const [doc] = useDocument<FileDoc>(hypermergeUrl)
+  const audioElement = useRef<HTMLAudioElement>(null)
+  const progressElement = useRef<HTMLProgressElement>(null)
+  const [audioState, setAudioState] = useState<AudioState>({ paused: true, time: 0 })
 
+  const [doc] = useDocument<FileDoc>(hypermergeUrl)
   if (!(doc && doc.hyperfileUrl)) {
     return null
   }
-  return <audio controls src={doc.hyperfileUrl} />
+
+  function playAudio() {
+    if (!audioElement.current) return
+    setAudioState({ ...audioState, paused: false })
+    audioElement.current.play()
+  }
+  function pauseAudio() {
+    if (!audioElement.current) return
+    setAudioState({ ...audioState, paused: true })
+    audioElement.current.pause()
+  }
+  function scrubToTime(time: number) {
+    if (!audioElement.current) return
+    updateTime(time)
+    audioElement.current.currentTime = time
+  }
+  function updateTime(time: number) {
+    if (!audioElement.current || !progressElement.current) return
+    progressElement.current.value = time
+    setAudioState({ ...audioState, time })
+  }
+  function handlePlayPause() {
+    if (audioState.paused) {
+      playAudio()
+    } else {
+      pauseAudio()
+    }
+  }
+  function handleEnd() {
+    if (!audioElement.current) return
+    setAudioState({ paused: true, time: 0 })
+    audioElement.current.currentTime = 0
+  }
+  function setMaxLength() {
+    if (audioElement.current && progressElement.current)
+      progressElement.current.setAttribute('max', String(audioElement.current.duration))
+  }
+  function handleAudioProgress() {
+    if (audioElement.current) updateTime(audioElement.current.currentTime)
+  }
+  function handleScrubClick(e: React.MouseEvent) {
+    if (audioElement.current && progressElement.current) {
+      const position = e.nativeEvent.offsetX / progressElement.current.offsetWidth
+      const time = position * audioElement.current.duration
+      scrubToTime(time)
+    }
+  }
+
+  return (
+    <div className="audioWrapper">
+      <audio
+        src={doc.hyperfileUrl}
+        ref={audioElement}
+        onLoadedMetadata={setMaxLength}
+        onTimeUpdate={handleAudioProgress}
+        onEnded={handleEnd}
+      />
+      <div className="audioControls">
+        <i
+          onClick={handlePlayPause}
+          className={`playPause fa fa-${audioState.paused ? 'play' : 'pause'}`}
+        />
+        <progress
+          className="progressBar"
+          value="0"
+          ref={progressElement}
+          onClick={handleScrubClick}
+        />
+      </div>
+    </div>
+  )
 }
 
 const supportsMimeType = (mimeType) => !!mimeType.match('audio/')
