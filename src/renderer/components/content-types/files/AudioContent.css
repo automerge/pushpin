@@ -1,7 +1,25 @@
-audio {
-  flex: 1;
-  outline: none;
+.audioWrapper {
+  width: 100%;
+  padding: var(--halfCellSize);
 }
-audio::-webkit-media-controls-panel {
-  background-color: white;
+.audioControls {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.progressBar {
+  flex: 1;
+  -webkit-appearance: none;
+  height: var(--cellSize);
+  width: 100%;
+}
+.progressBar::-webkit-progress-bar {
+  background-color: var(--colorPaleGrey);
+}
+.progressBar::-webkit-progress-value {
+  background-color: var(--colorSecondaryGrey);
+}
+.playPause::before {
+  margin-right: var(--halfCellSize);
+  font-size: var(--cellSize);
 }
