@@ -1,4 +1,4 @@
-# ARCHIVED: This version of PushPin is archived for posterity and represents (mostly) work done under the aegis of Ink & Switch Labs. Today, PushPin is developed by a group of open-source developers and can be found at http://github.com/automerge/pushpin . 
+# ARCHIVED: This version of PushPin is archived for posterity and represents (mostly) work done under the aegis of Ink & Switch Labs. Today, PushPin is developed by a group of open-source developers and can be found at http://github.com/automerge/pushpin .
 
 # PushPin
 
@@ -116,6 +116,7 @@ Thanks in particular to the following individuals for sending bug fixes and feat
 
 - Jeremy Apthorp
 - Irakli Gozala
+- Zach Sherman
 
 ## Upgrade Hackage Notes
 
