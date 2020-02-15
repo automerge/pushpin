@@ -2,7 +2,7 @@
 
 # PushPin
 
-[A collaborative corkboard app.](http://inkandswitch.github.io/pushpin) Designed to collect all the information you need and synchronize it across all your computers. PushPin supports taking notes, and can archive web content, images, PDFs, audio, video, and any other files you might want to hang out. It can synchronize across all your devices, and doesn't require any infrastructure to operate.
+[A local-first collaborative corkboard app.](https://automerge.github.io/pushpin) Designed to collect all the information you need and synchronize it across all your computers. PushPin supports taking notes, and can archive web content, images, PDFs, audio, video, and any other files you might want to hang out. It can synchronize across all your devices, and doesn't require any infrastructure to operate.
 
 [Join our Slack to ask questions, share ideas, or meet other users!](https://communityinviter.com/apps/automerge/automerge)
 

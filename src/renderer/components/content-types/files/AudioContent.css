@@ -1,0 +1,7 @@
+audio {
+  flex: 1;
+  outline: none;
+}
+audio::-webkit-media-controls-panel {
+  background-color: white;
+}

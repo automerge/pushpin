@@ -27,6 +27,7 @@
   min-height: 100%;
   cursor: text;
   overflow: hidden;
+  padding: var(--halfCellSize);
 }
 
 .ql-clipboard {

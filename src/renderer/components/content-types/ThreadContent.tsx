@@ -24,9 +24,9 @@ interface Doc {
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   localeMatcher: 'best fit',
   weekday: 'short',
-  hour: '2-digit',
+  hour: 'numeric',
   minute: '2-digit',
-  month: 'short',
+  month: 'numeric',
   day: 'numeric',
 })
 
