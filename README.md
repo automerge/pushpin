@@ -1,3 +1,5 @@
+# ARCHIVED: This version of PushPin is archived for posterity and represents (mostly) work done under the aegis of Ink & Switch Labs. Today, PushPin is developed by a group of open-source developers and can be found at http://github.com/automerge/pushpin . 
+
 # PushPin
 
 [A collaborative corkboard app.](http://inkandswitch.github.io/pushpin) Designed to collect all the information you need and synchronize it across all your computers. PushPin supports taking notes, and can archive web content, images, PDFs, audio, video, and any other files you might want to hang out. It can synchronize across all your devices, and doesn't require any infrastructure to operate.
