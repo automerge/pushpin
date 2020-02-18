@@ -5,17 +5,29 @@ import { ContentProps } from '../../Content'
 import * as ContentTypes from '../../../ContentTypes'
 import { useDocument } from '../../../Hooks'
 import './AudioContent.css'
+import { usePresence } from '../../../PresenceHooks'
 
 interface AudioState {
   paused: boolean
   time: number
 }
+
 export default function AudioContent({ hypermergeUrl }: ContentProps) {
   const audioElement = useRef<HTMLAudioElement>(null)
   const progressElement = useRef<HTMLDivElement>(null)
   const progressBarElement = useRef<HTMLDivElement>(null)
   const [audioState, setAudioState] = useState<AudioState>({ paused: true, time: 0 })
 
+  const remotePresences = usePresence<AudioState>(
+    hypermergeUrl,
+    // !audioState.paused || audioState.time > 0 ?
+    { ...audioState }
+    // : undefined
+  )
+
+  const presences = remotePresences.filter(
+    (presence) => presence && presence.data && presence.data.time
+  )
   const [doc] = useDocument<FileDoc>(hypermergeUrl)
   if (!(doc && doc.hyperfileUrl)) {
     return null
@@ -62,7 +74,6 @@ export default function AudioContent({ hypermergeUrl }: ContentProps) {
     const time = position * audioElement.current.duration
     scrubToTime(time)
   }
-
   return (
     <div className="audioWrapper">
       <audio
