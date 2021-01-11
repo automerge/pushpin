@@ -12,6 +12,7 @@ import { ContextMenuTrigger } from 'react-contextmenu'
 
 import * as ContentTypes from '../../../ContentTypes'
 import * as ImportData from '../../../ImportData'
+import * as UriList from '../../../UriList'
 import { PushpinUrl } from '../../../ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
@@ -273,6 +274,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         .map((c) => cards[c])
         .map((c) => ({ ...c, x: c.x - offset.x, y: c.y - offset.y }))
       e.clipboardData.setData(MIMETYPE_BOARD_CARD_DATA, JSON.stringify(boardCards))
+      e.clipboardData.setData(UriList.MIME_TYPE, UriList.stringify(boardCards.map((c) => c.url)))
     },
     [cards, selection]
   )

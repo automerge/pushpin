@@ -17,6 +17,7 @@ import './content-types/board'
 import './content-types/contact'
 import './content-types/files'
 import './content-types/storage-peer'
+import './content-types/ListContent'
 
 // other single-context components
 import './content-types/TextContent'
