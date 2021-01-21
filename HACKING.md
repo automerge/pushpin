@@ -8,7 +8,7 @@ You can make PushPin into almost anything by replacing the right pieces. You cou
 
 Before you begin, you're going to need to install PushPin on your computer.
 
-Go to [github.com/inkandswitch/pushpin](https://github.com/inkandswitch/pushpin) and check out the repository there.
+Go to [github.com/automerge/pushpin](https://github.com/automerge/pushpin) and check out the repository there.
 
 From the checked-out copy, run the following commands:
 
