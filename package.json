@@ -32,6 +32,7 @@
     "base64-js": "^1.3.1",
     "bs58": "^4.0.1",
     "classnames": "^2.2.6",
+    "codemirror": "5.49.2",
     "data-urls": "^1.1.0",
     "diff-match-patch": "^1.0.4",
     "discovery-cloud": "^1.0.8",
