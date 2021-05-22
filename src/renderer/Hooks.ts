@@ -44,13 +44,17 @@ export function useHandle<D>(
       return () => {}
     }
 
-    const handle = repo.open<D>(url)
+    try {
+      const handle = repo.open<D>(url)
 
-    const cleanup = cb(handle)
+      const cleanup = cb(handle)
 
-    return () => {
-      handle.close()
-      cleanup && cleanup()
+      return () => {
+        handle.close()
+        cleanup && cleanup()
+      }
+    } catch (error) {
+      return () => {}
     }
   }, [url])
 

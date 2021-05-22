@@ -1,0 +1,107 @@
+:root {
+  --syntax_normal: #1b1e23;
+  --syntax_comment: #a9b0bc;
+  --syntax_number: #20a5ba;
+  --syntax_keyword: #c30771;
+  --syntax_atom: #10a778;
+  --syntax_string: #008ec4;
+  --syntax_error: #ffbedc;
+  --syntax_unknown_variable: #838383;
+  --syntax_known_variable: #005f87;
+  --syntax_matchbracket: #20bbfc;
+  --syntax_key: #6636b4;
+  --mono_fonts: 82%/1.5 Menlo, Consolas, monospace;
+}
+
+.Inspector {
+  display: flex;
+  background-color: white;
+  width: 100%;
+  overflow: auto;
+  height: 100%;
+  padding: 1px 1px 0px 1px;
+}
+
+.observablehq--expanded,
+.observablehq--collapsed,
+.observablehq--function,
+.observablehq--import,
+.observablehq--string:before,
+.observablehq--string:after,
+.observablehq--gray {
+  color: var(--syntax_normal);
+}
+
+.observablehq--collapsed,
+.observablehq--inspect a {
+  cursor: pointer;
+}
+
+.observablehq--field {
+  text-indent: -1em;
+  margin-left: 1em;
+}
+
+.observablehq--empty {
+  color: var(--syntax_comment);
+}
+
+.observablehq--keyword,
+.observablehq--blue {
+  color: #3182bd;
+}
+
+.observablehq--forbidden,
+.observablehq--pink {
+  color: #e377c2;
+}
+
+.observablehq--orange {
+  color: #e6550d;
+}
+
+.observablehq--null,
+.observablehq--undefined,
+.observablehq--boolean {
+  color: var(--syntax_atom);
+}
+
+.observablehq--number,
+.observablehq--bigint,
+.observablehq--date,
+.observablehq--regexp,
+.observablehq--symbol,
+.observablehq--green {
+  color: var(--syntax_number);
+}
+
+.observablehq--index,
+.observablehq--key {
+  color: var(--syntax_key);
+}
+
+.observablehq--empty {
+  font-style: oblique;
+}
+
+.observablehq--string,
+.observablehq--purple {
+  color: var(--syntax_string);
+}
+
+.observablehq--error,
+.observablehq--red {
+  color: #e7040f;
+}
+
+.observablehq--inspect {
+  font: var(--mono_fonts);
+  overflow-x: auto;
+  display: block;
+  white-space: pre;
+}
+
+.observablehq--error .observablehq--inspect {
+  word-break: break-all;
+  white-space: pre-wrap;
+}

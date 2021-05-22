@@ -67,9 +67,10 @@ export function parseDocumentLink(link: string): Parts {
 
 export function parts(str: string) {
   const { protocol, pathname, query } = url.parse(str)
+  const { pushpinContentType } = query ? querystring.parse(query) : { pushpinContentType: null }
   return {
     scheme: protocol ? protocol.substr(0, protocol.length - 1) : '',
-    type: querystring.parse(query || '').pushpinContentType.toString(),
+    type: pushpinContentType ? pushpinContentType.toString() : '',
     docId: (pathname || '').substr(1),
   }
 }
