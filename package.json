@@ -94,7 +94,7 @@
     "concurrently": "^4.1.1",
     "copy-webpack-plugin": "^5.0.4",
     "css-loader": "^3.0.0",
-    "electron": "^7.2.4",
+    "electron": "^13.6.6",
     "electron-builder": "^21.2.0",
     "electron-mocha": "^8.0.2",
     "enzyme": "^3.9.0",
